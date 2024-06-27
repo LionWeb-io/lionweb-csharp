@@ -1,0 +1,43 @@
+<!--
+SPDX-FileCopyrightText: 2023 TRUMPF Laser SE and other contributors
+
+SPDX-License-Identifier: Apache-2.0
+-->
+
+<Project>
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>12</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>LionWeb-CSharp</RootNamespace>
+
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <Version>$(MinVerVersion)</Version>
+    <FileVersion>$(MinVerMajor).$(MinVerMinor).$(MinVerPatch).0</FileVersion>
+    <PackageVersion>$(MinVerVersion)</PackageVersion>
+    <AssemblyVersion>$(MinVerMajor).0.0.0</AssemblyVersion>
+
+    <CurrentYear>$([System.DateTime]::Now.Year)</CurrentYear>
+    <Copyright>Copyright 2023-$(CurrentYear) TRUMPF Laser SE and other contributors</Copyright>
+    <Company>TRUMPF Laser SE</Company>
+    <Product>LionWeb-CSharp</Product>
+    <Authors>TRUMPF Laser SE and other contributors</Authors>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl></RepositoryUrl>
+    <PackageProjectUrl></PackageProjectUrl>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MinVer">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <SourceRoot Include="$(SolutionDir)" RepositoryUrl="$(RepositoryUrl)" />
+  </ItemGroup>
+</Project>

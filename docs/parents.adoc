@@ -1,0 +1,102 @@
+= Parent handling
+
+.Old parent handling
+[plantuml, old-parent-handling, svg]
+----
+actor newParent
+actor prevChild
+actor movedChild
+actor oldParent
+
+
+[-> newParent ++: SetChild(movedChild)
+  newParent -> newParent ++: SetParentInternal(prevChild, null)
+    newParent -> prevChild ++: SetParent(null)
+      prevChild -> prevChild ++: DetachFromParent()
+        prevChild -> newParent ++: DetachChild(prevChild)
+          newParent -> newParent: this.child = null
+        return true
+      return
+      prevChild -> prevChild: this.parent = null
+    return
+  return
+  newParent -> newParent ++: SetParentInternal(newChild, newParent)
+    newParent -> movedChild ++: SetParent(newParent)
+      movedChild -> movedChild ++: DetachFromParent()
+        movedChild -> oldParent ++: DetachChild(movedChild)
+          oldParent -> oldParent: this.child = null
+        return true
+      return
+      movedChild -> movedChild: this.parent = newParent
+    return
+  return
+  newParent -> newParent: this.child = movedChild
+return
+----
+
+.Newer parent handling
+[plantuml, newer-parent-handling, svg]
+----
+actor newParent
+actor prevChild
+actor movedChild
+actor oldParent
+
+
+[-> newParent ++: SetChild(movedChild)
+  newParent -> newParent ++: SetParentInternal(prevChild, null)
+    newParent -> prevChild ++: SetParent(null)
+      prevChild -> prevChild: this.parent = null
+    return
+  return
+
+  newParent -> newParent ++: DetachChildInternal()
+    newParent -> oldParent ++: DetachChild(movedChild)
+      oldParent -> oldParent: this.child = null 
+    return true
+  return
+
+  newParent -> newParent ++: SetParentInternal(movedChild, newParent)
+    newParent -> movedChild ++: SetParent(newParent)
+      movedChild -> movedChild: this.parent = newParent
+    return
+  return
+
+  newParent -> newParent: this.child = movedChild
+return
+----
+
+
+.Newest parent handling
+[plantuml, newest-parent-handling, svg]
+----
+actor newParent
+actor prevChild
+actor movedChild
+actor oldParent
+
+
+[-> newParent ++: SetChild(movedChild)
+  newParent -> newParent: AssureNotNull(movedChild)
+  newParent -> newParent ++: SetParentNull(prevChild)
+    newParent -> newParent ++: SetParentInternal(prevChild, null)
+      newParent -> prevChild ++: SetParent(null)
+        prevChild -> prevChild: this.parent = null
+      return
+    return
+  return
+  newParent -> newParent ++: AttachChild(movedChild)
+    newParent -> newParent ++: DetachChildInternal()
+      newParent -> oldParent ++: DetachChild(movedChild)
+        oldParent -> oldParent: this.child = null 
+      return true
+    return
+    newParent -> newParent ++: SetParentInternal(movedChild, newParent)
+      newParent -> movedChild ++: SetParent(newParent)
+        movedChild -> movedChild: this.parent = newParent
+      return
+    return
+  return
+  newParent -> newParent: this.child = movedChild
+return
+----

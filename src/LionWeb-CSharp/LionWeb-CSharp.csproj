@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <Title>LionWeb-CSharp</Title>
+        <PackageTags>VF022; LionWeb</PackageTags>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <Description>This package contains a C# implementation of the LionWeb Metametamodel (M3).</Description>
+    </PropertyGroup>
+
+</Project>

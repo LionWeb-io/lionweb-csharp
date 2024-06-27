@@ -1,0 +1,842 @@
+:cs: C#
+:underscore: _
+:fn-prefix: pass:quotes[footnote:prefix[We use the term _property_ both in C# context and LionWeb context. Thus, we'll always qualify it with C# or LionWeb prefix. The same applies to the term _reference_.]]
+= LionWeb Introduction for C# Developers
+:toc:
+
+== Everything is an Object / Node
+In object-oriented languages like C#, everything is an
+https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/object-oriented/objects[_object_].
+Objects have an
+https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/object-oriented/objects#object-identity-vs-value-equality[_identity_], _state_, and a _type_ -- the object's
+https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/types/classes[_class_].
+The object's identity is its memory location, the object's state is the value of all its https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/object-oriented/#members[_members_].
+Relevant members are https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/fields[_fields_] and https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/properties[_{cs} properties_]{fn-prefix}
+
+Similarly, everything in LionWeb is a _node_. Nodes have an
+https://lionweb.io/specification/metametamodel/metametamodel.html#identifiers[_id_], state, and a
+https://lionweb.io/specification/metametamodel/metametamodel.html#Classifier[_classifier_] -- the node's
+https://lionweb.io/specification/metametamodel/metametamodel.html#Concept[_concept_].
+The id is a string comprised of uppercase or lowercase `A` to `Z`, `1` to `9`, `-` (dash) and `{underscore}` (underscore). 
+A node id has no "meaning" and must be unique, similarly to the memory location of an object.
+A node's state is the value of all its
+https://lionweb.io/specification/metametamodel/metametamodel.html#Feature[_features_].
+Possible features are
+https://lionweb.io/specification/metametamodel/metametamodel.html#Property[_LionWeb properties_]{fn-prefix},
+https://lionweb.io/specification/metametamodel/metametamodel.html#Containment[_containments_], and
+https://lionweb.io/specification/metametamodel/metametamodel.html#Reference[_LionWeb references_]{fn-prefix}.
+
+[plantuml, nodes, svg]
+----
+hide empty members
+
+package "C#" as cs <<rectangle>> {
+  class "Person" as csPerson << (C,LightSalmon) >> {
+    Firstname: string
+    Lastname: string
+  }
+  
+  class "JohnDoe<0xa1e>" as csJohnDoe << (o,LightSalmon) >> {
+    Firstname = "John"
+    Lastname = "Doe"
+  }
+  
+  csPerson <.. csJohnDoe: instance of
+}
+
+package "LionWeb" as lw <<rectangle>> {
+  class "Person" as lwPerson << (C,Aquamarine) >> {
+    <i>property</i> Firstname: string
+    <i>property</i> Lastname: string
+  }
+  
+  class "JohnDoe<g1_X>" as lwJohnDoe << (n,Aquamarine) >> {
+    Firstname = "John"
+    Lastname = "Doe"
+  }
+  
+  lwPerson <.. lwJohnDoe: instance of
+}
+----
+
+[%autowidth,cols="a,a"]
+|===
+|C# |LionWeb
+
+|object |node
+|object identity |node id
+|object type |node classifier
+|class |concept
+|class member |concept feature
+|field  +
+C# property
+|LionWeb property  +
+containment  +
+LionWeb reference
+|===
+
+== ... except Value Types / LionWeb Properties
+C# has https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/value-types[_value types_] that are not objects.
+Examples include `int` and `bool`.
+They don't have any identity, they are purely defined by their value.
+We cannot tell apart `15` from `15`, but we can tell apart the two objects `var a = new Person { Firstname="John", Lastname="Doe" };` and `var b = new Person { Firstname="John", Lastname="Doe" };`.
+Value types cannot be `null`, unless we declare them _nullable_: `int age = 23; int? numberOfAunts = null;`.
+In the example, we always know the person's age, but we might not know how many aunts they have.
+
+LionWeb properties have value type semanticsfootnote:[Value type _semantics_ because C# `string` is not a value type.] -- they are purely defined by their value. 
+LionWeb properties can have type `integer`, `boolean`, enumeration, and `string`.
+LionWeb properties are either _required_ or _optional_.
+If required, the LionWeb property must have a value, otherwise we can omit the value.
+
+[plantuml, properties, svg]
+----
+hide empty members
+
+package "C#" as cs <<rectangle>> {
+  class "Person" as csPerson << (C,LightSalmon) >> {
+    Firstname: string
+    Lastname: string?
+  }
+  
+  class "johnDoe<0xa1e>" as csJohnDoe << (o,LightSalmon) >> {
+    Firstname = "John"
+    Lastname = null
+  }
+  
+  csPerson <.. csJohnDoe: instance of
+}
+
+package "LionWeb" as lw <<rectangle>> {
+  class "Person" as lwPerson << (C,Aquamarine) >> {
+    <i>required property</i> Firstname: string
+    <i>optional property</i> Lastname: string
+  }
+  
+  class "johnDoe<g1_X>" as lwJohnDoe << (n,Aquamarine) >> {
+    Firstname = "John"
+  }
+  
+  lwPerson <.. lwJohnDoe: instance of
+}
+----
+
+=== Mapping to C#
+LionWeb properties become C# properties with proper getters and setters.
+In C# we also have a method like `Person SetFirstname(string value)`.
+They form a fluent interface.
+
+Optional LionWeb properties have nullable types in C#.
+They may return `null`, and can be set to `null`.
+
+Required LionWeb properties have non-nullable types in C#.
+They may never return `null`.
+If no value has ever been assigned to this C# property, the C# property getter throws an `UnsetFeatureException`.
+If set to `null`, the C# property setter, and the `SetProperty()` method, throw an `InvalidValueException`.
+
+[source, csharp]
+----
+class Person {
+  ...
+  public string Firstname { get; set; }
+  public Person SetFirstname(string value);
+    
+  public string? Lastname { get; set; }
+  public Person SetLastname(string? value);  
+}
+
+...
+
+Person johnDoe = new Person("g1_X");
+
+johnDoe.Firstname;           // throws UnsetFeatureException
+
+johnDoe
+  .SetFirstname("John")
+  .SetLastname("Doe");
+
+johnDoe.Firstname = null;    // throws InvalidValueException
+johnDoe.SetFirstname(null);  // throws InvalidValueException
+----
+
+[%autowidth,cols="a,a"]
+|===
+|C# |LionWeb
+
+|`int` type |`integer` property type
+|`bool` type |`boolean` property type
+|`string` type |`string` property type
+|enum |enumeration
+|nullable type |optional feature
+|non-nullable type |required feature
+|===
+
+== Object / Node Members
+C# always uses
+https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/keywords/reference-types[_C# references_] to connect objects.
+A `Person` object uses C# references to connect to both the person's `Heart` object and their aunts' objects.
+We cannot "delete" an object, but we can cut all C# references to it -- eventually the garbage collector will delete the object once all C# references to it are unset.
+
+In LionWeb we have two different ways to connect nodes.
+A `Person` node _contains_ its `Heart` node, but uses a _LionWeb reference_ to connect to the persons' aunts' nodes.
+Both _containment_ and _LionWeb reference_ are a _link_.
+
+[plantuml, containments, svg]
+----
+hide empty members
+
+package "C#" as cs <<rectangle>> {
+  class "Person" as csPerson << (C,LightSalmon) >> {
+  }
+  csPerson -> csPerson: aunts
+  csHeart <- csPerson: heart  
+
+  class "Heart" as csHeart << (C,LightSalmon) >> {
+  }
+
+  class "John<0xa1e>" as csJohn << (o,LightSalmon) >> {
+  }
+  csPerson <.. csJohn
+
+  class "John's heart<0x4e4>" as csJohnHeart << (o,LightSalmon) >> {
+  }
+  csHeart <.. csJohnHeart
+
+  class "Sid<0x221>" as csSid << (o,LightSalmon) >> {
+  }
+  csPerson <.. csSid
+
+ csJohn -> csJohnHeart: heart
+ csJohn -> csSid: aunts
+}
+
+package "LionWeb" as lw <<rectangle>> {
+  class "Person" as lwPerson << (C,Aquamarine) >> {
+  }
+  lwPerson o-> lwPerson: aunts
+  lwHeart <-* lwPerson: heart  
+
+  class "Heart" as lwHeart << (C,Aquamarine) >> {
+  }
+
+  class "John<g1_X>" as lwJohn << (n,Aquamarine) >> {
+  }
+  lwPerson <.. lwJohn
+
+  class "John's heart<hhh>" as lwJohnHeart << (n,Aquamarine) >> {
+  }
+  lwHeart <.. lwJohnHeart
+
+  class "Sid<-12>" as lwSid << (n,Aquamarine) >> {
+  }
+  lwPerson <.. lwSid
+
+ lwJohn *-> lwJohnHeart: heart
+ lwJohn o-> lwSid: aunts
+}
+----
+
+[%autowidth,cols="a,a"]
+|===
+|C# |LionWeb
+
+|C# reference |Link +
+Containment  +
+LionWeb Reference
+|===
+
+
+=== Containments
+
+Every node `A` is contained in exactly one other node `B`.
+`B` is contained in `C`, and so on, until we arrive at the _root node_.
+The root node is the only node that is not contained anywhere.
+Thus, all nodes form a tree.
+We usually look at the tree from the top: _root node_ contains `C`, which contains `B`, which contains `A`.
+Each node has one _parent_ and zero or more _children_.
+We cannot "delete" a node, but we can _detach_ the node from its parent.
+If we detach node `B` from its parent `C`, both `B` and its child `A` are _orphaned_ -- unless we re-attach them to `D`.
+If not, these nodes stay orphans, and the garbage collector claims them eventually.
+
+[plantuml, orphans, svg]
+----
+hide empty members
+
+package before <<rectangle>> {
+  class A << (n,Aquamarine) >>
+  class B << (n,Aquamarine) >>
+  class C << (n,Aquamarine) >>
+  class D << (n,Aquamarine) >>
+  class root << (n,Aquamarine) >>
+  
+  C *--> B
+  B *--> A
+  root *--> C
+  root *--> D
+}
+
+package "after detaching B" <<rectangle>> {
+  class A << (n,Aquamarine) >>
+  class B << (n,Aquamarine) >>
+  class C << (n,Aquamarine) >>
+  class D << (n,Aquamarine) >>
+  class root << (n,Aquamarine) >>
+  
+  B *--> A
+  root *--> C
+  root *--> D
+}
+
+package "after re-attaching B to D" <<rectangle>> {
+  class A << (n,Aquamarine) >>
+  class B << (n,Aquamarine) >>
+  class C << (n,Aquamarine) >>
+  class D << (n,Aquamarine) >>
+  class root << (n,Aquamarine) >>
+  
+  D *--> B
+  B *--> A
+  root *--> C
+  root *--> D
+}
+----
+
+=== LionWeb References
+
+LionWeb references behave very similar to C# references.
+We can refer to any other node, no matter where any of the two belongs to.
+Removing a LionWeb reference also does not affect anything besides that reference.
+LionWeb references turn the strict containment tree into a graph with interconnections. 
+
+[plantuml, referencesA, svg]
+----
+hide empty members
+
+package "no references" as noRef <<rectangle>> {
+  class A << (n,Aquamarine) >>
+  class B << (n,Aquamarine) >>
+  class C << (n,Aquamarine) >>
+  class D << (n,Aquamarine) >>
+  class root << (n,Aquamarine) >>
+  
+  C *--> B
+  B *--> A
+  root *--> C
+  root *--> D
+
+  C -[hidden]> D
+  D -[hidden]-> B
+}
+
+package "referencing parent" as refParent <<rectangle>> {
+  class A << (n,Aquamarine) >>
+  class B << (n,Aquamarine) >>
+  class C << (n,Aquamarine) >>
+  class D << (n,Aquamarine) >>
+  class root << (n,Aquamarine) >>
+  
+  C *--> B
+  B *--> A
+  root *--> C
+  root *--> D
+
+  C -[hidden]> D
+  D -[hidden]-> B
+
+  C <-[#red]o B
+}
+
+noRef -[hidden]> refParent
+
+package "referencing child" as refChild <<rectangle>> {
+  class A << (n,Aquamarine) >>
+  class B << (n,Aquamarine) >>
+  class C << (n,Aquamarine) >>
+  class D << (n,Aquamarine) >>
+  class root << (n,Aquamarine) >>
+  
+  C *--> B
+  B *--> A
+  root *--> C
+  root *--> D
+
+  B o-[#red]-> A
+}
+
+refChild -[hidden]> refParent
+----
+
+[plantuml, referencesB, svg]
+----
+hide empty members
+
+package "referencing self" as refSelf <<rectangle>> {
+  class A << (n,Aquamarine) >>
+  class B << (n,Aquamarine) >>
+  class C << (n,Aquamarine) >>
+  class D << (n,Aquamarine) >>
+  class root << (n,Aquamarine) >>
+  
+  C *--> B
+  B *--> A
+  root *--> C
+  root *--> D
+
+  B o-[#red]> B
+}
+
+package "referencing elsewhere" as refElse <<rectangle>> {
+  class A << (n,Aquamarine) >>
+  class B << (n,Aquamarine) >>
+  class C << (n,Aquamarine) >>
+  class D << (n,Aquamarine) >>
+  class root << (n,Aquamarine) >>
+  
+  C *--> B
+  B *--> A
+  root *--> C
+  root *--> D
+
+  D <-[#red]-o B
+}
+
+refSelf -[hidden]> refElse
+
+package "same target" as sameTarget <<rectangle>> {
+  class A << (n,Aquamarine) >>
+  class B << (n,Aquamarine) >>
+  class C << (n,Aquamarine) >>
+  class D << (n,Aquamarine) >>
+  class root << (n,Aquamarine) >>
+  
+  C *--> B
+  B *--> A
+  root *--> C
+  root *--> D
+
+  C o-[#red]> D
+  D <-[#red]-o B
+}
+
+refElse -[hidden]> sameTarget
+----
+
+=== Link Cardinality
+Links (i.e. containments and LionWeb references) are either _required_ or _optional_, just as LionWeb properties.
+Links are also either _singular_ or _multiple_, i.e. the link can point to one or several other nodes.
+This maps nicely to cardinalities, as known from UML:
+
+[%autowidth,cols="h,c,c"]
+|===
+| |singular |multiple
+
+|optional
+|0..1
+|0..*
+
+|required
+|1..1
+|1..*
+|===
+
+[plantuml, cardinality, svg]
+----
+hide empty members
+
+class "Person" as lwPerson << (C,Aquamarine) >> {
+}
+lwPerson o-> "0..*" lwPerson: aunts <<optional,multiple>>
+lwHeart "1" <-* lwPerson: heart <<required,single>>
+
+class "Heart" as lwHeart << (C,Aquamarine) >> {
+}
+
+class "John<g1_X>" as lwJohn << (n,Aquamarine) >> {
+}
+lwPerson <.. lwJohn
+
+class "John's heart<hhh>" as lwJohnHeart << (n,Aquamarine) >> {
+}
+lwHeart <.. lwJohnHeart
+
+class "Sid<-12>" as lwSid << (n,Aquamarine) >> {
+}
+lwPerson <.. lwSid
+
+class "Anne<DXd>" as lwAnne << (n,Aquamarine) >> {
+}
+lwPerson <.. lwAnne
+
+lwJohnHeart <-* lwJohn: heart
+lwJohn o-> lwSid: aunts
+lwJohn o-> lwAnne: aunts
+----
+
+=== Mapping to C#
+
+.Singular Links
+LionWeb singular links become C# properties with proper getters and setters.
+Singular links have a method like `Person SetHeart(Heart value)` in C#.
+They form a fluent interface.
+
+Their method parameter type and C# property type for a singular link is nullable for optional links.
+They may return `null`, and can be set to `null`.
+
+Required singular links have non-nullable types in C#.
+They may never return `null`.
+If no value has ever been assigned to this C# property, the C# property getter throws an `UnsetFeatureException`.
+If set to `null`, the C# property setter, and the `SetLink()` method, throw an `InvalidValueException`.
+
+[plantuml, singularLink, svg]
+----
+hide empty members
+
+class "Person" as lwPerson << (C,Aquamarine) >> {
+}
+lwHeart "1" <-* lwPerson: heart <<required,single>>
+lwPerson o-> "0..1" lwPerson: bestFriend <<optional,single>>
+
+class "Heart" as lwHeart << (C,Aquamarine) >> {
+}
+----
+
+[source, csharp]
+----
+class Person {
+  ...
+  public Heart OwnHeart { get; set; }
+  public Person SetOwnHeart(Heart value);
+    
+  public Person? BestFriend { get; set; }
+  public Person SetBestFriend(Person? value);  
+}
+
+...
+
+Person john = new Person("g1_X") { OwnHeart = new Heart("hhh") };
+Person sid = new Person("-12");
+
+john.SetBestFriend(sid);
+var friend = john.BestFriend;
+
+john.OwnHeart = null;  // throws InvalidValueException
+
+sid.OwnHeart;          // throws UnsetFeatureException
+----
+
+.Multiple Links
+LionWeb multiple links become C# properties with only getters.
+They always return `IReadOnlyList<LinkType>`, never `null`.
+The resulting enumerable cannot be modified -- it doesn't even offer appropriate methods.
+Instead of setters or direct manipulation of the result, we have several methods for each multiple link: `AddLink(IEnumerable<LinkType>)`, `InsertLink(int index, IEnumerable<LinkType>)`, `RemoveLink(IEnumerable<LinkType>)`.
+
+Optional multiple links may return empty `IReadOnlyList`, and all existing elements can be removed.
+
+Required multiple links never return `null` or an empty list.
+If the list is empty, the C# property getter throws an `UnsetFeatureException`.
+Trying to remove all entries from a required multiple link throws an `InvalidValueException`.
+
+[plantuml, multipleLink, svg]
+----
+hide empty members
+
+class "Person" as lwPerson << (C,Aquamarine) >> {
+}
+lwKidney "1..*" <-* lwPerson: kidneys <<required,multiple>>
+lwPerson o-> "0..*" lwPerson: aunts <<optional,multiple>>
+
+class "Kidney" as lwKidney << (C,Aquamarine) >> {
+}
+----
+
+[source, csharp]
+----
+class Person {
+  ...
+  public IReadOnlyList<Kidney> Kidneys { get; }
+  public Person AddKidneys(IEnumerable<Kidney> nodes);
+  public Person InsertKidneys(int index, IEnumerable<Kidney> nodes);
+  public Person RemoveKidneys(IEnumerable<Kidney> nodes);
+    
+  public IReadOnlyList<Person> Aunts { get; }
+  public Person AddAunts(IEnumerable<Person> nodes);
+  public Person InsertAunts(int index, IEnumerable<Person> nodes);
+  public Person RemoveAunts(IEnumerable<Person> nodes);
+}
+
+...
+
+Person john = new Person("g1_X") { Kidneys = [new Kidney("s3S")] };
+Person sid = new Person("-12");
+
+john.AddAunts([sid]);
+var onlyKidney = john.Kidneys.First();
+
+john.Kidneys = [];                 // compilation error
+john.Kidneys.Remove(onlyKidney);   // compilation error
+
+john.RemoveKidneys([onlyKidney]);  // throws InvalidValueException
+
+sid.Kidneys;                       // throws UnsetFeatureException
+----
+
+== Maintain Node Tree first, then Required Flag
+The LionWeb C# framework always keep the nodes in a tree.
+This means that every node has zero or one parents, and this parent contains the node.
+As a consequence, simple assignments of containments can have side effects.
+
+NOTE: This only concerns _containments_.
+We can freely assign _LionWeb references_ without side effects.
+
+[plantuml, treeShapeConcepts, svg]
+----
+hide empty members
+
+class "Person" as lwPerson << (C,Aquamarine) >> {
+}
+lwToe "1..*" <-* lwPerson: toes <<required,multiple>>
+lwPerson *-> "1" lwAppendix: app <<required,single>>
+
+class "Toe" as lwToe << (C,Aquamarine) >> {
+}
+
+class "Appendix" as lwAppendix << (C,Aquamarine) >> {
+}
+----
+
+[plantuml, treeShapeNodes, svg]
+----
+hide empty members
+
+class "john<g1_X>" as john << (n,Aquamarine) >>
+
+class "sid<-12>" as sid << (n,Aquamarine) >>
+
+class "toe1<t1>" as toe1 << (n,Aquamarine) >>
+class "toe2<t2>" as toe2 << (n,Aquamarine) >>
+
+class "worm<a>" as worm << (n,Aquamarine) >>
+
+john *--> toe1: toes
+john *--> toe2: toes
+
+john *--> worm: app
+----
+
+[source, csharp]
+----
+class Person {
+  ...
+  public IReadOnlyList<Toe> Toes { get; }
+  public Person AddToes(IEnumerable<Toe> nodes);
+  public Person InsertToes(int index, IEnumerable<Toe> nodes);
+  public Person RemoveToes(IEnumerable<Toe> nodes);
+    
+  public Appendix App { get; set; }
+  public Person SetApp(Appendix value);
+}
+
+...
+
+Toe toe1 = new Toe("t1");
+Toe toe2 = new Toe("t2");
+Appendix worm = new Appendix("a");
+Person john = new Person("g1_X") { Toes = [toe1, toe2], App = worm };
+Person sid = new Person("-12");
+
+sid.App = john.App  ;               <1>
+john.App;                           // throws UnsetFeatureException
+
+Toe firstToe = john.Toes.First();   <2>
+Toe lastToe = john.Toes.Last();
+
+sid.AddToes([firstToe, lastToe]);   <3>
+joh.Toes;                           // throws UnsetFeatureException    
+
+----
+<1> We assign John's App to Sid.
+For C#, that's just a C# reference -- several places can refer to the same C# object.
+But for LionWeb, that's a containment, and we _must not_ have two parents for `worm`!
+Thus, we detach `worm` from John, and attach it to Sid:
++
+[plantuml, treeShapeMoveWorm, svg]
+----
+hide empty members
+
+class "john<g1_X>" as john << (n,Aquamarine) >>
+
+class "sid<-12>" as sid << (n,Aquamarine) >>
+
+class "toe1<t1>" as toe1 << (n,Aquamarine) >>
+class "toe2<t2>" as toe2 << (n,Aquamarine) >>
+
+class "worm<a>" as worm << (n,Aquamarine) >>
+
+john *--> toe1: toes
+john *--> toe2: toes
+
+sid *--> worm: worm
+----
++
+Now, John's App is `null`, even though it's _required_.
+Consequently, we'd get a `UnsetFeatureException` in the next line if we tried to get John's App.
+
+<2> We get John's first Toe, i.e. `toe1`.
+That's ok, as we only store it in a local variable -- no effect on the tree.
+
+<3> We add several of John's Toes to Sid.
+Again, we _must not_ have two parents for the same toe, so we detach them from John, and attach them to Sid:
++
+[plantuml, treeShapeMoveToes, svg]
+----
+hide empty members
+
+class "john<g1_X>" as john << (n,Aquamarine) >>
+
+class "sid<-12>" as sid << (n,Aquamarine) >>
+
+class "toe1<t1>" as toe1 << (n,Aquamarine) >>
+class "toe2<t2>" as toe2 << (n,Aquamarine) >>
+
+class "worm<a>" as worm << (n,Aquamarine) >>
+
+sid *--> toe1: toes
+sid *--> toe2: toes
+
+sid *--> worm: worm
+----
++
+Now, John's Toes are empty, even though the link is _required_.
+Consequently, we'd get a `UnsetFeatureException` in the next line if we tried to get John's Toes.
+
+To summarize, the LionWeb framework always keeps the tree, even if it has to violate _required_ constraints.
+It helps the developer to adhere to required flags by throwing specializations of `LionWebExceptionBase` on direct attempts to violate the constraints.
+
+[appendix]
+== Diagram Legend
+[plantuml, legend, svg]
+----
+left to right direction
+
+hide empty members
+skinparam objectshadowing false
+skinparam objectbordercolor none
+skinparam objectbackgroundcolor none
+
+<style>
+note {
+    backgroundcolor white
+    shadowing 0
+    linecolor transparent
+}
+</style>
+
+class "A" as g << (n,Aquamarine) >>
+class "B" as h << (n,Aquamarine) >>
+g o--> h: aunt
+note right of h
+LionWeb node A references node B
+in containment "aunt"
+end note
+
+class "A" as k << (n,Aquamarine) >>
+class "B" as l << (n,Aquamarine) >>
+k *--> l: aunt
+note right of l
+LionWeb node A contains node B
+in containment "aunt" 
+end note
+
+object " " as lwNodeDummy
+lwNode -[hidden]-> lwNodeDummy
+note right of lwNodeDummy
+LionWeb node with node id g1_X
+with "Name" LionWeb property
+set to "John"
+end note
+
+class "name<g1_X>" as lwNode << (n,Aquamarine) >> {
+  Name = "John"
+}
+
+class "A" as o << (n,Aquamarine) >>
+class "B" as p << (C,Aquamarine) >>
+o ..> p
+note right of p
+node A is instance of concept B
+end note
+
+class "A" as m << (C,Aquamarine) >>
+class "B" as n << (C,Aquamarine) >>
+m o--> "1..*" n: aunts
+note right of n
+LionWeb concept A declares
+multiple, required LionWeb reference
+"aunts" to concept B 
+end note
+
+class "A" as e << (C,Aquamarine) >>
+class "B" as f << (C,Aquamarine) >>
+e *--> "0..1" f: aunt
+note right of f
+LionWeb concept A declares
+singlar, optional containment
+"aunt" to concept B
+end note
+
+object " " as lwConceptDummy
+lwConcept -[hidden]-> lwConceptDummy
+note right of lwConceptDummy
+LionWeb concept
+with required LionWeb property
+"Name" of type string
+end note
+
+class "ConceptName" as lwConcept << (C,Aquamarine) >> {
+  <i>required property</i> Name: string
+}
+
+class "A" as i  << (o,LightSalmon) >>
+class "B" as j  << (o,LightSalmon) >>
+i --> j: aunt
+note right of j
+C# object A's C# Property "aunt"
+references object B
+end note
+
+object " " as csObjectDummy
+csObject -[hidden]-> csObjectDummy
+note right of csObjectDummy
+C# object at memory location 0xa1e
+with "Name" C# property set to "John"
+end note
+
+class "name<0xa1e>" as csObject << (o,LightSalmon) >> {
+  Name = "John"
+}
+
+class "A" as a << (o,LightSalmon) >>
+class "B" as b << (C,LightSalmon) >>
+a ..> b
+note right of b
+C# object A is instance of C# class B
+end note
+
+class "A" as c << (C,LightSalmon) >>
+class "B" as d << (C,LightSalmon) >>
+c --> "0..1" d: aunt
+note right of d
+C# class A declares C# Reference
+"aunt" of type B with cardinality 0..1
+end note
+
+object " " as csClassDummy
+csClass -[hidden]-> csClassDummy
+note right of csClassDummy
+C# class
+with C# property "Name" of type string 
+end note
+
+class "ClassName" as csClass << (C,LightSalmon) >> {
+  Name: string
+}
+----

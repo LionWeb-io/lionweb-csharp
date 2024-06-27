@@ -1,0 +1,1131 @@
+= Comparer Examples
+
+Class `LionWeb.Utils.Comparer` deeply compares two lists of nodes with detailed report on differences.
+It considers all input nodes, including all descendants and annotations.
+
+This document lists examples for each compared element.
+
+We assume familiarity with LionWeb https://lionweb.io/specification/metametamodel/metametamodel.html#_overview[Meta-metamodel (M3)].
+
+== M2 (Metamodel)
+
+=== Basic elements
+Node _ids_, metamodel element _keys_, and language _versions_ are strings.
+We consider _ids_, _keys_, and _versions_ equal if their string values are equal.
+
+=== Language
+We consider two languages equal if both their key and their version match.
+
+NOTE: Each box represents _one language_.
+
+.Language examples
+[plantuml, language-examples, svg]
+----
+hide empty members
+
+class A <<(L, #aabbcc) Language>>  {
+  key = key-A
+  version = 2
+}
+
+class B <<(L, #aabbcc) Language>>  {
+  key = key-A
+  version = 2
+}
+
+class C <<(L, #aabbcc) Language>>  {
+  key = key-C
+  version = 2
+}
+
+class D <<(L, #aabbcc) Language>>  {
+  key = key-A
+  version = 3
+}
+----
+
+* `A` and `B` are equal because both their _key_ and _version_ matches.
+* `A` and `C` are not equal because they have different _keys_: `key-A` vs. `key-C`.
+* `A` and `D` are not equal because they have different _versions_: `2` vs. `3`.
+
+=== Classifier
+
+We consider classifiers (i.e. concepts and annotations) equal if their variant, key, and <<Language, language>> match.
+_variant_ describes whether the classifier is an instance of Annotation or Concept.
+
+NOTE: Each box represents _one language_ or _one classifier_.
+
+.Classifier examples
+[plantuml, classifier-examples, svg]
+----
+hide empty members
+
+class L1 <<(L, #aabbcc) Language>>  {
+  key = key-L1
+  version = 2
+}
+
+class A <<Concept>> {
+  key = key-A
+}
+L1 *-- A
+
+class B <<Concept>> {
+  key = key-A
+}
+L1 *-- B
+
+annotation C <<Annotation>> {
+  key = key-A
+}
+L1 *-- C
+
+class D <<Concept>> {
+  key = key-D
+}
+L1 *-- D
+
+class L2 <<(L, #aabbcc) Language>>  {
+  key = key-L2
+  version = 2
+}
+
+class E <<Classifier>> {
+  key = key-A
+}
+L2 *-- E
+
+class L3 <<(L, #aabbcc) Language>>  {
+  key = key-L1
+  version = 3
+}
+
+class F <<Classifier>> {
+  key = key-A
+}
+L3 *-- F
+----
+
+* `A` and `B` are equal because they are both _Concepts_, have equal _keys_, and belong to equal _languages_.
+* `A` and `C` are not equal because `A` is a _Concept_, but `C` is an _Annotation_.
+* `A` and `D` are not equal because they have different _keys_: `key-A` vs. `key-D`.
+* `A` and `E` are not equal because they belong to different _languages_ (in terms of _key_: `key-L1` vs. `key-L2`).
+* `A` and `F` are not equal because they belong to different _languages_ (in terms of _version_: `2` vs. `3`).
+
+=== Feature
+We consider features (i.e. properties, containments, and references) equal if their variant, key, and <<Classifier, classifier>> match.
+_variant_ describes whether the feature is an instance of Property, Containment, or Reference.
+
+NOTE: Each box represents _one language_, _one classifier_, or _one feature_.
+
+.Feature examples
+[plantuml, feature-examples, svg]
+----
+hide empty members
+
+class L1 <<(L, #aabbcc) Language>>  {
+  key = key-L1
+  version = 2
+}
+
+class C1 <<Concept>> {
+  key = key-C1
+}
+L1 *-- C1
+
+class A <<(P, #bbccaa) Property>> {
+  key = key-A
+}
+C1 *-- A
+
+class B <<(P, #bbccaa) Property>> {
+  key = key-A
+}
+C1 *-- B
+
+class C <<(C, #ccbbaa) Containment>> {
+  key = key-A
+}
+C1 *-- C
+
+class D <<(P, #bbccaa) Property>> {
+  key = key-D
+}
+C1 *-- D
+
+class C2 <<Concept>> {
+  key = key-C2
+}
+L1 *-- C2
+
+class E <<(P, #bbccaa) Property>> {
+  key = key-A
+}
+C2 *-- E
+
+class L2 <<(L, #aabbcc) Language>>  {
+  key = key-L2
+  version = 2
+}
+
+class C3 <<Classifier>> {
+  key = key-C1
+}
+L2 *-- C3
+
+class F <<(P, #bbccaa) Property>> {
+  key = key-A
+}
+C3 *-- F
+
+class L3 <<(L, #aabbcc) Language>>  {
+  key = key-L1
+  version = 3
+}
+
+class C4 <<Classifier>> {
+  key = key-C1
+}
+L3 *-- C4
+
+class G <<(P, #bbccaa) Property>> {
+  key = key-A
+}
+C4 *-- G
+----
+
+* `A` and `B` are equal because they are both _Properties_, have equal _keys_, and belong to equal _concepts_.
+* `A` and `C` are not equal because `A` is a _Property_ but `C` is a _Containment_.
+* `A` and `D` are not equal because they have different _keys_: `key-A` vs. `key-D`.
+* `A` and `E` are not equal because they belong to different _classifiers_ (in terms of _key_: `key-C1` vs. `key-C2`).
+* `A` and `F` are not equal because they belong to different _classifiers_ (in terms of _language key_: `key-L1` vs. `key-L2`).
+* `A` and `G` are not equal because they belong to different _classifiers_ (in terms of _language version_: `2` vs. `3`).
+
+== M1 (Model)
+
+=== Property
+We consider properties equal if their <<Feature, property>> and value match.
+
+The property value can be of type
+
+string:: Equal by string comparison.
+integer:: Equal by int comparison.
+boolean:: Equal by bool comparison.
+enumeration:: Equal if same C# enum type, and same literal name.
+
+We compare enum type by C# `==` operator.
+We compare enumeration literal names by string comparison.
+
+NOTE: Each box represents _one property_.
+
+.Simple property examples
+[plantuml, simple-property-value-examples, svg]
+----
+hide empty members
+
+class A <<P, #bbccaa) NameProperty>> {
+  property = {Shape.name,ShapesLang@v2}
+  --
+  value = "A"
+}
+
+class B <<P, #bbccaa) NameProperty>> {
+  property = {Shape.name,ShapesLang@v2}
+  --
+  value = "A"
+}
+
+class C <<P, #bbccaa) SecondNameProperty>> {
+  property = {Shape.secondName,ShapesLang@v2}
+  --
+  value = "A"
+}
+
+class D <<P, #bbccaa) NameProperty>> {
+  property = {Person.name,ShapesLang@v2}
+  --
+  value = "A"
+}
+
+class E <<P, #bbccaa) NameProperty>> {
+  property = {Shape.name,OtherShapesLang@v2}
+  --
+  value = "A"
+}
+
+class F <<P, #bbccaa) NameProperty>> {
+  property = {Shape.name,ShapesLang@v3}
+  --
+  value = "A"
+}
+----
+
+* `A` and `B` are equal because they have equal _property_, and equal _values_.
+* `A` and `C` are not equal because they have different _properties_ (in terms of _property key_: `name` vs. `secondName`).
+* `A` and `D` are not equal because they have different _properties_ (in terms of _concept key_: `Shape` vs. `Person`).
+* `A` and `E` are not equal because they have different _properties_ (in terms of _language key_: `ShapesLang` vs. `OtherShapesLang`).
+* `A` and `F` are not equal because they have different _properties_ (in terms of _language version_: `2` vs. `3`).
+
+.Property string value examples
+[plantuml, property-string-value-examples, svg]
+----
+hide empty members
+
+class A <<P, #bbccaa) NameProperty>> {
+  property = {Shape.name,ShapesLang@v2}
+  --
+  value = "A"
+}
+
+class B <<P, #bbccaa) NameProperty>> {
+  property = {Shape.name,ShapesLang@v2}
+  --
+  value = "A"
+}
+
+class C <<P, #bbccaa) NameProperty>> {
+  property = {Shape.name,ShapesLang@v2}
+  --
+  value = "X"
+}
+
+class D <<P, #bbccaa) NameProperty>> {
+  property = {Shape.name,ShapesLang@v2}
+  --
+  value = ""
+}
+
+class E <<P, #bbccaa) NameProperty>> {
+  property = {Shape.name,ShapesLang@v2}
+  --
+  value = null
+}
+
+class F <<P, #bbccaa) LengthProperty>> {
+  property = {Shape.length,ShapesLang@v2}
+  --
+  value = 42
+}
+----
+* `A` and `B` are equal because they have equal _values_.
+* `A` and `C` are not equal because they have different _values_: `A` vs. `X`.
+* `A` and `D` are not equal because they have different _values_: `A` vs. empty string.
+* `A` and `E` are not equal because they have different _values_: `A` vs. null.
+* `A` and `F` are not equal because they have different _values_: `A` vs. (integer) 42.
+They also have different _property keys_, as we cannot have an integer value in a string property.
+
+.Property integer value examples
+[plantuml, property-int-value-examples, svg]
+----
+hide empty members
+
+class A <<P, #bbccaa) LengthProperty>> {
+  property = {Shape.length,ShapesLang@v2}
+  --
+  value = 42
+}
+
+class B <<P, #bbccaa) LengthProperty>> {
+  property = {Shape.length,ShapesLang@v2}
+  --
+  value = 42
+}
+
+class C <<P, #bbccaa) LengthProperty>> {
+  property = {Shape.length,ShapesLang@v2}
+  --
+  value = 23
+}
+
+class D <<P, #bbccaa) LengthProperty>> {
+  property = {Shape.length,ShapesLang@v2}
+  --
+  value = null
+}
+----
+* `A` and `B` are equal because they have equal _values_.
+* `A` and `C` are not equal because they have different _values_: `42` vs. `23`.
+* `A` and `D` are not equal because they have different _values_: `42` vs. null.
+
+.Property boolean value examples
+[plantuml, property-bool-value-examples, svg]
+----
+hide empty members
+
+class A <<P, #bbccaa) SolidProperty>> {
+  property = {Shape.solid,ShapesLang@v2}
+  --
+  value = true
+}
+
+class B <<P, #bbccaa) SolidProperty>> {
+  property = {Shape.solid,ShapesLang@v2}
+  --
+  value = true
+}
+
+class C <<P, #bbccaa) SolidProperty>> {
+  property = {Shape.solid,ShapesLang@v2}
+  --
+  value = false
+}
+
+class D <<P, #bbccaa) SolidProperty>> {
+  property = {Shape.solid,ShapesLang@v2}
+  --
+  value = null
+}
+----
+* `A` and `B` are equal because they have equal _values_.
+* `A` and `C` are not equal because they have different _values_: `true` vs. `false`.
+* `A` and `D` are not equal because they have different _values_: `true` vs. null.
+
+.Property enumeration value examples
+[plantuml, property-enum-value-examples, svg]
+----
+hide empty members
+
+class A <<P, #bbccaa) ColorProperty>> {
+  property = {Shape.color,ShapesLang@v2}
+  --
+  value = MyNamespace.ColorEnum.Red
+}
+
+class B <<P, #bbccaa) ColorProperty>> {
+  property = {Shape.color,ShapesLang@v2}
+  --
+  value = MyNamespace.ColorEnum.Red
+}
+
+class C <<P, #bbccaa) ColorProperty>> {
+  property = {Shape.color,ShapesLang@v2}
+  --
+  value = MyNamespace.ColorEnum.Green
+}
+
+class D <<P, #bbccaa) ColorProperty>> {
+  property = {Shape.color,ShapesLang@v2}
+  --
+  value = null
+}
+
+class E <<P, #bbccaa) ColorProperty>> {
+  property = {Shape.color,ShapesLang@v2}
+  --
+  value = MyNamespace.OtherColorEnum.Red
+}
+
+class F <<P, #bbccaa) ColorProperty>> {
+  property = {Shape.color,ShapesLang@v2}
+  --
+  value = MyOtherNamespace.ColorEnum.Red
+}
+----
+
+* `A` and `B` are equal because they have equal _values_.
+* `A` and `C` are not equal because they have different _values_ in terms of _enumeration literal_: `Red` vs. `Green`.
+* `A` and `D` are not equal because they have different _values_: `Red` vs. null.
+* `A` and `E` are not equal because they have different _values_ in terms of _enumeration_: `ColorEnum` vs. `OtherColorEnum`.
+* `A` and `F` are not equal because they have different _values_ in terms of _namespace_: `MyNamespace` vs. `MyOtherNamespace`.
+
+WARNING: `E` and `F` should not be possible, because C# types `MyNamespace.ColorEnum`, `MyNamespace.OtherColorEnum`, and `MyOtherNamespace.ColorEnum` should not be compatible.
+However, due to the way C# implements enumerations, it can happen.
+
+=== Reference
+We distinguish between _internal_ and _external_ reference targets.
+An _internal_ target is element of the set of nodes to be compared, an _external_ target is not element of this set of nodes.
+We compare both kinds of targets, but in different ways.
+
+We consider references with _internal_ targets equal if their <<Feature, reference>> and <<Node, target node>> match, i.e. their target nodes are considered _comparable_.
+_Comparable_ means they have the same relative position within the compared nodes.
+
+We consider references with _external_ targets equal if their <<Feature, reference>> and target node id match.
+
+NOTE: We don't spell out all the differences in <<Feature, reference feature keys>> in our examples, i.e. _reference.key_, _reference.classifier.key_, _reference.classifier.language.key_ and _reference.classifier.language.version_.
+They apply the same way as for <<Property, Property features>>.
+
+NOTE: Each box represents one _complete node_.
+
+.Reference examples
+[plantuml, reference-value-examples, svg]
+----
+hide empty members
+
+package AA {
+    class A <<(N, #bbddff) Line>>  {
+      id = id-A
+      classifier = {Line,ShapesLang@v2}
+      --
+      start = AStart <<Containment {Line.start,ShapesLang@v2}>>
+      end = AEnd <<Containment {Line.end,ShapesLang@v2}>>
+    }
+    
+    class AStart <<(N, #bbddff) Coordinate>>  {
+      id = id-AStart
+      classifier = {Coordinate,ShapesLang@v2}
+      --
+      X = 42 <<Property {Coordinate.X,ShapesLang@v2}>>
+      Y = 23 <<Property {Coordinate.Y,ShapesLang@v2}>>
+    }
+    A *-- AStart: start
+    
+    class AEnd <<(N, #bbddff) CoordinateRef>>  {
+      id = id-AEnd
+      classifier = {CoordinateRef,ShapesLang@v2}
+      --
+      baseCoordinate = AStart \n  <<Reference {CoordinateRef.baseCoordinate,ShapesLang@v2}>>
+    }
+    A *-- AEnd: end
+    AStart <- AEnd: target
+}
+
+AA.AStart -[hidden]- BB.B
+AA.AEnd -[hidden]- BB.B
+
+
+package BB {
+    class B <<(N, #bbddff) Line>>  {
+      id = id-B
+      classifier = {Line,ShapesLang@v2}
+      --
+      start = BStart <<Containment {Line.start,ShapesLang@v2}>>
+      end = BEnd <<Containment {Line.end,ShapesLang@v2}>>
+    }
+    
+    class BStart <<(N, #bbddff) Coordinate>>  {
+      id = id-BStart
+      classifier = {Coordinate,ShapesLang@v2}
+      --
+      X = 42 <<Property {Coordinate.X,ShapesLang@v2}>>
+      Y = 23 <<Property {Coordinate.Y,ShapesLang@v2}>>
+    }
+    B *-- BStart: start
+    
+    class BEnd <<(N, #bbddff) CoordinateRef>>  {
+      id = id-BEnd
+      classifier = {CoordinateRef,ShapesLang@v2}
+      --
+      baseCoordinate = BStart \n  <<Reference {CoordinateRef.baseCoordinate,ShapesLang@v2}>>
+    }
+    B *-- BEnd: end
+    BStart <- BEnd: target
+}
+
+BB.BStart -[hidden]- CC.C
+BB.BEnd -[hidden]- CC.C
+
+package CC {
+    class C <<(N, #bbddff) Line>>  {
+      id = id-C
+      classifier = {Line,ShapesLang@v2}
+      --
+      start = CStart <<Containment {Line.start,ShapesLang@v2}>>
+      end = CEnd <<Containment {Line.end,ShapesLang@v2}>>
+    }
+    
+    class CStart <<(N, #bbddff) Coordinate>>  {
+      id = id-CStart
+      classifier = {Coordinate,ShapesLang@v2}
+      --
+      X = 1 <<Property {Coordinate.X,ShapesLang@v2}>>
+      Y = 23 <<Property {Coordinate.Y,ShapesLang@v2}>>
+    }
+    C *-- CStart: start
+    
+    class CEnd <<(N, #bbddff) CoordinateRef>>  {
+      id = id-CEnd
+      classifier = {CoordinateRef,ShapesLang@v2}
+      --
+      baseCoordinate = CStart \n  <<Reference {CoordinateRef.baseCoordinate,ShapesLang@v2}>>
+    }
+    C *-- CEnd: end
+    CStart <- CEnd: target
+}
+
+CC.CStart -[hidden]- DD.D
+CC.CEnd -[hidden]- DD.D
+
+package DD {
+    class D <<(N, #bbddff) Line>>  {
+      id = id-D
+      classifier = {Line,ShapesLang@v2}
+      --
+      start = null <<Containment {Line.start,ShapesLang@v2}>>
+      end = DEnd <<Containment {Line.end,ShapesLang@v2}>>
+    }
+    
+    class DStart <<(N, #bbddff) Coordinate>>  {
+      id = id-DStart
+      classifier = {Coordinate,ShapesLang@v2}
+      --
+      X = 42 <<Property {Coordinate.X,ShapesLang@v2}>>
+      Y = 23 <<Property {Coordinate.Y,ShapesLang@v2}>>
+    }
+    D *-[hidden]- DStart: start
+    
+    class DEnd <<(N, #bbddff) CoordinateRef>>  {
+      id = id-DEnd
+      classifier = {CoordinateRef,ShapesLang@v2}
+      --
+      baseCoordinate = DStart \n  <<Reference {CoordinateRef.baseCoordinate,ShapesLang@v2}>>
+    }
+    D *-- DEnd: end
+    DStart <- DEnd: target
+}
+
+DD.DStart -[hidden]- EE.E
+DD.DEnd -[hidden]- EE.E
+
+package EE {
+    class E <<(N, #bbddff) Line>>  {
+      id = id-E
+      classifier = {Line,ShapesLang@v2}
+      --
+      start = null <<Containment {Line.start,ShapesLang@v2}>>
+      end = EEnd <<Containment {Line.end,ShapesLang@v2}>>
+    }
+    
+    class EStart <<(N, #bbddff) Coordinate>>  {
+      id = id-EStart
+      classifier = {Coordinate,ShapesLang@v2}
+      --
+      X = 42 <<Property {Coordinate.X,ShapesLang@v2}>>
+      Y = 23 <<Property {Coordinate.Y,ShapesLang@v2}>>
+    }
+    E *-[hidden]- EStart: start
+    
+    class EEnd <<(N, #bbddff) CoordinateRef>>  {
+      id = id-EEnd
+      classifier = {CoordinateRef,ShapesLang@v2}
+      --
+      baseCoordinate = EStart \n  <<Reference {CoordinateRef.baseCoordinate,ShapesLang@v2}>>
+    }
+    E *-- EEnd: end
+    EStart <- EEnd: target
+}
+
+EE.EStart -[hidden]- FF.F
+EE.EEnd -[hidden]- FF.F
+
+package FF {
+    class F <<(N, #bbddff) Line>>  {
+      id = id-F
+      classifier = {Line,ShapesLang@v2}
+      --
+      start = null <<Containment {Line.start,ShapesLang@v2}>>
+      end = FEnd <<Containment {Line.end,ShapesLang@v2}>>
+    }
+    
+    class FEnd <<(N, #bbddff) CoordinateRef>>  {
+      id = id-FEnd
+      classifier = {CoordinateRef,ShapesLang@v2}
+      --
+      baseCoordinate = EStart \n  <<Reference {CoordinateRef.baseCoordinate,ShapesLang@v2}>>
+    }
+    F *-- FEnd: end
+    EStart <- FEnd: target
+}
+----
+
+Assume we compare `A` and `B`.
+Implicitly, we also compare all their _containments_, so we actually compare `[A, AStart, AEnd]` vs. `[B, BStart, BEnd]`. +
+`AEnd.baseCoordinate` and `BEnd.baseCoordinate` are equal because their _reference_ match; their _target_ is part of the comparison, so they are _internal_; and the targets are considered _comparable_: both their relative position is `root.start`.
+
+Assume we compare `A` and `C`.
+Implicitly, we also compare all their _containments_, so we actually compare `[A, AStart, AEnd]` vs. `[C, CStart, CEnd]`.
+Note that `AStart.X` and `CStart.X` have different values (`42` vs. `1`). +
+`AEnd.baseCoordinate` and `CEnd.baseCoordinate` are equal because their _reference_ match; their _target_ is part of the comparison, so they are _internal_; and the targets are considered _comparable_: both their relative position is `root.start`.
+It doesn't matter that `AStart` is not equal to `CStart`.
+
+Assume we compare `A` and `D`.
+Implicitly, we also compare all their _containments_, so we actually compare `[A, AEnd, AStart]` vs. `[D, DEnd]`. +
+`AEnd.baseCoordinate` and `DEnd.baseCoordinate` are not equal because their kind doesn't match: _internal_ vs. _external_.
+
+Assume we compare `[A, AStart]` and `[D, DStart]`.
+Implicitly, we also compare all their _containments_, so we actually compare `[A, AEnd, AStart]` vs. `[D, DEnd, DStart]`. +
+`AEnd.baseCoordinate` and `DEnd.baseCoordinate` are not equal because their _target_ does not match:
+both targets are part of the comparison, so they are _internal_.
+However, their relative position is different: `root.start` vs. `root`.
+
+Assume we compare `[D, DStart]` and `[E, EStart]`.
+Implicitly, we also compare all their _containments_, so we actually compare `[D, DEnd, DStart]` vs. `[E, EEnd, EStart]`. +
+`DEnd.baseCoordinate` and `EEnd.baseCoordinate` are equal because their _reference_ match; their _target_ is part of the comparison, so they are _internal_; and the targets are considered _comparable_: both their relative position is `root`.
+
+Assume we compare `D` and `E`.
+Implicitly, we also compare all their _containments_, so we actually compare `[D, DEnd]` vs. `[E, EEnd]`. +
+`DEnd.baseCoordinate` and `EEnd.baseCoordinate` are not equal because their _target_ does not match:
+both targets are outside the comparison, so they are _external_.
+However, their _ids_ differ: `id-DStart` vs. `id-EStart`.
+
+Assume we compare `E` and `F`.
+Implicitly, we also compare all their _containments_, so we actually compare `[E, EEnd]` vs. `[F, FEnd]`. +
+`EEnd.baseCoordinate` and `FEnd.baseCoordinate` are equal because their _reference_ match; their _target_ is outside the comparison, so they are _external_; and the targets are _equal_ because they have equal _ids_.
+
+
+
+
+=== Node
+We consider nodes equal if their <<Classifier, classifier>>, all their <<Node-list, annotations>>, and all their <<Feature, features>> match.
+We consider features matching if equal features are set, and each set feature is equal.
+
+NOTE: Each box represents one _complete node_.
+
+.Feature-less node examples
+[plantuml, node-nofeature-examples, svg]
+----
+hide empty members
+
+class A <<(N, #bbddff) Shape>>  {
+  id = id-A
+  classifier = {Shape,ShapesLang@v2}
+  --
+  features = []
+  annotations = []
+}
+
+class B <<(N, #bbddff) Shape>>  {
+  id = id-A
+  classifier = {Shape,ShapesLang@v2}
+  --
+  features = []
+  annotations = []
+}
+
+class C <<(N, #bbddff) Shape>>  {
+  id = id-C
+  classifier = {Shape,ShapesLang@v2}
+  --
+  features = []
+  annotations = []
+}
+
+class D <<(N, #bbddff) Line>>  {
+  id = id-A
+  classifier = {Line,ShapesLang@v2}
+  --
+  features = []
+  annotations = []
+}
+
+class E <<(N, #bbddff) Shape>>  {
+  id = id-A
+  classifier = {Shape,OtherShapesLang@v2}
+  --
+  features = []
+  annotations = []
+}
+
+class F <<(N, #bbddff) Shape>>  {
+  id = id-A
+  classifier = {Shape,ShapesLang@v3}
+  --
+  features = []
+  annotations = []
+}
+----
+
+* `A` and `B` are equal because they have equal _classifiers_, both no _features_, and both no _annotations_.
+We don't compare their _ids_.
+* `A` and `C` are equal because they have equal _classifiers_, both no _features_, and both no _annotations_.
+We don't compare their _ids_.
+* `A` and `D` are not equal because they have different _classifiers_ (in terms of _key_: `Shape` vs. `Line`).
+* `A` and `E` are not equal because they have different _classifiers_ (in terms of _language key_: `ShapesLang` vs. `OtherShapesLang`).
+* `A` and `F` are not equal because they have different _classifiers_ (in terms of _language version_: `2` vs. `3`).
+
+.Nodes with features examples
+[plantuml, node-feature-examples, svg]
+----
+hide empty members
+
+class A <<(N, #bbddff) Shape>>  {
+  id = id-A
+  classifier = {Shape,ShapesLang@v2}
+  --
+  name = "Alice" <<Property {Shape.name,ShapesLang@v2}>>
+  annotations = []
+}
+
+class B <<(N, #bbddff) Shape>>  {
+  id = id-B
+  classifier = {Shape,ShapesLang@v2}
+  --
+  name = "Alice" <<Property {Shape.name,ShapesLang@v2}>>
+  annotations = []
+}
+
+A -[hidden]- C
+B -[hidden]- D
+
+class C <<(N, #bbddff) Shape>>  {
+  id = id-C
+  classifier = {Shape,ShapesLang@v2}
+  --
+  name = "Bob" <<Property {Shape.name,ShapesLang@v2}>>
+  annotations = []
+}
+
+class D <<(N, #bbddff) Shape>>  {
+  id = id-D
+  classifier = {Shape,ShapesLang@v2}
+  --
+  otherName = "Alice" <<Property {Shape.otherName,ShapesLang@v2}>>
+  annotations = []
+}
+
+C -[hidden]- E
+D -[hidden]- F
+
+class E <<(N, #bbddff) Shape>>  {
+  id = id-E
+  classifier = {Shape,ShapesLang@v2}
+  --
+  name = "Alice" <<Property {INamed.name,ShapesLang@v2}>>
+  annotations = []
+}
+
+class F <<(N, #bbddff) Shape>>  {
+  id = id-F
+  classifier = {Shape,ShapesLang@v2}
+  --
+  name = null <<Property {INamed.name,ShapesLang@v2}>>
+  annotations = []
+}
+
+E -[hidden]- G
+F -[hidden]- H
+
+class G <<(N, #bbddff) Shape>>  {
+  id = id-F
+  classifier = {Shape,ShapesLang@v2}
+  --
+  features = []
+  annotations = []
+}
+
+class H <<(N, #bbddff) Shape>>  {
+  id = id-H
+  classifier = {Shape,ShapesLang@v2}
+  --
+  name = H1 <<Containment {ComplexShape.name,ShapesLang@v2}>>
+  annotations = []
+}
+
+class H1 <<(N, #bbddff) CompoundName>>  {
+  id = id-H1
+  classifier = {CompoundName,ShapesLang@v2}
+  --
+  firstName = "Alice" <<Property {CompoundName.firstName,ShapesLang@v2}>>
+  lastName = "Wonder" <<Property {CompoundName.lastName,ShapesLang@v2}>>
+  annotations = []
+}
+H *-- H1
+
+class H2 {}
+hide H2
+
+G -[hidden]- H2
+H2 -[hidden]- I
+H1 -[hidden]- J
+
+
+class I <<(N, #bbddff) Shape>>  {
+  id = id-I
+  classifier = {Shape,ShapesLang@v2}
+  --
+  name = I1 <<Containment {ComplexShape.name,ShapesLang@v2}>>
+  annotations = []
+}
+
+class I1 <<(N, #bbddff) CompoundName>>  {
+  id = id-I1
+  classifier = {CompoundName,ShapesLang@v2}
+  --
+  firstName = "Alice" <<Property {CompoundName.firstName,ShapesLang@v2}>>
+  lastName = "Wonder" <<Property {CompoundName.lastName,ShapesLang@v2}>>
+  annotations = []
+}
+I *-- I1
+
+class J <<(N, #bbddff) Shape>>  {
+  id = id-J
+  classifier = {Shape,ShapesLang@v2}
+  --
+  name = J1 <<Containment {ComplexShape.name,ShapesLang@v2}>>
+  annotations = []
+}
+
+class J1 <<(N, #bbddff) CompoundName>>  {
+  id = id-J1
+  classifier = {CompoundName,ShapesLang@v2}
+  --
+  firstName = "Alice" <<Property {CompoundName.firstName,ShapesLang@v2}>>
+  lastName = "Miracle" <<Property {CompoundName.lastName,ShapesLang@v2}>>
+  annotations = []
+}
+J *-- J1
+----
+
+* `A` and `B` are equal because they have equal _classifiers_, equal _features_, and both no _annotations_.
+* `A` and `C` are not equal because they have different _features_ (in terms of `name` properties' _value_: `Alice` vs. `Bob`).
+* `A` and `D` are not equal because they have different _features_: `name` vs. `otherName`.
+* `A` and `E` are not equal because they have different _features_: `Shape.name` vs. `INamed.name`.
+* `A` and `F` are not equal because they have different _features_: `name` property _value_ `Alice` vs. null.
+* `A` and `G` are not equal because they have different _features_: `name` property present vs. no features.
+* `A` and `H` are not equal because they have different _features_: `name` property vs. `name` containment.
+* `F` and `G` are equal because they have equal _classifiers_, both no annotations, and _semantically_ equal `name` property: We don't distinguish between an _unset_ feature and a feature with null value (or empty list, in case of multi-value feature).
+* `H` and `I` are equal because they have equal _classifiers_, both no annotations, and both equal `name` feature (equal contained `name` nodes).
+* `H` and `J` are not equal because they have different _features_: contained `name` nodes are not equal (in terms of property `lastName`: `Wonder` vs. `Miracle`).
+
+.Nodes with annotations examples
+[plantuml, node-annotation-examples, svg]
+----
+hide empty members
+
+class A <<(N, #bbddff) Shape>>  {
+  id = id-A
+  classifier = {Shape,ShapesLang@v2}
+  --
+  features = []
+  annotations = [A1]
+}
+
+class A1 <<(@, #bbddff) Docs>>  {
+  id = id-A1
+  classifier = {Docs,ShapesLang@v2}
+  --
+  text = "MyDocs" <<Property {Docs.text,ShapesLang@v2}
+  annotations = []
+}
+A *-- A1
+
+class B <<(N, #bbddff) Shape>>  {
+  id = id-B
+  classifier = {Shape,ShapesLang@v2}
+  --
+  features = []
+  annotations = [B1]
+}
+
+class B1 <<(@, #bbddff) Docs>>  {
+  id = id-B1
+  classifier = {Docs,ShapesLang@v2}
+  --
+  text = "MyDocs" <<Property {Docs.text,ShapesLang@v2}
+  annotations = []
+}
+B *-- B1
+
+class C <<(N, #bbddff) Shape>>  {
+  id = id-C
+  classifier = {Shape,ShapesLang@v2}
+  --
+  features = []
+  annotations = [C1]
+}
+
+A1 -[hidden]- C
+B1 -[hidden]- D
+
+class C1 <<(@, #bbddff) Docs>>  {
+  id = id-C1
+  classifier = {Docs,ShapesLang@v2}
+  --
+  text = "OtherDocs" <<Property {Docs.text,ShapesLang@v2}
+  annotations = []
+}
+C *-- C1
+
+class D <<(N, #bbddff) Shape>>  {
+  id = id-D
+  classifier = {Shape,ShapesLang@v2}
+  --
+  features = []
+  annotations = [D1]
+}
+
+class D1 <<(@, #bbddff) SpecialDocs>>  {
+  id = id-D1
+  classifier = {SpecialDocs,ShapesLang@v2}
+  --
+  text = "MyDocs" <<Property {Docs.text,ShapesLang@v2}
+  annotations = []
+}
+D *-- D1
+----
+
+* `A` and `B` are equal because they have equal _classifiers_, both no features, and both equal annotations (equal annotation nodes).
+* `A` and `C` are not equal because they have different _annotations_: annotation nodes differ in terms of `text` property: `MyDocs` vs. `OtherDocs`.
+* `A` and `D` are not equal because they have different _annotations_: annotation nodes differ in terms of _classifier key_: `Docs` vs. `SpecialDocs`.
+
+
+
+[[Node-list]]
+=== Nodes (list of nodes)
+Node lists may appear at different places:
+
+* Root-level parameter to Comparer.
+* List of node annotations.
+* Multi-valued containment.
+
+We consider lists of nodes equal if they have the same length, and the <<Node, nodes>> at each position are equal.
+
+.Node list examples
+[plantuml, node-list-examples, svg]
+----
+hide empty members
+
+package AA {
+    class A <<(N, #bbddff) Shape>>  {
+      id = id-A
+      classifier = {Shape,ShapesLang@v2}
+      --
+      features = []
+      annotations = [A1, A2]
+    }
+    
+    class A1 <<(@, #bbddff) Docs>>  {
+      id = id-A1
+      classifier = {Docs,ShapesLang@v2}
+      --
+      text = "MyDocs" <<Property {Docs.text,ShapesLang@v2}
+      annotations = []
+    }
+    A *-- A1
+    
+    class A2 <<(@, #bbddff) Docs>>  {
+      id = id-A2
+      classifier = {Docs,ShapesLang@v2}
+      --
+      text = "OtherDocs" <<Property {Docs.text,ShapesLang@v2}
+      annotations = []
+    }
+    A *-- A2
+}
+
+AA.A1 -[hidden]- BB.B
+AA.A2 -[hidden]- BB.B
+
+package BB {
+    class B <<(N, #bbddff) Shape>>  {
+      id = id-B
+      classifier = {Shape,ShapesLang@v2}
+      --
+      features = []
+      annotations = [B1, B2]
+    }
+    
+    class B1 <<(@, #bbddff) Docs>>  {
+      id = id-B1
+      classifier = {Docs,ShapesLang@v2}
+      --
+      text = "MyDocs" <<Property {Docs.text,ShapesLang@v2}
+      annotations = []
+    }
+    B *-- B1
+    
+    class B2 <<(@, #bbddff) Docs>>  {
+      id = id-B2
+      classifier = {Docs,ShapesLang@v2}
+      --
+      text = "OtherDocs" <<Property {Docs.text,ShapesLang@v2}
+      annotations = []
+    }
+    B *-- B2
+}
+
+BB.B1 -[hidden]- CC.C
+BB.B2 -[hidden]- CC.C
+
+package CC {
+    class C <<(N, #bbddff) Shape>>  {
+      id = id-C
+      classifier = {Shape,ShapesLang@v2}
+      --
+      features = []
+      annotations = [C1, C2]
+    }
+    
+    class C1 <<(@, #bbddff) Docs>>  {
+      id = id-C1
+      classifier = {Docs,ShapesLang@v2}
+      --
+      text = "DifferentDocs" <<Property {Docs.text,ShapesLang@v2}
+      annotations = []
+    }
+    C *-- C1
+    
+    class C2 <<(@, #bbddff) Docs>>  {
+      id = id-C2
+      classifier = {Docs,ShapesLang@v2}
+      --
+      text = "OtherDocs" <<Property {Docs.text,ShapesLang@v2}
+      annotations = []
+    }
+    C *-- C2
+}
+
+CC.C1 -[hidden]- DD.D
+CC.C2 -[hidden]- DD.D
+
+package DD {
+    class D <<(N, #bbddff) Shape>>  {
+      id = id-D
+      classifier = {Shape,ShapesLang@v2}
+      --
+      features = []
+      annotations = [D2, D1]
+    }
+    
+    class D2 <<(@, #bbddff) Docs>>  {
+      id = id-D2
+      classifier = {Docs,ShapesLang@v2}
+      --
+      text = "OtherDocs" <<Property {Docs.text,ShapesLang@v2}
+      annotations = []
+    }
+    D *-- D2
+
+    class D1 <<(@, #bbddff) Docs>>  {
+      id = id-D1
+      classifier = {Docs,ShapesLang@v2}
+      --
+      text = "MyDocs" <<Property {Docs.text,ShapesLang@v2}
+      annotations = []
+    }
+    D *-- D1
+}
+
+DD.D1 -[hidden]- EE.E
+DD.D2 -[hidden]- EE.E
+
+package EE {
+    class E <<(N, #bbddff) Shape>>  {
+      id = id-E
+      classifier = {Shape,ShapesLang@v2}
+      --
+      features = []
+      annotations = [E1]
+    }
+    
+    class E1 <<(@, #bbddff) Docs>>  {
+      id = id-DE
+      classifier = {Docs,ShapesLang@v2}
+      --
+      text = "MyDocs" <<Property {Docs.text,ShapesLang@v2}
+      annotations = []
+    }
+    E *-- E1
+}
+----
+* `A.annotations` and `B.annotations` are equal because they have the same length (`2`) and the nodes at each position are equal (`A1` at position 0 is equal to `B1` at position 0, and `A2` at position 1 is equal to `B2` at position 1).
+* `A.annotations` and `C.annotations` are not equal because position 0 differs in terms of the node's `text` property: `MyDocs` vs. `DifferentDocs`.
+* `A.annotations` and `D.annotations` are not equal because position 0 and 1 are flipped: `[A1, A2]` vs. `[D2, D1]`.
+(Technically, we just compare `A1` to `D2` and they differ in terms of their `text` property.)
+* `A.annotation` and `E.annotation` are not equal because of their size: `2` vs. `1`.
+
+[[Reference-list]]
+=== References (list of references)
+Reference features may be multi-valued.
+
+We consider lists of references equal if they have the same length, and the <<Reference, references>> at each position are equal.
+

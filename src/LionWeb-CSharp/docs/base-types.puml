@@ -1,0 +1,28 @@
+@startuml
+hide empty members
+
+interface IReadableNode {
+    id: String
+    parent: IReadableNode
+    classifier: Classifier
+    Get(Feature feature)
+}
+
+interface IWritableNode {
+    Set(Feature feature, object? value)
+    SetParent(IWritableNode parent)
+    DetachFromParent()
+    {method} (manipulate annotations)
+}
+
+IReadableNode <|-- IWritableNode
+
+abstract class ReadableNodeBase
+ReadableNodeBase <|-- IReadableNode
+
+abstract class NodeBase
+NodeBase <|-- ReadableNodeBase
+NodeBase <|-- INode
+
+
+@enduml
