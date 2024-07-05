@@ -36,16 +36,16 @@ jobs:
       - name: Test all projects
         run: dotnet test
 
-      - name: Pack NuGet package LionWeb-CSharp
-        run: dotnet pack --configuration Release --output ${{env.NuGetDirectory}} src/LionWeb-CSharp
-
-      - name: Pack NuGet package LionWeb-CSharp
-        run: dotnet pack --configuration Release --output ${{env.NuGetDirectory}} src/LionWeb-CSharp-Generator
+      - name: Pack NuGet packages
+        run: |
+          foreach ($packageDir in (Get-ChildItem src/)) {
+            dotnet pack --configuration Release --output ${{env.NuGetDirectory}} $packageDir
+          }
 
       - name: Publish NuGet packages
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          foreach($file in (Get-ChildItem "${{env.NuGetDirectory}}" -Recurse -Include *.nupkg)) {
-              dotnet nuget push $file --api-key "${{secrets.NUGET_APIKEY}}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          foreach ($packageFile in (Get-ChildItem "${{env.NuGetDirectory}}" -Recurse -Include *.nupkg)) {
+              dotnet nuget push $packageFile --api-key "${{secrets.NUGET_APIKEY}}" --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
 
