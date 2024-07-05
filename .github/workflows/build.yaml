@@ -4,10 +4,12 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 'feature/set-up-CI'   # (for now, only run on this branch)
+      - '*'
+    tags:
+      - '*'
 
-#env:
-#  NuGetDirectory: ${{ github.workspace }}/nuget
+env:
+  NuGetDirectory: ${{github.workspace}}/nuget
 
 defaults:
   run:
@@ -20,6 +22,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Get all history to allow automatic versioning using MinVer
+          # TODO  can we set this to 1 since we only need a tag?
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -32,4 +35,17 @@ jobs:
 
       - name: Test all projects
         run: dotnet test
+
+      - name: Pack NuGet package LionWeb-CSharp
+        run: dotnet pack --configuration Release --output ${{env.NuGetDirectory}} src/LionWeb-CSharp
+
+      - name: Pack NuGet package LionWeb-CSharp
+        run: dotnet pack --configuration Release --output ${{env.NuGetDirectory}} src/LionWeb-CSharp-Generator
+
+      - name: Publish NuGet packages
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          foreach($file in (Get-ChildItem "${{env.NuGetDirectory}}" -Recurse -Include *.nupkg)) {
+              dotnet nuget push $file --api-key "${{ secrets.NUGET_APIKEY }}" --source https://api.nuget.org/v3/index.json --skip-duplicate
+          }
 
