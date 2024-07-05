@@ -1,0 +1,35 @@
+name: Build LionWeb-C#
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'feature/set-up-CI'   # (for now, only run on this branch)
+
+#env:
+#  NuGetDirectory: ${{ github.workspace }}/nuget
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Get all history to allow automatic versioning using MinVer
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+
+      - name: Restore dependencies for all projects
+        run: dotnet restore
+
+      - name: Build all projects
+        run: dotnet build
+
+      - name: Test all projects
+        run: dotnet test
+

@@ -16,6 +16,17 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Deprecated
 ### Security
 
+
+## [0.2.2] - unreleased
+
+## Changed
+
+- Released as open source under the Apache-2.0 license.
+- Set up CI using GitHub Actions.
+
+(Both are infrastructural—i.e.: non-code— changes.)
+
+
 ## [0.2.1] - 2024-05-28
 
 ### Fixed
