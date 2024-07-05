@@ -2,9 +2,15 @@
 
     <PropertyGroup>
         <Title>LionWeb-CSharp</Title>
+        <Description>This package contains the C# reference implementation of the LionWeb core functionality</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageTags>VF022; LionWeb</PackageTags>
         <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-        <Description>This package contains a C# implementation of the LionWeb Metametamodel (M3).</Description>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="LICENSE" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
 </Project>

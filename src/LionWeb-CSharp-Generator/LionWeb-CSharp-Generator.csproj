@@ -1,6 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <Title>LionWeb-CSharp-Generator</Title>
+        <Description>A generator that generates C# source code from a LionWeb M2</Description>
         <TargetFramework>net8.0</TargetFramework>
         <RootNamespace>LionWeb_CSharp_Generator</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -13,6 +15,17 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.CodeAnalysis" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="LICENSE">
+        <Pack>true</Pack>
+        <PackagePath>/</PackagePath>
+      </None>
+      <None Update="README.md">
+        <Pack>true</Pack>
+        <PackagePath>/</PackagePath>
+      </None>
     </ItemGroup>
 
 </Project>
