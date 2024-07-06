@@ -17,11 +17,38 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Security
 
 
+## [0.2.2] - unreleased
+
+## Changed
+
+- Released as open source under the Apache-2.0 license.
+- Set up CI using GitHub Actions.
+
+(Both are infrastructural—i.e.: non-code— changes.)
+
+
+## [0.2.1] - 2024-05-28
+
+### Fixed
+
+- Fix a small bug w.r.t. `DynamicNode.GetInternal(...)`.
+- Update documentation.
+
+
+## [0.2.0] - 2024-05-27
+
+### Changed
+
+The complete API and structure of the LionWeb C# core NuGet package, as well as the generator and the code it generates, was overhauled.
+The generator now resides in its own package.
+See [the documents in this directory](./docs) for more information.
+
+
 ## [0.1.10] - 2024-03-19
 
 ### Changed
 
-- `Cloner` checks type expectations on features, and throws an exception it they don't hold.
+- `Cloner` checks type expectations on features, and throws an exception if they don't hold.
 
 
 ## [0.1.9] - 2024-02-26

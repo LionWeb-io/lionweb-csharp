@@ -18,5 +18,5 @@ See these projects' respective `README`s for more information.
 
 ## License
 
-The "Apache-2.0" open-source license applies _provisionally_ to the work in this repository.
+The "Apache-2.0" open-source license applies to the work in this repository.
 
