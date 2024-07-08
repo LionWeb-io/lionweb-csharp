@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-ALang", Version = "1")]
-public class ALangLanguage : LanguageBase<ALangFactory>
+public class ALangLanguage : LanguageBase<IALangFactory>
 {
 	public static readonly ALangLanguage Instance = new Lazy<ALangLanguage>(() => new("id-ALang")).Value;
 	public ALangLanguage(string id) : base(id)
@@ -60,7 +60,13 @@ public class ALangLanguage : LanguageBase<ALangFactory>
 	public EnumerationLiteral AEnum_right => _aEnum_right.Value;
 }
 
-public class ALangFactory : AbstractBaseNodeFactory
+public interface IALangFactory : INodeFactory
+{
+    public AConcept NewAConcept(string id);
+    public AConcept CreateAConcept();
+}
+
+public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 {
 	private readonly ALangLanguage _language;
 	public ALangFactory(ALangLanguage language) : base(language)
