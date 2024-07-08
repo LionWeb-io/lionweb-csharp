@@ -386,7 +386,7 @@ public class ComparerOutputTests : ComparerTestsBase
     private void AssertOutput(List<INode?> left, List<INode?> right, string expectedOutput,
         ComparerOutputConfig outputConfig)
     {
-        var comparer = new Comparer(left, right);
+        var comparer = new Comparer([.. left], [.. right]);
         comparer.Compare();
         Assert.AreEqual(expectedOutput, comparer.ToMessage(outputConfig));
     }

@@ -293,7 +293,7 @@ public class DeserializationTests
         var serializationChunk = Serializer.Serialize([line]);
         var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
 
-        var comparer = new Comparer([line], nodes);
+        var comparer = new Comparer([line], [.. nodes]);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 }

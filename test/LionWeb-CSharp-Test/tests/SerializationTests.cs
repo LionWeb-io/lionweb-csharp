@@ -52,6 +52,27 @@ public class SerializationTests
     }
 
     [TestMethod]
+    public void test_serialization_shapes_language()
+    {
+        var serializationChunk = LanguageSerializer.Serialize(ShapesLanguage.Instance);
+        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
+
+        var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
+        var comparer = new Comparer([ShapesLanguage.Instance], redeserialized.Cast<IReadableNode>().ToList());
+        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+    }
+
+    [TestMethod]
+    public void test_serialization_lioncore()
+    {
+        var serializationChunk = LanguageSerializer.Serialize(M3Language.Instance);
+        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
+
+        // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
+        LanguageDeserializer.Deserialize(serializationChunk);
+    }
+
+    [TestMethod]
     public void test_no_double_serialization()
     {
         var geometry = ExampleModels.ExampleModel(_language);
@@ -82,7 +103,7 @@ public class SerializationTests
         var serializationChunk = Serializer.Serialize([line, refGeo]);
         var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
 
-        var comparer = new Comparer([line, refGeo], nodes);
+        var comparer = new Comparer([line, refGeo], [.. nodes]);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
@@ -94,7 +115,7 @@ public class SerializationTests
         var serializationChunk = Serializer.Serialize([compositeShape]);
         var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
 
-        var comparer = new Comparer([compositeShape], nodes);
+        var comparer = new Comparer([compositeShape], [.. nodes]);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
@@ -106,7 +127,7 @@ public class SerializationTests
         var serializationChunk = Serializer.Serialize([materialGroup]);
         var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
 
-        var comparer = new Comparer([materialGroup], nodes);
+        var comparer = new Comparer([materialGroup], [.. nodes]);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 }

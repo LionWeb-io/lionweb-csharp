@@ -151,7 +151,7 @@ public abstract class ComparerTestsBase
         Comparer([left], [right]);
 
     private static Comparer Comparer(List<INode?> left, List<INode?> right) =>
-        new(left, right);
+        new([.. left], [.. right]);
 
     protected static ComparerOutputConfig OutputConfig = new()
     {
