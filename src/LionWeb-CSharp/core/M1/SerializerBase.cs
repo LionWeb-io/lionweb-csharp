@@ -73,6 +73,48 @@ public abstract class SerializerBase
             _ => value.ToString() // Integer, Json (and anything else)
         };
 
-    protected virtual void logError(string message) =>
+    protected virtual void LogError(string message) =>
         Console.Error.WriteLine(message);
+
+    protected SerializedNode SerializeSimpleNode(IReadableNode node) =>
+        new()
+        {
+            Id = node.GetId(),
+            Classifier = node.GetClassifier().ToMetaPointer(),
+            Properties = node.GetClassifier().AllFeatures().OfType<Property>()
+                .Select(property => SerializedPropertySetting(node, property)).ToArray(),
+            Containments = node.GetClassifier().AllFeatures().OfType<Containment>()
+                .Select<Containment, SerializedContainment>(containment =>
+                    SerializedContainmentSetting(node, containment)).ToArray(),
+            References = node.GetClassifier().AllFeatures().OfType<Reference>()
+                .Select<Reference, SerializedReference>(reference => SerializedReferenceSetting(node, reference))
+                .ToArray(),
+            Annotations = node.GetAnnotations()
+                .Select(annotation => annotation.GetId()).ToArray(),
+            Parent = node.GetParent()?.GetId()
+        };
+
+    private SerializedContainment SerializedContainmentSetting(IReadableNode node, Containment containment)
+    {
+        var value = GetValueIfSet(node, containment);
+        return new SerializedContainment
+        {
+            Containment = containment.ToMetaPointer(),
+            Children = value != null
+                ? containment.AsNodes<INode>(value).Select((child) => child.GetId()).ToArray()
+                : []
+        };
+    }
+
+    private SerializedReference SerializedReferenceSetting(IReadableNode node, Reference reference)
+    {
+        var value = GetValueIfSet(node, reference);
+        return new()
+        {
+            Reference = reference.ToMetaPointer(),
+            Targets = value != null
+                ? reference.AsNodes<INode>(value).Select(SerializedReferenceTarget).ToArray()
+                : []
+        };
+    }
 }

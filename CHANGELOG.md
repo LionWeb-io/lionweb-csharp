@@ -19,6 +19,10 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ## [0.2.2] - unreleased
 
+### Added
+
+- Language (de-)Serialization can handle annotations on languages.
+
 ## Changed
 
 - Released as open source under the Apache-2.0 license.

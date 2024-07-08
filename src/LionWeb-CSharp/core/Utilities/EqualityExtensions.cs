@@ -145,6 +145,10 @@ public class LanguageEntityIdentityComparer : IEqualityComparer<LanguageEntity>
     }
 
     /// <inheritdoc />
-    public int GetHashCode(LanguageEntity obj) =>
-        HashCode.Combine(obj.Key, obj.GetLanguage().GetHashCodeIdentity());
+    public int GetHashCode(LanguageEntity obj)
+    {
+        if(obj.GetParent() != null)
+            return HashCode.Combine(obj.Key, obj.GetLanguage().GetHashCodeIdentity());
+        return HashCode.Combine(obj.Key);
+    }
 }

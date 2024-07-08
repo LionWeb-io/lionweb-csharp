@@ -18,7 +18,6 @@
 namespace LionWeb.Core.M1;
 
 using M2;
-using M3;
 using Serialization;
 
 public class Serializer : SerializerBase
@@ -55,48 +54,8 @@ public class Serializer : SerializerBase
                 .Select(SerializedLanguageReference)
                 .ToArray(),
             Nodes = allNodes
-                .Select(SerializedNode)
+                .Select(SerializeSimpleNode)
                 .ToArray()
-        };
-    }
-
-    private SerializedNode SerializedNode(INode node) =>
-        new()
-        {
-            Id = node.GetId(),
-            Classifier = node.GetClassifier().ToMetaPointer(),
-            Properties = node.GetClassifier().AllFeatures().OfType<Property>()
-                .Select(property => SerializedPropertySetting(node, property)).ToArray(),
-            Containments = node.GetClassifier().AllFeatures().OfType<Containment>()
-                .Select(containment => SerializedContainmentSetting(node, containment)).ToArray(),
-            References = node.GetClassifier().AllFeatures().OfType<Reference>()
-                .Select(reference => SerializedReferenceSetting(node, reference)).ToArray(),
-            Annotations = node.GetAnnotations()
-                .Select(annotation => annotation.GetId()).ToArray(),
-            Parent = node.GetParent()?.GetId()
-        };
-
-    private SerializedContainment SerializedContainmentSetting(INode node, Containment containment)
-    {
-        var value = GetValueIfSet(node, containment);
-        return new SerializedContainment
-        {
-            Containment = containment.ToMetaPointer(),
-            Children = value != null
-                ? containment.AsNodes<INode>(value).Select((child) => child.GetId()).ToArray()
-                : []
-        };
-    }
-
-    private SerializedReference SerializedReferenceSetting(INode node, Reference reference)
-    {
-        var value = GetValueIfSet(node, reference);
-        return new()
-        {
-            Reference = reference.ToMetaPointer(),
-            Targets = value != null
-                ? reference.AsNodes<INode>(value).Select(SerializedReferenceTarget).ToArray()
-                : []
         };
     }
 }

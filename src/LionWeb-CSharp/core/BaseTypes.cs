@@ -222,7 +222,7 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
     /// <inheritdoc/>
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations)
     {
-        if (annotations is T[] t)
+        if (annotations is IEnumerable<T> t)
         {
             AddAnnotations(t);
         }
@@ -236,7 +236,7 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
     /// <inheritdoc/>
     void IWritableNode.InsertAnnotations(int index, IEnumerable<IWritableNode> annotations)
     {
-        if (annotations is T[] t)
+        if (annotations is IEnumerable<T> t)
         {
             InsertAnnotations(index, t);
         }
@@ -250,7 +250,7 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
     /// <inheritdoc/>
     bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations)
     {
-        if (annotations is T[] t)
+        if (annotations is IEnumerable<T> t)
         {
             RemoveAnnotations(t);
         }

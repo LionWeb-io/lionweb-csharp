@@ -16,6 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using Examples.Shapes.Dynamic;
+using Io.Lionweb.Mps.Specific;
 using LionWeb.CSharp.Generator.Impl;
 using LionWeb.CSharp.Generator.Names;
 using LionWeb.Core.M2;
@@ -60,7 +61,7 @@ try
         .ToFrozenSet();
 
     var serializationChunk = JsonUtils.ReadJsonFromFile<SerializationChunk>(importFilePath);
-    var loadedLanguages = LanguageDeserializer.Deserialize(serializationChunk).ToList();
+    var loadedLanguages = LanguageDeserializer.Deserialize(serializationChunk, SpecificLanguage.Instance).ToList();
     // foreach (var l in loadedLanguages)
     // {
     //     l.Name = l.Name.Replace(".", "_");
