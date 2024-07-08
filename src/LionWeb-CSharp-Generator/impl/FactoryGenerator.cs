@@ -32,6 +32,7 @@ using static AstExtensions;
 public class FactoryGenerator(INames names) : GeneratorBase(names)
 {
     private string FactoryName => _names.FactoryName;
+    private string FactoryInterfaceName => _names.FactoryInterfaceName;
 
     private IEnumerable<Classifier> ConcreteClassifiers =>
         Language
@@ -42,10 +43,26 @@ public class FactoryGenerator(INames names) : GeneratorBase(names)
     private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>();
 
     /// <inheritdoc cref="FactoryGenerator"/>
-    public ClassDeclarationSyntax FactoryClass() =>
+    public IEnumerable<TypeDeclarationSyntax> FactoryTypes() =>
+    [
+        FactoryInterface(),
+        FactoryClass()
+    ];
+
+    private InterfaceDeclarationSyntax FactoryInterface() =>
+        InterfaceDeclaration(FactoryInterfaceName)
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithBaseList(AsBase(AsType(typeof(INodeFactory))))
+            .WithMembers(List(new List<MemberDeclarationSyntax>(
+                ConcreteClassifiers
+                    .SelectMany(GenNewMethods)
+                    .Select(m => m.WithExpressionBody(null))
+            )));
+
+    private ClassDeclarationSyntax FactoryClass() =>
         ClassDeclaration(FactoryName)
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .WithBaseList(AsBase(AsType(typeof(AbstractBaseNodeFactory))))
+            .WithBaseList(AsBase(AsType(typeof(AbstractBaseNodeFactory)), _names.FactoryInterfaceType))
             .WithMembers(List(new List<MemberDeclarationSyntax>
             {
                 GenLanguageField(), GenConstructor(), GenCreateNode(), GenGetEnumerationLiteral()

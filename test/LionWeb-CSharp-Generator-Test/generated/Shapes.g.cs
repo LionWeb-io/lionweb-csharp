@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using Time = string;
 
 [LionCoreLanguage(Key = "key-Shapes", Version = "1")]
-public class ShapesLanguage : LanguageBase<ShapesFactory>
+public class ShapesLanguage : LanguageBase<IShapesFactory>
 {
 	public static readonly ShapesLanguage Instance = new Lazy<ShapesLanguage>(() => new("id-Shapes")).Value;
 	public ShapesLanguage(string id) : base(id)
@@ -74,7 +74,7 @@ public class ShapesLanguage : LanguageBase<ShapesFactory>
         public override IReadOnlyList<Language> DependsOn => [];
 
 	/// <inheritdoc/>
-        public override ShapesFactory GetFactory() => new(this);
+        public override IShapesFactory GetFactory() => new ShapesFactory(this);
 	private const string _key = "key-Shapes";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -229,7 +229,31 @@ public class ShapesLanguage : LanguageBase<ShapesFactory>
 	public PrimitiveType Time => _time.Value;
 }
 
-public class ShapesFactory : AbstractBaseNodeFactory
+public interface IShapesFactory : INodeFactory
+{
+	public Circle NewCircle(string id);
+	public Circle CreateCircle();
+	public Coord NewCoord(string id);
+	public Coord CreateCoord();
+	public Geometry NewGeometry(string id);
+	public Geometry CreateGeometry();
+	public Line NewLine(string id);
+	public Line CreateLine();
+	public OffsetDuplicate NewOffsetDuplicate(string id);
+	public OffsetDuplicate CreateOffsetDuplicate();
+	public CompositeShape NewCompositeShape(string id);
+	public CompositeShape CreateCompositeShape();
+	public ReferenceGeometry NewReferenceGeometry(string id);
+	public ReferenceGeometry CreateReferenceGeometry();
+	public Documentation NewDocumentation(string id);
+	public Documentation CreateDocumentation();
+	public BillOfMaterials NewBillOfMaterials(string id);
+	public BillOfMaterials CreateBillOfMaterials();
+	public MaterialGroup NewMaterialGroup(string id);
+	public MaterialGroup CreateMaterialGroup();
+}
+
+public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 {
 	private readonly ShapesLanguage _language;
 	public ShapesFactory(ShapesLanguage language) : base(language)

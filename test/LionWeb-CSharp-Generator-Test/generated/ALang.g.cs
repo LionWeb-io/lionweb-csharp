@@ -31,7 +31,7 @@ public class ALangLanguage : LanguageBase<IALangFactory>
         public override IReadOnlyList<Language> DependsOn => [Examples.Cirular.B.BLangLanguage.Instance];
 
 	/// <inheritdoc/>
-        public override ALangFactory GetFactory() => new(this);
+        public override IALangFactory GetFactory() => new ALangFactory(this);
 	private const string _key = "key-ALang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -62,8 +62,8 @@ public class ALangLanguage : LanguageBase<IALangFactory>
 
 public interface IALangFactory : INodeFactory
 {
-    public AConcept NewAConcept(string id);
-    public AConcept CreateAConcept();
+	public AConcept NewAConcept(string id);
+	public AConcept CreateAConcept();
 }
 
 public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
