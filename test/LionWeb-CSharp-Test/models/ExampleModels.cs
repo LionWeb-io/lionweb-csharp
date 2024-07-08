@@ -57,8 +57,9 @@ public static class ExampleModels
 
     public static INode ExampleModel(Language lang)
     {
-        var geometry = lang.GetFactory().CreateNode(IdUtils.NewId(), lang.ClassifierByKey("key-Geometry"));
-        geometry.Set(lang.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes"), new List<INode>{ExampleLine(lang)});
+        var language = ShapesLanguage.Instance;
+        var geometry = language.GetFactory().CreateNode(IdUtils.NewId(), language.ClassifierByKey("key-Geometry"));
+        geometry.Set(language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes"), new List<INode>{ExampleLine(language)});
 
         return geometry;
     }

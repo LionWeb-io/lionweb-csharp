@@ -23,7 +23,17 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 - Generate interface for each factory; factory implementation methods are `virtual` now.
 
-## Changed
+### Added
+
+- Add extensions class `ReferenceExtensions` (in namespace `TL.LDM.Language.Extensions`) with extension methods to deal with references:
+	- `<rootNodes>.AllReferenceValues()` finds all references within the forest with trunks `<rootNodes>`.
+	- `<targetNode>.AllIncomingReferencesWithin(<rootNodes>)` finds all references _to_ the `<targetNode>` within the forest with trunks `<rootNodes>`.
+
+### Fixed
+
+- Fix bug ([issue #7](https://github.com/LionWeb-io/lionweb-csharp/issues/7)) in `Textualizer`: don't crash on unset `name` properties of `INamed`s.
+
+### Changed
 
 - Released as open source under the Apache-2.0 license.
 - Set up CI using GitHub Actions.
