@@ -24,6 +24,9 @@ using Serialization;
 public class Serializer : SerializerBase
 {
     private readonly IEnumerable<INode> _nodes;
+    private readonly HashSet<Language> _usedLanguages = new();
+
+    public ISerializerHandler Handler { get; set; } = new SerializerExceptionHandler();
 
     public Serializer(IEnumerable<INode> nodes)
     {
@@ -40,25 +43,63 @@ public class Serializer : SerializerBase
 
     public SerializationChunk Serialize()
     {
-        var allNodes = _nodes
-            .SelectMany(node => node.Descendants(true, true))
-            .Distinct()
-            .ToList();
-        var languagesUsed = allNodes
-            .Select(node => node.GetClassifier().GetLanguage())
-            .Distinct();
+        var serializedNodes = SerializeToNodes()
+            .ToArray();
+        var languagesUsed = UsedLanguages()
+            .ToArray();
         return new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
-            Languages = languagesUsed
-                .Where(language => language.Key != BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
-                .Select(SerializedLanguageReference)
-                .ToArray(),
-            Nodes = allNodes
-                .Select(SerializedNode)
-                .ToArray()
+            SerializationFormatVersion = ReleaseVersion.Current, Languages = languagesUsed, Nodes = serializedNodes
         };
     }
+
+    public IEnumerable<SerializedNode> SerializeToNodes() =>
+        AllNodes()
+            .Select(RegisterUsedLanguage)
+            .Select(SerializedNode);
+
+    public IEnumerable<SerializedLanguageReference> UsedLanguages() =>
+        _usedLanguages
+            .Select(SerializeLanguageReference);
+
+    private INode RegisterUsedLanguage(INode node)
+    {
+        Language language = node.GetClassifier().GetLanguage();
+        if (language.Key != BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
+        {
+            Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.Key == language.Key && l.Version == language.Version);
+            if (existingLanguage != null)
+            {
+                Handler.DuplicateUsedLanguage(existingLanguage, language);
+            }
+            _usedLanguages.Add(language);
+        }
+
+        return node;
+    }
+
+    private class NodeIdEqualityComparer(ISerializerHandler handler) : IEqualityComparer<INode>
+    {
+        public bool Equals(INode? x, INode? y)
+        {
+            if (x == y)
+                return true;
+
+            if (x?.GetId() != y?.GetId())
+                return false;
+
+            handler.DuplicateNodeId(x, y);
+            return true;
+        }
+
+        public int GetHashCode(INode obj) =>
+            obj.GetId().GetHashCode();
+    }
+
+    private IEnumerable<INode> AllNodes() =>
+        _nodes
+            .SelectMany(node => node.Descendants(true, true))
+            .Distinct(new NodeIdEqualityComparer(Handler));
 
     private SerializedNode SerializedNode(INode node) =>
         new()
@@ -66,7 +107,7 @@ public class Serializer : SerializerBase
             Id = node.GetId(),
             Classifier = node.GetClassifier().ToMetaPointer(),
             Properties = node.GetClassifier().AllFeatures().OfType<Property>()
-                .Select(property => SerializedPropertySetting(node, property)).ToArray(),
+                .Select(property => SerializePropertySetting(node, property)).ToArray(),
             Containments = node.GetClassifier().AllFeatures().OfType<Containment>()
                 .Select(containment => SerializedContainmentSetting(node, containment)).ToArray(),
             References = node.GetClassifier().AllFeatures().OfType<Reference>()
@@ -95,8 +136,23 @@ public class Serializer : SerializerBase
         {
             Reference = reference.ToMetaPointer(),
             Targets = value != null
-                ? reference.AsNodes<INode>(value).Select(SerializedReferenceTarget).ToArray()
+                ? reference.AsNodes<INode>(value).Select(SerializeReferenceTarget).ToArray()
                 : []
         };
     }
+}
+
+public interface ISerializerHandler
+{
+    void DuplicateNodeId(INode a, INode b);
+    void DuplicateUsedLanguage(Language a, Language b);
+}
+
+public class SerializerExceptionHandler : ISerializerHandler
+{
+    public void DuplicateNodeId(INode a, INode b) =>
+        throw new ArgumentException($"nodes have same id '{a?.GetId() ?? b?.GetId()}': {a}, {b}");
+
+    public void DuplicateUsedLanguage(Language a, Language b) =>
+        throw new ArgumentException($"different languages with same key '{a?.Key ?? b?.Key}': {a}, {b}");
 }

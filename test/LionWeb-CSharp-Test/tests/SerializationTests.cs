@@ -21,6 +21,7 @@ using Examples.Shapes.Dynamic;
 using Examples.Shapes.M2;
 using M1;
 using M2;
+using M2.Generated.Test;
 using M3;
 using Serialization;
 using System.Collections;
@@ -55,7 +56,8 @@ public class SerializationTests
     public void test_no_double_serialization()
     {
         var geometry = ExampleModels.ExampleModel(_language);
-        var shape0 = (geometry.Get(_language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes")) as IEnumerable).Cast<INode>().First();
+        var shape0 = (geometry.Get(_language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes")) as IEnumerable)
+            .Cast<INode>().First();
 
         Assert.IsInstanceOfType<INode>(shape0);
         var serializationChunk = Serializer.Serialize([geometry, shape0]);
@@ -90,7 +92,7 @@ public class SerializationTests
     public void SerializeUnsetRequiredContainment()
     {
         var compositeShape = new CompositeShape("comp");
-        
+
         var serializationChunk = Serializer.Serialize([compositeShape]);
         var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
 
@@ -108,5 +110,152 @@ public class SerializationTests
 
         var comparer = new Comparer([materialGroup], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+    }
+
+    [TestMethod]
+    public void DuplicateId()
+    {
+        var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
+
+        Assert.ThrowsException<ArgumentException>(() => Serializer.Serialize([materialGroup]));
+    }
+
+    [TestMethod]
+    public void DuplicateNode()
+    {
+        var b = new Circle("b");
+        var a = new MaterialGroup("a") { DefaultShape = b };
+
+        var serializedNodes = new Serializer([a, b]).SerializeToNodes().ToList();
+        Assert.AreEqual(2, serializedNodes.Count);
+    }
+
+    class DuplicateNodeHandler(Action incrementer) : ISerializerHandler
+    {
+        public void DuplicateNodeId(INode? a, INode? b) => incrementer();
+        public void DuplicateUsedLanguage(Language a, Language b) => throw new NotImplementedException();
+    }
+
+    [TestMethod]
+    public void DuplicateId_CustomHandler()
+    {
+        var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
+
+        int count = 0;
+
+        var serializer =
+            new Serializer([materialGroup])
+            {
+                Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count))
+            };
+
+        serializer.Serialize();
+
+        Assert.AreEqual(1, count);
+    }
+
+    [TestMethod]
+    public void DuplicateUsedLanguage()
+    {
+        var lang = new DynamicLanguage("abc")
+        {
+            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
+        };
+        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
+            ShapesLanguage.Instance.MaterialGroup.Name);
+        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
+            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+
+        var a = lang.GetFactory().CreateNode("a", materialGroup);
+        var b = new Circle("b");
+        a.Set(defaultShape, b);
+
+        Assert.ThrowsException<ArgumentException>(() => Serializer.Serialize([a]));
+    }
+
+    [TestMethod]
+    public void DuplicateUsedLanguage_DifferentVersion()
+    {
+        var lang = new DynamicLanguage("abc")
+        {
+            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version + "hello"
+        };
+        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
+            ShapesLanguage.Instance.MaterialGroup.Name);
+        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
+            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+
+        var a = lang.GetFactory().CreateNode("a", materialGroup);
+        var b = new Circle("b");
+        a.Set(defaultShape, b);
+
+        var serializationChunk = Serializer.Serialize([a]);
+        Assert.AreEqual(2, serializationChunk.Languages.Length);
+    }
+
+    class DuplicateLanguageHandler(Action incrementer) : ISerializerHandler
+    {
+        public void DuplicateNodeId(INode? a, INode? b) => throw new NotImplementedException();
+        public void DuplicateUsedLanguage(Language a, Language b) => incrementer();
+    }
+
+    [TestMethod]
+    public void DuplicateLanguage_CustomHandler()
+    {
+        var lang = new DynamicLanguage("abc")
+        {
+            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
+        };
+        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
+            ShapesLanguage.Instance.MaterialGroup.Name);
+        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
+            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+
+        var a = lang.GetFactory().CreateNode("a", materialGroup);
+        var b = new Circle("b");
+        a.Set(defaultShape, b);
+
+        int count = 0;
+
+        var serializer =
+            new Serializer([a]) { Handler = new DuplicateLanguageHandler(() => Interlocked.Increment(ref count)) };
+
+        serializer.Serialize();
+
+        Assert.AreEqual(1, count);
+    }
+
+    [TestMethod]
+    public void SingleEnumerable()
+    {
+        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
+
+        var serializer = new Serializer(new SingleEnumerable<INode>([materialGroup]));
+        var serializedNodes = serializer.SerializeToNodes();
+        Assert.AreEqual(2, serializedNodes.Count());
+        Assert.AreEqual(1, serializer.UsedLanguages().Count());
+    }
+
+    [TestMethod]
+    public void SingleEnumerable_fail()
+    {
+        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
+
+        var serializer = new Serializer(new SingleEnumerable<INode>([materialGroup]));
+        var serializedNodes = serializer.SerializeToNodes();
+        Assert.AreEqual(2, serializedNodes.Count());
+        Assert.ThrowsException<AssertFailedException>(() => Assert.AreEqual(2, serializedNodes.Count()));
+    }
+
+    [TestMethod]
+    public void NoUsedLanguagesBeforeSerialization()
+    {
+        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
+
+        var serializer = new Serializer([materialGroup]);
+        Assert.AreEqual(0, serializer.UsedLanguages().Count());
+        var serializedNodes = serializer.SerializeToNodes();
+        Assert.AreEqual(2, serializedNodes.Count());
+        Assert.AreEqual(1, serializer.UsedLanguages().Count());
     }
 }

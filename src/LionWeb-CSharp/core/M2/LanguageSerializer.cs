@@ -49,7 +49,7 @@ public class LanguageSerializer : SerializerBase
             SerializationFormatVersion = ReleaseVersion.Current,
             Languages =
             [
-                SerializedLanguageReference(M3Language.Instance)
+                SerializeLanguageReference(M3Language.Instance)
             ],
             Nodes = _languages.SelectMany(language => M1Extensions.Descendants<IKeyed>(language, true))
                 .Select(SerializeNode).ToArray()
@@ -262,7 +262,7 @@ public class LanguageSerializer : SerializerBase
     }
 
     private SerializedProperty SerializedPropertySetting(Classifier metaConcept, string key, IReadableNode node)
-        => SerializedPropertySetting(node, (Property)metaConcept.FeatureByKey(key));
+        => SerializePropertySetting(node, (Property)metaConcept.FeatureByKey(key));
 
     private SerializedContainment SerializedContainmentSettings(Classifier metaConcept, string key,
         IEnumerable<IReadableNode> children)
@@ -278,7 +278,7 @@ public class LanguageSerializer : SerializerBase
             Reference = metaConcept.FeatureByKey(key).ToMetaPointer(),
             Targets = target == null
                 ? []
-                : [SerializedReferenceTarget(target)]
+                : [SerializeReferenceTarget(target)]
         };
 
     private SerializedReference SerializedReferenceSettings(Classifier metaConcept, string key,
@@ -286,6 +286,6 @@ public class LanguageSerializer : SerializerBase
         => new()
         {
             Reference = metaConcept.FeatureByKey(key).ToMetaPointer(),
-            Targets = targets.Select(SerializedReferenceTarget).ToArray()
+            Targets = targets.Select(SerializeReferenceTarget).ToArray()
         };
 }

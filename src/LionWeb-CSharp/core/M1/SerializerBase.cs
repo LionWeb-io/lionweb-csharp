@@ -23,10 +23,10 @@ using Serialization;
 
 public abstract class SerializerBase
 {
-    protected SerializedLanguageReference SerializedLanguageReference(Language language) =>
+    protected SerializedLanguageReference SerializeLanguageReference(Language language) =>
         new() { Key = language.Key, Version = language.Version };
 
-    protected SerializedProperty SerializedPropertySetting(IReadableNode node, Property property)
+    protected SerializedProperty SerializePropertySetting(IReadableNode node, Property property)
     {
         var value = GetValueIfSet(node, property);
 
@@ -43,7 +43,7 @@ public abstract class SerializerBase
         };
     }
 
-    protected SerializedReferenceTarget SerializedReferenceTarget(IReadableNode target)
+    protected SerializedReferenceTarget SerializeReferenceTarget(IReadableNode target)
     {
         var resolveInfo = target switch
         {
