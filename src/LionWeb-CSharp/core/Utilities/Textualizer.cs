@@ -41,9 +41,11 @@ public static class Textualizer
 
     private static IEnumerable<string> AsStrings(this INode node)
     {
+        var noNameSetOutput = "<no name set!>";
+
         return
         [
-            $"{node.GetClassifier().Name} (id: {node.GetId()}) {{",
+            $"{Name(node.GetClassifier())} (id: {node.GetId()}) {{",
             ..Indent([
                 ..node.CollectAllSetFeatures().OfType<Property>().Select(PropertyAsString),
                 ..node.CollectAllSetFeatures().OfType<Reference>().Select(ReferenceAsString),
@@ -60,29 +62,38 @@ public static class Textualizer
                 _ => $"{value}" // TODO  enums? null?
             };
 
-        string PropertyAsString(Property property)
-            => $"{property.Name} = {ValueAsString(node.Get(property))}";
+        bool HasSetName(INamed named)
+            => named.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name);
 
-        string NameInfo(INode node)
+        string Name(INamed named)
         {
-            if (node is INamed named)
+            try
             {
-                return named.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name)
-                    ? $"({named.Name})"
-                    : "<no name set!>";
+                return named.Name;
+            } catch (UnsetFeatureException e)
+            {
+                return noNameSetOutput;
             }
-
-            return "<not named>";
         }
 
+        string PropertyAsString(Property property)
+            => $"{Name(property)} = {ValueAsString(node.Get(property))}";
+
+        string ReferenceInfo(INode node)
+            => node switch
+            {
+                INamed named => " " + (HasSetName(named) ? $"({named.Name})" : noNameSetOutput),
+                _ => ""
+            };
+
         string ReferenceTargetAsString(INode target)
-            => $"{target.GetId()} {NameInfo(target)}";
+            => $"{target.GetId()}{ReferenceInfo(target)}";
 
         string ReferenceAsString(Reference reference)
         {
             var targets = reference.AsNodes<INode>(node.Get(reference));
             return
-                $"{reference.Name} -> {(targets.Any() ? Join(targets.Select(ReferenceTargetAsString), ", ") : " <none>")}";
+                $"{Name(reference)} -> {(targets.Any() ? Join(targets.Select(ReferenceTargetAsString), ", ") : " <none>")}";
         }
 
         IEnumerable<string> ContainmentAsStrings(Containment containment)
@@ -90,7 +101,7 @@ public static class Textualizer
             var children = containment.AsNodes<INode>(node.Get(containment));
             return
             [
-                $"{containment.Name}:{(children.Any() ? "" : " <none>")}",
+                $"{Name(containment)}:{(children.Any() ? "" : " <none>")}",
                 ..Indent(children.SelectMany(child => child.AsStrings()))
             ];
         }

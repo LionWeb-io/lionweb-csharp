@@ -17,6 +17,9 @@
 
 namespace LionWeb.Utilities.Test;
 
+using Core;
+using Core.M2;
+using Core.M3;
 using Core.Utilities;
 using Examples.Shapes.Dynamic;
 using Examples.Shapes.M2;
@@ -59,5 +62,43 @@ public class TextualizerTests
                             shapes -> foo (MyCompositeShape)
                         }
                         """, referenceGeometry.AsString());
+    }
+
+    [TestMethod]
+    public void does_not_crash_on_features_with_unset_names()
+    {
+        var language = new DynamicLanguage("lang");
+
+        var concept = new DynamicConcept("concept", language);
+        language.AddEntities([concept]);
+
+        // shows that INamed_name is declared as a set feature, but its getter still throws:
+        Assert.IsTrue(concept.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name));
+        Assert.ThrowsException<UnsetFeatureException>(() => concept.Name);
+
+        var property = new DynamicProperty("prop", concept);
+        property.Type = BuiltInsLanguage.Instance.String;
+        var containment = new DynamicContainment("cont", concept);
+        containment.Type = concept;
+        var reference = new DynamicReference("ref", concept);
+        reference.Type = concept;
+        concept.AddFeatures([property, containment, reference]);
+
+        var instance1 = new DynamicNode("instance1", concept);
+        var instance2 = new DynamicNode("instance2", concept);
+
+        instance1.Set(property, "val-prop");
+        instance1.Set(containment, instance2);
+        instance1.Set(reference, instance1);    // (self-ref.)
+
+        Assert.AreEqual("""
+                        <no name set!> (id: instance1) {
+                            <no name set!> = "val-prop"
+                            <no name set!> -> instance1
+                            <no name set!>:
+                                <no name set!> (id: instance2) {
+                                }
+                        }
+                        """, instance1.AsString());
     }
 }
