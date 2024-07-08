@@ -63,8 +63,20 @@ public static class Textualizer
         string PropertyAsString(Property property)
             => $"{property.Name} = {ValueAsString(node.Get(property))}";
 
+        string NameInfo(INode node)
+        {
+            if (node is INamed named)
+            {
+                return named.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name)
+                    ? $"({named.Name})"
+                    : "<no name set!>";
+            }
+
+            return "<not named>";
+        }
+
         string ReferenceTargetAsString(INode target)
-            => $"{target.GetId()}{(target is INamed named ? $" ({named.Name})" : "")}";
+            => $"{target.GetId()} {NameInfo(target)}";
 
         string ReferenceAsString(Reference reference)
         {

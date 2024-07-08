@@ -19,6 +19,7 @@ namespace LionWeb.Utilities.Test;
 
 using Core.Utilities;
 using Examples.Shapes.Dynamic;
+using Examples.Shapes.M2;
 
 [TestClass]
 public class TextualizerTests
@@ -28,5 +29,35 @@ public class TextualizerTests
     {
         var model = ExampleModels.ExampleModel(ShapesDynamic.Language);
         Console.WriteLine(model.AsString());
+    }
+
+    [TestMethod]
+    public void does_not_crash_on_reference_to_a_node_with_an_unset_name()
+    {
+        var factory = ShapesLanguage.Instance.GetFactory();
+        var compositeShape = factory.NewCompositeShape("foo");
+        var referenceGeometry = factory.NewReferenceGeometry("bar").AddShapes([compositeShape]);
+
+        Assert.AreEqual("""
+                        CompositeShape (id: foo) {
+                        }
+                        """, compositeShape.AsString());
+        Assert.AreEqual("""
+                        ReferenceGeometry (id: bar) {
+                            shapes -> foo <no name set!>
+                        }
+                        """, referenceGeometry.AsString());
+
+        compositeShape.Name = "MyCompositeShape";
+        Assert.AreEqual("""
+                        CompositeShape (id: foo) {
+                            name = "MyCompositeShape"
+                        }
+                        """, compositeShape.AsString());
+        Assert.AreEqual("""
+                        ReferenceGeometry (id: bar) {
+                            shapes -> foo (MyCompositeShape)
+                        }
+                        """, referenceGeometry.AsString());
     }
 }
