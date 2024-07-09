@@ -51,6 +51,10 @@ public interface INames
     /// <returns><c>MyLangNameLanguage</c></returns>
     NameSyntax LanguageType { get; }
 
+    /// Name of interface generated for <see cref="Language">Language's</see> Factory.
+    /// <returns><c>IMyLangFactory</c></returns>
+    string FactoryInterfaceName { get; }
+
     /// Name of class generated for <see cref="Language">Language's</see> Factory.
     /// <returns><c>MyLangFactory</c></returns>
     string FactoryName { get; }
@@ -58,6 +62,10 @@ public interface INames
     /// Roslyn type of class generated for <see cref="Language">Language's</see> Factory.
     /// <returns><c>MyLangFactory</c></returns>
     IdentifierNameSyntax FactoryType { get; }
+
+    /// Roslyn type of interface generated for <see cref="Language">Language's</see> Factory.
+    /// <returns><c>IMyLangFactory</c></returns>
+    IdentifierNameSyntax FactoryInterfaceType { get; }
 
     /// Converts <paramref name="type"/> to Roslyn type and registers it with <see cref="UsedTypes"/>.
     /// If <paramref name="type"/> includes generic type parameters and <paramref name="generics"/> is unset,

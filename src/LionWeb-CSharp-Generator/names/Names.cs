@@ -66,8 +66,14 @@ public partial class Names(Language language, string namespaceName) : INames
 
     /// <inheritdoc />
     public NameSyntax LanguageType => AsType(language);
+
+    /// <inheritdoc />
+    public string FactoryInterfaceName => $"I{FactoryName}";
+
     /// <inheritdoc />
     public string FactoryName => $"{LanguageBaseName(language)}Factory";
+    /// <inheritdoc />
+    public IdentifierNameSyntax FactoryInterfaceType => IdentifierName(FactoryInterfaceName);
     /// <inheritdoc />
     public IdentifierNameSyntax FactoryType => IdentifierName(FactoryName);
     /// <inheritdoc />

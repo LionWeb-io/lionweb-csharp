@@ -49,7 +49,7 @@ using Property = Core.M3.Property;
 /// <seealso cref="LanguageConstructorGenerator"/>
 public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
 {
-    private IdentifierNameSyntax FactoryType => _names.FactoryType;
+    private IdentifierNameSyntax FactoryInterfaceType => _names.FactoryInterfaceType;
 
     /// <inheritdoc cref="LanguageGenerator"/>
     public ClassDeclarationSyntax LanguageClass() =>
@@ -61,7 +61,7 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
                 ])
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .WithBaseList(AsBase(AsType(typeof(LanguageBase<>), generics: FactoryType)))
+            .WithBaseList(AsBase(AsType(typeof(LanguageBase<>), generics: FactoryInterfaceType)))
             .WithMembers(List(new List<MemberDeclarationSyntax>
                 {
                     GenLanguageInstance(),
@@ -103,7 +103,7 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             .Xdoc(XdocInheritDoc());
 
     private MethodDeclarationSyntax GenGetFactory() =>
-        Method("GetFactory", FactoryType, exprBody: NewCall([ThisExpression()]))
+        Method("GetFactory", FactoryInterfaceType, exprBody: NewCall([ThisExpression()], _names.FactoryType))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc());
 

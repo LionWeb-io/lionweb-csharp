@@ -18,6 +18,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 
 ## [0.2.2] - unreleased
+### Added
+
+- Generate interface for each factory; factory implementation methods are `virtual` now.
 
 ## Changed
 
