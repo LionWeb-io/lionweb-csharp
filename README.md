@@ -25,6 +25,7 @@ It's triggered:
 
 * On every push to branch for which a Pull Request exists.
 * When a commit (on any branch) is tagged.
+    If restoring, building, and running all tests is successful, then NuGet packages (for) `LionWeb-CSharp` and `LionWeb-CSharp-Generator` are published with the tag as version identification.
 
 
 ## License
