@@ -3,7 +3,6 @@ name: CI LionWeb-C#
 on:
   workflow_dispatch:
   pull_request:
-  push:
 
 env:
   NuGetDirectory: ${{github.workspace}}/nuget
