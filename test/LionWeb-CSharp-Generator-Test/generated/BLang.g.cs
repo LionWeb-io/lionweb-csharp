@@ -84,6 +84,7 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 	public virtual BConcept CreateBConcept() => NewBConcept(GetNewId());
 }
 
+/// <summary>Some enum</summary>
 [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-BConcept")]
 public class BConcept : NodeBase
 {

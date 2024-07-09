@@ -17,22 +17,35 @@
 
 using Examples.Shapes.Dynamic;
 using Io.Lionweb.Mps.Specific;
-using LionWeb.CSharp.Generator.Impl;
-using LionWeb.CSharp.Generator.Names;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using LionWeb.CSharp.Generator;
+using LionWeb.CSharp.Generator.Impl;
+using LionWeb.CSharp.Generator.Names;
 using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Frozen;
 using System.Reflection;
 
 var aLang = new DynamicLanguage("id-ALang") { Key = "key-ALang", Name = "ALang", Version = "1" };
 var aConcept = aLang.Concept("id-AConcept", "key-AConcept", "AConcept");
+aConcept.AddAnnotations([
+    new ConceptDescription("aaa-desc")
+    {
+        ConceptAlias = "AConcept Alias",
+        ConceptShortDescription = """
+                                  This is my
+                                    Des
+                                  crip
+                                     tion
+                                  """
+    }
+]);
 var aEnum = aLang.Enumeration("id-aEnum", "key-AEnum", "AEnum");
 
 var bLang = new DynamicLanguage("id-BLang") { Key = "key-BLang", Name = "BLang", Version = "2" };
 var bConcept = bLang.Concept("id-BConcept", "key-BConcept", "BConcept");
+bConcept.AddAnnotations([new ConceptDescription("xxx") { ConceptShortDescription = "Some enum" }]);
 
 aLang.AddDependsOn([bLang]);
 bLang.AddDependsOn([aLang]);

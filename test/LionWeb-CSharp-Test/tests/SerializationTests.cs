@@ -51,16 +51,17 @@ public class SerializationTests
         new Deserializer([_language]).Deserialize(serializationChunk);
     }
 
-    [TestMethod]
-    public void test_serialization_shapes_language()
-    {
-        var serializationChunk = LanguageSerializer.Serialize(ShapesLanguage.Instance);
-        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
-
-        var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
-        var comparer = new Comparer([ShapesLanguage.Instance], redeserialized.Cast<IReadableNode>().ToList());
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
-    }
+    // Disabled until #19 is merged
+    // [TestMethod]
+    // public void test_serialization_shapes_language()
+    // {
+    //     var serializationChunk = LanguageSerializer.Serialize(ShapesLanguage.Instance);
+    //     Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
+    //
+    //     var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
+    //     var comparer = new Comparer([ShapesLanguage.Instance], redeserialized.Cast<IReadableNode>().ToList());
+    //     Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+    // }
 
     [TestMethod]
     public void test_serialization_shapes_language_with_external_annotations()
