@@ -18,6 +18,15 @@ This repository contains an implementation of (select parts of) the [LionWeb](ht
 See these projects' respective `README`s for more information.
 
 
+## CI
+
+The CI is implemented through a GitHub Action, configured through the file [`build.yaml` workflow YAML file](./.github/workflows/build.yaml).
+It's triggered:
+
+* On every push to branch for which a Pull Request exists.
+* When a commit (on any branch) is tagged.
+
+
 ## License
 
 The "Apache-2.0" open-source license applies to the work in this repository.
