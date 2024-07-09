@@ -80,8 +80,8 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public BConcept NewBConcept(string id) => new(id);
-	public BConcept CreateBConcept() => NewBConcept(GetNewId());
+	public virtual BConcept NewBConcept(string id) => new(id);
+	public virtual BConcept CreateBConcept() => NewBConcept(GetNewId());
 }
 
 [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-BConcept")]

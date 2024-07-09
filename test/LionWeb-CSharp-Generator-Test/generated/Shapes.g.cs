@@ -295,26 +295,26 @@ public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public Circle NewCircle(string id) => new(id);
-	public Circle CreateCircle() => NewCircle(GetNewId());
-	public Coord NewCoord(string id) => new(id);
-	public Coord CreateCoord() => NewCoord(GetNewId());
-	public Geometry NewGeometry(string id) => new(id);
-	public Geometry CreateGeometry() => NewGeometry(GetNewId());
-	public Line NewLine(string id) => new(id);
-	public Line CreateLine() => NewLine(GetNewId());
-	public OffsetDuplicate NewOffsetDuplicate(string id) => new(id);
-	public OffsetDuplicate CreateOffsetDuplicate() => NewOffsetDuplicate(GetNewId());
-	public CompositeShape NewCompositeShape(string id) => new(id);
-	public CompositeShape CreateCompositeShape() => NewCompositeShape(GetNewId());
-	public ReferenceGeometry NewReferenceGeometry(string id) => new(id);
-	public ReferenceGeometry CreateReferenceGeometry() => NewReferenceGeometry(GetNewId());
-	public Documentation NewDocumentation(string id) => new(id);
-	public Documentation CreateDocumentation() => NewDocumentation(GetNewId());
-	public BillOfMaterials NewBillOfMaterials(string id) => new(id);
-	public BillOfMaterials CreateBillOfMaterials() => NewBillOfMaterials(GetNewId());
-	public MaterialGroup NewMaterialGroup(string id) => new(id);
-	public MaterialGroup CreateMaterialGroup() => NewMaterialGroup(GetNewId());
+	public virtual Circle NewCircle(string id) => new(id);
+	public virtual Circle CreateCircle() => NewCircle(GetNewId());
+	public virtual Coord NewCoord(string id) => new(id);
+	public virtual Coord CreateCoord() => NewCoord(GetNewId());
+	public virtual Geometry NewGeometry(string id) => new(id);
+	public virtual Geometry CreateGeometry() => NewGeometry(GetNewId());
+	public virtual Line NewLine(string id) => new(id);
+	public virtual Line CreateLine() => NewLine(GetNewId());
+	public virtual OffsetDuplicate NewOffsetDuplicate(string id) => new(id);
+	public virtual OffsetDuplicate CreateOffsetDuplicate() => NewOffsetDuplicate(GetNewId());
+	public virtual CompositeShape NewCompositeShape(string id) => new(id);
+	public virtual CompositeShape CreateCompositeShape() => NewCompositeShape(GetNewId());
+	public virtual ReferenceGeometry NewReferenceGeometry(string id) => new(id);
+	public virtual ReferenceGeometry CreateReferenceGeometry() => NewReferenceGeometry(GetNewId());
+	public virtual Documentation NewDocumentation(string id) => new(id);
+	public virtual Documentation CreateDocumentation() => NewDocumentation(GetNewId());
+	public virtual BillOfMaterials NewBillOfMaterials(string id) => new(id);
+	public virtual BillOfMaterials CreateBillOfMaterials() => NewBillOfMaterials(GetNewId());
+	public virtual MaterialGroup NewMaterialGroup(string id) => new(id);
+	public virtual MaterialGroup CreateMaterialGroup() => NewMaterialGroup(GetNewId());
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Circle")]

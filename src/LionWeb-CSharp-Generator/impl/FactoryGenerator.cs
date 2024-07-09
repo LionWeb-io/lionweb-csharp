@@ -66,7 +66,10 @@ public class FactoryGenerator(INames names) : GeneratorBase(names)
             .WithMembers(List(new List<MemberDeclarationSyntax>
             {
                 GenLanguageField(), GenConstructor(), GenCreateNode(), GenGetEnumerationLiteral()
-            }.Concat(ConcreteClassifiers.SelectMany(GenNewMethods))));
+            }.Concat(ConcreteClassifiers
+                .SelectMany(GenNewMethods)
+                .Select(m => m.WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.VirtualKeyword)))
+            )));
 
     private FieldDeclarationSyntax GenLanguageField() =>
         Field("_language", LanguageType)

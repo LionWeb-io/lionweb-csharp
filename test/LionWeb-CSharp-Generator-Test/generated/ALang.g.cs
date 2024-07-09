@@ -90,8 +90,8 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public AConcept NewAConcept(string id) => new(id);
-	public AConcept CreateAConcept() => NewAConcept(GetNewId());
+	public virtual AConcept NewAConcept(string id) => new(id);
+	public virtual AConcept CreateAConcept() => NewAConcept(GetNewId());
 }
 
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
