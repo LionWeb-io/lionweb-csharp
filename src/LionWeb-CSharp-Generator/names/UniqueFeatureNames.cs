@@ -51,7 +51,13 @@ public class UniqueFeatureNames(INames parent) : INames
     public NameSyntax LanguageType => parent.LanguageType;
 
     /// <inheritdoc />
+    public string FactoryInterfaceName => parent.FactoryInterfaceName;
+
+    /// <inheritdoc />
     public string FactoryName => parent.FactoryName;
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax FactoryInterfaceType => parent.FactoryInterfaceType;
 
     /// <inheritdoc />
     public IdentifierNameSyntax FactoryType => parent.FactoryType;

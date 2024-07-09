@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using Time = string;
 
 [LionCoreLanguage(Key = "key-Shapes", Version = "1")]
-public class ShapesLanguage : LanguageBase<ShapesFactory>
+public class ShapesLanguage : LanguageBase<IShapesFactory>
 {
 	public static readonly ShapesLanguage Instance = new Lazy<ShapesLanguage>(() => new("id-Shapes")).Value;
 	public ShapesLanguage(string id) : base(id)
@@ -74,7 +74,7 @@ public class ShapesLanguage : LanguageBase<ShapesFactory>
         public override IReadOnlyList<Language> DependsOn => [];
 
 	/// <inheritdoc/>
-        public override ShapesFactory GetFactory() => new(this);
+        public override IShapesFactory GetFactory() => new ShapesFactory(this);
 	private const string _key = "key-Shapes";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -229,7 +229,31 @@ public class ShapesLanguage : LanguageBase<ShapesFactory>
 	public PrimitiveType Time => _time.Value;
 }
 
-public class ShapesFactory : AbstractBaseNodeFactory
+public interface IShapesFactory : INodeFactory
+{
+	public Circle NewCircle(string id);
+	public Circle CreateCircle();
+	public Coord NewCoord(string id);
+	public Coord CreateCoord();
+	public Geometry NewGeometry(string id);
+	public Geometry CreateGeometry();
+	public Line NewLine(string id);
+	public Line CreateLine();
+	public OffsetDuplicate NewOffsetDuplicate(string id);
+	public OffsetDuplicate CreateOffsetDuplicate();
+	public CompositeShape NewCompositeShape(string id);
+	public CompositeShape CreateCompositeShape();
+	public ReferenceGeometry NewReferenceGeometry(string id);
+	public ReferenceGeometry CreateReferenceGeometry();
+	public Documentation NewDocumentation(string id);
+	public Documentation CreateDocumentation();
+	public BillOfMaterials NewBillOfMaterials(string id);
+	public BillOfMaterials CreateBillOfMaterials();
+	public MaterialGroup NewMaterialGroup(string id);
+	public MaterialGroup CreateMaterialGroup();
+}
+
+public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 {
 	private readonly ShapesLanguage _language;
 	public ShapesFactory(ShapesLanguage language) : base(language)
@@ -271,26 +295,26 @@ public class ShapesFactory : AbstractBaseNodeFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public Circle NewCircle(string id) => new(id);
-	public Circle CreateCircle() => NewCircle(GetNewId());
-	public Coord NewCoord(string id) => new(id);
-	public Coord CreateCoord() => NewCoord(GetNewId());
-	public Geometry NewGeometry(string id) => new(id);
-	public Geometry CreateGeometry() => NewGeometry(GetNewId());
-	public Line NewLine(string id) => new(id);
-	public Line CreateLine() => NewLine(GetNewId());
-	public OffsetDuplicate NewOffsetDuplicate(string id) => new(id);
-	public OffsetDuplicate CreateOffsetDuplicate() => NewOffsetDuplicate(GetNewId());
-	public CompositeShape NewCompositeShape(string id) => new(id);
-	public CompositeShape CreateCompositeShape() => NewCompositeShape(GetNewId());
-	public ReferenceGeometry NewReferenceGeometry(string id) => new(id);
-	public ReferenceGeometry CreateReferenceGeometry() => NewReferenceGeometry(GetNewId());
-	public Documentation NewDocumentation(string id) => new(id);
-	public Documentation CreateDocumentation() => NewDocumentation(GetNewId());
-	public BillOfMaterials NewBillOfMaterials(string id) => new(id);
-	public BillOfMaterials CreateBillOfMaterials() => NewBillOfMaterials(GetNewId());
-	public MaterialGroup NewMaterialGroup(string id) => new(id);
-	public MaterialGroup CreateMaterialGroup() => NewMaterialGroup(GetNewId());
+	public virtual Circle NewCircle(string id) => new(id);
+	public virtual Circle CreateCircle() => NewCircle(GetNewId());
+	public virtual Coord NewCoord(string id) => new(id);
+	public virtual Coord CreateCoord() => NewCoord(GetNewId());
+	public virtual Geometry NewGeometry(string id) => new(id);
+	public virtual Geometry CreateGeometry() => NewGeometry(GetNewId());
+	public virtual Line NewLine(string id) => new(id);
+	public virtual Line CreateLine() => NewLine(GetNewId());
+	public virtual OffsetDuplicate NewOffsetDuplicate(string id) => new(id);
+	public virtual OffsetDuplicate CreateOffsetDuplicate() => NewOffsetDuplicate(GetNewId());
+	public virtual CompositeShape NewCompositeShape(string id) => new(id);
+	public virtual CompositeShape CreateCompositeShape() => NewCompositeShape(GetNewId());
+	public virtual ReferenceGeometry NewReferenceGeometry(string id) => new(id);
+	public virtual ReferenceGeometry CreateReferenceGeometry() => NewReferenceGeometry(GetNewId());
+	public virtual Documentation NewDocumentation(string id) => new(id);
+	public virtual Documentation CreateDocumentation() => NewDocumentation(GetNewId());
+	public virtual BillOfMaterials NewBillOfMaterials(string id) => new(id);
+	public virtual BillOfMaterials CreateBillOfMaterials() => NewBillOfMaterials(GetNewId());
+	public virtual MaterialGroup NewMaterialGroup(string id) => new(id);
+	public virtual MaterialGroup CreateMaterialGroup() => NewMaterialGroup(GetNewId());
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Circle")]

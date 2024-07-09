@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-ALang", Version = "1")]
-public class ALangLanguage : LanguageBase<ALangFactory>
+public class ALangLanguage : LanguageBase<IALangFactory>
 {
 	public static readonly ALangLanguage Instance = new Lazy<ALangLanguage>(() => new("id-ALang")).Value;
 	public ALangLanguage(string id) : base(id)
@@ -31,7 +31,7 @@ public class ALangLanguage : LanguageBase<ALangFactory>
         public override IReadOnlyList<Language> DependsOn => [Examples.Cirular.B.BLangLanguage.Instance];
 
 	/// <inheritdoc/>
-        public override ALangFactory GetFactory() => new(this);
+        public override IALangFactory GetFactory() => new ALangFactory(this);
 	private const string _key = "key-ALang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -60,7 +60,13 @@ public class ALangLanguage : LanguageBase<ALangFactory>
 	public EnumerationLiteral AEnum_right => _aEnum_right.Value;
 }
 
-public class ALangFactory : AbstractBaseNodeFactory
+public interface IALangFactory : INodeFactory
+{
+	public AConcept NewAConcept(string id);
+	public AConcept CreateAConcept();
+}
+
+public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 {
 	private readonly ALangLanguage _language;
 	public ALangFactory(ALangLanguage language) : base(language)
@@ -84,8 +90,8 @@ public class ALangFactory : AbstractBaseNodeFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public AConcept NewAConcept(string id) => new(id);
-	public AConcept CreateAConcept() => NewAConcept(GetNewId());
+	public virtual AConcept NewAConcept(string id) => new(id);
+	public virtual AConcept CreateAConcept() => NewAConcept(GetNewId());
 }
 
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
