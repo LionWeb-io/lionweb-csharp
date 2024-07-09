@@ -185,7 +185,7 @@ public class DynamicProperty(string id, DynamicClassifier? classifier) : Dynamic
         if (M3Language.Instance.Property_type == feature)
         {
             result = Type;
-            return false;
+            return true;
         }
 
         return false;
