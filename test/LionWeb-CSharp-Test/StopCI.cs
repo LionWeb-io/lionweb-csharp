@@ -24,7 +24,7 @@ public class StopCI
     [TestMethod]
     public void stop_CI_from_publishing_to_NuGet_org()
     {
-        Assert.Fail("should stop the CI from publishing to NuGet.Org");
-        // seems to work so far...
+        Assert.Bail("should stop the CI from publishing to NuGet.Org");
+        // not compiling
     }
 }
