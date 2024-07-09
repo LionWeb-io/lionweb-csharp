@@ -397,7 +397,7 @@ public static class AstExtensions
     public static XmlTextSyntax XdocNewline() =>
         XmlText()
             .WithTextTokens(
-                TokenList(XmlTextNewLine(TriviaList(), "\n", "\n", TriviaList()))
+                TokenList(XmlTextNewLine(TriviaList(), Environment.NewLine, Environment.NewLine, TriviaList()))
             );
 
     /// <returns><c>!=</c></returns>
