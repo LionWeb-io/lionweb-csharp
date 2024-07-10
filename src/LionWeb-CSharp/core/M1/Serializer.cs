@@ -71,35 +71,34 @@ public class Serializer : SerializerBase
             if (existingLanguage != null)
             {
                 Handler.DuplicateUsedLanguage(existingLanguage, language);
+            } else
+            {
+                _usedLanguages.Add(language);
             }
-            _usedLanguages.Add(language);
         }
 
         return node;
     }
 
-    private class NodeIdEqualityComparer(ISerializerHandler handler) : IEqualityComparer<INode>
+    private class NodeIdEqualityComparer(ISerializerHandler handler) : IEqualityComparer<string>
     {
-        public bool Equals(INode? x, INode? y)
+        public bool Equals(string? x, string? y)
         {
-            if (x == y)
-                return true;
-
-            if (x?.GetId() != y?.GetId())
+            if (x != y)
                 return false;
 
-            handler.DuplicateNodeId(x, y);
+            handler.DuplicateNodeId(x);
             return true;
         }
 
-        public int GetHashCode(INode obj) =>
-            obj.GetId().GetHashCode();
+        public int GetHashCode(string obj) =>
+            obj.GetHashCode();
     }
 
     private IEnumerable<INode> AllNodes() =>
         _nodes
             .SelectMany(node => node.Descendants(true, true))
-            .Distinct(new NodeIdEqualityComparer(Handler));
+            .DistinctBy(n => n.GetId(), new NodeIdEqualityComparer(Handler));
 
     private SerializedNode SerializedNode(INode node) =>
         new()
@@ -146,12 +145,16 @@ public interface ISerializerHandler
 {
     void DuplicateNodeId(INode a, INode b);
     void DuplicateUsedLanguage(Language a, Language b);
+    void DuplicateNodeId(string? s);
 }
 
 public class SerializerExceptionHandler : ISerializerHandler
 {
     public virtual void DuplicateNodeId(INode a, INode b) =>
         throw new ArgumentException($"nodes have same id '{a?.GetId() ?? b?.GetId()}': {a}, {b}");
+
+    public void DuplicateNodeId(string? s) => 
+        throw new ArgumentException($"nodes have same id '{s}'");
 
     public virtual void DuplicateUsedLanguage(Language a, Language b) =>
         throw new ArgumentException($"different languages with same key '{a?.Key ?? b?.Key}': {a}, {b}");
