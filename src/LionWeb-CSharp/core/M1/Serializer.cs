@@ -26,7 +26,7 @@ public class Serializer : SerializerBase
     private readonly IEnumerable<INode> _nodes;
     private readonly HashSet<Language> _usedLanguages = new();
 
-    public ISerializerHandler Handler { get; set; } = new SerializerExceptionHandler();
+    public ISerializerHandler Handler { get; init; } = new SerializerExceptionHandler();
 
     public Serializer(IEnumerable<INode> nodes)
     {
@@ -150,9 +150,9 @@ public interface ISerializerHandler
 
 public class SerializerExceptionHandler : ISerializerHandler
 {
-    public void DuplicateNodeId(INode a, INode b) =>
+    public virtual void DuplicateNodeId(INode a, INode b) =>
         throw new ArgumentException($"nodes have same id '{a?.GetId() ?? b?.GetId()}': {a}, {b}");
 
-    public void DuplicateUsedLanguage(Language a, Language b) =>
+    public virtual void DuplicateUsedLanguage(Language a, Language b) =>
         throw new ArgumentException($"different languages with same key '{a?.Key ?? b?.Key}': {a}, {b}");
 }
