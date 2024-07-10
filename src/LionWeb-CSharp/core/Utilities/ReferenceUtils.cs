@@ -26,7 +26,7 @@ using M3;
 /// <param name="SourceNode">The source <see cref="IReadableNode"/> of the reference (relation)</param>
 /// <param name="Reference">The <see cref="LionWeb.Core.M3.Reference"/> feature that has the reference to the target node</param>
 /// <param name="Index">The index within the (intrinsically-ordered) multi-value of the reference feature on the <paramref name="SourceNode"/> of the reference,
-/// or <code>null</code> if the reference feature is not multivalued
+/// or <c>null</c> if the reference feature is not multivalued
 /// <param name="TargetNode">The target <see cref="IReadableNode"/> of the reference (relation)</param>
 /// </param>
 // ReSharper disable NotAccessedPositionalProperty.Global
@@ -35,18 +35,27 @@ public record ReferenceValue(IReadableNode SourceNode, Reference Reference, int?
 /// <summary>
 /// Extension methods to deal with references, i.e. values of <see cref="Reference"/> features.
 /// </summary>
-public static class ReferenceExtensions
+public static class ReferenceUtils
 {
     private static IEnumerable<ReferenceValue> GatherReferenceValues(IReadableNode sourceNode, Reference reference)
-        => reference.Multiple
-            ? (sourceNode.Get(reference) as IEnumerable<IReadableNode> ?? []).Select((targetNode, index) =>
-                new ReferenceValue(sourceNode, reference, index, targetNode))
-            : [new ReferenceValue(sourceNode, reference, null, (sourceNode.Get(reference) as IReadableNode)!)];
+    {
+        if (reference.Multiple)
+        {
+            var sourceNodes = sourceNode.Get(reference) as IEnumerable<IReadableNode> ?? [];
+            return sourceNodes
+                .Select((targetNode, index) =>
+                    new ReferenceValue(sourceNode, reference, index, targetNode)
+                );
+        }
+
+        // singular:
+        return [new ReferenceValue(sourceNode, reference, null, (sourceNode.Get(reference) as IReadableNode)!)];
+    }
 
     /// <summary>
     /// Finds all references within the given <paramref name="scope"/>, as <see cref="ReferenceValue"/>s.
     /// To search within all nodes under a collection of root nodes,
-    /// pass <code>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</code> as scope.
+    /// pass <c>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</c> as scope.
     /// </summary>
     /// <param name="scope">The <see cref="IReadableNode"/>s that are searched for references</param>
     /// <returns>An enumeration of references, as <see cref="ReferenceValue"/>s.</returns>
@@ -54,7 +63,8 @@ public static class ReferenceExtensions
         => scope
             .SelectMany(sourceNode =>                                                       // for all nodes in the scope:
                 sourceNode
-                    .CollectAllSetFeatures().OfType<Reference>()                            // for all set references:
+                    .CollectAllSetFeatures()                                                // for all set features
+                    .OfType<Reference>()                                                    //  that are references:
                     .SelectMany(reference => GatherReferenceValues(sourceNode, reference))  // gather all reference values
             );
 
@@ -62,7 +72,7 @@ public static class ReferenceExtensions
     /// Finds all references coming into any of the given <paramref name="targetNodes"/>
     /// within the given <paramref name="scope"/>, as <see cref="ReferenceValue"/>s.
     /// To search within all nodes under a collection of root nodes,
-    /// pass <code>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</code> as scope.
+    /// pass <c>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</c> as scope.
     /// </summary>
     /// <param name="targetNodes">The target nodes for which the incoming references are searched</param>
     /// <param name="scope">The <see cref="IReadableNode"/>s that are searched for references</param>
@@ -79,7 +89,7 @@ public static class ReferenceExtensions
     /// Finds all references coming into the given <paramref name="targetNode"/>
     /// within the given <paramref name="scope"/>, as <see cref="ReferenceValue"/>s.
     /// To search within all nodes under a collection of root nodes,
-    /// pass <code>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</code> as scope.
+    /// pass <c>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</c> as scope.
     /// </summary>
     /// <param name="targetNode">A target <see cref="IReadableNode"/></param>
     /// <param name="scope">The <see cref="IReadableNode"/>s that form the scope of the search</param>

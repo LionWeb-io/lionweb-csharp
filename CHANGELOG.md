@@ -22,12 +22,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Added
 
 - Generate interface for each factory; factory implementation methods are `virtual` now.
-
-### Added
-
-- Add extensions class `ReferenceExtensions` (in namespace `TL.LDM.Language.Extensions`) with extension methods to deal with references:
-	- `<rootNodes>.AllReferenceValues()` finds all references within the forest with trunks `<rootNodes>`.
-	- `<targetNode>.AllIncomingReferencesWithin(<rootNodes>)` finds all references _to_ the `<targetNode>` within the forest with trunks `<rootNodes>`.
+- Add utilities class `ReferenceUtils` (in namespace `LionWeb.Core.Utilities`) to deal with references:
+	- `ReferenceValues(<nodes>)` finds all references within all the given `<nodes>`.
+	- `FindIncomingReferences(<targetNode(s)>, <nodes>)` finds all references _to_ (all) the `<targetNode(s)>` within the given `<nodes>`.
 
 ### Fixed
 

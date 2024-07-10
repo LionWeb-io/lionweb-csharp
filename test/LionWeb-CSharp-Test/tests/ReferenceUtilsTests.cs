@@ -27,7 +27,7 @@ using LionWeb.Core;
 using LionWeb.Core.Utilities;
 
 [TestClass]
-public class ReferenceExtensionsTests
+public class ReferenceUtilsTests
 {
     [TestMethod]
     public void can_find_a_reference_from_a_feature_of_a_concept()
@@ -39,18 +39,15 @@ public class ReferenceExtensionsTests
         var geometry = (ExampleModels.ExampleModel(language) as Geometry)!;
         referenceGeometry.AddShapes(geometry.Shapes);
 
-        List<INode> rootNodes = [geometry, referenceGeometry];
-        var refs = ReferenceExtensions.FindIncomingReferences(geometry.Shapes[0], rootNodes).ToList();
-        Assert.AreEqual(1, refs.Count());
-        var ref0 = refs.First();
+        List<INode> scope = [geometry, referenceGeometry];
+        var expectedRefs = new List<ReferenceValue>
+        {
+            new (referenceGeometry, language.ReferenceGeometry_shapes, 0, geometry.Shapes[0])
+        };
 
-        var expectedReferenceValue =
-            new ReferenceValue(referenceGeometry, language.ReferenceGeometry_shapes, 0, geometry.Shapes[0]);
-        Assert.AreEqual(expectedReferenceValue, ref0);  // (relies on value equality of C# record types)
-
-        var allRefs = ReferenceExtensions.ReferenceValues(rootNodes).ToList();
-        Assert.AreEqual(1, allRefs.Count());
-        Assert.AreEqual(expectedReferenceValue, allRefs.First());
+        CollectionAssert.AreEqual(expectedRefs, ReferenceUtils.FindIncomingReferences(geometry.Shapes[0], scope).ToList());
+        CollectionAssert.AreEqual(expectedRefs, ReferenceUtils.ReferenceValues(scope).ToList());
+        // (also relies on value equality of C# record types)
     }
 
     [TestMethod]
@@ -69,12 +66,12 @@ public class ReferenceExtensionsTests
         var geometry = factory.CreateGeometry();
         geometry.AddShapes([circle, line]);
 
-        var refs = ReferenceExtensions.FindIncomingReferences(circle, [bom]).ToList();
-        Assert.AreEqual(1, refs.Count());
-        var ref0 = refs.First();
-
-        var expectedReferenceValue =
-            new ReferenceValue(bom, language.BillOfMaterials_materials, 0, circle);
-        Assert.AreEqual(expectedReferenceValue, ref0);  // (relies on value equality of C# record types)
+        CollectionAssert.AreEqual(
+            new List<ReferenceValue>
+            {
+                new (bom, language.BillOfMaterials_materials, 0, circle)
+            },
+            ReferenceUtils.FindIncomingReferences(circle, [bom]).ToList()
+        );
     }
 }
