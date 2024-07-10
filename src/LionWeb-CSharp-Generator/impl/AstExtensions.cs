@@ -371,16 +371,36 @@ public static class AstExtensions
         XdocNewline()
     ];
 
+    /// <summary>Takes care of properly wrapping multi-line text with `///` prefix</summary>
     /// <returns><c>text</c></returns>
-    public static XmlElementSyntax XdocText(string text) =>
-        XmlExampleElement(
+    public static XmlElementSyntax XdocText(string text)
+    {
+        using var reader = new StringReader(text);
+        bool first = true;
+        List<SyntaxToken> texts = new();
+        while (reader.ReadLine() is { } line)
+        {
+            if (first)
+            {
+                texts.Add(XmlTextLiteral(TriviaList(), line, line, TriviaList()));
+                first = false;
+            } else
+            {
+                texts.Add(XdocNewlineToken());
+                var prefixedLine = $" {line}";
+                texts.Add(XmlTextLiteral(TriviaList(XdocSlashesToken()), prefixedLine, prefixedLine, TriviaList()));
+            }
+        }
+
+        return XmlExampleElement(
             SingletonList<XmlNodeSyntax>(
                 XmlText()
                     .WithTextTokens(
-                        TokenList(XmlTextLiteral(TriviaList(), text, text, TriviaList()))
+                        TokenList(texts)
                     )
             )
         );
+    }
 
     /// <returns><c>/// </c></returns>
     public static XmlTextSyntax XdocSlashes() =>
@@ -388,17 +408,23 @@ public static class AstExtensions
             .WithTextTokens(
                 TokenList(
                     XmlTextLiteral(
-                        TriviaList(DocumentationCommentExterior("///")), " ", " ", TriviaList()
+                        TriviaList(XdocSlashesToken()), " ", " ", TriviaList()
                     )
                 )
             );
 
+    /// <returns><c>///</c></returns>
+    private static SyntaxTrivia XdocSlashesToken() =>
+        DocumentationCommentExterior("///");
+
     /// <returns>newline inside Xdoc</returns>
     public static XmlTextSyntax XdocNewline() =>
         XmlText()
-            .WithTextTokens(
-                TokenList(XmlTextNewLine(TriviaList(), Environment.NewLine, Environment.NewLine, TriviaList()))
-            );
+            .WithTextTokens(TokenList(XdocNewlineToken()));
+
+    /// <returns>newline Xdoc token</returns>
+    private static SyntaxToken XdocNewlineToken() =>
+        XmlTextNewLine(TriviaList(), Environment.NewLine, Environment.NewLine, TriviaList());
 
     /// <returns><c>!=</c></returns>
     public static BinaryExpressionSyntax NotEquals(ExpressionSyntax left, ExpressionSyntax right) =>

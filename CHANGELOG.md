@@ -19,12 +19,18 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ## [0.2.2] - unreleased
 
+### Added
+
+- Generator adds descriptions to generated classes from model annotations.
+- Language (de-)Serialization can handle annotations on languages.
+- Generate interface for each factory; factory implementation methods are `virtual` now.
+
 ## Changed
 
 - Released as open source under the Apache-2.0 license.
 - Set up CI using GitHub Actions.
 
-(Both are infrastructural—i.e.: non-code— changes.)
+(Both are infrastructural —i.e.: non-code— changes.)
 
 
 ## [0.2.1] - 2024-05-28

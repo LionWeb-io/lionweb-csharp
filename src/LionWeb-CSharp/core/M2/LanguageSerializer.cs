@@ -51,11 +51,11 @@ public class LanguageSerializer : SerializerBase
             [
                 SerializedLanguageReference(M3Language.Instance)
             ],
-            Nodes = _languages.SelectMany(language => M1Extensions.Descendants<IKeyed>(language, true))
+            Nodes = _languages.SelectMany(language => M1Extensions.Descendants<IReadableNode>(language, true, true))
                 .Select(SerializeNode).ToArray()
         };
 
-    private SerializedNode SerializeNode(IKeyed node)
+    private SerializedNode SerializeNode(IReadableNode node)
     {
         var metaConcept = node switch
         {
@@ -118,7 +118,7 @@ public class LanguageSerializer : SerializerBase
                 break;
 
             default:
-                logError($"serialization of {metaConcept.Name} not (yet) implemented");
+                serializedNode = SerializeSimpleNode(node);
                 break;
         }
 
