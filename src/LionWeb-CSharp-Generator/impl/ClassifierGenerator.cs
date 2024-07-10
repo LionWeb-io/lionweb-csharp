@@ -20,6 +20,7 @@ namespace LionWeb.CSharp.Generator.Impl;
 using Core;
 using Core.M2;
 using Core.M3;
+using Io.Lionweb.Mps.Specific;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -56,7 +57,7 @@ public class ClassifierGenerator(Classifier classifier, INames names)
         if (classifier is Concept { Abstract: true })
             modifiers.Add(SyntaxKind.AbstractKeyword);
 
-        return ClassDeclaration(ClassifierName)
+        var decl = ClassDeclaration(ClassifierName)
             .WithAttributeLists(AsAttributes([MetaPointerAttribute(classifier)]))
             .WithModifiers(AsModifiers(modifiers.ToArray()))
             .WithBaseList(AsBase(bases.ToArray()))
@@ -65,6 +66,19 @@ public class ClassifierGenerator(Classifier classifier, INames names)
                 .Concat(new ContainmentMethodsGenerator(classifier, _names).ContainmentMethods())
                 .Concat(FeaturesToImplement(classifier)
                     .SelectMany(f => new FeatureGenerator(classifier, f, _names).Members()))));
+
+        return AttachConceptDescription(decl);
+    }
+
+    private T AttachConceptDescription<T>(T decl) where T : TypeDeclarationSyntax
+    {
+        var conceptDescriptions = classifier.GetAnnotations().OfType<ConceptDescription>().Where(cd => cd.ConceptShortDescription != null);
+        if (conceptDescriptions.Any())
+        {
+            return decl.Xdoc(XdocLine(conceptDescriptions.First().ConceptShortDescription, "summary"));
+        }
+
+        return decl;
     }
 
     private TypeSyntax GetSuperclass() =>
@@ -100,12 +114,13 @@ public class ClassifierGenerator(Classifier classifier, INames names)
         if (bases.Count == 0)
             bases = [AsType(typeof(INode))];
 
-        return InterfaceDeclaration(ClassifierName)
+        var decl = InterfaceDeclaration(ClassifierName)
             .WithAttributeLists(AsAttributes([MetaPointerAttribute(classifier)]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.SelectMany(f =>
                 new FeatureGenerator(classifier, f, _names).AbstractMembers())));
+        return AttachConceptDescription(decl);
     }
 
     private string ClassifierName =>

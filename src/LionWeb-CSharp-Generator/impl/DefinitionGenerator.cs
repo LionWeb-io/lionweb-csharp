@@ -42,11 +42,9 @@ public class DefinitionGenerator(INames names) : GeneratorBase(names)
                     FileScopedNamespaceDeclaration(ParseName(_names.NamespaceName))
                         .WithNamespaceKeyword(Prelude())
                         .WithMembers(List(
-                            new List<MemberDeclarationSyntax>
-                                {
-                                    new LanguageGenerator(_names).LanguageClass(),
-                                    new FactoryGenerator(_names).FactoryClass()
-                                }.Concat(Classifiers.Select(
+                            new List<MemberDeclarationSyntax> { new LanguageGenerator(_names).LanguageClass() }
+                                .Concat(new FactoryGenerator(_names).FactoryTypes())
+                                .Concat(Classifiers.Select(
                                     c => new ClassifierGenerator(c, _names).ClassifierType()))
                                 .Concat(Enumerations.Select(e => new EnumGenerator(e, _names).EnumType()))
                         ))

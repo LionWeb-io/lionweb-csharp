@@ -20,6 +20,7 @@ namespace LionWeb.Core.M2;
 using M1;
 using M3;
 using Serialization;
+using Utilities;
 
 /// <summary>
 /// A deserializer that deserializes serializations of <see cref="Language"/>s.
@@ -30,26 +31,99 @@ public class LanguageDeserializer
 {
     private readonly SerializedNode[] _serializedNodes;
     private readonly Dictionary<string, SerializedNode> _serializedNodesById;
-    private readonly Dictionary<string, IKeyed> _nodesById = new();
+    private readonly Dictionary<string, IReadableNode> _nodesById = new();
     private readonly Dictionary<string, IKeyed> _dependentNodesById;
+    private readonly List<Language> _dependentLanguages;
 
-    private LanguageDeserializer(SerializationChunk serializationChunk, params Language[] dependentLanguages)
+    /// <summary>
+    /// Deserializes the given <paramref name="serializationChunk">serialization chunk</paramref> as an iterable collection of <see cref="Language"/>s.
+    /// The <paramref name="dependentLanguages">dependent languages</paramref> should contain all languages that are referenced by the top-level
+    /// <c>languages</c> property of the serialization chunk.
+    /// </summary>
+    ///
+    /// <param name="serializationChunk">Chunk to deserialize.</param>
+    /// <param name="preloadM3Language">Whether <see cref="M3Language"/> should be preloaded. Keep at <c>true</c> unless deserializing meta-languages.</param>
+    /// <param name="dependentLanguages">Referred languages.</param>
+    /// 
+    /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
+    public LanguageDeserializer(SerializationChunk serializationChunk, bool preloadM3Language = true,
+        params Language[] dependentLanguages)
     {
         _serializedNodes = serializationChunk.Nodes;
+        _dependentLanguages = dependentLanguages.ToList();
         _serializedNodesById = _serializedNodes.ToDictionary(
             serializedNode => serializedNode.Id
         );
+        List<Language> preloadedLanguages = [BuiltInsLanguage.Instance];
+        if (preloadM3Language)
+            preloadedLanguages.Add(M3Language.Instance);
+
         _dependentNodesById =
-            dependentLanguages.Concat([BuiltInsLanguage.Instance])
+            dependentLanguages.Concat(preloadedLanguages)
                 .SelectMany(language => M1Extensions.Descendants<IKeyed>(language, true))
                 .ToDictionary(node => node.GetId());
     }
 
-    private IKeyed MemoisedDeserialization(string id)
+    /// <summary>
+    /// Deserializes the given <paramref name="serializationChunk">serialization chunk</paramref> as an iterable collection of <see cref="Language"/>s.
+    /// The <paramref name="dependentLanguages">dependent languages</paramref> should contain all languages that are referenced by the top-level
+    /// <c>languages</c> property of the serialization chunk.
+    /// </summary>
+    /// 
+    /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
+    public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
+        params Language[] dependentLanguages)
+        => new LanguageDeserializer(serializationChunk, dependentLanguages: dependentLanguages).DeserializeLanguages();
+
+    /// <summary>
+    /// Deserializes the given serialization chunk as an iterable collection of <see cref="Language"/>s.
+    /// </summary>
+    /// 
+    /// <returns>The deserialization of the language definitions present in the given serializationChunk.</returns>
+    public IEnumerable<DynamicLanguage> DeserializeLanguages()
+    {
+        Dictionary<string, SerializedNode> annotationNodes = DeserializeLanguageNodes();
+
+        InstallLanguageLinks();
+
+        List<INode> deserializedAnnotationInstances = DeserializeAnnotations(annotationNodes);
+
+        InstallAnnotationReferences(deserializedAnnotationInstances, annotationNodes);
+
+        return _nodesById.Values.OfType<DynamicLanguage>();
+    }
+
+    private Dictionary<string, SerializedNode> DeserializeLanguageNodes()
+    {
+        Dictionary<string, SerializedNode> annotationNodes = new();
+        foreach (var serializedNode in _serializedNodes)
+        {
+            var id = serializedNode.Id;
+            if (IsLanguageNode(serializedNode))
+            {
+                if (IsInDependentNodes(id))
+                {
+                    LogWarn($"Skip deserializing {id} because dependentLanguages contains node with same id");
+                } else
+                {
+                    _nodesById[id] = MemoisedDeserialization(id);
+                }
+            } else
+            {
+                annotationNodes[id] = serializedNode;
+            }
+        }
+
+        return annotationNodes;
+    }
+
+    private bool IsInDependentNodes(string id) => _dependentNodesById.ContainsKey(id);
+
+    private IReadableNode MemoisedDeserialization(string id)
     {
         var serializedNode = _serializedNodesById[id];
-        IKeyed node;
-        if (!_nodesById.TryGetValue(id, out IKeyed? value))
+        IReadableNode node;
+        if (!_nodesById.TryGetValue(id, out var value))
         {
             var parentId = serializedNode.Parent;
             node = CreateNodeFromWithProperties(serializedNode,
@@ -66,42 +140,59 @@ public class LanguageDeserializer
         return node;
     }
 
-    private T LookupNode<T>(string id) where T : class, IKeyed
+    private void InstallLanguageLinks()
     {
-        if (_dependentNodesById.TryGetValue(id, out var node))
-            return (T)node;
-        return (T)_nodesById[id];
-    }
-
-    private IEnumerable<DynamicLanguage> DeserializedLanguages()
-    {
-        foreach (var serializedNode in _serializedNodes)
-        {
-            var id = serializedNode.Id;
-            _nodesById[id] = MemoisedDeserialization(id);
-        }
-
-        foreach (var serializedNode in _serializedNodes)
+        foreach (var serializedNode in _serializedNodes.Where(node => IsLanguageNode(node) && !IsInDependentNodes(node.Id)))
         {
             InstallContainments(serializedNode);
             InstallReferences(serializedNode);
         }
-
-        return _nodesById.Values.OfType<DynamicLanguage>();
     }
 
-    /// <summary>
-    /// Deserializes the given <paramref name="serializationChunk">serialization chunk</paramref> as an iterable collection of <see cref="Language"/>s.
-    /// The <paramref name="dependentLanguages">dependent languages</paramref> should contain all languages that are referenced by the top-level
-    /// <c>languages</c> property of the serialization chunk.
-    /// </summary>
-    /// 
-    /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
-    public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
-        params Language[] dependentLanguages)
-        => new LanguageDeserializer(serializationChunk, dependentLanguages).DeserializedLanguages();
+    private List<INode> DeserializeAnnotations(Dictionary<string, SerializedNode> annotationNodes)
+    {
+        var deserializer = new Deserializer(_nodesById.Values.OfType<Language>().Concat(_dependentLanguages));
+        List<INode> deserializedAnnotations = deserializer.Deserialize(annotationNodes.Values, _nodesById.Values);
+        foreach (INode deserializedAnnotation in deserializedAnnotations)
+        {
+            _nodesById[deserializedAnnotation.GetId()] = deserializedAnnotation;
+        }
 
-    private static DynamicIKeyed CreateNodeFromWithProperties(SerializedNode serializedNode, IKeyed? parent)
+        return deserializedAnnotations;
+    }
+
+    private void AttachAnnotationsToParents(List<INode> deserializedAnnotationInstances,
+        Dictionary<string, SerializedNode> annotationNodes)
+    {
+        foreach (var deserializedAnnotation in deserializedAnnotationInstances)
+        {
+            var serializedAnnotation = annotationNodes[deserializedAnnotation.GetId()];
+            var parentId = serializedAnnotation.Parent;
+            if (_nodesById.TryGetValue(parentId, out var parent) && parent is INode writableParent)
+            {
+                writableParent.AddAnnotations([deserializedAnnotation]);
+            } else
+            {
+                LogError($"Cannot attach annotation {serializedAnnotation} to its parent.");
+            }
+        }
+    }
+
+    private void InstallAnnotationReferences(List<INode> deserializedAnnotationInstances,
+        Dictionary<string, SerializedNode> annotationNodes)
+    {
+        AttachAnnotationsToParents(deserializedAnnotationInstances, annotationNodes);
+
+        foreach (var serializedNode in _serializedNodes.Where(n => !IsInDependentNodes(n.Id)))
+        {
+            InstallReferences(serializedNode);
+        }
+    }
+
+    private static bool IsLanguageNode(SerializedNode serializedNode) =>
+        serializedNode.Classifier.Language == M3Language.Instance.Key;
+
+    private static DynamicIKeyed CreateNodeFromWithProperties(SerializedNode serializedNode, IReadableNode? parent)
     {
         var serializedPropertiesByKey = serializedNode.Properties.ToDictionary(
             serializedProperty => serializedProperty.Property.Key,
@@ -219,30 +310,19 @@ public class LanguageDeserializer
                 }
             default:
                 {
-                    logError($"installing containments in node of meta-concept {node.GetType().Name} not implemented");
+                    LogError($"installing containments in node of meta-concept {node.GetType().Name} not implemented");
                     break;
                 }
         }
     }
 
-
-    private T? ResolveSingleRef<T>(string key, ILookup<string, IKeyed> serializedReferencesByKey)
-        where T : class, IKeyed
+    private T LookupNode<T>(string id) where T : class, IKeyed
     {
-        if (serializedReferencesByKey.Contains(key) && serializedReferencesByKey[key].Count() == 1)
-            return serializedReferencesByKey[key].Cast<T>().First();
-
-        return null;
+        if (_dependentNodesById.TryGetValue(id, out var node))
+            return (T)node;
+        return (T)_nodesById[id];
     }
 
-    private IEnumerable<T> ResolveMultiRef<T>(string key, ILookup<string, IKeyed> serializedReferencesByKey)
-        where T : class, IKeyed
-    {
-        if (serializedReferencesByKey.Contains(key))
-            return serializedReferencesByKey[key].Cast<T>();
-
-        return [];
-    }
 
     private void InstallReferences(SerializedNode serializedNode)
     {
@@ -257,8 +337,10 @@ public class LanguageDeserializer
             case DynamicAnnotation annotation:
                 {
                     annotation.Extends = ResolveSingleRef<Annotation>("Annotation-extends", serializedReferencesByKey);
-                    annotation.AddImplements(ResolveMultiRef<Interface>("Annotation-implements",
-                        serializedReferencesByKey));
+
+                    var resolvedInterfaces =
+                        ResolveMultiRef<Interface>("Annotation-implements", serializedReferencesByKey);
+                    annotation.AddImplements(FilterLinkedInterfaces(resolvedInterfaces, annotation.Implements));
                     annotation.Annotates =
                         ResolveSingleRef<Classifier>("Annotation-annotates", serializedReferencesByKey);
                     break;
@@ -266,7 +348,9 @@ public class LanguageDeserializer
             case DynamicConcept concept:
                 {
                     concept.Extends = ResolveSingleRef<Concept>("Concept-extends", serializedReferencesByKey);
-                    concept.AddImplements(ResolveMultiRef<Interface>("Concept-implements", serializedReferencesByKey));
+                    var resolvedInterfaces =
+                        ResolveMultiRef<Interface>("Concept-implements", serializedReferencesByKey);
+                    concept.AddImplements(FilterLinkedInterfaces(resolvedInterfaces, concept.Implements));
                     break;
                 }
             case DynamicContainment containment:
@@ -284,7 +368,8 @@ public class LanguageDeserializer
                 }
             case DynamicInterface @interface:
                 {
-                    @interface.AddExtends(ResolveMultiRef<Interface>("Interface-extends", serializedReferencesByKey));
+                    var resolvedInterfaces = ResolveMultiRef<Interface>("Interface-extends", serializedReferencesByKey);
+                    @interface.AddExtends(FilterLinkedInterfaces(resolvedInterfaces, @interface.Extends));
                     break;
                 }
             case DynamicLanguage:
@@ -308,12 +393,37 @@ public class LanguageDeserializer
                 }
             default:
                 {
-                    logError($"installing references in node of meta-concept {node.GetType().Name} not implemented");
+                    LogError($"installing references in node of meta-concept {node.GetType().Name} not implemented");
                     break;
                 }
         }
     }
 
-    protected virtual void logError(string message) =>
+    private T? ResolveSingleRef<T>(string key, ILookup<string, IKeyed> serializedReferencesByKey)
+        where T : class, IKeyed
+    {
+        if (serializedReferencesByKey.Contains(key) && serializedReferencesByKey[key].Count() == 1)
+            return serializedReferencesByKey[key].Cast<T>().First();
+
+        return null;
+    }
+
+    private IEnumerable<T> ResolveMultiRef<T>(string key, ILookup<string, IKeyed> serializedReferencesByKey)
+        where T : class, IKeyed
+    {
+        if (serializedReferencesByKey.Contains(key))
+            return serializedReferencesByKey[key].Cast<T>();
+
+        return [];
+    }
+
+    private static IEnumerable<Interface> FilterLinkedInterfaces(IEnumerable<Interface> resolvedInterfaces,
+        IEnumerable<Interface> linkedInterfaces) =>
+        resolvedInterfaces.Except(linkedInterfaces, new LanguageEntityIdentityComparer()).OfType<Interface>();
+
+    protected virtual void LogError(string message) =>
+        Console.Error.WriteLine(message);
+
+    protected virtual void LogWarn(string message) =>
         Console.Error.WriteLine(message);
 }
