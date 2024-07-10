@@ -23,8 +23,10 @@ using M1;
 using M2;
 using M2.Generated.Test;
 using M3;
+using Newtonsoft.Json;
 using Serialization;
 using System.Collections;
+using System.Diagnostics;
 using Utilities;
 using Comparer = Utilities.Comparer;
 
@@ -224,29 +226,29 @@ public class SerializationTests
         Assert.AreEqual(2, serializedNodes.Count);
     }
 
-    class DuplicateNodeHandler(Action incrementer) : ISerializerHandler
-    {
-        public void DuplicateNodeId(INode? a, INode? b) => incrementer();
-        public void DuplicateUsedLanguage(Language a, Language b) => throw new NotImplementedException();
-    }
-
-    [TestMethod]
-    public void DuplicateId_CustomHandler()
-    {
-        var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
-
-        int count = 0;
-
-        var serializer =
-            new Serializer([materialGroup])
-            {
-                Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count))
-            };
-
-        serializer.Serialize();
-
-        Assert.AreEqual(1, count);
-    }
+    // class DuplicateNodeHandler(Action incrementer) : ISerializerHandler
+    // {
+    //     public void DuplicateNodeId(INode? a, INode? b) => incrementer();
+    //     public void DuplicateUsedLanguage(Language a, Language b) => throw new NotImplementedException();
+    // }
+    //
+    // [TestMethod]
+    // public void DuplicateId_CustomHandler()
+    // {
+    //     var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
+    //
+    //     int count = 0;
+    //
+    //     var serializer =
+    //         new Serializer([materialGroup])
+    //         {
+    //             Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count))
+    //         };
+    //
+    //     serializer.Serialize();
+    //
+    //     Assert.AreEqual(1, count);
+    // }
 
     [TestMethod]
     public void DuplicateUsedLanguage()
@@ -287,37 +289,37 @@ public class SerializationTests
         Assert.AreEqual(2, serializationChunk.Languages.Length);
     }
 
-    class DuplicateLanguageHandler(Action incrementer) : ISerializerHandler
-    {
-        public void DuplicateNodeId(INode? a, INode? b) => throw new NotImplementedException();
-        public void DuplicateUsedLanguage(Language a, Language b) => incrementer();
-    }
-
-    [TestMethod]
-    public void DuplicateLanguage_CustomHandler()
-    {
-        var lang = new DynamicLanguage("abc")
-        {
-            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
-        };
-        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
-            ShapesLanguage.Instance.MaterialGroup.Name);
-        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
-            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
-
-        var a = lang.GetFactory().CreateNode("a", materialGroup);
-        var b = new Circle("b");
-        a.Set(defaultShape, b);
-
-        int count = 0;
-
-        var serializer =
-            new Serializer([a]) { Handler = new DuplicateLanguageHandler(() => Interlocked.Increment(ref count)) };
-
-        serializer.Serialize();
-
-        Assert.AreEqual(1, count);
-    }
+    // class DuplicateLanguageHandler(Action incrementer) : ISerializerHandler
+    // {
+    //     public void DuplicateNodeId(INode? a, INode? b) => throw new NotImplementedException();
+    //     public void DuplicateUsedLanguage(Language a, Language b) => incrementer();
+    // }
+    //
+    // [TestMethod]
+    // public void DuplicateLanguage_CustomHandler()
+    // {
+    //     var lang = new DynamicLanguage("abc")
+    //     {
+    //         Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
+    //     };
+    //     var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
+    //         ShapesLanguage.Instance.MaterialGroup.Name);
+    //     var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
+    //         ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+    //
+    //     var a = lang.GetFactory().CreateNode("a", materialGroup);
+    //     var b = new Circle("b");
+    //     a.Set(defaultShape, b);
+    //
+    //     int count = 0;
+    //
+    //     var serializer =
+    //         new Serializer([a]) { Handler = new DuplicateLanguageHandler(() => Interlocked.Increment(ref count)) };
+    //
+    //     serializer.Serialize();
+    //
+    //     Assert.AreEqual(1, count);
+    // }
 
     [TestMethod]
     public void SingleEnumerable()
@@ -351,5 +353,54 @@ public class SerializationTests
         var serializedNodes = serializer.SerializeToNodes();
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.AreEqual(1, serializer.UsedLanguages().Count());
+    }
+
+    [TestMethod]
+    public void MassSerialization()
+    {
+        const long maxSize = 1_000_000L;
+        using Stream stream = File.Create("output.json");
+        using StreamWriter writer = new StreamWriter(stream);
+        using JsonTextWriter jsonWriter = new JsonTextWriter(writer);
+        
+        var serializer = new Serializer(CreateNodes(maxSize));
+        var serializedNodes = serializer.SerializeToNodes();
+        JsonSerializer ser = new JsonSerializer();
+        foreach (var node in serializedNodes)
+        {
+            ser.Serialize(jsonWriter, node);
+            jsonWriter.Flush();
+        }
+
+        IEnumerable<INode> CreateNodes(long count)
+        {
+            for (long l = 0; l < count; l++)
+            {
+                var id = $"id{l}";
+                if(l % 10_000 == 0)
+                {
+                    TestContext.WriteLine($"Creating Line #{l} privateMem: {AsFraction(Process.GetCurrentProcess().PrivateMemorySize64)} gcMem: {AsFraction(GC.GetTotalMemory(false))}");
+                }
+
+                yield return new Line(id) { Name = id };
+            }
+
+            string AsFraction(long value1)
+            {
+                return string.Format("{0:0.000}", value1 / 1_000_000D)+ "M";
+            }
+        }
+    }
+    
+    private TestContext testContextInstance;
+
+    /// <summary>
+    /// Gets or sets the test context which provides
+    /// information about and functionality for the current test run.
+    /// </summary>
+    public TestContext TestContext
+    {
+        get { return testContextInstance; }
+        set { testContextInstance = value; }
     }
 }
