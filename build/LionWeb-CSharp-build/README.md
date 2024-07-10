@@ -7,17 +7,12 @@ Execute the following on the command line (PowerShell):
 build.ps1
 ```
 
-or (regular POSIX shell):
+This essentially runs the [`Build.cs` (top-level style main program) entrypoint](./Generate.cs), equivalent to:
 
 ```shell
-source build.sh
+dotnet run Generate.cs
 ```
 
-This essentially runs the [`Build.cs` (top-level style main program) entrypoint](./Build.cs), equivalent to:
-
-```shell
-dotnet run Build.cs
-```
-
-Look at the `// -> ` comments in that source file to see what it does exactly.
+This generates all code in the [`generated` folder](../../test/LionWeb-CSharp-Test/languages/generated).
+It also generates a couple of language definitions in the LionWeb serialization chunk JSON format.
 

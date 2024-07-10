@@ -4,15 +4,15 @@ if (-Not (Test-Path $LocalChunks)) {
 }
 
 $TestProject = "../../test/LionWeb-CSharp-Test";
-$GeneratedPath = $TestProject + "/languages/structure";
+$GeneratedPath = $TestProject + "/languages/generated";
 Remove-Item $GeneratedPath -Recurse
 New-Item -ItemType Directory -Path $GeneratedPath
 
-dotnet run Build.cs --no-dependencies --no-restore
+dotnet run Generate.cs --no-dependencies --no-restore
 
 $ExtDefs = "chunks/externalDefs";
 $LocalDefs = "chunks/localDefs";
 $TestProjectDefs = $TestProject + "/languages/defChunks";
 
-mv $LocalDefs/shapesLanguage.json $TestProjectDefs/shapes.json
+mv $LocalDefs/shapes.json $TestProjectDefs/
 cp $ExtDefs/with-enum.json $TestProjectDefs/
