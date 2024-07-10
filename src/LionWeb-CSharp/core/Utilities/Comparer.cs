@@ -69,6 +69,15 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
 {
     private readonly Dictionary<IReadableNode, IReadableNode?> _nodeMapping = [];
 
+    /// <param name="left">List of initial nodes on left side.</param>
+    /// <param name="right">List of initial nodes on right side.</param>
+    public Comparer(IList<INode?> left, IList<INode?> right) : this(
+        left.Cast<IReadableNode?>().ToList(),
+        right.Cast<IReadableNode?>().ToList()
+    )
+    {
+    }
+
     /// List of initial nodes on left side. 
     public ImmutableList<IReadableNode?> Left => [.. _left];
 
@@ -198,8 +207,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     }
 
     /// Compares <paramref name="left"/> and <paramref name="right"/>.
-    protected virtual List<IDifference> CompareNode(IReadableNode? leftOwner, IReadableNode? left, Link? containment, IReadableNode? rightOwner,
-        IReadableNode? right)
+    protected virtual List<IDifference> CompareNode(IReadableNode? leftOwner, IReadableNode? left, Link? containment,
+        IReadableNode? rightOwner, IReadableNode? right)
     {
         List<IDifference> result = [];
 
@@ -323,7 +332,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
 
 
     /// Compares <paramref name="leftFeature"/> and <paramref name="rightFeature"/>.
-    protected virtual List<IDifference> CompareFeature(IReadableNode left, Feature leftFeature, IReadableNode right, Feature rightFeature)
+    protected virtual List<IDifference> CompareFeature(IReadableNode left, Feature leftFeature, IReadableNode right,
+        Feature rightFeature)
     {
         List<IDifference> result = [];
 
@@ -344,7 +354,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     }
 
     /// Compares <paramref name="leftProp"/> and <paramref name="rightProp"/>.
-    protected virtual List<IDifference> CompareProperty(IReadableNode left, Property leftProp, IReadableNode right, Property rightProp)
+    protected virtual List<IDifference> CompareProperty(IReadableNode left, Property leftProp, IReadableNode right,
+        Property rightProp)
     {
         List<IDifference> result = [];
 
@@ -401,7 +412,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     }
 
     /// Compares <paramref name="leftCont"/> and <paramref name="rightCont"/>.
-    protected virtual List<IDifference> CompareContainment(IReadableNode left, Containment leftCont, IReadableNode right, Containment rightCont)
+    protected virtual List<IDifference> CompareContainment(IReadableNode left, Containment leftCont,
+        IReadableNode right, Containment rightCont)
     {
         List<IDifference> result = [];
 
@@ -446,7 +458,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     }
 
     /// Compares <paramref name="leftRef"/> and <paramref name="rightRef"/>.
-    protected virtual List<IDifference> CompareReference(IReadableNode left, Reference leftRef, IReadableNode right, Reference rightRef)
+    protected virtual List<IDifference> CompareReference(IReadableNode left, Reference leftRef, IReadableNode right,
+        Reference rightRef)
     {
         List<IDifference> result = [];
 
@@ -475,7 +488,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
         return SetParent(result, new ReferenceDifference(left, leftRef, right));
     }
 
-    private List<IDifference> CompareTargets(IReadableNode leftOwner, List<IReadableNode> leftTargets, Reference reference,
+    private List<IDifference> CompareTargets(IReadableNode leftOwner, List<IReadableNode> leftTargets,
+        Reference reference,
         IReadableNode rightOwner,
         List<IReadableNode> rightTargets)
     {
@@ -508,7 +522,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     }
 
     /// Compares <paramref name="leftTarget"/> and <paramref name="rightTarget"/>.
-    protected virtual List<IDifference> CompareTarget(IReadableNode leftOwner, IReadableNode leftTarget, Reference reference, IReadableNode rightOwner,
+    protected virtual List<IDifference> CompareTarget(IReadableNode leftOwner, IReadableNode leftTarget,
+        Reference reference, IReadableNode rightOwner,
         IReadableNode rightTarget)
     {
         List<IDifference> result = [];
@@ -535,7 +550,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     }
 
     /// Compares <paramref name="leftTarget"/> and <paramref name="rightTarget"/>.
-    protected virtual List<IDifference> CompareExternalTarget(IReadableNode leftOwner, IReadableNode leftTarget, Reference reference,
+    protected virtual List<IDifference> CompareExternalTarget(IReadableNode leftOwner, IReadableNode leftTarget,
+        Reference reference,
         IReadableNode rightOwner, IReadableNode rightTarget)
     {
         List<IDifference> result = [];
@@ -550,7 +566,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
 
     private bool ContainsDeep(IList<IReadableNode?> list, IReadableNode target)
     {
-        var allNodes = list.OfType<IReadableNode>().SelectMany(n => M1Extensions.Descendants<IReadableNode>(n, true, true)).ToList();
+        var allNodes = list.OfType<IReadableNode>()
+            .SelectMany(n => M1Extensions.Descendants<IReadableNode>(n, true, true)).ToList();
         return allNodes.Contains(target);
     }
 
@@ -576,7 +593,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     }
 
     /// Compares <paramref name="leftConcept"/> and <paramref name="rightConcept"/>.
-    protected virtual List<IDifference> CompareConcept(IReadableNode left, Concept leftConcept, IReadableNode right, Concept rightConcept)
+    protected virtual List<IDifference> CompareConcept(IReadableNode left, Concept leftConcept, IReadableNode right,
+        Concept rightConcept)
     {
         List<IDifference> result = [];
 
@@ -589,7 +607,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     }
 
     /// Compares <paramref name="leftAnn"/> and <paramref name="rightAnn"/>.
-    protected virtual List<IDifference> CompareAnnotation(IReadableNode left, Annotation leftAnn, IReadableNode right, Annotation rightAnn)
+    protected virtual List<IDifference> CompareAnnotation(IReadableNode left, Annotation leftAnn, IReadableNode right,
+        Annotation rightAnn)
     {
         List<IDifference> result = [];
 
