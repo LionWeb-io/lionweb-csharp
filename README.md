@@ -11,7 +11,7 @@ This repository contains an implementation of (select parts of) the [LionWeb](ht
 
 * [`src/LionWeb-CSharp`]: implementation of LionWeb for/in C#
 * [`src/LionWeb-CSharp-Generator`]: implementation of a C# code generator for LionWeb
-* [`build/LionWeb-CSharp-build`]: a .NET console application that generates various source files in the `-Test` project
+* [`build/LionWeb-CSharp-Build`]: a .NET console application that generates various source files in the `-Test` project
 * [`test/LionWeb-CSharp-Test`]: unit tests for `LionWeb-CSharp`
 
 See these projects' respective `README`s for more information.

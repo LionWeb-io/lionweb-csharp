@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LionWeb-CSharp-build", "build\LionWeb-CSharp-build\LionWeb-CSharp-build.csproj", "{9387B682-36E8-4385-80AB-45020B346A4B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LionWeb-CSharp-Build", "build\LionWeb-CSharp-Build\LionWeb-CSharp-Build.csproj", "{9387B682-36E8-4385-80AB-45020B346A4B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LionWeb-CSharp", "src\LionWeb-CSharp\LionWeb-CSharp.csproj", "{4066676D-48BA-4AEA-AB85-5D23A2E39B54}"
 EndProject

@@ -1,4 +1,4 @@
-cd build/LionWeb-CSharp-build
+cd build/LionWeb-CSharp-Build
 pwsh build.ps1
 cd ../..
 
