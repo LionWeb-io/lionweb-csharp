@@ -21,6 +21,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ### Added
 
+- Generator adds descriptions to generated classes from model annotations.
+- Language (de-)Serialization can handle annotations on languages.
 - Generate interface for each factory; factory implementation methods are `virtual` now.
 
 ## Changed

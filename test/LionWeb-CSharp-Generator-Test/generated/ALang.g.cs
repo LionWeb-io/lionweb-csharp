@@ -94,6 +94,10 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 	public virtual AConcept CreateAConcept() => NewAConcept(GetNewId());
 }
 
+/// <summary>This is my
+///   Des
+/// crip
+///    tion</summary>
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
 public class AConcept : NodeBase
 {

@@ -28,18 +28,37 @@ using Utilities;
 public static class M2Extensions
 {
     /// <summary>
+    /// Searches the things of type <typeparamref name="T"/> within the given <paramref name="ts"/>
+    /// by the given <paramref name="key"/> (from <see cref="IKeyed"/>).
+    /// </summary>
+    /// <param name="ts">Things to search through.</param>
+    /// <param name="key">Key of the requested thing.</param>
+    /// <returns>A <typeparamref name="T"/> with the given key, or:</returns>
+    /// <exception cref="KeyNotFoundException">If the given <paramref name="ts"/> does not contain a thing with the given key.</exception>
+    private static T FindByKey<T>(this IEnumerable<T> ts, string key) where T : IKeyed
+    {
+        IEnumerable<T> result = ts.Where(t => t.Key == key);
+        if (!result.Any())
+        {
+            throw new KeyNotFoundException($"could not find element with key=\"{key}\" among: {string.Join(", ", ts.Select(t => t.Key))}");
+        }
+
+        return result.First();
+    }
+
+    /// <summary>
     /// Returns the classifier with <paramref name="key"/> contained in <paramref name="language"/>.
     /// Does <i>not</i> find classifiers from dependent languages.
     /// </summary>
     /// <param name="language">Language to search through.</param>
     /// <param name="key">Key of the requested classifier.</param>
     /// <returns>Classifier with <paramref name="key"/> contained in <paramref name="language"/>.</returns>
-    /// <exception cref="InvalidOperationException">If <paramref name="language"/> does not contain a classifier with <paramref name="key"/>.</exception>
+    /// <exception cref="KeyNotFoundException">If <paramref name="language"/> does not contain a classifier with <paramref name="key"/>.</exception>
     public static Classifier ClassifierByKey(this Language language, string key)
         => language
             .Entities
             .OfType<Classifier>()
-            .First(concept => concept.Key == key);
+            .FindByKey(key);
 
     /// <summary>
     /// Returns the feature with <paramref name="key"/> contained in <paramref name="classifier"/> or any of its generalizations.
@@ -51,7 +70,7 @@ public static class M2Extensions
     public static Feature FeatureByKey(this Classifier classifier, string key)
         => classifier
             .AllFeatures()
-            .First(feature => feature.Key == key);
+            .FindByKey(key);
 
     /// <summary>
     /// Enumerates all features of <paramref name="classifier"/> and all its generalizations (aka supertypes).
@@ -135,7 +154,7 @@ public static class M2Extensions
     /// <seealso cref="DirectGeneralizations(LionWeb.Core.M3.Classifier)"/>
     public static ISet<Classifier> AllGeneralizations(this Classifier classifier, bool includeSelf = false)
     {
-        var result = CollectGeneralizations(classifier, new HashSet<Classifier>());
+        IEnumerable<Classifier> result = CollectGeneralizations(classifier, new HashSet<Classifier>());
 
         if (!includeSelf)
             result = result.Except([classifier]);
@@ -164,7 +183,7 @@ public static class M2Extensions
     public static ISet<Classifier> DirectSpecializations(this Classifier classifier,
         IEnumerable<Language> languages)
     {
-        var directSpecializations = MapAllSpecializations(languages);
+        ILookup<Classifier, Classifier> directSpecializations = MapAllSpecializations(languages);
 
         return directSpecializations[classifier]
             .Except([classifier])
@@ -192,9 +211,9 @@ public static class M2Extensions
     public static ISet<Classifier> AllSpecializations(this Classifier classifier,
         IEnumerable<Language> languages, bool includeSelf = false)
     {
-        var directSpecializations = MapAllSpecializations(languages);
+        ILookup<Classifier, Classifier> directSpecializations = MapAllSpecializations(languages);
 
-        var result = CollectSpecializations(classifier, directSpecializations, new HashSet<Classifier>());
+        IEnumerable<Classifier> result = CollectSpecializations(classifier, directSpecializations, new HashSet<Classifier>());
 
         if (!includeSelf)
             result = result.Except([classifier]);
@@ -280,7 +299,7 @@ public static class M2Extensions
     /// <returns><c>true</c> if <paramref name="annotation"/> can annotate <paramref name="candidate"/>, <c>false</c> otherwise.</returns>
     public static bool CanAnnotate(this Annotation annotation, Classifier candidate) =>
         ReferenceEquals(annotation.Annotates, BuiltInsLanguage.Instance.Node) ||
-        candidate.AllGeneralizations(true).Contains(annotation.Annotates);
+        candidate.AllGeneralizations(true).Contains(annotation.Annotates, new LanguageEntityIdentityComparer());
 
     /// <summary>
     /// Checks if <paramref name="candidate"/> is a generalization (aka supertype) of <paramref name="basis"/>.
