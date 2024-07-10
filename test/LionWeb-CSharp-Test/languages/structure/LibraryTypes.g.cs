@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "library", Version = "1")]
-public class LibraryLanguage : LanguageBase<LibraryFactory>
+public class LibraryLanguage : LanguageBase<ILibraryFactory>
 {
 	public static readonly LibraryLanguage Instance = new Lazy<LibraryLanguage>(() => new("txjxNU9yRzEuyghtmgJK_l-nF93qWt7d1vErz5RbLow")).Value;
 	public LibraryLanguage(string id) : base(id)
@@ -43,7 +43,7 @@ public class LibraryLanguage : LanguageBase<LibraryFactory>
         public override IReadOnlyList<Language> DependsOn => [];
 
 	/// <inheritdoc/>
-        public override LibraryFactory GetFactory() => new(this);
+        public override ILibraryFactory GetFactory() => new LibraryFactory(this);
 	private const string _key = "library";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -108,7 +108,21 @@ public class LibraryLanguage : LanguageBase<LibraryFactory>
 	public Property SpecialistBookWriter_subject => _specialistBookWriter_subject.Value;
 }
 
-public class LibraryFactory : AbstractBaseNodeFactory
+public interface ILibraryFactory : INodeFactory
+{
+	public Book NewBook(string id);
+	public Book CreateBook();
+	public Library NewLibrary(string id);
+	public Library CreateLibrary();
+	public Writer NewWriter(string id);
+	public Writer CreateWriter();
+	public GuideBookWriter NewGuideBookWriter(string id);
+	public GuideBookWriter CreateGuideBookWriter();
+	public SpecialistBookWriter NewSpecialistBookWriter(string id);
+	public SpecialistBookWriter CreateSpecialistBookWriter();
+}
+
+public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 {
 	private readonly LibraryLanguage _language;
 	public LibraryFactory(LibraryLanguage language) : base(language)
@@ -140,16 +154,16 @@ public class LibraryFactory : AbstractBaseNodeFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public Book NewBook(string id) => new(id);
-	public Book CreateBook() => NewBook(GetNewId());
-	public Library NewLibrary(string id) => new(id);
-	public Library CreateLibrary() => NewLibrary(GetNewId());
-	public Writer NewWriter(string id) => new(id);
-	public Writer CreateWriter() => NewWriter(GetNewId());
-	public GuideBookWriter NewGuideBookWriter(string id) => new(id);
-	public GuideBookWriter CreateGuideBookWriter() => NewGuideBookWriter(GetNewId());
-	public SpecialistBookWriter NewSpecialistBookWriter(string id) => new(id);
-	public SpecialistBookWriter CreateSpecialistBookWriter() => NewSpecialistBookWriter(GetNewId());
+	public virtual Book NewBook(string id) => new(id);
+	public virtual Book CreateBook() => NewBook(GetNewId());
+	public virtual Library NewLibrary(string id) => new(id);
+	public virtual Library CreateLibrary() => NewLibrary(GetNewId());
+	public virtual Writer NewWriter(string id) => new(id);
+	public virtual Writer CreateWriter() => NewWriter(GetNewId());
+	public virtual GuideBookWriter NewGuideBookWriter(string id) => new(id);
+	public virtual GuideBookWriter CreateGuideBookWriter() => NewGuideBookWriter(GetNewId());
+	public virtual SpecialistBookWriter NewSpecialistBookWriter(string id) => new(id);
+	public virtual SpecialistBookWriter CreateSpecialistBookWriter() => NewSpecialistBookWriter(GetNewId());
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Book")]

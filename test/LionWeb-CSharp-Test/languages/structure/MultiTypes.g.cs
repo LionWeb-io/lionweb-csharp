@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "multi", Version = "1")]
-public class MultiLanguage : LanguageBase<MultiFactory>
+public class MultiLanguage : LanguageBase<IMultiFactory>
 {
 	public static readonly MultiLanguage Instance = new Lazy<MultiLanguage>(() => new("S9d8_7DajL2oOe1cqvXUGPGa3cWUF3bocmHgANb5bpM")).Value;
 	public MultiLanguage(string id) : base(id)
@@ -28,7 +28,7 @@ public class MultiLanguage : LanguageBase<MultiFactory>
         public override IReadOnlyList<Language> DependsOn => [];
 
 	/// <inheritdoc/>
-        public override MultiFactory GetFactory() => new(this);
+        public override IMultiFactory GetFactory() => new MultiFactory(this);
 	private const string _key = "multi";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -48,7 +48,13 @@ public class MultiLanguage : LanguageBase<MultiFactory>
 	public Containment Container_libraries => _container_libraries.Value;
 }
 
-public class MultiFactory : AbstractBaseNodeFactory
+public interface IMultiFactory : INodeFactory
+{
+	public Container NewContainer(string id);
+	public Container CreateContainer();
+}
+
+public class MultiFactory : AbstractBaseNodeFactory, IMultiFactory
 {
 	private readonly MultiLanguage _language;
 	public MultiFactory(MultiLanguage language) : base(language)
@@ -70,8 +76,8 @@ public class MultiFactory : AbstractBaseNodeFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public Container NewContainer(string id) => new(id);
-	public Container CreateContainer() => NewContainer(GetNewId());
+	public virtual Container NewContainer(string id) => new(id);
+	public virtual Container CreateContainer() => NewContainer(GetNewId());
 }
 
 [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "Container")]

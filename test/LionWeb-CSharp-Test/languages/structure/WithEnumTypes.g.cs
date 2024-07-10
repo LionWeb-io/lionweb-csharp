@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "WithEnum", Version = "1")]
-public class WithEnumLanguage : LanguageBase<WithEnumFactory>
+public class WithEnumLanguage : LanguageBase<IWithEnumFactory>
 {
 	public static readonly WithEnumLanguage Instance = new Lazy<WithEnumLanguage>(() => new("RkXMUe9zMRUQpw3bzQjSbBX6ju1a0UplEYsVa799WPQ")).Value;
 	public WithEnumLanguage(string id) : base(id)
@@ -31,7 +31,7 @@ public class WithEnumLanguage : LanguageBase<WithEnumFactory>
         public override IReadOnlyList<Language> DependsOn => [];
 
 	/// <inheritdoc/>
-        public override WithEnumFactory GetFactory() => new(this);
+        public override IWithEnumFactory GetFactory() => new WithEnumFactory(this);
 	private const string _key = "WithEnum";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -60,7 +60,13 @@ public class WithEnumLanguage : LanguageBase<WithEnumFactory>
 	public Property EnumHolder_enumValue => _enumHolder_enumValue.Value;
 }
 
-public class WithEnumFactory : AbstractBaseNodeFactory
+public interface IWithEnumFactory : INodeFactory
+{
+	public EnumHolder NewEnumHolder(string id);
+	public EnumHolder CreateEnumHolder();
+}
+
+public class WithEnumFactory : AbstractBaseNodeFactory, IWithEnumFactory
 {
 	private readonly WithEnumLanguage _language;
 	public WithEnumFactory(WithEnumLanguage language) : base(language)
@@ -84,8 +90,8 @@ public class WithEnumFactory : AbstractBaseNodeFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public EnumHolder NewEnumHolder(string id) => new(id);
-	public EnumHolder CreateEnumHolder() => NewEnumHolder(GetNewId());
+	public virtual EnumHolder NewEnumHolder(string id) => new(id);
+	public virtual EnumHolder CreateEnumHolder() => NewEnumHolder(GetNewId());
 }
 
 [LionCoreMetaPointer(Language = typeof(WithEnumLanguage), Key = "EnumHolder")]

@@ -8,15 +8,11 @@ $GeneratedPath = $TestProject + "/languages/structure";
 Remove-Item $GeneratedPath -Recurse
 New-Item -ItemType Directory -Path $GeneratedPath
 
-dotnet run Build.cs --no-dependencies --no-restore #--watch
+dotnet run Build.cs --no-dependencies --no-restore
 
 $ExtDefs = "chunks/externalDefs";
 $LocalDefs = "chunks/localDefs";
 $TestProjectDefs = $TestProject + "/languages/defChunks";
 
-cp $LocalDefs/shapesLanguage.json $TestProjectDefs/shapes.json
+mv $LocalDefs/shapesLanguage.json $TestProjectDefs/shapes.json
 cp $ExtDefs/with-enum.json $TestProjectDefs/
-
-$TestProjectFile = $TestProject + "/LionWeb-CSharp-Test.csproj";
-dotnet build $TestProjectFile
-dotnet test --no-restore $TestProjectFile
