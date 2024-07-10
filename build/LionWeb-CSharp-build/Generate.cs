@@ -59,13 +59,13 @@ List<Names> names =
     },
     new (withEnumLanguage, "Examples.WithEnum.M2"),
     new (shapesLanguage, "Examples.Shapes.M2"),
-    new (testLanguagesDefinitions.ALang, "Examples.Cirular.A")
+    new (testLanguagesDefinitions.ALang, "Examples.Circular.A")
     {
-        NamespaceMappings = { [bLang] = "Examples.Cirular.B" }
+        NamespaceMappings = { [bLang] = "Examples.Circular.B" }
     },
-    new (testLanguagesDefinitions.BLang, "Examples.Cirular.B")
+    new (testLanguagesDefinitions.BLang, "Examples.Circular.B")
     {
-        NamespaceMappings = { [aLang] = "Examples.Cirular.A" }
+        NamespaceMappings = { [aLang] = "Examples.Circular.A" }
     },
 ];
 

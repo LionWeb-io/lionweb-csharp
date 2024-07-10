@@ -4,7 +4,7 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Examples.Cirular.B;
+namespace Examples.Circular.B;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -19,14 +19,14 @@ public class BLangLanguage : LanguageBase<IBLangFactory>
 	public BLangLanguage(string id) : base(id)
 	{
 		_bConcept = new(() => new ConceptBase<BLangLanguage>("id-BConcept", this) { Key = "key-BConcept", Name = "BConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [BConcept_ARef, BConcept_AEnumProp]) });
-		_bConcept_ARef = new(() => new ReferenceBase<BLangLanguage>("id-BConcept-ARef", BConcept, this) { Key = "key-ARef", Name = "ARef", Optional = true, Multiple = false, Type = Examples.Cirular.A.ALangLanguage.Instance.AConcept });
-		_bConcept_AEnumProp = new(() => new PropertyBase<BLangLanguage>("id-BConcept-AEnumProp", BConcept, this) { Key = "key-AEnumProp", Name = "AEnumProp", Optional = false, Type = Examples.Cirular.A.ALangLanguage.Instance.AEnum });
+		_bConcept_ARef = new(() => new ReferenceBase<BLangLanguage>("id-BConcept-ARef", BConcept, this) { Key = "key-ARef", Name = "ARef", Optional = true, Multiple = false, Type = Examples.Circular.A.ALangLanguage.Instance.AConcept });
+		_bConcept_AEnumProp = new(() => new PropertyBase<BLangLanguage>("id-BConcept-AEnumProp", BConcept, this) { Key = "key-AEnumProp", Name = "AEnumProp", Optional = false, Type = Examples.Circular.A.ALangLanguage.Instance.AEnum });
 	}
 
 	/// <inheritdoc/>
         public override IReadOnlyList<LanguageEntity> Entities => [BConcept];
 	/// <inheritdoc/>
-        public override IReadOnlyList<Language> DependsOn => [Examples.Cirular.A.ALangLanguage.Instance];
+        public override IReadOnlyList<Language> DependsOn => [Examples.Circular.A.ALangLanguage.Instance];
 
 	/// <inheritdoc/>
         public override IBLangFactory GetFactory() => new BLangFactory(this);
@@ -121,9 +121,9 @@ public class BConcept : NodeBase
 			return true;
 		if (BLangLanguage.Instance.BConcept_ARef.EqualsIdentity(feature))
 		{
-			if (value is null or Examples.Cirular.A.AConcept)
+			if (value is null or Examples.Circular.A.AConcept)
 			{
-				ARef = (Examples.Cirular.A.AConcept?)value;
+				ARef = (Examples.Circular.A.AConcept?)value;
 				return true;
 			}
 
@@ -132,7 +132,7 @@ public class BConcept : NodeBase
 
 		if (BLangLanguage.Instance.BConcept_AEnumProp.EqualsIdentity(feature))
 		{
-			if (value is Examples.Cirular.A.AEnum v)
+			if (value is Examples.Circular.A.AEnum v)
 			{
 				AEnumProp = v;
 				return true;
@@ -155,30 +155,30 @@ public class BConcept : NodeBase
 		return result;
 	}
 
-	private Examples.Cirular.A.AConcept? _aRef = null;
+	private Examples.Circular.A.AConcept? _aRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public Examples.Cirular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
+	public Examples.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
 
 	/// <remarks>Optional Single Reference</remarks>
-        public BConcept SetARef(Examples.Cirular.A.AConcept? value)
+        public BConcept SetARef(Examples.Circular.A.AConcept? value)
 	{
 		_aRef = value;
 		return this;
 	}
 
-	private Examples.Cirular.A.AEnum? _aEnumProp = null;
+	private Examples.Circular.A.AEnum? _aEnumProp = null;
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If AEnumProp has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-AEnumProp")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public Examples.Cirular.A.AEnum AEnumProp { get => _aEnumProp ?? throw new UnsetFeatureException(BLangLanguage.Instance.BConcept_AEnumProp); set => SetAEnumProp(value); }
+	public Examples.Circular.A.AEnum AEnumProp { get => _aEnumProp ?? throw new UnsetFeatureException(BLangLanguage.Instance.BConcept_AEnumProp); set => SetAEnumProp(value); }
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BConcept SetAEnumProp(Examples.Cirular.A.AEnum value)
+        public BConcept SetAEnumProp(Examples.Circular.A.AEnum value)
 	{
 		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
 		_aEnumProp = value;

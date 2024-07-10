@@ -4,7 +4,7 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Examples.Cirular.A;
+namespace Examples.Circular.A;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -19,7 +19,7 @@ public class ALangLanguage : LanguageBase<IALangFactory>
 	public ALangLanguage(string id) : base(id)
 	{
 		_aConcept = new(() => new ConceptBase<ALangLanguage>("id-AConcept", this) { Key = "key-AConcept", Name = "AConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [AConcept_BRef]) });
-		_aConcept_BRef = new(() => new ReferenceBase<ALangLanguage>("id-AConcept-BRef", AConcept, this) { Key = "key-BRef", Name = "BRef", Optional = true, Multiple = false, Type = Examples.Cirular.B.BLangLanguage.Instance.BConcept });
+		_aConcept_BRef = new(() => new ReferenceBase<ALangLanguage>("id-AConcept-BRef", AConcept, this) { Key = "key-BRef", Name = "BRef", Optional = true, Multiple = false, Type = Examples.Circular.B.BLangLanguage.Instance.BConcept });
 		_aEnum = new(() => new EnumerationBase<ALangLanguage>("id-aEnum", this) { Key = "key-AEnum", Name = "AEnum", LiteralsLazy = new(() => [AEnum_left, AEnum_right]) });
 		_aEnum_left = new(() => new EnumerationLiteralBase<ALangLanguage>("id-left", AEnum, this) { Key = "key-left", Name = "left" });
 		_aEnum_right = new(() => new EnumerationLiteralBase<ALangLanguage>("id-right", AEnum, this) { Key = "key-right", Name = "right" });
@@ -28,7 +28,7 @@ public class ALangLanguage : LanguageBase<IALangFactory>
 	/// <inheritdoc/>
         public override IReadOnlyList<LanguageEntity> Entities => [AConcept, AEnum];
 	/// <inheritdoc/>
-        public override IReadOnlyList<Language> DependsOn => [Examples.Cirular.B.BLangLanguage.Instance];
+        public override IReadOnlyList<Language> DependsOn => [Examples.Circular.B.BLangLanguage.Instance];
 
 	/// <inheritdoc/>
         public override IALangFactory GetFactory() => new ALangFactory(this);
@@ -128,9 +128,9 @@ public class AConcept : NodeBase
 			return true;
 		if (ALangLanguage.Instance.AConcept_BRef.EqualsIdentity(feature))
 		{
-			if (value is null or Examples.Cirular.B.BConcept)
+			if (value is null or Examples.Circular.B.BConcept)
 			{
-				BRef = (Examples.Cirular.B.BConcept?)value;
+				BRef = (Examples.Circular.B.BConcept?)value;
 				return true;
 			}
 
@@ -149,14 +149,14 @@ public class AConcept : NodeBase
 		return result;
 	}
 
-	private Examples.Cirular.B.BConcept? _bRef = null;
+	private Examples.Circular.B.BConcept? _bRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-BRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public Examples.Cirular.B.BConcept? BRef { get => _bRef; set => SetBRef(value); }
+	public Examples.Circular.B.BConcept? BRef { get => _bRef; set => SetBRef(value); }
 
 	/// <remarks>Optional Single Reference</remarks>
-        public AConcept SetBRef(Examples.Cirular.B.BConcept? value)
+        public AConcept SetBRef(Examples.Circular.B.BConcept? value)
 	{
 		_bRef = value;
 		return this;

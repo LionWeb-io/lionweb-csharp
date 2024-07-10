@@ -16,6 +16,8 @@ This repository contains an implementation of (select parts of) the [LionWeb](ht
 
 See these projects' respective `README`s for more information.
 
+Documentation can be found in the [`docs` folder](docs).
+
 
 ## CI
 
@@ -26,6 +28,11 @@ It's triggered:
 * When a commit (on any branch) is tagged.
     Provided that restoring, building, packaging, and running all tests are all successful,
     then NuGet packages (for) `LionWeb-CSharp` and `LionWeb-CSharp-Generator` are published with the tag as version identification.
+
+
+## Development
+
+Run the `make.ps1` PowerShell script to generate all required source files, build all projects, and run all unit tests.
 
 
 ## License
