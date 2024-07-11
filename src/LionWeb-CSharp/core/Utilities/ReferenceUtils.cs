@@ -61,6 +61,7 @@ public static class ReferenceUtils
     /// <returns>An enumeration of references, as <see cref="ReferenceValue"/>s.</returns>
     public static IEnumerable<ReferenceValue> ReferenceValues(IEnumerable<IReadableNode> scope)
         => scope
+            .Distinct()
             .SelectMany(sourceNode =>                                                       // for all nodes in the scope:
                 sourceNode
                     .CollectAllSetFeatures()                                                // for all set features
