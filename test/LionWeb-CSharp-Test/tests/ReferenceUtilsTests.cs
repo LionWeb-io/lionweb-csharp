@@ -23,8 +23,8 @@ namespace LionWeb_CSharp_Test.tests;
 
 using Examples.Shapes.Dynamic;
 using Examples.Shapes.M2;
+using Examples.TinyRefLang;
 using LionWeb.Core;
-using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 
 /// <summary>
@@ -82,21 +82,16 @@ public class ReferenceUtilsTests
     [TestMethod]
     public void finds_a_reference_to_itself()
     {
-        var language = new DynamicLanguage("lang");
-        var concept = new DynamicConcept("concept", language);
-        language.AddEntities([concept]);
+        var language = TinyRefLangLanguage.Instance;
+        var factory = language.GetFactory();
 
-        var selfRef = new DynamicReference("selfRef", concept);
-        concept.AddFeatures([selfRef]);
-        selfRef.Type = concept;
-
-        var node = new DynamicNode("node", concept);
-        node.Set(selfRef, node);
+        var node = factory.CreateMyConcept();
+        node.SingularRef = node;
 
         CollectionAssert.AreEqual(
             new List<ReferenceValue>
             {
-                new (node, selfRef, null, node)
+                new (node, language.MyConcept_singularRef, null, node)
             },
             ReferenceUtils.FindIncomingReferences(node, [node]).ToList()
         );
@@ -105,28 +100,19 @@ public class ReferenceUtilsTests
     [TestMethod]
     public void finds_references_in_different_features_of_the_source()
     {
-        var language = new DynamicLanguage("lang");
-        var concept = new DynamicConcept("concept", language);
-        language.AddEntities([concept]);
+        var language = TinyRefLangLanguage.Instance;
+        var factory = language.GetFactory();
 
-        var ref1 = new DynamicReference("ref1", concept);
-        concept.AddFeatures([ref1]);
-        ref1.Type = concept;
-
-        var ref2 = new DynamicReference("ref2", concept);
-        concept.AddFeatures([ref2]);
-        ref2.Type = concept;
-
-        var targetNode = new DynamicNode("targetNode", concept);
-        var sourceNode = new DynamicNode("sourceNode", concept);
-        sourceNode.Set(ref1, targetNode);
-        sourceNode.Set(ref2, targetNode);
+        var targetNode = factory.CreateMyConcept();
+        var sourceNode = factory.CreateMyConcept();
+        sourceNode.SingularRef = targetNode;
+        sourceNode.AddMultivaluedRef([targetNode]);
 
         CollectionAssert.AreEquivalent(
             new List<ReferenceValue>
             {
-                new (sourceNode, ref1, null, targetNode),
-                new (sourceNode, ref2, null, targetNode),
+                new (sourceNode, language.MyConcept_singularRef, null, targetNode),
+                new (sourceNode, language.MyConcept_multivaluedRef, 0, targetNode),
             },
             ReferenceUtils.FindIncomingReferences(targetNode, [sourceNode]).ToList()
         );
@@ -135,24 +121,18 @@ public class ReferenceUtilsTests
     [TestMethod]
     public void finds_multiple_references_to_target_in_a_multivalued_feature_of_the_source()
     {
-        var language = new DynamicLanguage("lang");
-        var concept = new DynamicConcept("concept", language);
-        language.AddEntities([concept]);
+        var language = TinyRefLangLanguage.Instance;
+        var factory = language.GetFactory();
 
-        var myRef = new DynamicReference("myRef", concept);
-        concept.AddFeatures([myRef]);
-        myRef.Type = concept;
-        myRef.Multiple = true;
-
-        var targetNode = new DynamicNode("targetNode", concept);
-        var sourceNode = new DynamicNode("sourceNode", concept);
-        sourceNode.Set(myRef, new List<INode> { targetNode, targetNode });
+        var targetNode = factory.CreateMyConcept();
+        var sourceNode = factory.CreateMyConcept();
+        sourceNode.AddMultivaluedRef([targetNode, targetNode]);
 
         CollectionAssert.AreEquivalent(
             new List<ReferenceValue>
             {
-                new (sourceNode, myRef, 0, targetNode),
-                new (sourceNode, myRef, 1, targetNode),
+                new (sourceNode, language.MyConcept_multivaluedRef, 0, targetNode),
+                new (sourceNode, language.MyConcept_multivaluedRef, 1, targetNode),
             },
             ReferenceUtils.FindIncomingReferences(targetNode, [sourceNode]).ToList()
         );
@@ -161,26 +141,21 @@ public class ReferenceUtilsTests
     [TestMethod]
     public void finds_references_among_multiple_sources_and_targets()
     {
-        var language = new DynamicLanguage("lang");
-        var concept = new DynamicConcept("concept", language);
-        language.AddEntities([concept]);
+        var language = TinyRefLangLanguage.Instance;
+        var factory = language.GetFactory();
 
-        var myRef = new DynamicReference("myRef", concept);
-        concept.AddFeatures([myRef]);
-        myRef.Type = concept;
-
-        var sourceNode1 = new DynamicNode("sourceNode1", concept);
-        var sourceNode2 = new DynamicNode("sourceNode2", concept);
-        var targetNode1 = new DynamicNode("targetNode1", concept);
-        var targetNode2 = new DynamicNode("targetNode2", concept);
-        sourceNode1.Set(myRef, targetNode1);
-        sourceNode2.Set(myRef, targetNode2);
+        var sourceNode1 = factory.CreateMyConcept();
+        var sourceNode2 = factory.CreateMyConcept();
+        var targetNode1 = factory.CreateMyConcept();
+        var targetNode2 = factory.CreateMyConcept();
+        sourceNode1.SingularRef = targetNode1;
+        sourceNode2.SingularRef = targetNode2;
 
         CollectionAssert.AreEquivalent(
             new List<ReferenceValue>
             {
-                new (sourceNode1, myRef, null, targetNode1),
-                new (sourceNode2, myRef, null, targetNode2),
+                new (sourceNode1, language.MyConcept_singularRef, null, targetNode1),
+                new (sourceNode2, language.MyConcept_singularRef, null, targetNode2),
             },
             ReferenceUtils.FindIncomingReferences([targetNode1, targetNode2], [sourceNode1, sourceNode2]).ToList()
         );

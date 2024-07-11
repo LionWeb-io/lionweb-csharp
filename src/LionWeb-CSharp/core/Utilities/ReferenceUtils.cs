@@ -37,11 +37,15 @@ public record ReferenceValue(IReadableNode SourceNode, Reference Reference, int?
 /// </summary>
 public static class ReferenceUtils
 {
+    /// <summary>
+    /// Returns all values of the given <paramref name="reference"/> on the given <paramref name="sourceNode"/>,
+    /// as <see cref="ReferenceValue"/>s.
+    /// </summary>
     private static IEnumerable<ReferenceValue> GatherReferenceValues(IReadableNode sourceNode, Reference reference)
     {
         if (reference.Multiple)
         {
-            var sourceNodes = sourceNode.Get(reference) as IEnumerable<IReadableNode> ?? [];
+            IEnumerable<IReadableNode> sourceNodes = sourceNode.Get(reference) as IEnumerable<IReadableNode> ?? [];
             return sourceNodes
                 .Select((targetNode, index) =>
                     new ReferenceValue(sourceNode, reference, index, targetNode)
@@ -56,6 +60,9 @@ public static class ReferenceUtils
     /// Finds all references within the given <paramref name="scope"/>, as <see cref="ReferenceValue"/>s.
     /// To search within all nodes under a collection of root nodes,
     /// pass <c>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</c> as scope.
+    /// Note that any reference is found uniquely,
+    /// i.e. the returned <see cref="ReferenceValue"/>s are pairwise distinct,
+    /// even if <paramref name="scope"/> contains duplicate nodes.
     /// </summary>
     /// <param name="scope">The <see cref="IReadableNode"/>s that are searched for references</param>
     /// <returns>An enumeration of references, as <see cref="ReferenceValue"/>s.</returns>
@@ -74,6 +81,9 @@ public static class ReferenceUtils
     /// within the given <paramref name="scope"/>, as <see cref="ReferenceValue"/>s.
     /// To search within all nodes under a collection of root nodes,
     /// pass <c>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</c> as scope.
+    /// Note that any reference is found uniquely,
+    /// i.e. the returned <see cref="ReferenceValue"/>s are pairwise distinct,
+    /// even if <paramref name="targetNodes"/> or <paramref name="scope"/> contain duplicate nodes.
     /// </summary>
     /// <param name="targetNodes">The target nodes for which the incoming references are searched</param>
     /// <param name="scope">The <see cref="IReadableNode"/>s that are searched for references</param>
@@ -91,6 +101,9 @@ public static class ReferenceUtils
     /// within the given <paramref name="scope"/>, as <see cref="ReferenceValue"/>s.
     /// To search within all nodes under a collection of root nodes,
     /// pass <c>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</c> as scope.
+    /// Note that any reference is found uniquely,
+    /// i.e. the returned <see cref="ReferenceValue"/>s are pairwise distinct,
+    /// even if <paramref name="scope"/> contains duplicate nodes.
     /// </summary>
     /// <param name="targetNode">A target <see cref="IReadableNode"/></param>
     /// <param name="scope">The <see cref="IReadableNode"/>s that form the scope of the search</param>
