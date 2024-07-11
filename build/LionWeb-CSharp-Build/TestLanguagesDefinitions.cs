@@ -24,6 +24,7 @@ public class TestLanguagesDefinitions
 {
     public readonly Language ALang;
     public readonly Language BLang;
+    public readonly Language TinyRefLang;
 
     public TestLanguagesDefinitions()
     {
@@ -59,5 +60,23 @@ public class TestLanguagesDefinitions
 
         ALang = aLang;
         BLang = bLang;
+
+
+        var tinyRefLang = new DynamicLanguage("id-TinyRefLang") { Key = "key-tinyRefLang", Name = "TinyRefLang", Version = "0" };
+        var myConcept = new DynamicConcept("id-Concept", tinyRefLang) { Key = "key-MyConcept", Name = "MyConcept" };
+        tinyRefLang.AddEntities([myConcept]);
+
+        var singularRef =
+            new DynamicReference("id-MyConcept-singularRef", myConcept)
+            {
+                Key = "key-MyConcept-singularRef", Name = "singularRef", Type = myConcept
+            };
+        var multivalueRef = new DynamicReference("id-Concept-multivaluedRef", myConcept)
+        {
+            Key = "key-MyConcept-multivaluedRef", Name = "multivaluedRef", Type = myConcept, Multiple = true
+        };
+        myConcept.AddFeatures([singularRef, multivalueRef]);
+
+        TinyRefLang = tinyRefLang;
     }
 }

@@ -47,6 +47,7 @@ shapesLanguage.Name = "Shapes";
 var testLanguagesDefinitions = new TestLanguagesDefinitions();
 var aLang = testLanguagesDefinitions.ALang;
 var bLang = testLanguagesDefinitions.BLang;
+var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
 
 List<Names> names =
 [
@@ -59,14 +60,15 @@ List<Names> names =
     },
     new (withEnumLanguage, "Examples.WithEnum.M2"),
     new (shapesLanguage, "Examples.Shapes.M2"),
-    new (testLanguagesDefinitions.ALang, "Examples.Circular.A")
+    new (aLang, "Examples.Circular.A")
     {
         NamespaceMappings = { [bLang] = "Examples.Circular.B" }
     },
-    new (testLanguagesDefinitions.BLang, "Examples.Circular.B")
+    new (bLang, "Examples.Circular.B")
     {
         NamespaceMappings = { [aLang] = "Examples.Circular.A" }
     },
+    new (tinyRefLang, "Examples.TinyRefLang"),
 ];
 
 
