@@ -76,6 +76,8 @@ public class AllFeaturesTests
                 lang.ClassifierByKey("key-Shape").FeatureByKey("key-shape-docs"),
                 lang.ClassifierByKey("key-Line").FeatureByKey("key-start"),
                 lang.ClassifierByKey("key-Line").FeatureByKey("key-end"),
+                lang.ClassifierByKey("key-IShape").FeatureByKey("key-uuid"),
+                lang.ClassifierByKey("key-IShape").FeatureByKey("key-fixpoints"),
             }, actual.ToList());
     }
 
@@ -159,7 +161,9 @@ public class AllFeaturesTests
                 BuiltInsLanguage.Instance.INamed_name,
                 lang.ClassifierByKey("key-Shape").FeatureByKey("key-shape-docs"),
                 lang.ClassifierByKey("key-Circle").FeatureByKey("key-r"),
-                lang.ClassifierByKey("key-Circle").FeatureByKey("key-center")
+                lang.ClassifierByKey("key-Circle").FeatureByKey("key-center"),
+                lang.ClassifierByKey("key-IShape").FeatureByKey("key-uuid"),
+                lang.ClassifierByKey("key-IShape").FeatureByKey("key-fixpoints"),
             },
             actual.ToList());
     }

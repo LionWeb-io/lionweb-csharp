@@ -44,7 +44,7 @@ public class Deserializer
     private readonly IEnumerable<Classifier> _classifiers;
 
     private readonly Dictionary<string, INode> _nodesById = new();
-    private Dictionary<string, INode> dependentNodesById;
+    private Dictionary<string, IReadableNode> dependentNodesById;
 
     public void RegisterCustomFactory(Language language, INodeFactory factory) =>
         _language2NodeFactory[language] = factory;
@@ -59,15 +59,25 @@ public class Deserializer
     /// References to any of the given dependent nodes are resolved as well.
     /// </returns>
     /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
-    public List<INode> Deserialize(SerializationChunk serializationChunk, IEnumerable<INode> dependentNodes)
+    public List<INode> Deserialize(SerializationChunk serializationChunk, IEnumerable<INode> dependentNodes) =>
+        Deserialize(serializationChunk.Nodes, dependentNodes);
+    
+    /// <returns>
+    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNodes">serialized nodes</paramref>.
+    /// References to any of the given dependent nodes are resolved as well.
+    /// </returns>
+    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
+    public List<INode> Deserialize(IEnumerable<SerializedNode> serializedNodes, IEnumerable<IReadableNode> dependentNodes)
     {
-        NodesWithProperties(serializationChunk);
+        var serializedNodesList = serializedNodes.ToList();
+        NodesWithProperties(serializedNodesList);
 
         dependentNodesById = dependentNodes
-            .SelectMany(node => node.Descendants(true, true))
+            .SelectMany(node => M1Extensions.Descendants<IReadableNode>(node, true, true))
+            .Distinct()
             .ToDictionary(node => node.GetId());
 
-        foreach (var serializedNode in serializationChunk.Nodes)
+        foreach (var serializedNode in serializedNodesList)
         {
             var id = serializedNode.Id;
             var node = _nodesById[id];
@@ -81,9 +91,9 @@ public class Deserializer
             .ToList();
     }
 
-    private void NodesWithProperties(SerializationChunk serializationChunk)
+    private void NodesWithProperties(IEnumerable<SerializedNode> serializedNodes)
     {
-        foreach (var serializedNode in serializationChunk.Nodes)
+        foreach (var serializedNode in serializedNodes)
         {
             var id = serializedNode.Id;
             var node = Instantiate(id, serializedNode.Classifier);
@@ -117,7 +127,7 @@ public class Deserializer
                 node.SetParent(parent);
             } else
             {
-                logError($"On node with id={id}: couldn't find specified parent - leaving this node orphaned.");
+                LogError($"On node with id={id}: couldn't find specified parent - leaving this node orphaned.");
             }
         }
     }
@@ -133,7 +143,7 @@ public class Deserializer
                 {
                     if (_nodesById.TryGetValue(childId, out var existing))
                         return existing;
-                    logError($"On node with id={id}: couldn't find child with id={childId} - skipping.");
+                    LogError($"On node with id={id}: couldn't find child with id={childId} - skipping.");
                     return null;
                 })
                 .Where(c => c != null)
@@ -163,7 +173,7 @@ public class Deserializer
                     if (dependentNodesById.TryGetValue(targetId, out var dependentNode))
                         return dependentNode;
 
-                    logError($"On node with id={id}: couldn't find reference with id={targetId} - skipping.");
+                    LogError($"On node with id={id}: couldn't find reference with id={targetId} - skipping.");
                     return null;
                 })
                 .Where(c => c != null)
@@ -186,12 +196,12 @@ public class Deserializer
             if (_nodesById.TryGetValue(annotationId, out INode? ownNode))
             {
                 node.AddAnnotations([ownNode]);
-            } else if (dependentNodesById.TryGetValue(annotationId, out var dependentNode))
+            } else if (dependentNodesById.TryGetValue(annotationId, out var dependentNode) && dependentNode is IWritableNode writableNode)
             {
-                node.AddAnnotations([dependentNode]);
+                node.AddAnnotations([writableNode]);
             } else
             {
-                logError($"On node with id={id}: couldn't find annotation with id={annotationId} - skipping.");
+                LogError($"On node with id={id}: couldn't find annotation with id={annotationId} - skipping.");
             }
         }
     }
@@ -209,7 +219,7 @@ public class Deserializer
             case 0:
                 throw new UnsupportedClassifierException(metaPointer, $"On node with id={id}:");
             case > 1:
-                logError($"On node with id={id}: multiple classifiers found matching meta-pointer {metaPointer}.");
+                LogError($"On node with id={id}: multiple classifiers found matching meta-pointer {metaPointer}.");
                 break;
         }
 
@@ -231,7 +241,7 @@ public class Deserializer
             case 0:
                 throw new UnknownFeatureException(classifier, metaPointer, $"On node with id={id}:");
             case > 1:
-                logError(
+                LogError(
                     $"On node with id={id}: multiple {typeof(TFeature).Name.ToLower()} features found matching meta-pointer {metaPointer}.");
                 break;
         }
@@ -268,6 +278,6 @@ public class Deserializer
     }
 
 
-    protected virtual void logError(string message) =>
+    protected virtual void LogError(string message) =>
         Console.Error.WriteLine(message);
 }

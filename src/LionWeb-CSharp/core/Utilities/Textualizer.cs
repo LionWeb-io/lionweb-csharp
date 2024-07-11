@@ -36,7 +36,7 @@ public static class Textualizer
 
     /// <returns>a textualization of the given {@link INode node}.</returns>
     public static string AsString(this INode node)
-        => Join(node.AsStrings(), "\n");
+        => Join(node.AsStrings(), Environment.NewLine);
 
 
     private static IEnumerable<string> AsStrings(this INode node)

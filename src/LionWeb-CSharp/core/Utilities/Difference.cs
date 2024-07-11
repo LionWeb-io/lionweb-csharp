@@ -85,10 +85,10 @@ public abstract record DifferenceBase : IDifference
     protected string RightDescription() => OutputConfig.RightDescription;
 
     /// Pretty-printing of a node including classifier according to Config.
-    protected string NC(INode? node) => node != null ? $"{N(node)}{C(node.GetClassifier())}" : "null";
+    protected string NC(IReadableNode? node) => node != null ? $"{N(node)}{C(node.GetClassifier())}" : "null";
 
     /// Pretty-printing of a node according to Config.
-    protected string N(INode? node)
+    protected string N(IReadableNode? node)
     {
         if (node != null)
         {
@@ -158,7 +158,7 @@ public abstract record DifferenceBase : IDifference
 
 /// <paramref name="Left"/> and <paramref name="Right"/>, including all their descendants and their annotations,
 /// differ in at least one way.
-public record NodeDifference(INode Left, INode Right) : DifferenceBase, IContainerDifference
+public record NodeDifference(IReadableNode Left, IReadableNode Right) : DifferenceBase, IContainerDifference
 {
     /// <inheritdoc />
     protected override string Describe() =>
@@ -166,7 +166,7 @@ public record NodeDifference(INode Left, INode Right) : DifferenceBase, IContain
 }
 
 /// <paramref name="Left"/> and <paramref name="Right"/> have a different <see cref="IReadableNode.GetClassifier"/>.
-public record ClassifierDifference(INode Left, INode Right) : DifferenceBase
+public record ClassifierDifference(IReadableNode Left, IReadableNode Right) : DifferenceBase
 {
     /// <inheritdoc />
     protected override string Describe() =>
@@ -174,7 +174,7 @@ public record ClassifierDifference(INode Left, INode Right) : DifferenceBase
 }
 
 /// One of <paramref name="Left"/> and <paramref name="Right"/> is an <see cref="Annotation"/>, the other one a <see cref="Concept"/>. 
-public record IncompatibleClassifierDifference(INode Left, INode Right) : DifferenceBase
+public record IncompatibleClassifierDifference(IReadableNode Left, IReadableNode Right) : DifferenceBase
 {
     /// <inheritdoc />
     protected override string Describe() =>
@@ -183,10 +183,10 @@ public record IncompatibleClassifierDifference(INode Left, INode Right) : Differ
 
 /// The value of <paramref name="Property"/> in <paramref name="Left"/> and <paramref name="Right"/> differ.
 public record PropertyValueDifference(
-    INode Left,
+    IReadableNode Left,
     object LeftValue,
     Property Property,
-    INode Right,
+    IReadableNode Right,
     object RightValue
 ) : DifferenceBase
 {
@@ -197,10 +197,10 @@ public record PropertyValueDifference(
 
 /// The LionWeb type of <paramref name="Property"/> in <paramref name="Left"/> and <paramref name="Right"/> differ.
 public record PropertyValueTypeDifference(
-    INode Left,
+    IReadableNode Left,
     object? LeftValue,
     Property Property,
-    INode Right,
+    IReadableNode Right,
     object? RightValue
 ) : DifferenceBase
 {
@@ -211,10 +211,10 @@ public record PropertyValueTypeDifference(
 
 /// The C# type of <paramref name="Property"/> in <paramref name="Left"/> and <paramref name="Right"/> differ.
 public record PropertyEnumTypeDifference(
-    INode Left,
+    IReadableNode Left,
     Enum LeftEnum,
     Property Property,
-    INode Right,
+    IReadableNode Right,
     Enum RightEnum
 ) : DifferenceBase
 {
@@ -227,20 +227,20 @@ public record PropertyEnumTypeDifference(
 public interface IUnsetFeatureDifference : IDifference
 {
     /// Left side of difference
-    INode Left { get; init; }
+    IReadableNode Left { get; init; }
     
     /// Feature of difference
     Feature Feature { get; init; }
     
     /// Right side of difference
-    INode Right { get; init; }
+    IReadableNode Right { get; init; }
 }
 
 /// The <paramref name="Feature"/> is not set in <paramref name="Left"/>, i.e. it exists only in <paramref name="Right"/>.
 public record UnsetFeatureLeftDifference(
-    INode Left,
+    IReadableNode Left,
     Feature Feature,
-    INode Right
+    IReadableNode Right
 ) : DifferenceBase, IUnsetFeatureDifference
 {
     /// <inheritdoc />
@@ -250,9 +250,9 @@ public record UnsetFeatureLeftDifference(
 
 /// The <paramref name="Feature"/> is not set in <paramref name="Right"/>, i.e. it exists only in <paramref name="Left"/>.
 public record UnsetFeatureRightDifference(
-    INode Left,
+    IReadableNode Left,
     Feature Feature,
-    INode Right
+    IReadableNode Right
 ) : DifferenceBase, IUnsetFeatureDifference
 {
     /// <inheritdoc />
@@ -264,21 +264,21 @@ public record UnsetFeatureRightDifference(
 public interface ILinkDifference : IContainerDifference
 {
     /// Left side of difference
-    INode Left { get; init; }
+    IReadableNode Left { get; init; }
     
     /// Link of difference
     Link Link { get; }
     
     /// Right side of difference
-    INode Right { get; init; }
+    IReadableNode Right { get; init; }
 }
 
 /// Contents of <paramref name="Containment"/> in <paramref name="Left"/> and <paramref name="Right"/>,
 /// including all their descendants and their annotations, differ in at least one way.
 public record ContainmentDifference(
-    INode Left,
+    IReadableNode Left,
     Containment Containment,
-    INode Right
+    IReadableNode Right
 ) : DifferenceBase, ILinkDifference
 {
     /// <inheritdoc />
@@ -291,9 +291,9 @@ public record ContainmentDifference(
 
 /// The target(s) of <paramref name="Reference"/> in <paramref name="Left"/> and <paramref name="Right"/> differ.
 public record ReferenceDifference(
-    INode Left,
+    IReadableNode Left,
     Reference Reference,
-    INode Right
+    IReadableNode Right
 ) : DifferenceBase, ILinkDifference
 {
     /// <inheritdoc />
@@ -307,11 +307,11 @@ public record ReferenceDifference(
 /// <paramref name="LeftTarget"/> is _external_, but <paramref name="RightTarget"/> is _internal_. 
 /// <seealso cref="Comparer"/> 
 public record ExternalTargetLeftDifference(
-    INode LeftOwner,
-    INode LeftTarget,
+    IReadableNode LeftOwner,
+    IReadableNode LeftTarget,
     Reference Reference,
-    INode RightOwner,
-    INode RightTarget
+    IReadableNode RightOwner,
+    IReadableNode RightTarget
 ) : DifferenceBase
 {
     /// <inheritdoc />
@@ -322,11 +322,11 @@ public record ExternalTargetLeftDifference(
 /// <paramref name="LeftTarget"/> is _internal_, but <paramref name="RightTarget"/> is _external_. 
 /// <seealso cref="Comparer"/> 
 public record ExternalTargetRightDifference(
-    INode LeftOwner,
-    INode LeftTarget,
+    IReadableNode LeftOwner,
+    IReadableNode LeftTarget,
     Reference Reference,
-    INode RightOwner,
-    INode RightTarget
+    IReadableNode RightOwner,
+    IReadableNode RightTarget
 ) : DifferenceBase
 {
     /// <inheritdoc />
@@ -337,11 +337,11 @@ public record ExternalTargetRightDifference(
 /// A <paramref name="Reference"/> points to different _external_ nodes. 
 /// <seealso cref="Comparer"/> 
 public record ExternalTargetDifference(
-    INode LeftOwner,
-    INode LeftTarget,
+    IReadableNode LeftOwner,
+    IReadableNode LeftTarget,
     Reference Reference,
-    INode RightOwner,
-    INode RightTarget
+    IReadableNode RightOwner,
+    IReadableNode RightTarget
 ) : DifferenceBase
 {
     /// <inheritdoc />
@@ -352,11 +352,11 @@ public record ExternalTargetDifference(
 /// A <paramref name="Reference"/> points to different _internal_ nodes.
 /// <seealso cref="Comparer"/> 
 public record InternalTargetDifference(
-    INode LeftOwner,
-    INode LeftTarget,
+    IReadableNode LeftOwner,
+    IReadableNode LeftTarget,
     Reference Reference,
-    INode RightOwner,
-    INode RightTarget
+    IReadableNode RightOwner,
+    IReadableNode RightTarget
 ) : DifferenceBase
 {
     /// <inheritdoc />
@@ -366,8 +366,8 @@ public record InternalTargetDifference(
 
 /// Annotations of <paramref name="Left"/> and <paramref name="Right"/> differ.
 public record AnnotationDifference(
-    INode Left,
-    INode Right
+    IReadableNode Left,
+    IReadableNode Right
 ) : DifferenceBase, IContainerDifference
 {
     /// <inheritdoc />
@@ -384,10 +384,10 @@ public record AnnotationDifference(
 /// <param name="Right">Owner of the right list. Might be <c>null</c> if top-level list.</param>
 /// <param name="RightCount">Length of right list.</param>
 public record NodeCountDifference(
-    INode? Left,
+    IReadableNode? Left,
     int LeftCount,
     Link? Link,
-    INode? Right,
+    IReadableNode? Right,
     int RightCount
 ) : DifferenceBase
 {
@@ -400,13 +400,13 @@ public record NodeCountDifference(
 public interface ISurplusNodeDifference : IDifference
 {
     /// Owner of surplus node
-    INode? Owner { get; init; }
+    IReadableNode? Owner { get; init; }
     
     /// Link containing surplus node
     Link? Link { get; init; }
     
     /// surplus node
-    INode Node { get; init; }
+    IReadableNode Node { get; init; }
 }
 
 /// <summary>
@@ -416,9 +416,9 @@ public interface ISurplusNodeDifference : IDifference
 /// <param name="Link">Feature hosting the list. Might be <c>null</c> if top-level list or annotations.</param>
 /// <param name="Node">Surplus node.</param>
 public record LeftSurplusNodeDifference(
-    INode? Owner,
+    IReadableNode? Owner,
     Link? Link,
-    INode Node
+    IReadableNode Node
 ) : DifferenceBase, ISurplusNodeDifference
 {
     /// <inheritdoc />
@@ -433,9 +433,9 @@ public record LeftSurplusNodeDifference(
 /// <param name="Link">Feature hosting the list. Might be <c>null</c> if top-level list or annotations.</param>
 /// <param name="Node">Surplus node.</param>
 public record RightSurplusNodeDifference(
-    INode? Owner,
+    IReadableNode? Owner,
     Link? Link,
-    INode Node) : DifferenceBase, ISurplusNodeDifference
+    IReadableNode Node) : DifferenceBase, ISurplusNodeDifference
 {
     /// <inheritdoc />
     protected override string Describe() =>
@@ -449,9 +449,9 @@ public record RightSurplusNodeDifference(
 /// <param name="Link">Feature hosting the list. Might be <c>null</c> if top-level list or annotations.</param>
 /// <param name="Node">Non-null right node.</param>
 public record LeftNullNodeDifference(
-    INode? Owner,
+    IReadableNode? Owner,
     Link? Link,
-    INode Node
+    IReadableNode Node
 ) : DifferenceBase, ISurplusNodeDifference
 {
     /// <inheritdoc />
@@ -466,9 +466,9 @@ public record LeftNullNodeDifference(
 /// <param name="Link">Feature hosting the list. Might be <c>null</c> if top-level list or annotations.</param>
 /// <param name="Node">Non-null left node.</param>
 public record RightNullNodeDifference(
-    INode? Owner,
+    IReadableNode? Owner,
     Link? Link,
-    INode Node) : DifferenceBase, ISurplusNodeDifference
+    IReadableNode Node) : DifferenceBase, ISurplusNodeDifference
 {
     /// <inheritdoc />
     protected override string Describe() =>
