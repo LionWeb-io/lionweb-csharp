@@ -24,8 +24,15 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 - Generator adds descriptions to generated classes from model annotations.
 - Language (de-)Serialization can handle annotations on languages.
 - Generate interface for each factory; factory implementation methods are `virtual` now.
+- Add utilities class `ReferenceUtils` (in namespace `LionWeb.Core.Utilities`) to deal with references:
+	- `ReferenceValues(<nodes>)` finds all references within all the given `<nodes>`.
+	- `FindIncomingReferences(<targetNode(s)>, <nodes>)` finds all references _to_ (all) the `<targetNode(s)>` within the given `<nodes>`.
 
-## Changed
+### Fixed
+
+- Fix bug ([issue #7](https://github.com/LionWeb-io/lionweb-csharp/issues/7)) in `Textualizer`: don't crash on unset `name` properties of `INamed`s.
+
+### Changed
 
 - Released as open source under the Apache-2.0 license.
 - Set up CI using GitHub Actions.

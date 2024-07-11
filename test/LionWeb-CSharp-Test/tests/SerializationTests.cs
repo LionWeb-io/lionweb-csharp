@@ -132,8 +132,7 @@ public class SerializationTests
         DynamicClassifier redeserializedCircle2 =
             (DynamicClassifier)redeserializedShapes2.ClassifierByKey(ShapesLanguage.Instance.Circle.Key);
 
-        var comparer = new Comparer(redeserializedCircle.GetAnnotations().ToList(),
-            redeserializedCircle2.GetAnnotations().ToList());
+        var comparer = new Comparer(redeserializedCircle.GetAnnotations().ToList(), redeserializedCircle2.GetAnnotations().ToList());
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
@@ -146,6 +145,17 @@ public class SerializationTests
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
         var deserializer = new LanguageDeserializer(serializationChunk, false);
         deserializer.DeserializeLanguages();
+    }
+
+    [TestMethod]
+    public void test_serialization_shapes_language()
+    {
+        var serializationChunk = LanguageSerializer.Serialize(ShapesLanguage.Instance);
+        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
+
+        var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
+        var comparer = new Comparer([ShapesLanguage.Instance], redeserialized.Cast<IReadableNode>().ToList());
+        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
     [TestMethod]

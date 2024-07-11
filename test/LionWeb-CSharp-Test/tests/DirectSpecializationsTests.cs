@@ -172,6 +172,6 @@ public class DirectSpecializationsTests
 
         var actual = BuiltInsLanguage.Instance.INamed.DirectSpecializations([lang, InvalidLanguage.Language]);
 
-        CollectionAssert.AreEquivalent(new List<Classifier> { lang.ClassifierByKey("key-Shape"), }, actual.ToList());
+        CollectionAssert.AreEquivalent(new List<Classifier> { lang.ClassifierByKey("key-Shape"), lang.ClassifierByKey("key-Line"), }, actual.ToList());
     }
 }

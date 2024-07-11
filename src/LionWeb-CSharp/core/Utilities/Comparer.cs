@@ -24,6 +24,7 @@ namespace LionWeb.Core.Utilities;
 using M1;
 using M3;
 using System.Collections;
+using System.Collections.Immutable;
 
 /// <summary>
 /// <para>
@@ -62,13 +63,26 @@ using System.Collections;
 /// Otherwise, we consider the target _external_.
 /// </para>
 /// </summary>
-public class Comparer
+/// <param name="_left">List of initial nodes on left side.</param>
+/// <param name="_right">List of initial nodes on right side.</param>
+public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
 {
+    private readonly Dictionary<IReadableNode, IReadableNode?> _nodeMapping = [];
+
+    /// <param name="left">List of initial nodes on left side.</param>
+    /// <param name="right">List of initial nodes on right side.</param>
+    public Comparer(IList<INode?> left, IList<INode?> right) : this(
+        left.Cast<IReadableNode?>().ToList(),
+        right.Cast<IReadableNode?>().ToList()
+    )
+    {
+    }
+
     /// List of initial nodes on left side. 
-    public List<INode?> Left { get; }
+    public ImmutableList<IReadableNode?> Left => [.. _left];
 
     /// List of initial nodes on right side. 
-    public List<INode?> Right { get; }
+    public ImmutableList<IReadableNode?> Right => [.. _right];
 
     /// <inheritdoc cref="ComparerBehaviorConfig"/>
     public ComparerBehaviorConfig BehaviorConfig { get; init; } = new();
@@ -77,23 +91,13 @@ public class Comparer
     /// Only populated after <see cref="Compare()"/> has been called.
     public List<IDifference> Differences { get; } = [];
 
-    private readonly Dictionary<INode, INode?> _nodeMapping = [];
-
-    /// <param name="left">List of initial nodes on left side.</param>
-    /// <param name="right">List of initial nodes on right side.</param>
-    public Comparer(List<INode?> left, List<INode?> right)
-    {
-        Left = left;
-        Right = right;
-    }
-
     /// <summary>
     /// Compares <see cref="Left"/> and <see cref="Right"/>.
     /// </summary>
     /// <returns>List of differences. Empty list if <see cref="Left"/> and <see cref="Right"/> are equal.</returns>
     public IEnumerable<IDifference> Compare()
     {
-        List<IDifference> result = CompareNodes(null, Left, null, null, Right);
+        List<IDifference> result = CompareNodes(null, _left, null, null, _right);
 
         PostprocessReferenceTargets(result);
 
@@ -129,7 +133,7 @@ public class Comparer
     {
         foreach (var targetDifference in result.OfType<InternalTargetDifference>().ToList())
         {
-            if (_nodeMapping.TryGetValue(targetDifference.LeftTarget, out INode? rightTarget) &&
+            if (_nodeMapping.TryGetValue(targetDifference.LeftTarget, out IReadableNode? rightTarget) &&
                 AreSameSideNodesEqual(rightTarget, targetDifference.RightTarget))
             {
                 result.Remove(targetDifference);
@@ -161,8 +165,8 @@ public class Comparer
     }
 
     /// Compares <paramref name="left"/> and <paramref name="right"/>.
-    protected virtual List<IDifference> CompareNodes(INode? leftOwner, List<INode?> left, Link? link,
-        INode? rightOwner, List<INode?> right)
+    protected virtual List<IDifference> CompareNodes(IReadableNode? leftOwner, IList<IReadableNode?> left, Link? link,
+        IReadableNode? rightOwner, IList<IReadableNode?> right)
     {
         List<IDifference> result = [];
 
@@ -203,8 +207,8 @@ public class Comparer
     }
 
     /// Compares <paramref name="left"/> and <paramref name="right"/>.
-    protected virtual List<IDifference> CompareNode(INode? leftOwner, INode? left, Link? containment, INode? rightOwner,
-        INode? right)
+    protected virtual List<IDifference> CompareNode(IReadableNode? leftOwner, IReadableNode? left, Link? containment,
+        IReadableNode? rightOwner, IReadableNode? right)
     {
         List<IDifference> result = [];
 
@@ -229,7 +233,7 @@ public class Comparer
     }
 
     /// Compares <paramref name="left"/> and <paramref name="right"/>.
-    protected virtual List<IDifference> CompareAnnotations(INode left, INode right)
+    protected virtual List<IDifference> CompareAnnotations(IReadableNode left, IReadableNode right)
     {
         List<IDifference> result = [];
 
@@ -240,7 +244,7 @@ public class Comparer
     }
 
     /// Compares <paramref name="left"/> and <paramref name="right"/>.
-    protected virtual List<IDifference> CompareFeatures(INode left, INode right)
+    protected virtual List<IDifference> CompareFeatures(IReadableNode left, IReadableNode right)
     {
         List<IDifference> result = [];
 
@@ -284,12 +288,12 @@ public class Comparer
     /// As the logic is extensive, we parameterize the side we're working on.
     /// </summary>
     private static List<IDifference> RegisterSurplusFeature(
-        INode left,
-        INode right,
+        IReadableNode left,
+        IReadableNode right,
         Feature feature,
         bool useLeft,
-        Func<INode, Feature, INode, IContainerDifference?, IUnsetFeatureDifference> unsetFactory,
-        Func<INode, Link, INode, IContainerDifference?, ISurplusNodeDifference> surplusFactory
+        Func<IReadableNode, Feature, IReadableNode, IContainerDifference?, IUnsetFeatureDifference> unsetFactory,
+        Func<IReadableNode, Link, IReadableNode, IContainerDifference?, ISurplusNodeDifference> surplusFactory
     )
     {
         List<IDifference> result = [];
@@ -316,7 +320,7 @@ public class Comparer
             {
                 (int leftCount, int rightCount) = useLeft ? (coll.Count, 0) : (0, coll.Count);
                 result.Add(new NodeCountDifference(left, leftCount, link, right, rightCount) { Parent = parent });
-                foreach (var entry in coll.OfType<INode>())
+                foreach (var entry in coll.OfType<IReadableNode>())
                 {
                     result.Add(surplusFactory(owner, link, entry, parent));
                 }
@@ -328,7 +332,8 @@ public class Comparer
 
 
     /// Compares <paramref name="leftFeature"/> and <paramref name="rightFeature"/>.
-    protected virtual List<IDifference> CompareFeature(INode left, Feature leftFeature, INode right, Feature rightFeature)
+    protected virtual List<IDifference> CompareFeature(IReadableNode left, Feature leftFeature, IReadableNode right,
+        Feature rightFeature)
     {
         List<IDifference> result = [];
 
@@ -349,7 +354,8 @@ public class Comparer
     }
 
     /// Compares <paramref name="leftProp"/> and <paramref name="rightProp"/>.
-    protected virtual List<IDifference> CompareProperty(INode left, Property leftProp, INode right, Property rightProp)
+    protected virtual List<IDifference> CompareProperty(IReadableNode left, Property leftProp, IReadableNode right,
+        Property rightProp)
     {
         List<IDifference> result = [];
 
@@ -406,7 +412,8 @@ public class Comparer
     }
 
     /// Compares <paramref name="leftCont"/> and <paramref name="rightCont"/>.
-    protected virtual List<IDifference> CompareContainment(INode left, Containment leftCont, INode right, Containment rightCont)
+    protected virtual List<IDifference> CompareContainment(IReadableNode left, Containment leftCont,
+        IReadableNode right, Containment rightCont)
     {
         List<IDifference> result = [];
 
@@ -417,12 +424,12 @@ public class Comparer
         {
             case (null, null):
                 return result;
-            case (INode leftNode, INode rightNode):
+            case (IReadableNode leftNode, IReadableNode rightNode):
                 result.AddRange(CompareNode(left, leftNode, leftCont, right, rightNode));
                 break;
             case (ICollection leftColl, ICollection rightColl):
-                result.AddRange(CompareNodes(left, leftColl.OfType<INode?>().ToList(), leftCont, right,
-                    rightColl.OfType<INode?>().ToList()));
+                result.AddRange(CompareNodes(left, leftColl.OfType<IReadableNode?>().ToList(), leftCont, right,
+                    rightColl.OfType<IReadableNode?>().ToList()));
                 break;
             case (null, _):
                 result.Add(new UnsetFeatureLeftDifference(left, leftCont, right));
@@ -451,7 +458,8 @@ public class Comparer
     }
 
     /// Compares <paramref name="leftRef"/> and <paramref name="rightRef"/>.
-    protected virtual List<IDifference> CompareReference(INode left, Reference leftRef, INode right, Reference rightRef)
+    protected virtual List<IDifference> CompareReference(IReadableNode left, Reference leftRef, IReadableNode right,
+        Reference rightRef)
     {
         List<IDifference> result = [];
 
@@ -462,12 +470,12 @@ public class Comparer
         {
             case (null, null):
                 return result;
-            case (INode leftTarget, INode rightTarget):
+            case (IReadableNode leftTarget, IReadableNode rightTarget):
                 result.AddRange(CompareTarget(left, leftTarget, leftRef, right, rightTarget));
                 break;
             case (ICollection leftColl, ICollection rightColl):
-                result.AddRange(CompareTargets(left, leftColl.OfType<INode>().ToList(), leftRef, right,
-                    rightColl.OfType<INode>().ToList()));
+                result.AddRange(CompareTargets(left, leftColl.OfType<IReadableNode>().ToList(), leftRef, right,
+                    rightColl.OfType<IReadableNode>().ToList()));
                 break;
             case (null, _):
                 result.Add(new UnsetFeatureLeftDifference(left, leftRef, right));
@@ -480,9 +488,10 @@ public class Comparer
         return SetParent(result, new ReferenceDifference(left, leftRef, right));
     }
 
-    private List<IDifference> CompareTargets(INode leftOwner, List<INode> leftTargets, Reference reference,
-        INode rightOwner,
-        List<INode> rightTargets)
+    private List<IDifference> CompareTargets(IReadableNode leftOwner, List<IReadableNode> leftTargets,
+        Reference reference,
+        IReadableNode rightOwner,
+        List<IReadableNode> rightTargets)
     {
         List<IDifference> result = [];
 
@@ -513,14 +522,15 @@ public class Comparer
     }
 
     /// Compares <paramref name="leftTarget"/> and <paramref name="rightTarget"/>.
-    protected virtual List<IDifference> CompareTarget(INode leftOwner, INode leftTarget, Reference reference, INode rightOwner,
-        INode rightTarget)
+    protected virtual List<IDifference> CompareTarget(IReadableNode leftOwner, IReadableNode leftTarget,
+        Reference reference, IReadableNode rightOwner,
+        IReadableNode rightTarget)
     {
         List<IDifference> result = [];
 
-        if (ContainsDeep(Left, leftTarget))
+        if (ContainsDeep(_left, leftTarget))
         {
-            if (ContainsDeep(Right, rightTarget))
+            if (ContainsDeep(_right, rightTarget))
             {
                 result.Add(new InternalTargetDifference(leftOwner, leftTarget, reference, rightOwner, rightTarget));
             } else
@@ -528,7 +538,7 @@ public class Comparer
                 result.Add(new ExternalTargetRightDifference(leftOwner, leftTarget, reference, rightOwner,
                     rightTarget));
             }
-        } else if (ContainsDeep(Right, rightTarget))
+        } else if (ContainsDeep(_right, rightTarget))
         {
             result.Add(new ExternalTargetLeftDifference(leftOwner, leftTarget, reference, rightOwner, rightTarget));
         } else
@@ -540,8 +550,9 @@ public class Comparer
     }
 
     /// Compares <paramref name="leftTarget"/> and <paramref name="rightTarget"/>.
-    protected virtual List<IDifference> CompareExternalTarget(INode leftOwner, INode leftTarget, Reference reference,
-        INode rightOwner, INode rightTarget)
+    protected virtual List<IDifference> CompareExternalTarget(IReadableNode leftOwner, IReadableNode leftTarget,
+        Reference reference,
+        IReadableNode rightOwner, IReadableNode rightTarget)
     {
         List<IDifference> result = [];
 
@@ -553,14 +564,15 @@ public class Comparer
         return result;
     }
 
-    private bool ContainsDeep(List<INode?> list, INode target)
+    private bool ContainsDeep(IList<IReadableNode?> list, IReadableNode target)
     {
-        var allNodes = list.OfType<INode>().SelectMany(n => n.Descendants(true, true)).ToList();
+        var allNodes = list.OfType<IReadableNode>()
+            .SelectMany(n => M1Extensions.Descendants<IReadableNode>(n, true, true)).ToList();
         return allNodes.Contains(target);
     }
 
     /// Compares <paramref name="left"/> and <paramref name="right"/>.
-    protected virtual List<IDifference> CompareClassifier(INode left, INode right)
+    protected virtual List<IDifference> CompareClassifier(IReadableNode left, IReadableNode right)
     {
         List<IDifference> result = [];
 
@@ -581,7 +593,8 @@ public class Comparer
     }
 
     /// Compares <paramref name="leftConcept"/> and <paramref name="rightConcept"/>.
-    protected virtual List<IDifference> CompareConcept(INode left, Concept leftConcept, INode right, Concept rightConcept)
+    protected virtual List<IDifference> CompareConcept(IReadableNode left, Concept leftConcept, IReadableNode right,
+        Concept rightConcept)
     {
         List<IDifference> result = [];
 
@@ -594,7 +607,8 @@ public class Comparer
     }
 
     /// Compares <paramref name="leftAnn"/> and <paramref name="rightAnn"/>.
-    protected virtual List<IDifference> CompareAnnotation(INode left, Annotation leftAnn, INode right, Annotation rightAnn)
+    protected virtual List<IDifference> CompareAnnotation(IReadableNode left, Annotation leftAnn, IReadableNode right,
+        Annotation rightAnn)
     {
         List<IDifference> result = [];
 
@@ -607,7 +621,7 @@ public class Comparer
     }
 
     /// Compares <paramref name="a"/> and <paramref name="b"/> from the same side.
-    protected virtual bool AreSameSideNodesEqual(INode? a, INode? b) =>
+    protected virtual bool AreSameSideNodesEqual(IReadableNode? a, IReadableNode? b) =>
         // ReSharper disable once PossibleUnintendedReferenceComparison
         a == b;
 }
@@ -640,6 +654,6 @@ public class ComparerOutputConfig
     /// Whether features print only their name or also key and language.
     public bool FullFeature { get; set; } = false;
 
-    /// Whether implementers of INode print only their id or also their name.
+    /// Whether implementers of IReadableNode print only their id or also their name.
     public bool NodeName { get; set; } = true;
 }
