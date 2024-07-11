@@ -14,5 +14,5 @@ $ExtDefs = "chunks/externalDefs";
 $LocalDefs = "chunks/localDefs";
 $TestProjectDefs = $TestProject + "/languages/defChunks";
 
-mv $LocalDefs/shapes.json $TestProjectDefs/
-cp $ExtDefs/with-enum.json $TestProjectDefs/
+Move-Item -Path $LocalDefs/shapes.json -Destination $TestProjectDefs/ -Force
+Copy-Item -Path $ExtDefs/with-enum.json -Destination $TestProjectDefs/

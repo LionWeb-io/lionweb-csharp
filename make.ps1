@@ -1,5 +1,5 @@
 cd build/LionWeb-CSharp-Build
-pwsh build.ps1
+./build.ps1
 cd ../..
 
 dotnet restore
