@@ -15,10 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.CSharp.Test;
+namespace LionWeb_CSharp_Test.tests;
 
-using Examples.Cirular.A;
-using Examples.Cirular.B;
+using Examples.Circular.A;
+using Examples.Circular.B;
 
 [TestClass]
 public class CircularTests

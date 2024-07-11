@@ -23,7 +23,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\LionWeb-CSharp\LionWeb-CSharp.csproj" />
-      <ProjectReference Include="..\LionWeb-CSharp-Generator-Test\LionWeb-CSharp-Generator-Test.csproj" />
     </ItemGroup>
 
 </Project>
