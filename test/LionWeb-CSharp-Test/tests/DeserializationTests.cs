@@ -290,7 +290,7 @@ public class DeserializationTests
     {
         var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
 
-        var serializationChunk = Serializer.Serialize([line]);
+        var serializationChunk = Serializer.SerializeToChunk([line]);
         var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
 
         var comparer = new Comparer([line], nodes);

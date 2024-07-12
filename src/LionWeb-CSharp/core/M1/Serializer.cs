@@ -22,23 +22,40 @@ using M3;
 using Serialization;
 using Utilities;
 
-public class Serializer : SerializerBase
+public interface ISerializer
 {
-    private readonly IEnumerable<INode> _allNodes;
-    private readonly HashSet<Language> _usedLanguages = new();
-    private readonly DuplicateIdChecker _duplicateIdChecker = new();
-
-    public ISerializerHandler Handler { get; init; } = new SerializerExceptionHandler();
+    ISerializerHandler Handler { get; init; }
 
     /// <param name="allNodes">Collection of nodes to be serialized. Does not transform the collection, i.e. does not consider descendants.</param>
     /// <remarks>
     /// We want to keep any transformation outside the serializer, as it might lead to duplicate nodes.
-    /// Calling <c>Distinct()</c> implcitly creates a HashSet of the elements, violating the idea to stream nodes with minimal memory overhead. 
+    /// Calling <c>Distinct()</c> implicitly creates a HashSet of the elements, violating the idea to stream nodes with minimal memory overhead. 
     /// </remarks>
-    public Serializer(IEnumerable<INode> allNodes)
-    {
-        _allNodes = allNodes;
-    }
+    SerializationChunk Serialize(IEnumerable<INode> allNodes);
+
+    /// <param name="allNodes">Collection of nodes to be serialized. Does not transform the collection, i.e. does not consider descendants.</param>
+    /// <remarks>
+    /// We want to keep any transformation outside the serializer, as it might lead to duplicate nodes.
+    /// Calling <c>Distinct()</c> implicitly creates a HashSet of the elements, violating the idea to stream nodes with minimal memory overhead. 
+    /// </remarks>
+    IEnumerable<SerializedNode> SerializeToNodes(IEnumerable<INode> allNodes);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// Lazily populated while processing <i>allNodes</i> of <see cref="SerializeToNodes"/>.
+    /// </remarks>
+    IEnumerable<SerializedLanguageReference> UsedLanguages { get; }
+}
+
+public class Serializer : SerializerBase, ISerializer
+{
+    private readonly HashSet<Language> _usedLanguages = new();
+    private readonly DuplicateIdChecker _duplicateIdChecker = new();
+
+    /// <inheritdoc />
+    public ISerializerHandler Handler { get; init; } = new SerializerExceptionHandler();
 
     /// <summary>
     /// Serializes a given <paramref name="nodes">iterable collection of nodes</paramref>, including all descendants and annotations.
@@ -46,18 +63,18 @@ public class Serializer : SerializerBase
     /// </summary>
     /// 
     /// <returns>A data structure that can be directly serialized/unparsed to JSON.</returns>
-    public static SerializationChunk Serialize(IEnumerable<INode> nodes) =>
-        new Serializer(nodes
+    public static SerializationChunk SerializeToChunk(IEnumerable<INode> nodes) =>
+        new Serializer()
+            .Serialize(nodes
                 .SelectMany(n => n.Descendants(true, true))
                 .Distinct()
-            )
-            .Serialize();
+            );
 
-    public SerializationChunk Serialize()
+    public SerializationChunk Serialize(IEnumerable<INode> allNodes)
     {
-        var serializedNodes = SerializeToNodes()
+        var serializedNodes = SerializeToNodes(allNodes)
             .ToArray();
-        var languagesUsed = UsedLanguages()
+        var languagesUsed = UsedLanguages
             .ToArray();
         return new SerializationChunk
         {
@@ -65,20 +82,24 @@ public class Serializer : SerializerBase
         };
     }
 
-    public IEnumerable<SerializedNode> SerializeToNodes() =>
-        _allNodes
-            .Select(RegisterUsedLanguage)
-            .Select(SerializeNode);
+    public IEnumerable<SerializedNode> SerializeToNodes(IEnumerable<INode> allNodes)
+    {
+        foreach (INode node in allNodes)
+        {
+            RegisterUsedLanguage(node);
+            yield return SerializeNode(node);
+        }
+    }
 
-    public IEnumerable<SerializedLanguageReference> UsedLanguages() =>
+    public IEnumerable<SerializedLanguageReference> UsedLanguages =>
         _usedLanguages
             .Select(SerializeLanguageReference);
 
-    private INode RegisterUsedLanguage(INode node)
+    private void RegisterUsedLanguage(INode node)
     {
         Language language = node.GetClassifier().GetLanguage();
         if (language.Key == BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
-            return node;
+            return;
 
         Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.EqualsIdentity(language));
         if (existingLanguage != null)
@@ -91,8 +112,6 @@ public class Serializer : SerializerBase
         {
             _usedLanguages.Add(language);
         }
-
-        return node;
     }
 
     private SerializedNode SerializeNode(INode node)

@@ -23,7 +23,6 @@ using M1;
 using M2;
 using M2.Generated.Test;
 using M3;
-using Newtonsoft.Json;
 using Serialization;
 using System.Collections;
 using System.Diagnostics;
@@ -47,7 +46,7 @@ public class SerializationTests
     {
         INode rootNode = ExampleModels.ExampleModel(_language);
 
-        var serializationChunk = Serializer.Serialize(new List<INode> { rootNode });
+        var serializationChunk = Serializer.SerializeToChunk(new List<INode> { rootNode });
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
@@ -167,7 +166,7 @@ public class SerializationTests
             .Cast<INode>().First();
 
         Assert.IsInstanceOfType<INode>(shape0);
-        var serializationChunk = Serializer.Serialize([geometry, shape0]);
+        var serializationChunk = Serializer.SerializeToChunk([geometry, shape0]);
         Assert.AreEqual(4, serializationChunk.Nodes.Length);
     }
 
@@ -175,7 +174,7 @@ public class SerializationTests
     public void test_optional_string_property_serialization()
     {
         var documentation = _factory.CreateDocumentation();
-        var serializationChunk = Serializer.Serialize([documentation]);
+        var serializationChunk = Serializer.SerializeToChunk([documentation]);
 
         var serializedProperty = serializationChunk.Nodes[0].Properties.First(p => p.Property.Key == "key-text");
         Assert.IsNull(serializedProperty.Value);
@@ -188,7 +187,7 @@ public class SerializationTests
         var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
         var refGeo = new ReferenceGeometry("ref") { Shapes = [line] };
 
-        var serializationChunk = Serializer.Serialize([line, refGeo]);
+        var serializationChunk = Serializer.SerializeToChunk([line, refGeo]);
         var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
 
         var comparer = new Comparer([line, refGeo], nodes);
@@ -200,7 +199,7 @@ public class SerializationTests
     {
         var compositeShape = new CompositeShape("comp");
 
-        var serializationChunk = Serializer.Serialize([compositeShape]);
+        var serializationChunk = Serializer.SerializeToChunk([compositeShape]);
         var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
 
         var comparer = new Comparer([compositeShape], nodes);
@@ -212,7 +211,7 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("goup");
 
-        var serializationChunk = Serializer.Serialize([materialGroup]);
+        var serializationChunk = Serializer.SerializeToChunk([materialGroup]);
         var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
 
         var comparer = new Comparer([materialGroup], nodes);
@@ -224,7 +223,7 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
 
-        Assert.ThrowsException<ArgumentException>(() => Serializer.Serialize([materialGroup]));
+        Assert.ThrowsException<ArgumentException>(() => Serializer.SerializeToChunk([materialGroup]));
     }
 
     [TestMethod]
@@ -233,7 +232,7 @@ public class SerializationTests
         var b = new Circle("b");
         var a = new MaterialGroup("a") { DefaultShape = b };
 
-        var serializedNodes = new Serializer([a, b]).SerializeToNodes().ToList();
+        var serializedNodes = new Serializer().SerializeToNodes([a, b]).ToList();
         Assert.AreEqual(2, serializedNodes.Count);
     }
 
@@ -253,14 +252,11 @@ public class SerializationTests
         int count = 0;
 
         var serializer =
-            new Serializer(materialGroup.Descendants(true, true))
-            {
-                Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count))
-            };
+            new Serializer { Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count)) };
 
         try
         {
-            serializer.Serialize();
+            serializer.Serialize(materialGroup.Descendants(true, true));
         } catch (InvalidOperationException _)
         {
         }
@@ -284,7 +280,7 @@ public class SerializationTests
         var b = new Circle("b");
         a.Set(defaultShape, b);
 
-        Assert.ThrowsException<ArgumentException>(() => Serializer.Serialize([a]));
+        Assert.ThrowsException<ArgumentException>(() => Serializer.SerializeToChunk([a]));
     }
 
     [TestMethod]
@@ -303,7 +299,7 @@ public class SerializationTests
         var b = new Circle("b");
         a.Set(defaultShape, b);
 
-        var serializationChunk = Serializer.Serialize([a]);
+        var serializationChunk = Serializer.SerializeToChunk([a]);
         Assert.AreEqual(2, serializationChunk.Languages.Length);
     }
 
@@ -333,7 +329,7 @@ public class SerializationTests
         int count = 0;
 
         var serializer =
-            new Serializer(a.Descendants(true, true))
+            new Serializer
             {
                 Handler = new DuplicateLanguageHandler(() =>
                 {
@@ -344,7 +340,7 @@ public class SerializationTests
 
         try
         {
-            serializer.Serialize();
+            serializer.Serialize(a.Descendants(true, true));
         } catch (InvalidOperationException _)
         {
         }
@@ -371,7 +367,7 @@ public class SerializationTests
         int count = 0;
 
         var serializer =
-            new Serializer(a.Descendants(true, true))
+            new Serializer
             {
                 Handler = new DuplicateLanguageHandler(() =>
                 {
@@ -380,7 +376,7 @@ public class SerializationTests
                 })
             };
 
-        serializer.Serialize();
+        serializer.Serialize(a.Descendants(true, true));
 
         Assert.AreEqual(1, count);
     }
@@ -390,10 +386,10 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
-        var serializer = new Serializer(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
-        var serializedNodes = serializer.SerializeToNodes();
+        var serializer = new Serializer();
+        var serializedNodes = serializer.SerializeToNodes(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
         Assert.AreEqual(2, serializedNodes.Count());
-        Assert.AreEqual(1, serializer.UsedLanguages().Count());
+        Assert.AreEqual(1, serializer.UsedLanguages.Count());
     }
 
     [TestMethod]
@@ -401,8 +397,8 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
-        var serializer = new Serializer(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
-        var serializedNodes = serializer.SerializeToNodes();
+        var serializer = new Serializer();
+        var serializedNodes = serializer.SerializeToNodes(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.ThrowsException<AssertFailedException>(() => Assert.AreEqual(2, serializedNodes.Count()));
     }
@@ -412,29 +408,21 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
-        var serializer = new Serializer(materialGroup.Descendants(true));
-        Assert.AreEqual(0, serializer.UsedLanguages().Count());
-        var serializedNodes = serializer.SerializeToNodes();
+        var serializer = new Serializer();
+        Assert.AreEqual(0, serializer.UsedLanguages.Count());
+        var serializedNodes = serializer.SerializeToNodes(materialGroup.Descendants(true));
         Assert.AreEqual(2, serializedNodes.Count());
-        Assert.AreEqual(1, serializer.UsedLanguages().Count());
+        Assert.AreEqual(1, serializer.UsedLanguages.Count());
     }
 
     [TestMethod]
     public void MassSerialization()
     {
         const long maxSize = 1_000_000L;
-        using Stream stream = File.Create("output.json");
-        using StreamWriter writer = new StreamWriter(stream);
-        using JsonTextWriter jsonWriter = new JsonTextWriter(writer);
 
-        var serializer = new Serializer(CreateNodes(maxSize));
-        var serializedNodes = serializer.SerializeToNodes();
-        JsonSerializer ser = new JsonSerializer();
-        foreach (var node in serializedNodes)
-        {
-            ser.Serialize(jsonWriter, node);
-            jsonWriter.Flush();
-        }
+
+        using Stream stream = File.Create("output.json");
+        JsonUtils.WriteNodesToStream(stream, new Serializer(), CreateNodes(maxSize));
 
         IEnumerable<INode> CreateNodes(long count)
         {

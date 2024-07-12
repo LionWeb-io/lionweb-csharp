@@ -17,7 +17,9 @@
 
 namespace LionWeb.Core.Serialization;
 
+using M1;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 /// <summary>
 /// Utility methods for working with JSON.
@@ -58,4 +60,30 @@ public static class JsonUtils
     /// </summary>
     public static void WriteJsonToFile(string path, object data) =>
         File.WriteAllText(path, WriteJsonToString(data));
+
+    /// <summary>
+    /// Writes the given <paramref name="data"/> to a <paramref name="stream"/>.
+    /// </summary>
+    public static void WriteJsonToStream(Stream stream, object data) =>
+        JsonSerializer.Serialize(stream, data, _writeOptions);
+
+    public static void WriteNodesToStream(Stream stream, ISerializer serializer, IEnumerable<INode> nodes)
+    {
+        WriteJsonToStream(stream,
+            new LazySerializationChunk
+            {
+                SerializationFormatVersion = ReleaseVersion.Current,
+                Nodes = serializer.SerializeToNodes(nodes),
+                Languages = serializer.UsedLanguages
+            });
+    }
+}
+
+class LazySerializationChunk
+{
+    [JsonPropertyOrder(0)] public string SerializationFormatVersion { get; init; }
+
+    [JsonPropertyOrder(1)] public IEnumerable<SerializedNode> Nodes { get; init; }
+
+    [JsonPropertyOrder(2)] public IEnumerable<SerializedLanguageReference> Languages { get; init; }
 }
