@@ -132,7 +132,8 @@ public class SerializationTests
         DynamicClassifier redeserializedCircle2 =
             (DynamicClassifier)redeserializedShapes2.ClassifierByKey(ShapesLanguage.Instance.Circle.Key);
 
-        var comparer = new Comparer(redeserializedCircle.GetAnnotations().ToList(), redeserializedCircle2.GetAnnotations().ToList());
+        var comparer = new Comparer(redeserializedCircle.GetAnnotations().ToList(),
+            redeserializedCircle2.GetAnnotations().ToList());
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
@@ -236,29 +237,36 @@ public class SerializationTests
         Assert.AreEqual(2, serializedNodes.Count);
     }
 
-    // class DuplicateNodeHandler(Action incrementer) : ISerializerHandler
-    // {
-    //     public void DuplicateNodeId(INode? a, INode? b) => incrementer();
-    //     public void DuplicateUsedLanguage(Language a, Language b) => throw new NotImplementedException();
-    // }
-    //
-    // [TestMethod]
-    // public void DuplicateId_CustomHandler()
-    // {
-    //     var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
-    //
-    //     int count = 0;
-    //
-    //     var serializer =
-    //         new Serializer([materialGroup])
-    //         {
-    //             Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count))
-    //         };
-    //
-    //     serializer.Serialize();
-    //
-    //     Assert.AreEqual(1, count);
-    // }
+    class DuplicateNodeHandler(Action incrementer) : ISerializerHandler
+    {
+        Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) =>
+            throw new NotImplementedException();
+
+        public void DuplicateNodeId(INode n) => incrementer();
+    }
+
+    [TestMethod]
+    public void DuplicateId_CustomHandler()
+    {
+        var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
+
+        int count = 0;
+
+        var serializer =
+            new Serializer(materialGroup.Descendants(true, true))
+            {
+                Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count))
+            };
+
+        try
+        {
+            serializer.Serialize();
+        } catch (InvalidOperationException _)
+        {
+        }
+
+        Assert.AreEqual(1, count);
+    }
 
     [TestMethod]
     public void DuplicateUsedLanguage()
@@ -299,44 +307,90 @@ public class SerializationTests
         Assert.AreEqual(2, serializationChunk.Languages.Length);
     }
 
-    // class DuplicateLanguageHandler(Action incrementer) : ISerializerHandler
-    // {
-    //     public void DuplicateNodeId(INode? a, INode? b) => throw new NotImplementedException();
-    //     public void DuplicateUsedLanguage(Language a, Language b) => incrementer();
-    // }
-    //
-    // [TestMethod]
-    // public void DuplicateLanguage_CustomHandler()
-    // {
-    //     var lang = new DynamicLanguage("abc")
-    //     {
-    //         Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
-    //     };
-    //     var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
-    //         ShapesLanguage.Instance.MaterialGroup.Name);
-    //     var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
-    //         ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
-    //
-    //     var a = lang.GetFactory().CreateNode("a", materialGroup);
-    //     var b = new Circle("b");
-    //     a.Set(defaultShape, b);
-    //
-    //     int count = 0;
-    //
-    //     var serializer =
-    //         new Serializer([a]) { Handler = new DuplicateLanguageHandler(() => Interlocked.Increment(ref count)) };
-    //
-    //     serializer.Serialize();
-    //
-    //     Assert.AreEqual(1, count);
-    // }
+    class DuplicateLanguageHandler(Func<Language?> incrementer) : ISerializerHandler
+    {
+        Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) => incrementer();
+
+        public void DuplicateNodeId(INode n) => throw new NotImplementedException();
+    }
+
+    [TestMethod]
+    public void DuplicateLanguage_CustomHandler()
+    {
+        var lang = new DynamicLanguage("abc")
+        {
+            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
+        };
+        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
+            ShapesLanguage.Instance.MaterialGroup.Name);
+        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
+            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+
+        var a = lang.GetFactory().CreateNode("a", materialGroup);
+        var b = new Circle("b");
+        a.Set(defaultShape, b);
+
+        int count = 0;
+
+        var serializer =
+            new Serializer(a.Descendants(true, true))
+            {
+                Handler = new DuplicateLanguageHandler(() =>
+                {
+                    Interlocked.Increment(ref count);
+                    return null;
+                })
+            };
+
+        try
+        {
+            serializer.Serialize();
+        } catch (InvalidOperationException _)
+        {
+        }
+
+        Assert.AreEqual(1, count);
+    }
+
+    [TestMethod]
+    public void DuplicateLanguage_CustomHandler_Heal()
+    {
+        var lang = new DynamicLanguage("abc")
+        {
+            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
+        };
+        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
+            ShapesLanguage.Instance.MaterialGroup.Name);
+        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
+            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
+
+        var a = lang.GetFactory().CreateNode("a", materialGroup);
+        var b = new Circle("b");
+        a.Set(defaultShape, b);
+
+        int count = 0;
+
+        var serializer =
+            new Serializer(a.Descendants(true, true))
+            {
+                Handler = new DuplicateLanguageHandler(() =>
+                {
+                    Interlocked.Increment(ref count);
+                    return ShapesLanguage.Instance;
+                })
+            };
+
+        serializer.Serialize();
+
+        Assert.AreEqual(1, count);
+    }
 
     [TestMethod]
     public void SingleEnumerable()
     {
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
-        var serializer = new Serializer(new SingleEnumerable<INode>([materialGroup]));
+        var serializer = new Serializer(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
         var serializedNodes = serializer.SerializeToNodes();
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.AreEqual(1, serializer.UsedLanguages().Count());
@@ -347,7 +401,7 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
-        var serializer = new Serializer(new SingleEnumerable<INode>([materialGroup]));
+        var serializer = new Serializer(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
         var serializedNodes = serializer.SerializeToNodes();
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.ThrowsException<AssertFailedException>(() => Assert.AreEqual(2, serializedNodes.Count()));
@@ -358,7 +412,7 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
-        var serializer = new Serializer([materialGroup]);
+        var serializer = new Serializer(materialGroup.Descendants(true));
         Assert.AreEqual(0, serializer.UsedLanguages().Count());
         var serializedNodes = serializer.SerializeToNodes();
         Assert.AreEqual(2, serializedNodes.Count());
@@ -372,7 +426,7 @@ public class SerializationTests
         using Stream stream = File.Create("output.json");
         using StreamWriter writer = new StreamWriter(stream);
         using JsonTextWriter jsonWriter = new JsonTextWriter(writer);
-        
+
         var serializer = new Serializer(CreateNodes(maxSize));
         var serializedNodes = serializer.SerializeToNodes();
         JsonSerializer ser = new JsonSerializer();
@@ -386,10 +440,11 @@ public class SerializationTests
         {
             for (long l = 0; l < count; l++)
             {
-                var id = $"id{l}";
-                if(l % 10_000 == 0)
+                var id = $"id{l}_{StringRandomizer.RandomLength()}";
+                if (l % 10_000 == 0)
                 {
-                    TestContext.WriteLine($"Creating Line #{l} privateMem: {AsFraction(Process.GetCurrentProcess().PrivateMemorySize64)} gcMem: {AsFraction(GC.GetTotalMemory(false))}");
+                    TestContext.WriteLine(
+                        $"Creating Line #{l} privateMem: {AsFraction(Process.GetCurrentProcess().PrivateMemorySize64)} gcMem: {AsFraction(GC.GetTotalMemory(false))}");
                 }
 
                 yield return new Line(id) { Name = id };
@@ -397,11 +452,11 @@ public class SerializationTests
 
             string AsFraction(long value1)
             {
-                return string.Format("{0:0.000}", value1 / 1_000_000D)+ "M";
+                return string.Format("{0:0.000}", value1 / 1_000_000D) + "M";
             }
         }
     }
-    
+
     private TestContext testContextInstance;
 
     /// <summary>
@@ -413,4 +468,18 @@ public class SerializationTests
         get { return testContextInstance; }
         set { testContextInstance = value; }
     }
+}
+
+static class StringRandomizer
+{
+    // Constant seed for reproducible tests
+    static Random random = new Random(0x1EE7);
+    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+
+    public static string RandomLength() =>
+        Random(random.Next(500));
+
+    public static string Random(int length) =>
+        new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[random.Next(s.Length)]).ToArray());
 }

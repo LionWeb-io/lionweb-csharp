@@ -20,26 +20,38 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
+using Utilities;
 
 public class Serializer : SerializerBase
 {
-    private readonly IEnumerable<INode> _nodes;
+    private readonly IEnumerable<INode> _allNodes;
     private readonly HashSet<Language> _usedLanguages = new();
+    private readonly DuplicateIdChecker _duplicateIdChecker = new();
 
     public ISerializerHandler Handler { get; init; } = new SerializerExceptionHandler();
 
-    public Serializer(IEnumerable<INode> nodes)
+    /// <param name="allNodes">Collection of nodes to be serialized. Does not transform the collection, i.e. does not consider descendants.</param>
+    /// <remarks>
+    /// We want to keep any transformation outside the serializer, as it might lead to duplicate nodes.
+    /// Calling <c>Distinct()</c> implcitly creates a HashSet of the elements, violating the idea to stream nodes with minimal memory overhead. 
+    /// </remarks>
+    public Serializer(IEnumerable<INode> allNodes)
     {
-        _nodes = nodes;
+        _allNodes = allNodes;
     }
 
     /// <summary>
-    /// Serializes a given <paramref name="nodes">iterable collection of nodes</paramref>.
+    /// Serializes a given <paramref name="nodes">iterable collection of nodes</paramref>, including all descendants and annotations.
+    /// Disregards duplicate nodes, but fails on duplicate node ids.
     /// </summary>
     /// 
     /// <returns>A data structure that can be directly serialized/unparsed to JSON.</returns>
     public static SerializationChunk Serialize(IEnumerable<INode> nodes) =>
-        new Serializer(nodes).Serialize();
+        new Serializer(nodes
+                .SelectMany(n => n.Descendants(true, true))
+                .Distinct()
+            )
+            .Serialize();
 
     public SerializationChunk Serialize()
     {
@@ -54,9 +66,9 @@ public class Serializer : SerializerBase
     }
 
     public IEnumerable<SerializedNode> SerializeToNodes() =>
-        AllNodes()
+        _allNodes
             .Select(RegisterUsedLanguage)
-            .Select(SerializedNode);
+            .Select(SerializeNode);
 
     public IEnumerable<SerializedLanguageReference> UsedLanguages() =>
         _usedLanguages
@@ -65,45 +77,36 @@ public class Serializer : SerializerBase
     private INode RegisterUsedLanguage(INode node)
     {
         Language language = node.GetClassifier().GetLanguage();
-        if (language.Key != BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
+        if (language.Key == BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
+            return node;
+
+        Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.EqualsIdentity(language));
+        if (existingLanguage != null)
         {
-            Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.Key == language.Key && l.Version == language.Version);
-            if (existingLanguage != null)
-            {
-                Handler.DuplicateUsedLanguage(existingLanguage, language);
-            } else
-            {
-                _usedLanguages.Add(language);
-            }
+            Language? altLanguage = Handler.DuplicateUsedLanguage(existingLanguage, language);
+            _usedLanguages.Add(altLanguage ??
+                               throw new InvalidOperationException(
+                                   $"Duplicate UsedLanguage: '{language}' vs. '{existingLanguage}'"));
+        } else
+        {
+            _usedLanguages.Add(language);
         }
 
         return node;
     }
 
-    private class NodeIdEqualityComparer(ISerializerHandler handler) : IEqualityComparer<string>
+    private SerializedNode SerializeNode(INode node)
     {
-        public bool Equals(string? x, string? y)
+        var id = node.GetId();
+        if (_duplicateIdChecker.IsIdDuplicate(id))
         {
-            if (x != y)
-                return false;
-
-            handler.DuplicateNodeId(x);
-            return true;
+            Handler.DuplicateNodeId(node);
+            throw new InvalidOperationException($"Duplicate node id '{id}': {node}");
         }
 
-        public int GetHashCode(string obj) =>
-            obj.GetHashCode();
-    }
-
-    private IEnumerable<INode> AllNodes() =>
-        _nodes
-            .SelectMany(node => node.Descendants(true, true))
-            .DistinctBy(n => n.GetId(), new NodeIdEqualityComparer(Handler));
-
-    private SerializedNode SerializedNode(INode node) =>
-        new()
+        return new()
         {
-            Id = node.GetId(),
+            Id = id,
             Classifier = node.GetClassifier().ToMetaPointer(),
             Properties = node.GetClassifier().AllFeatures().OfType<Property>()
                 .Select(property => SerializePropertySetting(node, property)).ToArray(),
@@ -115,6 +118,7 @@ public class Serializer : SerializerBase
                 .Select(annotation => annotation.GetId()).ToArray(),
             Parent = node.GetParent()?.GetId()
         };
+    }
 
     private SerializedContainment SerializedContainmentSetting(INode node, Containment containment)
     {
@@ -143,19 +147,33 @@ public class Serializer : SerializerBase
 
 public interface ISerializerHandler
 {
-    void DuplicateNodeId(INode a, INode b);
-    void DuplicateUsedLanguage(Language a, Language b);
-    void DuplicateNodeId(string? s);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="a"></param>
+    /// <param name="b"></param>
+    /// <returns>The language to use, if any.</returns>
+    Language? DuplicateUsedLanguage(Language a, Language b);
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="n"></param>
+    /// <remarks>
+    /// It makes no sense to allow "healing" a duplicate id (e.g. by creating a new id).
+    /// If we allowed this, we'd need to keep a map of all nodes to their (potentially "healed") id,
+    /// in case we wanted to refer to it.
+    /// This would clash with streaming nodes with minimal memory overhead.
+    /// </remarks>
+    void DuplicateNodeId(INode n);
 }
 
 public class SerializerExceptionHandler : ISerializerHandler
 {
-    public virtual void DuplicateNodeId(INode a, INode b) =>
-        throw new ArgumentException($"nodes have same id '{a?.GetId() ?? b?.GetId()}': {a}, {b}");
+    public void DuplicateNodeId(INode n) =>
+        throw new ArgumentException($"nodes have same id '{n.GetId()}': {n}");
 
-    public void DuplicateNodeId(string? s) => 
-        throw new ArgumentException($"nodes have same id '{s}'");
-
-    public virtual void DuplicateUsedLanguage(Language a, Language b) =>
-        throw new ArgumentException($"different languages with same key '{a?.Key ?? b?.Key}': {a}, {b}");
+    public virtual Language? DuplicateUsedLanguage(Language a, Language b) =>
+        throw new ArgumentException(
+            $"different languages with same key '{a?.Key ?? b?.Key}' / version '{a?.Version ?? b?.Version}': {a}, {b}");
 }
