@@ -87,6 +87,45 @@ public static class M1Extensions
         list.Insert(index + 1, newSuccessor);
         parent.Set(containment, list);
     }
+    
+    //TODO: The order of returned siblings ? 0 ... n or n ...0
+    public static IEnumerable<INode> PrecedingSibling(this INode self, bool includeSelf = false)
+    {
+        INode? parent = self.GetParent();
+        if (parent == null)
+            throw new TreeShapeException(self, "Cannot get siblings of a node with no parent");
+        
+        Containment containment = parent.GetContainmentOf(self)!;
+        if (!containment.Multiple)
+            throw new TreeShapeException(self, "A single containment does not have siblings");
+        
+        var value = parent.Get(containment);
+        if (value is not IEnumerable enumerable)
+            // should not happen
+            throw new TreeShapeException(self, "A single containment does not have siblings");
+        
+        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
+        return includeSelf ? list.Take(list.IndexOf(self) + 1) : list.Take(list.IndexOf(self));
+    }
+    
+    public static IEnumerable<INode> FollowingSibling(this INode self, bool includeSelf = false)
+    {
+        INode? parent = self.GetParent();
+        if (parent == null)
+            throw new TreeShapeException(self, "Cannot get siblings of a node with no parent");
+        
+        Containment containment = parent.GetContainmentOf(self)!;
+        if (!containment.Multiple)
+            throw new TreeShapeException(self, "A single containment does not have siblings");
+        
+        var value = parent.Get(containment);
+        if (value is not IEnumerable enumerable)
+            // should not happen
+            throw new TreeShapeException(self, "A single containment does not have siblings");
+        
+        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
+        return includeSelf ? list.Skip(list.IndexOf(self)) : list.Skip(list.IndexOf(self) + 1);
+    }
 
     /// <summary>
     /// Replaces <paramref name="self"/> in its parent with <paramref name="replacement"/>.
@@ -154,6 +193,12 @@ public static class M1Extensions
         bool includeAnnotations = false) =>
         Children<INode>(self, includeSelf, includeAnnotations);
 
+    
+    public static T? Ancestor<T>(this INode self, bool includeSelf = false) where T : INode =>
+        self.Ancestors(includeSelf)
+            .OfType<T>()
+            .FirstOrDefault();
+    
     /// <summary>
     /// Enumerates all direct and indirect parents of <paramref name="self"/>.
     /// Optionally includes <paramref name="self"/>.
