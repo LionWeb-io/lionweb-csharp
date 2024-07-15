@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1.Test;
 using Examples.Shapes.M2;
 
 [TestClass]
-public class AxisTests
+public class TreeTraversalTests
 {
     #region ancestors
 
