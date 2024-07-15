@@ -39,12 +39,7 @@ public class DeserializationTests
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-Geometry",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
                     Properties = [],
                     Containments = [],
                     References = [],
@@ -74,22 +69,12 @@ public class DeserializationTests
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-Geometry",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
                     Properties = [],
                     Containments = [
                         new SerializedContainment
                         {
-                            Containment = new MetaPointer
-                            {
-                                Key = "key-shapes",
-                                Language = "key-Shapes",
-                                Version = "1"
-                            },
+                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"),
                             Children = [ "bar" ]
                         }
                     ],
@@ -120,22 +105,12 @@ public class DeserializationTests
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-Geometry",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
                     Properties = [],
                     Containments = [
                         new SerializedContainment
                         {
-                            Containment = new MetaPointer
-                            {
-                                Key = "key-shapes",
-                                Language = "key-Shapes",
-                                Version = "1"
-                            },
+                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"),
                             Children = [
                                 "bar"
                             ]
@@ -148,23 +123,13 @@ public class DeserializationTests
                 new SerializedNode()
                 {
                     Id = "bar",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-OffsetDuplicate",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
                     Properties = [],
                     Containments = [],  // should have an offset:Coord but can leave that one off
                     References = [
                         new SerializedReference
                         {
-                            Reference = new MetaPointer
-                            {
-                                Key = "key-source",
-                                Language = "key-Shapes",
-                                Version = "1"
-                            },
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
                             Targets = [
                                 new SerializedReferenceTarget
                                 {
@@ -205,23 +170,13 @@ public class DeserializationTests
                 new SerializedNode()
                 {
                     Id = "bar",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-OffsetDuplicate",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
                     Properties = [],
                     Containments = [],  // should have an offset:Coord but can leave that one off
                     References = [
                         new SerializedReference
                         {
-                            Reference = new MetaPointer
-                            {
-                                Key = "key-source",
-                                Language = "key-Shapes",
-                                Version = "1"
-                            },
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
                             Targets = [
                                 new SerializedReferenceTarget
                                 {
@@ -241,7 +196,7 @@ public class DeserializationTests
         var dependentGeometry = ShapesLanguage.Instance.GetFactory().CreateGeometry()
             .AddShapes([lizard]);
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk, [dependentGeometry]);
+        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk, dependentGeometry.Descendants(true, true));
         Assert.AreEqual(1, nodes.Count);
         var node = nodes.First();
         Assert.IsInstanceOfType<OffsetDuplicate>(node);
@@ -262,12 +217,7 @@ public class DeserializationTests
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-Geometry",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
                     Properties = [],
                     Containments = [],
                     References = [],

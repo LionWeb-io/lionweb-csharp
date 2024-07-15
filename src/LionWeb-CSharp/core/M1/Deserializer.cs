@@ -25,79 +25,100 @@ using Serialization;
 /// Instances of this class can deserialize a <see cref="SerializationChunk"/> as a list of <see cref="INode"/>s that are root nodes.
 /// An instance is parametrized with a collection of <see cref="Language"/> definitions with a corresponding <see cref="INodeFactory"/>.
 /// </summary>
-public class Deserializer
+public class Deserializer : IDeserializer
 {
-    public Deserializer(IEnumerable<Language> languages)
+    private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
+    private readonly Dictionary<MetaPointer, Classifier> _classifiers = new();
+    private readonly Dictionary<MetaPointer, Feature> _features = new();
+    private readonly Dictionary<string, NodePair> _nodesById = new();
+
+    private readonly Dictionary<string, IReadableNode> _dependentNodesById=new ();
+
+    /// <inheritdoc />
+    public IDeserializerHandler Handler { get; init; } = new DeserializerExceptionHandler();
+
+    public Deserializer()
     {
-        var list = languages.ToList();
-        _language2NodeFactory = list.ToDictionary(
-            l => l,
-            l => l.GetFactory()
-        );
-        _classifiers = list.SelectMany(
-            l => l.Entities.OfType<Classifier>()
-        );
-        // TODO  pre-compute dictionaries Concept-key -> Concept[], Concept -> Features[] (all features), or even key this on the meta-pointer? -- for performance
+        RegisterLanguage(BuiltInsLanguage.Instance);
     }
 
-    private readonly IDictionary<Language, INodeFactory> _language2NodeFactory;
-    private readonly IEnumerable<Classifier> _classifiers;
+    public Deserializer(IEnumerable<Language> languages) : this()
+    {
+        RegisterLanguages(languages);
+    }
 
-    private readonly Dictionary<string, INode> _nodesById = new();
-    private Dictionary<string, IReadableNode> dependentNodesById;
+    #region Languages
 
+    /// <inheritdoc />
+    public void RegisterLanguages(IEnumerable<Language> languages)
+    {
+        foreach (Language language in languages)
+        {
+            RegisterLanguage(language);
+        }
+    }
+
+    /// <inheritdoc />
     public void RegisterCustomFactory(Language language, INodeFactory factory) =>
-        _language2NodeFactory[language] = factory;
+        RegisterLanguage(language, factory);
 
-    /// <returns>The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.</returns>
-    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
+    private void RegisterLanguage(Language language, INodeFactory? factory = null)
+    {
+        _language2NodeFactory[language] = factory ?? language.GetFactory();
+
+        foreach (Classifier classifier in language.Entities.OfType<Classifier>())
+        {
+            _classifiers[classifier.ToMetaPointer()] = classifier;
+            foreach (Feature feature in classifier.Features)
+            {
+                _features[feature.ToMetaPointer()] = feature;
+            }
+        }
+    }
+
+    #endregion
+
+    /// <inheritdoc />
     public List<INode> Deserialize(SerializationChunk serializationChunk) =>
         Deserialize(serializationChunk, Enumerable.Empty<INode>());
 
-    /// <returns>
-    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.
-    /// References to any of the given dependent nodes are resolved as well.
-    /// </returns>
-    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
+    /// <inheritdoc />
     public List<INode> Deserialize(SerializationChunk serializationChunk, IEnumerable<INode> dependentNodes) =>
         Deserialize(serializationChunk.Nodes, dependentNodes);
-    
-    /// <returns>
-    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNodes">serialized nodes</paramref>.
-    /// References to any of the given dependent nodes are resolved as well.
-    /// </returns>
-    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
-    public List<INode> Deserialize(IEnumerable<SerializedNode> serializedNodes, IEnumerable<IReadableNode> dependentNodes)
+
+    /// <inheritdoc />
+    public List<INode> Deserialize(IEnumerable<SerializedNode> serializedNodes,
+        IEnumerable<IReadableNode> dependentNodes)
     {
-        var serializedNodesList = serializedNodes.ToList();
-        NodesWithProperties(serializedNodesList);
-
-        dependentNodesById = dependentNodes
-            .SelectMany(node => M1Extensions.Descendants<IReadableNode>(node, true, true))
-            .Distinct()
-            .ToDictionary(node => node.GetId());
-
-        foreach (var serializedNode in serializedNodesList)
+        foreach (var nodePair in NodesWithProperties(serializedNodes))
         {
-            var id = serializedNode.Id;
-            var node = _nodesById[id];
-            Parent(serializedNode, node, id);
-            Containments(serializedNode, node, id);
-            References(serializedNode, node, id);
-            Annotations(serializedNode, node, id);
+            _nodesById[nodePair.SerializedNode.Id] = nodePair;
+        }
+
+        foreach (var dependentNode in dependentNodes)
+        {
+            _dependentNodesById[dependentNode.GetId()] = dependentNode;
+        }
+
+        foreach (var nodePair in _nodesById.Values)
+        {
+            Parent(nodePair);
+            Containments(nodePair);
+            References(nodePair);
+            Annotations(nodePair);
         }
 
         return FilterRootNodes()
             .ToList();
     }
 
-    private void NodesWithProperties(IEnumerable<SerializedNode> serializedNodes)
-    {
-        foreach (var serializedNode in serializedNodes)
+    #region NodesWithProperties
+
+    private IEnumerable<NodePair> NodesWithProperties(IEnumerable<SerializedNode> serializedNodes) =>
+        serializedNodes.Select(serializedNode =>
         {
             var id = serializedNode.Id;
             var node = Instantiate(id, serializedNode.Classifier);
-            _nodesById[id] = node;
             foreach (var serializedProperty in serializedNode.Properties.Where(p => p.Value != null))
             {
                 var property = FindFeature<Property>(node.GetClassifier(), serializedProperty.Property, id);
@@ -115,138 +136,20 @@ public class Deserializer
                     }
                 );
             }
-        }
-    }
 
-    private void Parent(SerializedNode serializedNode, INode node, string id)
-    {
-        if (serializedNode.Parent != null)
-        {
-            if (_nodesById.TryGetValue(serializedNode.Parent, out INode? parent))
-            {
-                node.SetParent(parent);
-            } else
-            {
-                LogError($"On node with id={id}: couldn't find specified parent - leaving this node orphaned.");
-            }
-        }
-    }
-
-    private void Containments(SerializedNode serializedNode, INode node, string id)
-    {
-        foreach (var serializedContainment in serializedNode.Containments)
-        {
-            var containment = FindFeature<Containment>(node.GetClassifier(), serializedContainment.Containment, id);
-            var children = serializedContainment
-                .Children
-                .Select(childId =>
-                {
-                    if (_nodesById.TryGetValue(childId, out var existing))
-                        return existing;
-                    LogError($"On node with id={id}: couldn't find child with id={childId} - skipping.");
-                    return null;
-                })
-                .Where(c => c != null)
-                .ToList();
-
-            if (children.Count != 0)
-            {
-                node.Set(
-                    containment,
-                    containment.Multiple ? children : children.FirstOrDefault()
-                );
-            }
-        }
-    }
-
-    private void References(SerializedNode serializedNode, INode node, string id)
-    {
-        foreach (var serializedReference in serializedNode.References)
-        {
-            var reference = FindFeature<Reference>(node.GetClassifier(), serializedReference.Reference, id);
-            var targets = serializedReference.Targets.Select(target =>
-                {
-                    var targetId = target.Reference;
-                    if (_nodesById.TryGetValue(targetId, out INode? ownNode))
-                        return ownNode;
-
-                    if (dependentNodesById.TryGetValue(targetId, out var dependentNode))
-                        return dependentNode;
-
-                    LogError($"On node with id={id}: couldn't find reference with id={targetId} - skipping.");
-                    return null;
-                })
-                .Where(c => c != null)
-                .ToList();
-
-            if (targets.Count != 0)
-            {
-                node.Set(
-                    reference,
-                    reference.Multiple ? targets : targets.FirstOrDefault()
-                );
-            }
-        }
-    }
-
-    private void Annotations(SerializedNode serializedNode, INode node, string id)
-    {
-        foreach (var annotationId in serializedNode.Annotations)
-        {
-            if (_nodesById.TryGetValue(annotationId, out INode? ownNode))
-            {
-                node.AddAnnotations([ownNode]);
-            } else if (dependentNodesById.TryGetValue(annotationId, out var dependentNode) && dependentNode is IWritableNode writableNode)
-            {
-                node.AddAnnotations([writableNode]);
-            } else
-            {
-                LogError($"On node with id={id}: couldn't find annotation with id={annotationId} - skipping.");
-            }
-        }
-    }
-
-    private IEnumerable<INode> FilterRootNodes() =>
-        _nodesById
-            .Values
-            .Where(node => node.GetParent() == null);
+            return new NodePair(serializedNode, node);
+        });
 
     private INode Instantiate(string id, MetaPointer metaPointer)
     {
-        var candidateClassifiers = _classifiers.Where(metaPointer.Matches).ToList();
-        switch (candidateClassifiers.Count)
+        if (!_classifiers.TryGetValue(metaPointer, out var classifier))
         {
-            case 0:
+            classifier = Handler.UnknownClassifier(id, metaPointer);
+            if (classifier == null)
                 throw new UnsupportedClassifierException(metaPointer, $"On node with id={id}:");
-            case > 1:
-                LogError($"On node with id={id}: multiple classifiers found matching meta-pointer {metaPointer}.");
-                break;
         }
-
-        var classifier = candidateClassifiers.First();
 
         return _language2NodeFactory[classifier.GetLanguage()].CreateNode(id, classifier);
-    }
-
-    private TFeature FindFeature<TFeature>(Classifier classifier, MetaPointer metaPointer, string id)
-        where TFeature : Feature
-    {
-        var candidateFeatures = classifier
-            .AllFeatures()
-            .OfType<TFeature>()
-            .Where(f => metaPointer.Matches(f))
-            .ToList();
-        switch (candidateFeatures.Count)
-        {
-            case 0:
-                throw new UnknownFeatureException(classifier, metaPointer, $"On node with id={id}:");
-            case > 1:
-                LogError(
-                    $"On node with id={id}: multiple {typeof(TFeature).Name.ToLower()} features found matching meta-pointer {metaPointer}.");
-                break;
-        }
-
-        return candidateFeatures.First();
     }
 
     /// <summary>
@@ -277,7 +180,154 @@ public class Deserializer
         throw new InvalidValueException(property, value);
     }
 
+    #endregion
 
-    protected virtual void LogError(string message) =>
-        Console.Error.WriteLine(message);
+
+    #region Parent
+
+    private void Parent(NodePair nodePair)
+    {
+        string? parentId = nodePair.SerializedNode.Parent;
+        if (parentId == null)
+            return;
+
+        INode? parent = FindParent(nodePair, parentId);
+
+        if (parent != null)
+            nodePair.Node.SetParent(parent);
+    }
+
+    private INode? FindParent(NodePair nodePair, string parentId)
+    {
+        if (_nodesById.TryGetValue(parentId, out NodePair? parentPair))
+            return parentPair.Node;
+
+        var parent = Handler.UnknownParent(parentId, nodePair.SerializedNode, nodePair.Node);
+
+        return parent;
+    }
+
+    #endregion
+
+    #region Containments
+
+    private void Containments(NodePair nodePair)
+    {
+        foreach (var serializedContainment in nodePair.SerializedNode.Containments)
+        {
+            var containment = FindFeature<Containment>(nodePair.Node.GetClassifier(), serializedContainment.Containment,
+                nodePair.SerializedNode.Id);
+            var children = serializedContainment
+                .Children
+                .Select(childId => FindChild(nodePair, childId))
+                .Where(c => c != null)
+                .ToList();
+
+            if (children.Count != 0)
+            {
+                nodePair.Node.Set(
+                    containment,
+                    containment.Multiple ? children : children.FirstOrDefault()
+                );
+            }
+        }
+    }
+
+    private INode? FindChild(NodePair nodePair, string childId)
+    {
+        if (_nodesById.TryGetValue(childId, out var existingPair))
+            return existingPair.Node;
+
+        var healed = Handler.UnknownChild(childId, nodePair.SerializedNode, nodePair.Node);
+        return healed;
+    }
+
+    #endregion
+
+    #region References
+
+    private void References(NodePair nodePair)
+    {
+        foreach (var serializedReference in nodePair.SerializedNode.References)
+        {
+            var reference = FindFeature<Reference>(nodePair.Node.GetClassifier(), serializedReference.Reference,
+                nodePair.SerializedNode.Id);
+            var targets = serializedReference
+                .Targets
+                .Select(target => FindReferenceTarget(nodePair, target))
+                .Where(c => c != null)
+                .ToList();
+
+            if (targets.Count != 0)
+            {
+                nodePair.Node.Set(
+                    reference,
+                    reference.Multiple ? targets : targets.FirstOrDefault()
+                );
+            }
+        }
+    }
+
+    private IReadableNode? FindReferenceTarget(NodePair nodePair, SerializedReferenceTarget target)
+    {
+        var targetId = target.Reference;
+        if (_nodesById.TryGetValue(targetId, out var ownNodePair))
+            return ownNodePair.Node;
+
+        if (_dependentNodesById.TryGetValue(targetId, out var dependentNode))
+            return dependentNode;
+
+        IReadableNode? healed = Handler.UnknownReference(target, nodePair.SerializedNode, nodePair.Node);
+        return healed;
+    }
+
+    #endregion
+
+    #region Annotations
+
+    private void Annotations(NodePair nodePair)
+    {
+        var annotations = nodePair.SerializedNode
+            .Annotations
+            .Select(childId => FindAnnotation(nodePair, childId))
+            .Where(c => c != null)
+            .ToList();
+
+        nodePair.Node.AddAnnotations(annotations);
+    }
+
+    private INode? FindAnnotation(NodePair nodePair, string annotationId)
+    {
+        if (_nodesById.TryGetValue(annotationId, out var existingPair))
+            return existingPair.Node;
+
+        var healed = Handler.UnknownAnnotation(annotationId, nodePair.SerializedNode, nodePair.Node);
+        return healed;
+    }
+
+    #endregion
+
+    private IEnumerable<INode> FilterRootNodes() =>
+        _nodesById
+            .Values
+            .Select(p => p.Node)
+            .Where(node => node.GetParent() == null);
+
+    private TFeature FindFeature<TFeature>(Classifier classifier, MetaPointer metaPointer, string id)
+        where TFeature : Feature
+    {
+        if (!_features.TryGetValue(metaPointer, out var feature))
+        {
+            feature = Handler.UnknownFeature(id, classifier, metaPointer);
+            if (feature == null)
+                throw new UnknownFeatureException(classifier, metaPointer, $"On node with id={id}:");
+        }
+
+        if (feature is not TFeature f)
+            throw new UnknownFeatureException(classifier, metaPointer, $"On node with id={id}:");
+
+        return f;
+    }
+
+    private record NodePair(SerializedNode SerializedNode, INode Node);
 }

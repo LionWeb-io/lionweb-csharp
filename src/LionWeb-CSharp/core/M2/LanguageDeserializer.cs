@@ -142,7 +142,8 @@ public class LanguageDeserializer
 
     private void InstallLanguageLinks()
     {
-        foreach (var serializedNode in _serializedNodes.Where(node => IsLanguageNode(node) && !IsInDependentNodes(node.Id)))
+        foreach (var serializedNode in _serializedNodes.Where(node =>
+                     IsLanguageNode(node) && !IsInDependentNodes(node.Id)))
         {
             InstallContainments(serializedNode);
             InstallReferences(serializedNode);
@@ -152,7 +153,9 @@ public class LanguageDeserializer
     private List<INode> DeserializeAnnotations(Dictionary<string, SerializedNode> annotationNodes)
     {
         var deserializer = new Deserializer(_nodesById.Values.OfType<Language>().Concat(_dependentLanguages));
-        List<INode> deserializedAnnotations = deserializer.Deserialize(annotationNodes.Values, _nodesById.Values);
+        List<INode> deserializedAnnotations = deserializer.Deserialize(annotationNodes.Values, _nodesById.Values
+            .SelectMany(node => M1Extensions.Descendants<IReadableNode>(node, true, true))
+            .Distinct());
         foreach (INode deserializedAnnotation in deserializedAnnotations)
         {
             _nodesById[deserializedAnnotation.GetId()] = deserializedAnnotation;

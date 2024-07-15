@@ -231,8 +231,10 @@ public class SerializationTests
     {
         var b = new Circle("b");
         var a = new MaterialGroup("a") { DefaultShape = b };
+        var b2 = new Circle("b");
 
-        var serializedNodes = new Serializer().SerializeToNodes([a, b]).ToList();
+        var x = new Serializer().SerializeToNodes([a, b, b]).ToList();
+        var serializedNodes = new Serializer().SerializeToNodes([a, b, b2]).ToList();
         Assert.AreEqual(2, serializedNodes.Count);
     }
 

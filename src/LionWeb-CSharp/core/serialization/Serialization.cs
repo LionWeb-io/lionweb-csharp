@@ -44,15 +44,7 @@ public class SerializedNode
     public string? Parent { get; set; }
 }
 
-public class MetaPointer
-{
-    public string Language { get; set; }
-    public string Version { get; set; }
-    public string Key { get; set; }
-
-    public override string ToString()
-        => $"{Key} of ({Language}, {Version})";
-}
+public record MetaPointer(string Language, string Version, string Key);
 
 public class SerializedProperty
 {
