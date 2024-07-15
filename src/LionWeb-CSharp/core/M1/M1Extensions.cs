@@ -88,43 +88,41 @@ public static class M1Extensions
         parent.Set(containment, list);
     }
     
-    //TODO: The order of returned siblings ? 0 ... n or n ...0
+    /// <summary>
+    /// Returns all the preceding siblings of the base node <param name="self"></param>
+    /// Optionally includes <paramref name="self"/>.
+    /// 
+    /// Starting from index 0 to the index of base node, includes the index of <param name="self"></param>
+    /// if <paramref name="includeSelf"/> is set to true.  
+    /// </summary>
+    /// <param name="self">Base node to find preceding siblings of.</param>
+    /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
+    /// <returns>List of preceding siblings of <param name="self"></param>.</returns>
+    /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent, or is not a child in a multiple containment.</exception>
     public static IEnumerable<INode> PrecedingSibling(this INode self, bool includeSelf = false)
     {
-        INode? parent = self.GetParent();
-        if (parent == null)
-            throw new TreeShapeException(self, "Cannot get siblings of a node with no parent");
-        
-        Containment containment = parent.GetContainmentOf(self)!;
-        if (!containment.Multiple)
-            throw new TreeShapeException(self, "A single containment does not have siblings");
-        
-        var value = parent.Get(containment);
-        if (value is not IEnumerable enumerable)
-            // should not happen
-            throw new TreeShapeException(self, "A single containment does not have siblings");
-        
-        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
-        return includeSelf ? list.Take(list.IndexOf(self) + 1) : list.Take(list.IndexOf(self));
+        List<INode> list = GetContainmentNodes(self);
+        var takeCount = includeSelf ? list.IndexOf(self) + 1 : list.IndexOf(self);
+        return list.Take(takeCount);
     }
-    
+
+    /// <summary>
+    /// Returns all the following siblings of the base node <param name="self"></param>
+    /// Optionally includes <paramref name="self"/>.
+    ///
+    /// Starting from the following index of <param name="self"></param>, includes the index of <paramref name="self"/>
+    /// if <paramref name="includeSelf"/> is set to true.  
+    /// </summary>
+    ///
+    /// <param name="self">Base node to find following siblings of.</param>
+    /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
+    /// <returns>List of following siblings of <param name="self"></param>.</returns>
+    /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent, or is not a child in a multiple containment.</exception>
     public static IEnumerable<INode> FollowingSibling(this INode self, bool includeSelf = false)
     {
-        INode? parent = self.GetParent();
-        if (parent == null)
-            throw new TreeShapeException(self, "Cannot get siblings of a node with no parent");
-        
-        Containment containment = parent.GetContainmentOf(self)!;
-        if (!containment.Multiple)
-            throw new TreeShapeException(self, "A single containment does not have siblings");
-        
-        var value = parent.Get(containment);
-        if (value is not IEnumerable enumerable)
-            // should not happen
-            throw new TreeShapeException(self, "A single containment does not have siblings");
-        
-        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
-        return includeSelf ? list.Skip(list.IndexOf(self)) : list.Skip(list.IndexOf(self) + 1);
+        List<INode> list = GetContainmentNodes(self);
+        var skipCount = includeSelf ? list.IndexOf(self) : list.IndexOf(self) + 1;
+        return list.Skip(skipCount);
     }
 
     /// <summary>
@@ -194,6 +192,14 @@ public static class M1Extensions
         Children<INode>(self, includeSelf, includeAnnotations);
 
     
+    /// <summary>
+    /// Enumerates all direct and indirect parents of <paramref name="self"/> that matches with type <typeparamref name="T"/>
+    /// Optionally includes <paramref name="self"/>.
+    /// </summary>
+    /// <param name="self">Base node to find ancestor of.</param>
+    /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns>The first ancestor of <paramref name="self"/> that matches with type <typeparamref name="T"/> or default </returns>
     public static T? Ancestor<T>(this INode self, bool includeSelf = false) where T : INode =>
         self.Ancestors(includeSelf)
             .OfType<T>()
@@ -209,6 +215,24 @@ public static class M1Extensions
     public static IEnumerable<INode> Ancestors(this INode self, bool includeSelf = false) =>
         Ancestors<INode>(self, includeSelf);
 
+    private static List<INode> GetContainmentNodes(INode self)
+    {
+        INode? parent = self.GetParent();
+        if (parent == null)
+            throw new TreeShapeException(self, "Cannot get siblings of a node with no parent");
+        
+        Containment containment = parent.GetContainmentOf(self)!;
+        if (!containment.Multiple)
+            throw new TreeShapeException(self, "A single containment does not have siblings");
+        
+        var value = parent.Get(containment);
+        if (value is not IEnumerable enumerable)
+            // should not happen
+            throw new TreeShapeException(self, "A single containment does not have siblings");
+        
+        return [..containment.AsNodes<INode>(enumerable)];
+    }
+    
     internal static IEnumerable<T> Descendants<T>(T self, bool includeSelf = false,
         bool includeAnnotations = false) where T : class, IReadableNode
     {

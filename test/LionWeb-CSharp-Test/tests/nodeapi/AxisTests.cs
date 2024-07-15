@@ -212,8 +212,8 @@ public class AxisTests
     [TestMethod]
     public void PrecedingSibling_SingleContainment()
     {
-        var coord = new Coord("coord0");
-        var circle = new Circle("circ0") { Center = coord };
+        var coord = new Coord("a");
+        var circle = new Circle("b") { Center = coord };
         Assert.ThrowsException<TreeShapeException>(() => coord.PrecedingSibling());
     }
     
@@ -271,8 +271,8 @@ public class AxisTests
     [TestMethod]
     public void FollowingSibling_SingleContainment()
     {
-        var coord = new Coord("coord0");
-        var circle = new Circle("circ0") { Center = coord };
+        var coord = new Coord("a");
+        var circle = new Circle("b") { Center = coord };
         Assert.ThrowsException<TreeShapeException>(() => coord.FollowingSibling());
     }
     
