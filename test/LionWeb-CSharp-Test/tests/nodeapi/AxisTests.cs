@@ -162,8 +162,12 @@ public class AxisTests
         var node = new Coord("n");
         var parent = new Line("p") { Start = node };
         var ancestor = new Geometry("a") { Shapes = [parent] };
+        
         Assert.IsNotNull(node.Ancestor<Shape>());
         Assert.AreEqual(parent, node.Ancestor<Shape>());
+        
+        Assert.IsNotNull(parent.Ancestor<Geometry>());
+        Assert.AreEqual(ancestor, parent.Ancestor<Geometry>());
     }
     
     [TestMethod]
@@ -172,8 +176,12 @@ public class AxisTests
         var node = new Coord("n");
         var parent = new Line("p") { Start = node };
         var ancestor = new Geometry("a") { Shapes = [parent] };
+        
         Assert.IsNotNull(node.Ancestor<Shape>(true));
         Assert.AreEqual(parent, node.Ancestor<Shape>(true));
+        
+        Assert.IsNotNull(parent.Ancestor<Geometry>(true));
+        Assert.AreEqual(ancestor, parent.Ancestor<Geometry>(true));
     }
     
     #endregion
