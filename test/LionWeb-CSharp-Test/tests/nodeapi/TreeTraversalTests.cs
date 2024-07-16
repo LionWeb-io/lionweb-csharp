@@ -155,39 +155,39 @@ public class TreeTraversalTests
         Assert.AreEqual(node, node.Ancestor<Shape>(true));
         Assert.IsNotNull(node.Ancestor<Shape>(true));
     }
-    
+
     [TestMethod]
     public void Ancestor_ManyParents()
     {
         var node = new Coord("n");
         var parent = new Line("p") { Start = node };
         var ancestor = new Geometry("a") { Shapes = [parent] };
-        
+
         Assert.IsNotNull(node.Ancestor<Shape>());
         Assert.AreEqual(parent, node.Ancestor<Shape>());
-        
+
         Assert.IsNotNull(parent.Ancestor<Geometry>());
         Assert.AreEqual(ancestor, parent.Ancestor<Geometry>());
     }
-    
+
     [TestMethod]
     public void Ancestor_ManyParents_Self()
     {
         var node = new Coord("n");
         var parent = new Line("p") { Start = node };
         var ancestor = new Geometry("a") { Shapes = [parent] };
-        
+
         Assert.IsNotNull(node.Ancestor<Shape>(true));
         Assert.AreEqual(parent, node.Ancestor<Shape>(true));
-        
+
         Assert.IsNotNull(parent.Ancestor<Geometry>(true));
         Assert.AreEqual(ancestor, parent.Ancestor<Geometry>(true));
     }
-    
+
     #endregion
-    
+
     #region precedingSibling
-    
+
     [TestMethod]
     public void PrecedingSibling()
     {
@@ -196,9 +196,9 @@ public class TreeTraversalTests
         var circleC = new Circle("c");
         var circleD = new Circle("d");
         var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
-        CollectionAssert.AreEqual(new List<INode>{circleA, circleB}, circleC.PrecedingSibling().ToList());
+        CollectionAssert.AreEqual(new List<INode> { circleA, circleB }, circleC.PrecedingSiblings().ToList());
     }
-    
+
     [TestMethod]
     public void PrecedingSibling_Self()
     {
@@ -207,46 +207,47 @@ public class TreeTraversalTests
         var circleC = new Circle("c");
         var circleD = new Circle("d");
         var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
-        CollectionAssert.AreEqual(new List<INode>{circleA, circleB, circleC}, circleC.PrecedingSibling(true).ToList());
+        CollectionAssert.AreEqual(new List<INode> { circleA, circleB, circleC },
+            circleC.PrecedingSiblings(true).ToList());
     }
-    
+
     [TestMethod]
     public void PrecedingSibling_NoParent()
     {
         var circleA = new Circle("a");
-        Assert.ThrowsException<TreeShapeException>(() => circleA.PrecedingSibling());
+        Assert.ThrowsException<TreeShapeException>(() => circleA.PrecedingSiblings());
     }
-    
+
     [TestMethod]
     public void PrecedingSibling_SingleContainment()
     {
         var coord = new Coord("a");
         var circle = new Circle("b") { Center = coord };
-        Assert.ThrowsException<TreeShapeException>(() => coord.PrecedingSibling());
+        Assert.ThrowsException<TreeShapeException>(() => coord.PrecedingSiblings());
     }
-    
+
     [TestMethod]
     public void PrecedingSibling_NoPrecedingSibling()
     {
         var circleA = new Circle("a");
         var circleB = new Circle("b");
         var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
-        CollectionAssert.AreEqual(new List<INode>{}, circleA.PrecedingSibling().ToList());
+        CollectionAssert.AreEqual(new List<INode> { }, circleA.PrecedingSiblings().ToList());
     }
-    
+
     [TestMethod]
     public void PrecedingSibling_NoPrecedingSibling_Self()
     {
         var circleA = new Circle("a");
         var circleB = new Circle("b");
         var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
-        CollectionAssert.AreEqual(new List<INode>{circleA}, circleA.PrecedingSibling(true).ToList());
+        CollectionAssert.AreEqual(new List<INode> { circleA }, circleA.PrecedingSiblings(true).ToList());
     }
-    
+
     #endregion
-    
+
     #region followingSibling
-    
+
     [TestMethod]
     public void FollowingSibling()
     {
@@ -255,9 +256,9 @@ public class TreeTraversalTests
         var circleC = new Circle("c");
         var circleD = new Circle("d");
         var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
-        CollectionAssert.AreEqual(new List<INode>{circleD}, circleC.FollowingSibling().ToList());
+        CollectionAssert.AreEqual(new List<INode> { circleD }, circleC.FollowingSiblings().ToList());
     }
-    
+
     [TestMethod]
     public void FollowingSibling_Self()
     {
@@ -266,42 +267,42 @@ public class TreeTraversalTests
         var circleC = new Circle("c");
         var circleD = new Circle("d");
         var ancestor = new Geometry("a") { Shapes = [circleA, circleB, circleC, circleD] };
-        CollectionAssert.AreEqual(new List<INode>{circleC, circleD}, circleC.FollowingSibling(true).ToList());
+        CollectionAssert.AreEqual(new List<INode> { circleC, circleD }, circleC.FollowingSiblings(true).ToList());
     }
-    
+
     [TestMethod]
     public void FollowingSibling_NoParent()
     {
         var circleA = new Circle("a");
-        Assert.ThrowsException<TreeShapeException>(() => circleA.FollowingSibling());
+        Assert.ThrowsException<TreeShapeException>(() => circleA.FollowingSiblings());
     }
-    
+
     [TestMethod]
     public void FollowingSibling_SingleContainment()
     {
         var coord = new Coord("a");
         var circle = new Circle("b") { Center = coord };
-        Assert.ThrowsException<TreeShapeException>(() => coord.FollowingSibling());
+        Assert.ThrowsException<TreeShapeException>(() => coord.FollowingSiblings());
     }
-    
+
     [TestMethod]
     public void FollowingSibling_NoFollowingSibling()
     {
         var circleA = new Circle("a");
         var circleB = new Circle("b");
         var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
-        CollectionAssert.AreEqual(new List<INode>{}, circleB.FollowingSibling().ToList());
+        CollectionAssert.AreEqual(new List<INode> { }, circleB.FollowingSiblings().ToList());
     }
-    
+
     [TestMethod]
     public void FollowingSibling_NoFollowingSibling_Self()
     {
         var circleA = new Circle("a");
         var circleB = new Circle("b");
         var ancestor = new Geometry("a") { Shapes = [circleA, circleB] };
-        CollectionAssert.AreEqual(new List<INode>{circleB}, circleB.FollowingSibling(true).ToList());
+        CollectionAssert.AreEqual(new List<INode> { circleB }, circleB.FollowingSiblings(true).ToList());
     }
-    
+
     #endregion
 
     #region children
