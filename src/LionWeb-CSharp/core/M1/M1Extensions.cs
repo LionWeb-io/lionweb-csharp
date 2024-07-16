@@ -199,7 +199,7 @@ public static class M1Extensions
     /// <param name="self">Base node to find ancestor of.</param>
     /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
     /// <typeparam name="T"></typeparam>
-    /// <returns>The first ancestor of <paramref name="self"/> that matches with type <typeparamref name="T"/> or null </returns>
+    /// <returns>The first ancestor of <paramref name="self"/> that matches with type <typeparamref name="T"/> or <c>null</c> </returns>
     public static T? Ancestor<T>(this INode self, bool includeSelf = false) where T : INode =>
         self.Ancestors(includeSelf)
             .OfType<T>()
