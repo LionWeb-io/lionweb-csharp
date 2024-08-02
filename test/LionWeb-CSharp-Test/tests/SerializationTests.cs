@@ -50,7 +50,10 @@ public class SerializationTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        new Deserializer([_language]).Deserialize(serializationChunk);
+        new DeserializerBuilder()
+            .WithLanguage(_language)
+            .Build()
+            .Deserialize(serializationChunk);
     }
 
     // Disabled until #19 is merged
@@ -188,7 +191,10 @@ public class SerializationTests
         var refGeo = new ReferenceGeometry("ref") { Shapes = [line] };
 
         var serializationChunk = Serializer.SerializeToChunk([line, refGeo]);
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
 
         var comparer = new Comparer([line, refGeo], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
@@ -200,7 +206,10 @@ public class SerializationTests
         var compositeShape = new CompositeShape("comp");
 
         var serializationChunk = Serializer.SerializeToChunk([compositeShape]);
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
 
         var comparer = new Comparer([compositeShape], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
@@ -212,7 +221,10 @@ public class SerializationTests
         var materialGroup = new MaterialGroup("goup");
 
         var serializationChunk = Serializer.SerializeToChunk([materialGroup]);
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
 
         var comparer = new Comparer([materialGroup], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));

@@ -58,7 +58,10 @@ public class EnumsTests
         Console.WriteLine(JsonUtils.WriteJsonToString(chunk));
         Assert.AreEqual("lit1", chunk.Nodes[0].Properties[0].Value);
 
-        var deserialization = new Deserializer([_language]).Deserialize(chunk);
+        var deserialization = new DeserializerBuilder()
+                .WithLanguage(_language)
+                .Build()
+            .Deserialize(chunk);
         Assert.AreEqual(MyEnum.literal1, (deserialization[0] as EnumHolder).EnumValue);
 
         var reserialization = Serializer.SerializeToChunk(deserialization);

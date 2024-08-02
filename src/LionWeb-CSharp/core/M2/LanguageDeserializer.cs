@@ -152,7 +152,9 @@ public class LanguageDeserializer
 
     private List<INode> DeserializeAnnotations(Dictionary<string, SerializedNode> annotationNodes)
     {
-        var deserializer = new Deserializer(_nodesById.Values.OfType<Language>().Concat(_dependentLanguages));
+        var deserializer = new DeserializerBuilder()
+            .WithLanguages(_nodesById.Values.OfType<Language>().Concat(_dependentLanguages))
+            .Build();
         List<INode> deserializedAnnotations = deserializer.Deserialize(annotationNodes.Values, _nodesById.Values
             .SelectMany(node => M1Extensions.Descendants<IReadableNode>(node, true, true))
             .Distinct());

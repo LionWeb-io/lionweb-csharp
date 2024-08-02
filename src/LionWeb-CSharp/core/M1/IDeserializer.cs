@@ -23,30 +23,48 @@ using Serialization;
 
 public class DeserializerBuilder
 {
-    public DeserializerBuilder()
-    {
-        
-    }
+    private IDeserializerHandler? _handler;
+    private Dictionary<Language, INodeFactory> _languages = new();
 
 
     public DeserializerBuilder WithHandler(IDeserializerHandler handler)
     {
-        
+        _handler = handler;
+        return this;
     }
 
-    public DeserializerBuilder WithLanguage(Language language, INodeFactory? factory = null)
+    public DeserializerBuilder WithLanguage(Language language)
     {
-        
+        WithCustomFactory(language, language.GetFactory());
+        return this;
     }
 
     public DeserializerBuilder WithLanguages(IEnumerable<Language> languages)
     {
-        
+        foreach (Language language in languages)
+        {
+            WithLanguage(language);
+        }
+
+        return this;
+    }
+
+    public DeserializerBuilder WithCustomFactory(Language language, INodeFactory factory)
+    {
+        _languages[language] = factory;
+        return this;
     }
 
     public IDeserializer Build()
     {
-        
+        Deserializer result = _handler != null ? new Deserializer { Handler = _handler } : new Deserializer();
+
+        foreach ((Language language, INodeFactory factory) in _languages)
+        {
+            result.RegisterLanguage(language, factory);
+        }
+
+        return result;
     }
 }
 
@@ -54,20 +72,7 @@ public interface IDeserializer
 {
     IDeserializerHandler Handler { get; init; }
 
-    void RegisterLanguages(IEnumerable<Language> languages);
-
-    void RegisterCustomFactory(Language language, INodeFactory factory);
-
-    /// <returns>The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.</returns>
-    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
-    List<INode> Deserialize(SerializationChunk serializationChunk);
-
-    /// <returns>
-    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.
-    /// References to any of the given dependent nodes are resolved as well.
-    /// </returns>
-    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
-    List<INode> Deserialize(SerializationChunk serializationChunk, IEnumerable<INode> dependentNodes);
+    void RegisterLanguage(Language language, INodeFactory factory);
 
     /// <returns>
     /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNodes">serialized nodes</paramref>.
@@ -75,6 +80,24 @@ public interface IDeserializer
     /// </returns>
     /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
     List<INode> Deserialize(IEnumerable<SerializedNode> serializedNodes, IEnumerable<IReadableNode> dependentNodes);
+}
+
+public static class IDeserializerExtensions
+{
+    /// <returns>The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.</returns>
+    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
+    public static List<INode> Deserialize(this IDeserializer deserializer, SerializationChunk serializationChunk) =>
+        deserializer.Deserialize(serializationChunk, Enumerable.Empty<INode>());
+
+
+    /// <returns>
+    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.
+    /// References to any of the given dependent nodes are resolved as well.
+    /// </returns>
+    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
+    public static List<INode> Deserialize(this IDeserializer deserializer, SerializationChunk serializationChunk,
+        IEnumerable<INode> dependentNodes) =>
+        deserializer.Deserialize(serializationChunk.Nodes, dependentNodes);
 }
 
 public interface IDeserializerHandler

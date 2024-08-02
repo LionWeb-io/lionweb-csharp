@@ -39,32 +39,13 @@ public class Deserializer : IDeserializer
 
     public Deserializer()
     {
-        RegisterLanguage(BuiltInsLanguage.Instance);
-    }
-
-    public Deserializer(IEnumerable<Language> languages) : this()
-    {
-        RegisterLanguages(languages);
-    }
-
-    #region Languages
-
-    /// <inheritdoc />
-    public void RegisterLanguages(IEnumerable<Language> languages)
-    {
-        foreach (Language language in languages)
-        {
-            RegisterLanguage(language);
-        }
+        RegisterLanguage(BuiltInsLanguage.Instance, BuiltInsLanguage.Instance.GetFactory());
     }
 
     /// <inheritdoc />
-    public void RegisterCustomFactory(Language language, INodeFactory factory) =>
-        RegisterLanguage(language, factory);
-
-    private void RegisterLanguage(Language language, INodeFactory? factory = null)
+    public void RegisterLanguage(Language language, INodeFactory factory)
     {
-        _language2NodeFactory[language] = factory ?? language.GetFactory();
+        _language2NodeFactory[language] = factory;
 
         foreach (Classifier classifier in language.Entities.OfType<Classifier>())
         {
@@ -75,16 +56,6 @@ public class Deserializer : IDeserializer
             }
         }
     }
-
-    #endregion
-
-    /// <inheritdoc />
-    public List<INode> Deserialize(SerializationChunk serializationChunk) =>
-        Deserialize(serializationChunk, Enumerable.Empty<INode>());
-
-    /// <inheritdoc />
-    public List<INode> Deserialize(SerializationChunk serializationChunk, IEnumerable<INode> dependentNodes) =>
-        Deserialize(serializationChunk.Nodes, dependentNodes);
 
     /// <inheritdoc />
     public List<INode> Deserialize(IEnumerable<SerializedNode> serializedNodes,

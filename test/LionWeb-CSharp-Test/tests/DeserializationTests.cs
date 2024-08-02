@@ -49,7 +49,10 @@ public class DeserializationTests
             ]
         };
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
         var node = nodes.First();
         Assert.IsInstanceOfType<Geometry>(node);
@@ -85,7 +88,10 @@ public class DeserializationTests
             ]
         };
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+                .WithLanguage(ShapesLanguage.Instance)
+                .Build()
+            .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
         var node = nodes.First();
         Assert.IsInstanceOfType<Geometry>(node);
@@ -145,7 +151,10 @@ public class DeserializationTests
             ]
         };
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
         var node = nodes.First();
         Assert.IsInstanceOfType<Geometry>(node);
@@ -196,7 +205,10 @@ public class DeserializationTests
         var dependentGeometry = ShapesLanguage.Instance.GetFactory().CreateGeometry()
             .AddShapes([lizard]);
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk, dependentGeometry.Descendants(true, true));
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk, dependentGeometry.Descendants(true, true));
         Assert.AreEqual(1, nodes.Count);
         var node = nodes.First();
         Assert.IsInstanceOfType<OffsetDuplicate>(node);
@@ -229,7 +241,10 @@ public class DeserializationTests
             ]
         };
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
         var node = nodes.First();
         Assert.AreEqual(0, node.GetAnnotations().Count);
@@ -241,7 +256,10 @@ public class DeserializationTests
         var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
 
         var serializationChunk = Serializer.SerializeToChunk([line]);
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
 
         var comparer = new Comparer([line], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
