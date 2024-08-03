@@ -23,10 +23,10 @@ using Serialization;
 
 public abstract class SerializerBase
 {
-    protected SerializedLanguageReference SerializedLanguageReference(Language language) =>
+    protected SerializedLanguageReference SerializeLanguageReference(Language language) =>
         new() { Key = language.Key, Version = language.Version };
 
-    protected SerializedProperty SerializedPropertySetting(IReadableNode node, Property property)
+    protected SerializedProperty SerializePropertySetting(IReadableNode node, Property property)
     {
         var value = GetValueIfSet(node, property);
 
@@ -43,7 +43,7 @@ public abstract class SerializerBase
         };
     }
 
-    protected SerializedReferenceTarget SerializedReferenceTarget(IReadableNode target)
+    protected SerializedReferenceTarget SerializeReferenceTarget(IReadableNode target)
     {
         var resolveInfo = target switch
         {
@@ -82,7 +82,7 @@ public abstract class SerializerBase
             Id = node.GetId(),
             Classifier = node.GetClassifier().ToMetaPointer(),
             Properties = node.GetClassifier().AllFeatures().OfType<Property>()
-                .Select(property => SerializedPropertySetting(node, property)).ToArray(),
+                .Select(property => SerializePropertySetting(node, property)).ToArray(),
             Containments = node.GetClassifier().AllFeatures().OfType<Containment>()
                 .Select<Containment, SerializedContainment>(containment =>
                     SerializedContainmentSetting(node, containment)).ToArray(),
@@ -113,7 +113,7 @@ public abstract class SerializerBase
         {
             Reference = reference.ToMetaPointer(),
             Targets = value != null
-                ? reference.AsNodes<INode>(value).Select(SerializedReferenceTarget).ToArray()
+                ? reference.AsNodes<INode>(value).Select(SerializeReferenceTarget).ToArray()
                 : []
         };
     }

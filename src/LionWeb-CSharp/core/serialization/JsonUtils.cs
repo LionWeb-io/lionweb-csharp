@@ -17,7 +17,10 @@
 
 namespace LionWeb.Core.Serialization;
 
+using M1;
 using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Stream;
 
 /// <summary>
 /// Utility methods for working with JSON.
@@ -58,4 +61,74 @@ public static class JsonUtils
     /// </summary>
     public static void WriteJsonToFile(string path, object data) =>
         File.WriteAllText(path, WriteJsonToString(data));
+
+    /// <summary>
+    /// Writes the given <paramref name="data"/> to a <paramref name="stream"/>.
+    /// </summary>
+    public static void WriteJsonToStream(Stream stream, object data) =>
+        JsonSerializer.Serialize(stream, data, _writeOptions);
+
+    public static void WriteNodesToStream(Stream stream, ISerializer serializer, IEnumerable<INode> nodes)
+    {
+        WriteJsonToStream(stream,
+            new LazySerializationChunk
+            {
+                SerializationFormatVersion = ReleaseVersion.Current,
+                Nodes = serializer.SerializeToNodes(nodes),
+                Languages = serializer.UsedLanguages
+            });
+    }
+
+        public static async Task<List<INode>> ReadNodesFromStream(Stream stream, IDeserializer deserializer)
+        {
+            var streamReader = new Utf8JsonAsyncStreamReader(stream, leaveOpen: true);
+
+            bool insideNodes = false;
+            while (await Advance())
+            {
+                switch (streamReader.TokenType)
+                {
+                    case JsonTokenType.PropertyName when streamReader.GetString() == "serializationFormatVersion":
+                        await Advance();
+                        string? version = streamReader.GetString();
+                        break;
+
+                    case JsonTokenType.PropertyName when streamReader.GetString() == "nodes":
+                        insideNodes = true;
+                        break;
+
+                    case JsonTokenType.PropertyName when streamReader.GetString() != "nodes":
+                        insideNodes = false;
+                        break;
+
+                    case JsonTokenType.StartObject when insideNodes:
+                        try
+                        {
+                            var serializedNode = await streamReader.DeserializeAsync<SerializedNode>(_readOptions);
+                            if (serializedNode != null)
+                            {
+                                await Task.Run(() => deserializer.Process(serializedNode));
+                            }
+                        } catch
+                        {
+                            // grouping awaits, see https://learn.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/consuming-the-task-based-asynchronous-pattern#interleaving
+                        }
+
+                        break;
+                }
+            }
+
+            return deserializer.Finish().ToList();
+
+            async Task<bool> Advance() => await streamReader.ReadAsync();
+        }
+}
+
+class LazySerializationChunk
+{
+    [JsonPropertyOrder(0)] public string SerializationFormatVersion { get; init; }
+
+    [JsonPropertyOrder(1)] public IEnumerable<SerializedNode> Nodes { get; init; }
+
+    [JsonPropertyOrder(2)] public IEnumerable<SerializedLanguageReference> Languages { get; init; }
 }

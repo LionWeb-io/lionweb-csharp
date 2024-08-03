@@ -19,6 +19,10 @@
         <Content Include="languages/defChunks/**">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+        <EmbeddedResource Include="resources/*.json" />
+        <Content Include="resources/*.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
