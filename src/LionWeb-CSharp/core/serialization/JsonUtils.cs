@@ -111,7 +111,7 @@ public static class JsonUtils
                             }
                         } catch
                         {
-                            // grouping awaits
+                            // grouping awaits, see https://learn.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/consuming-the-task-based-asynchronous-pattern#interleaving
                         }
 
                         break;

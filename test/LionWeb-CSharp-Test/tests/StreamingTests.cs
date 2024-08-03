@@ -35,6 +35,7 @@ public class StreamingTests
 
     // private const long _maxSize = 1_500_000L;
     private const long _maxSize = 1_500L;
+    private const string _testJsonFileName = "output.json";
 
     public enum FakeRuns
     {
@@ -64,7 +65,7 @@ public class StreamingTests
 
     private void MassSerialization()
     {
-        using Stream stream = File.Create("output.json");
+        using Stream stream = File.Create(_testJsonFileName);
         JsonUtils.WriteNodesToStream(stream, new Serializer(), CreateNodes(_maxSize));
 
         IEnumerable<INode> CreateNodes(long count)
@@ -114,7 +115,7 @@ public class StreamingTests
 
     private void MassDeserialization()
     {
-        using Stream stream = File.OpenRead("output.json");
+        using Stream stream = File.OpenRead(_testJsonFileName);
 
         var deserializer = new DeserializerBuilder()
             .WithLanguage(_language)
@@ -125,17 +126,11 @@ public class StreamingTests
         Assert.AreEqual(_maxSize, nodes.SelectMany(n => n.Descendants(true, true)).Count());
     }
 
-    private TestContext _testContextInstance;
-
     /// <summary>
     /// Gets or sets the test context which provides
     /// information about and functionality for the current test run.
     /// </summary>
-    public TestContext TestContext
-    {
-        get { return _testContextInstance; }
-        set { _testContextInstance = value; }
-    }
+    public TestContext TestContext { get; set; }
 }
 
 internal static class StringRandomizer
