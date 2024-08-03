@@ -28,11 +28,23 @@ using Serialization;
 public class Deserializer : IDeserializer
 {
     private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
-    private readonly Dictionary<MetaPointer, Classifier> _classifiers = new();
-    private readonly Dictionary<MetaPointer, Feature> _features = new();
-    private readonly Dictionary<string, NodePair> _nodesById = new();
+    private readonly Dictionary<CompressedMetaPointer, Classifier> _classifiers = new();
+    private readonly Dictionary<CompressedMetaPointer, Feature> _features = new();
+    private readonly Dictionary<CompressedId, IReadableNode> _dependentNodesById = new();
 
-    private readonly Dictionary<string, IReadableNode> _dependentNodesById=new ();
+    private readonly Dictionary<CompressedId, INode> _nodesById = new();
+
+    private readonly Dictionary<CompressedId, List<(CompressedMetaPointer, List<CompressedId>)>>
+        _containmentsByOwnerId =
+            new();
+
+    private readonly Dictionary<CompressedId, List<(CompressedMetaPointer, List<(CompressedId, string?)>)>>
+        _referencesByOwnerId = new
+            ();
+
+    private readonly Dictionary<CompressedId, List<CompressedId>> _annotationsByOwnerId = new();
+    private readonly Dictionary<CompressedId, CompressedId> _parentByNodeId = new();
+
 
     /// <inheritdoc />
     public IDeserializerHandler Handler { get; init; } = new DeserializerExceptionHandler();
@@ -49,75 +61,124 @@ public class Deserializer : IDeserializer
 
         foreach (Classifier classifier in language.Entities.OfType<Classifier>())
         {
-            _classifiers[classifier.ToMetaPointer()] = classifier;
+            _classifiers[CompressedMetaPointer.Create(classifier.ToMetaPointer())] = classifier;
             foreach (Feature feature in classifier.Features)
             {
-                _features[feature.ToMetaPointer()] = feature;
+                _features[CompressedMetaPointer.Create(feature.ToMetaPointer())] = feature;
             }
         }
     }
 
-    /// <inheritdoc />
-    public List<INode> Deserialize(IEnumerable<SerializedNode> serializedNodes,
-        IEnumerable<IReadableNode> dependentNodes)
+    public void RegisterDependentNodes(IEnumerable<IReadableNode> dependentNodes)
     {
-        foreach (var nodePair in NodesWithProperties(serializedNodes))
-        {
-            _nodesById[nodePair.SerializedNode.Id] = nodePair;
-        }
-
         foreach (var dependentNode in dependentNodes)
         {
-            _dependentNodesById[dependentNode.GetId()] = dependentNode;
+            _dependentNodesById[CompressedId.Create(dependentNode.GetId())] = dependentNode;
         }
+    }
 
-        foreach (var nodePair in _nodesById.Values)
+    public void Process(SerializedNode serializedNode) =>
+        Deserialize(serializedNode);
+
+    public IEnumerable<INode> Finish()
+    {
+        foreach (var compressedId in _nodesById.Keys)
         {
-            Parent(nodePair);
-            Containments(nodePair);
-            References(nodePair);
-            Annotations(nodePair);
+            Parent(compressedId);
+            Containments(compressedId);
+            References(compressedId);
+            Annotations(compressedId);
         }
 
         return FilterRootNodes()
             .ToList();
     }
 
+    private void Deserialize(SerializedNode serializedNode)
+    {
+        var id = serializedNode.Id;
+        var compressedId = CompressedId.Create(id);
+
+        var node = Instantiate(id, CompressedMetaPointer.Create(serializedNode.Classifier));
+        _nodesById[compressedId] = node;
+
+        Properties(serializedNode, node);
+
+        if (serializedNode.Containments.Length != 0)
+        {
+            _containmentsByOwnerId[compressedId] = serializedNode
+                .Containments
+                .Select(c => (
+                    CompressedMetaPointer.Create(c.Containment),
+                    c
+                        .Children
+                        .Select(CompressedId.Create)
+                        .ToList()
+                ))
+                .ToList();
+        }
+
+        if (serializedNode.References.Length != 0)
+        {
+            _referencesByOwnerId[compressedId] = serializedNode
+                .References
+                .Select(r => (
+                    CompressedMetaPointer.Create(r.Reference),
+                    r
+                        .Targets
+                        .Select(t => (CompressedId.Create(t.Reference), t.ResolveInfo))
+                        .ToList()
+                ))
+                .ToList();
+        }
+
+        if (serializedNode.Annotations.Length != 0)
+        {
+            _annotationsByOwnerId[compressedId] = serializedNode
+                .Annotations
+                .Select(CompressedId.Create)
+                .ToList();
+        }
+
+        if (serializedNode.Parent != null)
+        {
+            _parentByNodeId[compressedId] = CompressedId.Create(serializedNode.Parent);
+        }
+    }
+
+    private void Properties(SerializedNode serializedNode, INode node)
+    {
+        var id = serializedNode.Id;
+
+        foreach (var serializedProperty in serializedNode.Properties.Where(p => p.Value != null))
+        {
+            var property = FindFeature<Property>(node, CompressedMetaPointer.Create(serializedProperty.Property));
+            var type = property.Type;
+            node.Set(
+                property,
+                type switch
+                {
+                    PrimitiveType => FromString(serializedProperty.Value, property),
+                    Enumeration enumeration => _language2NodeFactory[enumeration.GetLanguage()]
+                        .GetEnumerationLiteral(enumeration.Literals.First(literal =>
+                            literal.Key == serializedProperty.Value)),
+                    _ => throw new UnsupportedClassifierException(serializedNode.Classifier,
+                        $"On node with id={id}: can't deserialize property {property.Name} (key={property.Key}) from a <{type.GetType().Name}> datatype \"{type.Name}\"")
+                }
+            );
+        }
+    }
+
     #region NodesWithProperties
 
-    private IEnumerable<NodePair> NodesWithProperties(IEnumerable<SerializedNode> serializedNodes) =>
-        serializedNodes.Select(serializedNode =>
-        {
-            var id = serializedNode.Id;
-            var node = Instantiate(id, serializedNode.Classifier);
-            foreach (var serializedProperty in serializedNode.Properties.Where(p => p.Value != null))
-            {
-                var property = FindFeature<Property>(node.GetClassifier(), serializedProperty.Property, id);
-                var type = property.Type;
-                node.Set(
-                    property,
-                    type switch
-                    {
-                        PrimitiveType => FromString(serializedProperty.Value, property),
-                        Enumeration enumeration => _language2NodeFactory[enumeration.GetLanguage()]
-                            .GetEnumerationLiteral(enumeration.Literals.First(literal =>
-                                literal.Key == serializedProperty.Value)),
-                        _ => throw new UnsupportedClassifierException(serializedNode.Classifier,
-                            $"On node with id={id}: can't deserialize property {property.Name} (key={property.Key}) from a <{type.GetType().Name}> datatype \"{type.Name}\"")
-                    }
-                );
-            }
-
-            return new NodePair(serializedNode, node);
-        });
-
-    private INode Instantiate(string id, MetaPointer metaPointer)
+    private INode Instantiate(string id, CompressedMetaPointer compressedMetaPointer)
     {
-        if (!_classifiers.TryGetValue(metaPointer, out var classifier))
+        if (!_classifiers.TryGetValue(compressedMetaPointer, out var classifier))
         {
-            classifier = Handler.UnknownClassifier(id, metaPointer);
+            classifier = Handler.UnknownClassifier(id, compressedMetaPointer);
             if (classifier == null)
-                throw new UnsupportedClassifierException(metaPointer, $"On node with id={id}:");
+                throw new DeserializerException($"On node with id={id}:");
+            // throw new UnsupportedClassifierException(compressedMetaPointer, $"On node with id={id}:");
         }
 
         return _language2NodeFactory[classifier.GetLanguage()].CreateNode(id, classifier);
@@ -156,24 +217,23 @@ public class Deserializer : IDeserializer
 
     #region Parent
 
-    private void Parent(NodePair nodePair)
+    private void Parent(CompressedId compressedId)
     {
-        string? parentId = nodePair.SerializedNode.Parent;
-        if (parentId == null)
+        if (!_parentByNodeId.TryGetValue(compressedId, out var parentCompressedId))
             return;
 
-        INode? parent = FindParent(nodePair, parentId);
+        INode? parent = FindParent(compressedId, parentCompressedId);
 
         if (parent != null)
-            nodePair.Node.SetParent(parent);
+            _nodesById[compressedId].SetParent(parent);
     }
 
-    private INode? FindParent(NodePair nodePair, string parentId)
+    private INode? FindParent(CompressedId compressedId, CompressedId parentId)
     {
-        if (_nodesById.TryGetValue(parentId, out NodePair? parentPair))
-            return parentPair.Node;
+        if (_nodesById.TryGetValue(parentId, out INode? existingParent))
+            return existingParent;
 
-        var parent = Handler.UnknownParent(parentId, nodePair.SerializedNode, nodePair.Node);
+        var parent = Handler.UnknownParent(parentId, _nodesById[compressedId]);
 
         return parent;
     }
@@ -182,21 +242,24 @@ public class Deserializer : IDeserializer
 
     #region Containments
 
-    private void Containments(NodePair nodePair)
+    private void Containments(CompressedId compressedId)
     {
-        foreach (var serializedContainment in nodePair.SerializedNode.Containments)
+        if (!_containmentsByOwnerId.TryGetValue(compressedId, out var containments))
+            return;
+
+        INode node = _nodesById[compressedId];
+
+        foreach ((var compressedMetaPointer, var compressedChildrenIds) in containments)
         {
-            var containment = FindFeature<Containment>(nodePair.Node.GetClassifier(), serializedContainment.Containment,
-                nodePair.SerializedNode.Id);
-            var children = serializedContainment
-                .Children
-                .Select(childId => FindChild(nodePair, childId))
+            var containment = FindFeature<Containment>(node, compressedMetaPointer);
+            var children = compressedChildrenIds
+                .Select(childId => FindChild(node, childId))
                 .Where(c => c != null)
                 .ToList();
 
             if (children.Count != 0)
             {
-                nodePair.Node.Set(
+                node.Set(
                     containment,
                     containment.Multiple ? children : children.FirstOrDefault()
                 );
@@ -204,12 +267,12 @@ public class Deserializer : IDeserializer
         }
     }
 
-    private INode? FindChild(NodePair nodePair, string childId)
+    private INode? FindChild(INode node, CompressedId childId)
     {
         if (_nodesById.TryGetValue(childId, out var existingPair))
-            return existingPair.Node;
+            return existingPair;
 
-        var healed = Handler.UnknownChild(childId, nodePair.SerializedNode, nodePair.Node);
+        var healed = Handler.UnknownChild(childId, node);
         return healed;
     }
 
@@ -217,21 +280,23 @@ public class Deserializer : IDeserializer
 
     #region References
 
-    private void References(NodePair nodePair)
+    private void References(CompressedId compressedId)
     {
-        foreach (var serializedReference in nodePair.SerializedNode.References)
+        if (!_referencesByOwnerId.TryGetValue(compressedId, out var references))
+            return;
+
+        INode node = _nodesById[compressedId];
+        foreach ((var compressedMetaPointer, var targetEntries) in references)
         {
-            var reference = FindFeature<Reference>(nodePair.Node.GetClassifier(), serializedReference.Reference,
-                nodePair.SerializedNode.Id);
-            var targets = serializedReference
-                .Targets
-                .Select(target => FindReferenceTarget(nodePair, target))
+            var reference = FindFeature<Reference>(node, compressedMetaPointer);
+            var targets = targetEntries
+                .Select(target => FindReferenceTarget(node, target.Item1, target.Item2))
                 .Where(c => c != null)
                 .ToList();
 
             if (targets.Count != 0)
             {
-                nodePair.Node.Set(
+                node.Set(
                     reference,
                     reference.Multiple ? targets : targets.FirstOrDefault()
                 );
@@ -239,16 +304,15 @@ public class Deserializer : IDeserializer
         }
     }
 
-    private IReadableNode? FindReferenceTarget(NodePair nodePair, SerializedReferenceTarget target)
+    private IReadableNode? FindReferenceTarget(INode node, CompressedId targetId, string? resolveInfo)
     {
-        var targetId = target.Reference;
-        if (_nodesById.TryGetValue(targetId, out var ownNodePair))
-            return ownNodePair.Node;
+        if (_nodesById.TryGetValue(targetId, out var ownNode))
+            return ownNode;
 
         if (_dependentNodesById.TryGetValue(targetId, out var dependentNode))
             return dependentNode;
 
-        IReadableNode? healed = Handler.UnknownReference(target, nodePair.SerializedNode, nodePair.Node);
+        IReadableNode? healed = Handler.UnknownReference(targetId, resolveInfo, node);
         return healed;
     }
 
@@ -256,23 +320,27 @@ public class Deserializer : IDeserializer
 
     #region Annotations
 
-    private void Annotations(NodePair nodePair)
+    private void Annotations(CompressedId compressedId)
     {
-        var annotations = nodePair.SerializedNode
-            .Annotations
-            .Select(childId => FindAnnotation(nodePair, childId))
+        if (!_annotationsByOwnerId.TryGetValue(compressedId, out var annotationIds))
+            return;
+
+        INode node = _nodesById[compressedId];
+
+        var annotations = annotationIds
+            .Select(annId => FindAnnotation(node, annId))
             .Where(c => c != null)
             .ToList();
 
-        nodePair.Node.AddAnnotations(annotations);
+        node.AddAnnotations(annotations);
     }
 
-    private INode? FindAnnotation(NodePair nodePair, string annotationId)
+    private INode? FindAnnotation(INode node, CompressedId annotationId)
     {
-        if (_nodesById.TryGetValue(annotationId, out var existingPair))
-            return existingPair.Node;
+        if (_nodesById.TryGetValue(annotationId, out var existing))
+            return existing;
 
-        var healed = Handler.UnknownAnnotation(annotationId, nodePair.SerializedNode, nodePair.Node);
+        var healed = Handler.UnknownAnnotation(annotationId, node);
         return healed;
     }
 
@@ -281,24 +349,27 @@ public class Deserializer : IDeserializer
     private IEnumerable<INode> FilterRootNodes() =>
         _nodesById
             .Values
-            .Select(p => p.Node)
             .Where(node => node.GetParent() == null);
 
-    private TFeature FindFeature<TFeature>(Classifier classifier, MetaPointer metaPointer, string id)
+    private TFeature FindFeature<TFeature>(INode node, CompressedMetaPointer compressedMetaPointer)
         where TFeature : Feature
     {
-        if (!_features.TryGetValue(metaPointer, out var feature))
+        Classifier classifier = node.GetClassifier();
+        var id = node.GetId();
+        if (!_features.TryGetValue(compressedMetaPointer, out var feature))
         {
-            feature = Handler.UnknownFeature(id, classifier, metaPointer);
+            feature = Handler.UnknownFeature(compressedMetaPointer, node);
             if (feature == null)
-                throw new UnknownFeatureException(classifier, metaPointer, $"On node with id={id}:");
+                // throw new UnknownFeatureException(classifier, compressedMetaPointer, $"On node with id={id}:");
+                throw new DeserializerException($"On node with id={id}:");
         }
 
         if (feature is not TFeature f)
-            throw new UnknownFeatureException(classifier, metaPointer, $"On node with id={id}:");
+            // throw new UnknownFeatureException(classifier, compressedMetaPointer, $"On node with id={id}:");
+            throw new DeserializerException($"On node with id={id}:");
 
         return f;
     }
-
-    private record NodePair(SerializedNode SerializedNode, INode Node);
 }
+
+internal class DeserializerException(string? message) : LionWebExceptionBase(message);

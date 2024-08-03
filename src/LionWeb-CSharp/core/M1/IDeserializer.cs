@@ -25,6 +25,7 @@ public class DeserializerBuilder
 {
     private IDeserializerHandler? _handler;
     private Dictionary<Language, INodeFactory> _languages = new();
+    private HashSet<IReadableNode> _dependentNodes = new();
 
 
     public DeserializerBuilder WithHandler(IDeserializerHandler handler)
@@ -55,6 +56,16 @@ public class DeserializerBuilder
         return this;
     }
 
+    public DeserializerBuilder WithDependentNodes(IEnumerable<IReadableNode> dependentNodes)
+    {
+        foreach (var dependentNode in dependentNodes)
+        {
+            _dependentNodes.Add(dependentNode);
+        }
+
+        return this;
+    }
+
     public IDeserializer Build()
     {
         Deserializer result = _handler != null ? new Deserializer { Handler = _handler } : new Deserializer();
@@ -63,6 +74,8 @@ public class DeserializerBuilder
         {
             result.RegisterLanguage(language, factory);
         }
+
+        result.RegisterDependentNodes(_dependentNodes);
 
         return result;
     }
@@ -74,12 +87,16 @@ public interface IDeserializer
 
     void RegisterLanguage(Language language, INodeFactory factory);
 
+    void RegisterDependentNodes(IEnumerable<IReadableNode> dependentNodes);
+
     /// <returns>
     /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNodes">serialized nodes</paramref>.
     /// References to any of the given dependent nodes are resolved as well.
     /// </returns>
     /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
-    List<INode> Deserialize(IEnumerable<SerializedNode> serializedNodes, IEnumerable<IReadableNode> dependentNodes);
+    void Process(SerializedNode serializedNode);
+
+    IEnumerable<INode> Finish();
 }
 
 public static class IDeserializerExtensions
@@ -87,8 +104,7 @@ public static class IDeserializerExtensions
     /// <returns>The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.</returns>
     /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
     public static List<INode> Deserialize(this IDeserializer deserializer, SerializationChunk serializationChunk) =>
-        deserializer.Deserialize(serializationChunk, Enumerable.Empty<INode>());
-
+        deserializer.Deserialize(serializationChunk, []);
 
     /// <returns>
     /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.
@@ -98,14 +114,30 @@ public static class IDeserializerExtensions
     public static List<INode> Deserialize(this IDeserializer deserializer, SerializationChunk serializationChunk,
         IEnumerable<INode> dependentNodes) =>
         deserializer.Deserialize(serializationChunk.Nodes, dependentNodes);
+
+    public static List<INode> Deserialize(this IDeserializer deserializer,
+        IEnumerable<SerializedNode> serializedNodes) =>
+        deserializer.Deserialize(serializedNodes, []);
+
+    public static List<INode> Deserialize(this IDeserializer deserializer, IEnumerable<SerializedNode> serializedNodes,
+        IEnumerable<IReadableNode> dependentNodes)
+    {
+        deserializer.RegisterDependentNodes(dependentNodes);
+        foreach (SerializedNode serializedNode in serializedNodes)
+        {
+            deserializer.Process(serializedNode);
+        }
+
+        return deserializer.Finish().ToList();
+    }
 }
 
 public interface IDeserializerHandler
 {
-    Classifier? UnknownClassifier(string id, MetaPointer metaPointer);
-    Feature? UnknownFeature(string id, Classifier classifier, MetaPointer metaPointer);
-    INode? UnknownParent(string parentId, SerializedNode serializedNode, INode node);
-    INode? UnknownChild(string childId, SerializedNode serializedNode, INode node);
-    IReadableNode? UnknownReference(SerializedReferenceTarget target, SerializedNode serializedNode, INode node);
-    INode? UnknownAnnotation(string annotationId, SerializedNode serializedNode, INode node);
+    Classifier? UnknownClassifier(string id, CompressedMetaPointer metaPointer);
+    Feature? UnknownFeature(CompressedMetaPointer metaPointer, INode node);
+    INode? UnknownParent(CompressedId parentId, INode node);
+    INode? UnknownChild(CompressedId childId, INode node);
+    IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, INode node);
+    INode? UnknownAnnotation(CompressedId annotationId, INode node);
 }

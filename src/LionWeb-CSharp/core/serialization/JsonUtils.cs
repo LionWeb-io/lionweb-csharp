@@ -20,6 +20,7 @@ namespace LionWeb.Core.Serialization;
 using M1;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Stream;
 
 /// <summary>
 /// Utility methods for working with JSON.
@@ -77,6 +78,30 @@ public static class JsonUtils
                 Languages = serializer.UsedLanguages
             });
     }
+
+    public static List<INode> ReadNodesFromStream(Stream stream, IDeserializer deserializer)
+    {
+        // var streaming = new LionWebStreamingDeserializer(new LionWebConfiguration(), stream, deserializer)
+
+        var streamReader = new Utf8JsonAsyncStreamReader(stream, leaveOpen:true);
+
+        while (streamReader.ReadAsync().GetAwaiter().GetResult())
+        {
+            Console.WriteLine(streamReader.TokenType);
+        }
+
+        return [];
+    }
+
+    // private class LionWebConfiguration : ILionWebConfiguration
+    // {
+    //     public IDictionary<string, string> Paths { get => new Dictionary<string, string>() { { "file", "value" } }; }
+    // }
+    //
+    // private class LionWebFilesConfiguration : ILionWebFilesConfiguration
+    // {
+    //     public IDictionary<string, string> Paths { get => new Dictionary<string, string>() { { "test", "output.json" } }; }
+    // }
 }
 
 class LazySerializationChunk

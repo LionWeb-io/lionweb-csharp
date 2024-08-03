@@ -154,10 +154,11 @@ public class LanguageDeserializer
     {
         var deserializer = new DeserializerBuilder()
             .WithLanguages(_nodesById.Values.OfType<Language>().Concat(_dependentLanguages))
+            .WithDependentNodes(_nodesById.Values
+                .SelectMany(node => M1Extensions.Descendants<IReadableNode>(node, true, true))
+                .Distinct())
             .Build();
-        List<INode> deserializedAnnotations = deserializer.Deserialize(annotationNodes.Values, _nodesById.Values
-            .SelectMany(node => M1Extensions.Descendants<IReadableNode>(node, true, true))
-            .Distinct());
+        List<INode> deserializedAnnotations = deserializer.Deserialize(annotationNodes.Values);
         foreach (INode deserializedAnnotation in deserializedAnnotations)
         {
             _nodesById[deserializedAnnotation.GetId()] = deserializedAnnotation;

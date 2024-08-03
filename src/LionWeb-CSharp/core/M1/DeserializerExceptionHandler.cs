@@ -23,42 +23,43 @@ using Serialization;
 public class DeserializerExceptionHandler : IDeserializerHandler
 {
     /// <inheritdoc />
-    public virtual Classifier? UnknownClassifier(string id, MetaPointer metaPointer) =>
-        throw new UnsupportedClassifierException(metaPointer, $"On node with id={id}:");
+    public virtual Classifier? UnknownClassifier(string id, CompressedMetaPointer metaPointer) =>
+        throw new DeserializerException($"On node with id={id}:");
+        // throw new UnsupportedClassifierException(metaPointer, $"On node with id={id}:");
 
     /// <inheritdoc />
-    public virtual Feature? UnknownFeature(string id, Classifier classifier, MetaPointer metaPointer) =>
-        throw new UnknownFeatureException(classifier, metaPointer, $"On node with id={id}:");
+    public virtual Feature? UnknownFeature(CompressedMetaPointer metaPointer, INode node) =>
+        throw new DeserializerException($"On node with id={node.GetId()}:");
+        // throw new UnknownFeatureException(classifier, metaPointer, $"On node with id={id}:");
 
     /// <inheritdoc />
-    public virtual INode? UnknownParent(string parentId, SerializedNode serializedNode, INode node)
+    public virtual INode? UnknownParent(CompressedId parentId, INode node)
     {
         Console.WriteLine(
-            $"On node with id={serializedNode}: couldn't find specified parent - leaving this node orphaned.");
+            $"On node with id={node.GetId()}: couldn't find specified parent - leaving this node orphaned.");
         return null;
     }
 
     /// <inheritdoc />
-    public virtual INode? UnknownChild(string childId, SerializedNode serializedNode, INode node)
+    public virtual INode? UnknownChild(CompressedId childId, INode node)
     {
-        Console.WriteLine($"On node with id={serializedNode.Id}: couldn't find child with id={childId} - skipping.");
+        Console.WriteLine($"On node with id={node.GetId()}: couldn't find child with id={childId} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
-    public virtual IReadableNode? UnknownReference(SerializedReferenceTarget target, SerializedNode serializedNode,
-        INode node)
+    public virtual IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, INode node)
     {
         Console.WriteLine(
-            $"On node with id={serializedNode.Id}: couldn't find reference with id={target.Reference} - skipping.");
+            $"On node with id={node.GetId()}: couldn't find reference with id={targetId} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
-    public virtual INode? UnknownAnnotation(string annotationId, SerializedNode serializedNode, INode node)
+    public virtual INode? UnknownAnnotation(CompressedId annotationId, INode node)
     {
         Console.WriteLine(
-            $"On node with id={serializedNode.Id}: couldn't find annotation with id={annotationId} - skipping.");
+            $"On node with id={node.GetId()}: couldn't find annotation with id={annotationId} - skipping.");
         return null;
     }
 }

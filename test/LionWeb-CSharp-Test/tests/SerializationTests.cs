@@ -25,7 +25,6 @@ using M2.Generated.Test;
 using M3;
 using Serialization;
 using System.Collections;
-using System.Diagnostics;
 using Utilities;
 using Comparer = Utilities.Comparer;
 
@@ -429,36 +428,6 @@ public class SerializationTests
         Assert.AreEqual(1, serializer.UsedLanguages.Count());
     }
 
-    [TestMethod]
-    public void MassSerialization()
-    {
-        const long maxSize = 1_000_000L;
-
-
-        using Stream stream = File.Create("output.json");
-        JsonUtils.WriteNodesToStream(stream, new Serializer(), CreateNodes(maxSize));
-
-        IEnumerable<INode> CreateNodes(long count)
-        {
-            for (long l = 0; l < count; l++)
-            {
-                var id = $"id{l}_{StringRandomizer.RandomLength()}";
-                if (l % 10_000 == 0)
-                {
-                    TestContext.WriteLine(
-                        $"Creating Line #{l} privateMem: {AsFraction(Process.GetCurrentProcess().PrivateMemorySize64)} gcMem: {AsFraction(GC.GetTotalMemory(false))}");
-                }
-
-                yield return new Line(id) { Name = id };
-            }
-
-            string AsFraction(long value1)
-            {
-                return string.Format("{0:0.000}", value1 / 1_000_000D) + "M";
-            }
-        }
-    }
-
     private TestContext testContextInstance;
 
     /// <summary>
@@ -470,18 +439,4 @@ public class SerializationTests
         get { return testContextInstance; }
         set { testContextInstance = value; }
     }
-}
-
-static class StringRandomizer
-{
-    // Constant seed for reproducible tests
-    static Random random = new Random(0x1EE7);
-    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
-
-    public static string RandomLength() =>
-        Random(random.Next(500));
-
-    public static string Random(int length) =>
-        new string(Enumerable.Repeat(chars, length)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
 }
