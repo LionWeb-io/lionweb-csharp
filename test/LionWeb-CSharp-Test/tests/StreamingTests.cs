@@ -22,6 +22,7 @@ using M1;
 using M3;
 using Serialization;
 using System.Diagnostics;
+using System.Reflection;
 
 [TestClass]
 public class StreamingTests
@@ -35,40 +36,11 @@ public class StreamingTests
 
     // private const long _maxSize = 1_500_000L;
     private const long _maxSize = 1_500L;
-    private const string _testJsonFileName = "output.json";
 
-    public enum FakeRuns
+    [TestMethod]
+    public void MassSerialization()
     {
-        Serialization,
-        Deserialization
-    }
-
-    [DataTestMethod]
-    [DynamicData(nameof(GetData), DynamicDataSourceType.Method)]
-    public void Streaming(FakeRuns run)
-    {
-        switch (run)
-        {
-            case FakeRuns.Serialization:
-                MassSerialization();
-                return;
-
-            case FakeRuns.Deserialization:
-                MassDeserialization();
-                return;
-            default:
-                return;
-        }
-    }
-
-    public static IEnumerable<object[]> GetData()
-    {
-        yield return new object[] { FakeRuns.Serialization };
-        yield return new object[] { FakeRuns.Deserialization };
-    }
-    private void MassSerialization()
-    {
-        using Stream stream = File.Create(_testJsonFileName);
+        using Stream stream = File.Create(Path.GetTempFileName());
         JsonUtils.WriteNodesToStream(stream, new Serializer(), CreateNodes(_maxSize));
 
         IEnumerable<INode> CreateNodes(long count)
@@ -116,9 +88,13 @@ public class StreamingTests
     static string AsFraction(long value) =>
         $"{value / 1_000_000D:0.000}" + "M";
 
-    private void MassDeserialization()
+
+    [TestMethod]
+    public void MassDeserialization()
     {
-        using Stream stream = File.OpenRead(_testJsonFileName);
+        using Stream stream =
+            Assembly.GetExecutingAssembly().GetManifestResourceStream("LionWeb_CSharp_Test.resources.expected.json") ??
+            throw new AssertFailedException();
 
         var deserializer = new DeserializerBuilder()
             .WithLanguage(_language)
