@@ -43,10 +43,8 @@ public class StreamingTests
         Deserialization
     }
 
-    [TestMethod]
-    // forcing the right order
-    [DataRow(FakeRuns.Serialization)]
-    [DataRow(FakeRuns.Deserialization)]
+    [DataTestMethod]
+    [DynamicData(nameof(GetData), DynamicDataSourceType.Method)]
     public void Streaming(FakeRuns run)
     {
         switch (run)
@@ -63,6 +61,11 @@ public class StreamingTests
         }
     }
 
+    public static IEnumerable<object[]> GetData()
+    {
+        yield return new object[] { FakeRuns.Serialization };
+        yield return new object[] { FakeRuns.Deserialization };
+    }
     private void MassSerialization()
     {
         using Stream stream = File.Create(_testJsonFileName);
