@@ -79,29 +79,49 @@ public static class JsonUtils
             });
     }
 
-    public static List<INode> ReadNodesFromStream(Stream stream, IDeserializer deserializer)
-    {
-        // var streaming = new LionWebStreamingDeserializer(new LionWebConfiguration(), stream, deserializer)
-
-        var streamReader = new Utf8JsonAsyncStreamReader(stream, leaveOpen:true);
-
-        while (streamReader.ReadAsync().GetAwaiter().GetResult())
+        public static async Task<List<INode>> ReadNodesFromStream(Stream stream, IDeserializer deserializer)
         {
-            Console.WriteLine(streamReader.TokenType);
+            var streamReader = new Utf8JsonAsyncStreamReader(stream, leaveOpen: true);
+
+            bool insideNodes = false;
+            while (await Advance())
+            {
+                switch (streamReader.TokenType)
+                {
+                    case JsonTokenType.PropertyName when streamReader.GetString() == "serializationFormatVersion":
+                        await Advance();
+                        string? version = streamReader.GetString();
+                        break;
+
+                    case JsonTokenType.PropertyName when streamReader.GetString() == "nodes":
+                        insideNodes = true;
+                        break;
+
+                    case JsonTokenType.PropertyName when streamReader.GetString() != "nodes":
+                        insideNodes = false;
+                        break;
+
+                    case JsonTokenType.StartObject when insideNodes:
+                        try
+                        {
+                            var serializedNode = await streamReader.DeserializeAsync<SerializedNode>(_readOptions);
+                            if (serializedNode != null)
+                            {
+                                await Task.Run(() => deserializer.Process(serializedNode));
+                            }
+                        } catch
+                        {
+                            // grouping awaits
+                        }
+
+                        break;
+                }
+            }
+
+            return deserializer.Finish().ToList();
+
+            async Task<bool> Advance() => await streamReader.ReadAsync();
         }
-
-        return [];
-    }
-
-    // private class LionWebConfiguration : ILionWebConfiguration
-    // {
-    //     public IDictionary<string, string> Paths { get => new Dictionary<string, string>() { { "file", "value" } }; }
-    // }
-    //
-    // private class LionWebFilesConfiguration : ILionWebFilesConfiguration
-    // {
-    //     public IDictionary<string, string> Paths { get => new Dictionary<string, string>() { { "test", "output.json" } }; }
-    // }
 }
 
 class LazySerializationChunk

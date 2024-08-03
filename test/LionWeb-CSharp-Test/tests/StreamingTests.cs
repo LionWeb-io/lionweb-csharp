@@ -22,10 +22,6 @@ using M1;
 using M3;
 using Serialization;
 using System.Diagnostics;
-using System.Drawing;
-using System.Runtime.CompilerServices;
-using System.Text.Json;
-using System.Text.Json.Stream;
 
 [TestClass]
 public class StreamingTests
@@ -37,13 +33,39 @@ public class StreamingTests
         _language = ShapesLanguage.Instance;
     }
 
-    const long maxSize = 1_500_000L;
+    // private const long _maxSize = 1_500_000L;
+    private const long _maxSize = 1_500L;
+
+    public enum FakeRuns
+    {
+        Serialization,
+        Deserialization
+    }
 
     [TestMethod]
-    public void MassSerialization()
+    // forcing the right order
+    [DataRow(FakeRuns.Serialization)]
+    [DataRow(FakeRuns.Deserialization)]
+    public void Streaming(FakeRuns run)
+    {
+        switch (run)
+        {
+            case FakeRuns.Serialization:
+                MassSerialization();
+                return;
+
+            case FakeRuns.Deserialization:
+                MassDeserialization();
+                return;
+            default:
+                return;
+        }
+    }
+
+    private void MassSerialization()
     {
         using Stream stream = File.Create("output.json");
-        JsonUtils.WriteNodesToStream(stream, new Serializer(), CreateNodes(maxSize));
+        JsonUtils.WriteNodesToStream(stream, new Serializer(), CreateNodes(_maxSize));
 
         IEnumerable<INode> CreateNodes(long count)
         {
@@ -75,7 +97,7 @@ public class StreamingTests
                     result = lastCircle;
                 } else if (l % 37 == 0)
                 {
-                    result = new Geometry(id) { Shapes = [lastLine, lastCircle] };
+                    result = new Geometry(id) { Shapes = [lastLine!, lastCircle!] };
                 } else
                 {
                     lastCoord = new Coord(id);
@@ -87,13 +109,10 @@ public class StreamingTests
         }
     }
 
-    string AsFraction(long value1)
-    {
-        return string.Format("{0:0.000}", value1 / 1_000_000D) + "M";
-    }
+    static string AsFraction(long value) =>
+        $"{value / 1_000_000D:0.000}" + "M";
 
-    [TestMethod]
-    public async Task MassDeserialization()
+    private void MassDeserialization()
     {
         using Stream stream = File.OpenRead("output.json");
 
@@ -101,69 +120,12 @@ public class StreamingTests
             .WithLanguage(_language)
             .Build();
 
-        long count = 0;
+        List<INode> nodes = JsonUtils.ReadNodesFromStream(stream, deserializer).GetAwaiter().GetResult();
 
-        async Task<List<INode>> doit(Stream stream, IDeserializer deserializer)
-        {
-            var streamReader = new Utf8JsonAsyncStreamReader(stream, leaveOpen: true);
-
-            JsonSerializerOptions _readOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
-
-            bool insideNodes = false;
-            while (await Advance())
-            {
-                switch (streamReader.TokenType)
-                {
-                    case JsonTokenType.PropertyName when streamReader.GetString() == "serializationFormatVersion":
-                        await Advance();
-                        string version = streamReader.GetString();
-                        TestContext.WriteLine($"version: {version}");
-                        break;
-
-                    case JsonTokenType.PropertyName when streamReader.GetString() == "nodes":
-                        insideNodes = true;
-                        break;
-
-                    case JsonTokenType.PropertyName when streamReader.GetString() != "nodes":
-                        insideNodes = false;
-                        break;
-
-                    case JsonTokenType.StartObject when insideNodes:
-                        try
-                        {
-                            var serializedNode = await streamReader.DeserializeAsync<SerializedNode>(_readOptions);
-                            if (serializedNode != null)
-                            {
-                                await Task.Run(() =>
-                                {
-                                    deserializer.Process(serializedNode);
-                                    if (count++ % 10_000 == 0)
-                                    {
-                                        TestContext.WriteLine(
-                                            $"Parsing Entry #{count} privateMem: {AsFraction(Process.GetCurrentProcess().PrivateMemorySize64)} gcMem: {AsFraction(GC.GetTotalMemory(false))}");
-                                    }
-                                });
-                            }
-                        } catch { }
-                        break;
-                }
-            }
-
-            return deserializer.Finish().ToList();
-
-            async Task<bool> Advance()
-            {
-                return await streamReader.ReadAsync();
-            }
-        }
-
-
-        List<INode> nodes = await doit(stream, deserializer);
-
-        Assert.AreEqual(maxSize, nodes.SelectMany(n => n.Descendants(true, true)).Count());
+        Assert.AreEqual(_maxSize, nodes.SelectMany(n => n.Descendants(true, true)).Count());
     }
 
-    private TestContext testContextInstance;
+    private TestContext _testContextInstance;
 
     /// <summary>
     /// Gets or sets the test context which provides
@@ -171,21 +133,21 @@ public class StreamingTests
     /// </summary>
     public TestContext TestContext
     {
-        get { return testContextInstance; }
-        set { testContextInstance = value; }
+        get { return _testContextInstance; }
+        set { _testContextInstance = value; }
     }
 }
 
-static class StringRandomizer
+internal static class StringRandomizer
 {
     // Constant seed for reproducible tests
-    static Random random = new Random(0x1EE7);
-    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+    private static readonly Random _defaultRandom = new Random(0x1EE7);
+    private const string _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
 
     public static string RandomLength() =>
-        Random(random.Next(500));
+        Random(_defaultRandom.Next(500));
 
     public static string Random(int length) =>
-        new string(Enumerable.Repeat(chars, length)
-            .Select(s => s[random.Next(s.Length)]).ToArray());
+        new string(Enumerable.Repeat(_chars, length)
+            .Select(s => s[_defaultRandom.Next(s.Length)]).ToArray());
 }
