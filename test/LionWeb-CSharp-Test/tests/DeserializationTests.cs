@@ -50,6 +50,7 @@ public class DeserializationTests
         };
 
         var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
             .WithLanguage(ShapesLanguage.Instance)
             .Build()
             .Deserialize(serializationChunk);
@@ -89,6 +90,7 @@ public class DeserializationTests
         };
 
         var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
                 .WithLanguage(ShapesLanguage.Instance)
                 .Build()
             .Deserialize(serializationChunk);
@@ -152,6 +154,7 @@ public class DeserializationTests
         };
 
         var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
             .WithLanguage(ShapesLanguage.Instance)
             .Build()
             .Deserialize(serializationChunk);
@@ -242,6 +245,7 @@ public class DeserializationTests
         };
 
         var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
             .WithLanguage(ShapesLanguage.Instance)
             .Build()
             .Deserialize(serializationChunk);

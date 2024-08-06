@@ -29,13 +29,10 @@ public static class LanguagesUtils
     /// Loads the languages defined in the resource with the given <paramref name="resourceName" /> inside the assembly with the given <paramref name="assemblyName" />,
     /// which must be a JSON file in the LionWeb serialization (chunk) format that contains LionCore languages (M2).
     /// </summary>
-    public static IEnumerable<DynamicLanguage> LoadLanguages(string assemblyName, string resourceName) =>
-        LanguageDeserializer.Deserialize(
-            JsonUtils.ReadJsonFromString<SerializationChunk>(
-                ResourcesUtils.GetResourceAsText(
-                    ResourcesUtils.GetAssemblyByName(assemblyName),
-                    resourceName
-                )
-            )
-        );
+    public static IEnumerable<DynamicLanguage> LoadLanguages(string assemblyName, string resourceName)
+    {
+        Stream stream = ResourcesUtils.GetAssemblyByName(assemblyName).GetManifestResourceStream(resourceName) ?? throw new ArgumentException($"Cannot read resource: {resourceName}", nameof(resourceName));
+        return JsonUtils.ReadNodesFromStream(stream, new LanguageDeserializer()).GetAwaiter().GetResult()
+            .Cast<DynamicLanguage>();
+    }
 }

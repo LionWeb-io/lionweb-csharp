@@ -40,7 +40,7 @@ public class StreamingTests
     [TestMethod]
     public void MassSerialization()
     {
-        using Stream stream = File.Create(Path.GetTempFileName());
+        using Stream stream = File.Create("output.json");
         JsonUtils.WriteNodesToStream(stream, new Serializer(), CreateNodes(_maxSize));
 
         IEnumerable<INode> CreateNodes(long count)
@@ -100,9 +100,9 @@ public class StreamingTests
             .WithLanguage(_language)
             .Build();
 
-        List<INode> nodes = JsonUtils.ReadNodesFromStream(stream, deserializer).GetAwaiter().GetResult();
+        List<IReadableNode> nodes = JsonUtils.ReadNodesFromStream(stream, deserializer).GetAwaiter().GetResult();
 
-        Assert.AreEqual(_maxSize, nodes.SelectMany(n => n.Descendants(true, true)).Count());
+        Assert.AreEqual(_maxSize, nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count());
     }
 
     /// <summary>

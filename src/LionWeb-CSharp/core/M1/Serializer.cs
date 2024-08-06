@@ -17,122 +17,38 @@
 
 namespace LionWeb.Core.M1;
 
-using M2;
-using M3;
 using Serialization;
-using Utilities;
 
 /// <inheritdoc cref="ISerializer"/>
 public class Serializer : SerializerBase, ISerializer
 {
-    private readonly HashSet<Language> _usedLanguages = new();
     private readonly DuplicateIdChecker _duplicateIdChecker = new();
 
-    /// <inheritdoc />
-    public ISerializerHandler Handler { get; init; } = new SerializerExceptionHandler();
-
-    /// <summary>
-    /// Serializes a given <paramref name="nodes">iterable collection of nodes</paramref>, including all descendants and annotations.
-    /// Disregards duplicate nodes, but fails on duplicate node ids.
-    /// </summary>
-    /// 
-    /// <returns>A data structure that can be directly serialized/unparsed to JSON.</returns>
-    public static SerializationChunk SerializeToChunk(IEnumerable<INode> nodes) =>
-        new Serializer()
-            .Serialize(nodes
-                .SelectMany(n => n.Descendants(true, true))
-                .Distinct()
-            );
+    /// <inheritdoc cref="ISerializerExtensions.SerializeToChunk"/>
+    public static SerializationChunk SerializeToChunk(IEnumerable<IReadableNode> nodes) =>
+        new Serializer().SerializeToChunk(nodes);
 
     /// <inheritdoc />
-    public IEnumerable<SerializedNode> SerializeToNodes(IEnumerable<INode> allNodes)
+    public override IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes)
     {
-        foreach (INode node in allNodes)
+        foreach (var node in allNodes)
         {
             RegisterUsedLanguage(node);
-            yield return SerializeNode(node);
+            var result = SerializeNode(node);
+            if (result != null)
+                yield return result;
         }
     }
 
-    public IEnumerable<SerializedLanguageReference> UsedLanguages =>
-        _usedLanguages
-            .Select(SerializeLanguageReference);
-
-    private void RegisterUsedLanguage(INode node)
-    {
-        Language language = node.GetClassifier().GetLanguage();
-        if (language.Key == BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
-            return;
-
-        Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.EqualsIdentity(language));
-        if (existingLanguage != null)
-        {
-            Language? altLanguage = Handler.DuplicateUsedLanguage(existingLanguage, language);
-            _usedLanguages.Add(altLanguage ??
-                               throw new InvalidOperationException(
-                                   $"Duplicate UsedLanguage: '{language}' vs. '{existingLanguage}'"));
-        } else
-        {
-            _usedLanguages.Add(language);
-        }
-    }
-
-    private SerializedNode SerializeNode(INode node)
+    private SerializedNode? SerializeNode(IReadableNode node)
     {
         var id = node.GetId();
-        if (_duplicateIdChecker.IsIdDuplicate(id))
+        if (_duplicateIdChecker.IsIdDuplicate(Compress(id)))
         {
             Handler.DuplicateNodeId(node);
-            throw new InvalidOperationException($"Duplicate node id '{id}': {node}");
+            return null;
         }
 
-        return new()
-        {
-            Id = id,
-            Classifier = node.GetClassifier().ToMetaPointer(),
-            Properties = node.GetClassifier().AllFeatures().OfType<Property>()
-                .Select(property => SerializePropertySetting(node, property)).ToArray(),
-            Containments = node.GetClassifier().AllFeatures().OfType<Containment>()
-                .Select(containment => SerializedContainmentSetting(node, containment)).ToArray(),
-            References = node.GetClassifier().AllFeatures().OfType<Reference>()
-                .Select(reference => SerializedReferenceSetting(node, reference)).ToArray(),
-            Annotations = node.GetAnnotations()
-                .Select(annotation => annotation.GetId()).ToArray(),
-            Parent = node.GetParent()?.GetId()
-        };
+        return SerializeSimpleNode(node);
     }
-
-    private SerializedContainment SerializedContainmentSetting(INode node, Containment containment)
-    {
-        var value = GetValueIfSet(node, containment);
-        return new SerializedContainment
-        {
-            Containment = containment.ToMetaPointer(),
-            Children = value != null
-                ? containment.AsNodes<INode>(value).Select((child) => child.GetId()).ToArray()
-                : []
-        };
-    }
-
-    private SerializedReference SerializedReferenceSetting(INode node, Reference reference)
-    {
-        var value = GetValueIfSet(node, reference);
-        return new()
-        {
-            Reference = reference.ToMetaPointer(),
-            Targets = value != null
-                ? reference.AsNodes<INode>(value).Select(SerializeReferenceTarget).ToArray()
-                : []
-        };
-    }
-}
-
-public class SerializerExceptionHandler : ISerializerHandler
-{
-    public void DuplicateNodeId(INode n) =>
-        throw new ArgumentException($"nodes have same id '{n.GetId()}': {n}");
-
-    public virtual Language? DuplicateUsedLanguage(Language a, Language b) =>
-        throw new ArgumentException(
-            $"different languages with same key '{a?.Key ?? b?.Key}' / version '{a?.Version ?? b?.Version}': {a}, {b}");
 }

@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M1;
 
-using M3;
 using Serialization;
 
 public interface ISerializer
@@ -29,13 +28,13 @@ public interface ISerializer
     /// We want to keep any transformation outside the serializer, as it might lead to duplicate nodes.
     /// Calling <c>Distinct()</c> implicitly creates a HashSet of the elements, violating the idea to stream nodes with minimal memory overhead. 
     /// </remarks>
-    IEnumerable<SerializedNode> SerializeToNodes(IEnumerable<INode> allNodes);
+    IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes);
 
     /// <summary>
     /// 
     /// </summary>
     /// <remarks>
-    /// Lazily populated while processing <i>allNodes</i> of <see cref="SerializeToNodes"/>.
+    /// Lazily populated while processing <i>allNodes</i> of <see cref="Serialize"/>.
     /// </remarks>
     IEnumerable<SerializedLanguageReference> UsedLanguages { get; }
 }
@@ -47,9 +46,9 @@ public static class ISerializerExtensions
     /// We want to keep any transformation outside the serializer, as it might lead to duplicate nodes.
     /// Calling <c>Distinct()</c> implicitly creates a HashSet of the elements, violating the idea to stream nodes with minimal memory overhead. 
     /// </remarks>
-    public static SerializationChunk Serialize(this ISerializer serializer, IEnumerable<INode> allNodes)
+    public static SerializationChunk Serialize(this ISerializer serializer, IEnumerable<IReadableNode> allNodes)
     {
-        SerializedNode[] serializedNodes = serializer.SerializeToNodes(allNodes).ToArray();
+        SerializedNode[] serializedNodes = serializer.Serialize(allNodes).ToArray();
         return new SerializationChunk
         {
             SerializationFormatVersion = ReleaseVersion.Current,
@@ -59,29 +58,17 @@ public static class ISerializerExtensions
     }
 
     public static IEnumerable<SerializedNode> SerializeDescendants(this ISerializer serializer,
-        IEnumerable<INode> nodes) =>
-        serializer.SerializeToNodes(nodes.SelectMany(n => n.Descendants(true, true)));
-}
-
-public interface ISerializerHandler
-{
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
-    /// <returns>The language to use, if any.</returns>
-    Language? DuplicateUsedLanguage(Language a, Language b);
+        IEnumerable<IReadableNode> nodes) => serializer.Serialize(nodes.AllNodes());
 
     /// <summary>
-    /// 
+    /// Serializes a given <paramref name="nodes">iterable collection of nodes</paramref>, including all descendants and annotations.
+    /// Disregards duplicate nodes, but fails on duplicate node ids.
     /// </summary>
-    /// <param name="n"></param>
-    /// <remarks>
-    /// It makes no sense to allow "healing" a duplicate id (e.g. by creating a new id).
-    /// If we allowed this, we'd need to keep a map of all nodes to their (potentially "healed") id,
-    /// in case we wanted to refer to it.
-    /// This would clash with streaming nodes with minimal memory overhead.
-    /// </remarks>
-    void DuplicateNodeId(INode n);
+    /// 
+    /// <returns>A data structure that can be directly serialized/unparsed to JSON.</returns>
+    public static SerializationChunk SerializeToChunk(this ISerializer serializer, IEnumerable<IReadableNode> nodes) =>
+        Serialize(serializer, nodes.AllNodes().Distinct());
+
+    private static IEnumerable<IReadableNode> AllNodes(this IEnumerable<IReadableNode> nodes) =>
+        nodes.SelectMany(n => M1Extensions.Descendants(n, true, true));
 }

@@ -21,12 +21,39 @@ using M2;
 using M3;
 using Serialization;
 
+public interface IDeserializer
+{
+    IDeserializerHandler Handler { get; init; }
+
+    void RegisterInstantiatedLanguage(Language language, INodeFactory factory);
+
+    void RegisterDependentNodes(IEnumerable<IReadableNode> dependentNodes);
+
+    /// <returns>
+    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNodes">serialized nodes</paramref>.
+    /// References to any of the given dependent nodes are resolved as well.
+    /// </returns>
+    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
+    void Process(SerializedNode serializedNode);
+
+    IEnumerable<IReadableNode> Finish();
+}
+
+public interface IDeserializer<out T> : IDeserializer where T : IReadableNode
+{
+    IEnumerable<IReadableNode> IDeserializer.Finish() =>
+        Finish().Cast<IReadableNode>();
+
+    /// <inheritdoc cref="IDeserializer.Finish"/>
+    new IEnumerable<T> Finish();
+}
+
 public class DeserializerBuilder
 {
+    private readonly Dictionary<Language, INodeFactory> _languages = new();
+    private readonly HashSet<IReadableNode> _dependentNodes = new();
     private IDeserializerHandler? _handler;
-    private Dictionary<Language, INodeFactory> _languages = new();
-    private HashSet<IReadableNode> _dependentNodes = new();
-
+    private bool _storeUncompressedIds = false;
 
     public DeserializerBuilder WithHandler(IDeserializerHandler handler)
     {
@@ -66,13 +93,21 @@ public class DeserializerBuilder
         return this;
     }
 
+    public DeserializerBuilder WithUncompressedIds(bool storeUncompressedIds)
+    {
+        _storeUncompressedIds = storeUncompressedIds;
+        return this;
+    }
+
     public IDeserializer Build()
     {
-        Deserializer result = _handler != null ? new Deserializer { Handler = _handler } : new Deserializer();
+        Deserializer result = _handler != null
+            ? new Deserializer { Handler = _handler, StoreUncompressedIds = _storeUncompressedIds }
+            : new Deserializer() { StoreUncompressedIds = _storeUncompressedIds };
 
         foreach ((Language language, INodeFactory factory) in _languages)
         {
-            result.RegisterLanguage(language, factory);
+            result.RegisterInstantiatedLanguage(language, factory);
         }
 
         result.RegisterDependentNodes(_dependentNodes);
@@ -81,29 +116,12 @@ public class DeserializerBuilder
     }
 }
 
-public interface IDeserializer
-{
-    IDeserializerHandler Handler { get; init; }
-
-    void RegisterLanguage(Language language, INodeFactory factory);
-
-    void RegisterDependentNodes(IEnumerable<IReadableNode> dependentNodes);
-
-    /// <returns>
-    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNodes">serialized nodes</paramref>.
-    /// References to any of the given dependent nodes are resolved as well.
-    /// </returns>
-    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
-    void Process(SerializedNode serializedNode);
-
-    IEnumerable<INode> Finish();
-}
-
 public static class IDeserializerExtensions
 {
     /// <returns>The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.</returns>
     /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
-    public static List<INode> Deserialize(this IDeserializer deserializer, SerializationChunk serializationChunk) =>
+    public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
+        SerializationChunk serializationChunk) =>
         deserializer.Deserialize(serializationChunk, []);
 
     /// <returns>
@@ -111,15 +129,17 @@ public static class IDeserializerExtensions
     /// References to any of the given dependent nodes are resolved as well.
     /// </returns>
     /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
-    public static List<INode> Deserialize(this IDeserializer deserializer, SerializationChunk serializationChunk,
+    public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
+        SerializationChunk serializationChunk,
         IEnumerable<INode> dependentNodes) =>
         deserializer.Deserialize(serializationChunk.Nodes, dependentNodes);
 
-    public static List<INode> Deserialize(this IDeserializer deserializer,
+    public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
         IEnumerable<SerializedNode> serializedNodes) =>
         deserializer.Deserialize(serializedNodes, []);
 
-    public static List<INode> Deserialize(this IDeserializer deserializer, IEnumerable<SerializedNode> serializedNodes,
+    public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
+        IEnumerable<SerializedNode> serializedNodes,
         IEnumerable<IReadableNode> dependentNodes)
     {
         deserializer.RegisterDependentNodes(dependentNodes);
@@ -130,14 +150,4 @@ public static class IDeserializerExtensions
 
         return deserializer.Finish().ToList();
     }
-}
-
-public interface IDeserializerHandler
-{
-    Classifier? UnknownClassifier(string id, CompressedMetaPointer metaPointer);
-    Feature? UnknownFeature(CompressedMetaPointer metaPointer, INode node);
-    INode? UnknownParent(CompressedId parentId, INode node);
-    INode? UnknownChild(CompressedId childId, INode node);
-    IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, INode node);
-    INode? UnknownAnnotation(CompressedId annotationId, INode node);
 }

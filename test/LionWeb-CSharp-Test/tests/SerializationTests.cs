@@ -133,8 +133,12 @@ public class SerializationTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        var deserializer = new LanguageDeserializer(serializationChunk, false);
-        deserializer.DeserializeLanguages();
+        var deserializer = new LanguageDeserializer(false);
+        foreach (var serializedNode in serializationChunk.Nodes)
+        {
+            deserializer.Process(serializedNode);
+        }
+        deserializer.Finish();
     }
 
     [TestMethod]
@@ -233,8 +237,8 @@ public class SerializationTests
         var a = new MaterialGroup("a") { DefaultShape = b };
         var b2 = new Circle("b");
 
-        var x = new Serializer().SerializeToNodes([a, b, b]).ToList();
-        var serializedNodes = new Serializer().SerializeToNodes([a, b, b2]).ToList();
+        var x = new Serializer().Serialize([a, b, b]).ToList();
+        var serializedNodes = new Serializer().Serialize([a, b, b2]).ToList();
         Assert.AreEqual(2, serializedNodes.Count);
     }
 
@@ -243,7 +247,9 @@ public class SerializationTests
         Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) =>
             throw new NotImplementedException();
 
-        public void DuplicateNodeId(INode n) => incrementer();
+        public void DuplicateNodeId(IReadableNode n) => incrementer();
+        
+        public string? UnknownDatatype(IReadableNode node, Property property, object? value) => throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -258,7 +264,7 @@ public class SerializationTests
 
         try
         {
-            serializer.Serialize(materialGroup.Descendants(true, true));
+            ISerializerExtensions.Serialize(serializer, materialGroup.Descendants(true, true));
         } catch (InvalidOperationException _)
         {
         }
@@ -309,7 +315,9 @@ public class SerializationTests
     {
         Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) => incrementer();
 
-        public void DuplicateNodeId(INode n) => throw new NotImplementedException();
+        public void DuplicateNodeId(IReadableNode n) => throw new NotImplementedException();
+        
+        public string? UnknownDatatype(IReadableNode node, Property property, object? value) => throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -342,7 +350,7 @@ public class SerializationTests
 
         try
         {
-            serializer.Serialize(a.Descendants(true, true));
+            ISerializerExtensions.Serialize(serializer, a.Descendants(true, true));
         } catch (InvalidOperationException _)
         {
         }
@@ -378,7 +386,7 @@ public class SerializationTests
                 })
             };
 
-        serializer.Serialize(a.Descendants(true, true));
+        ISerializerExtensions.Serialize(serializer, a.Descendants(true, true));
 
         Assert.AreEqual(1, count);
     }
@@ -389,7 +397,7 @@ public class SerializationTests
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
         var serializer = new Serializer();
-        var serializedNodes = serializer.SerializeToNodes(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
+        var serializedNodes = serializer.Serialize(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.AreEqual(1, serializer.UsedLanguages.Count());
     }
@@ -400,7 +408,7 @@ public class SerializationTests
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
         var serializer = new Serializer();
-        var serializedNodes = serializer.SerializeToNodes(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
+        var serializedNodes = serializer.Serialize(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.ThrowsException<AssertFailedException>(() => Assert.AreEqual(2, serializedNodes.Count()));
     }
@@ -412,7 +420,7 @@ public class SerializationTests
 
         var serializer = new Serializer();
         Assert.AreEqual(0, serializer.UsedLanguages.Count());
-        var serializedNodes = serializer.SerializeToNodes(materialGroup.Descendants(true));
+        var serializedNodes = serializer.Serialize(materialGroup.Descendants(true));
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.AreEqual(1, serializer.UsedLanguages.Count());
     }

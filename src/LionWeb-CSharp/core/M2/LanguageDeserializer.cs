@@ -20,20 +20,19 @@ namespace LionWeb.Core.M2;
 using M1;
 using M3;
 using Serialization;
-using Utilities;
 
 /// <summary>
 /// A deserializer that deserializes serializations of <see cref="Language"/>s.
 /// The generic deserializer isn't aware of the LionCore M3-types (and their idiosyncrasies),
 /// so that can't be used.
 /// </summary>
-public class LanguageDeserializer
+public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILanguageDeserializer
 {
-    private readonly SerializedNode[] _serializedNodes;
-    private readonly Dictionary<string, SerializedNode> _serializedNodesById;
-    private readonly Dictionary<string, IReadableNode> _nodesById = new();
-    private readonly Dictionary<string, IKeyed> _dependentNodesById;
-    private readonly List<Language> _dependentLanguages;
+    private static readonly M3Language _m3 = M3Language.Instance;
+
+    private readonly Dictionary<CompressedId, SerializedNode> _serializedNodesById = new();
+
+    private readonly DeserializerBuilder _deserializerBuilder = new();
 
     /// <summary>
     /// Deserializes the given <paramref name="serializationChunk">serialization chunk</paramref> as an iterable collection of <see cref="Language"/>s.
@@ -46,390 +45,188 @@ public class LanguageDeserializer
     /// <param name="dependentLanguages">Referred languages.</param>
     /// 
     /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
-    public LanguageDeserializer(SerializationChunk serializationChunk, bool preloadM3Language = true,
-        params Language[] dependentLanguages)
+    public LanguageDeserializer(bool preloadM3Language = true)
     {
-        _serializedNodes = serializationChunk.Nodes;
-        _dependentLanguages = dependentLanguages.ToList();
-        _serializedNodesById = _serializedNodes.ToDictionary(
-            serializedNode => serializedNode.Id
-        );
-        List<Language> preloadedLanguages = [BuiltInsLanguage.Instance];
+        RegisterDependentLanguage(BuiltInsLanguage.Instance);
+
         if (preloadM3Language)
-            preloadedLanguages.Add(M3Language.Instance);
-
-        _dependentNodesById =
-            dependentLanguages.Concat(preloadedLanguages)
-                .SelectMany(language => M1Extensions.Descendants<IKeyed>(language, true))
-                .ToDictionary(node => node.GetId());
+            RegisterDependentLanguage(_m3);
     }
 
-    /// <summary>
-    /// Deserializes the given <paramref name="serializationChunk">serialization chunk</paramref> as an iterable collection of <see cref="Language"/>s.
-    /// The <paramref name="dependentLanguages">dependent languages</paramref> should contain all languages that are referenced by the top-level
-    /// <c>languages</c> property of the serialization chunk.
-    /// </summary>
-    /// 
-    /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
+    /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
     public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
-        params Language[] dependentLanguages)
-        => new LanguageDeserializer(serializationChunk, dependentLanguages: dependentLanguages).DeserializeLanguages();
+        params Language[] dependentLanguages) =>
+        new LanguageDeserializer().Deserialize(serializationChunk, dependentLanguages);
 
-    /// <summary>
-    /// Deserializes the given serialization chunk as an iterable collection of <see cref="Language"/>s.
-    /// </summary>
-    /// 
-    /// <returns>The deserialization of the language definitions present in the given serializationChunk.</returns>
-    public IEnumerable<DynamicLanguage> DeserializeLanguages()
+    /// <inheritdoc />
+    public override void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
     {
-        Dictionary<string, SerializedNode> annotationNodes = DeserializeLanguageNodes();
-
-        InstallLanguageLinks();
-
-        List<INode> deserializedAnnotationInstances = DeserializeAnnotations(annotationNodes);
-
-        InstallAnnotationReferences(deserializedAnnotationInstances, annotationNodes);
-
-        return _nodesById.Values.OfType<DynamicLanguage>();
+        base.RegisterInstantiatedLanguage(language, factory);
+        _deserializerBuilder.WithCustomFactory(language, factory);
     }
 
-    private Dictionary<string, SerializedNode> DeserializeLanguageNodes()
+    /// <inheritdoc />
+    public void RegisterDependentLanguage(Language language)
     {
-        Dictionary<string, SerializedNode> annotationNodes = new();
-        foreach (var serializedNode in _serializedNodes)
-        {
-            var id = serializedNode.Id;
-            if (IsLanguageNode(serializedNode))
-            {
-                if (IsInDependentNodes(id))
-                {
-                    LogWarn($"Skip deserializing {id} because dependentLanguages contains node with same id");
-                } else
-                {
-                    _nodesById[id] = MemoisedDeserialization(id);
-                }
-            } else
-            {
-                annotationNodes[id] = serializedNode;
-            }
-        }
-
-        return annotationNodes;
+        _deserializerBuilder.WithLanguage(language);
+        RegisterDependentNodes(M1Extensions.Descendants<IKeyed>(language, true));
     }
 
-    private bool IsInDependentNodes(string id) => _dependentNodesById.ContainsKey(id);
+    #region Process
 
-    private IReadableNode MemoisedDeserialization(string id)
+    /// <inheritdoc />
+    public override void Process(SerializedNode serializedNode)
     {
-        var serializedNode = _serializedNodesById[id];
-        IReadableNode node;
-        if (!_nodesById.TryGetValue(id, out var value))
+        _serializedNodesById[Compress(serializedNode.Id)] = serializedNode;
+        if (!IsLanguageNode(serializedNode))
+            return;
+
+        var id = serializedNode.Id;
+        var compressedId = Compress(id);
+        if (!(IsInDependentNodes(compressedId) && Handler.SkipDeserializingDependentNode(id)))
+            _deserializedNodesById[compressedId] = DeserializeMemoized(compressedId);
+    }
+
+    private bool IsInDependentNodes(CompressedId compressedId) =>
+        _dependentNodesById.ContainsKey(compressedId);
+
+    private IReadableNode DeserializeMemoized(CompressedId compressedId)
+    {
+        var serializedNode = _serializedNodesById[compressedId];
+        if (!_deserializedNodesById.TryGetValue(compressedId, out var node))
         {
-            var parentId = serializedNode.Parent;
-            node = CreateNodeFromWithProperties(serializedNode,
-                (parentId == null || !_nodesById.ContainsKey(parentId))
-                    ? null
-                    : MemoisedDeserialization(parentId)
-            );
-            _nodesById[node.GetId()] = node;
-        } else
-        {
-            node = value;
+            node = CreateNodeWithProperties(serializedNode);
         }
 
         return node;
     }
 
-    private void InstallLanguageLinks()
-    {
-        foreach (var serializedNode in _serializedNodes.Where(node =>
-                     IsLanguageNode(node) && !IsInDependentNodes(node.Id)))
-        {
-            InstallContainments(serializedNode);
-            InstallReferences(serializedNode);
-        }
-    }
-
-    private List<INode> DeserializeAnnotations(Dictionary<string, SerializedNode> annotationNodes)
-    {
-        var deserializer = new DeserializerBuilder()
-            .WithLanguages(_nodesById.Values.OfType<Language>().Concat(_dependentLanguages))
-            .WithDependentNodes(_nodesById.Values
-                .SelectMany(node => M1Extensions.Descendants<IReadableNode>(node, true, true))
-                .Distinct())
-            .Build();
-        List<INode> deserializedAnnotations = deserializer.Deserialize(annotationNodes.Values);
-        foreach (INode deserializedAnnotation in deserializedAnnotations)
-        {
-            _nodesById[deserializedAnnotation.GetId()] = deserializedAnnotation;
-        }
-
-        return deserializedAnnotations;
-    }
-
-    private void AttachAnnotationsToParents(List<INode> deserializedAnnotationInstances,
-        Dictionary<string, SerializedNode> annotationNodes)
-    {
-        foreach (var deserializedAnnotation in deserializedAnnotationInstances)
-        {
-            var serializedAnnotation = annotationNodes[deserializedAnnotation.GetId()];
-            var parentId = serializedAnnotation.Parent;
-            if (_nodesById.TryGetValue(parentId, out var parent) && parent is INode writableParent)
-            {
-                writableParent.AddAnnotations([deserializedAnnotation]);
-            } else
-            {
-                LogError($"Cannot attach annotation {serializedAnnotation} to its parent.");
-            }
-        }
-    }
-
-    private void InstallAnnotationReferences(List<INode> deserializedAnnotationInstances,
-        Dictionary<string, SerializedNode> annotationNodes)
-    {
-        AttachAnnotationsToParents(deserializedAnnotationInstances, annotationNodes);
-
-        foreach (var serializedNode in _serializedNodes.Where(n => !IsInDependentNodes(n.Id)))
-        {
-            InstallReferences(serializedNode);
-        }
-    }
-
-    private static bool IsLanguageNode(SerializedNode serializedNode) =>
-        serializedNode.Classifier.Language == M3Language.Instance.Key;
-
-    private static DynamicIKeyed CreateNodeFromWithProperties(SerializedNode serializedNode, IReadableNode? parent)
+    private DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode)
     {
         var serializedPropertiesByKey = serializedNode.Properties.ToDictionary(
-            serializedProperty => serializedProperty.Property.Key,
+            serializedProperty => Compress(serializedProperty.Property),
             serializedProperty => serializedProperty.Value
         );
         var id = serializedNode.Id;
-        var key = serializedPropertiesByKey["IKeyed-key"];
-        var name = serializedPropertiesByKey["LionCore-builtins-INamed-name"];
-        return serializedNode.Classifier.Key switch
+        string key = LookupString(_m3.IKeyed_key);
+        string name = LookupString(BuiltInsLanguage.Instance.INamed_name);
+
+        return serializedNode.Classifier switch
         {
-            "Annotation" => new DynamicAnnotation(id, parent as DynamicLanguage) { Key = key, Name = name },
-            "Concept" => new DynamicConcept(id, parent as DynamicLanguage)
+            var s when s.Matches(_m3.Annotation) => new DynamicAnnotation(id, null) { Key = key, Name = name },
+            var s when s.Matches(_m3.Concept) => new DynamicConcept(id, null)
             {
                 Key = key,
                 Name = name,
-                Abstract = serializedPropertiesByKey["Concept-abstract"] == "true",
-                Partition = serializedPropertiesByKey["Concept-partition"] == "true"
+                Abstract = LookupBool(_m3.Concept_abstract),
+                Partition = LookupBool(_m3.Concept_partition)
             },
-            "Containment" => new DynamicContainment(id, parent as DynamicClassifier)
+            var s when s.Matches(_m3.Containment) => new DynamicContainment(id, null)
             {
                 Key = key,
                 Name = name,
-                Optional = IsOptional(serializedPropertiesByKey),
-                Multiple = IsMultiple(serializedPropertiesByKey)
+                Optional = LookupBool(_m3.Feature_optional),
+                Multiple = LookupBool(_m3.Link_multiple)
             },
-            "Enumeration" => new DynamicEnumeration(id, parent as DynamicLanguage) { Key = key, Name = name },
-            "EnumerationLiteral" => new DynamicEnumerationLiteral(id, parent as DynamicEnumeration)
+            var s when s.Matches(_m3.Enumeration) => new DynamicEnumeration(id, null) { Key = key, Name = name },
+            var s when s.Matches(_m3.EnumerationLiteral) => new DynamicEnumerationLiteral(id, null)
             {
                 Key = key, Name = name
             },
-            "Interface" => new DynamicInterface(id, parent as DynamicLanguage) { Key = key, Name = name },
-            "Language" => new DynamicLanguage(id)
+            var s when s.Matches(_m3.Interface) => new DynamicInterface(id, null) { Key = key, Name = name },
+            var s when s.Matches(_m3.Language) => new DynamicLanguage(id)
             {
-                Key = key, Name = name, Version = serializedPropertiesByKey["Language-version"]
+                Key = key, Name = name, Version = LookupString(_m3.Language_version)
             },
-            "PrimitiveType" => new DynamicPrimitiveType(id, parent as DynamicLanguage) { Key = key, Name = name },
-            "Property" => new DynamicProperty(id, parent as DynamicClassifier)
+            var s when s.Matches(_m3.PrimitiveType) => new DynamicPrimitiveType(id, null) { Key = key, Name = name },
+            var s when s.Matches(_m3.Property) => new DynamicProperty(id, null)
             {
-                Key = key, Name = name, Optional = IsOptional(serializedPropertiesByKey)
+                Key = key, Name = name, Optional = LookupBool(_m3.Feature_optional)
             },
-            "Reference" => new DynamicReference(id, parent as DynamicClassifier)
+            var s when s.Matches(_m3.Reference) => new DynamicReference(id, null)
             {
                 Key = key,
                 Name = name,
-                Optional = IsOptional(serializedPropertiesByKey),
-                Multiple = IsMultiple(serializedPropertiesByKey)
+                Optional = LookupBool(_m3.Feature_optional),
+                Multiple = LookupBool(_m3.Link_multiple)
             },
             _ => throw new UnsupportedClassifierException(serializedNode.Classifier)
         };
-    }
 
-    private static bool IsMultiple(Dictionary<string, string> serializedPropertiesByKey) =>
-        serializedPropertiesByKey["Link-multiple"] == "true";
-
-    private static bool IsOptional(Dictionary<string, string> serializedPropertiesByKey) =>
-        serializedPropertiesByKey["Feature-optional"] == "true";
-
-
-    private void InstallContainments(SerializedNode serializedNode)
-    {
-        var node = _nodesById[serializedNode.Id];
-
-        ILookup<string, IKeyed> serializedContainmentsByKey = serializedNode
-            .Containments
-            .SelectMany(containment => containment.Children.Select(child => (containment, child)))
-            .ToLookup(pair => pair.containment.Containment.Key, pair => LookupNode<IKeyed>(pair.child));
-
-        switch (node)
+        bool LookupBool(Property property)
         {
-            case DynamicAnnotation annotation:
-                {
-                    annotation.AddFeatures(serializedContainmentsByKey["Classifier-features"].Cast<Feature>());
-                    break;
-                }
-            case DynamicConcept concept:
-                {
-                    concept.AddFeatures(serializedContainmentsByKey["Classifier-features"].Cast<Feature>());
-                    break;
-                }
-            case DynamicContainment:
-                {
-                    break;
-                }
-            case DynamicEnumeration enumeration:
-                {
-                    enumeration.AddLiterals(serializedContainmentsByKey["Enumeration-literals"]
-                        .Cast<EnumerationLiteral>());
-                    break;
-                }
-            case DynamicEnumerationLiteral:
-                {
-                    break;
-                }
-            case DynamicInterface @interface:
-                {
-                    @interface.AddFeatures(serializedContainmentsByKey["Classifier-features"].Cast<Feature>());
-                    break;
-                }
-            case DynamicLanguage language:
-                {
-                    language.AddEntities(serializedContainmentsByKey["Language-entities"].Cast<LanguageEntity>());
-                    break;
-                }
-            case DynamicPrimitiveType:
-                {
-                    break;
-                }
-            case DynamicProperty:
-                {
-                    break;
-                }
-            case DynamicReference:
-                {
-                    break;
-                }
-            default:
-                {
-                    LogError($"installing containments in node of meta-concept {node.GetType().Name} not implemented");
-                    break;
-                }
+            var compressedMetaPointer = Compress(property.ToMetaPointer());
+            if (serializedPropertiesByKey.TryGetValue(compressedMetaPointer, out var value))
+                return value == "true";
+
+            var result = Handler.UnknownDatatype(id, property, null);
+            return result as bool? ?? throw new InvalidValueException(property, result);
+        }
+
+        string LookupString(Property property)
+        {
+            var compressedMetaPointer = Compress(property.ToMetaPointer());
+            if (serializedPropertiesByKey.TryGetValue(compressedMetaPointer, out var s) && s != null)
+                return s;
+
+            var result = Handler.UnknownDatatype(id, property, null);
+            return result as string ?? throw new InvalidValueException(property, result);
         }
     }
 
-    private T LookupNode<T>(string id) where T : class, IKeyed
-    {
-        if (_dependentNodesById.TryGetValue(id, out var node))
-            return (T)node;
-        return (T)_nodesById[id];
-    }
+    #endregion
 
+    private static bool IsLanguageNode(SerializedNode serializedNode) =>
+        serializedNode.Classifier.Language == _m3.Key;
+}
 
-    private void InstallReferences(SerializedNode serializedNode)
-    {
-        var node = _nodesById[serializedNode.Id];
-        ILookup<string, IKeyed> serializedReferencesByKey = serializedNode
-            .References
-            .SelectMany(reference => reference.Targets.Select(target => (reference, target)))
-            .ToLookup(pair => pair.reference.Reference.Key, pair => LookupNode<IKeyed>(pair.target.Reference));
+internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : IDeserializerHandler
+{
+    public INode? UnknownParent(CompressedId parentId, INode node) =>
+        null;
 
-        switch (node)
-        {
-            case DynamicAnnotation annotation:
-                {
-                    annotation.Extends = ResolveSingleRef<Annotation>("Annotation-extends", serializedReferencesByKey);
+    public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) =>
+        @delegate.UnknownClassifier(id, metaPointer);
 
-                    var resolvedInterfaces =
-                        ResolveMultiRef<Interface>("Annotation-implements", serializedReferencesByKey);
-                    annotation.AddImplements(FilterLinkedInterfaces(resolvedInterfaces, annotation.Implements));
-                    annotation.Annotates =
-                        ResolveSingleRef<Classifier>("Annotation-annotates", serializedReferencesByKey);
-                    break;
-                }
-            case DynamicConcept concept:
-                {
-                    concept.Extends = ResolveSingleRef<Concept>("Concept-extends", serializedReferencesByKey);
-                    var resolvedInterfaces =
-                        ResolveMultiRef<Interface>("Concept-implements", serializedReferencesByKey);
-                    concept.AddImplements(FilterLinkedInterfaces(resolvedInterfaces, concept.Implements));
-                    break;
-                }
-            case DynamicContainment containment:
-                {
-                    containment.Type = ResolveSingleRef<Classifier>("Link-type", serializedReferencesByKey);
-                    break;
-                }
-            case DynamicEnumeration:
-                {
-                    break;
-                }
-            case DynamicEnumerationLiteral:
-                {
-                    break;
-                }
-            case DynamicInterface @interface:
-                {
-                    var resolvedInterfaces = ResolveMultiRef<Interface>("Interface-extends", serializedReferencesByKey);
-                    @interface.AddExtends(FilterLinkedInterfaces(resolvedInterfaces, @interface.Extends));
-                    break;
-                }
-            case DynamicLanguage:
-                {
-                    // TODO  dependsOn? -> dependent languages (insofar present and != BuiltIns)
-                    break;
-                }
-            case DynamicPrimitiveType:
-                {
-                    break;
-                }
-            case DynamicProperty property:
-                {
-                    property.Type = ResolveSingleRef<Datatype>("Property-type", serializedReferencesByKey);
-                    break;
-                }
-            case DynamicReference reference:
-                {
-                    reference.Type = ResolveSingleRef<Classifier>("Link-type", serializedReferencesByKey);
-                    break;
-                }
-            default:
-                {
-                    LogError($"installing references in node of meta-concept {node.GetType().Name} not implemented");
-                    break;
-                }
-        }
-    }
+    public Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        IReadableNode node) =>
+        @delegate.UnknownFeature(classifier, compressedMetaPointer, node);
 
-    private T? ResolveSingleRef<T>(string key, ILookup<string, IKeyed> serializedReferencesByKey)
-        where T : class, IKeyed
-    {
-        if (serializedReferencesByKey.Contains(key) && serializedReferencesByKey[key].Count() == 1)
-            return serializedReferencesByKey[key].Cast<T>().First();
+    public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        INode node) where TFeature : class, Feature =>
+        @delegate.InvalidFeature<TFeature>(classifier, compressedMetaPointer, node);
 
-        return null;
-    }
+    public INode? UnknownChild(CompressedId childId, IWritableNode node) =>
+        @delegate.UnknownChild(childId, node);
 
-    private IEnumerable<T> ResolveMultiRef<T>(string key, ILookup<string, IKeyed> serializedReferencesByKey)
-        where T : class, IKeyed
-    {
-        if (serializedReferencesByKey.Contains(key))
-            return serializedReferencesByKey[key].Cast<T>();
+    public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
+        @delegate.UnknownReference(targetId, resolveInfo, node);
 
-        return [];
-    }
+    public INode? UnknownAnnotation(CompressedId annotationId, INode node) =>
+        @delegate.UnknownAnnotation(annotationId, node);
 
-    private static IEnumerable<Interface> FilterLinkedInterfaces(IEnumerable<Interface> resolvedInterfaces,
-        IEnumerable<Interface> linkedInterfaces) =>
-        resolvedInterfaces.Except(linkedInterfaces, new LanguageEntityIdentityComparer()).OfType<Interface>();
+    public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+        @delegate.InvalidAnnotation(annotation, node);
 
-    protected virtual void LogError(string message) =>
-        Console.Error.WriteLine(message);
+    public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
+        @delegate.UnknownEnumerationLiteral(nodeId, enumeration, key);
 
-    protected virtual void LogWarn(string message) =>
-        Console.Error.WriteLine(message);
+    public object? UnknownDatatype(string nodeId, Property property, string? value) =>
+        @delegate.UnknownDatatype(nodeId, property, value);
+
+    public bool SkipDeserializingDependentNode(string id) =>
+        @delegate.SkipDeserializingDependentNode(id);
+
+    public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        IReadableNode node) where TFeature : class, Feature =>
+        @delegate.InvalidFeature<TFeature>(classifier, compressedMetaPointer, node);
+
+    public void InvalidContainment(IReadableNode node) =>
+        @delegate.InvalidContainment(node);
+
+    public void InvalidReference(IReadableNode node) =>
+        @delegate.InvalidReference(node);
+
+    public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
+        @delegate.InvalidAnnotationParent(annotation, parentId);
 }

@@ -20,13 +20,32 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
+using Utilities;
 
-public abstract class SerializerBase
+public abstract class SerializerBase : ISerializer
 {
+    private readonly HashSet<Language> _usedLanguages = new();
+
+    /// <inheritdoc />
+    public ISerializerHandler Handler { get; init; } = new SerializerExceptionHandler();
+
+    /// <inheritdoc />
+    public IEnumerable<SerializedLanguageReference> UsedLanguages =>
+        _usedLanguages.Select(SerializeLanguageReference);
+
+
+    /// <summary>
+    /// Whether we store uncompressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
+    /// Uses more memory, but very helpful for debugging. 
+    /// </summary>
+    public bool StoreUncompressedIds { get; init; } = false;
+
+    public abstract IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes);
+
     protected SerializedLanguageReference SerializeLanguageReference(Language language) =>
         new() { Key = language.Key, Version = language.Version };
 
-    protected SerializedProperty SerializePropertySetting(IReadableNode node, Property property)
+    protected SerializedProperty SerializeProperty(IReadableNode node, Property property)
     {
         var value = GetValueIfSet(node, property);
 
@@ -36,26 +55,21 @@ public abstract class SerializerBase
             Value = property.Type switch
             {
                 _ when value == null => null,
-                PrimitiveType => AsString(value),
-                Enumeration => (value as Enum).LionCoreKey(),
-                _ => throw new ArgumentException($"unsupported property: {property}", nameof(property))
+                PrimitiveType => ConvertPrimitiveType(value),
+                Enumeration when value is Enum e => e.LionCoreKey(),
+                _ => Handler.UnknownDatatype(node, property, value)
             }
         };
     }
 
-    protected SerializedReferenceTarget SerializeReferenceTarget(IReadableNode target)
-    {
-        var resolveInfo = target switch
-        {
-            INamed namedTarget when namedTarget.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name)
-                => namedTarget.Name,
-            _ => null
-        };
-        return new() { Reference = target.GetId(), ResolveInfo = resolveInfo };
-    }
+    protected SerializedReferenceTarget SerializeReferenceTarget(IReadableNode? target) =>
+        new() { Reference = target?.GetId(), ResolveInfo = target.GetNodeName() };
 
     protected object? GetValueIfSet(IReadableNode node, Feature feature) =>
         node.CollectAllSetFeatures().Contains(feature) ? node.Get(feature) : null;
+
+    protected CompressedId Compress(string id) =>
+        CompressedId.Create(id, StoreUncompressedIds);
 
     /// <summary>
     /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
@@ -64,57 +78,92 @@ public abstract class SerializerBase
     /// <em>Note!</em> No exception is thrown when the given runtime value doesn't correspond to a primitive type defined here.
     /// Instead, the runtime value is simply coerced to a string using its <c>ToString</c> method.
     /// </summary>
-    private string? AsString(object? value)
-        => value switch
+    private string? ConvertPrimitiveType(object? value) => value switch
+    {
+        null => null,
+        bool boolean => boolean ? "true" : "false",
+        string @string => @string,
+        _ => value.ToString()
+    };
+
+    protected SerializedNode SerializeSimpleNode(IReadableNode node)
+    {
+        Classifier classifier = node switch
         {
-            null => null,
-            bool boolean => boolean ? "true" : "false",
-            string @string => @string,
-            _ => value.ToString() // Integer, Json (and anything else)
+            Language => M3Language.Instance.Language,
+            Annotation => M3Language.Instance.Annotation,
+            Concept => M3Language.Instance.Concept,
+            Interface => M3Language.Instance.Interface,
+            Enumeration => M3Language.Instance.Enumeration,
+            PrimitiveType => M3Language.Instance.PrimitiveType,
+            EnumerationLiteral => M3Language.Instance.EnumerationLiteral,
+            Property => M3Language.Instance.Property,
+            Containment => M3Language.Instance.Containment,
+            Reference => M3Language.Instance.Reference,
+            _ => node.GetClassifier()
         };
 
-    protected virtual void LogError(string message) =>
-        Console.Error.WriteLine(message);
-
-    protected SerializedNode SerializeSimpleNode(IReadableNode node) =>
-        new()
+        return new()
         {
             Id = node.GetId(),
-            Classifier = node.GetClassifier().ToMetaPointer(),
-            Properties = node.GetClassifier().AllFeatures().OfType<Property>()
-                .Select(property => SerializePropertySetting(node, property)).ToArray(),
-            Containments = node.GetClassifier().AllFeatures().OfType<Containment>()
+            Classifier = classifier.ToMetaPointer(),
+            Properties = classifier.AllFeatures().OfType<Property>()
+                .Select(property => SerializeProperty(node, property)).ToArray(),
+            Containments = classifier.AllFeatures().OfType<Containment>()
                 .Select<Containment, SerializedContainment>(containment =>
-                    SerializedContainmentSetting(node, containment)).ToArray(),
-            References = node.GetClassifier().AllFeatures().OfType<Reference>()
-                .Select<Reference, SerializedReference>(reference => SerializedReferenceSetting(node, reference))
+                    SerializeContainmentsOf(node, containment)).ToArray(),
+            References = classifier.AllFeatures().OfType<Reference>()
+                .Select<Reference, SerializedReference>(reference => SerializeReferencesOf(node, reference))
                 .ToArray(),
             Annotations = node.GetAnnotations()
                 .Select(annotation => annotation.GetId()).ToArray(),
             Parent = node.GetParent()?.GetId()
         };
-
-    private SerializedContainment SerializedContainmentSetting(IReadableNode node, Containment containment)
-    {
-        var value = GetValueIfSet(node, containment);
-        return new SerializedContainment
-        {
-            Containment = containment.ToMetaPointer(),
-            Children = value != null
-                ? containment.AsNodes<INode>(value).Select((child) => child.GetId()).ToArray()
-                : []
-        };
     }
 
-    private SerializedReference SerializedReferenceSetting(IReadableNode node, Reference reference)
+    private SerializedContainment SerializeContainmentsOf(IReadableNode node, Containment containment)
+    {
+        var value = GetValueIfSet(node, containment);
+        return SerializeContainment(value != null ? containment.AsNodes<IReadableNode>(value) : [], containment);
+    }
+
+    private SerializedReference SerializeReferencesOf(IReadableNode node, Reference reference)
     {
         var value = GetValueIfSet(node, reference);
-        return new()
+        return SerializeReference(value != null ? reference.AsNodes<IReadableNode>(value) : [], reference);
+    }
+
+    protected SerializedContainment SerializeContainment(
+        IEnumerable<IReadableNode> children,
+        Containment containment) =>
+        new()
+        {
+            Containment = containment.ToMetaPointer(),
+            Children = children.Select((child) => child.GetId()).ToArray()
+        };
+
+    protected SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Reference reference) =>
+        new()
         {
             Reference = reference.ToMetaPointer(),
-            Targets = value != null
-                ? reference.AsNodes<INode>(value).Select(SerializeReferenceTarget).ToArray()
-                : []
+            Targets = targets.Where(t => t != null).Select(SerializeReferenceTarget).ToArray()
         };
+
+    protected void RegisterUsedLanguage(IReadableNode node)
+    {
+        Language language = node.GetClassifier().GetLanguage();
+        if (language.Key == BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
+            return;
+
+        Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.EqualsIdentity(language));
+        if (existingLanguage == null)
+        {
+            _usedLanguages.Add(language);
+            return;
+        }
+
+        Language? altLanguage = Handler.DuplicateUsedLanguage(existingLanguage, language);
+        if (altLanguage != null)
+            _usedLanguages.Add(altLanguage);
     }
 }

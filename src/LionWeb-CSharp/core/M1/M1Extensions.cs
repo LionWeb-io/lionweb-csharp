@@ -164,6 +164,20 @@ public static class M1Extensions
     public static IEnumerable<INode> Ancestors(this INode self, bool includeSelf = false) =>
         Ancestors<INode>(self, includeSelf);
 
+    public static string? GetNodeName(this IReadableNode self)
+    {
+        try
+        {
+            if (self.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name))
+                return self.Get(BuiltInsLanguage.Instance.INamed_name) as string ?? null;
+
+            return null;
+        } catch (UnsetFeatureException)
+        {
+            return null;
+        }
+    }
+
     internal static IEnumerable<T> Descendants<T>(T self, bool includeSelf = false,
         bool includeAnnotations = false) where T : class, IReadableNode
     {

@@ -25,8 +25,8 @@ public class DuplicateIdChecker
 {
     private readonly HashSet<CompressedId> _knownIds = new();
 
-    public bool IsIdDuplicate(string id) =>
-        !_knownIds.Add(CompressedId.Create(id));
+    public bool IsIdDuplicate(CompressedId compressedId) =>
+        !_knownIds.Add(compressedId);
 }
 
 public interface CompressedElement
@@ -38,15 +38,16 @@ public interface CompressedElement
         left.SequenceEqual(right);
 }
 
-public readonly struct CompressedId(byte[] identifier) : CompressedElement
+public readonly struct CompressedId(byte[] identifier, string? original) : CompressedElement
 {
     public byte[] Identifier { get; } = identifier;
+    public string? Original { get; } = original;
 
-    public static CompressedId Create(string id)
+    public static CompressedId Create(string id, bool keepOriginal)
     {
         var sha1 = SHA1.Create();
         var idHash = sha1.ComputeHash(CompressedElement.AsBytes(id));
-        return new CompressedId(idHash);
+        return new CompressedId(idHash, keepOriginal ? id : null);
     }
 
     /// <inheritdoc />
@@ -56,19 +57,24 @@ public readonly struct CompressedId(byte[] identifier) : CompressedElement
     /// <inheritdoc />
     public override bool Equals(object? other) =>
         other is CompressedId id && CompressedElement.Equals(Identifier, id.Identifier);
+
+    /// <inheritdoc />
+    public override string ToString() =>
+        Original ?? BitConverter.ToString(Identifier);
 }
 
-public readonly struct CompressedMetaPointer(byte[] identifier) : CompressedElement
+public readonly struct CompressedMetaPointer(byte[] identifier, MetaPointer? original) : CompressedElement
 {
     public byte[] Identifier { get; } = identifier;
+    public MetaPointer? Original { get; } = original;
 
-    public static CompressedMetaPointer Create(MetaPointer metaPointer)
+    public static CompressedMetaPointer Create(MetaPointer metaPointer, bool keepOriginal)
     {
         var sha1 = SHA1.Create();
         sha1.ComputeHash(CompressedElement.AsBytes(metaPointer.Language));
         sha1.ComputeHash(CompressedElement.AsBytes(metaPointer.Version));
         sha1.ComputeHash(CompressedElement.AsBytes(metaPointer.Key));
-        return new CompressedMetaPointer(sha1.Hash!);
+        return new CompressedMetaPointer(sha1.Hash!, keepOriginal ? metaPointer : null);
     }
 
     /// <inheritdoc />
@@ -78,4 +84,8 @@ public readonly struct CompressedMetaPointer(byte[] identifier) : CompressedElem
     /// <inheritdoc />
     public override bool Equals(object? other) =>
         other is CompressedMetaPointer id && CompressedElement.Equals(Identifier, id.Identifier);
+
+    /// <inheritdoc />
+    public override string ToString() =>
+        Original?.ToString() ?? BitConverter.ToString(Identifier);
 }
