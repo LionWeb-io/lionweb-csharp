@@ -111,4 +111,21 @@ public static class ReferenceUtils
     public static IEnumerable<ReferenceValue> FindIncomingReferences(IReadableNode targetNode,
         IEnumerable<IReadableNode> scope)
         => FindIncomingReferences([targetNode], scope);
+
+    /// <summary>
+    /// Finds all references to nodes that are not in the given <paramref name="scope"/>, as <see cref="ReferenceValue"/>s.
+    /// To search within all nodes under a collection of root nodes,
+    /// pass <c>rootNodes.SelectMany(rootNode => rootNode.Descendants(true, true)</c> as scope.
+    /// Note that any reference is found uniquely,
+    /// i.e. the returned <see cref="ReferenceValue"/>s are pairwise distinct,
+    /// even if <paramref name="scope"/> contains duplicate nodes.
+    /// </summary>
+    /// <param name="scope">The <see cref="IReadableNode"/>s that form the scope of “reachable” nodes</param>
+    /// <returns>An enumeration of references to nodes that are not in the given scope, as <see cref="ReferenceValue"/>s.</returns>
+    public static IEnumerable<ReferenceValue> ReferencesToOutOfScopeNodes(IEnumerable<IReadableNode> scope)
+    {
+        var scopeAsSet = new HashSet<IReadableNode>(scope);
+        return ReferenceValues(scope)
+            .Where(referenceValue => !scopeAsSet.Contains(referenceValue.TargetNode));
+    }
 }
