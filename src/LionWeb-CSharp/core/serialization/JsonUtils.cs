@@ -81,8 +81,8 @@ public static class JsonUtils
                     string? version = streamReader.GetString();
                     if (version != ReleaseVersion.Current)
                     {
-                        
                     }
+
                     break;
 
                 case JsonTokenType.PropertyName when streamReader.GetString() == "nodes":
@@ -94,17 +94,9 @@ public static class JsonUtils
                     break;
 
                 case JsonTokenType.StartObject when insideNodes:
-                    try
-                    {
-                        var serializedNode = await streamReader.DeserializeAsync<SerializedNode>(_readOptions);
-                        if (serializedNode != null)
-                        {
-                            await Task.Run(() => deserializer.Process(serializedNode));
-                        }
-                    } catch
-                    {
-                        // grouping awaits, see https://learn.microsoft.com/en-us/dotnet/standard/asynchronous-programming-patterns/consuming-the-task-based-asynchronous-pattern#interleaving
-                    }
+                    var serializedNode = await streamReader.DeserializeAsync<SerializedNode>(_readOptions);
+                    if (serializedNode != null)
+                        deserializer.Process(serializedNode);
 
                     break;
             }
@@ -120,11 +112,14 @@ public static class JsonUtils
 internal class LazySerializationChunk
 {
     /// <inheritdoc cref="SerializationChunk.SerializationFormatVersion"/>
-    [JsonPropertyOrder(0)] public string SerializationFormatVersion { get; init; }
+    [JsonPropertyOrder(0)]
+    public string SerializationFormatVersion { get; init; }
 
     /// <inheritdoc cref="SerializationChunk.Nodes"/>
-    [JsonPropertyOrder(1)] public IEnumerable<SerializedNode> Nodes { get; init; }
+    [JsonPropertyOrder(1)]
+    public IEnumerable<SerializedNode> Nodes { get; init; }
 
     /// <inheritdoc cref="SerializationChunk.Languages"/>
-    [JsonPropertyOrder(2)] public IEnumerable<SerializedLanguageReference> Languages { get; init; }
+    [JsonPropertyOrder(2)]
+    public IEnumerable<SerializedLanguageReference> Languages { get; init; }
 }
