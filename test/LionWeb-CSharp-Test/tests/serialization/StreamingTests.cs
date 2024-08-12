@@ -15,14 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test;
+namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.M2;
-using M1;
-using M3;
-using Serialization;
+using LionWeb.Core;
+using LionWeb.Core.M1;
+using LionWeb.Core.M3;
+using LionWeb.Core.Serialization;
 using System.Diagnostics;
-using System.Reflection;
 
 [TestClass]
 public class StreamingTests
@@ -34,8 +34,8 @@ public class StreamingTests
         _language = ShapesLanguage.Instance;
     }
 
-    // private const long _maxSize = 1_500_000L;
-    private const long _maxSize = 1_500L;
+    private const long _maxSize = 1_500_000L;
+    // private const long _maxSize = 1_500L;
 
     [TestMethod]
     public void MassSerialization()
@@ -93,8 +93,9 @@ public class StreamingTests
     public void MassDeserialization()
     {
         using Stream stream =
-            Assembly.GetExecutingAssembly().GetManifestResourceStream("LionWeb_CSharp_Test.resources.expected.json") ??
-            throw new AssertFailedException();
+            File.OpenRead("output.json");
+        // Assembly.GetExecutingAssembly().GetManifestResourceStream("LionWeb_CSharp_Test.resources.expected.json") ??
+        //     throw new AssertFailedException();
 
         var deserializer = new DeserializerBuilder()
             .WithLanguage(_language)

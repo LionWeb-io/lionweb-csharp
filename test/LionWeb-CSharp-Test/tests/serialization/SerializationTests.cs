@@ -15,18 +15,19 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test;
+namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.Dynamic;
 using Examples.Shapes.M2;
-using M1;
-using M2;
-using M2.Generated.Test;
-using M3;
-using Serialization;
+using LionWeb.Core;
+using LionWeb.Core.M1;
+using LionWeb.Core.M2;
+using LionWeb.Core.M2.Generated.Test;
+using LionWeb.Core.M3;
+using LionWeb.Core.Serialization;
+using LionWeb.Core.Utilities;
 using System.Collections;
-using Utilities;
-using Comparer = Utilities.Comparer;
+using Comparer = LionWeb.Core.Utilities.Comparer;
 
 [TestClass]
 public class SerializationTests

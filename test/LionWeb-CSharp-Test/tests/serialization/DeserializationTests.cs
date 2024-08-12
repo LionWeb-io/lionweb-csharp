@@ -15,13 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test;
+namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.M2;
-using M1;
-using M2;
-using Serialization;
-using Utilities;
+using LionWeb.Core;
+using LionWeb.Core.M1;
+using LionWeb.Core.M2;
+using LionWeb.Core.Serialization;
+using LionWeb.Core.Utilities;
 
 [TestClass]
 public class DeserializationTests

@@ -29,19 +29,19 @@ public class DuplicateIdChecker
         !_knownIds.Add(compressedId);
 }
 
-public interface CompressedElement
+/// <summary>
+/// Stores a LionWeb node id in a compact format, optionally preserving the original.
+/// </summary>
+public readonly struct CompressedId
 {
-    protected static byte[] AsBytes(string str) =>
-        Encoding.ASCII.GetBytes(str);
+    private CompressedId(byte[] identifier, string? original)
+    {
+        Identifier = identifier;
+        Original = original;
+    }
 
-    protected static bool Equals(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right) =>
-        left.SequenceEqual(right);
-}
-
-public readonly struct CompressedId(byte[] identifier, string? original) : CompressedElement
-{
-    public byte[] Identifier { get; } = identifier;
-    public string? Original { get; } = original;
+    private byte[] Identifier { get; }
+    public string? Original { get; }
 
     public static CompressedId Create(string id, bool keepOriginal)
     {
@@ -63,17 +63,29 @@ public readonly struct CompressedId(byte[] identifier, string? original) : Compr
         Original ?? BitConverter.ToString(Identifier);
 }
 
-public readonly struct CompressedMetaPointer(byte[] identifier, MetaPointer? original) : CompressedElement
+/// <summary>
+/// Stores a LionWeb MetaPointer in a compact format, optionally preserving the original.
+/// </summary>
+public readonly struct CompressedMetaPointer
 {
-    public byte[] Identifier { get; } = identifier;
-    public MetaPointer? Original { get; } = original;
+    private CompressedMetaPointer(byte[] identifier, MetaPointer? original)
+    {
+        Identifier = identifier;
+        Original = original;
+    }
+
+    private byte[] Identifier { get; }
+    public MetaPointer? Original { get; }
 
     public static CompressedMetaPointer Create(MetaPointer metaPointer, bool keepOriginal)
     {
         var sha1 = SHA1.Create();
-        sha1.ComputeHash(CompressedElement.AsBytes(metaPointer.Language));
-        sha1.ComputeHash(CompressedElement.AsBytes(metaPointer.Version));
-        sha1.ComputeHash(CompressedElement.AsBytes(metaPointer.Key));
+        var langBuf = CompressedElement.AsBytes(metaPointer.Language);
+        sha1.TransformBlock(langBuf, 0, langBuf.Length, null, 0);
+        var verBuf = CompressedElement.AsBytes(metaPointer.Version);
+        sha1.TransformBlock(verBuf, 0, verBuf.Length, null, 0);
+        var keyBuf = CompressedElement.AsBytes(metaPointer.Key);
+        sha1.TransformFinalBlock(keyBuf, 0, keyBuf.Length);
         return new CompressedMetaPointer(sha1.Hash!, keepOriginal ? metaPointer : null);
     }
 
@@ -88,4 +100,13 @@ public readonly struct CompressedMetaPointer(byte[] identifier, MetaPointer? ori
     /// <inheritdoc />
     public override string ToString() =>
         Original?.ToString() ?? BitConverter.ToString(Identifier);
+}
+
+internal static class CompressedElement
+{
+    internal static byte[] AsBytes(string str) =>
+        Encoding.ASCII.GetBytes(str);
+
+    internal static bool Equals(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right) =>
+        left.SequenceEqual(right);
 }
