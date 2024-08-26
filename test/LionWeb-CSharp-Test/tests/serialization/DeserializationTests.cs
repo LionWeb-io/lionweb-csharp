@@ -532,4 +532,125 @@ public class DeserializationTests
     }
 
     #endregion
+
+    #region unknown_parent
+
+    [TestMethod]
+    public void test_deserialization_of_a_node_with_unknown_parent_throws_exception_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "bar"
+                }
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<DeserializerException>((() => deserializer.Deserialize(serializationChunk)));
+    }
+
+    private class UnknownParentHandler(Func<INode?> incrementer) : IDeserializerHandler
+    {
+        public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) => throw new NotImplementedException();
+
+        public Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+            IReadableNode node) => throw new NotImplementedException();
+
+        public INode? UnknownParent(CompressedId parentId, INode node)
+            => incrementer();
+
+        public INode? UnknownChild(CompressedId childId, IWritableNode node) => throw new NotImplementedException();
+
+        public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
+            throw new NotImplementedException();
+
+        public INode? UnknownAnnotation(CompressedId annotationId, INode node) => throw new NotImplementedException();
+
+        public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+            throw new NotImplementedException();
+
+        public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
+            throw new NotImplementedException();
+
+        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
+            throw new NotImplementedException();
+
+        public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
+
+        public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+            IReadableNode node) where TFeature : class, Feature =>
+            throw new NotImplementedException();
+
+        public void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
+
+        public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
+
+        public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
+            throw new NotImplementedException();
+    }
+
+    [TestMethod]
+    public void test_deserialization_of_a_node_with_unknown_parent_custom_handler_returns_null_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "bar"
+                }
+            ]
+        };
+
+        var count = 0;
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new UnknownParentHandler(() =>
+            {
+                Interlocked.Increment(ref count);
+                return null;
+            }))
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        try
+        {
+            deserializer.Deserialize(serializationChunk);
+        } catch (InvalidOperationException _)
+        {
+        }
+    }
+
+    #endregion
 }
