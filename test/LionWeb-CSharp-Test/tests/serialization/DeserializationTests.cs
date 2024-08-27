@@ -281,6 +281,49 @@ public class DeserializationTests
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
+    private abstract class NotImplementedDeserializerHandler : IDeserializerHandler
+    {
+        public virtual Classifier? UnknownClassifier(string id, MetaPointer metaPointer) =>
+            throw new NotImplementedException();
+
+        public virtual Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+            IReadableNode node) => throw new NotImplementedException();
+
+        public virtual INode? UnknownParent(CompressedId parentId, INode node) => throw new NotImplementedException();
+
+        public virtual INode? UnknownChild(CompressedId childId, IWritableNode node) =>
+            throw new NotImplementedException();
+
+        public virtual IReadableNode?
+            UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
+            throw new NotImplementedException();
+
+        public virtual INode? UnknownAnnotation(CompressedId annotationId, INode node) =>
+            throw new NotImplementedException();
+
+        public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+            throw new NotImplementedException();
+
+        public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
+            throw new NotImplementedException();
+
+        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
+            throw new NotImplementedException();
+
+        public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
+
+        public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+            IReadableNode node) where TFeature : class, Feature =>
+            throw new NotImplementedException();
+
+        public void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
+
+        public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
+
+        public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
+            throw new NotImplementedException();
+    }
+
     #region unknown_classifier
 
     [TestMethod]
@@ -312,43 +355,9 @@ public class DeserializationTests
         Assert.ThrowsException<UnsupportedClassifierException>(() => deserializer.Deserialize(serializationChunk));
     }
 
-    private class UnknownClassifierHandler(Func<Classifier?> incrementer) : IDeserializerHandler
+    private class UnknownClassifierHandler(Func<Classifier?> incrementer) : NotImplementedDeserializerHandler
     {
-        public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) => incrementer();
-
-        public Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) => throw new NotImplementedException();
-
-        public INode? UnknownParent(CompressedId parentId, INode node) => throw new NotImplementedException();
-
-        public INode? UnknownChild(CompressedId childId, IWritableNode node) => throw new NotImplementedException();
-
-        public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public INode? UnknownAnnotation(CompressedId annotationId, INode node) => throw new NotImplementedException();
-
-        public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
-            throw new NotImplementedException();
-
-        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
-            throw new NotImplementedException();
-
-        public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
-
-        public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) where TFeature : class, Feature =>
-            throw new NotImplementedException();
-
-        public void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
-
-        public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
-
-        public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
-            throw new NotImplementedException();
+        public override Classifier? UnknownClassifier(string id, MetaPointer metaPointer) => incrementer();
     }
 
     [TestMethod]
@@ -439,44 +448,11 @@ public class DeserializationTests
         Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
     }
 
-    private class UnknownFeatureHandler(Func<Feature?> incrementer) : IDeserializerHandler
+    private class UnknownFeatureHandler(Func<Feature?> incrementer) : NotImplementedDeserializerHandler
     {
-        public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) => throw new NotImplementedException();
-
-        public Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        public override Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
             IReadableNode node)
             => incrementer();
-
-        public INode? UnknownParent(CompressedId parentId, INode node) => throw new NotImplementedException();
-
-        public INode? UnknownChild(CompressedId childId, IWritableNode node) => throw new NotImplementedException();
-
-        public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public INode? UnknownAnnotation(CompressedId annotationId, INode node) => throw new NotImplementedException();
-
-        public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
-            throw new NotImplementedException();
-
-        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
-            throw new NotImplementedException();
-
-        public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
-
-        public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) where TFeature : class, Feature =>
-            throw new NotImplementedException();
-
-        public void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
-
-        public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
-
-        public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
-            throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -568,44 +544,10 @@ public class DeserializationTests
         Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
     }
 
-    private class UnknownParentHandler(Func<INode?> incrementer) : IDeserializerHandler
+    private class UnknownParentHandler(Func<INode?> incrementer) : NotImplementedDeserializerHandler
     {
-        public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) => throw new NotImplementedException();
-
-        public Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) => throw new NotImplementedException();
-
-        public INode? UnknownParent(CompressedId parentId, INode node)
+        public override INode? UnknownParent(CompressedId parentId, INode node)
             => incrementer();
-
-        public INode? UnknownChild(CompressedId childId, IWritableNode node) => throw new NotImplementedException();
-
-        public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public INode? UnknownAnnotation(CompressedId annotationId, INode node) => throw new NotImplementedException();
-
-        public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
-            throw new NotImplementedException();
-
-        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
-            throw new NotImplementedException();
-
-        public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
-
-        public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) where TFeature : class, Feature =>
-            throw new NotImplementedException();
-
-        public void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
-
-        public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
-
-        public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
-            throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -696,44 +638,10 @@ public class DeserializationTests
         Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
     }
 
-    private class UnknownChildHandler(Func<INode?> incrementer) : IDeserializerHandler
+    private class UnknownChildHandler(Func<INode?> incrementer) : NotImplementedDeserializerHandler
     {
-        public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) => throw new NotImplementedException();
-
-        public Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) => throw new NotImplementedException();
-
-        public INode? UnknownParent(CompressedId parentId, INode node) => throw new NotImplementedException();
-
-        public INode? UnknownChild(CompressedId childId, IWritableNode node)
+        public override INode? UnknownChild(CompressedId childId, IWritableNode node)
             => incrementer();
-
-        public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public INode? UnknownAnnotation(CompressedId annotationId, INode node) => throw new NotImplementedException();
-
-        public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
-            throw new NotImplementedException();
-
-        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
-            throw new NotImplementedException();
-
-        public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
-
-        public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) where TFeature : class, Feature =>
-            throw new NotImplementedException();
-
-        public void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
-
-        public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
-
-        public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
-            throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -833,43 +741,10 @@ public class DeserializationTests
         Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
     }
 
-    private class UnknownReferenceHandler(Func<IReadableNode?> incrementer) : IDeserializerHandler
+    private class UnknownReferenceHandler(Func<IReadableNode?> incrementer) : NotImplementedDeserializerHandler
     {
-        public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) => throw new NotImplementedException();
-
-        public Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) => throw new NotImplementedException();
-
-        public INode? UnknownParent(CompressedId parentId, INode node) => throw new NotImplementedException();
-
-        public INode? UnknownChild(CompressedId childId, IWritableNode node) => throw new NotImplementedException();
-
-        public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node)
+        public override IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node)
             => incrementer();
-
-        public INode? UnknownAnnotation(CompressedId annotationId, INode node) => throw new NotImplementedException();
-
-        public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
-            throw new NotImplementedException();
-
-        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
-            throw new NotImplementedException();
-
-        public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
-
-        public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) where TFeature : class, Feature =>
-            throw new NotImplementedException();
-
-        public void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
-
-        public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
-
-        public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
-            throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -963,44 +838,10 @@ public class DeserializationTests
         Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
     }
 
-    private class UnknownAnnotationHandler(Func<INode?> incrementer) : IDeserializerHandler
+    private class UnknownAnnotationHandler(Func<INode?> incrementer) : NotImplementedDeserializerHandler
     {
-        public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) => throw new NotImplementedException();
-
-        public Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) => throw new NotImplementedException();
-
-        public INode? UnknownParent(CompressedId parentId, INode node) => throw new NotImplementedException();
-
-        public INode? UnknownChild(CompressedId childId, IWritableNode node) => throw new NotImplementedException();
-
-        public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public INode? UnknownAnnotation(CompressedId annotationId, INode node)
+        public override INode? UnknownAnnotation(CompressedId annotationId, INode node)
             => incrementer();
-
-        public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
-            throw new NotImplementedException();
-
-        public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
-            throw new NotImplementedException();
-
-        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
-            throw new NotImplementedException();
-
-        public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
-
-        public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) where TFeature : class, Feature =>
-            throw new NotImplementedException();
-
-        public void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
-
-        public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
-
-        public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
-            throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -1044,7 +885,7 @@ public class DeserializationTests
         } catch (InvalidOperationException)
         {
         }
-        
+
         Assert.AreEqual(1, count);
     }
 
