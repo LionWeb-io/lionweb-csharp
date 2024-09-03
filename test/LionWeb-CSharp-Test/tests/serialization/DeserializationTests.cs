@@ -312,7 +312,8 @@ public class DeserializationTests
 
         public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
 
-        public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        public virtual TFeature? InvalidFeature<TFeature>(Classifier classifier,
+            CompressedMetaPointer compressedMetaPointer,
             IReadableNode node) where TFeature : class, Feature =>
             throw new NotImplementedException();
 
@@ -887,6 +888,45 @@ public class DeserializationTests
         }
 
         Assert.AreEqual(1, count);
+    }
+
+    #endregion
+
+    #region invalid_feature
+
+    [TestMethod]
+    public void test_deserialization_of_a_node_with_invalid_feature_throws_exception_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties =
+                    [
+                        new SerializedProperty { Property = new MetaPointer("key-Shapes", "2", "key-x"), Value = "1" }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
     }
 
     #endregion
