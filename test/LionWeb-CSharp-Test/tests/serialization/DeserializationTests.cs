@@ -18,6 +18,7 @@
 namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.M2;
+using Examples.WithEnum.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
@@ -304,7 +305,7 @@ public class DeserializationTests
         public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
             throw new NotImplementedException();
 
-        public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
+        public virtual Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
             throw new NotImplementedException();
 
         public object? UnknownDatatype(string nodeId, Property property, string? value) =>
@@ -927,6 +928,106 @@ public class DeserializationTests
             .Build();
 
         Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    #endregion
+
+    #region unknown_enumeration_literal
+
+    [TestMethod]
+    public void test_deserialization_of_a_node_with_unknown_enumeration_literal_throws_exception_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "WithEnum", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("WithEnum", "1", "EnumHolder"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("WithEnum", "1", "enumValue"), Value = "unknown"
+                        }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(WithEnumLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    private class UnknownEnumerationLiteralHandler(Func<Enum?> incrementer) : NotImplementedDeserializerHandler
+    {
+        public override Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key)
+            => incrementer();
+    }
+
+    [TestMethod]
+    public void
+        test_deserialization_of_a_node_with_unknown_enumeration_literal_custom_handler_returns_null_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "WithEnum", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("WithEnum", "1", "EnumHolder"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("WithEnum", "1", "enumValue"), Value = "unknown"
+                        }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var count = 0;
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new UnknownEnumerationLiteralHandler(() =>
+            {
+                Interlocked.Increment(ref count);
+                return null;
+            }))
+            .WithLanguage(WithEnumLanguage.Instance)
+            .Build();
+
+        try
+        {
+            deserializer.Deserialize(serializationChunk);
+        } catch (InvalidOperationException _)
+        {
+        }
+
+        Assert.AreEqual(1, count);
     }
 
     #endregion
