@@ -19,6 +19,8 @@ namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.M2;
 using Examples.WithEnum.M2;
+using Examples.Library.M2;
+using Examples.TinyRefLang;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
@@ -318,7 +320,7 @@ public class DeserializationTests
             IReadableNode node) where TFeature : class, Feature =>
             throw new NotImplementedException();
 
-        public void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
+        public virtual void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
 
         public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
 
@@ -1086,8 +1088,7 @@ public class DeserializationTests
     }
 
     [TestMethod]
-    public void
-        test_deserialization_of_a_node_with_invalid_containment_multiple_children_throws_exception_does_not_fail()
+    public void test_deserialization_of_a_node_with_single_containment_expected_throws_exception_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -1142,6 +1143,193 @@ public class DeserializationTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(new DeserializerExceptionHandler())
             .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    private class InvalidContainmentHandler(Action incrementer) : NotImplementedDeserializerHandler
+    {
+        public override void InvalidContainment(IReadableNode node) => incrementer();
+    }
+
+    [TestMethod]
+    [Ignore("fails")]
+    public void test_deserialization_of_a_node_with_invalid_containment_custom_handler_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-center"), Children = ["bar"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "bar",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
+                    Properties = [],
+                    Containments =
+                    [
+                    ],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var count = 0;
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new InvalidContainmentHandler(() =>
+            {
+                Interlocked.Increment(ref count);
+            }))
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        try
+        {
+            deserializer.Deserialize(serializationChunk);
+        } catch (InvalidOperationException _)
+        {
+        }
+
+        Assert.AreEqual(1, count);
+    }
+
+    #endregion
+
+    #region invalid_reference
+
+    [TestMethod]
+    public void test_deserialization_of_a_node_with_invalid_reference_throws_exception_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "library", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("library", "1", "Book"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("library", "1", "author"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "author_1", ResolveInfo = "author" },
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "author_1",
+                    Classifier = new MetaPointer("library", "1", "Book"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(LibraryLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<UnsupportedClassifierException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    [TestMethod]
+    public void test_deserialization_of_a_node_with_single_reference_expected_throws_exception_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-tinyRefLang", Version = "0" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept-singularRef"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "ref_1", ResolveInfo = "ref"},
+                                new SerializedReferenceTarget { Reference = "ref_2", ResolveInfo = "ref"},
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "ref_1",
+                    Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+                
+                new SerializedNode
+                {
+                    Id = "ref_2",
+                    Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(TinyRefLangLanguage.Instance)
             .Build();
 
         Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
