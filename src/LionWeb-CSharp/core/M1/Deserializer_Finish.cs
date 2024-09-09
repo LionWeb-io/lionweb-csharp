@@ -85,16 +85,16 @@ public partial class Deserializer
 
             if (children.Count != 0)
             {
-                foreach (INode child in children.OfType<INode>()
-                             .Where(child => !child.GetClassifier().IsGeneralization(containment.Type)))
-                {
-                    throw new UnsupportedClassifierException(child.GetClassifier().ToMetaPointer());
-                }
-
                 if (children.Count > 1 && !containment.Multiple)
                 {
                     throw new InvalidValueException(containment,
                         "single containment is expected, but multiple children encountered");
+                }
+
+                foreach (INode child in children.OfType<INode>()
+                             .Where(child => !child.GetClassifier().IsGeneralization(containment.Type)))
+                {
+                    throw new UnsupportedClassifierException(child.GetClassifier().ToMetaPointer());
                 }
 
                 node.Set(
