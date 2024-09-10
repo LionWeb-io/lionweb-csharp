@@ -304,7 +304,7 @@ public class DeserializationTests
         public virtual INode? UnknownAnnotation(CompressedId annotationId, INode node) =>
             throw new NotImplementedException();
 
-        public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+        public virtual INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
             throw new NotImplementedException();
 
         public virtual Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
@@ -324,7 +324,7 @@ public class DeserializationTests
 
         public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
 
-        public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
+        public virtual IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
             throw new NotImplementedException();
     }
 
@@ -1297,8 +1297,8 @@ public class DeserializationTests
                             Reference = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept-singularRef"),
                             Targets =
                             [
-                                new SerializedReferenceTarget { Reference = "ref_1", ResolveInfo = "ref"},
-                                new SerializedReferenceTarget { Reference = "ref_2", ResolveInfo = "ref"},
+                                new SerializedReferenceTarget { Reference = "ref_1", ResolveInfo = "ref" },
+                                new SerializedReferenceTarget { Reference = "ref_2", ResolveInfo = "ref" },
                             ]
                         }
                     ],
@@ -1314,7 +1314,7 @@ public class DeserializationTests
                     References = [],
                     Annotations = [],
                 },
-                
+
                 new SerializedNode
                 {
                     Id = "ref_2",
@@ -1333,6 +1333,222 @@ public class DeserializationTests
             .Build();
 
         Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    #endregion
+
+    #region invalid_annotation
+
+    [TestMethod]
+    public void test_deserialization_of_a_node_with_invalid_annotation_throws_exception_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = ["lizard"],
+                },
+
+                new SerializedNode
+                {
+                    Id = "lizard",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    private class InvalidAnnotationHandler(Func<INode?> incrementer) : NotImplementedDeserializerHandler
+    {
+        public override INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+            incrementer();
+    }
+
+    [TestMethod]
+    public void test_deserialization_of_a_node_with_invalid_annotation_custom_handler_returns_null_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = ["lizard"],
+                },
+
+                new SerializedNode
+                {
+                    Id = "lizard",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var count = 0;
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new InvalidAnnotationHandler(() =>
+            {
+                Interlocked.Increment(ref count);
+                return null;
+            }))
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        try
+        {
+            deserializer.Deserialize(serializationChunk);
+        } catch (InvalidOperationException _)
+        {
+        }
+
+        Assert.AreEqual(1, count);
+    }
+
+    #endregion
+
+    #region invalid_annotation_parent
+
+    [TestMethod]
+    public void test_deserialization_of_a_node_with_invalid_annotation_parent_throws_exception_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = ["lizard"],
+                },
+
+                new SerializedNode
+                {
+                    Id = "lizard",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Documentation"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    private class InvalidAnnotationParentHandler(Func<IWritableNode?> incrementer) : NotImplementedDeserializerHandler
+    {
+        public override IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId)
+            => incrementer();
+    }
+
+
+    [TestMethod]
+    public void
+        test_deserialization_of_a_node_with_invalid_annotation_parent_custom_handler_returns_null_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = ["lizard"],
+                },
+
+                new SerializedNode
+                {
+                    Id = "lizard",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Documentation"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var count = 0;
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new InvalidAnnotationParentHandler(() =>
+            {
+                Interlocked.Increment(ref count);
+                return null;
+            }))
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        try
+        {
+            deserializer.Deserialize(serializationChunk);
+        } catch (InvalidOperationException _)
+        {
+        }
+        
+        Assert.AreEqual(1, count);
     }
 
     #endregion
