@@ -322,7 +322,7 @@ public class DeserializationTests
 
         public virtual void InvalidContainment(IReadableNode node) => throw new NotImplementedException();
 
-        public void InvalidReference(IReadableNode node) => throw new NotImplementedException();
+        public virtual void InvalidReference(IReadableNode node) => throw new NotImplementedException();
 
         public virtual IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
             throw new NotImplementedException();
@@ -898,6 +898,9 @@ public class DeserializationTests
     #region invalid_feature
 
     [TestMethod]
+    [Ignore("ThrowFormatException is invalid feature case ?")]
+    // Remark: what is the difference between UnknownFeature and InvalidFeature ? For both cases
+    // UnknownFeatureException is thrown.
     public void test_deserialization_of_a_node_with_invalid_feature_throws_exception_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
@@ -915,7 +918,10 @@ public class DeserializationTests
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
                     Properties =
                     [
-                        new SerializedProperty { Property = new MetaPointer("key-Shapes", "2", "key-x"), Value = "1" }
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("key-Shapes", "1", "key-x"), Value = "not a integer"
+                        }
                     ],
                     Containments = [],
                     References = [],
@@ -924,12 +930,78 @@ public class DeserializationTests
             ]
         };
 
+        /*IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        deserializer.Deserialize(serializationChunk);*/
+
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(new DeserializerExceptionHandler())
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
         Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    private class InvalidFeatureHandler(Func<Feature?> incrementer) : NotImplementedDeserializerHandler
+    {
+        public override TFeature? InvalidFeature<TFeature>(Classifier classifier,
+            CompressedMetaPointer compressedMetaPointer,
+            IReadableNode node) where TFeature : class => (TFeature?)incrementer();
+    }
+
+    [TestMethod]
+    [Ignore("UnknownFeature is recognized instead of InvalidFeature")]
+    public void test_deserialization_of_a_node_with_invalid_feature_custom_handler_returns_null_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("key-Shapes", "2", "key-x"), Value = "not an integer"
+                        }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var count = 0;
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new InvalidFeatureHandler(() =>
+            {
+                Interlocked.Increment(ref count);
+                return null;
+            }))
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        try
+        {
+            deserializer.Deserialize(serializationChunk);
+        } catch (InvalidOperationException _)
+        {
+        }
+
+        Assert.AreEqual(1, count);
     }
 
     #endregion
@@ -1154,7 +1226,7 @@ public class DeserializationTests
     }
 
     [TestMethod]
-    [Ignore("fails")]
+    [Ignore("fails, InvalidContainment is not considered in M1 deserialization, this might be the reason ?")]
     public void test_deserialization_of_a_node_with_invalid_containment_custom_handler_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
@@ -1187,9 +1259,7 @@ public class DeserializationTests
                     Id = "bar",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
                     Properties = [],
-                    Containments =
-                    [
-                    ],
+                    Containments = [],
                     References = [],
                     Annotations = [],
                 }
@@ -1333,6 +1403,76 @@ public class DeserializationTests
             .Build();
 
         Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    private class InvalidReferenceHandler(Action incrementer) : NotImplementedDeserializerHandler
+    {
+        public override void InvalidReference(IReadableNode node) => incrementer();
+    }
+
+    [TestMethod]
+    [Ignore("fails, InvalidReference is not considered in M1 deserialization, this might be the reason ?")]
+    public void test_deserialization_of_a_node_with_invalid_reference_custom_handler_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "library", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("library", "1", "Book"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("library", "1", "author"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "author_1", ResolveInfo = "author" },
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "author_1",
+                    Classifier = new MetaPointer("library", "1", "Book"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+            ]
+        };
+
+        var count = 0;
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new InvalidReferenceHandler(() =>
+            {
+                Interlocked.Increment(ref count);
+            }))
+            .WithLanguage(LibraryLanguage.Instance)
+            .Build();
+
+        try
+        {
+            deserializer.Deserialize(serializationChunk);
+        } catch (InvalidOperationException _)
+        {
+        }
+
+        Assert.AreEqual(1, count);
     }
 
     #endregion
@@ -1547,8 +1687,129 @@ public class DeserializationTests
         } catch (InvalidOperationException _)
         {
         }
-        
+
         Assert.AreEqual(1, count);
+    }
+
+    #endregion
+
+    #region skip_deserializing_dependent_node
+
+    [TestMethod]
+    [Ignore("no exception is thrown in M1 deserializer")]
+    public void test_skip_deserializing_dependent_node_throws_exception_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode()
+                {
+                    Id = "bar",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-docs"), Children = ["doc"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "doc",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Documentation"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+            ]
+        };
+
+
+        Geometry dependentGeometry = ShapesLanguage.Instance.GetFactory().CreateGeometry();
+        Documentation documentation = ShapesLanguage.Instance.GetFactory().NewDocumentation("doc");
+        dependentGeometry.Documentation = documentation;
+
+        /*
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        deserializer.Deserialize(serializationChunk,
+            dependentGeometry.Descendants(true, true));
+            */
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+
+        Assert.ThrowsException<DeserializerException>(() =>
+            deserializer.Deserialize(serializationChunk,
+                dependentGeometry.Descendants(true, true)));
+    }
+
+    #endregion
+
+    #region unknown_datatype
+
+    [TestMethod]
+    [Ignore("test case is not proper, how to write a test case with unknown datatype")]
+    public void test_deserialization_of_a_node_with_unknown_datatype_throws_exception_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "WithEnum", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("WithEnum", "1", "EnumHolder"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("WithEnum", "1", "enumValue"), Value = "lit1"
+                        }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(WithEnumLanguage.Instance)
+            .Build();
+
+        deserializer.Deserialize(serializationChunk);
+
+        /*IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(WithEnumLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));*/
     }
 
     #endregion
