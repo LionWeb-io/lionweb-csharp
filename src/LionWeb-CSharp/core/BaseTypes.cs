@@ -355,7 +355,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public void AddAnnotations(IEnumerable<INode> annotations)
+    public virtual void AddAnnotations(IEnumerable<INode> annotations)
     {
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
@@ -363,7 +363,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public void InsertAnnotations(int index, IEnumerable<INode> annotations)
+    public virtual void InsertAnnotations(int index, IEnumerable<INode> annotations)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
@@ -372,7 +372,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public bool RemoveAnnotations(IEnumerable<INode> annotations) =>
+    public virtual bool RemoveAnnotations(IEnumerable<INode> annotations) =>
         RemoveSelfParent(annotations?.ToList(), _annotations, null);
 
     /// <inheritdoc />
