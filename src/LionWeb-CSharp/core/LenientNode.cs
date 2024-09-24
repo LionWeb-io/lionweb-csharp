@@ -44,6 +44,10 @@ using System.Collections;
 /// <inheritdoc cref="CollectAllSetFeatures"/>
 /// </item>
 /// </list>
+/// <remarks>
+/// The main use case for this class are migration scenarios,
+/// where the metamodel (M2) might not fit the instance (M1) nodes.
+/// </remarks>
 /// </summary>
 public class LenientNode : NodeBase, INode
 {
