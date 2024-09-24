@@ -87,4 +87,38 @@ public class PropertyTests_Boolean_Optional : LenientNodeTestsBase
     }
 
     #endregion
+
+    #region metamodelViolation
+
+    [TestMethod]
+    public void Booleans_Reflective()
+    {
+        var parent = newDocumentation("od");
+        var value = new List<bool> { true, false };
+        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Documentation_technical, value));
+        Assert.AreEqual(null, parent.Get(Documentation_technical));
+    }
+
+    [TestMethod]
+    public void Node_Reflective()
+    {
+        var parent = newDocumentation("od");
+        var value = newCoord("c");
+        parent.Set(Documentation_technical, value);
+        Assert.AreSame(value, parent.Get(Documentation_technical));
+    }
+
+    [TestMethod]
+    public void Nodes_Reflective()
+    {
+        var parent = newDocumentation("od");
+        var valueA = newCoord("cA");
+        var valueB = newCoord("cB");
+        var value = new List<IReadableNode> { valueA, valueB };
+        parent.Set(Documentation_technical, value);
+        CollectionAssert.AreEqual(new List<IReadableNode>() { valueA, valueB },
+            parent.Get(Documentation_technical) as List<IReadableNode>);
+    }
+
+    #endregion
 }

@@ -87,4 +87,38 @@ public class PropertyTests_Integer_Required : LenientNodeTestsBase
     }
 
     #endregion
+
+    #region metamodelViolation
+
+    [TestMethod]
+    public void Integers_Reflective()
+    {
+        var parent = newCircle("od");
+        var value = new List<int> { 1, -1 };
+        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Circle_r, value));
+        Assert.ThrowsException<UnsetFeatureException>(() => parent.Get(Circle_r));
+    }
+
+    [TestMethod]
+    public void Node_Reflective()
+    {
+        var parent = newCircle("od");
+        var value = newCoord("c");
+        parent.Set(Circle_r, value);
+        Assert.AreSame(value, parent.Get(Circle_r));
+    }
+
+    [TestMethod]
+    public void Nodes_Reflective()
+    {
+        var parent = newCircle("od");
+        var valueA = newCoord("cA");
+        var valueB = newCoord("cB");
+        var value = new List<IReadableNode> { valueA, valueB };
+        parent.Set(Circle_r, value);
+        CollectionAssert.AreEqual(new List<IReadableNode>() { valueA, valueB },
+            parent.Get(Circle_r) as List<IReadableNode>);
+    }
+
+    #endregion
 }

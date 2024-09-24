@@ -36,6 +36,26 @@ public class ContainmentTests_Annotation : LenientNodeTestsBase
     }
 
     [TestMethod]
+    public void Single_Add_NonAnnotating()
+    {
+        var parent = newCoord("g");
+        var value = newDocumentation("myId");
+        parent.AddAnnotations([value]);
+        Assert.AreSame(parent, value.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(value));
+    }
+
+    [TestMethod]
+    public void Single_Add_NoAnnotation()
+    {
+        var parent = newCoord("g");
+        var value = newLine("myId");
+        parent.AddAnnotations([value]);
+        Assert.AreSame(parent, value.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(value));
+    }
+
+    [TestMethod]
     public void Single_Reflective()
     {
         var parent = newLine("g");
@@ -43,6 +63,26 @@ public class ContainmentTests_Annotation : LenientNodeTestsBase
         parent.Set(null, bom);
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
+    }
+
+    [TestMethod]
+    public void Single_Reflective_NonAnnotating()
+    {
+        var parent = newCoord("g");
+        var value = newDocumentation("myId");
+        parent.Set(null, value);
+        Assert.AreSame(parent, value.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(value));
+    }
+
+    [TestMethod]
+    public void Single_Reflective_NoAnnotation()
+    {
+        var parent = newCoord("g");
+        var value = newLine("myId");
+        parent.Set(null, value);
+        Assert.AreSame(parent, value.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(value));
     }
 
     #region Insert
@@ -55,6 +95,26 @@ public class ContainmentTests_Annotation : LenientNodeTestsBase
         parent.InsertAnnotations(0, [bom]);
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
+    }
+
+    [TestMethod]
+    public void Single_Insert_Empty_NonAnnotating()
+    {
+        var parent = newCoord("g");
+        var value = newDocumentation("myId");
+        parent.InsertAnnotations(0, [value]);
+        Assert.AreSame(parent, value.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(value));
+    }
+
+    [TestMethod]
+    public void Single_Insert_Empty_NoAnnotation()
+    {
+        var parent = newCoord("g");
+        var value = newLine("myId");
+        parent.InsertAnnotations(0, [value]);
+        Assert.AreSame(parent, value.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(value));
     }
 
     [TestMethod]
@@ -168,6 +228,26 @@ public class ContainmentTests_Annotation : LenientNodeTestsBase
     }
 
     [TestMethod]
+    public void Single_Remove_Empty_NonAnnotating()
+    {
+        var parent = newCoord("g");
+        var value = newDocumentation("myId");
+        parent.RemoveAnnotations([value]);
+        Assert.IsNull(value.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(value));
+    }
+
+    [TestMethod]
+    public void Single_Remove_Empty_NoAnnotation()
+    {
+        var parent = newCoord("g");
+        var value = newLine("myId");
+        parent.RemoveAnnotations([value]);
+        Assert.IsNull(value.GetParent());
+        Assert.IsFalse(parent.GetAnnotations().Contains(value));
+    }
+
+    [TestMethod]
     public void Single_Remove_NotContained()
     {
         var doc = newDocumentation("myC");
@@ -192,11 +272,37 @@ public class ContainmentTests_Annotation : LenientNodeTestsBase
     }
 
     [TestMethod]
+    public void Single_Remove_First_NonAnnotating()
+    {
+        var doc = newDocumentation("cId");
+        var value = newDocumentation("myId");
+        var parent = newCoord("g");
+        parent.AddAnnotations([value, doc]);
+        parent.RemoveAnnotations([value]);
+        Assert.AreSame(parent, doc.GetParent());
+        Assert.IsNull(value.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
+    }
+
+    [TestMethod]
+    public void Single_Remove_First_NoAnnotation()
+    {
+        var doc = newDocumentation("cId");
+        var value = newLine("myId");
+        var parent = newCoord("g");
+        parent.AddAnnotations([value, doc]);
+        parent.RemoveAnnotations([value]);
+        Assert.AreSame(parent, doc.GetParent());
+        Assert.IsNull(value.GetParent());
+        CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
+    }
+
+    [TestMethod]
     public void Single_Remove_First()
     {
         var doc = newDocumentation("cId");
         var bom = newBillOfMaterials("myId");
-        var parent = newLine("g");
+        var parent = newCoord("g");
         parent.AddAnnotations([bom, doc]);
         parent.RemoveAnnotations([bom]);
         Assert.AreSame(parent, doc.GetParent());
@@ -1188,6 +1294,28 @@ public class ContainmentTests_Annotation : LenientNodeTestsBase
         var parent = newLine("g");
         var result = parent.Get(null);
         Assert.IsInstanceOfType<IReadOnlyList<INode>>(result);
+    }
+
+    #endregion
+
+    #region metamodelViolation
+
+    [TestMethod]
+    public void String_Reflective()
+    {
+        var parent = newOffsetDuplicate("od");
+        var value = "a";
+        Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, value));
+        Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Count() == 0);
+    }
+
+    [TestMethod]
+    public void Integer_Reflective()
+    {
+        var parent = newOffsetDuplicate("od");
+        var value = -10;
+        Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, value));
+        Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Count() == 0);
     }
 
     #endregion

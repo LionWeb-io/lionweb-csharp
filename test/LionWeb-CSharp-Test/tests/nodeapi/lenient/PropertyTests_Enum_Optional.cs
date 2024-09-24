@@ -121,4 +121,38 @@ public class PropertyTests_Enum_Optional : LenientNodeTestsBase
     }
 
     #endregion
+
+    #region metamodelViolation
+
+    [TestMethod]
+    public void Enums_Reflective()
+    {
+        var parent = newMaterialGroup("od");
+        var value = new List<Enum> { MatterState_Liquid, MatterState_Gas };
+        Assert.ThrowsException<InvalidValueException>(() => parent.Set(MaterialGroup_matterState, value));
+        Assert.AreEqual(null, parent.Get(MaterialGroup_matterState));
+    }
+
+    [TestMethod]
+    public void Node_Reflective()
+    {
+        var parent = newMaterialGroup("od");
+        var value = newCoord("c");
+        parent.Set(MaterialGroup_matterState, value);
+        Assert.AreSame(value, parent.Get(MaterialGroup_matterState));
+    }
+
+    [TestMethod]
+    public void Nodes_Reflective()
+    {
+        var parent = newMaterialGroup("od");
+        var valueA = newCoord("cA");
+        var valueB = newCoord("cB");
+        var value = new List<IReadableNode> { valueA, valueB };
+        parent.Set(MaterialGroup_matterState, value);
+        CollectionAssert.AreEqual(new List<IReadableNode>() { valueA, valueB },
+            parent.Get(MaterialGroup_matterState) as List<IReadableNode>);
+    }
+
+    #endregion
 }

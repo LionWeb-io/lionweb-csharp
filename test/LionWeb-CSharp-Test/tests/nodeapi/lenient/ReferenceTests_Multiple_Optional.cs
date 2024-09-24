@@ -447,4 +447,26 @@ public class ReferenceTests_Multiple_Optional : LenientNodeTestsBase
     }
 
     #endregion
+
+    #region metamodelViolation
+
+    [TestMethod]
+    public void String_Reflective()
+    {
+        var parent = newOffsetDuplicate("od");
+        var value = "a";
+        parent.Set(ReferenceGeometry_shapes, value);
+        Assert.AreEqual("a", parent.Get(ReferenceGeometry_shapes));
+    }
+
+    [TestMethod]
+    public void Integer_Reflective()
+    {
+        var parent = newOffsetDuplicate("od");
+        var value = -10;
+        parent.Set(ReferenceGeometry_shapes, value);
+        Assert.AreEqual(-10, parent.Get(ReferenceGeometry_shapes));
+    }
+
+    #endregion
 }

@@ -507,7 +507,7 @@ public class ParentHandlingTests : LenientNodeTestsBase
         var childA = newLine("a");
         var childB = newLine("b");
         var source = newGeometry("src");
-        source.Set(Geometry_shapes, new List<INode> { childA,childB });
+        source.Set(Geometry_shapes, new List<INode> { childA, childB });
         var target = newGeometry("tgt");
 
         target.Set(Geometry_shapes, new List<LenientNode> { childA });
@@ -527,7 +527,7 @@ public class ParentHandlingTests : LenientNodeTestsBase
         var childA = newLine("a");
         var childB = newLine("b");
         var source = newGeometry("src");
-        source.Set(Geometry_shapes, new List<INode> { childA,childB });
+        source.Set(Geometry_shapes, new List<INode> { childA, childB });
         var target = newCompositeShape("tgt");
 
         target.Set(CompositeShape_parts, new List<LenientNode> { childA });
@@ -771,7 +771,7 @@ public class ParentHandlingTests : LenientNodeTestsBase
         var childA = newLine("a");
         var childB = newLine("b");
         var source = newCompositeShape("src");
-        source.Set(CompositeShape_parts, new List<INode> { childA,childB });
+        source.Set(CompositeShape_parts, new List<INode> { childA, childB });
         var target = newGeometry("tgt");
 
         target.Set(Geometry_shapes, new List<LenientNode> { childA });
@@ -791,7 +791,7 @@ public class ParentHandlingTests : LenientNodeTestsBase
         var childA = newLine("a");
         var childB = newLine("b");
         var parent = newCompositeShape("src");
-        parent.Set(CompositeShape_parts, new List<INode> { childA,childB });
+        parent.Set(CompositeShape_parts, new List<INode> { childA, childB });
 
         parent.Set(CompositeShape_disabledParts, new List<LenientNode> { childA });
 

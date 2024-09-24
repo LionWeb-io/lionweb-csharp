@@ -462,4 +462,26 @@ public class ContainmentTests_Multiple_Optional : LenientNodeTestsBase
     }
 
     #endregion
+
+    #region metamodelViolation
+
+    [TestMethod]
+    public void String_Reflective()
+    {
+        var parent = newOffsetDuplicate("od");
+        var value = "a";
+        parent.Set(Geometry_shapes, value);
+        Assert.AreEqual("a", parent.Get(Geometry_shapes));
+    }
+
+    [TestMethod]
+    public void Integer_Reflective()
+    {
+        var parent = newOffsetDuplicate("od");
+        var value = -10;
+        parent.Set(Geometry_shapes, value);
+        Assert.AreEqual(-10, parent.Get(Geometry_shapes));
+    }
+
+    #endregion
 }

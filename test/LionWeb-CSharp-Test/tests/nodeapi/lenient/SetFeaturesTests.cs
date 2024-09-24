@@ -17,11 +17,10 @@
 
 namespace LionWeb.Core.M2.Lenient.Test;
 
-using Examples.Shapes.M2;
 using M3;
 
 [TestClass]
-public class SetFeaturesTests:LenientNodeTestsBase
+public class SetFeaturesTests : LenientNodeTestsBase
 {
     #region property
 
@@ -217,7 +216,7 @@ public class SetFeaturesTests:LenientNodeTestsBase
     {
         var parent = newGeometry("g");
         var value = newCircle("myId");
-        parent.Set(Geometry_shapes, new List<LenientNode>{value});
+        parent.Set(Geometry_shapes, new List<LenientNode> { value });
         parent.Set(Geometry_shapes, new List<LenientNode>());
         CollectionAssert.AreEqual(new List<Feature>(),
             parent.CollectAllSetFeatures().ToList());
@@ -228,7 +227,7 @@ public class SetFeaturesTests:LenientNodeTestsBase
     {
         var parent = newGeometry("g");
         var value = newCircle("myA");
-        parent.Set(Geometry_shapes, new List<LenientNode>{value});
+        parent.Set(Geometry_shapes, new List<LenientNode> { value });
         parent.Set(Geometry_shapes, new List<LenientNode> { newCircle("myB") });
         CollectionAssert.AreEqual(new List<Feature> { Geometry_shapes },
             parent.CollectAllSetFeatures().ToList());
@@ -352,7 +351,7 @@ public class SetFeaturesTests:LenientNodeTestsBase
     {
         var parent = newReferenceGeometry("g");
         var value = newCircle("myId");
-        parent.Set(ReferenceGeometry_shapes, new List<LenientNode>{value});
+        parent.Set(ReferenceGeometry_shapes, new List<LenientNode> { value });
         parent.Set(ReferenceGeometry_shapes, new List<LenientNode>());
         CollectionAssert.AreEqual(new List<Feature>(),
             parent.CollectAllSetFeatures().ToList());

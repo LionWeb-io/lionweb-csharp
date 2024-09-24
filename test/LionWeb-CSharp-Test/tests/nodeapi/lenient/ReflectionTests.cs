@@ -32,6 +32,18 @@ public class ReflectionTests : LenientNodeTestsBase
             new LanguageEntityIdentityComparer());
     }
 
+    [TestMethod]
+    public void SetClassifier()
+    {
+        var node = newCircle("id");
+        Assert.AreEqual(ShapesDynamic.Language.ClassifierByKey("key-Circle"), node.GetClassifier(),
+            new LanguageEntityIdentityComparer());
+
+        node.SetClassifier(ShapesDynamic.Language.ClassifierByKey("key-Line"));
+        Assert.AreEqual(ShapesDynamic.Language.ClassifierByKey("key-Line"), node.GetClassifier(),
+            new LanguageEntityIdentityComparer());
+    }
+
     #region inherited
 
     #region property
@@ -98,6 +110,81 @@ public class ReflectionTests : LenientNodeTestsBase
         var parent = newCircle("id");
         parent.Set(Shape_shapeDocs, child);
         CollectionAssert.AreEqual(new List<Feature> { Shape_shapeDocs },
+            parent.CollectAllSetFeatures().ToList());
+    }
+
+    #endregion
+
+    #endregion
+
+    #region metamodelViolation
+
+    #region property
+
+    [TestMethod]
+    public void SetGetUnknownProperty()
+    {
+        var node = newCircle("id");
+        node.Set(Documentation_text, "hi");
+        Assert.AreEqual("hi", node.Get(Documentation_text));
+    }
+
+    [TestMethod]
+    public void GetUnknownProperty_Unset()
+    {
+        var node = newCircle("id");
+        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
+    }
+
+    #endregion
+
+    #region containment
+
+    [TestMethod]
+    public void SetGetUnknownContainment()
+    {
+        var child = newDocumentation("c");
+        var parent = newCircle("id");
+        parent.Set(MaterialGroup_defaultShape, child);
+        Assert.AreSame(child, parent.Get(MaterialGroup_defaultShape));
+    }
+
+    [TestMethod]
+    public void GetUnknownContainment_Unset()
+    {
+        var parent = newCircle("id");
+        Assert.ThrowsException<UnknownFeatureException>(() => parent.Get(MaterialGroup_defaultShape));
+    }
+
+    [TestMethod]
+    public void UnknownContainment_DetachChild()
+    {
+        var child = newDocumentation("c");
+        var parent = newCircle("id");
+        parent.Set(MaterialGroup_defaultShape, child);
+        child.DetachFromParent();
+        Assert.IsNull(child.GetParent());
+        Assert.ThrowsException<UnknownFeatureException>(() => parent.Get(MaterialGroup_defaultShape));
+        Assert.AreEqual(null, parent.GetContainmentOf(child));
+        Assert.IsFalse(parent.CollectAllSetFeatures().Any());
+    }
+
+    [TestMethod]
+    public void UnknownContainment_GetContainmentOf()
+    {
+        var child = newDocumentation("c");
+        var parent = newCircle("id");
+        parent.Set(MaterialGroup_defaultShape, child);
+        Assert.AreEqual(MaterialGroup_defaultShape, parent.GetContainmentOf(child));
+    }
+
+    [TestMethod]
+    public void UnknownContainment_CollectAllSetFeatures()
+    {
+        var child = newDocumentation("c");
+        var parent = newCircle("id");
+        parent.Set(MaterialGroup_defaultShape, child);
+        CollectionAssert.AreEqual(new List<Feature> { MaterialGroup_defaultShape },
             parent.CollectAllSetFeatures().ToList());
     }
 
