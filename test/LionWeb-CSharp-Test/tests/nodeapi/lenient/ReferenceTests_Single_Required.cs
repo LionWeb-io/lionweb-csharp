@@ -17,7 +17,11 @@
 
 namespace LionWeb.Core.M2.Lenient.Test;
 
+using Examples.Shapes.Dynamic;
+using Examples.Shapes.M2;
+using M3;
 using System.Collections;
+using Utils.Tests;
 
 [TestClass]
 public class ReferenceTests_Single_Required : LenientNodeTestsBase
@@ -373,7 +377,69 @@ public class ReferenceTests_Single_Required : LenientNodeTestsBase
 
     #endregion
 
-    #region metamodelViolation
+    #region NodeVariants
+
+    [TestMethod]
+    public void INode_Reflective()
+    {
+        var parent = newOffsetDuplicate("g");
+        var valueA = new Line("sA");
+        var valueB = new Line("sB");
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(OffsetDuplicate_source, values);
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsTrue((parent.Get(OffsetDuplicate_source) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsTrue((parent.Get(OffsetDuplicate_source) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void DynamicNode_Reflective()
+    {
+        var parent = newOffsetDuplicate("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new DynamicNode("sA", line);
+        var valueB = new DynamicNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(OffsetDuplicate_source, values);
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsTrue((parent.Get(OffsetDuplicate_source) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsTrue((parent.Get(OffsetDuplicate_source) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void LenientNode_Reflective()
+    {
+        var parent = newOffsetDuplicate("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new LenientNode("sA", line);
+        var valueB = new LenientNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(OffsetDuplicate_source, values);
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsTrue((parent.Get(OffsetDuplicate_source) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsTrue((parent.Get(OffsetDuplicate_source) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void IReadableNode_Reflective()
+    {
+        var parent = newOffsetDuplicate("g");
+        var valueA = new ReadOnlyLine("sA", null) {Name = "nameA", Uuid = "uuidA", Start = new Coord("startA"), End = new Coord("endA")};
+        var valueB = new ReadOnlyLine("sB", null) {Name = "nameB", Uuid = "uuidB", Start = new Coord("startB"), End = new Coord("endB")};
+        var values = new List<IReadableNode> { valueA, valueB };
+        parent.Set(OffsetDuplicate_source, values);
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsTrue((parent.Get(OffsetDuplicate_source) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsTrue((parent.Get(OffsetDuplicate_source) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    #endregion
+
+    #region MetamodelViolation
 
     [TestMethod]
     public void String_Reflective()

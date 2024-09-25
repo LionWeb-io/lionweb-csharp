@@ -17,8 +17,12 @@
 
 namespace LionWeb.Core.M2.Lenient.Test;
 
+using Examples.Shapes.Dynamic;
+using Examples.Shapes.M2;
 using Generated.Test;
+using M3;
 using System.Collections;
+using Utils.Tests;
 
 [TestClass]
 public class ReferenceTests_Multiple_Optional : LenientNodeTestsBase
@@ -448,12 +452,74 @@ public class ReferenceTests_Multiple_Optional : LenientNodeTestsBase
 
     #endregion
 
-    #region metamodelViolation
+    #region NodeVariants
+
+    [TestMethod]
+    public void INode_Reflective()
+    {
+        var parent = newReferenceGeometry("g");
+        var valueA = new Line("sA");
+        var valueB = new Line("sB");
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(ReferenceGeometry_shapes, values);
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsTrue((parent.Get(ReferenceGeometry_shapes) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsTrue((parent.Get(ReferenceGeometry_shapes) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void DynamicNode_Reflective()
+    {
+        var parent = newReferenceGeometry("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new DynamicNode("sA", line);
+        var valueB = new DynamicNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(ReferenceGeometry_shapes, values);
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsTrue((parent.Get(ReferenceGeometry_shapes) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsTrue((parent.Get(ReferenceGeometry_shapes) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void LenientNode_Reflective()
+    {
+        var parent = newReferenceGeometry("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new LenientNode("sA", line);
+        var valueB = new LenientNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(ReferenceGeometry_shapes, values);
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsTrue((parent.Get(ReferenceGeometry_shapes) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsTrue((parent.Get(ReferenceGeometry_shapes) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void IReadableNode_Reflective()
+    {
+        var parent = newReferenceGeometry("g");
+        var valueA = new ReadOnlyLine("sA", null) {Name = "nameA", Uuid = "uuidA", Start = new Coord("startA"), End = new Coord("endA")};
+        var valueB = new ReadOnlyLine("sB", null) {Name = "nameB", Uuid = "uuidB", Start = new Coord("startB"), End = new Coord("endB")};
+        var values = new List<IReadableNode> { valueA, valueB };
+        parent.Set(ReferenceGeometry_shapes, values);
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsTrue((parent.Get(ReferenceGeometry_shapes) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsTrue((parent.Get(ReferenceGeometry_shapes) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    #endregion
+    
+    #region MetamodelViolation
 
     [TestMethod]
     public void String_Reflective()
     {
-        var parent = newOffsetDuplicate("od");
+        var parent = newReferenceGeometry("od");
         var value = "a";
         parent.Set(ReferenceGeometry_shapes, value);
         Assert.AreEqual("a", parent.Get(ReferenceGeometry_shapes));
@@ -462,7 +528,7 @@ public class ReferenceTests_Multiple_Optional : LenientNodeTestsBase
     [TestMethod]
     public void Integer_Reflective()
     {
-        var parent = newOffsetDuplicate("od");
+        var parent = newReferenceGeometry("od");
         var value = -10;
         parent.Set(ReferenceGeometry_shapes, value);
         Assert.AreEqual(-10, parent.Get(ReferenceGeometry_shapes));

@@ -17,8 +17,12 @@
 
 namespace LionWeb.Core.M2.Lenient.Test;
 
+using Examples.Shapes.Dynamic;
+using Examples.Shapes.M2;
 using Generated.Test;
+using M3;
 using System.Collections;
+using Utils.Tests;
 
 [TestClass]
 public class ContainmentTests_Annotation : LenientNodeTestsBase
@@ -1298,12 +1302,123 @@ public class ContainmentTests_Annotation : LenientNodeTestsBase
 
     #endregion
 
-    #region metamodelViolation
+    #region NodeVariants
+
+    [TestMethod]
+    public void INode_Add()
+    {
+        var parent = newLine("g");
+        var valueA = new Line("sA");
+        var valueB = new Line("sB");
+        var values = new List<INode> { valueA, valueB };
+        parent.AddAnnotations(values);
+        Assert.AreSame(parent, valueA.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(valueA));
+        Assert.AreSame(parent, valueB.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(valueB));
+    }
+
+    [TestMethod]
+    public void INode_Reflective()
+    {
+        var parent = newLine("g");
+        var valueA = new Line("sA");
+        var valueB = new Line("sB");
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(null, values);
+        Assert.AreSame(parent, valueA.GetParent());
+        Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.AreSame(parent, valueB.GetParent());
+        Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void DynamicNode_Add()
+    {
+        var parent = newLine("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new DynamicNode("sA", line);
+        var valueB = new DynamicNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.AddAnnotations(values);
+        Assert.AreSame(parent, valueA.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(valueA));
+        Assert.AreSame(parent, valueB.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(valueB));
+    }
+
+    [TestMethod]
+    public void DynamicNode_Reflective()
+    {
+        var parent = newLine("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new DynamicNode("sA", line);
+        var valueB = new DynamicNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(null, values);
+        Assert.AreSame(parent, valueA.GetParent());
+        Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.AreSame(parent, valueB.GetParent());
+        Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void LenientNode_Add()
+    {
+        var parent = newLine("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new LenientNode("sA", line);
+        var valueB = new LenientNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.AddAnnotations(values);
+        Assert.AreSame(parent, valueA.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(valueA));
+        Assert.AreSame(parent, valueB.GetParent());
+        Assert.IsTrue(parent.GetAnnotations().Contains(valueB));
+    }
+
+    [TestMethod]
+    public void LenientNode_Reflective()
+    {
+        var parent = newLine("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new LenientNode("sA", line);
+        var valueB = new LenientNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(null, values);
+        Assert.AreSame(parent, valueA.GetParent());
+        Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.AreSame(parent, valueB.GetParent());
+        Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void IReadableNode_Reflective()
+    {
+        var parent = newLine("g");
+        var valueA = new ReadOnlyLine("sA", null)
+        {
+            Name = "nameA", Uuid = "uuidA", Start = new Coord("startA"), End = new Coord("endA")
+        };
+        var valueB = new ReadOnlyLine("sB", null)
+        {
+            Name = "nameB", Uuid = "uuidB", Start = new Coord("startB"), End = new Coord("endB")
+        };
+        var values = new ArrayList { valueA, valueB };
+        Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, values));
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsFalse((parent.Get(null) as IEnumerable<IReadableNode>).Any());
+    }
+
+    #endregion
+
+    #region MetamodelViolation
 
     [TestMethod]
     public void String_Reflective()
     {
-        var parent = newOffsetDuplicate("od");
+        var parent = newLine("od");
         var value = "a";
         Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, value));
         Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Count() == 0);
@@ -1312,7 +1427,7 @@ public class ContainmentTests_Annotation : LenientNodeTestsBase
     [TestMethod]
     public void Integer_Reflective()
     {
-        var parent = newOffsetDuplicate("od");
+        var parent = newLine("od");
         var value = -10;
         Assert.ThrowsException<InvalidValueException>(() => parent.Set(null, value));
         Assert.IsTrue((parent.Get(null) as IEnumerable<IReadableNode>).Count() == 0);

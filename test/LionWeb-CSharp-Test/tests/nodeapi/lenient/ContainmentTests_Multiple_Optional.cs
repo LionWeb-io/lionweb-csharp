@@ -17,8 +17,12 @@
 
 namespace LionWeb.Core.M2.Lenient.Test;
 
+using Examples.Shapes.Dynamic;
+using Examples.Shapes.M2;
 using Generated.Test;
+using M3;
 using System.Collections;
+using Utils.Tests;
 
 [TestClass]
 public class ContainmentTests_Multiple_Optional : LenientNodeTestsBase
@@ -463,12 +467,73 @@ public class ContainmentTests_Multiple_Optional : LenientNodeTestsBase
 
     #endregion
 
-    #region metamodelViolation
+    #region NodeVariants
+
+    [TestMethod]
+    public void INode_Reflective()
+    {
+        var parent = newGeometry("g");
+        var valueA = new Line("sA");
+        var valueB = new Line("sB");
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(Geometry_shapes, values);
+        Assert.AreSame(parent, valueA.GetParent());
+        Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.AreSame(parent, valueB.GetParent());
+        Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void DynamicNode_Reflective()
+    {
+        var parent = newGeometry("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new DynamicNode("sA", line);
+        var valueB = new DynamicNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(Geometry_shapes, values);
+        Assert.AreSame(parent, valueA.GetParent());
+        Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.AreSame(parent, valueB.GetParent());
+        Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void LenientNode_Reflective()
+    {
+        var parent = newGeometry("g");
+        Classifier line = ShapesDynamic.Language.ClassifierByKey("key-Line");
+        var valueA = new LenientNode("sA", line);
+        var valueB = new LenientNode("sA", line);
+        var values = new List<INode> { valueA, valueB };
+        parent.Set(Geometry_shapes, values);
+        Assert.AreSame(parent, valueA.GetParent());
+        Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Contains(valueA));
+        Assert.AreSame(parent, valueB.GetParent());
+        Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Contains(valueB));
+    }
+
+    [TestMethod]
+    public void IReadableNode_Reflective()
+    {
+        var parent = newGeometry("g");
+        var valueA = new ReadOnlyLine("sA", null) {Name = "nameA", Uuid = "uuidA", Start = new Coord("startA"), End = new Coord("endA")};
+        var valueB = new ReadOnlyLine("sB", null) {Name = "nameB", Uuid = "uuidB", Start = new Coord("startB"), End = new Coord("endB")};
+        var values = new ArrayList { valueA, valueB };
+        Assert.ThrowsException<InvalidValueException>(() => parent.Set(Geometry_shapes, values));
+        Assert.IsNull(valueA.GetParent());
+        Assert.IsNull(valueB.GetParent());
+        Assert.IsFalse((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Any());
+    }
+
+    #endregion
+
+    #region MetamodelViolation
 
     [TestMethod]
     public void String_Reflective()
     {
-        var parent = newOffsetDuplicate("od");
+        var parent = newGeometry("od");
         var value = "a";
         parent.Set(Geometry_shapes, value);
         Assert.AreEqual("a", parent.Get(Geometry_shapes));
@@ -477,7 +542,7 @@ public class ContainmentTests_Multiple_Optional : LenientNodeTestsBase
     [TestMethod]
     public void Integer_Reflective()
     {
-        var parent = newOffsetDuplicate("od");
+        var parent = newGeometry("od");
         var value = -10;
         parent.Set(Geometry_shapes, value);
         Assert.AreEqual(-10, parent.Get(Geometry_shapes));

@@ -210,7 +210,7 @@ public class LenientNode : NodeBase, INode
 
             case { } v:
                 if (!v.GetType().IsValueType)
-                    return false;
+                    throw new InvalidValueException(feature, value);
 
                 _featureValues[feature] = value;
                 return true;
