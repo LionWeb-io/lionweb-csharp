@@ -129,6 +129,32 @@ public class ReflectionTests : LenientNodeTestsBase
         Assert.AreEqual("hi", node.Get(Documentation_text));
     }
 
+    private struct TestStruct(int a, string b);
+    
+    [TestMethod]
+    public void SetValueTypeProperty()
+    {
+        var node = newCircle("id");
+        node.Set(Documentation_text, new TestStruct(2, "hi"));
+        Assert.AreEqual(new TestStruct(2, "hi"), node.Get(Documentation_text));
+    }
+
+    [TestMethod]
+    public void SetValueTypeListProperty()
+    {
+        var node = newCircle("id");
+        Assert.ThrowsException<InvalidValueException>(() => node.Set(Documentation_text, new List<TestStruct>{ new TestStruct(2, "hi")}));
+        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
+    }
+
+    [TestMethod]
+    public void SetObjectProperty()
+    {
+        var node = newCircle("id");
+        Assert.ThrowsException<InvalidValueException>(() => node.Set(Documentation_text, new object()));
+        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
+    }
+    
     [TestMethod]
     public void GetUnknownProperty_Unset()
     {
@@ -149,6 +175,30 @@ public class ReflectionTests : LenientNodeTestsBase
         Assert.AreSame(child, parent.Get(MaterialGroup_defaultShape));
     }
 
+    [TestMethod]
+    public void SetValueTypeContainment()
+    {
+        var node = newCircle("id");
+        node.Set(MaterialGroup_defaultShape, new TestStruct(2, "hi"));
+        Assert.AreEqual(new TestStruct(2, "hi"), node.Get(MaterialGroup_defaultShape));
+    }
+
+    [TestMethod]
+    public void SetValueTypeListContainment()
+    {
+        var node = newCircle("id");
+        Assert.ThrowsException<InvalidValueException>(() => node.Set(MaterialGroup_defaultShape, new List<TestStruct>{ new TestStruct(2, "hi")}));
+        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
+    }
+
+    [TestMethod]
+    public void SetObjectContainment()
+    {
+        var node = newCircle("id");
+        Assert.ThrowsException<InvalidValueException>(() => node.Set(MaterialGroup_defaultShape, new object()));
+        Assert.ThrowsException<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
+    }
+    
     [TestMethod]
     public void GetUnknownContainment_Unset()
     {
