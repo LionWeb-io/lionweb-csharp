@@ -23,8 +23,11 @@ using Core.M3;
 using Core.Utilities;
 using Examples.Shapes.M2;
 
-public class ReadOnlyLine(string id, IReadableNode<IReadableNode>? parent)
-    : ReadableNodeBase<IReadableNode<IReadableNode>>(id, parent), INamed
+/// Example of a node that implements <see cref="IReadableNode"/>,
+/// but neither <see cref="IWritableNode"/> nor <see cref="INode"/>.
+/// Effectively provides the same read-API as <see cref="Line"/> 
+public class ReadOnlyLine(string id, IReadableNode? parent)
+    : ReadableNodeBase<IReadableNode>(id, parent), INamed
 {
     /// <inheritdoc/>
     public override Classifier GetClassifier() => ShapesLanguage.Instance.Line;
@@ -67,7 +70,7 @@ public class ReadOnlyLine(string id, IReadableNode<IReadableNode>? parent)
     /// <see cref="IShape"/>
     public required string Uuid { get; init; }
 
-    public IReadOnlyList<Coord> Fixpoints { get; init; }
+    public IReadOnlyList<Coord> Fixpoints { get; init; } = new List<Coord>().AsReadOnly();
     public Documentation? ShapeDocs { get; init; }
 
     /// <see cref="Line"/>
