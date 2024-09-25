@@ -47,6 +47,13 @@ using System.Collections;
 /// <remarks>
 /// The main use case for this class are migration scenarios,
 /// where the metamodel (M2) might not fit the instance (M1) nodes.
+///
+/// <p><b>Comparison to <see cref="DynamicNode"/></b></p>
+/// <see cref="DynamicNode"/> completely adheres to the <see cref="INode"/> interface semantics:
+/// Setting a feature unknown to the classifier fails,
+/// setting a required feature to null or empty list fails,
+/// setting a link with type building to instance of tree fails.
+/// <see cref="LenientNode"/> accepts all that.
 /// </remarks>
 /// </summary>
 public class LenientNode : NodeBase, INode
@@ -140,10 +147,11 @@ public class LenientNode : NodeBase, INode
     }
 
     /// <summary>
-    /// <see cref="IWritableNode.Set"/> never fails, it accepts any feature and value --
-    /// including features unknown to the target node's classifier, <c>null</c> for <i>required features</i>,
-    /// and all of <i>value types</i>, single nodes, and collection of nodes for any feature.
-    /// For containments, sets the target node as parent of the value, even if the value doesn't fit the containment's type. 
+    /// <see cref="IWritableNode.Set"/> never fails, it accepts any feature and feature value that makes sense in LW context.
+    /// So nodes, enumerables of nodes, value types. Enumerable of value types doesn't work, and arbitrary objects do not work.
+    /// Features unknown to the target node's classifier do work as well as <c>null</c> for <i>required features</i>.
+    /// For containments, sets the target node as parent of the value, even if the value doesn't fit the containment's type.
+    /// For containments, the target node MUST implement <see cref="INode"/>; for references, the target node MUST implement <see cref="IReadableNode"/>. 
     /// </summary>
     protected override bool SetInternal(Feature? feature, object? value)
     {
