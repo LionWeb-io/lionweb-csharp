@@ -33,12 +33,10 @@ using Comparer = LionWeb.Core.Utilities.Comparer;
 public class SerializationTests
 {
     private readonly Language _language;
-    private readonly ShapesFactory _factory;
 
     public SerializationTests()
     {
         _language = ShapesLanguage.Instance;
-        _factory = _language.GetFactory() as ShapesFactory;
     }
 
     [TestMethod]
@@ -57,103 +55,6 @@ public class SerializationTests
     }
 
     [TestMethod]
-    public void test_serialization_shapes_language_with_external_annotations()
-    {
-        var serializationChunk = LanguageSerializer.Serialize(ShapesLanguage.Instance);
-
-        var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
-        Language redeserializedShapes = redeserialized.Cast<INode>().OfType<Language>().First();
-
-        var language = new DynamicLanguage("id-anns") { Key = "key-anns", Name = "Anns", Version = "1" };
-
-        var ann = language.Annotation("id-classifierAnn", "key-classifierAnn", "ClassifierAnn");
-        Property age = ann
-            .Annotating(M3Language.Instance.Classifier)
-            .Implementing(BuiltInsLanguage.Instance.INamed)
-            .Property("id-age", "key-age", "Age").OfType(BuiltInsLanguage.Instance.Integer);
-
-        DynamicClassifier redeserializedCircle =
-            (DynamicClassifier)redeserializedShapes.ClassifierByKey(ShapesLanguage.Instance.Circle.Key);
-        var annInst = language.GetFactory().CreateNode("ann-inst", ann);
-        annInst.Set(BuiltInsLanguage.Instance.INamed_name, "Hello");
-        annInst.Set(age, 23);
-        redeserializedCircle.AddAnnotations([annInst]);
-
-        var serializationChunk2 = LanguageSerializer.Serialize(redeserializedShapes);
-        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
-        var redeserialized2 = LanguageDeserializer.Deserialize(serializationChunk2, language);
-        Language redeserializedShapes2 = redeserialized2.Cast<INode>().OfType<Language>().First();
-        DynamicClassifier redeserializedCircle2 =
-            (DynamicClassifier)redeserializedShapes2.ClassifierByKey(ShapesLanguage.Instance.Circle.Key);
-
-        var comparer = new Comparer(redeserializedCircle.GetAnnotations().ToList(),
-            redeserializedCircle2.GetAnnotations().ToList());
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
-    }
-
-    [TestMethod]
-    public void test_serialization_shapes_language_together_with_annotations()
-    {
-        var serializationChunk = LanguageSerializer.Serialize(ShapesLanguage.Instance);
-
-        var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
-        Language redeserializedShapes = redeserialized.Cast<INode>().OfType<Language>().First();
-
-        var language = new DynamicLanguage("id-anns") { Key = "key-anns", Name = "Anns", Version = "1" };
-
-        var ann = language.Annotation("id-classifierAnn", "key-classifierAnn", "ClassifierAnn");
-        Property age = ann
-            .Annotating(M3Language.Instance.Classifier)
-            .Implementing(BuiltInsLanguage.Instance.INamed)
-            .Property("id-age", "key-age", "Age").OfType(BuiltInsLanguage.Instance.Integer);
-
-        DynamicClassifier redeserializedCircle =
-            (DynamicClassifier)redeserializedShapes.ClassifierByKey(ShapesLanguage.Instance.Circle.Key);
-        var annInst = language.GetFactory().CreateNode("ann-inst", ann);
-        annInst.Set(BuiltInsLanguage.Instance.INamed_name, "Hello");
-        annInst.Set(age, 23);
-        redeserializedCircle.AddAnnotations([annInst]);
-
-        var serializationChunk2 = LanguageSerializer.Serialize(redeserializedShapes, language);
-        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
-        var redeserialized2 = LanguageDeserializer.Deserialize(serializationChunk2);
-        Language redeserializedShapes2 = redeserialized2.Cast<INode>().OfType<Language>()
-            .First(l => l.Key == ShapesLanguage.Instance.Key);
-        DynamicClassifier redeserializedCircle2 =
-            (DynamicClassifier)redeserializedShapes2.ClassifierByKey(ShapesLanguage.Instance.Circle.Key);
-
-        var comparer = new Comparer(redeserializedCircle.GetAnnotations().ToList(),
-            redeserializedCircle2.GetAnnotations().ToList());
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
-    }
-
-    [TestMethod]
-    public void test_serialization_lioncore()
-    {
-        var serializationChunk = LanguageSerializer.Serialize(M3Language.Instance);
-        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
-
-        // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        var deserializer = new LanguageDeserializer(false);
-        foreach (var serializedNode in serializationChunk.Nodes)
-        {
-            deserializer.Process(serializedNode);
-        }
-        deserializer.Finish();
-    }
-
-    [TestMethod]
-    public void test_serialization_shapes_language()
-    {
-        var serializationChunk = LanguageSerializer.Serialize(ShapesLanguage.Instance);
-        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
-
-        var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
-        var comparer = new Comparer([ShapesLanguage.Instance], redeserialized.Cast<IReadableNode>().ToList());
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
-    }
-
-    [TestMethod]
     public void test_no_double_serialization()
     {
         var geometry = ExampleModels.ExampleModel(_language);
@@ -168,7 +69,7 @@ public class SerializationTests
     [TestMethod]
     public void test_optional_string_property_serialization()
     {
-        var documentation = _factory.CreateDocumentation();
+        var documentation = ((ShapesFactory)_language.GetFactory()).CreateDocumentation();
         var serializationChunk = Serializer.SerializeToChunk([documentation]);
 
         var serializedProperty = serializationChunk.Nodes[0].Properties.First(p => p.Property.Key == "key-text");
@@ -243,36 +144,6 @@ public class SerializationTests
         Assert.AreEqual(2, serializedNodes.Count);
     }
 
-    class DuplicateNodeHandler(Action incrementer) : ISerializerHandler
-    {
-        Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) =>
-            throw new NotImplementedException();
-
-        public void DuplicateNodeId(IReadableNode n) => incrementer();
-        
-        public string? UnknownDatatype(IReadableNode node, Property property, object? value) => throw new NotImplementedException();
-    }
-
-    [TestMethod]
-    public void DuplicateId_CustomHandler()
-    {
-        var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
-
-        int count = 0;
-
-        var serializer =
-            new Serializer { Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count)) };
-
-        try
-        {
-            ISerializerExtensions.Serialize(serializer, materialGroup.Descendants(true, true));
-        } catch (InvalidOperationException _)
-        {
-        }
-
-        Assert.AreEqual(1, count);
-    }
-
     [TestMethod]
     public void DuplicateUsedLanguage()
     {
@@ -310,86 +181,6 @@ public class SerializationTests
 
         var serializationChunk = Serializer.SerializeToChunk([a]);
         Assert.AreEqual(2, serializationChunk.Languages.Length);
-    }
-
-    class DuplicateLanguageHandler(Func<Language?> incrementer) : ISerializerHandler
-    {
-        Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) => incrementer();
-
-        public void DuplicateNodeId(IReadableNode n) => throw new NotImplementedException();
-        
-        public string? UnknownDatatype(IReadableNode node, Property property, object? value) => throw new NotImplementedException();
-    }
-
-    [TestMethod]
-    public void DuplicateLanguage_CustomHandler()
-    {
-        var lang = new DynamicLanguage("abc")
-        {
-            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
-        };
-        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
-            ShapesLanguage.Instance.MaterialGroup.Name);
-        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
-            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
-
-        var a = lang.GetFactory().CreateNode("a", materialGroup);
-        var b = new Circle("b");
-        a.Set(defaultShape, b);
-
-        int count = 0;
-
-        var serializer =
-            new Serializer
-            {
-                Handler = new DuplicateLanguageHandler(() =>
-                {
-                    Interlocked.Increment(ref count);
-                    return null;
-                })
-            };
-
-        try
-        {
-            ISerializerExtensions.Serialize(serializer, a.Descendants(true, true));
-        } catch (InvalidOperationException _)
-        {
-        }
-
-        Assert.AreEqual(1, count);
-    }
-
-    [TestMethod]
-    public void DuplicateLanguage_CustomHandler_Heal()
-    {
-        var lang = new DynamicLanguage("abc")
-        {
-            Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
-        };
-        var materialGroup = lang.Concept("efg", ShapesLanguage.Instance.MaterialGroup.Key,
-            ShapesLanguage.Instance.MaterialGroup.Name);
-        var defaultShape = materialGroup.Containment("ijk", ShapesLanguage.Instance.MaterialGroup_defaultShape.Key,
-            ShapesLanguage.Instance.MaterialGroup_defaultShape.Name);
-
-        var a = lang.GetFactory().CreateNode("a", materialGroup);
-        var b = new Circle("b");
-        a.Set(defaultShape, b);
-
-        int count = 0;
-
-        var serializer =
-            new Serializer
-            {
-                Handler = new DuplicateLanguageHandler(() =>
-                {
-                    Interlocked.Increment(ref count);
-                    return ShapesLanguage.Instance;
-                })
-            };
-
-        ISerializerExtensions.Serialize(serializer, a.Descendants(true, true));
-
-        Assert.AreEqual(1, count);
     }
 
     [TestMethod]
