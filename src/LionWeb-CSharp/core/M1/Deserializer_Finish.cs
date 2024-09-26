@@ -131,23 +131,8 @@ public partial class Deserializer
                 .Where(c => c != null)
                 .ToList();
 
-            ISet<Classifier> allSpecializations = reference.Type.AllSpecializations(
-                [reference.GetLanguage()], true);
-
             if (targets.Count != 0)
             {
-                if (targets.Count > 1 && !reference.Multiple)
-                {
-                    throw new InvalidValueException(reference,
-                        "single reference is expected, but multiple targets encountered");
-                }
-
-                foreach (IReadableNode target in targets.OfType<IReadableNode>().Where(
-                             target => !allSpecializations.Contains(target.GetClassifier())))
-                {
-                    throw new UnsupportedClassifierException(target.GetClassifier().ToMetaPointer());
-                }
-
                 node.Set(
                     reference,
                     reference.Multiple ? targets : targets.FirstOrDefault()
