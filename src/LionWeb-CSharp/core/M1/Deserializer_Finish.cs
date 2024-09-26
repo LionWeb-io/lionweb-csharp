@@ -190,16 +190,8 @@ public partial class Deserializer
     {
         if (_deserializedNodesById.TryGetValue(annotationId, out var existingAnnotation))
         {
-            if (existingAnnotation.GetClassifier() is not Annotation)
-            {
+            if (existingAnnotation.GetClassifier() is not Annotation ann || !ann.CanAnnotate(node.GetClassifier()))
                 return Handler.InvalidAnnotation(existingAnnotation, node);
-            }
-
-            if (existingAnnotation.GetClassifier() is Annotation ann && !ann.CanAnnotate(node.GetClassifier()))
-            {
-                return (INode?)Handler.InvalidAnnotationParent(existingAnnotation, node.GetId());
-            }
-
             return existingAnnotation;
         }
 
