@@ -203,4 +203,23 @@ public class ReferenceUtilsTests
         CollectionAssert.AreEqual(expectedRefs, ReferenceUtils.FindIncomingReferences(geometry.Shapes[0], duplicateScope).ToList());
         CollectionAssert.AreEqual(expectedRefs, ReferenceUtils.ReferenceValues(scope).ToList());
     }
+
+    [TestMethod]
+    public void finds_unreachable_nodes()
+    {
+        var language = ShapesLanguage.Instance;
+        var factory = language.GetFactory();
+        var referenceGeometry = factory.CreateReferenceGeometry();
+
+        var geometry = (ExampleModels.ExampleModel(language) as Geometry)!;
+        referenceGeometry.AddShapes(geometry.Shapes);
+
+        Assert.AreEqual(1, referenceGeometry.Shapes.Count);
+        var refValues = ReferenceUtils.ReferencesToOutOfScopeNodes([referenceGeometry]);
+        var expectedRefValues = new List<ReferenceValue>
+        {
+            new (referenceGeometry, language.ReferenceGeometry_shapes, 0, geometry.Shapes[0])
+        };
+        CollectionAssert.AreEqual(expectedRefValues, refValues.ToList());
+    }
 }
