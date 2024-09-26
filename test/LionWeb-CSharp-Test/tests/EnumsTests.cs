@@ -54,14 +54,17 @@ public class EnumsTests
     public void RoundtripSerializationOfModelWithEnum()
     {
         var nodes = new[] { Model() };
-        var chunk = Serializer.Serialize(nodes);
+        var chunk = Serializer.SerializeToChunk(nodes);
         Console.WriteLine(JsonUtils.WriteJsonToString(chunk));
         Assert.AreEqual("lit1", chunk.Nodes[0].Properties[0].Value);
 
-        var deserialization = new Deserializer([_language]).Deserialize(chunk);
+        var deserialization = new DeserializerBuilder()
+                .WithLanguage(_language)
+                .Build()
+            .Deserialize(chunk);
         Assert.AreEqual(MyEnum.literal1, (deserialization[0] as EnumHolder).EnumValue);
 
-        var reserialization = Serializer.Serialize(deserialization);
+        var reserialization = Serializer.SerializeToChunk(deserialization);
         Assert.AreEqual(JsonUtils.WriteJsonToString(chunk), JsonUtils.WriteJsonToString(reserialization));
     }
 }

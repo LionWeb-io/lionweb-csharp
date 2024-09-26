@@ -80,8 +80,8 @@ public class UnknownFeatureException : LionWebExceptionBase
 {
     /// <param name="classifier">Classifier trying to use.</param>
     /// <param name="feature">Feature unknown to <paramref name="classifier"/>.</param>
-    public UnknownFeatureException(Classifier classifier, Feature? feature) : base(
-        $"Classifier {classifier.Name} does not know feature {feature?.Name}")
+    public UnknownFeatureException(Classifier classifier, Feature? feature, string? message = null) : base(
+        $"{message}Classifier {classifier.Name} does not know feature {feature?.Name}")
     {
     }
 

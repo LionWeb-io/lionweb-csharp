@@ -26,22 +26,16 @@ public static class MetaPointerExtensions
     /// Represents <paramref name="entity"/> as MetaPointer.
     public static MetaPointer ToMetaPointer(this LanguageEntity entity)
     {
-        var metaPointer = new MetaPointer();
         var language = entity.GetLanguage();
-        metaPointer.Language = language.Key;
-        metaPointer.Version = language.Version;
-        metaPointer.Key = entity.Key;
+        var metaPointer = new MetaPointer(language.Key, language.Version, entity.Key);
         return metaPointer;
     }
 
     /// Represents <paramref name="feature"/> as MetaPointer.
     public static MetaPointer ToMetaPointer(this Feature feature)
     {
-        var metaPointer = new MetaPointer();
         var language = feature.GetFeatureClassifier().GetLanguage();
-        metaPointer.Language = language.Key;
-        metaPointer.Version = language.Version;
-        metaPointer.Key = feature.Key;
+        var metaPointer = new MetaPointer(language.Key, language.Version, feature.Key);
         return metaPointer;
     }
 
