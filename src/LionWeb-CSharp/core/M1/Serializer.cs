@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
+using M2;
 using Serialization;
 
 /// <inheritdoc cref="ISerializer"/>
@@ -33,7 +34,7 @@ public class Serializer : SerializerBase, ISerializer
     {
         foreach (var node in allNodes)
         {
-            RegisterUsedLanguage(node);
+            RegisterUsedLanguage(node.GetClassifier().GetLanguage());
             var result = SerializeNode(node);
             if (result != null)
                 yield return result;

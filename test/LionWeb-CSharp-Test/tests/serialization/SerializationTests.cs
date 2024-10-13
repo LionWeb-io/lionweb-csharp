@@ -71,6 +71,7 @@ public class SerializationTests
     {
         var documentation = ((ShapesFactory)_language.GetFactory()).CreateDocumentation();
         var serializationChunk = Serializer.SerializeToChunk([documentation]);
+        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         var serializedProperty = serializationChunk.Nodes[0].Properties.First(p => p.Property.Key == "key-text");
         Assert.IsNull(serializedProperty.Value);

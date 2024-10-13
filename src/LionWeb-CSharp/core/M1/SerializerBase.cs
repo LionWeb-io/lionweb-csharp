@@ -20,6 +20,7 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
+using System.Collections;
 using Utilities;
 
 public abstract class SerializerBase : ISerializer
@@ -63,7 +64,7 @@ public abstract class SerializerBase : ISerializer
     }
 
     protected SerializedReferenceTarget SerializeReferenceTarget(IReadableNode? target) =>
-        new() { Reference = target?.GetId(), ResolveInfo = target.GetNodeName() };
+        new() { Reference = target?.GetId(), ResolveInfo = target?.GetNodeName() };
 
     protected object? GetValueIfSet(IReadableNode node, Feature feature) =>
         node.CollectAllSetFeatures().Contains(feature) ? node.Get(feature) : null;
@@ -86,7 +87,63 @@ public abstract class SerializerBase : ISerializer
         _ => value.ToString()
     };
 
+    /// <remarks>
+    /// Features with `string` or _value type_ values are treated as property.
+    /// Remaining features with single or IEnumerable&lt;IReadableNode> values with all values' parents == node are treated as containment.
+    /// Remaining features with single or IEnumerable&lt;IReadableNode> values are treated as reference.
+    /// If any feature still remaining, throws exception.
+    /// Only annotations are treated as annotations.
+    /// </remarks>
     protected SerializedNode SerializeSimpleNode(IReadableNode node)
+    {
+        Classifier classifier = ExtractClassifier(node);
+
+        var featureValues = node
+            .CollectAllSetFeatures()
+            .ToDictionary(f => f, node.Get);
+
+        Dictionary<Feature, object?> properties = CollectProperties(featureValues);
+        RemoveFromFeatureValues(properties);
+
+        Dictionary<Feature, object?> containments = CollectContainments(node, featureValues);
+        RemoveFromFeatureValues(containments);
+
+        Dictionary<Feature, object?> references = CollectReferences(featureValues);
+        RemoveFromFeatureValues(references);
+
+        if (featureValues.Count != 0)
+            throw new ArgumentException($"remaining features: {featureValues}");
+
+        var allFeatures = classifier.AllFeatures();
+
+        return new()
+        {
+            Id = node.GetId(),
+            Classifier = classifier.ToMetaPointer(),
+            Properties = properties.Select(pair => SerializeProperty(node, pair.Key, pair.Value))
+                .Concat(CollectUnsetProperties(node, allFeatures, properties))
+                .ToArray(),
+            Containments = containments.Select(SerializeContainment)
+                .Concat(CollectUnsetContainments(allFeatures, containments))
+                .ToArray(),
+            References = references.Select(SerializeReference)
+                .Concat(CollectUnsetReferences(allFeatures, references))
+                .ToArray(),
+            Annotations = node.GetAnnotations().Select(SerializeAnnotationTarget)
+                .ToArray(),
+            Parent = node.GetParent()?.GetId()
+        };
+
+        void RemoveFromFeatureValues(Dictionary<Feature, object?> dictionary)
+        {
+            foreach (var key in dictionary.Keys)
+            {
+                featureValues.Remove(key);
+            }
+        }
+    }
+
+    private Classifier ExtractClassifier(IReadableNode node)
     {
         Classifier classifier = node switch
         {
@@ -102,56 +159,109 @@ public abstract class SerializerBase : ISerializer
             Reference => M3Language.Instance.Reference,
             _ => node.GetClassifier()
         };
+        return classifier;
+    }
 
-        return new()
+    private Dictionary<Feature, object?> CollectProperties(Dictionary<Feature, object?> featureValues) =>
+        featureValues
+            .Where(pair => pair.Value is string
+                           || (pair.Value is not null && pair.Value.GetType().IsValueType)
+                           || pair is { Key: Property, Value: null }
+            )
+            .ToDictionary();
+
+    private Dictionary<Feature, object?> CollectContainments(IReadableNode node,
+        Dictionary<Feature, object?> featureValues)
+    {
+        var containments = featureValues
+            .Where(pair =>
+                pair.Key is Containment
+                || (pair.Value is IReadableNode n && ReferenceEquals(n.GetParent(), node))
+                || (pair.Value is IEnumerable<IReadableNode> en && en.All(c => ReferenceEquals(c.GetParent(), node)))
+                || (pair.Value is IEnumerable e &&
+                    e.Cast<IReadableNode>().All(c => ReferenceEquals(c.GetParent(), node)))
+            )
+            .ToDictionary();
+        return containments;
+    }
+
+    private Dictionary<Feature, object?> CollectReferences(Dictionary<Feature, object?> featureValues)
+    {
+        var references = featureValues
+            .Where(pair => pair.Key is Reference
+                           || pair.Value is IReadableNode
+                           || (pair.Value is IEnumerable e && M2Extensions.AreAll<IReadableNode>(e))
+            )
+            .ToDictionary();
+        return references;
+    }
+
+    private IEnumerable<SerializedProperty> CollectUnsetProperties(IReadableNode node, ISet<Feature> allFeatures,
+        Dictionary<Feature, object?> properties) =>
+        allFeatures
+            .OfType<Property>()
+            .Except(properties.Keys)
+            .Select(p => SerializeProperty(node, p, null));
+
+    private IEnumerable<SerializedContainment> CollectUnsetContainments(ISet<Feature> allFeatures,
+        Dictionary<Feature, object?> containments) =>
+        allFeatures
+            .OfType<Containment>()
+            .Except(containments.Keys)
+            .Select(c => SerializeContainment([], c));
+
+    private IEnumerable<SerializedReference> CollectUnsetReferences(ISet<Feature> allFeatures,
+        Dictionary<Feature, object?> references) =>
+        allFeatures
+            .OfType<Reference>()
+            .Except(references.Keys)
+            .Select(c => SerializeReference([], c));
+
+    private IEnumerable<IReadableNode> AsNodes(KeyValuePair<Feature, object?> pair) =>
+        pair.Value != null ? M2Extensions.AsNodes<IReadableNode>(pair.Value) : [];
+
+    private SerializedProperty SerializeProperty(IReadableNode node, Feature feature, object? value)
+    {
+        if (value is not null && feature is Property { Type: Enumeration enumeration })
+            RegisterUsedLanguage(enumeration.GetLanguage());
+
+        return new SerializedProperty
         {
-            Id = node.GetId(),
-            Classifier = classifier.ToMetaPointer(),
-            Properties = classifier.AllFeatures().OfType<Property>()
-                .Select(property => SerializeProperty(node, property)).ToArray(),
-            Containments = classifier.AllFeatures().OfType<Containment>()
-                .Select<Containment, SerializedContainment>(containment =>
-                    SerializeContainmentsOf(node, containment)).ToArray(),
-            References = classifier.AllFeatures().OfType<Reference>()
-                .Select<Reference, SerializedReference>(reference => SerializeReferencesOf(node, reference))
-                .ToArray(),
-            Annotations = node.GetAnnotations()
-                .Select(annotation => annotation.GetId()).ToArray(),
-            Parent = node.GetParent()?.GetId()
+            Property = feature.ToMetaPointer(),
+            Value = value switch
+            {
+                null => null,
+                Enum e => e.LionCoreKey(),
+                int or bool or string => ConvertPrimitiveType(value),
+                _ => Handler.UnknownDatatype(node, feature, value)
+            }
         };
     }
 
-    private SerializedContainment SerializeContainmentsOf(IReadableNode node, Containment containment)
-    {
-        var value = GetValueIfSet(node, containment);
-        return SerializeContainment(value != null ? containment.AsNodes<IReadableNode>(value) : [], containment);
-    }
+    private SerializedContainment SerializeContainment(KeyValuePair<Feature, object?> pair) =>
+        SerializeContainment(AsNodes(pair), pair.Key);
 
-    private SerializedReference SerializeReferencesOf(IReadableNode node, Reference reference)
-    {
-        var value = GetValueIfSet(node, reference);
-        return SerializeReference(value != null ? reference.AsNodes<IReadableNode>(value) : [], reference);
-    }
-
-    protected SerializedContainment SerializeContainment(
-        IEnumerable<IReadableNode> children,
-        Containment containment) =>
+    protected SerializedContainment SerializeContainment(IEnumerable<IReadableNode> children, Feature containment) =>
         new()
         {
-            Containment = containment.ToMetaPointer(),
-            Children = children.Select((child) => child.GetId()).ToArray()
+            Containment = containment.ToMetaPointer(), Children = children.Select(child => child.GetId()).ToArray()
         };
 
-    protected SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Reference reference) =>
+    private SerializedReference SerializeReference(KeyValuePair<Feature, object?> pair) =>
+        SerializeReference(AsNodes(pair), pair.Key);
+
+    protected SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Feature reference) =>
         new()
         {
             Reference = reference.ToMetaPointer(),
             Targets = targets.Where(t => t != null).Select(SerializeReferenceTarget).ToArray()
         };
 
-    protected void RegisterUsedLanguage(IReadableNode node)
+    private string SerializeAnnotationTarget(IReadableNode annotation) =>
+        annotation.GetId();
+
+    protected void RegisterUsedLanguage(Language language)
     {
-        Language language = node.GetClassifier().GetLanguage();
         if (language.Key == BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
             return;
 

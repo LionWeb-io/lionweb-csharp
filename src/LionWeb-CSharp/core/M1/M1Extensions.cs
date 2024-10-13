@@ -269,7 +269,9 @@ public static class M1Extensions
         var result = self
             .CollectAllSetFeatures()
             .OfType<Containment>()
-            .SelectMany<Containment, T>(containment => containment.AsNodes<T>(self.Get(containment)));
+            .Select(containment => (containment, self.Get(containment)))
+            .Where(tuple => tuple.Item2 is T || tuple.Item2 is IEnumerable e && M2Extensions.AreAll<T>(e))
+            .SelectMany(tuple => M2Extensions.AsNodes<T>(tuple.Item2));
 
         if (includeAnnotations)
             result = result.Concat(self.GetAnnotations().Cast<T>());

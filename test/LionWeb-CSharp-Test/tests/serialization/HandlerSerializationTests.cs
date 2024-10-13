@@ -32,7 +32,7 @@ public class HandlerSerializationTests
 
         public void DuplicateNodeId(IReadableNode n) => incrementer();
         
-        public string? UnknownDatatype(IReadableNode node, Property property, object? value) => throw new NotImplementedException();
+        public string? UnknownDatatype(IReadableNode node, Feature property, object? value) => throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -61,7 +61,7 @@ public class HandlerSerializationTests
 
         public void DuplicateNodeId(IReadableNode n) => throw new NotImplementedException();
         
-        public string? UnknownDatatype(IReadableNode node, Property property, object? value) => throw new NotImplementedException();
+        public string? UnknownDatatype(IReadableNode node, Feature property, object? value) => throw new NotImplementedException();
     }
 
     [TestMethod]
