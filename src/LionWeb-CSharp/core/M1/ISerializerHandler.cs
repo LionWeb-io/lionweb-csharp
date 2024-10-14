@@ -41,7 +41,7 @@ public interface ISerializerHandler
     /// </remarks>
     void DuplicateNodeId(IReadableNode n);
 
-    string? UnknownDatatype(IReadableNode node, Property property, object? value);
+    string? UnknownDatatype(IReadableNode node, Feature property, object? value);
 }
 
 public class SerializerExceptionHandler : ISerializerHandler
@@ -56,7 +56,7 @@ public class SerializerExceptionHandler : ISerializerHandler
             $"different languages with same key '{a?.Key ?? b?.Key}' / version '{a?.Version ?? b?.Version}': {a}, {b}");
 
     /// <inheritdoc />
-    public string? UnknownDatatype(IReadableNode node, Property property, object? value) =>
+    public string? UnknownDatatype(IReadableNode node, Feature property, object? value) =>
         throw new ArgumentException($"unsupported property: {property}", nameof(property));
 }
 
@@ -74,7 +74,7 @@ public class SerializerIgnoringHandler : ISerializerHandler
         return a;
     }
 
-    public string? UnknownDatatype(IReadableNode node, Property property, object? value)
+    public string? UnknownDatatype(IReadableNode node, Feature property, object? value)
     {
         Console.WriteLine($"unsupported property: {property}", nameof(property));
         return null;

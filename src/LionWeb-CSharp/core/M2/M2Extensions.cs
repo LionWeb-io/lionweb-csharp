@@ -359,4 +359,12 @@ public static class M2Extensions
             }
         }
     }
+    
+    public static bool AreAllReadableNodes(IEnumerable enumerable) =>
+        enumerable.Cast<object?>().All(o => o is IReadableNode and not INode);
+
+    public static bool AreAll<T>(IEnumerable enumerable) =>
+        enumerable.Cast<object?>().All(o => o is T);
+
+
 }
