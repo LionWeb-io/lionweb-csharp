@@ -97,6 +97,23 @@ public class WithEnumFactory : AbstractBaseNodeFactory, IWithEnumFactory
 [LionCoreMetaPointer(Language = typeof(WithEnumLanguage), Key = "EnumHolder")]
 public class EnumHolder : NodeBase
 {
+	private MyEnum? _enumValue = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If EnumValue has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(WithEnumLanguage), Key = "enumValue")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public MyEnum EnumValue { get => _enumValue ?? throw new UnsetFeatureException(WithEnumLanguage.Instance.EnumHolder_enumValue); set => SetEnumValue(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public EnumHolder SetEnumValue(MyEnum value)
+	{
+		AssureNotNull(value, WithEnumLanguage.Instance.EnumHolder_enumValue);
+		_enumValue = value;
+		return this;
+	}
+
 	public EnumHolder(string id) : base(id)
 	{
 	}
@@ -143,23 +160,6 @@ public class EnumHolder : NodeBase
 		if (_enumValue != default)
 			result.Add(WithEnumLanguage.Instance.EnumHolder_enumValue);
 		return result;
-	}
-
-	private MyEnum? _enumValue = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If EnumValue has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(WithEnumLanguage), Key = "enumValue")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public MyEnum EnumValue { get => _enumValue ?? throw new UnsetFeatureException(WithEnumLanguage.Instance.EnumHolder_enumValue); set => SetEnumValue(value); }
-
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public EnumHolder SetEnumValue(MyEnum value)
-	{
-		AssureNotNull(value, WithEnumLanguage.Instance.EnumHolder_enumValue);
-		_enumValue = value;
-		return this;
 	}
 }
 

@@ -87,6 +87,66 @@ public class TinyRefLangFactory : AbstractBaseNodeFactory, ITinyRefLangFactory
 [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept")]
 public class MyConcept : NodeBase
 {
+	private MyConcept? _singularRef = null;
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "UnsetFeatureException">If SingularRef has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-singularRef")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
+	public MyConcept SingularRef { get => _singularRef ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public MyConcept SetSingularRef(MyConcept value)
+	{
+		AssureNotNull(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
+		_singularRef = value;
+		return this;
+	}
+
+	private readonly List<MyConcept> _multivaluedRef = [];
+	/// <remarks>Required Multiple Reference</remarks>
+    	/// <exception cref = "UnsetFeatureException">If MultivaluedRef is empty</exception>
+        [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-multivaluedRef")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
+	public IReadOnlyList<MyConcept> MultivaluedRef { get => AsNonEmptyReadOnly(_multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef); init => AddMultivaluedRef(value); }
+
+	/// <remarks>Required Multiple Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
+        public MyConcept AddMultivaluedRef(IEnumerable<MyConcept> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		_multivaluedRef.AddRange(safeNodes);
+		return this;
+	}
+
+	/// <remarks>Required Multiple Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
+    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than MultivaluedRef.Count</exception>
+        public MyConcept InsertMultivaluedRef(int index, IEnumerable<MyConcept> nodes)
+	{
+		AssureInRange(index, _multivaluedRef);
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		_multivaluedRef.InsertRange(index, safeNodes);
+		return this;
+	}
+
+	/// <remarks>Required Multiple Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If MultivaluedRef would be empty</exception>
+        public MyConcept RemoveMultivaluedRef(IEnumerable<MyConcept> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		AssureNotClearing(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		RemoveAll(safeNodes, _multivaluedRef);
+		return this;
+	}
+
 	public MyConcept(string id) : base(id)
 	{
 	}
@@ -150,65 +210,5 @@ public class MyConcept : NodeBase
 		if (_multivaluedRef.Count != 0)
 			result.Add(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		return result;
-	}
-
-	private MyConcept? _singularRef = null;
-	/// <remarks>Required Single Reference</remarks>
-    	/// <exception cref = "UnsetFeatureException">If SingularRef has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-singularRef")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public MyConcept SingularRef { get => _singularRef ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
-
-	/// <remarks>Required Single Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public MyConcept SetSingularRef(MyConcept value)
-	{
-		AssureNotNull(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
-		_singularRef = value;
-		return this;
-	}
-
-	private readonly List<MyConcept> _multivaluedRef = [];
-	/// <remarks>Required Multiple Reference</remarks>
-    	/// <exception cref = "UnsetFeatureException">If MultivaluedRef is empty</exception>
-        [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-multivaluedRef")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public IReadOnlyList<MyConcept> MultivaluedRef { get => AsNonEmptyReadOnly(_multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef); init => AddMultivaluedRef(value); }
-
-	/// <remarks>Required Multiple Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
-        public MyConcept AddMultivaluedRef(IEnumerable<MyConcept> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		_multivaluedRef.AddRange(safeNodes);
-		return this;
-	}
-
-	/// <remarks>Required Multiple Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
-    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than MultivaluedRef.Count</exception>
-        public MyConcept InsertMultivaluedRef(int index, IEnumerable<MyConcept> nodes)
-	{
-		AssureInRange(index, _multivaluedRef);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		_multivaluedRef.InsertRange(index, safeNodes);
-		return this;
-	}
-
-	/// <remarks>Required Multiple Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If MultivaluedRef would be empty</exception>
-        public MyConcept RemoveMultivaluedRef(IEnumerable<MyConcept> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		AssureNotClearing(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		RemoveAll(safeNodes, _multivaluedRef);
-		return this;
 	}
 }

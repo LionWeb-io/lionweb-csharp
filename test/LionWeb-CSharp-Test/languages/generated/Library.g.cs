@@ -169,6 +169,67 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Book")]
 public class Book : NodeBase
 {
+	private string? _title = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Title has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "title")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Title { get => _title ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_title); set => SetTitle(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Book SetTitle(string value)
+	{
+		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
+		_title = value;
+		return this;
+	}
+
+	private int? _pages = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Pages has not been set</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "pages")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public int Pages { get => _pages ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_pages); set => SetPages(value); }
+
+	/// <remarks>Required Property</remarks>
+        public Book SetPages(int value)
+	{
+		_pages = value;
+		return this;
+	}
+
+	private Writer? _author = null;
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Author has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "author")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
+	public Writer Author { get => _author ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Book SetAuthor(Writer value)
+	{
+		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
+		_author = value;
+		return this;
+	}
+
+	private BookType? _type = null;
+	/// <remarks>Optional Property</remarks>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "type")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
+	public BookType? Type { get => _type; set => SetType(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public Book SetType(BookType? value)
+	{
+		_type = value;
+		return this;
+	}
+
 	public Book(string id) : base(id)
 	{
 	}
@@ -273,72 +334,69 @@ public class Book : NodeBase
 			result.Add(LibraryLanguage.Instance.Book_type);
 		return result;
 	}
-
-	private string? _title = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Title has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "title")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Title { get => _title ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_title); set => SetTitle(value); }
-
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Book SetTitle(string value)
-	{
-		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
-		_title = value;
-		return this;
-	}
-
-	private int? _pages = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Pages has not been set</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "pages")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public int Pages { get => _pages ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_pages); set => SetPages(value); }
-
-	/// <remarks>Required Property</remarks>
-        public Book SetPages(int value)
-	{
-		_pages = value;
-		return this;
-	}
-
-	private Writer? _author = null;
-	/// <remarks>Required Single Reference</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Author has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "author")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public Writer Author { get => _author ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
-
-	/// <remarks>Required Single Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Book SetAuthor(Writer value)
-	{
-		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
-		_author = value;
-		return this;
-	}
-
-	private BookType? _type = null;
-	/// <remarks>Optional Property</remarks>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "type")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
-	public BookType? Type { get => _type; set => SetType(value); }
-
-	/// <remarks>Optional Property</remarks>
-        public Book SetType(BookType? value)
-	{
-		_type = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Library")]
 public class Library : NodeBase
 {
+	private string? _name = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Library_name")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Library_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Library SetName(string value)
+	{
+		AssureNotNull(value, LibraryLanguage.Instance.Library_name);
+		_name = value;
+		return this;
+	}
+
+	private readonly List<Book> _books = [];
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Books is empty</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "books")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public IReadOnlyList<Book> Books { get => AsNonEmptyReadOnly(_books, LibraryLanguage.Instance.Library_books); init => AddBooks(value); }
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
+        public Library AddBooks(IEnumerable<Book> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
+    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Books.Count</exception>
+        public Library InsertBooks(int index, IEnumerable<Book> nodes)
+	{
+		AssureInRange(index, _books);
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		AssureNoSelfMove(index, safeNodes, _books);
+		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If Books would be empty</exception>
+        public Library RemoveBooks(IEnumerable<Book> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, LibraryLanguage.Instance.Library_books);
+		AssureNotClearing(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		RemoveSelfParent(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		return this;
+	}
+
 	public Library(string id) : base(id)
 	{
 	}
@@ -429,69 +487,28 @@ public class Library : NodeBase
 			return LibraryLanguage.Instance.Library_books;
 		return null;
 	}
-
-	private string? _name = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Library_name")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Library_name); set => SetName(value); }
-
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Library SetName(string value)
-	{
-		AssureNotNull(value, LibraryLanguage.Instance.Library_name);
-		_name = value;
-		return this;
-	}
-
-	private readonly List<Book> _books = [];
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Books is empty</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "books")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public IReadOnlyList<Book> Books { get => AsNonEmptyReadOnly(_books, LibraryLanguage.Instance.Library_books); init => AddBooks(value); }
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
-        public Library AddBooks(IEnumerable<Book> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
-    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Books.Count</exception>
-        public Library InsertBooks(int index, IEnumerable<Book> nodes)
-	{
-		AssureInRange(index, _books);
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		AssureNoSelfMove(index, safeNodes, _books);
-		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If Books would be empty</exception>
-        public Library RemoveBooks(IEnumerable<Book> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, LibraryLanguage.Instance.Library_books);
-		AssureNotClearing(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		RemoveSelfParent(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Writer")]
 public class Writer : NodeBase
 {
+	private string? _name = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Writer_name")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Writer_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Writer SetName(string value)
+	{
+		AssureNotNull(value, LibraryLanguage.Instance.Writer_name);
+		_name = value;
+		return this;
+	}
+
 	public Writer(string id) : base(id)
 	{
 	}
@@ -539,28 +556,28 @@ public class Writer : NodeBase
 			result.Add(LibraryLanguage.Instance.Writer_name);
 		return result;
 	}
-
-	private string? _name = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Writer_name")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Writer_name); set => SetName(value); }
-
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Writer SetName(string value)
-	{
-		AssureNotNull(value, LibraryLanguage.Instance.Writer_name);
-		_name = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "GuideBookWriter")]
 public class GuideBookWriter : Writer
 {
+	private string? _countries = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Countries has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "countries")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Countries { get => _countries ?? throw new UnsetFeatureException(LibraryLanguage.Instance.GuideBookWriter_countries); set => SetCountries(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public GuideBookWriter SetCountries(string value)
+	{
+		AssureNotNull(value, LibraryLanguage.Instance.GuideBookWriter_countries);
+		_countries = value;
+		return this;
+	}
+
 	public GuideBookWriter(string id) : base(id)
 	{
 	}
@@ -608,28 +625,28 @@ public class GuideBookWriter : Writer
 			result.Add(LibraryLanguage.Instance.GuideBookWriter_countries);
 		return result;
 	}
-
-	private string? _countries = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Countries has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "countries")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Countries { get => _countries ?? throw new UnsetFeatureException(LibraryLanguage.Instance.GuideBookWriter_countries); set => SetCountries(value); }
-
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public GuideBookWriter SetCountries(string value)
-	{
-		AssureNotNull(value, LibraryLanguage.Instance.GuideBookWriter_countries);
-		_countries = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "SpecialistBookWriter")]
 public class SpecialistBookWriter : Writer
 {
+	private string? _subject = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Subject has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "subject")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Subject { get => _subject ?? throw new UnsetFeatureException(LibraryLanguage.Instance.SpecialistBookWriter_subject); set => SetSubject(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public SpecialistBookWriter SetSubject(string value)
+	{
+		AssureNotNull(value, LibraryLanguage.Instance.SpecialistBookWriter_subject);
+		_subject = value;
+		return this;
+	}
+
 	public SpecialistBookWriter(string id) : base(id)
 	{
 	}
@@ -676,23 +693,6 @@ public class SpecialistBookWriter : Writer
 		if (_subject != default)
 			result.Add(LibraryLanguage.Instance.SpecialistBookWriter_subject);
 		return result;
-	}
-
-	private string? _subject = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Subject has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "subject")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Subject { get => _subject ?? throw new UnsetFeatureException(LibraryLanguage.Instance.SpecialistBookWriter_subject); set => SetSubject(value); }
-
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SpecialistBookWriter SetSubject(string value)
-	{
-		AssureNotNull(value, LibraryLanguage.Instance.SpecialistBookWriter_subject);
-		_subject = value;
-		return this;
 	}
 }
 
