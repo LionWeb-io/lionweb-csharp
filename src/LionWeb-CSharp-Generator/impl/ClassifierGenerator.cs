@@ -58,7 +58,10 @@ public class ClassifierGenerator(Classifier classifier, INames names)
             modifiers.Add(SyntaxKind.AbstractKeyword);
 
         var decl = ClassDeclaration(ClassifierName)
-            .WithAttributeLists(AsAttributes([MetaPointerAttribute(classifier)]))
+            .WithAttributeLists(AsAttributes([
+                MetaPointerAttribute(classifier),
+                ObsoleteAttribute(classifier)
+            ]))
             .WithModifiers(AsModifiers(modifiers.ToArray()))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(
@@ -117,7 +120,11 @@ public class ClassifierGenerator(Classifier classifier, INames names)
             bases = [AsType(typeof(INode))];
 
         var decl = InterfaceDeclaration(ClassifierName)
-            .WithAttributeLists(AsAttributes([MetaPointerAttribute(classifier)]))
+            .WithAttributeLists(AsAttributes(
+            [
+                MetaPointerAttribute(classifier),
+                ObsoleteAttribute(classifier)
+            ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.SelectMany(f =>

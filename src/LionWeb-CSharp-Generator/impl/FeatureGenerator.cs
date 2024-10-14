@@ -477,7 +477,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithAttributeLists(AsAttributes([
                 MetaPointerAttribute(feature),
-                FeatureAttribute()
+                FeatureAttribute(),
+                ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocRemarks(feature)
@@ -514,7 +515,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ])))
             .WithAttributeLists(AsAttributes([
                 MetaPointerAttribute(feature),
-                FeatureAttribute()
+                FeatureAttribute(),
+                ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocRemarks(feature));
@@ -526,7 +528,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithAttributeLists(AsAttributes([
                 MetaPointerAttribute(feature),
-                FeatureAttribute()
+                FeatureAttribute(),
+                ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocRemarks(feature));
@@ -542,7 +545,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ])))
             .WithAttributeLists(AsAttributes([
                 MetaPointerAttribute(feature),
-                FeatureAttribute()
+                FeatureAttribute(),
+                ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocRemarks(feature));
@@ -562,7 +566,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ])))
             .WithAttributeLists(AsAttributes([
                 MetaPointerAttribute(feature),
-                FeatureAttribute()
+                FeatureAttribute(),
+                ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocRemarks(link));
@@ -579,7 +584,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ])))
             .WithAttributeLists(AsAttributes([
                 MetaPointerAttribute(feature),
-                FeatureAttribute()
+                FeatureAttribute(),
+                ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocRemarks(link));

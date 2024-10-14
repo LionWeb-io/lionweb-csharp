@@ -50,8 +50,8 @@ public static class AstExtensions
         BaseList(SeparatedList<BaseTypeSyntax>(bases.Select(SimpleBaseType)));
 
     /// <paramref name="attributes"/> ready to be fed to <see cref="BaseTypeDeclarationSyntax.WithAttributeLists"/>.
-    public static SyntaxList<AttributeListSyntax> AsAttributes(IEnumerable<AttributeSyntax> attributes) =>
-        List(attributes.Select(a => AttributeList(SingletonSeparatedList(a))));
+    public static SyntaxList<AttributeListSyntax> AsAttributes(IEnumerable<AttributeSyntax?> attributes) =>
+        List(attributes.OfType<AttributeSyntax>().Select(a => AttributeList(SingletonSeparatedList(a))));
 
     /// <returns><c>[attributeName(parameters.string = parameters.expression, ...)</c></returns>
     public static AttributeSyntax AsAttribute(TypeSyntax attributeName,
