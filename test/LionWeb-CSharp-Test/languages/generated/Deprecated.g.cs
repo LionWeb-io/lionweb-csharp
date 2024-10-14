@@ -52,24 +52,31 @@ public class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
         public override string Version => _version;
 
 	private readonly Lazy<Concept> _deprConcept;
+	[Obsolete("deprConcept comment")]
 	public Concept DeprConcept => _deprConcept.Value;
 
 	private readonly Lazy<Property> _deprConcept_deprProp;
+	[Obsolete("deprProp comment")]
 	public Property DeprConcept_deprProp => _deprConcept_deprProp.Value;
 
 	private readonly Lazy<Containment> _deprConcept_deprChild;
+	[Obsolete("deprChild comment")]
 	public Containment DeprConcept_deprChild => _deprConcept_deprChild.Value;
 
 	private readonly Lazy<Reference> _deprConcept_deprRef;
+	[Obsolete("deprRef comment")]
 	public Reference DeprConcept_deprRef => _deprConcept_deprRef.Value;
 
 	private readonly Lazy<Interface> _deprIface;
+	[Obsolete("deprIface comment")]
 	public Interface DeprIface => _deprIface.Value;
 
 	private readonly Lazy<Annotation> _deprAnnotation;
+	[Obsolete("deprAnnotation comment")]
 	public Annotation DeprAnnotation => _deprAnnotation.Value;
 
 	private readonly Lazy<Enumeration> _deprEnum;
+	[Obsolete("deprEnum comment")]
 	public Enumeration DeprEnum => _deprEnum.Value;
 
 	private readonly Lazy<EnumerationLiteral> _deprEnum_A;
@@ -79,19 +86,27 @@ public class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
 	public EnumerationLiteral DeprEnum_B => _deprEnum_B.Value;
 
 	private readonly Lazy<PrimitiveType> _deprDatatype;
+	[Obsolete("deprDatatype comment")]
 	public PrimitiveType DeprDatatype => _deprDatatype.Value;
 
 	private readonly Lazy<Concept> _deprNoComment;
+	[Obsolete]
 	public Concept DeprNoComment => _deprNoComment.Value;
 }
 
 public interface IDeprecatedFactory : INodeFactory
 {
+	[Obsolete("deprConcept comment")]
 	public DeprConcept NewDeprConcept(string id);
+	[Obsolete("deprConcept comment")]
 	public DeprConcept CreateDeprConcept();
+	[Obsolete("deprAnnotation comment")]
 	public DeprAnnotation NewDeprAnnotation(string id);
+	[Obsolete("deprAnnotation comment")]
 	public DeprAnnotation CreateDeprAnnotation();
+	[Obsolete]
 	public DeprNoComment NewDeprNoComment(string id);
+	[Obsolete]
 	public DeprNoComment CreateDeprNoComment();
 }
 
@@ -123,11 +138,17 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
+	[Obsolete("deprConcept comment")]
 	public virtual DeprConcept NewDeprConcept(string id) => new(id);
+	[Obsolete("deprConcept comment")]
 	public virtual DeprConcept CreateDeprConcept() => NewDeprConcept(GetNewId());
+	[Obsolete("deprAnnotation comment")]
 	public virtual DeprAnnotation NewDeprAnnotation(string id) => new(id);
+	[Obsolete("deprAnnotation comment")]
 	public virtual DeprAnnotation CreateDeprAnnotation() => NewDeprAnnotation(GetNewId());
+	[Obsolete]
 	public virtual DeprNoComment NewDeprNoComment(string id) => new(id);
+	[Obsolete]
 	public virtual DeprNoComment CreateDeprNoComment() => NewDeprNoComment(GetNewId());
 }
 
@@ -143,7 +164,8 @@ public class DeprConcept : NodeBase
 	public string? DeprProp { get => _deprProp; set => SetDeprProp(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public DeprConcept SetDeprProp(string? value)
+        [Obsolete("deprProp comment")]
+	public DeprConcept SetDeprProp(string? value)
 	{
 		_deprProp = value;
 		return this;
@@ -157,14 +179,16 @@ public class DeprConcept : NodeBase
 	public IReadOnlyList<DeprIface> DeprChild { get => _deprChild.AsReadOnly(); init => AddDeprChild(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes)
+        [Obsolete("deprChild comment")]
+	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes)
 	{
 		_deprChild.AddRange(SetSelfParent(nodes?.ToList(), DeprecatedLanguage.Instance.DeprConcept_deprChild));
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public DeprConcept InsertDeprChild(int index, IEnumerable<DeprIface> nodes)
+        [Obsolete("deprChild comment")]
+	public DeprConcept InsertDeprChild(int index, IEnumerable<DeprIface> nodes)
 	{
 		AssureInRange(index, _deprChild);
 		var safeNodes = nodes?.ToList();
@@ -175,7 +199,8 @@ public class DeprConcept : NodeBase
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public DeprConcept RemoveDeprChild(IEnumerable<DeprIface> nodes)
+        [Obsolete("deprChild comment")]
+	public DeprConcept RemoveDeprChild(IEnumerable<DeprIface> nodes)
 	{
 		RemoveSelfParent(nodes?.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		return this;
@@ -192,7 +217,8 @@ public class DeprConcept : NodeBase
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public DeprConcept SetDeprRef(DeprAnnotation value)
+        [Obsolete("deprRef comment")]
+	public DeprConcept SetDeprRef(DeprAnnotation value)
 	{
 		AssureNotNull(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
 		_deprRef = value;
