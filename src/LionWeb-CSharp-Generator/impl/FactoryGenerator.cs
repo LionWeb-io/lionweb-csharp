@@ -151,13 +151,15 @@ public class FactoryGenerator(INames names) : GeneratorBase(names)
         Method(AsNewMethod(classifier), AsType(classifier), [Param("id", AsType(typeof(string)))],
                 NewCall([IdentifierName("id")])
             )
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword));
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(classifier)]));
 
     private MethodDeclarationSyntax GenCreateMethod(Classifier classifier) =>
         Method(AsCreateMethod(classifier), AsType(classifier),
                 exprBody: Call(AsNewMethod(classifier), ParseExpression("GetNewId()"))
             )
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword));
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(classifier)]));
 
     #endregion
 

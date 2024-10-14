@@ -58,21 +58,26 @@ public class ClassifierGenerator(Classifier classifier, INames names)
             modifiers.Add(SyntaxKind.AbstractKeyword);
 
         var decl = ClassDeclaration(ClassifierName)
-            .WithAttributeLists(AsAttributes([MetaPointerAttribute(classifier)]))
+            .WithAttributeLists(AsAttributes([
+                MetaPointerAttribute(classifier),
+                ObsoleteAttribute(classifier)
+            ]))
             .WithModifiers(AsModifiers(modifiers.ToArray()))
             .WithBaseList(AsBase(bases.ToArray()))
-            .WithMembers(List(new List<MemberDeclarationSyntax> { GenConstructor(), GenGetClassifier() }
-                .Concat(new FeatureMethodsGenerator(classifier, _names).FeatureMethods())
-                .Concat(new ContainmentMethodsGenerator(classifier, _names).ContainmentMethods())
-                .Concat(FeaturesToImplement(classifier)
-                    .SelectMany(f => new FeatureGenerator(classifier, f, _names).Members()))));
+            .WithMembers(List(
+                FeaturesToImplement(classifier).SelectMany(f => new FeatureGenerator(classifier, f, _names).Members())
+                    .Concat(new List<MemberDeclarationSyntax> { GenConstructor(), GenGetClassifier() })
+                    .Concat(new FeatureMethodsGenerator(classifier, _names).FeatureMethods())
+                    .Concat(new ContainmentMethodsGenerator(classifier, _names).ContainmentMethods())
+            ));
 
         return AttachConceptDescription(decl);
     }
 
     private T AttachConceptDescription<T>(T decl) where T : TypeDeclarationSyntax
     {
-        var conceptDescriptions = classifier.GetAnnotations().OfType<ConceptDescription>().Where(cd => cd.ConceptShortDescription != null);
+        var conceptDescriptions = classifier.GetAnnotations().OfType<ConceptDescription>()
+            .Where(cd => cd.ConceptShortDescription != null);
         if (conceptDescriptions.Any())
         {
             return decl.Xdoc(XdocLine(conceptDescriptions.First().ConceptShortDescription, "summary"));
@@ -115,7 +120,11 @@ public class ClassifierGenerator(Classifier classifier, INames names)
             bases = [AsType(typeof(INode))];
 
         var decl = InterfaceDeclaration(ClassifierName)
-            .WithAttributeLists(AsAttributes([MetaPointerAttribute(classifier)]))
+            .WithAttributeLists(AsAttributes(
+            [
+                MetaPointerAttribute(classifier),
+                ObsoleteAttribute(classifier)
+            ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.SelectMany(f =>

@@ -88,6 +88,36 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-BConcept")]
 public class BConcept : NodeBase
 {
+	private Examples.Circular.A.AConcept? _aRef = null;
+	/// <remarks>Optional Single Reference</remarks>
+        [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	public Examples.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
+
+	/// <remarks>Optional Single Reference</remarks>
+        public BConcept SetARef(Examples.Circular.A.AConcept? value)
+	{
+		_aRef = value;
+		return this;
+	}
+
+	private Examples.Circular.A.AEnum? _aEnumProp = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If AEnumProp has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-AEnumProp")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public Examples.Circular.A.AEnum AEnumProp { get => _aEnumProp ?? throw new UnsetFeatureException(BLangLanguage.Instance.BConcept_AEnumProp); set => SetAEnumProp(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public BConcept SetAEnumProp(Examples.Circular.A.AEnum value)
+	{
+		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
+		_aEnumProp = value;
+		return this;
+	}
+
 	public BConcept(string id) : base(id)
 	{
 	}
@@ -153,35 +183,5 @@ public class BConcept : NodeBase
 		if (_aEnumProp != default)
 			result.Add(BLangLanguage.Instance.BConcept_AEnumProp);
 		return result;
-	}
-
-	private Examples.Circular.A.AConcept? _aRef = null;
-	/// <remarks>Optional Single Reference</remarks>
-        [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public Examples.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
-
-	/// <remarks>Optional Single Reference</remarks>
-        public BConcept SetARef(Examples.Circular.A.AConcept? value)
-	{
-		_aRef = value;
-		return this;
-	}
-
-	private Examples.Circular.A.AEnum? _aEnumProp = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If AEnumProp has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-AEnumProp")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public Examples.Circular.A.AEnum AEnumProp { get => _aEnumProp ?? throw new UnsetFeatureException(BLangLanguage.Instance.BConcept_AEnumProp); set => SetAEnumProp(value); }
-
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BConcept SetAEnumProp(Examples.Circular.A.AEnum value)
-	{
-		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
-		_aEnumProp = value;
-		return this;
 	}
 }

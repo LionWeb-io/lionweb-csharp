@@ -63,6 +63,8 @@ public abstract class LanguageGeneratorBase : GeneratorBase
             return ParseExpression("BuiltInsLanguage.Instance.Json");
         if (entity.EqualsIdentity(BuiltInsLanguage.Instance.String))
             return ParseExpression("BuiltInsLanguage.Instance.String");
+        if (entity.EqualsIdentity(M3Language.Instance.IKeyed))
+            return ParseExpression("M3Language.Instance.IKeyed");
         if (entity.EqualsIdentity(M3Language.Instance.Classifier))
             return ParseExpression("M3Language.Instance.Classifier");
         if (entity.EqualsIdentity(M3Language.Instance.Concept))

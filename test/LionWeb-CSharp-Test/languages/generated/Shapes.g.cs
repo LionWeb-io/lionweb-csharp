@@ -320,6 +320,39 @@ public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Circle")]
 public class Circle : Shape
 {
+	private int? _r = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If R has not been set</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-r")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public int R { get => _r ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Circle_r); set => SetR(value); }
+
+	/// <remarks>Required Property</remarks>
+        public Circle SetR(int value)
+	{
+		_r = value;
+		return this;
+	}
+
+	private Coord? _center = null;
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Center has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-center")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public Coord Center { get => _center ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Circle_center); set => SetCenter(value); }
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Circle SetCenter(Coord value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.Circle_center);
+		SetParentNull(_center);
+		AttachChild(value);
+		_center = value;
+		return this;
+	}
+
 	public Circle(string id) : base(id)
 	{
 	}
@@ -412,44 +445,53 @@ public class Circle : Shape
 			return ShapesLanguage.Instance.Circle_center;
 		return null;
 	}
-
-	private int? _r = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If R has not been set</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-r")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public int R { get => _r ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Circle_r); set => SetR(value); }
-
-	/// <remarks>Required Property</remarks>
-        public Circle SetR(int value)
-	{
-		_r = value;
-		return this;
-	}
-
-	private Coord? _center = null;
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Center has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-center")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public Coord Center { get => _center ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Circle_center); set => SetCenter(value); }
-
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Circle SetCenter(Coord value)
-	{
-		AssureNotNull(value, ShapesLanguage.Instance.Circle_center);
-		SetParentNull(_center);
-		AttachChild(value);
-		_center = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Coord")]
 public class Coord : NodeBase
 {
+	private int? _x = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If X has not been set</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-x")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public int X { get => _x ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_x); set => SetX(value); }
+
+	/// <remarks>Required Property</remarks>
+        public Coord SetX(int value)
+	{
+		_x = value;
+		return this;
+	}
+
+	private int? _y = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Y has not been set</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-y")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public int Y { get => _y ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_y); set => SetY(value); }
+
+	/// <remarks>Required Property</remarks>
+        public Coord SetY(int value)
+	{
+		_y = value;
+		return this;
+	}
+
+	private int? _z = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Z has not been set</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-z")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public int Z { get => _z ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_z); set => SetZ(value); }
+
+	/// <remarks>Required Property</remarks>
+        public Coord SetZ(int value)
+	{
+		_z = value;
+		return this;
+	}
+
 	public Coord(string id) : base(id)
 	{
 	}
@@ -535,53 +577,57 @@ public class Coord : NodeBase
 			result.Add(ShapesLanguage.Instance.Coord_z);
 		return result;
 	}
-
-	private int? _x = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If X has not been set</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-x")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public int X { get => _x ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_x); set => SetX(value); }
-
-	/// <remarks>Required Property</remarks>
-        public Coord SetX(int value)
-	{
-		_x = value;
-		return this;
-	}
-
-	private int? _y = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Y has not been set</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-y")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public int Y { get => _y ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_y); set => SetY(value); }
-
-	/// <remarks>Required Property</remarks>
-        public Coord SetY(int value)
-	{
-		_y = value;
-		return this;
-	}
-
-	private int? _z = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Z has not been set</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-z")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public int Z { get => _z ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_z); set => SetZ(value); }
-
-	/// <remarks>Required Property</remarks>
-        public Coord SetZ(int value)
-	{
-		_z = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Geometry")]
 public class Geometry : NodeBase
 {
+	private readonly List<IShape> _shapes = [];
+	/// <remarks>Optional Multiple Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public Geometry AddShapes(IEnumerable<IShape> nodes)
+	{
+		_shapes.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.Geometry_shapes));
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public Geometry InsertShapes(int index, IEnumerable<IShape> nodes)
+	{
+		AssureInRange(index, _shapes);
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
+		AssureNoSelfMove(index, safeNodes, _shapes);
+		_shapes.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public Geometry RemoveShapes(IEnumerable<IShape> nodes)
+	{
+		RemoveSelfParent(nodes?.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes);
+		return this;
+	}
+
+	private Documentation? _documentation = null;
+	/// <remarks>Optional Single Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-documentation")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public Documentation? Documentation { get => _documentation; set => SetDocumentation(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public Geometry SetDocumentation(Documentation? value)
+	{
+		SetParentNull(_documentation);
+		AttachChild(value);
+		_documentation = value;
+		return this;
+	}
+
 	public Geometry(string id) : base(id)
 	{
 	}
@@ -679,52 +725,6 @@ public class Geometry : NodeBase
 			return ShapesLanguage.Instance.Geometry_documentation;
 		return null;
 	}
-
-	private readonly List<IShape> _shapes = [];
-	/// <remarks>Optional Multiple Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
-
-	/// <remarks>Optional Multiple Containment</remarks>
-        public Geometry AddShapes(IEnumerable<IShape> nodes)
-	{
-		_shapes.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.Geometry_shapes));
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Containment</remarks>
-        public Geometry InsertShapes(int index, IEnumerable<IShape> nodes)
-	{
-		AssureInRange(index, _shapes);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
-		AssureNoSelfMove(index, safeNodes, _shapes);
-		_shapes.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Containment</remarks>
-        public Geometry RemoveShapes(IEnumerable<IShape> nodes)
-	{
-		RemoveSelfParent(nodes?.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes);
-		return this;
-	}
-
-	private Documentation? _documentation = null;
-	/// <remarks>Optional Single Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-documentation")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public Documentation? Documentation { get => _documentation; set => SetDocumentation(value); }
-
-	/// <remarks>Optional Single Containment</remarks>
-        public Geometry SetDocumentation(Documentation? value)
-	{
-		SetParentNull(_documentation);
-		AttachChild(value);
-		_documentation = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-IShape")]
@@ -753,6 +753,44 @@ public interface IShape : INode
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Line")]
 public class Line : Shape, INamedWritable
 {
+	private Coord? _start = null;
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Start has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-start")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public Coord Start { get => _start ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Line_start); set => SetStart(value); }
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Line SetStart(Coord value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.Line_start);
+		SetParentNull(_start);
+		AttachChild(value);
+		_start = value;
+		return this;
+	}
+
+	private Coord? _end = null;
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If End has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-end")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public Coord End { get => _end ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Line_end); set => SetEnd(value); }
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Line SetEnd(Coord value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.Line_end);
+		SetParentNull(_end);
+		AttachChild(value);
+		_end = value;
+		return this;
+	}
+
 	public Line(string id) : base(id)
 	{
 	}
@@ -853,49 +891,90 @@ public class Line : Shape, INamedWritable
 			return ShapesLanguage.Instance.Line_end;
 		return null;
 	}
-
-	private Coord? _start = null;
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Start has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-start")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public Coord Start { get => _start ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Line_start); set => SetStart(value); }
-
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Line SetStart(Coord value)
-	{
-		AssureNotNull(value, ShapesLanguage.Instance.Line_start);
-		SetParentNull(_start);
-		AttachChild(value);
-		_start = value;
-		return this;
-	}
-
-	private Coord? _end = null;
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If End has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-end")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public Coord End { get => _end ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Line_end); set => SetEnd(value); }
-
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Line SetEnd(Coord value)
-	{
-		AssureNotNull(value, ShapesLanguage.Instance.Line_end);
-		SetParentNull(_end);
-		AttachChild(value);
-		_end = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-OffsetDuplicate")]
 public class OffsetDuplicate : Shape
 {
+	private Coord? _offset = null;
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Offset has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-offset")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public Coord Offset { get => _offset ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_offset); set => SetOffset(value); }
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public OffsetDuplicate SetOffset(Coord value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_offset);
+		SetParentNull(_offset);
+		AttachChild(value);
+		_offset = value;
+		return this;
+	}
+
+	private Shape? _source = null;
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Source has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-source")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
+	public Shape Source { get => _source ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_source); set => SetSource(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public OffsetDuplicate SetSource(Shape value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_source);
+		_source = value;
+		return this;
+	}
+
+	private Shape? _altSource = null;
+	/// <remarks>Optional Single Reference</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-source")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	public Shape? AltSource { get => _altSource; set => SetAltSource(value); }
+
+	/// <remarks>Optional Single Reference</remarks>
+        public OffsetDuplicate SetAltSource(Shape? value)
+	{
+		_altSource = value;
+		return this;
+	}
+
+	private Documentation? _docs = null;
+	/// <remarks>Optional Single Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-docs")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public Documentation? Docs { get => _docs; set => SetDocs(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public OffsetDuplicate SetDocs(Documentation? value)
+	{
+		SetParentNull(_docs);
+		AttachChild(value);
+		_docs = value;
+		return this;
+	}
+
+	private Documentation? _secretDocs = null;
+	/// <remarks>Optional Single Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-secret-docs")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public Documentation? SecretDocs { get => _secretDocs; set => SetSecretDocs(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public OffsetDuplicate SetSecretDocs(Documentation? value)
+	{
+		SetParentNull(_secretDocs);
+		AttachChild(value);
+		_secretDocs = value;
+		return this;
+	}
+
 	public OffsetDuplicate(string id) : base(id)
 	{
 	}
@@ -1061,90 +1140,98 @@ public class OffsetDuplicate : Shape
 			return ShapesLanguage.Instance.OffsetDuplicate_secretDocs;
 		return null;
 	}
-
-	private Coord? _offset = null;
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Offset has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-offset")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public Coord Offset { get => _offset ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_offset); set => SetOffset(value); }
-
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public OffsetDuplicate SetOffset(Coord value)
-	{
-		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_offset);
-		SetParentNull(_offset);
-		AttachChild(value);
-		_offset = value;
-		return this;
-	}
-
-	private Shape? _source = null;
-	/// <remarks>Required Single Reference</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Source has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-source")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public Shape Source { get => _source ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_source); set => SetSource(value); }
-
-	/// <remarks>Required Single Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public OffsetDuplicate SetSource(Shape value)
-	{
-		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_source);
-		_source = value;
-		return this;
-	}
-
-	private Shape? _altSource = null;
-	/// <remarks>Optional Single Reference</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-source")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public Shape? AltSource { get => _altSource; set => SetAltSource(value); }
-
-	/// <remarks>Optional Single Reference</remarks>
-        public OffsetDuplicate SetAltSource(Shape? value)
-	{
-		_altSource = value;
-		return this;
-	}
-
-	private Documentation? _docs = null;
-	/// <remarks>Optional Single Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-docs")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public Documentation? Docs { get => _docs; set => SetDocs(value); }
-
-	/// <remarks>Optional Single Containment</remarks>
-        public OffsetDuplicate SetDocs(Documentation? value)
-	{
-		SetParentNull(_docs);
-		AttachChild(value);
-		_docs = value;
-		return this;
-	}
-
-	private Documentation? _secretDocs = null;
-	/// <remarks>Optional Single Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-secret-docs")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public Documentation? SecretDocs { get => _secretDocs; set => SetSecretDocs(value); }
-
-	/// <remarks>Optional Single Containment</remarks>
-        public OffsetDuplicate SetSecretDocs(Documentation? value)
-	{
-		SetParentNull(_secretDocs);
-		AttachChild(value);
-		_secretDocs = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Shape")]
 public abstract class Shape : NodeBase, INamedWritable, IShape
 {
+	private string? _name = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(BuiltInsLanguage), Key = "LionCore-builtins-INamed-name")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Name { get => _name ?? throw new UnsetFeatureException(BuiltInsLanguage.Instance.INamed_name); set => SetName(value); }
+/// <remarks>Required Property</remarks>
+/// <exception cref="InvalidValueException">If set to null</exception>
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Shape SetName(string value)
+	{
+		AssureNotNull(value, BuiltInsLanguage.Instance.INamed_name);
+		_name = value;
+		return this;
+	}
+
+	private string? _uuid = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Uuid has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-uuid")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Uuid { get => _uuid ?? throw new UnsetFeatureException(ShapesLanguage.Instance.IShape_uuid); set => SetUuid(value); }
+/// <remarks>Required Property</remarks>
+/// <exception cref="InvalidValueException">If set to null</exception>
+ IShape IShape.SetUuid(string value) => SetUuid(value);
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Shape SetUuid(string value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.IShape_uuid);
+		_uuid = value;
+		return this;
+	}
+
+	private readonly List<Coord> _fixpoints = [];
+	/// <remarks>Optional Multiple Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-fixpoints")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public IReadOnlyList<Coord> Fixpoints { get => _fixpoints.AsReadOnly(); init => AddFixpoints(value); }
+/// <remarks>Optional Multiple Containment</remarks>
+ IShape IShape.AddFixpoints(IEnumerable<Coord> nodes) => AddFixpoints(nodes);
+	/// <remarks>Optional Multiple Containment</remarks>
+        public Shape AddFixpoints(IEnumerable<Coord> nodes)
+	{
+		_fixpoints.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.IShape_fixpoints));
+		return this;
+	}
+/// <remarks>Optional Multiple Containment</remarks>
+ IShape IShape.InsertFixpoints(int index, IEnumerable<Coord> nodes) => InsertFixpoints(index, nodes);
+	/// <remarks>Optional Multiple Containment</remarks>
+        public Shape InsertFixpoints(int index, IEnumerable<Coord> nodes)
+	{
+		AssureInRange(index, _fixpoints);
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
+		AssureNoSelfMove(index, safeNodes, _fixpoints);
+		_fixpoints.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
+		return this;
+	}
+/// <remarks>Optional Multiple Containment</remarks>
+ IShape IShape.RemoveFixpoints(IEnumerable<Coord> nodes) => RemoveFixpoints(nodes);
+	/// <remarks>Optional Multiple Containment</remarks>
+        public Shape RemoveFixpoints(IEnumerable<Coord> nodes)
+	{
+		RemoveSelfParent(nodes?.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
+		return this;
+	}
+
+	private Documentation? _shapeDocs = null;
+	/// <remarks>Optional Single Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shape-docs")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public Documentation? ShapeDocs { get => _shapeDocs; set => SetShapeDocs(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public Shape SetShapeDocs(Documentation? value)
+	{
+		SetParentNull(_shapeDocs);
+		AttachChild(value);
+		_shapeDocs = value;
+		return this;
+	}
+
 	public Shape(string id) : base(id)
 	{
 	}
@@ -1280,98 +1367,112 @@ public abstract class Shape : NodeBase, INamedWritable, IShape
 			return ShapesLanguage.Instance.Shape_shapeDocs;
 		return null;
 	}
-
-	private string? _name = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(BuiltInsLanguage), Key = "LionCore-builtins-INamed-name")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Name { get => _name ?? throw new UnsetFeatureException(BuiltInsLanguage.Instance.INamed_name); set => SetName(value); }
-/// <remarks>Required Property</remarks>
-/// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value) => SetName(value);
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Shape SetName(string value)
-	{
-		AssureNotNull(value, BuiltInsLanguage.Instance.INamed_name);
-		_name = value;
-		return this;
-	}
-
-	private string? _uuid = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Uuid has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-uuid")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Uuid { get => _uuid ?? throw new UnsetFeatureException(ShapesLanguage.Instance.IShape_uuid); set => SetUuid(value); }
-/// <remarks>Required Property</remarks>
-/// <exception cref="InvalidValueException">If set to null</exception>
- IShape IShape.SetUuid(string value) => SetUuid(value);
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Shape SetUuid(string value)
-	{
-		AssureNotNull(value, ShapesLanguage.Instance.IShape_uuid);
-		_uuid = value;
-		return this;
-	}
-
-	private readonly List<Coord> _fixpoints = [];
-	/// <remarks>Optional Multiple Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-fixpoints")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<Coord> Fixpoints { get => _fixpoints.AsReadOnly(); init => AddFixpoints(value); }
-/// <remarks>Optional Multiple Containment</remarks>
- IShape IShape.AddFixpoints(IEnumerable<Coord> nodes) => AddFixpoints(nodes);
-	/// <remarks>Optional Multiple Containment</remarks>
-        public Shape AddFixpoints(IEnumerable<Coord> nodes)
-	{
-		_fixpoints.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.IShape_fixpoints));
-		return this;
-	}
-/// <remarks>Optional Multiple Containment</remarks>
- IShape IShape.InsertFixpoints(int index, IEnumerable<Coord> nodes) => InsertFixpoints(index, nodes);
-	/// <remarks>Optional Multiple Containment</remarks>
-        public Shape InsertFixpoints(int index, IEnumerable<Coord> nodes)
-	{
-		AssureInRange(index, _fixpoints);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
-		AssureNoSelfMove(index, safeNodes, _fixpoints);
-		_fixpoints.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
-		return this;
-	}
-/// <remarks>Optional Multiple Containment</remarks>
- IShape IShape.RemoveFixpoints(IEnumerable<Coord> nodes) => RemoveFixpoints(nodes);
-	/// <remarks>Optional Multiple Containment</remarks>
-        public Shape RemoveFixpoints(IEnumerable<Coord> nodes)
-	{
-		RemoveSelfParent(nodes?.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
-		return this;
-	}
-
-	private Documentation? _shapeDocs = null;
-	/// <remarks>Optional Single Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shape-docs")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public Documentation? ShapeDocs { get => _shapeDocs; set => SetShapeDocs(value); }
-
-	/// <remarks>Optional Single Containment</remarks>
-        public Shape SetShapeDocs(Documentation? value)
-	{
-		SetParentNull(_shapeDocs);
-		AttachChild(value);
-		_shapeDocs = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-CompositeShape")]
 public class CompositeShape : Shape
 {
+	private readonly List<IShape> _parts = [];
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Parts is empty</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-parts")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public IReadOnlyList<IShape> Parts { get => AsNonEmptyReadOnly(_parts, ShapesLanguage.Instance.CompositeShape_parts); init => AddParts(value); }
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
+        public CompositeShape AddParts(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
+    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Parts.Count</exception>
+        public CompositeShape InsertParts(int index, IEnumerable<IShape> nodes)
+	{
+		AssureInRange(index, _parts);
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		AssureNoSelfMove(index, safeNodes, _parts);
+		_parts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If Parts would be empty</exception>
+        public CompositeShape RemoveParts(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
+		AssureNotClearing(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		RemoveSelfParent(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		return this;
+	}
+
+	private readonly List<IShape> _disabledParts = [];
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If DisabledParts is empty</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-disabled-parts")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public IReadOnlyList<IShape> DisabledParts { get => AsNonEmptyReadOnly(_disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts); init => AddDisabledParts(value); }
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
+        public CompositeShape AddDisabledParts(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
+    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than DisabledParts.Count</exception>
+        public CompositeShape InsertDisabledParts(int index, IEnumerable<IShape> nodes)
+	{
+		AssureInRange(index, _disabledParts);
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		AssureNoSelfMove(index, safeNodes, _disabledParts);
+		_disabledParts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If DisabledParts would be empty</exception>
+        public CompositeShape RemoveDisabledParts(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		AssureNotClearing(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		RemoveSelfParent(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		return this;
+	}
+
+	private IShape? _evilPart = null;
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If EvilPart has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-evil-part")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public IShape EvilPart { get => _evilPart ?? throw new UnsetFeatureException(ShapesLanguage.Instance.CompositeShape_evilPart); set => SetEvilPart(value); }
+
+	/// <remarks>Required Single Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public CompositeShape SetEvilPart(IShape value)
+	{
+		AssureNotNull(value, ShapesLanguage.Instance.CompositeShape_evilPart);
+		SetParentNull(_evilPart);
+		AttachChild(value);
+		_evilPart = value;
+		return this;
+	}
+
 	public CompositeShape(string id) : base(id)
 	{
 	}
@@ -1495,112 +1596,48 @@ public class CompositeShape : Shape
 			return ShapesLanguage.Instance.CompositeShape_evilPart;
 		return null;
 	}
-
-	private readonly List<IShape> _parts = [];
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Parts is empty</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-parts")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public IReadOnlyList<IShape> Parts { get => AsNonEmptyReadOnly(_parts, ShapesLanguage.Instance.CompositeShape_parts); init => AddParts(value); }
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
-        public CompositeShape AddParts(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
-		_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
-    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Parts.Count</exception>
-        public CompositeShape InsertParts(int index, IEnumerable<IShape> nodes)
-	{
-		AssureInRange(index, _parts);
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
-		AssureNoSelfMove(index, safeNodes, _parts);
-		_parts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If Parts would be empty</exception>
-        public CompositeShape RemoveParts(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
-		AssureNotClearing(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
-		RemoveSelfParent(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
-		return this;
-	}
-
-	private readonly List<IShape> _disabledParts = [];
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If DisabledParts is empty</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-disabled-parts")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public IReadOnlyList<IShape> DisabledParts { get => AsNonEmptyReadOnly(_disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts); init => AddDisabledParts(value); }
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
-        public CompositeShape AddDisabledParts(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
-    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than DisabledParts.Count</exception>
-        public CompositeShape InsertDisabledParts(int index, IEnumerable<IShape> nodes)
-	{
-		AssureInRange(index, _disabledParts);
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		AssureNoSelfMove(index, safeNodes, _disabledParts);
-		_disabledParts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If DisabledParts would be empty</exception>
-        public CompositeShape RemoveDisabledParts(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		AssureNotClearing(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		RemoveSelfParent(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		return this;
-	}
-
-	private IShape? _evilPart = null;
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If EvilPart has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-evil-part")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public IShape EvilPart { get => _evilPart ?? throw new UnsetFeatureException(ShapesLanguage.Instance.CompositeShape_evilPart); set => SetEvilPart(value); }
-
-	/// <remarks>Required Single Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public CompositeShape SetEvilPart(IShape value)
-	{
-		AssureNotNull(value, ShapesLanguage.Instance.CompositeShape_evilPart);
-		SetParentNull(_evilPart);
-		AttachChild(value);
-		_evilPart = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-ReferenceGeometry")]
 public class ReferenceGeometry : NodeBase
 {
+	private readonly List<IShape> _shapes = [];
+	/// <remarks>Optional Multiple Reference</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes-references")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		_shapes.AddRange(safeNodes);
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public ReferenceGeometry InsertShapes(int index, IEnumerable<IShape> nodes)
+	{
+		AssureInRange(index, _shapes);
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		_shapes.InsertRange(index, safeNodes);
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public ReferenceGeometry RemoveShapes(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		RemoveAll(safeNodes, _shapes);
+		return this;
+	}
+
 	public ReferenceGeometry(string id) : base(id)
 	{
 	}
@@ -1645,48 +1682,37 @@ public class ReferenceGeometry : NodeBase
 			result.Add(ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		return result;
 	}
-
-	private readonly List<IShape> _shapes = [];
-	/// <remarks>Optional Multiple Reference</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes-references")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
-
-	/// <remarks>Optional Multiple Reference</remarks>
-        public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		_shapes.AddRange(safeNodes);
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Reference</remarks>
-        public ReferenceGeometry InsertShapes(int index, IEnumerable<IShape> nodes)
-	{
-		AssureInRange(index, _shapes);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		_shapes.InsertRange(index, safeNodes);
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Reference</remarks>
-        public ReferenceGeometry RemoveShapes(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		RemoveAll(safeNodes, _shapes);
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Documentation")]
 public class Documentation : NodeBase
 {
+	private string? _text = null;
+	/// <remarks>Optional Property</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-text")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
+	public string? Text { get => _text; set => SetText(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public Documentation SetText(string? value)
+	{
+		_text = value;
+		return this;
+	}
+
+	private bool? _technical = null;
+	/// <remarks>Optional Property</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-technical")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
+	public bool? Technical { get => _technical; set => SetTechnical(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public Documentation SetTechnical(bool? value)
+	{
+		_technical = value;
+		return this;
+	}
+
 	public Documentation(string id) : base(id)
 	{
 	}
@@ -1753,37 +1779,125 @@ public class Documentation : NodeBase
 			result.Add(ShapesLanguage.Instance.Documentation_technical);
 		return result;
 	}
-
-	private string? _text = null;
-	/// <remarks>Optional Property</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-text")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
-	public string? Text { get => _text; set => SetText(value); }
-
-	/// <remarks>Optional Property</remarks>
-        public Documentation SetText(string? value)
-	{
-		_text = value;
-		return this;
-	}
-
-	private bool? _technical = null;
-	/// <remarks>Optional Property</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-technical")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
-	public bool? Technical { get => _technical; set => SetTechnical(value); }
-
-	/// <remarks>Optional Property</remarks>
-        public Documentation SetTechnical(bool? value)
-	{
-		_technical = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-BillOfMaterials")]
 public class BillOfMaterials : NodeBase
 {
+	private readonly List<IShape> _materials = [];
+	/// <remarks>Optional Multiple Reference</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-materials")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	public IReadOnlyList<IShape> Materials { get => _materials.AsReadOnly(); init => AddMaterials(value); }
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		_materials.AddRange(safeNodes);
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public BillOfMaterials InsertMaterials(int index, IEnumerable<IShape> nodes)
+	{
+		AssureInRange(index, _materials);
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		_materials.InsertRange(index, safeNodes);
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public BillOfMaterials RemoveMaterials(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		RemoveAll(safeNodes, _materials);
+		return this;
+	}
+
+	private readonly List<MaterialGroup> _groups = [];
+	/// <remarks>Optional Multiple Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-groups")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public IReadOnlyList<MaterialGroup> Groups { get => _groups.AsReadOnly(); init => AddGroups(value); }
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes)
+	{
+		_groups.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.BillOfMaterials_groups));
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public BillOfMaterials InsertGroups(int index, IEnumerable<MaterialGroup> nodes)
+	{
+		AssureInRange(index, _groups);
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
+		AssureNoSelfMove(index, safeNodes, _groups);
+		_groups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public BillOfMaterials RemoveGroups(IEnumerable<MaterialGroup> nodes)
+	{
+		RemoveSelfParent(nodes?.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
+		return this;
+	}
+
+	private readonly List<MaterialGroup> _altGroups = [];
+	/// <remarks>Optional Multiple Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-groups")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public IReadOnlyList<MaterialGroup> AltGroups { get => _altGroups.AsReadOnly(); init => AddAltGroups(value); }
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes)
+	{
+		_altGroups.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.BillOfMaterials_altGroups));
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public BillOfMaterials InsertAltGroups(int index, IEnumerable<MaterialGroup> nodes)
+	{
+		AssureInRange(index, _altGroups);
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		AssureNoSelfMove(index, safeNodes, _altGroups);
+		_altGroups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public BillOfMaterials RemoveAltGroups(IEnumerable<MaterialGroup> nodes)
+	{
+		RemoveSelfParent(nodes?.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		return this;
+	}
+
+	private MaterialGroup? _defaultGroup = null;
+	/// <remarks>Optional Single Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-default-group")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public MaterialGroup? DefaultGroup { get => _defaultGroup; set => SetDefaultGroup(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public BillOfMaterials SetDefaultGroup(MaterialGroup? value)
+	{
+		SetParentNull(_defaultGroup);
+		AttachChild(value);
+		_defaultGroup = value;
+		return this;
+	}
+
 	public BillOfMaterials(string id) : base(id)
 	{
 	}
@@ -1921,125 +2035,82 @@ public class BillOfMaterials : NodeBase
 			return ShapesLanguage.Instance.BillOfMaterials_defaultGroup;
 		return null;
 	}
-
-	private readonly List<IShape> _materials = [];
-	/// <remarks>Optional Multiple Reference</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-materials")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<IShape> Materials { get => _materials.AsReadOnly(); init => AddMaterials(value); }
-
-	/// <remarks>Optional Multiple Reference</remarks>
-        public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		_materials.AddRange(safeNodes);
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Reference</remarks>
-        public BillOfMaterials InsertMaterials(int index, IEnumerable<IShape> nodes)
-	{
-		AssureInRange(index, _materials);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		_materials.InsertRange(index, safeNodes);
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Reference</remarks>
-        public BillOfMaterials RemoveMaterials(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		RemoveAll(safeNodes, _materials);
-		return this;
-	}
-
-	private readonly List<MaterialGroup> _groups = [];
-	/// <remarks>Optional Multiple Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-groups")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<MaterialGroup> Groups { get => _groups.AsReadOnly(); init => AddGroups(value); }
-
-	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes)
-	{
-		_groups.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.BillOfMaterials_groups));
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials InsertGroups(int index, IEnumerable<MaterialGroup> nodes)
-	{
-		AssureInRange(index, _groups);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
-		AssureNoSelfMove(index, safeNodes, _groups);
-		_groups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials RemoveGroups(IEnumerable<MaterialGroup> nodes)
-	{
-		RemoveSelfParent(nodes?.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
-		return this;
-	}
-
-	private readonly List<MaterialGroup> _altGroups = [];
-	/// <remarks>Optional Multiple Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-groups")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IReadOnlyList<MaterialGroup> AltGroups { get => _altGroups.AsReadOnly(); init => AddAltGroups(value); }
-
-	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes)
-	{
-		_altGroups.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.BillOfMaterials_altGroups));
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials InsertAltGroups(int index, IEnumerable<MaterialGroup> nodes)
-	{
-		AssureInRange(index, _altGroups);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-		AssureNoSelfMove(index, safeNodes, _altGroups);
-		_altGroups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
-		return this;
-	}
-
-	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials RemoveAltGroups(IEnumerable<MaterialGroup> nodes)
-	{
-		RemoveSelfParent(nodes?.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-		return this;
-	}
-
-	private MaterialGroup? _defaultGroup = null;
-	/// <remarks>Optional Single Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-default-group")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public MaterialGroup? DefaultGroup { get => _defaultGroup; set => SetDefaultGroup(value); }
-
-	/// <remarks>Optional Single Containment</remarks>
-        public BillOfMaterials SetDefaultGroup(MaterialGroup? value)
-	{
-		SetParentNull(_defaultGroup);
-		AttachChild(value);
-		_defaultGroup = value;
-		return this;
-	}
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-MaterialGroup")]
 public class MaterialGroup : NodeBase
 {
+	private MatterState? _matterState = null;
+	/// <remarks>Optional Property</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-matter-state")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
+	public MatterState? MatterState { get => _matterState; set => SetMatterState(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public MaterialGroup SetMatterState(MatterState? value)
+	{
+		_matterState = value;
+		return this;
+	}
+
+	private readonly List<IShape> _materials = [];
+	/// <remarks>Required Multiple Reference</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Materials is empty</exception>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-group-materials")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
+	public IReadOnlyList<IShape> Materials { get => AsNonEmptyReadOnly(_materials, ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
+
+	/// <remarks>Required Multiple Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
+        public MaterialGroup AddMaterials(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
+		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
+		_materials.AddRange(safeNodes);
+		return this;
+	}
+
+	/// <remarks>Required Multiple Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
+    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Materials.Count</exception>
+        public MaterialGroup InsertMaterials(int index, IEnumerable<IShape> nodes)
+	{
+		AssureInRange(index, _materials);
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
+		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
+		_materials.InsertRange(index, safeNodes);
+		return this;
+	}
+
+	/// <remarks>Required Multiple Reference</remarks>
+    	/// <exception cref = "InvalidValueException">If Materials would be empty</exception>
+        public MaterialGroup RemoveMaterials(IEnumerable<IShape> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
+		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
+		AssureNotClearing(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
+		RemoveAll(safeNodes, _materials);
+		return this;
+	}
+
+	private IShape? _defaultShape = null;
+	/// <remarks>Optional Single Containment</remarks>
+        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-default-shape")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	public IShape? DefaultShape { get => _defaultShape; set => SetDefaultShape(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public MaterialGroup SetDefaultShape(IShape? value)
+	{
+		SetParentNull(_defaultShape);
+		AttachChild(value);
+		_defaultShape = value;
+		return this;
+	}
+
 	public MaterialGroup(string id) : base(id)
 	{
 	}
@@ -2148,77 +2219,6 @@ public class MaterialGroup : NodeBase
 		if (ReferenceEquals(_defaultShape, child))
 			return ShapesLanguage.Instance.MaterialGroup_defaultShape;
 		return null;
-	}
-
-	private MatterState? _matterState = null;
-	/// <remarks>Optional Property</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-matter-state")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
-	public MatterState? MatterState { get => _matterState; set => SetMatterState(value); }
-
-	/// <remarks>Optional Property</remarks>
-        public MaterialGroup SetMatterState(MatterState? value)
-	{
-		_matterState = value;
-		return this;
-	}
-
-	private readonly List<IShape> _materials = [];
-	/// <remarks>Required Multiple Reference</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Materials is empty</exception>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-group-materials")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public IReadOnlyList<IShape> Materials { get => AsNonEmptyReadOnly(_materials, ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
-
-	/// <remarks>Required Multiple Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
-        public MaterialGroup AddMaterials(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
-		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		_materials.AddRange(safeNodes);
-		return this;
-	}
-
-	/// <remarks>Required Multiple Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
-    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Materials.Count</exception>
-        public MaterialGroup InsertMaterials(int index, IEnumerable<IShape> nodes)
-	{
-		AssureInRange(index, _materials);
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
-		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		_materials.InsertRange(index, safeNodes);
-		return this;
-	}
-
-	/// <remarks>Required Multiple Reference</remarks>
-    	/// <exception cref = "InvalidValueException">If Materials would be empty</exception>
-        public MaterialGroup RemoveMaterials(IEnumerable<IShape> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
-		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		AssureNotClearing(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		RemoveAll(safeNodes, _materials);
-		return this;
-	}
-
-	private IShape? _defaultShape = null;
-	/// <remarks>Optional Single Containment</remarks>
-        [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-default-shape")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
-	public IShape? DefaultShape { get => _defaultShape; set => SetDefaultShape(value); }
-
-	/// <remarks>Optional Single Containment</remarks>
-        public MaterialGroup SetDefaultShape(IShape? value)
-	{
-		SetParentNull(_defaultShape);
-		AttachChild(value);
-		_defaultShape = value;
-		return this;
 	}
 }
 
