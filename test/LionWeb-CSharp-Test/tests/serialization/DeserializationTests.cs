@@ -1156,7 +1156,7 @@ public class DeserializationTests
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnsupportedClassifierException>(() => deserializer.Deserialize(serializationChunk));
+        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
     }
 
     [TestMethod]
@@ -1291,6 +1291,7 @@ public class DeserializationTests
     #region invalid_reference
 
     [TestMethod]
+    // rename test: reference target type mismatch exception handler / ignoring handler / custom handler
     public void test_deserialization_of_a_node_with_invalid_reference_throws_exception_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
@@ -1315,7 +1316,7 @@ public class DeserializationTests
                             Reference = new MetaPointer("library", "1", "author"),
                             Targets =
                             [
-                                new SerializedReferenceTarget { Reference = "author_1", ResolveInfo = "author" },
+                                new SerializedReferenceTarget { Reference = "book_1", ResolveInfo = "author" },
                             ]
                         }
                     ],
@@ -1324,7 +1325,7 @@ public class DeserializationTests
 
                 new SerializedNode
                 {
-                    Id = "author_1",
+                    Id = "book_1",
                     Classifier = new MetaPointer("library", "1", "Book"),
                     Properties = [],
                     Containments = [],
@@ -1339,7 +1340,7 @@ public class DeserializationTests
             .WithLanguage(LibraryLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnsupportedClassifierException>(() => deserializer.Deserialize(serializationChunk));
+        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
     }
 
     [TestMethod]
