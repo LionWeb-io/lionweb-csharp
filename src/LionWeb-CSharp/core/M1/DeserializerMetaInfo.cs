@@ -67,20 +67,20 @@ public class DeserializerMetaInfo()
         return Handler.UnknownEnumerationLiteral(nodeId, enumeration, value);
     }
 
-    internal TFeature? FindFeature<TFeature>(IWritableNode node, CompressedMetaPointer compressedMetaPointer)
+    internal Feature? FindFeature<TFeature>(IWritableNode node, CompressedMetaPointer compressedMetaPointer)
         where TFeature : class, Feature
     {
         Classifier classifier = node.GetClassifier();
         if (!_features.TryGetValue(compressedMetaPointer, out var feature))
         {
-            feature = Handler.UnknownFeature(classifier, compressedMetaPointer, node);
+            feature = Handler.UnknownFeature<TFeature>(classifier, compressedMetaPointer, node);
             if (feature == null)
                 return null;
         }
 
         return feature is TFeature f
             ? f
-            : Handler.InvalidFeature<TFeature>(classifier, compressedMetaPointer, node);
+            : Handler.InvalidFeature<Feature>(classifier, compressedMetaPointer, node);
     }
 
     private CompressedMetaPointer Compress(MetaPointer metaPointer) =>

@@ -24,8 +24,10 @@ using Examples.WithEnum.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
+using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using LionWeb.Core.Utilities;
+using System.Collections;
 using Comparer = LionWeb.Core.Utilities.Comparer;
 
 [TestClass]
@@ -47,18 +49,186 @@ public class SerializationLenientTests
         var serializationChunk = Serializer.SerializeToChunk(new List<INode> { rootNode, childA, childB });
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
-        // var readableNodes = new DeserializerBuilder()
-        //     .WithLanguage(ShapesLanguage.Instance)
-        //     .WithLanguage(LibraryLanguage.Instance)
-        //     .WithLanguage(BLangLanguage.Instance)
-        //     .WithLanguage(WithEnumLanguage.Instance)
-        //     .Build()
-        //     .Deserialize(serializationChunk);
-        //
-        // Assert.AreEqual(1, readableNodes.Count);
-        //
-        // var comparer = new Comparer(new List<IReadableNode> { rootNode }, readableNodes);
-        // Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+        var readableNodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .WithCustomFactory(ShapesLanguage.Instance, new LenientFactory(ShapesLanguage.Instance))
+            .WithLanguage(LibraryLanguage.Instance)
+            .WithLanguage(BLangLanguage.Instance)
+            .WithLanguage(WithEnumLanguage.Instance)
+            .WithHandler(new LenientHandler())
+            .WithUncompressedIds(true)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(1, readableNodes.Count);
+
+        var comparer = new LenientComparer(new List<IReadableNode> { rootNode }, readableNodes);
+        var differences = comparer.Compare().ToList();
+        
+        Assert.AreEqual(2, differences.Count);
+        Assert.IsInstanceOfType<NodeDifference>(differences.First());
+        Assert.IsInstanceOfType<PropertyValueTypeDifference>(differences.Last());
+        var diff = (differences.Last() as PropertyValueTypeDifference);
+        Assert.AreEqual(MyEnum.literal1, diff.LeftValue);
+        Assert.AreEqual("lit1", diff.RightValue);
+    }
+
+    class LenientFactory(Language language) : AbstractBaseNodeFactory(language)
+    {
+        public override INode CreateNode(string id, Classifier classifier) =>
+            new LenientNode(id, classifier);
+
+        public override Enum GetEnumerationLiteral(EnumerationLiteral literal) =>
+            EnumValueFor<Enum>(literal);
+    }
+
+    class LenientHandler : DeserializerExceptionHandler
+    {
+        public override TFeature? InvalidFeature<TFeature>(Classifier classifier,
+            CompressedMetaPointer compressedMetaPointer,
+            IReadableNode node) where TFeature : class
+        {
+            var feature = new List<Language>
+                {
+                    BuiltInsLanguage.Instance,
+                    ShapesLanguage.Instance,
+                    LibraryLanguage.Instance,
+                    BLangLanguage.Instance,
+                    WithEnumLanguage.Instance
+                }
+                .SelectMany(l => l.Entities)
+                .OfType<Classifier>()
+                .SelectMany(c => c.Features)
+                .OfType<TFeature>()
+                .FirstOrDefault(f =>
+                    CompressedMetaPointer.Create(f.ToMetaPointer(), false).Equals(compressedMetaPointer));
+
+            return feature;
+        }
+
+        public override object? UnknownDatatype(string nodeId, Feature property, string? value) => value;
+    }
+
+    class LenientComparer : Comparer
+    {
+        public LenientComparer(IList<INode?> left, IList<INode?> right) : base(left, right)
+        {
+        }
+
+        public LenientComparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right) : base(_left, _right)
+        {
+        }
+
+        class LenientProperty : PropertyBase<Language>
+        {
+            public LenientProperty(Feature feature) : base(feature.GetId(), feature.GetFeatureClassifier(), feature.GetLanguage())
+            {
+            }
+
+            public static LenientProperty Create(Feature feature, object? value) =>
+                new(feature)
+                {
+                    Name = feature.Name,
+                    Key = feature.Key,
+                    Optional = feature.Optional,
+                    Type = value is Enum e ? new LenientEnumeration("a", feature.GetLanguage())
+                    {
+                        Key = "a",
+                        Name = "a",
+                        LiteralsLazy = new([]) 
+                    } : BuiltInsLanguage.Instance.String
+                };
+        }
+
+        class LenientEnumeration(string id, Language parent) : EnumerationBase<Language>(id, parent);
+
+        class LenientContainment : ContainmentBase<Language>
+        {
+            public LenientContainment(Feature feature) : base(feature.GetId(), feature.GetFeatureClassifier(), feature.GetLanguage())
+            {
+            }
+
+            public static LenientContainment Create(Feature feature) =>
+                new(feature)
+                {
+                    Name = feature.Name,
+                    Key = feature.Key,
+                    Optional = feature.Optional,
+                    Multiple = false,
+                    Type = BuiltInsLanguage.Instance.Node
+                };
+        }
+
+        class LenientReference : ReferenceBase<Language>
+        {
+            public LenientReference(Feature feature) : base(feature.GetId(), feature.GetFeatureClassifier(), feature.GetLanguage())
+            {
+            }
+
+            public static LenientReference Create(Feature feature) =>
+                new(feature)
+                {
+                    Name = feature.Name,
+                    Key = feature.Key,
+                    Optional = feature.Optional,
+                    Multiple = false,
+                    Type = BuiltInsLanguage.Instance.Node
+                };
+        }
+
+        protected override List<IDifference> CompareFeature(IReadableNode left, Feature leftFeature,
+            IReadableNode right, Feature rightFeature)
+        {
+            var leftValue = left.Get(leftFeature);
+            var rightValue = right.Get(rightFeature);
+
+            Containment leftCont = leftFeature as Containment ?? LenientContainment.Create(leftFeature);
+            Reference leftRef = leftFeature as Reference ?? LenientReference.Create(leftFeature);;
+            Property leftProp = leftFeature as Property ?? LenientProperty.Create(leftFeature, leftValue);
+            Property rightProp = rightFeature as Property ?? LenientProperty.Create(rightFeature, rightValue);
+
+            switch ((leftValue, rightValue, leftFeature, rightFeature))
+            {
+                case (null, null, _, _):
+                    return [];
+
+                case (null, _, _, _):
+                    return [new UnsetFeatureLeftDifference(left, leftFeature, right)];
+
+                case (_, null, _, _):
+                    return [new UnsetFeatureRightDifference(left, rightFeature, right)];
+
+                case (string or int or bool or Enum, string or int or bool or Enum, _, _):
+                    return CompareProperty(left, leftProp, right, rightProp);
+                
+                case (var lv, var rv, _, _) when lv.GetType().IsValueType && rv.GetType().IsValueType:
+                    return CompareProperty(left, leftProp, right, rightProp);
+
+                case (IReadableNode ln, IReadableNode rn, _, _) when ReferenceEquals(left, ln.GetParent()) &&
+                                                                     ReferenceEquals(right, ln.GetParent()):
+                    return CompareNode(left, ln,
+                        leftCont, right, rn);
+
+                case (IReadableNode ln, IReadableNode rn, _, _):
+                    return CompareTarget(left, ln,
+                        leftRef, right, rn);
+
+                case (IEnumerable le, IEnumerable lr, _, _):
+                    {
+                        var leftNodes = le.Cast<IReadableNode>().ToList();
+                        var rightNodes = lr.Cast<IReadableNode>().ToList();
+
+                        if (leftNodes.All(n => ReferenceEquals(left, n.GetParent())) &&
+                            rightNodes.All(n => ReferenceEquals(right, n.GetParent())))
+                            return CompareNodes(left, leftNodes, leftCont, right, rightNodes);
+
+                        return CompareTargets(left, leftNodes, leftRef, right, rightNodes);
+                    }
+
+                default:
+                    return [];
+            }
+        }
     }
 
     private TestContext testContextInstance;

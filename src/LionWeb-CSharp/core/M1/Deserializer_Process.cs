@@ -52,12 +52,11 @@ public partial class Deserializer
             if (property == null)
                 continue;
 
-            var type = property.Type;
             var value = serializedProperty.Value;
-            var convertedValue = type switch
+            var convertedValue = property switch
             {
-                PrimitiveType => ConvertPrimitiveType(property, value),
-                Enumeration enumeration => _deserializerMetaInfo.ConvertEnumeration(id, enumeration, value),
+                Property {Type:PrimitiveType} p => ConvertPrimitiveType(p, value),
+                Property {Type:Enumeration enumeration} => _deserializerMetaInfo.ConvertEnumeration(id, enumeration, value),
                 _ => Handler.UnknownDatatype(id, property, value)
             };
 
