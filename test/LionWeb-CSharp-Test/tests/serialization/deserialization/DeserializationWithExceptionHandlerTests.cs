@@ -29,10 +29,13 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class DeserializationWithExceptionHandlerTests
 {
-    #region unknown_classifier
+    /// <summary>
+    /// <see cref="IDeserializerHandler.UnknownClassifier"/>
+    /// </summary>
+    #region unknown classifier
 
     [TestMethod]
-    public void unknown_classifier_does_not_fail()
+    public void unknown_classifier()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -62,10 +65,14 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region unknown_feature
+    /// <summary>
+    /// <see cref="IDeserializerHandler.UnknownFeature"/>
+    /// <seealso cref="IDeserializerHandler.UnknownReference"/>
+    /// </summary>
+    #region unknown feature
 
     [TestMethod]
-    public void unknown_containment_does_not_fail()
+    public void unknown_containment()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -101,7 +108,7 @@ public class DeserializationWithExceptionHandlerTests
 
     [TestMethod]
     [Ignore(message: "no exception thrown")]
-    public void unknown_property_does_not_fail()
+    public void unknown_property()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -137,7 +144,7 @@ public class DeserializationWithExceptionHandlerTests
     }
 
     [TestMethod]
-    public void unknown_reference_does_not_fail()
+    public void unknown_reference()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -190,10 +197,13 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region unknown_parent
+    /// <summary>
+    /// <see cref="IDeserializerHandler.UnknownParent"/>
+    /// </summary>
+    #region unknown parent
 
     [TestMethod]
-    public void unknown_parent_does_not_fail()
+    public void unknown_parent()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -227,10 +237,13 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region unknown_child
+    /// <summary>
+    /// <see cref="IDeserializerHandler.UnknownChild"/>
+    /// </summary>
+    #region unknown child
 
     [TestMethod]
-    public void unknown_child_does_not_fail()
+    public void unknown_child()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -270,10 +283,10 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region unknown_reference_target
+    #region unknown reference target
 
     [TestMethod]
-    public void unknown_reference_target_does_not_fail()
+    public void unknown_reference_target()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -319,10 +332,13 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region unknown_annotation
+    /// <summary>
+    /// <see cref="IDeserializerHandler.UnknownAnnotation"/>
+    /// </summary>
+    #region unknown annotation
 
     [TestMethod]
-    public void unknown_annotation_does_not_fail()
+    public void unknown_annotation()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -355,10 +371,13 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region unknown_enumeration_literal
+    /// <summary>
+    /// <see cref="IDeserializerHandler.UnknownEnumerationLiteral"/>
+    /// </summary>
+    #region unknown enumeration literal
 
     [TestMethod]
-    public void unknown_enumeration_literal_does_not_fail()
+    public void unknown_enumeration_literal()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -398,10 +417,13 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region invalid_containment
+    /// <summary>
+    /// <see cref="IDeserializerHandler.InvalidContainment"/>
+    /// </summary>
+    #region invalid containment
 
     [TestMethod]
-    public void invalid_containment_classifier_mismatch_does_not_fail()
+    public void invalid_containment_classifier_mismatch()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -451,7 +473,7 @@ public class DeserializationWithExceptionHandlerTests
 
     [TestMethod]
     [Ignore(message: "no exception thrown")]
-    public void single_containment_expected_does_not_fail()
+    public void single_containment_expected()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -513,10 +535,10 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region invalid_reference_target
+    #region invalid reference target
 
     [TestMethod]
-    public void reference_target_type_mismatch_does_not_fail()
+    public void reference_target_classifier_mismatch()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -569,7 +591,7 @@ public class DeserializationWithExceptionHandlerTests
 
     [TestMethod]
     [Ignore(message: "no exception thrown")]
-    public void single_reference_expected_does_not_fail()
+    public void single_reference_expected()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -632,12 +654,15 @@ public class DeserializationWithExceptionHandlerTests
     }
 
     #endregion
-
-    #region invalid_feature
+    
+    /// <summary>
+    /// <see cref="IDeserializerHandler.InvalidFeature{TFeature}"/>
+    /// </summary>
+    #region invalid feature
 
     [TestMethod]
     [Ignore("throws FormatException")]
-    public void invalid_feature_does_not_fail()
+    public void invalid_feature()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -676,10 +701,13 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region invalid_annotation
+    /// <summary>
+    /// <see cref="IDeserializerHandler.InvalidAnnotation"/>
+    /// </summary>
+    #region invalid annotation
 
     [TestMethod]
-    public void invalid_annotation_classifier_mismatch_does_not_fail()
+    public void invalid_annotation_classifier_mismatch()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -722,10 +750,13 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region invalid_annotation_parent
+    /// <summary>
+    /// <see cref="IDeserializerHandler.InvalidAnnotationParent"/>
+    /// </summary>
+    #region invalid annotation parent
 
     [TestMethod]
-    public void invalid_annotation_parent_does_not_fail()
+    public void invalid_annotation_parent()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -768,11 +799,14 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region unknown_datatype
+    /// <summary>
+    /// <see cref="IDeserializerHandler.UnknownDatatype"/>
+    /// </summary>
+    #region unknown datatype
 
     [TestMethod]
     [Ignore("how to write a test case with unknown datatype")]
-    public void unknown_datatype_does_not_fail()
+    public void unknown_datatype()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -811,11 +845,14 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region skip_deserializing_dependent_node
+    /// <summary>
+    /// <see cref="IDeserializerHandler.SkipDeserializingDependentNode"/>
+    /// </summary>
+    #region skip deserializing dependent node
 
     [TestMethod]
     [Ignore(message: "no exception thrown")]
-    public void skip_deserializing_dependent_node_does_not_fail()
+    public void skip_deserializing_dependent_node()
     {
         var serializationChunk = new SerializationChunk
         {

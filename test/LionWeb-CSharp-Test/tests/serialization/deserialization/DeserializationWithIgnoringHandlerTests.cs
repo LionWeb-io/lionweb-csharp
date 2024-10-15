@@ -25,10 +25,10 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class DeserializationWithIgnoringHandlerTests
 {
-    #region unknown_classifier
+    #region unknown classifier
 
     [TestMethod]
-    public void unknown_classifier_does_not_fail()
+    public void unknown_classifier()
     {
         var serializationChunk = new SerializationChunk
         {

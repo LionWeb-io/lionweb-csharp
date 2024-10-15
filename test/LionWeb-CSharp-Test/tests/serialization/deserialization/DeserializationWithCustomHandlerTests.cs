@@ -70,7 +70,7 @@ public class DeserializationWithCustomHandlerTests
             throw new NotImplementedException();
     }
 
-    #region unknown_classifier
+    #region unknown classifier
 
     private class UnknownClassifierHandler(Func<Classifier?> incrementer) : NotImplementedDeserializerHandler
     {
@@ -78,7 +78,7 @@ public class DeserializationWithCustomHandlerTests
     }
 
     [TestMethod]
-    public void unknown_classifier_does_not_fail()
+    public void unknown_classifier()
     {
         var serializationChunk = new SerializationChunk
         {
