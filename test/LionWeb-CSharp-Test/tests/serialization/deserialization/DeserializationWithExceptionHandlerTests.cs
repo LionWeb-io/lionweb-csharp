@@ -23,6 +23,7 @@ using Examples.TinyRefLang;
 using Examples.WithEnum.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.Serialization;
 
 [TestClass]
@@ -64,7 +65,7 @@ public class DeserializationWithExceptionHandlerTests
     #region unknown_feature
 
     [TestMethod]
-    public void unknown_feature_does_not_fail()
+    public void unknown_containment_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -93,6 +94,95 @@ public class DeserializationWithExceptionHandlerTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(new DeserializerExceptionHandler())
             .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    [TestMethod]
+    [Ignore(message: "no exception thrown")]
+    public void unknown_property_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
+                new SerializedLanguageReference { Key = "LionCore_builtins", Version = ReleaseVersion.Current }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties =
+                    [
+                        new SerializedProperty { Property = new MetaPointer("LionCore_builtins", "1", "key-unknown"), }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguages([ShapesLanguage.Instance, BuiltInsLanguage.Instance])
+            .Build();
+
+        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    [TestMethod]
+    public void unknown_reference_does_not_fail()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "library", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("library", "1", "Book"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("library", "1", "key-unknown"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "author_1", ResolveInfo = "author" },
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "author_1",
+                    Classifier = new MetaPointer("library", "1", "Writer"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguage(LibraryLanguage.Instance)
             .Build();
 
         Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
@@ -180,10 +270,10 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region unknown_reference
+    #region unknown_reference_target
 
     [TestMethod]
-    public void unknown_reference_does_not_fail()
+    public void unknown_reference_target_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -423,7 +513,7 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region invalid_reference
+    #region invalid_reference_target
 
     [TestMethod]
     public void reference_target_type_mismatch_does_not_fail()
@@ -547,8 +637,6 @@ public class DeserializationWithExceptionHandlerTests
 
     [TestMethod]
     [Ignore("throws FormatException")]
-    // Remark: what is the difference between UnknownFeature and InvalidFeature ?
-    // For both cases UnknownFeatureException is thrown.
     public void invalid_feature_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
@@ -583,7 +671,7 @@ public class DeserializationWithExceptionHandlerTests
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
     }
 
     #endregion
@@ -591,7 +679,6 @@ public class DeserializationWithExceptionHandlerTests
     #region invalid_annotation
 
     [TestMethod]
-    [Ignore(message: "make the test clear")]
     public void invalid_annotation_classifier_mismatch_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
@@ -638,7 +725,6 @@ public class DeserializationWithExceptionHandlerTests
     #region invalid_annotation_parent
 
     [TestMethod]
-    [Ignore(message: "make the test clear")]
     public void invalid_annotation_parent_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
@@ -685,7 +771,7 @@ public class DeserializationWithExceptionHandlerTests
     #region unknown_datatype
 
     [TestMethod]
-    [Ignore("test case is not proper, how to write a test case with unknown datatype")]
+    [Ignore("how to write a test case with unknown datatype")]
     public void unknown_datatype_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
@@ -716,11 +802,11 @@ public class DeserializationWithExceptionHandlerTests
         };
 
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerIgnoringHandler())
+            .WithHandler(new DeserializerExceptionHandler())
             .WithLanguage(WithEnumLanguage.Instance)
             .Build();
 
-        deserializer.Deserialize(serializationChunk);
+        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
     }
 
     #endregion
