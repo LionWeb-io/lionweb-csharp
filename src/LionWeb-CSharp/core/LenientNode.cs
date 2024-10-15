@@ -20,6 +20,7 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using System.Collections;
+using Utilities;
 
 /// <summary>
 /// A LenientNode can handle any kind of <i>feature value</i>
@@ -58,7 +59,7 @@ using System.Collections;
 /// </summary>
 public class LenientNode : NodeBase, INode
 {
-    private readonly Dictionary<Feature, object?> _featureValues = new();
+    private readonly Dictionary<Feature, object?> _featureValues = new(new FeatureIdentityComparer());
     private Classifier? _classifier;
 
     /// <summary>

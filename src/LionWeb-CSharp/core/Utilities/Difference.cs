@@ -19,6 +19,7 @@
 
 namespace LionWeb.Core.Utilities;
 
+using M1;
 using M2;
 using M3;
 using System.Diagnostics;
@@ -92,14 +93,8 @@ public abstract record DifferenceBase : IDifference
     {
         if (node != null)
         {
-            if (OutputConfig.NodeName && node.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name))
-            {
-                var name = node.Get(BuiltInsLanguage.Instance.INamed_name);
-                if (name is string s)
-                {
-                    return $"{s}({node.GetId()})";
-                }
-            }
+            if (OutputConfig.NodeName && node.GetNodeName() is { } s)
+                return $"{s}({node.GetId()})";
 
             return $"({node.GetId()})";
         }
@@ -228,10 +223,10 @@ public interface IUnsetFeatureDifference : IDifference
 {
     /// Left side of difference
     IReadableNode Left { get; init; }
-    
+
     /// Feature of difference
     Feature Feature { get; init; }
-    
+
     /// Right side of difference
     IReadableNode Right { get; init; }
 }
@@ -265,10 +260,10 @@ public interface ILinkDifference : IContainerDifference
 {
     /// Left side of difference
     IReadableNode Left { get; init; }
-    
+
     /// Link of difference
     Link Link { get; }
-    
+
     /// Right side of difference
     IReadableNode Right { get; init; }
 }
@@ -401,10 +396,10 @@ public interface ISurplusNodeDifference : IDifference
 {
     /// Owner of surplus node
     IReadableNode? Owner { get; init; }
-    
+
     /// Link containing surplus node
     Link? Link { get; init; }
-    
+
     /// surplus node
     IReadableNode Node { get; init; }
 }
