@@ -85,7 +85,7 @@ public class TinyRefLangFactory : AbstractBaseNodeFactory, ITinyRefLangFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept")]
-public class MyConcept : NodeBase
+public partial class MyConcept : NodeBase
 {
 	private MyConcept? _singularRef = null;
 	/// <remarks>Required Single Reference</remarks>
