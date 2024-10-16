@@ -23,14 +23,14 @@ using Serialization;
 public interface IDeserializerHandler
 {
     Classifier? UnknownClassifier(string id, MetaPointer metaPointer);
-    Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer, IReadableNode node);
+    TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer, IReadableNode node) where TFeature : class, Feature;
     INode? UnknownParent(CompressedId parentId, INode node);
     INode? UnknownChild(CompressedId childId, IWritableNode node);
     IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node);
     INode? UnknownAnnotation(CompressedId annotationId, INode node);
     INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node);
     Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key);
-    object? UnknownDatatype(string nodeId, Property property, string? value);
+    object? UnknownDatatype(string nodeId, Feature property, string? value);
     bool SkipDeserializingDependentNode(string id);
 
     TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
@@ -49,17 +49,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new UnsupportedClassifierException(metaPointer, $"On node with id={id}: ");
 
     /// <inheritdoc />
-    public virtual Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-        IReadableNode node)
-    {
-        var message = $"On node with id={node.GetId()}:";
-        if (compressedMetaPointer.Original is { } metaPointer)
-            throw new UnknownFeatureException(classifier, metaPointer, message);
-        throw new UnknownFeatureException(classifier, (Feature?)null, message);
-    }
-
-    /// <inheritdoc />
-    public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+    public virtual TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
         IReadableNode node) where TFeature : class, Feature
     {
         var message = $"On node with id={node.GetId()}:";
@@ -69,12 +59,22 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public void InvalidContainment(IReadableNode node) =>
+    public virtual TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        IReadableNode node) where TFeature : class, Feature
+    {
+        var message = $"On node with id={node.GetId()}:";
+        if (compressedMetaPointer.Original is { } metaPointer)
+            throw new UnknownFeatureException(classifier, metaPointer, message);
+        throw new UnknownFeatureException(classifier, (Feature?)null, message);
+    }
+
+    /// <inheritdoc />
+    public virtual void InvalidContainment(IReadableNode node) =>
         throw new UnsupportedClassifierException(node.GetClassifier().ToMetaPointer(),
             $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public void InvalidReference(IReadableNode node) =>
+    public virtual void InvalidReference(IReadableNode node) =>
         throw new UnsupportedClassifierException(node.GetClassifier().ToMetaPointer(),
             $"On node with id={node.GetId()}:");
 
@@ -98,26 +98,26 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"On node with id={node.GetId()}: couldn't find annotation with id={annotationId}");
 
     /// <inheritdoc />
-    public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+    public virtual INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
         throw new DeserializerException(
             $"On node with id={node?.GetId()}: unsuitable annotation {annotation}");
 
     /// <inheritdoc />
-    public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
+    public virtual IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
         throw new DeserializerException($"Cannot attach annotation {annotation} to its parent with id={parentId}.");
 
     /// <inheritdoc />
-    public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
+    public virtual Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
         throw new DeserializerException(
             $"On node with id={nodeId}: unknown enumeration literal for enumeration {enumeration} with key {key}");
 
     /// <inheritdoc />
-    public object? UnknownDatatype(string nodeId, Property property, string? value) =>
+    public virtual object? UnknownDatatype(string nodeId, Feature property, string? value) =>
         throw new DeserializerException(
-            $"On node with id={nodeId}: unknown property type {property.Type} with value {value}");
+            $"On node with id={nodeId}: unknown property type {property/*.Type*/} with value {value}");
 
     /// <inheritdoc />
-    public bool SkipDeserializingDependentNode(string id) =>
+    public virtual bool SkipDeserializingDependentNode(string id) =>
         throw new DeserializerException(
             $"Skip deserializing {id} because dependentLanguages contains node with same id");
 }
@@ -135,8 +135,8 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public virtual Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-        IReadableNode node)
+    public virtual TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        IReadableNode node) where TFeature : class, Feature
     {
         Console.WriteLine(
             $"On node with id={node.GetId()}: couldn't find specified feature {compressedMetaPointer} - leaving this feature unset.");
@@ -213,10 +213,10 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public object? UnknownDatatype(string nodeId, Property property, string? value)
+    public object? UnknownDatatype(string nodeId, Feature property, string? value)
     {
         Console.WriteLine(
-            $"On node with id={nodeId}: unknown datatype {property.Type} with value {value} - skipping");
+            $"On node with id={nodeId}: unknown datatype {property/*.Type*/} with value {value} - skipping");
         return null;
     }
 

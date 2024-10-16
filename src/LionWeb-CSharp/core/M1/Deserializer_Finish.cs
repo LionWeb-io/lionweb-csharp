@@ -84,10 +84,7 @@ public partial class Deserializer
 
             if (children.Count != 0)
             {
-                node.Set(
-                    containment,
-                    containment.Multiple ? children : children.FirstOrDefault()
-                );
+                node.Set(containment, (containment is Link l && !l.Multiple) ? children.FirstOrDefault() : children);
             }
         }
     }
@@ -122,7 +119,7 @@ public partial class Deserializer
             {
                 node.Set(
                     reference,
-                    reference.Multiple ? targets : targets.FirstOrDefault()
+                    (reference is Link l && !l.Multiple) ? targets.FirstOrDefault() : targets
                 );
             }
         }

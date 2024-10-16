@@ -188,9 +188,9 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
     public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) =>
         @delegate.UnknownClassifier(id, metaPointer);
 
-    public Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-        IReadableNode node) =>
-        @delegate.UnknownFeature(classifier, compressedMetaPointer, node);
+    public TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        IReadableNode node) where TFeature : class, Feature =>
+        @delegate.UnknownFeature<TFeature>(classifier, compressedMetaPointer, node);
 
     public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
         INode node) where TFeature : class, Feature =>
@@ -211,7 +211,7 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
     public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
         @delegate.UnknownEnumerationLiteral(nodeId, enumeration, key);
 
-    public object? UnknownDatatype(string nodeId, Property property, string? value) =>
+    public object? UnknownDatatype(string nodeId, Feature property, string? value) =>
         @delegate.UnknownDatatype(nodeId, property, value);
 
     public bool SkipDeserializingDependentNode(string id) =>
