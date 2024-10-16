@@ -99,7 +99,7 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 /// crip
 ///    tion</summary>
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
-public class AConcept : NodeBase
+public partial class AConcept : NodeBase
 {
 	private Examples.Circular.B.BConcept? _bRef = null;
 	/// <remarks>Optional Single Reference</remarks>

@@ -154,7 +154,7 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY")]
 [Obsolete("deprConcept comment")]
-public class DeprConcept : NodeBase
+public partial class DeprConcept : NodeBase
 {
 	private string? _deprProp = null;
 	/// <remarks>Optional Property</remarks>
@@ -337,13 +337,13 @@ public class DeprConcept : NodeBase
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NTU")]
 [Obsolete("deprIface comment")]
-public interface DeprIface : INode
+public partial interface DeprIface : INode
 {
 }
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE")]
 [Obsolete("deprAnnotation comment")]
-public class DeprAnnotation : NodeBase
+public partial class DeprAnnotation : NodeBase
 {
 	public DeprAnnotation(string id) : base(id)
 	{
@@ -355,7 +355,7 @@ public class DeprAnnotation : NodeBase
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk1MDc1ODcyODk")]
 [Obsolete]
-public class DeprNoComment : NodeBase
+public partial class DeprNoComment : NodeBase
 {
 	public DeprNoComment(string id) : base(id)
 	{

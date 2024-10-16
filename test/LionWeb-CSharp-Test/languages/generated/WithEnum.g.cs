@@ -95,7 +95,7 @@ public class WithEnumFactory : AbstractBaseNodeFactory, IWithEnumFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(WithEnumLanguage), Key = "EnumHolder")]
-public class EnumHolder : NodeBase
+public partial class EnumHolder : NodeBase
 {
 	private MyEnum? _enumValue = null;
 	/// <remarks>Required Property</remarks>

@@ -318,7 +318,7 @@ public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Circle")]
-public class Circle : Shape
+public partial class Circle : Shape
 {
 	private int? _r = null;
 	/// <remarks>Required Property</remarks>
@@ -448,7 +448,7 @@ public class Circle : Shape
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Coord")]
-public class Coord : NodeBase
+public partial class Coord : NodeBase
 {
 	private int? _x = null;
 	/// <remarks>Required Property</remarks>
@@ -580,7 +580,7 @@ public class Coord : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Geometry")]
-public class Geometry : NodeBase
+public partial class Geometry : NodeBase
 {
 	private readonly List<IShape> _shapes = [];
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -728,7 +728,7 @@ public class Geometry : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-IShape")]
-public interface IShape : INode
+public partial interface IShape : INode
 {
 	/// <remarks>Required Property</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-uuid")]
@@ -751,7 +751,7 @@ public interface IShape : INode
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Line")]
-public class Line : Shape, INamedWritable
+public partial class Line : Shape, INamedWritable
 {
 	private Coord? _start = null;
 	/// <remarks>Required Single Containment</remarks>
@@ -894,7 +894,7 @@ public class Line : Shape, INamedWritable
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-OffsetDuplicate")]
-public class OffsetDuplicate : Shape
+public partial class OffsetDuplicate : Shape
 {
 	private Coord? _offset = null;
 	/// <remarks>Required Single Containment</remarks>
@@ -1143,7 +1143,7 @@ public class OffsetDuplicate : Shape
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Shape")]
-public abstract class Shape : NodeBase, INamedWritable, IShape
+public abstract partial class Shape : NodeBase, INamedWritable, IShape
 {
 	private string? _name = null;
 	/// <remarks>Required Property</remarks>
@@ -1370,7 +1370,7 @@ public abstract class Shape : NodeBase, INamedWritable, IShape
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-CompositeShape")]
-public class CompositeShape : Shape
+public partial class CompositeShape : Shape
 {
 	private readonly List<IShape> _parts = [];
 	/// <remarks>Required Multiple Containment</remarks>
@@ -1599,7 +1599,7 @@ public class CompositeShape : Shape
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-ReferenceGeometry")]
-public class ReferenceGeometry : NodeBase
+public partial class ReferenceGeometry : NodeBase
 {
 	private readonly List<IShape> _shapes = [];
 	/// <remarks>Optional Multiple Reference</remarks>
@@ -1685,7 +1685,7 @@ public class ReferenceGeometry : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Documentation")]
-public class Documentation : NodeBase
+public partial class Documentation : NodeBase
 {
 	private string? _text = null;
 	/// <remarks>Optional Property</remarks>
@@ -1782,7 +1782,7 @@ public class Documentation : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-BillOfMaterials")]
-public class BillOfMaterials : NodeBase
+public partial class BillOfMaterials : NodeBase
 {
 	private readonly List<IShape> _materials = [];
 	/// <remarks>Optional Multiple Reference</remarks>
@@ -2038,7 +2038,7 @@ public class BillOfMaterials : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-MaterialGroup")]
-public class MaterialGroup : NodeBase
+public partial class MaterialGroup : NodeBase
 {
 	private MatterState? _matterState = null;
 	/// <remarks>Optional Property</remarks>

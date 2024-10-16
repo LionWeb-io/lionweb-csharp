@@ -167,7 +167,7 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Book")]
-public class Book : NodeBase
+public partial class Book : NodeBase
 {
 	private string? _title = null;
 	/// <remarks>Required Property</remarks>
@@ -337,7 +337,7 @@ public class Book : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Library")]
-public class Library : NodeBase
+public partial class Library : NodeBase
 {
 	private string? _name = null;
 	/// <remarks>Required Property</remarks>
@@ -490,7 +490,7 @@ public class Library : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Writer")]
-public class Writer : NodeBase
+public partial class Writer : NodeBase
 {
 	private string? _name = null;
 	/// <remarks>Required Property</remarks>
@@ -559,7 +559,7 @@ public class Writer : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "GuideBookWriter")]
-public class GuideBookWriter : Writer
+public partial class GuideBookWriter : Writer
 {
 	private string? _countries = null;
 	/// <remarks>Required Property</remarks>
@@ -628,7 +628,7 @@ public class GuideBookWriter : Writer
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "SpecialistBookWriter")]
-public class SpecialistBookWriter : Writer
+public partial class SpecialistBookWriter : Writer
 {
 	private string? _subject = null;
 	/// <remarks>Required Property</remarks>

@@ -56,6 +56,7 @@ public class ClassifierGenerator(Classifier classifier, INames names)
         List<SyntaxKind> modifiers = [SyntaxKind.PublicKeyword];
         if (classifier is Concept { Abstract: true })
             modifiers.Add(SyntaxKind.AbstractKeyword);
+        modifiers.Add(SyntaxKind.PartialKeyword);
 
         var decl = ClassDeclaration(ClassifierName)
             .WithAttributeLists(AsAttributes([
@@ -125,7 +126,7 @@ public class ClassifierGenerator(Classifier classifier, INames names)
                 MetaPointerAttribute(classifier),
                 ObsoleteAttribute(classifier)
             ]))
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.SelectMany(f =>
                 new FeatureGenerator(classifier, f, _names).AbstractMembers())));

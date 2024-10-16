@@ -81,7 +81,7 @@ public class MultiFactory : AbstractBaseNodeFactory, IMultiFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "Container")]
-public class Container : NodeBase
+public partial class Container : NodeBase
 {
 	private readonly List<Examples.Library.M2.Library> _libraries = [];
 	/// <remarks>Required Multiple Containment</remarks>
