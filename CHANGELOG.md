@@ -17,7 +17,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Security
 
 
-## [0.2.2] - unreleased
+## [0.2.2] - 2024-10-21
 
 ### Added
 
@@ -29,6 +29,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 	- `ReferenceValues(<nodes>)` finds all references within all the given `<nodes>`.
 	- `FindIncomingReferences(<targetNode(s)>, <nodes>)` finds all references _to_ (all) the `<targetNode(s)>` within the given `<nodes>`.
     - `ReferencesToOutOfScopeNodes(<nodes>)` finds all references to nodes that are not withing the given `<nodes>`.
+- Generate `[Obsolete]` attributes on all classes / members with the corresponding annotation `io-lionweb-mps-specific.Deprecated` in LionWeb.
+- Generate all types as `partial` to ease customization.
 
 ### Fixed
 
