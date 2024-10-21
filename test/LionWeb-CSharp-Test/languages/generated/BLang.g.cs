@@ -86,7 +86,7 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 
 /// <summary>Some enum</summary>
 [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-BConcept")]
-public class BConcept : NodeBase
+public partial class BConcept : NodeBase
 {
 	private Examples.Circular.A.AConcept? _aRef = null;
 	/// <remarks>Optional Single Reference</remarks>
