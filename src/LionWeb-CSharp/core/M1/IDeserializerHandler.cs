@@ -23,7 +23,7 @@ using Serialization;
 public interface IDeserializerHandler
 {
     Classifier? UnknownClassifier(string id, MetaPointer metaPointer);
-   
+
     /// <summary>
     /// Cannot find feature according to <paramref name="compressedMetaPointer"/>
     /// </summary>
@@ -32,14 +32,34 @@ public interface IDeserializerHandler
     /// <param name="node"></param>
     /// <typeparam name="TFeature"></typeparam>
     /// <returns></returns>
-    TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer, IReadableNode node) where TFeature : class, Feature;
+    TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        IReadableNode node) where TFeature : class, Feature;
+
     INode? UnknownParent(CompressedId parentId, INode node);
+
+    /// <summary>
+    /// Cannot find node with id <paramref name="childId"/> required as child for <paramref name="node"/> 
+    /// </summary>
+    /// <param name="childId"></param>
+    /// <param name="node"></param>
+    /// <returns>The node to be used as child of <paramref name="node"/> instead of <paramref name="childId"/> or
+    /// null if child should be skipped</returns>
     INode? UnknownChild(CompressedId childId, IWritableNode node);
+
     IReadableNode? UnknownReferenceTarget(CompressedId targetId, string? resolveInfo, IWritableNode node);
     INode? UnknownAnnotation(CompressedId annotationId, INode node);
     INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node);
     Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key);
+
+    /// <summary>
+    /// Cannot put <paramref name="value"/> into <paramref name="property"/>
+    /// </summary>
+    /// <param name="nodeId"></param>
+    /// <param name="property"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
     object? UnknownDatatype(string nodeId, Feature property, string? value);
+
     bool SkipDeserializingDependentNode(string id);
 
     /// <summary>
@@ -66,7 +86,8 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new UnsupportedClassifierException(metaPointer, $"On node with id={id}: ");
 
     /// <inheritdoc />
-    public virtual TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+    public virtual TFeature? UnknownFeature<TFeature>(Classifier classifier,
+        CompressedMetaPointer compressedMetaPointer,
         IReadableNode node) where TFeature : class, Feature
     {
         var message = $"On node with id={node.GetId()}:";
@@ -76,7 +97,8 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public virtual TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+    public virtual TFeature? InvalidFeature<TFeature>(Classifier classifier,
+        CompressedMetaPointer compressedMetaPointer,
         IReadableNode node) where TFeature : class, Feature
     {
         var message = $"On node with id={node.GetId()}:";
@@ -105,7 +127,8 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new DeserializerException($"On node with id={node.GetId()}: couldn't find child with id={childId}");
 
     /// <inheritdoc />
-    public virtual IReadableNode? UnknownReferenceTarget(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
+    public virtual IReadableNode?
+        UnknownReferenceTarget(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: couldn't find reference target with id={targetId}");
 
@@ -131,7 +154,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     /// <inheritdoc />
     public virtual object? UnknownDatatype(string nodeId, Feature property, string? value) =>
         throw new DeserializerException(
-            $"On node with id={nodeId}: unknown property type {property/*.Type*/} with value {value}");
+            $"On node with id={nodeId}: unknown property type {property /*.Type*/} with value {value}");
 
     /// <inheritdoc />
     public virtual bool SkipDeserializingDependentNode(string id) =>
@@ -152,7 +175,8 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public virtual TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+    public virtual TFeature? UnknownFeature<TFeature>(Classifier classifier,
+        CompressedMetaPointer compressedMetaPointer,
         IReadableNode node) where TFeature : class, Feature
     {
         Console.WriteLine(
@@ -233,7 +257,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     public object? UnknownDatatype(string nodeId, Feature property, string? value)
     {
         Console.WriteLine(
-            $"On node with id={nodeId}: unknown datatype {property/*.Type*/} with value {value} - skipping");
+            $"On node with id={nodeId}: unknown datatype {property /*.Type*/} with value {value} - skipping");
         return null;
     }
 
