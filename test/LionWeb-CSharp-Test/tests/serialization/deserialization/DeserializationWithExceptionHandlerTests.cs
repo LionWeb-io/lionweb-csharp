@@ -23,7 +23,6 @@ using Examples.TinyRefLang;
 using Examples.WithEnum.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
-using LionWeb.Core.M2;
 using LionWeb.Core.Serialization;
 
 [TestClass]
@@ -32,6 +31,7 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.UnknownClassifier"/>
     /// </summary>
+
     #region unknown classifier
 
     [TestMethod]
@@ -66,9 +66,9 @@ public class DeserializationWithExceptionHandlerTests
     #endregion
 
     /// <summary>
-    /// <see cref="IDeserializerHandler.UnknownFeature"/>
-    /// <seealso cref="IDeserializerHandler.UnknownReference"/>
+    /// <see cref="IDeserializerHandler.UnknownFeature{TFeature}"/>
     /// </summary>
+
     #region unknown feature
 
     [TestMethod]
@@ -107,26 +107,27 @@ public class DeserializationWithExceptionHandlerTests
     }
 
     [TestMethod]
-    [Ignore(message: "no exception thrown")]
-    public void unknown_property()
+    public void unknown_property_with_value()
     {
         var serializationChunk = new SerializationChunk
         {
             SerializationFormatVersion = ReleaseVersion.Current,
             Languages =
             [
-                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
-                new SerializedLanguageReference { Key = "LionCore_builtins", Version = ReleaseVersion.Current }
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
             ],
             Nodes =
             [
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
                     Properties =
                     [
-                        new SerializedProperty { Property = new MetaPointer("LionCore_builtins", "1", "key-unknown"), }
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("key-Shapes", "1", "key-unknown"), Value = "1"
+                        }
                     ],
                     Containments = [],
                     References = [],
@@ -137,7 +138,82 @@ public class DeserializationWithExceptionHandlerTests
 
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(new DeserializerExceptionHandler())
-            .WithLanguages([ShapesLanguage.Instance, BuiltInsLanguage.Instance])
+            .WithLanguages([ShapesLanguage.Instance])
+            .Build();
+
+        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    [TestMethod]
+    [Ignore(message: "no exception thrown, expects an assigned value to evaluate, requires implementation")]
+    public void unknown_property_without_value()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties =
+                    [
+                        new SerializedProperty { Property = new MetaPointer("key-Shapes", "1", "key-unknown") }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguages([ShapesLanguage.Instance])
+            .Build();
+
+        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    [TestMethod]
+    [Ignore(message: "no exception thrown, expects an assigned value to evaluate, requires implementation")]
+    public void unknown_property_with_null_value()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("key-Shapes", "1", "key-unknown"), Value = null
+                        }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(new DeserializerExceptionHandler())
+            .WithLanguages([ShapesLanguage.Instance])
             .Build();
 
         Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
@@ -200,6 +276,7 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.UnknownParent"/>
     /// </summary>
+
     #region unknown parent
 
     [TestMethod]
@@ -240,6 +317,7 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.UnknownChild"/>
     /// </summary>
+
     #region unknown child
 
     [TestMethod]
@@ -281,6 +359,65 @@ public class DeserializationWithExceptionHandlerTests
         Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
     }
 
+    [TestMethod]
+    public void unknown_child_deserializer()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"),
+                            Children = ["unknown-child"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var unknownChildDeserializer = new UnknownChildDeserializer();
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(unknownChildDeserializer)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownChildDeserializer.Called);
+        
+    }
+
+    private class UnknownChildDeserializer : DeserializerExceptionHandler
+    {
+        public bool Called;
+
+        public override INode? UnknownChild(CompressedId childId, IWritableNode node)
+        {
+            Called = true;
+            return null;
+        }
+    }
+
+    [TestMethod]
+    public void unknown_child_exception_handler() =>
+        Assert.ThrowsException<DeserializerException>(() =>
+            new DeserializerExceptionHandler().UnknownChild(CompressedId.Create("xx", true), new Line("a")));
+
     #endregion
 
     #region unknown reference target
@@ -312,7 +449,8 @@ public class DeserializationWithExceptionHandlerTests
                             [
                                 new SerializedReferenceTarget
                                 {
-                                    Reference = "unknown-reference", ResolveInfo = "unknown-reference-resolve-info"
+                                    Reference = "unknown-reference-target",
+                                    ResolveInfo = "unknown-reference-target-resolve-info"
                                 }
                             ]
                         }
@@ -335,6 +473,7 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.UnknownAnnotation"/>
     /// </summary>
+
     #region unknown annotation
 
     [TestMethod]
@@ -374,6 +513,7 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.UnknownEnumerationLiteral"/>
     /// </summary>
+
     #region unknown enumeration literal
 
     [TestMethod]
@@ -420,10 +560,11 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.InvalidContainment"/>
     /// </summary>
+
     #region invalid containment
 
     [TestMethod]
-    public void invalid_containment_classifier_mismatch()
+    public void containment_classifier_mismatch()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -472,7 +613,7 @@ public class DeserializationWithExceptionHandlerTests
     }
 
     [TestMethod]
-    [Ignore(message: "no exception thrown")]
+    [Ignore(message:"requires implementation")]
     public void single_containment_expected()
     {
         var serializationChunk = new SerializationChunk
@@ -535,10 +676,10 @@ public class DeserializationWithExceptionHandlerTests
 
     #endregion
 
-    #region invalid reference target
+    #region invalid reference
 
     [TestMethod]
-    public void reference_target_classifier_mismatch()
+    public void reference_classifier_mismatch()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -590,7 +731,7 @@ public class DeserializationWithExceptionHandlerTests
     }
 
     [TestMethod]
-    [Ignore(message: "no exception thrown")]
+    [Ignore(message:"requires implementation")]
     public void single_reference_expected()
     {
         var serializationChunk = new SerializationChunk
@@ -654,15 +795,16 @@ public class DeserializationWithExceptionHandlerTests
     }
 
     #endregion
-    
+
     /// <summary>
     /// <see cref="IDeserializerHandler.InvalidFeature{TFeature}"/>
     /// </summary>
-    #region invalid feature
+
+    #region invalid property value
 
     [TestMethod]
-    [Ignore("throws FormatException")]
-    public void invalid_feature()
+    [Ignore(message: "requires implementation")]
+    public void invalid_property_value()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -704,6 +846,7 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.InvalidAnnotation"/>
     /// </summary>
+
     #region invalid annotation
 
     [TestMethod]
@@ -753,6 +896,7 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.InvalidAnnotationParent"/>
     /// </summary>
+
     #region invalid annotation parent
 
     [TestMethod]
@@ -802,10 +946,10 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.UnknownDatatype"/>
     /// </summary>
+
     #region unknown datatype
 
     [TestMethod]
-    [Ignore("how to write a test case with unknown datatype")]
     public void unknown_datatype()
     {
         var serializationChunk = new SerializationChunk
@@ -825,7 +969,7 @@ public class DeserializationWithExceptionHandlerTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("WithEnum", "1", "enumValue"), Value = "lit1"
+                            Property = new MetaPointer("WithEnum", "1", "enumValue"), Value = "xxx"
                         }
                     ],
                     Containments = [],
@@ -848,10 +992,11 @@ public class DeserializationWithExceptionHandlerTests
     /// <summary>
     /// <see cref="IDeserializerHandler.SkipDeserializingDependentNode"/>
     /// </summary>
+
     #region skip deserializing dependent node
 
     [TestMethod]
-    [Ignore(message: "no exception thrown")]
+    [Ignore(message:"requires implementation")]
     public void skip_deserializing_dependent_node()
     {
         var serializationChunk = new SerializationChunk
