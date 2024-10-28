@@ -31,8 +31,9 @@ public class DeserializationWithCustomHandlerTests
         public virtual Classifier? UnknownClassifier(string id, MetaPointer metaPointer) =>
             throw new NotImplementedException();
 
-        public virtual Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) => throw new NotImplementedException();
+        public virtual TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+            IReadableNode node) where TFeature : class, Feature =>
+            throw new NotImplementedException();
 
         public virtual INode? UnknownParent(CompressedId parentId, INode node) => throw new NotImplementedException();
 
@@ -52,7 +53,7 @@ public class DeserializationWithCustomHandlerTests
         public virtual Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
             throw new NotImplementedException();
 
-        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
+        public object? UnknownDatatype(string nodeId, Feature property, string? value) =>
             throw new NotImplementedException();
 
         public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();

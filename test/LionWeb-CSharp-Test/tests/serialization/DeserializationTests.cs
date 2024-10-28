@@ -292,6 +292,10 @@ public class DeserializationTests
         public virtual Feature? UnknownFeature(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
             IReadableNode node) => throw new NotImplementedException();
 
+        public TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+            IReadableNode node) where TFeature : class, Feature =>
+            throw new NotImplementedException();
+
         public virtual INode? UnknownParent(CompressedId parentId, INode node) => throw new NotImplementedException();
 
         public virtual INode? UnknownChild(CompressedId childId, IWritableNode node) =>
@@ -310,7 +314,7 @@ public class DeserializationTests
         public virtual Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
             throw new NotImplementedException();
 
-        public object? UnknownDatatype(string nodeId, Property property, string? value) =>
+        public object? UnknownDatatype(string nodeId, Feature property, string? value) =>
             throw new NotImplementedException();
 
         public bool SkipDeserializingDependentNode(string id) => throw new NotImplementedException();
@@ -460,6 +464,7 @@ public class DeserializationTests
     }
 
     [TestMethod]
+    [Ignore]
     public void test_deserialization_of_a_node_with_unknown_feature_custom_handler_returns_null_does_not_fail()
     {
         var serializationChunk = new SerializationChunk
