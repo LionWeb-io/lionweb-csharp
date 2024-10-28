@@ -133,7 +133,7 @@ public partial class Deserializer
         if (_dependentNodesById.TryGetValue(targetId, out var dependentNode))
             return dependentNode;
 
-        return Handler.UnknownReference(targetId, resolveInfo, node);
+        return Handler.UnknownReferenceTarget(targetId, resolveInfo, node);
     }
 
     #endregion

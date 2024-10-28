@@ -196,7 +196,7 @@ public partial class LanguageDeserializer
         T? UnknownReference<T>(SerializedReferenceTarget target) where T : class
         {
             var targetNode =
-                Handler.UnknownReference(Compress(target.Reference), target.ResolveInfo, (IWritableNode)node);
+                Handler.UnknownReferenceTarget(Compress(target.Reference), target.ResolveInfo, (IWritableNode)node);
             if (targetNode is T result)
                 return result;
             return null;

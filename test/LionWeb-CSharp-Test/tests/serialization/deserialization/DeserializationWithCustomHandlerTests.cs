@@ -41,7 +41,7 @@ public class DeserializationWithCustomHandlerTests
             throw new NotImplementedException();
 
         public virtual IReadableNode?
-            UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
+            UnknownReferenceTarget(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
             throw new NotImplementedException();
 
         public virtual INode? UnknownAnnotation(CompressedId annotationId, INode node) =>

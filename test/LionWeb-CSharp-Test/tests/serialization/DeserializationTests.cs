@@ -302,7 +302,7 @@ public class DeserializationTests
             throw new NotImplementedException();
 
         public virtual IReadableNode?
-            UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
+            UnknownReferenceTarget(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
             throw new NotImplementedException();
 
         public virtual INode? UnknownAnnotation(CompressedId annotationId, INode node) =>
@@ -752,7 +752,7 @@ public class DeserializationTests
 
     private class UnknownReferenceHandler(Func<IReadableNode?> incrementer) : NotImplementedDeserializerHandler
     {
-        public override IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node)
+        public override IReadableNode? UnknownReferenceTarget(CompressedId targetId, string? resolveInfo, IWritableNode node)
             => incrementer();
     }
 

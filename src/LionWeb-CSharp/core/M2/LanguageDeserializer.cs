@@ -199,8 +199,8 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
     public INode? UnknownChild(CompressedId childId, IWritableNode node) =>
         @delegate.UnknownChild(childId, node);
 
-    public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
-        @delegate.UnknownReference(targetId, resolveInfo, node);
+    public IReadableNode? UnknownReferenceTarget(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
+        @delegate.UnknownReferenceTarget(targetId, resolveInfo, node);
 
     public INode? UnknownAnnotation(CompressedId annotationId, INode node) =>
         @delegate.UnknownAnnotation(annotationId, node);
