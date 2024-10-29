@@ -23,7 +23,7 @@ using LionWeb.Core.M1;
 using LionWeb.Core.Serialization;
 
 [TestClass]
-public class DeserializationWithIgnoringHandlerTests
+public class DeserializerIgnoringHandler
 {
     #region unknown classifier
 
@@ -49,7 +49,7 @@ public class DeserializationWithIgnoringHandlerTests
         };
 
         List<IReadableNode> nodes = new DeserializerBuilder()
-            .WithHandler(new DeserializerIgnoringHandler())
+            .WithHandler(new LionWeb.Core.M1.DeserializerIgnoringHandler())
             .WithLanguage(ShapesLanguage.Instance)
             .Build()
             .Deserialize(serializationChunk);
