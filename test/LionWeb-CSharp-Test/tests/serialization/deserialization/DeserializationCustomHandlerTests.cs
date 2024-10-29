@@ -19,20 +19,31 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 
 using Examples.Library.M2;
 using Examples.Shapes.M2;
-using Examples.TinyRefLang;
 using Examples.WithEnum.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
 [TestClass]
-public class DeserializationWithExceptionHandlerTests
+public class DeserializationCustomHandlerTests
 {
     /// <summary>
     /// <see cref="IDeserializerHandler.UnknownClassifier"/>
     /// </summary>
 
     #region unknown classifier
+
+    private class UnknownClassifierDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+
+        public override Classifier? UnknownClassifier(string id, MetaPointer metaPointer)
+        {
+            Called = true;
+            return null;
+        }
+    }
 
     [TestMethod]
     public void unknown_classifier()
@@ -55,12 +66,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownClassifierDeserializerHandler = new UnknownClassifierDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(unknownClassifierDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnsupportedClassifierException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownClassifierDeserializerHandler.Called);
     }
 
     #endregion
@@ -70,6 +83,20 @@ public class DeserializationWithExceptionHandlerTests
     /// </summary>
 
     #region unknown feature
+
+    private class UnknownFeatureDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+
+        public override TFeature? UnknownFeature<TFeature>(Classifier classifier,
+            CompressedMetaPointer compressedMetaPointer,
+            IReadableNode node) where TFeature : class
+        {
+            Called = true;
+            return null;
+        }
+    }
+
 
     [TestMethod]
     public void unknown_containment()
@@ -98,12 +125,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownFeatureDeserializerHandler = new UnknownFeatureDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(unknownFeatureDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownFeatureDeserializerHandler.Called);
     }
 
     [TestMethod]
@@ -136,12 +165,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownFeatureDeserializerHandler = new UnknownFeatureDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
-            .WithLanguages([ShapesLanguage.Instance])
+            .WithHandler(unknownFeatureDeserializerHandler)
+            .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownFeatureDeserializerHandler.Called);
     }
 
     [TestMethod]
@@ -172,12 +203,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownFeatureDeserializerHandler = new UnknownFeatureDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
-            .WithLanguages([ShapesLanguage.Instance])
+            .WithHandler(unknownFeatureDeserializerHandler)
+            .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownFeatureDeserializerHandler.Called);
     }
 
     [TestMethod]
@@ -211,12 +244,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownFeatureDeserializerHandler = new UnknownFeatureDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
-            .WithLanguages([ShapesLanguage.Instance])
+            .WithHandler(unknownFeatureDeserializerHandler)
+            .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownFeatureDeserializerHandler.Called);
     }
 
     [TestMethod]
@@ -263,12 +298,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownFeatureDeserializerHandler = new UnknownFeatureDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
-            .WithLanguage(LibraryLanguage.Instance)
+            .WithHandler(unknownFeatureDeserializerHandler)
+            .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownFeatureDeserializerHandler.Called);
     }
 
     #endregion
@@ -278,6 +315,17 @@ public class DeserializationWithExceptionHandlerTests
     /// </summary>
 
     #region unknown parent
+
+    private class UnknownParentDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+
+        public override INode? UnknownParent(CompressedId parentId, INode node)
+        {
+            Called = true;
+            return null;
+        }
+    }
 
     [TestMethod]
     public void unknown_parent()
@@ -304,12 +352,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownParentDeserializerHandler = new UnknownParentDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(unknownParentDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownParentDeserializerHandler.Called);
     }
 
     #endregion
@@ -319,6 +369,17 @@ public class DeserializationWithExceptionHandlerTests
     /// </summary>
 
     #region unknown child
+
+    private class UnknownChildDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+
+        public override INode? UnknownChild(CompressedId childId, IWritableNode node)
+        {
+            Called = true;
+            return null;
+        }
+    }
 
     [TestMethod]
     public void unknown_child()
@@ -351,76 +412,31 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownChildDeserializerHandler = new UnknownChildDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
-            .WithLanguage(ShapesLanguage.Instance)
-            .Build();
-
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
-    }
-
-    [TestMethod]
-    public void unknown_child_deserializer()
-    {
-        var serializationChunk = new SerializationChunk
-        {
-            SerializationFormatVersion = ReleaseVersion.Current,
-            Languages =
-            [
-                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
-            ],
-            Nodes =
-            [
-                new SerializedNode
-                {
-                    Id = "foo",
-                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
-                    Properties = [],
-                    Containments =
-                    [
-                        new SerializedContainment
-                        {
-                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"),
-                            Children = ["unknown-child"]
-                        }
-                    ],
-                    References = [],
-                    Annotations = [],
-                }
-            ]
-        };
-
-        var unknownChildDeserializer = new UnknownChildDeserializer();
-
-        IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unknownChildDeserializer)
+            .WithHandler(unknownChildDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
         deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unknownChildDeserializer.Called);
-        
+        Assert.IsTrue(unknownChildDeserializerHandler.Called);
     }
 
-    private class UnknownChildDeserializer : DeserializerExceptionHandler
-    {
-        public bool Called;
+    #endregion
 
-        public override INode? UnknownChild(CompressedId childId, IWritableNode node)
+    #region unknown reference target
+
+    private class UnknownReferenceTargetDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+        
+        public override IReadableNode? UnknownReferenceTarget(CompressedId targetId, string? resolveInfo,
+            IWritableNode node)
         {
             Called = true;
             return null;
         }
     }
-
-    [TestMethod]
-    public void unknown_child_exception_handler() =>
-        Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().UnknownChild(CompressedId.Create("xx", true), new Line("a")));
-
-    #endregion
-
-    #region unknown reference target
 
     [TestMethod]
     public void unknown_reference_target()
@@ -460,12 +476,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownReferenceTargetDeserializerHandler = new UnknownReferenceTargetDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(unknownReferenceTargetDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownReferenceTargetDeserializerHandler.Called);
     }
 
     #endregion
@@ -476,6 +494,18 @@ public class DeserializationWithExceptionHandlerTests
 
     #region unknown annotation
 
+    private class UnknownAnnotationDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+        
+        public override INode? UnknownAnnotation(CompressedId annotationId, INode node)
+        {
+            Called = true;
+            return null;
+        }
+    }
+
+    
     [TestMethod]
     public void unknown_annotation()
     {
@@ -500,12 +530,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownAnnotationDeserializerHandler = new UnknownAnnotationDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(unknownAnnotationDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownAnnotationDeserializerHandler.Called);
     }
 
     #endregion
@@ -516,6 +548,17 @@ public class DeserializationWithExceptionHandlerTests
 
     #region unknown enumeration literal
 
+    private class UnknownEnumerationLiteralDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+        
+        public override Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key)
+        {
+            Called = true;
+            return null;
+        }
+    }
+    
     [TestMethod]
     public void unknown_enumeration_literal()
     {
@@ -547,12 +590,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownEnumerationLiteralDeserializerHandler = new UnknownEnumerationLiteralDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(unknownEnumerationLiteralDeserializerHandler)
             .WithLanguage(WithEnumLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownEnumerationLiteralDeserializerHandler.Called);
     }
 
     #endregion
@@ -563,6 +608,13 @@ public class DeserializationWithExceptionHandlerTests
 
     #region invalid containment
 
+    private class InvalidContainmentDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+        
+        public override void InvalidContainment(IReadableNode node) => Called = true;
+    }
+    
     [TestMethod]
     public void containment_classifier_mismatch()
     {
@@ -604,16 +656,18 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var invalidContainmentDeserializerHandler = new InvalidContainmentDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(invalidContainmentDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(invalidContainmentDeserializerHandler.Called);
     }
 
     [TestMethod]
-    [Ignore(message:"requires implementation")]
+    [Ignore(message: "requires implementation")]
     public void single_containment_expected()
     {
         var serializationChunk = new SerializationChunk
@@ -666,18 +720,27 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var invalidContainmentDeserializerHandler = new InvalidContainmentDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(invalidContainmentDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(invalidContainmentDeserializerHandler.Called);
     }
 
     #endregion
 
     #region invalid reference
 
+    private class InvalidReferenceDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+        
+        public override void InvalidReference(IReadableNode node) => Called = true;
+    }
+    
     [TestMethod]
     public void reference_classifier_mismatch()
     {
@@ -722,16 +785,18 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var invalidReferenceDeserializerHandler = new InvalidReferenceDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(invalidReferenceDeserializerHandler)
             .WithLanguage(LibraryLanguage.Instance)
             .Build();
-
-        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+        
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(invalidReferenceDeserializerHandler.Called);
     }
 
     [TestMethod]
-    [Ignore(message:"requires implementation")]
+    [Ignore(message: "requires implementation")]
     public void single_reference_expected()
     {
         var serializationChunk = new SerializationChunk
@@ -786,12 +851,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var invalidReferenceDeserializerHandler = new InvalidReferenceDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
-            .WithLanguage(TinyRefLangLanguage.Instance)
+            .WithHandler(invalidReferenceDeserializerHandler)
+            .WithLanguage(LibraryLanguage.Instance)
             .Build();
-
-        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+        
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(invalidReferenceDeserializerHandler.Called);
     }
 
     #endregion
@@ -849,6 +916,17 @@ public class DeserializationWithExceptionHandlerTests
 
     #region invalid annotation
 
+    private class InvalidAnnotationDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+
+        public override INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node)
+        {
+            Called = true;
+            return null;
+        }
+    }
+    
     [TestMethod]
     public void invalid_annotation_classifier_mismatch()
     {
@@ -883,12 +961,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var invalidAnnotationDeserializerHandler = new InvalidAnnotationDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(invalidAnnotationDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(invalidAnnotationDeserializerHandler.Called);
     }
 
     #endregion
@@ -899,6 +979,17 @@ public class DeserializationWithExceptionHandlerTests
 
     #region invalid annotation parent
 
+    private class InvalidAnnotationParentDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+        
+        public override IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId)
+        {
+            Called = true;
+            return null;
+        }
+    }
+    
     [TestMethod]
     public void invalid_annotation_parent()
     {
@@ -933,12 +1024,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var invalidAnnotationParentDeserializerHandler = new InvalidAnnotationParentDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(invalidAnnotationParentDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(invalidAnnotationParentDeserializerHandler.Called);
     }
 
     #endregion
@@ -949,6 +1042,18 @@ public class DeserializationWithExceptionHandlerTests
 
     #region unknown datatype
 
+    private class UnknownDatatypeDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+
+        public override object? UnknownDatatype(string nodeId, Feature property, string? value)
+        {
+            Called = true;
+            return null;
+        }
+    }
+
+    
     [TestMethod]
     public void unknown_datatype()
     {
@@ -979,12 +1084,14 @@ public class DeserializationWithExceptionHandlerTests
             ]
         };
 
+        var unknownDatatypeDeserializerHandler = new UnknownDatatypeDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(unknownDatatypeDeserializerHandler)
             .WithLanguage(WithEnumLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(unknownDatatypeDeserializerHandler.Called);
     }
 
     #endregion
@@ -995,8 +1102,20 @@ public class DeserializationWithExceptionHandlerTests
 
     #region skip deserializing dependent node
 
+    private class SkipDeserializingDependentNodeDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+        
+        public override bool SkipDeserializingDependentNode(string id)
+        {
+            Called = true;
+            return true;
+        }
+    }
+    
+    
     [TestMethod]
-    [Ignore(message:"requires implementation")]
+    [Ignore(message: "requires implementation")]
     public void skip_deserializing_dependent_node()
     {
         var serializationChunk = new SerializationChunk
@@ -1040,14 +1159,14 @@ public class DeserializationWithExceptionHandlerTests
         Documentation documentation = ShapesLanguage.Instance.GetFactory().NewDocumentation("repeated-id");
         dependentGeometry.Documentation = documentation;
 
+        var skipDeserializingDependentNodeDeserializerHandler = new SkipDeserializingDependentNodeDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(skipDeserializingDependentNodeDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<DeserializerException>(() =>
-            deserializer.Deserialize(serializationChunk,
-                dependentGeometry.Descendants(true, true)));
+        deserializer.Deserialize(serializationChunk, dependentGeometry.Descendants(true, true));
+        Assert.IsTrue(skipDeserializingDependentNodeDeserializerHandler.Called);
     }
 
     #endregion
