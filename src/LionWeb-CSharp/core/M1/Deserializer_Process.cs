@@ -46,17 +46,19 @@ public partial class Deserializer
     {
         var id = serializedNode.Id;
 
-        foreach (var serializedProperty in serializedNode.Properties.Where(p => p.Value != null))
+        foreach (var serializedProperty in serializedNode.Properties)
         {
             var property = _deserializerMetaInfo.FindFeature<Property>(node, Compress(serializedProperty.Property));
             if (property == null)
                 continue;
 
             var value = serializedProperty.Value;
-            var convertedValue = property switch
+            var convertedValue = (property, value) switch
             {
-                Property {Type:PrimitiveType} p => ConvertPrimitiveType(p, value),
-                Property {Type:Enumeration enumeration} => _deserializerMetaInfo.ConvertEnumeration(id, enumeration, value),
+                (_, null) => null,
+                (Property { Type: PrimitiveType } p, { } v) => ConvertPrimitiveType(id, p, v),
+                (Property { Type: Enumeration enumeration }, { } v) => _deserializerMetaInfo.ConvertEnumeration(id,
+                    enumeration, v),
                 _ => Handler.UnknownDatatype(id, property, value)
             };
 
@@ -67,13 +69,13 @@ public partial class Deserializer
         }
     }
 
-    private object? ConvertPrimitiveType(Property property, string value) => property.Type switch
+    private object? ConvertPrimitiveType(string nodeId, Property property, string value) => property.Type switch
     {
-        var b when b == BuiltInsLanguage.Instance.Boolean => value == "true",
-        var i when i == BuiltInsLanguage.Instance.Integer => int.Parse(value),
+        var b when b == BuiltInsLanguage.Instance.Boolean && bool.TryParse(value, out var result) => result,
+        var i when i == BuiltInsLanguage.Instance.Integer && int.TryParse(value, out var result) => result,
         // leave both a String and JSON value as a string:
         var s when s == BuiltInsLanguage.Instance.String || s == BuiltInsLanguage.Instance.Json => value,
-        _ => null
+        _ => Handler.UnknownDatatype(nodeId, property, value)
     };
 
     private void RegisterParent(SerializedNode serializedNode, CompressedId compressedId)
