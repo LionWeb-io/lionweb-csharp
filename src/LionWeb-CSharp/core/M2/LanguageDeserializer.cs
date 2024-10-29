@@ -83,7 +83,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
 
         var id = serializedNode.Id;
         var compressedId = Compress(id);
-        if (!(IsInDependentNodes(compressedId) && Handler.SkipDeserializingDependentNode(id)))
+        if (!IsInDependentNodes(compressedId) || !Handler.SkipDeserializingDependentNode(compressedId))
             _deserializedNodesById[compressedId] = DeserializeMemoized(compressedId);
     }
 
@@ -159,7 +159,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
             if (serializedPropertiesByKey.TryGetValue(compressedMetaPointer, out var value))
                 return value == "true";
 
-            var result = Handler.UnknownDatatype(id, property, null);
+            var result = Handler.InvalidPropertyValue<bool>(null, property, Compress(id));
             return result as bool? ?? throw new InvalidValueException(property, result);
         }
 
@@ -169,7 +169,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
             if (serializedPropertiesByKey.TryGetValue(compressedMetaPointer, out var s) && s != null)
                 return s;
 
-            var result = Handler.UnknownDatatype(id, property, null);
+            var result = Handler.InvalidPropertyValue<string>(null, property, Compress(id));
             return result as string ?? throw new InvalidValueException(property, result);
         }
     }
@@ -182,44 +182,45 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
 
 internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : IDeserializerHandler
 {
-    public INode? UnknownParent(CompressedId parentId, INode node) =>
+    public IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node) =>
         null;
 
-    public Classifier? UnknownClassifier(string id, MetaPointer metaPointer) =>
-        @delegate.UnknownClassifier(id, metaPointer);
+    public Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) =>
+        @delegate.UnknownClassifier(classifier, id);
 
-    public TFeature? UnknownFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-        IReadableNode node) where TFeature : class, Feature =>
-        @delegate.UnknownFeature<TFeature>(classifier, compressedMetaPointer, node);
+    public Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IWritableNode node)
+        where TFeature : class, Feature =>
+        @delegate.UnknownFeature<TFeature>(feature, classifier, node);
 
-    public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-        INode node) where TFeature : class, Feature =>
-        @delegate.InvalidFeature<TFeature>(classifier, compressedMetaPointer, node);
+    public IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) =>
+        @delegate.UnresolvableChild(childId, containment, node);
 
-    public INode? UnknownChild(CompressedId childId, IWritableNode node) =>
-        @delegate.UnknownChild(childId, node);
+    public IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo, Feature reference,
+        IWritableNode node) =>
+        @delegate.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
 
-    public IReadableNode? UnknownReference(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
-        @delegate.UnknownReference(targetId, resolveInfo, node);
+    public IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node) =>
+        @delegate.UnresolvableAnnotation(annotationId, node);
 
-    public INode? UnknownAnnotation(CompressedId annotationId, INode node) =>
-        @delegate.UnknownAnnotation(annotationId, node);
-
-    public INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+    public IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
         @delegate.InvalidAnnotation(annotation, node);
 
-    public Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key) =>
-        @delegate.UnknownEnumerationLiteral(nodeId, enumeration, key);
+    public Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
+        IWritableNode nodeId) =>
+        @delegate.UnknownEnumerationLiteral(key, enumeration, property, nodeId);
 
-    public object? UnknownDatatype(string nodeId, Feature property, string? value) =>
-        @delegate.UnknownDatatype(nodeId, property, value);
+    public object? UnknownDatatype(Feature property, string? value, IWritableNode nodeId) =>
+        @delegate.UnknownDatatype(property, value, nodeId);
 
-    public bool SkipDeserializingDependentNode(string id) =>
+    public object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId) =>
+        @delegate.InvalidPropertyValue<TValue>(value, property, nodeId);
+
+    public bool SkipDeserializingDependentNode(CompressedId id) =>
         @delegate.SkipDeserializingDependentNode(id);
 
-    public TFeature? InvalidFeature<TFeature>(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
-        IReadableNode node) where TFeature : class, Feature =>
-        @delegate.InvalidFeature<TFeature>(classifier, compressedMetaPointer, node);
+    public Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IWritableNode node)
+        where TFeature : class, Feature =>
+        @delegate.InvalidFeature<TFeature>(feature, classifier, node);
 
     public void InvalidContainment(IReadableNode node) =>
         @delegate.InvalidContainment(node);
@@ -227,6 +228,6 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
     public void InvalidReference(IReadableNode node) =>
         @delegate.InvalidReference(node);
 
-    public IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId) =>
-        @delegate.InvalidAnnotationParent(annotation, parentId);
+    public void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent) =>
+        @delegate.InvalidAnnotationParent(annotation, parent);
 }

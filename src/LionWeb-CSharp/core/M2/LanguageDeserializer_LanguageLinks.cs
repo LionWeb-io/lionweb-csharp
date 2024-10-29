@@ -88,7 +88,7 @@ public partial class LanguageDeserializer
 
             return serializedContainment.Children.Select(c =>
             {
-                var targetNode = Handler.UnknownChild(Compress(c), (IWritableNode)node);
+                var targetNode = Handler.UnresolvableChild(Compress(c), containment, (IWritableNode)node);
                 if (targetNode is T result)
                     return result;
                 return null;
@@ -167,7 +167,7 @@ public partial class LanguageDeserializer
             if (serializedReference.Targets.Length == 1)
             {
                 var target = serializedReference.Targets.First();
-                return UnknownReference<T>(target);
+                return UnknownReference<T>(reference, target);
             }
 
             return null;
@@ -183,7 +183,7 @@ public partial class LanguageDeserializer
             if (serializedReference == null)
                 return [];
 
-            return serializedReference.Targets.Select(UnknownReference<T>).Where(t => t != null)!;
+            return serializedReference.Targets.Select(t => UnknownReference<T>(reference, t)).Where(t => t != null)!;
         }
 
         IEnumerable<Interface> LookupFilteredInterfaces(Reference reference, IEnumerable<Interface> linkedInterfaces) =>
@@ -193,10 +193,11 @@ public partial class LanguageDeserializer
         SerializedReference? FindSerializedReference(Reference reference) =>
             serializedNode.References.FirstOrDefault(r => r.Reference.Matches(reference));
 
-        T? UnknownReference<T>(SerializedReferenceTarget target) where T : class
+        T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class
         {
             var targetNode =
-                Handler.UnknownReference(Compress(target.Reference), target.ResolveInfo, (IWritableNode)node);
+                Handler.UnresolvableReferenceTarget(target.Reference != null ? Compress(target.Reference) : null,
+                    target.ResolveInfo, reference, (IWritableNode)node);
             if (targetNode is T result)
                 return result;
             return null;

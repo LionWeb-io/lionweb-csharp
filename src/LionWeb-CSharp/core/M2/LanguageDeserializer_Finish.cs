@@ -27,14 +27,14 @@ public partial class LanguageDeserializer
     {
         InstallLanguageLinks();
 
-        List<INode> deserializedAnnotationInstances = DeserializeAnnotations();
+        List<IWritableNode> deserializedAnnotationInstances = DeserializeAnnotations();
         InstallAnnotationParents(deserializedAnnotationInstances);
         InstallAnnotationReferences();
 
         return _deserializedNodesById.Values.OfType<DynamicLanguage>();
     }
 
-    private List<INode> DeserializeAnnotations()
+    private List<IWritableNode> DeserializeAnnotations()
     {
         _deserializerBuilder
             .WithHandler(new AnnotationDeserializerHandler(Handler))
@@ -51,7 +51,7 @@ public partial class LanguageDeserializer
         return deserializedAnnotations
             .Select(deserializedAnnotation =>
             {
-                if (deserializedAnnotation is not INode node)
+                if (deserializedAnnotation is not IWritableNode node)
                     node = Handler.InvalidAnnotation(deserializedAnnotation, null);
 
                 if (node != null)
@@ -63,7 +63,7 @@ public partial class LanguageDeserializer
             .ToList()!;
     }
 
-    private void InstallAnnotationParents(List<INode> deserializedAnnotationInstances)
+    private void InstallAnnotationParents(List<IWritableNode> deserializedAnnotationInstances)
     {
         foreach (var deserializedAnnotation in deserializedAnnotationInstances)
         {
@@ -74,12 +74,12 @@ public partial class LanguageDeserializer
 
             if (!_deserializedNodesById.TryGetValue(Compress(parentId), out var parent) ||
                 parent is not IWritableNode writableParent)
-                writableParent = Handler.InvalidAnnotationParent(deserializedAnnotation, parentId);
-
-            if (writableParent == null)
+            {
+                Handler.InvalidAnnotationParent(deserializedAnnotation, parent);
                 continue;
+            }
 
-            INode? annotation = deserializedAnnotation;
+            IWritableNode? annotation = deserializedAnnotation;
             if (deserializedAnnotation.GetClassifier() is not Annotation ann ||
                 !ann.CanAnnotate(writableParent.GetClassifier()))
             {

@@ -64,7 +64,8 @@ public class SerializationLenientTests
 
         var comparer = new LenientComparer(new List<IReadableNode> { rootNode }, readableNodes);
         var differences = comparer.Compare().ToList();
-        
+        TestContext.WriteLine(differences.DescribeAll(new ComparerOutputConfig()));
+
         Assert.AreEqual(2, differences.Count);
         Assert.IsInstanceOfType<NodeDifference>(differences.First());
         Assert.IsInstanceOfType<PropertyValueTypeDifference>(differences.Last());
@@ -84,11 +85,10 @@ public class SerializationLenientTests
 
     class LenientHandler : DeserializerExceptionHandler
     {
-        public override TFeature? InvalidFeature<TFeature>(Classifier classifier,
-            CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) where TFeature : class
+        public override Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
+            IWritableNode node) where TFeature : class
         {
-            var feature = new List<Language>
+            var replacementFeature = new List<Language>
                 {
                     BuiltInsLanguage.Instance,
                     ShapesLanguage.Instance,
@@ -99,14 +99,13 @@ public class SerializationLenientTests
                 .SelectMany(l => l.Entities)
                 .OfType<Classifier>()
                 .SelectMany(c => c.Features)
-                .OfType<TFeature>()
                 .FirstOrDefault(f =>
-                    CompressedMetaPointer.Create(f.ToMetaPointer(), false).Equals(compressedMetaPointer));
+                    CompressedMetaPointer.Create(f.ToMetaPointer(), false).Equals(feature));
 
-            return feature;
+            return replacementFeature;
         }
 
-        public override object? UnknownDatatype(string nodeId, Feature property, string? value) => value;
+        public override object? UnknownDatatype(Feature property, string? value, IWritableNode nodeId) => value;
     }
 
     class LenientComparer : Comparer
@@ -121,7 +120,8 @@ public class SerializationLenientTests
 
         class LenientProperty : PropertyBase<Language>
         {
-            public LenientProperty(Feature feature) : base(feature.GetId(), feature.GetFeatureClassifier(), feature.GetLanguage())
+            public LenientProperty(Feature feature) : base(feature.GetId(), feature.GetFeatureClassifier(),
+                feature.GetLanguage())
             {
             }
 
@@ -131,12 +131,12 @@ public class SerializationLenientTests
                     Name = feature.Name,
                     Key = feature.Key,
                     Optional = feature.Optional,
-                    Type = value is Enum e ? new LenientEnumeration("a", feature.GetLanguage())
-                    {
-                        Key = "a",
-                        Name = "a",
-                        LiteralsLazy = new([]) 
-                    } : BuiltInsLanguage.Instance.String
+                    Type = value is Enum e
+                        ? new LenientEnumeration("a", feature.GetLanguage())
+                        {
+                            Key = "a", Name = "a", LiteralsLazy = new([])
+                        }
+                        : BuiltInsLanguage.Instance.String
                 };
         }
 
@@ -144,7 +144,8 @@ public class SerializationLenientTests
 
         class LenientContainment : ContainmentBase<Language>
         {
-            public LenientContainment(Feature feature) : base(feature.GetId(), feature.GetFeatureClassifier(), feature.GetLanguage())
+            public LenientContainment(Feature feature) : base(feature.GetId(), feature.GetFeatureClassifier(),
+                feature.GetLanguage())
             {
             }
 
@@ -161,7 +162,8 @@ public class SerializationLenientTests
 
         class LenientReference : ReferenceBase<Language>
         {
-            public LenientReference(Feature feature) : base(feature.GetId(), feature.GetFeatureClassifier(), feature.GetLanguage())
+            public LenientReference(Feature feature) : base(feature.GetId(), feature.GetFeatureClassifier(),
+                feature.GetLanguage())
             {
             }
 
@@ -183,7 +185,8 @@ public class SerializationLenientTests
             var rightValue = right.Get(rightFeature);
 
             Containment leftCont = leftFeature as Containment ?? LenientContainment.Create(leftFeature);
-            Reference leftRef = leftFeature as Reference ?? LenientReference.Create(leftFeature);;
+            Reference leftRef = leftFeature as Reference ?? LenientReference.Create(leftFeature);
+            ;
             Property leftProp = leftFeature as Property ?? LenientProperty.Create(leftFeature, leftValue);
             Property rightProp = rightFeature as Property ?? LenientProperty.Create(rightFeature, rightValue);
 
@@ -200,7 +203,7 @@ public class SerializationLenientTests
 
                 case (string or int or bool or Enum, string or int or bool or Enum, _, _):
                     return CompareProperty(left, leftProp, right, rightProp);
-                
+
                 case (var lv, var rv, _, _) when lv.GetType().IsValueType && rv.GetType().IsValueType:
                     return CompareProperty(left, leftProp, right, rightProp);
 

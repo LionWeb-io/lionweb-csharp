@@ -21,13 +21,13 @@ using M2;
 using M3;
 using Serialization;
 using CompressedContainment = (CompressedMetaPointer, List<CompressedId>);
-using CompressedReference = (CompressedMetaPointer, List<(CompressedId, string?)>);
+using CompressedReference = (CompressedMetaPointer, List<(CompressedId?, string?)>);
 
 /// <summary>
-/// Instances of this class can deserialize a <see cref="SerializationChunk"/> as a list of <see cref="INode"/>s that are root nodes.
+/// Instances of this class can deserialize a <see cref="SerializationChunk"/> as a list of <see cref="IWritableNode"/>s that are root nodes.
 /// An instance is parametrized with a collection of <see cref="Language"/> definitions with a corresponding <see cref="INodeFactory"/>.
 /// </summary>
-public partial class Deserializer : DeserializerBase<INode>
+public partial class Deserializer : DeserializerBase<IWritableNode>
 {
     private readonly Dictionary<CompressedId, List<CompressedContainment>> _containmentsByOwnerId = new();
     private readonly Dictionary<CompressedId, List<CompressedReference>> _referencesByOwnerId = new();

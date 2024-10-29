@@ -23,7 +23,7 @@ using M3;
 public partial class Deserializer
 {
     /// <inheritdoc />
-    public override IEnumerable<INode> Finish()
+    public override IEnumerable<IWritableNode> Finish()
     {
         foreach (var compressedId in _deserializedNodesById.Keys)
         {
@@ -37,7 +37,7 @@ public partial class Deserializer
             .ToList();
     }
 
-    private IEnumerable<INode> FilterRootNodes() =>
+    private IEnumerable<IWritableNode> FilterRootNodes() =>
         _deserializedNodesById
             .Values
             .Where(node => node.GetParent() == null);
@@ -49,16 +49,16 @@ public partial class Deserializer
         if (!_parentByNodeId.TryGetValue(compressedId, out var parentCompressedId))
             return;
 
-        INode? parent = FindParent(compressedId, parentCompressedId);
+        IWritableNode? parent = FindParent(compressedId, parentCompressedId);
 
         if (parent != null)
             _deserializedNodesById[compressedId].SetParent(parent);
     }
 
-    private INode? FindParent(CompressedId compressedId, CompressedId parentId) =>
-        _deserializedNodesById.TryGetValue(parentId, out INode? existingParent)
+    private IWritableNode? FindParent(CompressedId compressedId, CompressedId parentId) =>
+        _deserializedNodesById.TryGetValue(parentId, out IWritableNode? existingParent)
             ? existingParent
-            : Handler.UnknownParent(parentId, _deserializedNodesById[compressedId]);
+            : Handler.UnresolvableParent(parentId, _deserializedNodesById[compressedId]);
 
     #endregion
 
@@ -69,7 +69,7 @@ public partial class Deserializer
         if (!_containmentsByOwnerId.TryGetValue(compressedId, out var containments))
             return;
 
-        INode node = _deserializedNodesById[compressedId];
+        IWritableNode node = _deserializedNodesById[compressedId];
 
         foreach ((var compressedMetaPointer, var compressedChildrenIds) in containments)
         {
@@ -78,7 +78,7 @@ public partial class Deserializer
                 continue;
 
             var children = compressedChildrenIds
-                .Select(childId => FindChild(node, childId))
+                .Select(childId => FindChild(node, containment, childId))
                 .Where(c => c != null)
                 .ToList();
 
@@ -89,10 +89,10 @@ public partial class Deserializer
         }
     }
 
-    private INode? FindChild(INode node, CompressedId childId) =>
+    private IWritableNode? FindChild(IWritableNode node, Feature containment, CompressedId childId) =>
         _deserializedNodesById.TryGetValue(childId, out var existingChild)
             ? existingChild
-            : Handler.UnknownChild(childId, node);
+            : Handler.UnresolvableChild(childId, containment, node);
 
     #endregion
 
@@ -103,7 +103,7 @@ public partial class Deserializer
         if (!_referencesByOwnerId.TryGetValue(compressedId, out var references))
             return;
 
-        INode node = _deserializedNodesById[compressedId];
+        IWritableNode node = _deserializedNodesById[compressedId];
         foreach ((var compressedMetaPointer, var targetEntries) in references)
         {
             var reference = _deserializerMetaInfo.FindFeature<Reference>(node, compressedMetaPointer);
@@ -111,7 +111,7 @@ public partial class Deserializer
                 continue;
 
             var targets = targetEntries
-                .Select(target => FindReferenceTarget(node, target.Item1, target.Item2))
+                .Select(target => FindReferenceTarget(node, reference, target.Item1, target.Item2))
                 .Where(c => c != null)
                 .ToList();
 
@@ -125,15 +125,20 @@ public partial class Deserializer
         }
     }
 
-    private IReadableNode? FindReferenceTarget(INode node, CompressedId targetId, string? resolveInfo)
+    private IReadableNode? FindReferenceTarget(IWritableNode node, Feature reference, CompressedId? targetId,
+        string? resolveInfo)
     {
-        if (_deserializedNodesById.TryGetValue(targetId, out var ownNode))
-            return ownNode;
+        if (targetId is not null)
+        {
+            var tid = (CompressedId)targetId;
+            if (_deserializedNodesById.TryGetValue(tid, out var ownNode))
+                return ownNode;
 
-        if (_dependentNodesById.TryGetValue(targetId, out var dependentNode))
-            return dependentNode;
+            if (_dependentNodesById.TryGetValue(tid, out var dependentNode))
+                return dependentNode;
+        }
 
-        return Handler.UnknownReference(targetId, resolveInfo, node);
+        return Handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
     }
 
     #endregion
@@ -145,9 +150,9 @@ public partial class Deserializer
         if (!_annotationsByOwnerId.TryGetValue(compressedId, out var annotationIds))
             return;
 
-        INode node = _deserializedNodesById[compressedId];
+        IWritableNode node = _deserializedNodesById[compressedId];
 
-        List<INode> annotations = annotationIds
+        List<IWritableNode> annotations = annotationIds
             .Select(annId => FindAnnotation(node, annId))
             .Where(c => c != null)
             .ToList()!;
@@ -155,16 +160,17 @@ public partial class Deserializer
         node.AddAnnotations(annotations);
     }
 
-    private INode? FindAnnotation(INode node, CompressedId annotationId)
+    private IWritableNode? FindAnnotation(IWritableNode node, CompressedId annotationId)
     {
-        if (_deserializedNodesById.TryGetValue(annotationId, out var existingAnnotation))
-        {
-            if (existingAnnotation.GetClassifier() is not Annotation ann || !ann.CanAnnotate(node.GetClassifier()))
-                return Handler.InvalidAnnotation(existingAnnotation, node);
-            return existingAnnotation;
-        }
+        if (!_deserializedNodesById.TryGetValue(annotationId, out var existingAnnotation))
+            existingAnnotation = Handler.UnresolvableAnnotation(annotationId, node);
 
-        return Handler.UnknownAnnotation(annotationId, node);
+        if (existingAnnotation == null)
+            return null;
+
+        if (existingAnnotation.GetClassifier() is not Annotation ann || !ann.CanAnnotate(node.GetClassifier()))
+            return Handler.InvalidAnnotation(existingAnnotation, node);
+        return existingAnnotation;
     }
 
     #endregion

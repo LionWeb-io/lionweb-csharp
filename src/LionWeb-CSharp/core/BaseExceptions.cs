@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1;
 using M2;
 using M3;
 using Serialization;
@@ -92,6 +93,15 @@ public class UnknownFeatureException : LionWebExceptionBase
         $"{message}Classifier {classifier.Name} does not know feature {metaPointer}")
     {
     }
+
+    /// <param name="classifier">Classifier trying to use.</param>
+    /// <param name="compressedMetaPointer"><see cref="Feature"/> unknown to <paramref name="classifier"/>.</param>
+    /// <param name="message">Optional additional message.</param>
+    public UnknownFeatureException(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        string? message = null) : base(
+        $"{message}Classifier {classifier.Name} does not know feature {compressedMetaPointer}")
+    {
+    }
 }
 
 /// <summary>
@@ -109,6 +119,13 @@ public class UnsupportedClassifierException : LionWebExceptionBase
     /// <param name="message">Optional additional message.</param>
     public UnsupportedClassifierException(MetaPointer metaPointer, string? message = null) : base(
         $"{message}Classifier {metaPointer} not supported")
+    {
+    }
+
+    /// <param name="compressedMetaPointer">Unsupported <see cref="Classifier"/>.</param>
+    /// <param name="message">Optional additional message.</param>
+    public UnsupportedClassifierException(CompressedMetaPointer compressedMetaPointer, string? message = null) : base(
+        $"{message}Classifier {compressedMetaPointer} not supported")
     {
     }
 }
