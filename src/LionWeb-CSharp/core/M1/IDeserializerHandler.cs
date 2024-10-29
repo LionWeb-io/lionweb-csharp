@@ -127,8 +127,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new DeserializerException($"On node with id={node.GetId()}: couldn't find child with id={childId}");
 
     /// <inheritdoc />
-    public virtual IReadableNode?
-        UnknownReferenceTarget(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
+    public virtual IReadableNode? UnknownReferenceTarget(CompressedId targetId, string? resolveInfo, IWritableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: couldn't find reference target with id={targetId}");
 
@@ -161,7 +160,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new DeserializerException(
             $"Skip deserializing {id} because dependentLanguages contains node with same id");
 }
-
+    
 public class DeserializerException(string? message) : LionWebExceptionBase(message);
 
 public class DeserializerIgnoringHandler : IDeserializerHandler
