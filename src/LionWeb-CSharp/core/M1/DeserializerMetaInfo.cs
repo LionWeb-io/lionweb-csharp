@@ -49,7 +49,8 @@ public class DeserializerMetaInfo()
         var compressedMetaPointer = Compress(metaPointer);
         if (!_classifiers.TryGetValue(compressedMetaPointer, out var classifier))
         {
-            classifier = Handler.UnknownClassifier(id, metaPointer);
+            classifier =
+                Handler.UnknownClassifier(compressedMetaPointer, CompressedId.Create(id, StoreUncompressedIds));
             if (classifier == null)
                 return null;
         }
@@ -57,14 +58,20 @@ public class DeserializerMetaInfo()
         return _language2NodeFactory[classifier.GetLanguage()].CreateNode(id, classifier);
     }
 
-    internal Enum? ConvertEnumeration(string nodeId, Enumeration enumeration, string value)
+    internal Enum? ConvertEnumeration(IWritableNode nodeId, Feature property, Enumeration enumeration, string value)
     {
         var literal = enumeration.Literals.FirstOrDefault(literal => literal.Key == value);
 
         if (literal != null && _language2NodeFactory.TryGetValue(enumeration.GetLanguage(), out var factory))
-            return factory.GetEnumerationLiteral(literal);
+        {
+            Enum? result = factory.GetEnumerationLiteral(literal);
+            if (result != null)
+            {
+                return result;
+            }
+        }
 
-        return Handler.UnknownEnumerationLiteral(nodeId, enumeration, value);
+        return Handler.UnknownEnumerationLiteral(value, enumeration, property, nodeId);
     }
 
     internal Feature? FindFeature<TFeature>(IWritableNode node, CompressedMetaPointer compressedMetaPointer)
@@ -73,14 +80,12 @@ public class DeserializerMetaInfo()
         Classifier classifier = node.GetClassifier();
         if (!_features.TryGetValue(compressedMetaPointer, out var feature))
         {
-            feature = Handler.UnknownFeature<TFeature>(classifier, compressedMetaPointer, node);
+            feature = Handler.UnknownFeature<TFeature>(compressedMetaPointer, classifier, node);
             if (feature == null)
                 return null;
         }
 
-        return feature is TFeature f
-            ? f
-            : Handler.InvalidFeature<Feature>(classifier, compressedMetaPointer, node);
+        return feature as TFeature ?? Handler.InvalidFeature<TFeature>(compressedMetaPointer, classifier, node);
     }
 
     private CompressedMetaPointer Compress(MetaPointer metaPointer) =>

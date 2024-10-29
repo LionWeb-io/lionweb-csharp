@@ -42,22 +42,23 @@ public partial class Deserializer
         RegisterParent(serializedNode, compressedId);
     }
 
-    private void DeserializeProperties(SerializedNode serializedNode, INode node)
+    private void DeserializeProperties(SerializedNode serializedNode, IWritableNode node)
     {
         var id = serializedNode.Id;
 
-        foreach (var serializedProperty in serializedNode.Properties.Where(p => p.Value != null))
+        foreach (var serializedProperty in serializedNode.Properties)
         {
             var property = _deserializerMetaInfo.FindFeature<Property>(node, Compress(serializedProperty.Property));
             if (property == null)
                 continue;
 
-            var value = serializedProperty.Value;
-            var convertedValue = property switch
+            var convertedValue = (property, value: serializedProperty.Value) switch
             {
-                Property {Type:PrimitiveType} p => ConvertPrimitiveType(p, value),
-                Property {Type:Enumeration enumeration} => _deserializerMetaInfo.ConvertEnumeration(id, enumeration, value),
-                _ => Handler.UnknownDatatype(id, property, value)
+                (_, null) => null,
+                (Property { Type: PrimitiveType } p, { } v) => ConvertPrimitiveType(node, p, v),
+                (Property { Type: Enumeration enumeration }, { } v) =>
+                    _deserializerMetaInfo.ConvertEnumeration(node, property, enumeration, v),
+                var (_, v) => Handler.UnknownDatatype(property, v, node)
             };
 
             if (convertedValue == null)
@@ -67,14 +68,22 @@ public partial class Deserializer
         }
     }
 
-    private object? ConvertPrimitiveType(Property property, string value) => property.Type switch
+    private object? ConvertPrimitiveType(IWritableNode node, Property property, string value)
     {
-        var b when b == BuiltInsLanguage.Instance.Boolean => value == "true",
-        var i when i == BuiltInsLanguage.Instance.Integer => int.Parse(value),
-        // leave both a String and JSON value as a string:
-        var s when s == BuiltInsLanguage.Instance.String || s == BuiltInsLanguage.Instance.Json => value,
-        _ => null
-    };
+        CompressedId compressedId = Compress(node.GetId());
+        return property.Type switch
+        {
+            var b when b == BuiltInsLanguage.Instance.Boolean => bool.TryParse(value, out var result)
+                ? result
+                : Handler.InvalidPropertyValue<bool>(value, property, compressedId),
+            var i when i == BuiltInsLanguage.Instance.Integer => int.TryParse(value, out var result)
+                ? result
+                : Handler.InvalidPropertyValue<int>(value, property, compressedId),
+            // leave both a String and JSON value as a string:
+            var s when s == BuiltInsLanguage.Instance.String || s == BuiltInsLanguage.Instance.Json => value,
+            _ => Handler.UnknownDatatype(property, value, node)
+        };
+    }
 
     private void RegisterParent(SerializedNode serializedNode, CompressedId compressedId)
     {
@@ -106,7 +115,7 @@ public partial class Deserializer
                 Compress(r.Reference),
                 r
                     .Targets
-                    .Select(t => (Compress(t.Reference), t.ResolveInfo))
+                    .Select(t => (t.Reference != null ? Compress(t.Reference) : (CompressedId?)null, t.ResolveInfo))
                     .ToList()
             ))
             .ToList();
