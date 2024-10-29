@@ -30,8 +30,9 @@ public class DeserializerExceptionHandlerTests
     public void unknown_classifier()
     {
         Assert.ThrowsException<UnsupportedClassifierException>(() =>
-            new DeserializerExceptionHandler().UnknownClassifier("a",
-                new MetaPointer("key-Shapes", "1", "key-Geometry")));
+            new DeserializerExceptionHandler().UnknownClassifier(
+                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
+                CompressedId.Create("a", true)));
     }
 
     [TestMethod]
@@ -39,18 +40,8 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<UnknownFeatureException>(() =>
             new DeserializerExceptionHandler().UnknownFeature<Containment>(
-                new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
                 CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
-                new Line("line")));
-    }
-
-    [TestMethod]
-    public void unknown_feature_keepOriginal_is_false()
-    {
-        Assert.ThrowsException<UnknownFeatureException>(() =>
-            new DeserializerExceptionHandler().UnknownFeature<Containment>(
                 new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
-                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), false),
                 new Line("line")));
     }
 
@@ -59,18 +50,8 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<UnknownFeatureException>(() =>
             new DeserializerExceptionHandler().InvalidFeature<Containment>(
-                new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
                 CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
-                new Line("line")));
-    }
-
-    [TestMethod]
-    public void invalid_feature_keepOriginal_is_false()
-    {
-        Assert.ThrowsException<UnknownFeatureException>(() =>
-            new DeserializerExceptionHandler().InvalidFeature<Containment>(
                 new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
-                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), false),
                 new Line("line")));
     }
 
@@ -89,32 +70,42 @@ public class DeserializerExceptionHandlerTests
     }
 
     [TestMethod]
-    public void unknown_parent()
+    public void unresolvable_parent()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().UnknownParent(CompressedId.Create("a", true), new Line("b")));
+            new DeserializerExceptionHandler().UnresolvableParent(
+                CompressedId.Create("a", true),
+                new Line("b")));
     }
 
     [TestMethod]
-    public void unknown_child()
+    public void unresolvable_child()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().UnknownChild(CompressedId.Create("a", true), new Line("b")));
+            new DeserializerExceptionHandler().UnresolvableChild(
+                CompressedId.Create("a", true),
+                new DynamicContainment("b", new DynamicConcept("c", new DynamicLanguage("lang"))),
+                new Line("d")));
     }
 
     [TestMethod]
-    public void unknown_reference_target()
+    public void unresolvable_reference_target()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().UnknownReferenceTarget(
-                CompressedId.Create("a", true), "resolve-info", new Line("b")));
+            new DeserializerExceptionHandler().UnresolvableReferenceTarget(
+                CompressedId.Create("a", true),
+                "resolve-info",
+                new DynamicReference("b", new DynamicConcept("c", new DynamicLanguage("lang"))),
+                new Line("d")));
     }
 
     [TestMethod]
-    public void unknown_annotation()
+    public void unresolvable_annotation()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().UnknownAnnotation(CompressedId.Create("a", true), new Line("b")));
+            new DeserializerExceptionHandler().UnresolvableAnnotation(
+                CompressedId.Create("a", true),
+                new Line("b")));
     }
 
     [TestMethod]
@@ -128,7 +119,7 @@ public class DeserializerExceptionHandlerTests
     public void invalid_annotation_parent()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().InvalidAnnotationParent(new Documentation("a"), "b"));
+            new DeserializerExceptionHandler().InvalidAnnotationParent(new Documentation("a"), new Line("b")));
     }
 
     [TestMethod]
@@ -136,7 +127,11 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnknownEnumerationLiteral(
-                "a", new DynamicEnumeration("b", new DynamicLanguage("c")), "key"));
+                "a",
+                new DynamicEnumeration("b", new DynamicLanguage("c")),
+                new DynamicProperty("d", new DynamicConcept("e", new DynamicLanguage("lang"))),
+                new Line("f")
+            ));
     }
 
     [TestMethod]
@@ -144,15 +139,25 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnknownDatatype(
+                new DynamicProperty("a", new DynamicConcept("b", new DynamicLanguage("lang"))),
+                "c",
+                new Line("d")));
+    }
+
+    [TestMethod]
+    public void invalid_property_value()
+    {
+        Assert.ThrowsException<DeserializerException>(() =>
+            new DeserializerExceptionHandler().InvalidPropertyValue<int>(
                 "a",
-                new DynamicContainment("b", new DynamicConcept("c", new DynamicLanguage("lang"))),
-                "value"));
+                new DynamicProperty("b", new DynamicConcept("c", new DynamicLanguage("lang"))),
+                CompressedId.Create("d", true)));
     }
 
     [TestMethod]
     public void skip_deserializing_dependent_node()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().SkipDeserializingDependentNode("a"));
+            new DeserializerExceptionHandler().SkipDeserializingDependentNode(CompressedId.Create("a", true)));
     }
 }

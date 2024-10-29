@@ -257,7 +257,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"Skip deserializing {id} because dependentLanguages contains node with same id");
 }
 
-internal class DeserializerException(string? message) : LionWebExceptionBase(message);
+public class DeserializerException(string? message) : LionWebExceptionBase(message);
 
 public class DeserializerIgnoringHandler : IDeserializerHandler
 {

@@ -38,7 +38,7 @@ public class DeserializationCustomHandlerTests
     {
         public bool Called { get; private set; }
 
-        public override Classifier? UnknownClassifier(string id, MetaPointer metaPointer)
+        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id)
         {
             Called = true;
             return null;
@@ -87,10 +87,9 @@ public class DeserializationCustomHandlerTests
     private class UnknownFeatureDeserializerHandler : DeserializerExceptionHandler
     {
         public bool Called { get; private set; }
-
-        public override TFeature? UnknownFeature<TFeature>(Classifier classifier,
-            CompressedMetaPointer compressedMetaPointer,
-            IReadableNode node) where TFeature : class
+        
+        public override Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
+            IWritableNode node)
         {
             Called = true;
             return null;
@@ -176,7 +175,7 @@ public class DeserializationCustomHandlerTests
     }
 
     [TestMethod]
-    [Ignore(message: "no exception thrown, expects an assigned value to evaluate, requires implementation")]
+    //[Ignore(message: "no exception thrown, expects an assigned value to evaluate, requires implementation")]
     public void unknown_property_without_value()
     {
         var serializationChunk = new SerializationChunk
@@ -214,7 +213,7 @@ public class DeserializationCustomHandlerTests
     }
 
     [TestMethod]
-    [Ignore(message: "no exception thrown, expects an assigned value to evaluate, requires implementation")]
+    //[Ignore(message: "no exception thrown, expects an assigned value to evaluate, requires implementation")]
     public void unknown_property_with_null_value()
     {
         var serializationChunk = new SerializationChunk
@@ -311,16 +310,16 @@ public class DeserializationCustomHandlerTests
     #endregion
 
     /// <summary>
-    /// <see cref="IDeserializerHandler.UnknownParent"/>
+    /// <see cref="IDeserializerHandler.UnresolvableParent"/>
     /// </summary>
 
-    #region unknown parent
+    #region unresolvable parent
 
-    private class UnknownParentDeserializerHandler : DeserializerExceptionHandler
+    private class UnresolvableParentDeserializerHandler : DeserializerExceptionHandler
     {
         public bool Called { get; private set; }
-
-        public override INode? UnknownParent(CompressedId parentId, INode node)
+        
+        public override IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node)
         {
             Called = true;
             return null;
@@ -328,7 +327,7 @@ public class DeserializationCustomHandlerTests
     }
 
     [TestMethod]
-    public void unknown_parent()
+    public void unresolvable_parent()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -347,34 +346,34 @@ public class DeserializationCustomHandlerTests
                     Containments = [],
                     References = [],
                     Annotations = [],
-                    Parent = "unknown-parent"
+                    Parent = "unresolvable-parent"
                 }
             ]
         };
 
-        var unknownParentDeserializerHandler = new UnknownParentDeserializerHandler();
+        var unresolvableParentDeserializerHandler = new UnresolvableParentDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unknownParentDeserializerHandler)
+            .WithHandler(unresolvableParentDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
         deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unknownParentDeserializerHandler.Called);
+        Assert.IsTrue(unresolvableParentDeserializerHandler.Called);
     }
 
     #endregion
 
     /// <summary>
-    /// <see cref="IDeserializerHandler.UnknownChild"/>
+    /// <see cref="IDeserializerHandler.UnresolvableChild"/>
     /// </summary>
 
-    #region unknown child
+    #region unresolvable child
 
-    private class UnknownChildDeserializerHandler : DeserializerExceptionHandler
+    private class UnresolvableChildDeserializerHandler : DeserializerExceptionHandler
     {
         public bool Called { get; private set; }
-
-        public override INode? UnknownChild(CompressedId childId, IWritableNode node)
+        
+        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node)
         {
             Called = true;
             return null;
@@ -382,7 +381,7 @@ public class DeserializationCustomHandlerTests
     }
 
     [TestMethod]
-    public void unknown_child()
+    public void unresolvable_child()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -412,25 +411,29 @@ public class DeserializationCustomHandlerTests
             ]
         };
 
-        var unknownChildDeserializerHandler = new UnknownChildDeserializerHandler();
+        var unresolvableChildDeserializerHandler = new UnresolvableChildDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unknownChildDeserializerHandler)
+            .WithHandler(unresolvableChildDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
         deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unknownChildDeserializerHandler.Called);
+        Assert.IsTrue(unresolvableChildDeserializerHandler.Called);
     }
 
     #endregion
 
-    #region unknown reference target
+    /// <summary>
+    /// <see cref="IDeserializerHandler.UnresolvableReferenceTarget"/>
+    /// </summary>
+    #region unresolvable reference target
 
-    private class UnknownReferenceTargetDeserializerHandler : DeserializerExceptionHandler
+    private class UnresolvableReferenceTargetDeserializerHandler : DeserializerExceptionHandler
     {
         public bool Called { get; private set; }
-        
-        public override IReadableNode? UnknownReferenceTarget(CompressedId targetId, string? resolveInfo,
+
+        public override IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo,
+            Feature reference,
             IWritableNode node)
         {
             Called = true;
@@ -439,7 +442,7 @@ public class DeserializationCustomHandlerTests
     }
 
     [TestMethod]
-    public void unknown_reference_target()
+    public void unresolvable_reference_target()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -476,29 +479,29 @@ public class DeserializationCustomHandlerTests
             ]
         };
 
-        var unknownReferenceTargetDeserializerHandler = new UnknownReferenceTargetDeserializerHandler();
+        var unresolvableReferenceTargetDeserializerHandler = new UnresolvableReferenceTargetDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unknownReferenceTargetDeserializerHandler)
+            .WithHandler(unresolvableReferenceTargetDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
         deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unknownReferenceTargetDeserializerHandler.Called);
+        Assert.IsTrue(unresolvableReferenceTargetDeserializerHandler.Called);
     }
 
     #endregion
 
     /// <summary>
-    /// <see cref="IDeserializerHandler.UnknownAnnotation"/>
+    /// <see cref="IDeserializerHandler.UnresolvableAnnotation"/>
     /// </summary>
 
-    #region unknown annotation
+    #region unresolvable annotation
 
-    private class UnknownAnnotationDeserializerHandler : DeserializerExceptionHandler
+    private class UnresolvableAnnotationDeserializerHandler : DeserializerExceptionHandler
     {
         public bool Called { get; private set; }
         
-        public override INode? UnknownAnnotation(CompressedId annotationId, INode node)
+        public override IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node)
         {
             Called = true;
             return null;
@@ -507,7 +510,7 @@ public class DeserializationCustomHandlerTests
 
     
     [TestMethod]
-    public void unknown_annotation()
+    public void unresolvable_annotation()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -530,14 +533,14 @@ public class DeserializationCustomHandlerTests
             ]
         };
 
-        var unknownAnnotationDeserializerHandler = new UnknownAnnotationDeserializerHandler();
+        var unresolvableAnnotationDeserializerHandler = new UnresolvableAnnotationDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unknownAnnotationDeserializerHandler)
+            .WithHandler(unresolvableAnnotationDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
         deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unknownAnnotationDeserializerHandler.Called);
+        Assert.IsTrue(unresolvableAnnotationDeserializerHandler.Called);
     }
 
     #endregion
@@ -552,7 +555,8 @@ public class DeserializationCustomHandlerTests
     {
         public bool Called { get; private set; }
         
-        public override Enum? UnknownEnumerationLiteral(string nodeId, Enumeration enumeration, string key)
+        public override Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
+            IWritableNode nodeId)
         {
             Called = true;
             return null;
@@ -667,7 +671,7 @@ public class DeserializationCustomHandlerTests
     }
 
     [TestMethod]
-    [Ignore(message: "requires implementation")]
+    //[Ignore(message: "requires implementation")]
     public void single_containment_expected()
     {
         var serializationChunk = new SerializationChunk
@@ -796,7 +800,7 @@ public class DeserializationCustomHandlerTests
     }
 
     [TestMethod]
-    [Ignore(message: "requires implementation")]
+    //[Ignore(message: "requires implementation")]
     public void single_reference_expected()
     {
         var serializationChunk = new SerializationChunk
@@ -864,13 +868,23 @@ public class DeserializationCustomHandlerTests
     #endregion
 
     /// <summary>
-    /// <see cref="IDeserializerHandler.InvalidFeature{TFeature}"/>
+    /// <see cref="IDeserializerHandler.InvalidPropertyValue{TValue}"/>
     /// </summary>
 
     #region invalid property value
 
+    private class InvalidPropertyValueDeserializerHandler : DeserializerExceptionHandler
+    {
+        public bool Called { get; private set; }
+        
+        public override object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId)
+        {
+            Called = true;
+            return null;
+        }
+    }
+    
     [TestMethod]
-    [Ignore(message: "requires implementation")]
     public void invalid_property_value()
     {
         var serializationChunk = new SerializationChunk
@@ -900,12 +914,14 @@ public class DeserializationCustomHandlerTests
             ]
         };
 
+        var invalidPropertyValueDeserializerHandler = new InvalidPropertyValueDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(new DeserializerExceptionHandler())
+            .WithHandler(invalidPropertyValueDeserializerHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+        deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(invalidPropertyValueDeserializerHandler.Called);
     }
 
     #endregion
@@ -983,11 +999,7 @@ public class DeserializationCustomHandlerTests
     {
         public bool Called { get; private set; }
         
-        public override IWritableNode? InvalidAnnotationParent(IReadableNode annotation, string parentId)
-        {
-            Called = true;
-            return null;
-        }
+        public override void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent) => Called = true;
     }
     
     [TestMethod]
@@ -1045,8 +1057,8 @@ public class DeserializationCustomHandlerTests
     private class UnknownDatatypeDeserializerHandler : DeserializerExceptionHandler
     {
         public bool Called { get; private set; }
-
-        public override object? UnknownDatatype(string nodeId, Feature property, string? value)
+        
+        public override object? UnknownDatatype(Feature property, string? value, IWritableNode node)
         {
             Called = true;
             return null;
@@ -1106,7 +1118,7 @@ public class DeserializationCustomHandlerTests
     {
         public bool Called { get; private set; }
         
-        public override bool SkipDeserializingDependentNode(string id)
+        public override bool SkipDeserializingDependentNode(CompressedId id)
         {
             Called = true;
             return true;
@@ -1115,7 +1127,7 @@ public class DeserializationCustomHandlerTests
     
     
     [TestMethod]
-    [Ignore(message: "requires implementation")]
+    //[Ignore(message: "requires implementation")]
     public void skip_deserializing_dependent_node()
     {
         var serializationChunk = new SerializationChunk
