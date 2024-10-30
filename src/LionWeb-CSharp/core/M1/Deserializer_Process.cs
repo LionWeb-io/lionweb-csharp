@@ -28,11 +28,14 @@ public partial class Deserializer
     {
         var id = serializedNode.Id;
 
+        var compressedId = Compress(id);
+        if (IsInDependentNodes(compressedId) && Handler.SkipDeserializingDependentNode(compressedId))
+            return;
+        
         var node = _deserializerMetaInfo.Instantiate(id, serializedNode.Classifier);
         if (node == null)
             return;
 
-        var compressedId = Compress(id);
         _deserializedNodesById[compressedId] = node;
 
         DeserializeProperties(serializedNode, node);
