@@ -86,10 +86,19 @@ public partial class Deserializer
         }
     }
 
-    private IWritableNode? FindChild(IWritableNode node, Feature containment, CompressedId childId) =>
-        _deserializedNodesById.TryGetValue(childId, out var existingChild)
+    private IWritableNode? FindChild(IWritableNode node, Feature containment, CompressedId childId)
+    {
+        IWritableNode? result = _deserializedNodesById.TryGetValue(childId, out var existingChild)
             ? existingChild
             : Handler.UnresolvableChild(childId, containment, node);
+
+        if (M1Extensions.Ancestors(node, true).Contains(result))
+        {
+            throw new TreeShapeException(node, "circular containment");
+        }
+        
+        return result;
+    }
 
     #endregion
 
@@ -101,7 +110,7 @@ public partial class Deserializer
         var single = link is Link { Multiple: false };
         try
         {
-            node.Set(link, single ? children.FirstOrDefault() : children);
+            node.Set(link, single && children.Count == 1 ? children[0] : children);
         } catch (InvalidValueException)
         {
             List<T>? replacement = Handler.InvalidLinkValue(children, link, node);
