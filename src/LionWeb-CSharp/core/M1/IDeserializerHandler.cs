@@ -59,6 +59,18 @@ public interface IDeserializerHandler
         where TFeature : class, Feature;
 
     /// <summary>
+    /// Cannot put <paramref name="value"/> into <paramref name="link"/>.
+    /// Most probably, that's because <paramref name="value"/> is not compatible with <paramref name="link"/>'s
+    /// <see cref="Link.Type"/>, <see cref="Link.Multiple"/>, and/or <see cref="Feature.Optional"/>.
+    /// </summary>
+    /// <param name="value">Invalid value for <paramref name="link"/>.</param>
+    /// <param name="link">Link with invalid <paramref name="value"/>.</param>
+    /// <param name="node">Node that has link <paramref name="link"/>.</param>
+    /// <typeparam name="T">Only needed to allow any kind of <see cref="IReadableNode"/> in <paramref name="value"/> or returned list.</typeparam>
+    /// <returns>Replacement value to use, or <c>null</c> to skip link <paramref name="link"/>.</returns>
+    List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node) where T : class, IReadableNode;
+
+    /// <summary>
     /// <paramref name="annotation"/> is not a valid annotation for <paramref name="node"/>.
     /// This means <paramref name="annotation"/>'s classifier is not an <see cref="Annotation"/>,
     /// or <paramref name="node"/> is not compatible with the classifier's <see cref="Annotation.Annotates"/>.
@@ -93,6 +105,7 @@ public interface IDeserializerHandler
 
     /// <summary>
     /// Cannot put <paramref name="value"/> into <paramref name="property"/>.
+    /// Most probably, that's because <paramref name="value"/> is not compatible with <paramref name="property"/>'s <see cref="Property.Type"/>.
     /// </summary>
     /// <param name="value">Invalid value for <paramref name="property"/>.</param>
     /// <param name="property">Property with invalid <paramref name="value"/>.</param>
@@ -194,6 +207,11 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new UnknownFeatureException(classifier, feature, $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
+    public List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
+        where T : class, IReadableNode =>
+        throw new InvalidValueException(link, value);
+
+    /// <inheritdoc />
     public virtual void InvalidContainment(IReadableNode node) =>
         throw new UnsupportedClassifierException(node.GetClassifier().ToMetaPointer(),
             $"On node with id={node.GetId()}:");
@@ -264,8 +282,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     /// <inheritdoc />
     public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id)
     {
-        Console.WriteLine(
-            $"On node with id={id}: couldn't find specified classifier {classifier} - skipping.");
+        LogMessage($"On node with id={id}: couldn't find specified classifier {classifier} - skipping.");
         return null;
     }
 
@@ -274,41 +291,46 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
         Classifier classifier,
         IWritableNode node) where TFeature : class, Feature
     {
-        Console.WriteLine(
+        LogMessage(
             $"On node with id={node.GetId()}: couldn't find specified feature {feature} - leaving this feature unset.");
         return null;
     }
 
     /// <inheritdoc />
+    public List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node) where T : class, IReadableNode
+    {
+        LogMessage($"On node with id={node.GetId()}: invalid link value {value} for link {link} - skipping");
+        return null;
+    }
+
+    /// <inheritdoc />
     public void InvalidContainment(IReadableNode node) =>
-        Console.WriteLine($"installing containments in node of meta-concept {node.GetType().Name} not implemented");
+        LogMessage($"installing containments in node of meta-concept {node.GetType().Name} not implemented");
 
     /// <inheritdoc />
     public void InvalidReference(IReadableNode node) =>
-        Console.WriteLine($"installing references in node of meta-concept {node.GetType().Name} not implemented");
+        LogMessage($"installing references in node of meta-concept {node.GetType().Name} not implemented");
 
     /// <inheritdoc />
     public Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature,
         Classifier classifier,
         IWritableNode node) where TFeature : class, Feature
     {
-        Console.WriteLine(
-            $"On node with id={node.GetId()}: wrong type of feature {feature} - leaving this feature unset.");
+        LogMessage($"On node with id={node.GetId()}: wrong type of feature {feature} - leaving this feature unset.");
         return null;
     }
 
     /// <inheritdoc />
     public virtual IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node)
     {
-        Console.WriteLine(
-            $"On node with id={node.GetId()}: couldn't find specified parent - leaving this node orphaned.");
+        LogMessage($"On node with id={node.GetId()}: couldn't find specified parent - leaving this node orphaned.");
         return null;
     }
 
     /// <inheritdoc />
     public virtual IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node)
     {
-        Console.WriteLine($"On node with id={node.GetId()}: couldn't find child with id={childId} - skipping.");
+        LogMessage($"On node with id={node.GetId()}: couldn't find child with id={childId} - skipping.");
         return null;
     }
 
@@ -318,35 +340,32 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
         Feature reference,
         IWritableNode node)
     {
-        Console.WriteLine(
-            $"On node with id={node.GetId()}: couldn't find reference target with id={targetId} - skipping.");
+        LogMessage($"On node with id={node.GetId()}: couldn't find reference target with id={targetId} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
     public virtual IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node)
     {
-        Console.WriteLine(
-            $"On node with id={node.GetId()}: couldn't find annotation with id={annotationId} - skipping.");
+        LogMessage($"On node with id={node.GetId()}: couldn't find annotation with id={annotationId} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
     public void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent) =>
-        Console.WriteLine($"Cannot attach annotation {annotation} to its parent with id={parent?.GetId()}.");
+        LogMessage($"Cannot attach annotation {annotation} to its parent with id={parent?.GetId()}.");
 
     /// <inheritdoc />
     public IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node)
     {
-        Console.WriteLine(
-            $"On node with id={node?.GetId()}: unsuitable annotation {annotation} - skipping.");
+        LogMessage($"On node with id={node?.GetId()}: unsuitable annotation {annotation} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
     public Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property, IWritableNode nodeId)
     {
-        Console.WriteLine(
+        LogMessage(
             $"On node with id={nodeId}: unknown enumeration literal for enumeration {enumeration} with key {key} - skipping");
         return null;
     }
@@ -354,7 +373,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     /// <inheritdoc />
     public object? UnknownDatatype(Feature property, string? value, IWritableNode node)
     {
-        Console.WriteLine(
+        LogMessage(
             $"On node with id={node.GetId()}: unknown datatype {property /*.Type*/} with value {value} - skipping");
         return null;
     }
@@ -362,17 +381,17 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     /// <inheritdoc />
     public object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId)
     {
-        Console.WriteLine(
-            $"On node with id={nodeId}: invalid property value {value} for property {property} - skipping");
+        LogMessage($"On node with id={nodeId}: invalid property value {value} for property {property} - skipping");
         return null;
     }
-
 
     /// <inheritdoc />
     public bool SkipDeserializingDependentNode(CompressedId id)
     {
-        Console.WriteLine(
-            $"Skip deserializing {id} because dependent nodes contains node with same id");
+        LogMessage($"Skip deserializing {id} because dependent nodes contains node with same id");
         return true;
     }
+
+    protected virtual void LogMessage(string format) =>
+        Console.WriteLine(format);
 }

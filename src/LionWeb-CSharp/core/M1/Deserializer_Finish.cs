@@ -77,15 +77,12 @@ public partial class Deserializer
             if (containment == null)
                 continue;
 
-            var children = compressedChildrenIds
+            List<IWritableNode> children = compressedChildrenIds
                 .Select(childId => FindChild(node, containment, childId))
                 .Where(c => c != null)
-                .ToList();
+                .ToList()!;
 
-            if (children.Count != 0)
-            {
-                node.Set(containment, containment is Link { Multiple: false } ? children.FirstOrDefault() : children);
-            }
+            SetLink(children, node, containment);
         }
     }
 
@@ -95,6 +92,23 @@ public partial class Deserializer
             : Handler.UnresolvableChild(childId, containment, node);
 
     #endregion
+
+    private void SetLink<T>(List<T> children, IWritableNode node, Feature link) where T : class, IReadableNode
+    {
+        if (children.Count == 0)
+            return;
+
+        var single = link is Link { Multiple: false };
+        try
+        {
+            node.Set(link, single ? children.FirstOrDefault() : children);
+        } catch (InvalidValueException)
+        {
+            List<T>? replacement = Handler.InvalidLinkValue(children, link, node);
+            if (replacement != null)
+                node.Set(link, single ? replacement.FirstOrDefault() : replacement);
+        }
+    }
 
     #region References
 
@@ -110,18 +124,12 @@ public partial class Deserializer
             if (reference == null)
                 continue;
 
-            var targets = targetEntries
+            List<IReadableNode> targets = targetEntries
                 .Select(target => FindReferenceTarget(node, reference, target.Item1, target.Item2))
                 .Where(c => c != null)
-                .ToList();
+                .ToList()!;
 
-            if (targets.Count != 0)
-            {
-                node.Set(
-                    reference,
-                    reference is Link { Multiple: false } ? targets.FirstOrDefault() : targets
-                );
-            }
+            SetLink(targets, node, reference);
         }
     }
 

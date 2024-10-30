@@ -192,6 +192,10 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
         where TFeature : class, Feature =>
         @delegate.UnknownFeature<TFeature>(feature, classifier, node);
 
+    public List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
+        where T : class, IReadableNode =>
+        @delegate.InvalidLinkValue(value, link, node);
+
     public IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) =>
         @delegate.UnresolvableChild(childId, containment, node);
 
