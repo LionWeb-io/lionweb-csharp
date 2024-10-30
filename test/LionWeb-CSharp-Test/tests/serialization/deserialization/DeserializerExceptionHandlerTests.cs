@@ -8,6 +8,7 @@
 // 
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
+// distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
@@ -56,17 +57,38 @@ public class DeserializerExceptionHandlerTests
     }
 
     [TestMethod]
+    public void invalid_link_value()
+    {
+        Assert.ThrowsException<InvalidValueException>(() =>
+            new DeserializerExceptionHandler().InvalidLinkValue<Containment>(
+                [],
+                new DynamicReference("dyn-reference",
+                    new DynamicConcept("dyn-concept-1", new DynamicLanguage("dyn-lang-1") { Name = "lang-name" })
+                    {
+                        Name = "concept-name"
+                    })
+                {
+                    Name = "dynamic-reference",
+                    Type = new DynamicConcept("dyn-concept-2", new DynamicLanguage("dyn-lang-2") { Name = "lang-name" })
+                    {
+                        Name = "concept-name"
+                    }
+                },
+                new Line("line")));
+    }
+
+    [TestMethod]
     public void invalid_containment()
     {
         Assert.ThrowsException<UnsupportedClassifierException>(() =>
-            new DeserializerExceptionHandler().InvalidContainment(new Line("a")));
+            new DeserializerExceptionHandler().InvalidContainment(new Line("line")));
     }
 
     [TestMethod]
     public void invalid_reference()
     {
         Assert.ThrowsException<UnsupportedClassifierException>(() =>
-            new DeserializerExceptionHandler().InvalidReference(new Line("a")));
+            new DeserializerExceptionHandler().InvalidReference(new Line("line")));
     }
 
     [TestMethod]
@@ -75,7 +97,7 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableParent(
                 CompressedId.Create("a", true),
-                new Line("b")));
+                new Line("line")));
     }
 
     [TestMethod]
@@ -84,8 +106,9 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableChild(
                 CompressedId.Create("a", true),
-                new DynamicContainment("b", new DynamicConcept("c", new DynamicLanguage("lang"))),
-                new Line("d")));
+                new DynamicContainment("dyn-containment",
+                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+                new Line("line")));
     }
 
     [TestMethod]
@@ -95,8 +118,9 @@ public class DeserializerExceptionHandlerTests
             new DeserializerExceptionHandler().UnresolvableReferenceTarget(
                 CompressedId.Create("a", true),
                 "resolve-info",
-                new DynamicReference("b", new DynamicConcept("c", new DynamicLanguage("lang"))),
-                new Line("d")));
+                new DynamicReference("dyn-reference",
+                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+                new Line("line")));
     }
 
     [TestMethod]
@@ -105,21 +129,21 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableAnnotation(
                 CompressedId.Create("a", true),
-                new Line("b")));
+                new Line("line")));
     }
 
     [TestMethod]
     public void invalid_annotation()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().InvalidAnnotation(new Documentation("a"), new Line("b")));
+            new DeserializerExceptionHandler().InvalidAnnotation(new Documentation("doc"), new Line("line")));
     }
 
     [TestMethod]
     public void invalid_annotation_parent()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().InvalidAnnotationParent(new Documentation("a"), new Line("b")));
+            new DeserializerExceptionHandler().InvalidAnnotationParent(new Documentation("doc"), new Line("line")));
     }
 
     [TestMethod]
@@ -128,9 +152,10 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnknownEnumerationLiteral(
                 "a",
-                new DynamicEnumeration("b", new DynamicLanguage("c")),
-                new DynamicProperty("d", new DynamicConcept("e", new DynamicLanguage("lang"))),
-                new Line("f")
+                new DynamicEnumeration("dyn-enum", new DynamicLanguage("dyn-lang-1")),
+                new DynamicProperty("dyn-property",
+                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang-2"))),
+                new Line("line")
             ));
     }
 
@@ -139,9 +164,9 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnknownDatatype(
-                new DynamicProperty("a", new DynamicConcept("b", new DynamicLanguage("lang"))),
-                "c",
-                new Line("d")));
+                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+                "a",
+                new Line("line")));
     }
 
     [TestMethod]
@@ -150,8 +175,8 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().InvalidPropertyValue<int>(
                 "a",
-                new DynamicProperty("b", new DynamicConcept("c", new DynamicLanguage("lang"))),
-                CompressedId.Create("d", true)));
+                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+                CompressedId.Create("b", true)));
     }
 
     [TestMethod]
