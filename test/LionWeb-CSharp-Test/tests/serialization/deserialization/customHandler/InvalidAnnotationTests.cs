@@ -22,6 +22,7 @@ using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.Serialization;
 
+[TestClass]
 public class InvalidAnnotationTests
 {
     /// <summary>

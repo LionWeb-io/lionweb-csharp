@@ -25,6 +25,7 @@ using LionWeb.Core.M1;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
+[TestClass]
 public class InvalidLinkValueTests
 {
     /// <summary>
