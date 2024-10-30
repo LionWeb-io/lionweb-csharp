@@ -207,7 +207,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new UnknownFeatureException(classifier, feature, $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
+    public virtual List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
         where T : class, IReadableNode =>
         throw new InvalidValueException(link, value);
 
