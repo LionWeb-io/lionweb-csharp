@@ -175,9 +175,19 @@ public static class M1Extensions
     /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
     /// <param name="includeAnnotations">If true, the result includes directly and indirectly contained annotations.</param>
     /// <returns>All directly and indirectly contained nodes of <paramref name="self"/>.</returns>
+    /// <exception cref="TreeShapeException">If containment hierarchy contains cycles.</exception>
     public static IEnumerable<INode> Descendants(this INode self, bool includeSelf = false,
         bool includeAnnotations = false) =>
-        Descendants<INode>(self, includeSelf, includeAnnotations);
+        new ResettingEnumerable(self, includeSelf, includeAnnotations);
+
+    private class ResettingEnumerable(INode self, bool includeSelf, bool includeAnnotations) : IEnumerable<INode>
+    {
+        IEnumerator IEnumerable.GetEnumerator() =>
+            GetEnumerator();
+
+        public IEnumerator<INode> GetEnumerator() =>
+            Descendants<INode>(self, [], includeSelf, includeAnnotations).GetEnumerator();
+    }
 
     /// <summary>
     /// Enumerates all direct children of <paramref name="self"/>.
@@ -187,6 +197,7 @@ public static class M1Extensions
     /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
     /// <param name="includeAnnotations">If true, the result includes directly contained annotations.</param>
     /// <returns>All directly contained nodes of <paramref name="self"/>.</returns>
+    /// <exception cref="TreeShapeException">If containment hierarchy contains cycles.</exception>
     public static IEnumerable<INode> Children(this INode self, bool includeSelf = false,
         bool includeAnnotations = false) =>
         Children<INode>(self, includeSelf, includeAnnotations);
@@ -200,6 +211,7 @@ public static class M1Extensions
     /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
     /// <typeparam name="T"></typeparam>
     /// <returns>The first ancestor of <paramref name="self"/> that matches with type <typeparamref name="T"/> or <c>null</c> </returns>
+    /// <exception cref="TreeShapeException">If containment hierarchy contains cycles.</exception>
     public static T? Ancestor<T>(this INode self, bool includeSelf = false) where T : INode =>
         self.Ancestors(includeSelf)
             .OfType<T>()
@@ -212,8 +224,9 @@ public static class M1Extensions
     /// <param name="self">Base node to find ancestors of.</param>
     /// <param name="includeSelf">If true, the result includes <paramref name="self"/>.</param>
     /// <returns>All direct and indirect parents of <paramref name="self"/>.</returns>
+    /// <exception cref="TreeShapeException">If containment hierarchy contains cycles.</exception>
     public static IEnumerable<INode> Ancestors(this INode self, bool includeSelf = false) =>
-        Ancestors<INode>(self, includeSelf);
+        Ancestors<INode>(self, [], includeSelf);
 
     /// <summary>
     /// Returns the name of the node if it is set, <c>null</c>/> otherwise.
@@ -232,7 +245,7 @@ public static class M1Extensions
             return null;
         }
     }
-    
+
     private static List<INode> GetContainmentNodes(INode self)
     {
         INode? parent = self.GetParent();
@@ -251,11 +264,15 @@ public static class M1Extensions
         return [..containment.AsNodes<INode>(enumerable)];
     }
 
-    internal static IEnumerable<T> Descendants<T>(T self, bool includeSelf = false,
+    internal static IEnumerable<T> Descendants<T>(T self, HashSet<T> visited, bool includeSelf = false,
         bool includeAnnotations = false) where T : class, IReadableNode
     {
+        if (!visited.Add(self))
+            throw new TreeShapeException(self,
+                $"{self.GetId()} contains itself as descendant: [{string.Join(",", visited.Select(a => a.GetId()))}]");
+
         var result = Children(self, false, includeAnnotations)
-            .SelectMany(child => Descendants(child, includeSelf: true, includeAnnotations: includeAnnotations));
+            .SelectMany(child => Descendants(child, visited, includeSelf: true, includeAnnotations: includeAnnotations));
 
         if (includeSelf)
             result = result.Prepend(self);
@@ -271,7 +288,11 @@ public static class M1Extensions
             .OfType<Containment>()
             .Select(containment => (containment, self.Get(containment)))
             .Where(tuple => tuple.Item2 is T || tuple.Item2 is IEnumerable e && M2Extensions.AreAll<T>(e))
-            .SelectMany(tuple => M2Extensions.AsNodes<T>(tuple.Item2));
+            .SelectMany(tuple => M2Extensions.AsNodes<T>(tuple.Item2))
+            .Select(c => !ReferenceEquals(c, self)
+                ? c
+                : throw new TreeShapeException(self,
+                    $"{self.GetId()} contains itself as child"));
 
         if (includeAnnotations)
             result = result.Concat(self.GetAnnotations().Cast<T>());
@@ -282,12 +303,17 @@ public static class M1Extensions
         return result;
     }
 
-    internal static IEnumerable<T> Ancestors<T>(T self, bool includeSelf = false) where T : class, IReadableNode
+    internal static IEnumerable<T> Ancestors<T>(T self, HashSet<T> visited, bool includeSelf = false)
+        where T : class, IReadableNode
     {
+        if (!visited.Add(self))
+            throw new TreeShapeException(self,
+                $"{self.GetId()} contains itself as ancestor: [{string.Join(",", visited.Select(a => a.GetId()))}]");
+
         var result = Enumerable.Empty<T>();
         var parent = (T?)self.GetParent();
         if (parent != null)
-            result = Ancestors(parent, true);
+            result = Ancestors(parent, visited, true);
 
         if (includeSelf)
             result = result.Prepend(self);

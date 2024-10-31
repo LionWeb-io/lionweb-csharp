@@ -20,7 +20,6 @@ namespace Examples.Shapes.Dynamic;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
-using LionWeb.Core.Utilities;
 using M2;
 
 public static class ExampleModels
@@ -36,15 +35,15 @@ public static class ExampleModels
         var coordY = coordClassifier.FeatureByKey("key-y");
         var coordZ = coordClassifier.FeatureByKey("key-z");
 
-        var line = lang.GetFactory().CreateNode(IdUtils.NewId(), lineClassifier);
+        var line = lang.GetFactory().CreateNode("line", lineClassifier);
         line.Set(lineName, "line1");
 
-        var start = lang.GetFactory().CreateNode(IdUtils.NewId(), coordClassifier);
+        var start = lang.GetFactory().CreateNode("start", coordClassifier);
         start.Set(coordX, -1);
         start.Set(coordY, -3);
         start.Set(coordZ, -3);
 
-        var end = lang.GetFactory().CreateNode(IdUtils.NewId(), coordClassifier);
+        var end = lang.GetFactory().CreateNode("end", coordClassifier);
         end.Set(coordX, 1);
         end.Set(coordY, 2);
         end.Set(coordZ, 3);
@@ -58,7 +57,7 @@ public static class ExampleModels
     public static INode ExampleModel(Language lang)
     {
         var language = ShapesLanguage.Instance;
-        var geometry = language.GetFactory().CreateNode(IdUtils.NewId(), language.ClassifierByKey("key-Geometry"));
+        var geometry = language.GetFactory().CreateNode("geo", language.ClassifierByKey("key-Geometry"));
         geometry.Set(language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes"), new List<INode>{ExampleLine(language)});
 
         return geometry;
