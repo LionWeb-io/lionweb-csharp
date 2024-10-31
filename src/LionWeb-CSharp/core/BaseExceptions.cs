@@ -152,4 +152,4 @@ public class UnsupportedNodeTypeException(object? node, string? paramName)
 /// </summary>
 /// <param name="node">Node trying to operate on.</param>
 /// <param name="message">Description of failed operation.</param>
-public class TreeShapeException(INode node, string message) : LionWebExceptionBase($"{node.GetId()}: {message}");
+public class TreeShapeException(IWritableNode node, string message) : LionWebExceptionBase($"{node.GetId()}: {message}");

@@ -87,9 +87,6 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
             _deserializedNodesById[compressedId] = DeserializeMemoized(compressedId);
     }
 
-    private bool IsInDependentNodes(CompressedId compressedId) =>
-        _dependentNodesById.ContainsKey(compressedId);
-
     private IReadableNode DeserializeMemoized(CompressedId compressedId)
     {
         var serializedNode = _serializedNodesById[compressedId];

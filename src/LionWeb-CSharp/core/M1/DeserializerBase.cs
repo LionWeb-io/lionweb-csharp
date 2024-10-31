@@ -67,4 +67,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadable
 
     protected CompressedMetaPointer Compress(MetaPointer metaPointer) =>
         CompressedMetaPointer.Create(metaPointer, StoreUncompressedIds);
+
+    protected bool IsInDependentNodes(CompressedId compressedId) =>
+        _dependentNodesById.ContainsKey(compressedId);
 }

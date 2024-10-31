@@ -207,7 +207,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new UnknownFeatureException(classifier, feature, $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
+    public virtual List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
         where T : class, IReadableNode =>
         throw new InvalidValueException(link, value);
 
@@ -236,7 +236,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         Feature reference,
         IWritableNode node) =>
         throw new DeserializerException(
-            $"On node with id={node.GetId()}: couldn't find reference with id={targetId}");
+            $"On node with id={node.GetId()}: couldn't find reference target with id={targetId}");
 
     /// <inheritdoc />
     public virtual IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node) =>
@@ -340,7 +340,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
         Feature reference,
         IWritableNode node)
     {
-        LogMessage($"On node with id={node.GetId()}: couldn't find reference with id={targetId} - skipping.");
+        LogMessage($"On node with id={node.GetId()}: couldn't find reference target with id={targetId} - skipping.");
         return null;
     }
 
