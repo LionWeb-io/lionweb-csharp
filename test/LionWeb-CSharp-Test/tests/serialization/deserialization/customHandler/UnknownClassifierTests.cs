@@ -24,8 +24,8 @@ using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
 /// <summary>
-/// <see cref="IDeserializerHandler.UnknownClassifier"/>
-/// </summary>
+/// Tests for <see cref="IDeserializerHandler.UnknownClassifier"/>
+/// </summary>>
 [TestClass]
 public class UnknownClassifierTests
 {
@@ -70,7 +70,7 @@ public class UnknownClassifierTests
     }
 
     /// <summary>
-    /// Heals by replacing unknown classifier with a known classifier in the language  
+    /// Heals by replacing unknown classifier with a known classifier in <see cref="ShapesLanguage"/> language  
     ///
     /// Test scenario:
     /// Deserialize a node which is serialized with a different (possibly one of the previous)

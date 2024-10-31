@@ -23,24 +23,16 @@ using LionWeb.Core.M1;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
+/// <summary>
+/// Tests for <see cref="IDeserializerHandler.UnresolvableChild"/>
+/// </summary>
 [TestClass]
 public class UnresolvableChildTests
 {
-    /// <summary>
-    /// <see cref="IDeserializerHandler.UnresolvableChild"/>
-    /// </summary>
-
-    #region unresolvable child
-
-    private class UnresolvableChildDeserializerHandler : DeserializerExceptionHandler
+    private class DeserializerHealingHandler<TResult>(Func<TResult> heal) : DeserializerExceptionHandler
+        where TResult : IWritableNode?
     {
-        public bool Called { get; private set; }
-
-        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node)
-        {
-            Called = true;
-            return null;
-        }
+        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) => heal();
     }
 
     [TestMethod]
@@ -74,15 +66,56 @@ public class UnresolvableChildTests
             ]
         };
 
-        var unresolvableChildDeserializerHandler = new UnresolvableChildDeserializerHandler();
+        var deserializerHealingHandler = new DeserializerHealingHandler<IWritableNode?>(() => null);
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unresolvableChildDeserializerHandler)
+            .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unresolvableChildDeserializerHandler.Called);
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
     }
 
-    #endregion
+    [TestMethod]
+    public void unresolvable_child_heals()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"),
+                            Children = ["unresolvable-child"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var circle = new Circle("new-child");
+
+        var deserializerHealingHandler = new DeserializerHealingHandler<IWritableNode?>(() => circle);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreSame(circle, deserializedNodes.OfType<Geometry>().First().Shapes[0]);
+    }
 }
