@@ -32,7 +32,6 @@ public partial class Deserializer : DeserializerBase<IWritableNode>
     private readonly Dictionary<CompressedId, List<CompressedContainment>> _containmentsByOwnerId = new();
     private readonly Dictionary<CompressedId, List<CompressedReference>> _referencesByOwnerId = new();
     private readonly Dictionary<CompressedId, List<CompressedId>> _annotationsByOwnerId = new();
-    private readonly Dictionary<CompressedId, CompressedId> _parentByNodeId = new();
 
     /// <summary>
     /// TODO

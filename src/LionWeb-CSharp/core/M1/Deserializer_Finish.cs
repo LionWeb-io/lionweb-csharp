@@ -27,43 +27,18 @@ public partial class Deserializer
     {
         foreach (var compressedId in _deserializedNodesById.Keys)
         {
-            // InstallParent(compressedId);
             InstallContainments(compressedId);
             InstallReferences(compressedId);
             InstallAnnotations(compressedId);
         }
 
         return FilterRootNodes();
-        // .ToList();
     }
 
     private IEnumerable<IWritableNode> FilterRootNodes() =>
         _deserializedNodesById
             .Values
             .Where(node => node.GetParent() == null);
-
-    #region Parent
-
-    private void InstallParent(CompressedId compressedId)
-    {
-        if (!_parentByNodeId.TryGetValue(compressedId, out var parentCompressedId))
-            return;
-
-        var node = _deserializedNodesById[compressedId];
-        IWritableNode? parent = FindParent(node, parentCompressedId);
-
-        while (parent != null && ContainsAncestor(node, parent))
-            parent = Handler.CircularContainment(node, parent);
-
-        node.SetParent(parent);
-    }
-
-    private IWritableNode? FindParent(IWritableNode node, CompressedId parentId) =>
-        _deserializedNodesById.TryGetValue(parentId, out IWritableNode? existingParent)
-            ? existingParent
-            : Handler.UnresolvableParent(parentId, node);
-
-    #endregion
 
     #region Containments
 

@@ -60,7 +60,6 @@ public partial class Deserializer
         RegisterContainments(serializedNode, compressedId);
         RegisterReferences(serializedNode, compressedId);
         RegisterAnnotations(serializedNode, compressedId);
-        RegisterParent(serializedNode, compressedId);
     }
 
     private void DeserializeProperties(SerializedNode serializedNode, IWritableNode node)
@@ -104,14 +103,6 @@ public partial class Deserializer
             var s when s == BuiltInsLanguage.Instance.String || s == BuiltInsLanguage.Instance.Json => value,
             _ => Handler.UnknownDatatype(property, value, node)
         };
-    }
-
-    private void RegisterParent(SerializedNode serializedNode, CompressedId compressedId)
-    {
-        if (serializedNode.Parent == null)
-            return;
-
-        _parentByNodeId[compressedId] = Compress(serializedNode.Parent);
     }
 
     private void RegisterAnnotations(SerializedNode serializedNode, CompressedId compressedId)
