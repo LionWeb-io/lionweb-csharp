@@ -26,7 +26,7 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class SkipDeserializingDependentNodeTests
 {
-        /// <summary>
+    /// <summary>
     /// <see cref="IDeserializerHandler.SkipDeserializingDependentNode"/>
     /// </summary>
 
@@ -45,7 +45,9 @@ public class SkipDeserializingDependentNodeTests
 
 
     [TestMethod]
-    [Ignore(message:"do we need to implement SkipDeserializingDependentNode for other nodes such as containment and annotations")]
+    [Ignore(
+        message:
+        "do we need to implement SkipDeserializingDependentNode for other nodes such as containment and annotations")]
     public void skip_deserializing_dependent_containment_node()
     {
         var serializationChunk = new SerializationChunk
@@ -84,7 +86,7 @@ public class SkipDeserializingDependentNodeTests
                 },
             ]
         };
-        
+
         Documentation documentation = ShapesLanguage.Instance.GetFactory().NewDocumentation("repeated-id");
 
         var skipDeserializingDependentNodeDeserializerHandler = new SkipDeserializingDependentNodeDeserializerHandler();
@@ -141,11 +143,10 @@ public class SkipDeserializingDependentNodeTests
                     References = [],
                     Annotations = [],
                 },
-                
             ]
         };
         MyConcept myConcept = TinyRefLangLanguage.Instance.GetFactory().NewMyConcept("repeated-id");
-            
+
         var skipDeserializingDependentNodeDeserializerHandler = new SkipDeserializingDependentNodeDeserializerHandler();
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(skipDeserializingDependentNodeDeserializerHandler)
@@ -157,8 +158,7 @@ public class SkipDeserializingDependentNodeTests
 
         MyConcept deserializedMyConcept = deserializedNodes.OfType<MyConcept>().First(n => n.GetId() == "foo");
         Assert.AreSame(myConcept, deserializedMyConcept.SingularRef);
-
     }
-    
+
     #endregion
 }

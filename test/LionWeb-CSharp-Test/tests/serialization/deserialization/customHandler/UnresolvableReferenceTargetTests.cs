@@ -26,7 +26,7 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnresolvableReferenceTargetTests
 {
-        /// <summary>
+    /// <summary>
     /// <see cref="IDeserializerHandler.UnresolvableReferenceTarget"/>
     /// </summary>
 
@@ -94,5 +94,4 @@ public class UnresolvableReferenceTargetTests
     }
 
     #endregion
-
 }
