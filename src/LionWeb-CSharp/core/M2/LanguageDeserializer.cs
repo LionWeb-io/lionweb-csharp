@@ -60,7 +60,7 @@ public class LanguageDeserializer
 
         _dependentNodesById =
             dependentLanguages.Concat(preloadedLanguages)
-                .SelectMany(language => M1Extensions.Descendants<IKeyed>(language, true))
+                .SelectMany(language => M1Extensions.Descendants<IKeyed>(language, [], true))
                 .ToDictionary(node => node.GetId());
     }
 

@@ -357,4 +357,13 @@ public static class M2Extensions
             }
         }
     }
+
+    /// <summary>
+    /// Checks whether all entries in <paramref name="enumerable"/> are of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <param name="enumerable">Enumerable to check entries of.</param>
+    /// <typeparam name="T">Type all entries of <paramref name="enumerable"/> should conform to.</typeparam>
+    /// <returns><c>true</c> if all entries of <paramref name="enumerable"/> are of type <typeparamref name="T"/>; <c>false</c> otherwise.</returns>
+    public static bool AreAll<T>(IEnumerable enumerable) =>
+        enumerable.Cast<object?>().All(o => o is T);
 }
