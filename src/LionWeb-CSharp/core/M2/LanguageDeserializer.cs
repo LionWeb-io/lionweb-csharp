@@ -69,7 +69,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     public void RegisterDependentLanguage(Language language)
     {
         _deserializerBuilder.WithLanguage(language);
-        RegisterDependentNodes(M1Extensions.Descendants<IKeyed>(language, true));
+        RegisterDependentNodes(M1Extensions.Descendants<IKeyed>(language, [], true));
     }
 
     #region Process
@@ -185,6 +185,9 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
     public Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) =>
         @delegate.UnknownClassifier(classifier, id);
 
+    public string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
+        @delegate.DuplicateNodeId(nodeId, existingNode, node);
+
     public Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IWritableNode node)
         where TFeature : class, Feature =>
         @delegate.UnknownFeature<TFeature>(feature, classifier, node);
@@ -205,6 +208,13 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
 
     public IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
         @delegate.InvalidAnnotation(annotation, node);
+
+    public IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent) =>
+        @delegate.CircularContainment(containedNode, parent);
+
+    public bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
+        IReadableNode existingParent) =>
+        @delegate.DuplicateContainment(containedNode, newParent, existingParent);
 
     public Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
         IWritableNode nodeId) =>

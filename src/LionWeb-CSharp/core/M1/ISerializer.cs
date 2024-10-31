@@ -70,5 +70,5 @@ public static class ISerializerExtensions
         Serialize(serializer, nodes.AllNodes().Distinct());
 
     private static IEnumerable<IReadableNode> AllNodes(this IEnumerable<IReadableNode> nodes) =>
-        nodes.SelectMany(n => M1Extensions.Descendants(n, true, true));
+        nodes.SelectMany(n => M1Extensions.Descendants(n, [], true, true));
 }

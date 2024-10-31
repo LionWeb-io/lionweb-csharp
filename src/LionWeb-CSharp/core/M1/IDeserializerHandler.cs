@@ -30,6 +30,16 @@ public interface IDeserializerHandler
     /// <returns>Replacement classifier to use, or <c>null</c> to skip node <paramref name="id"/>.</returns>
     Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id);
 
+    /// <summary>
+    /// <paramref name="nodeId"/> is same for <paramref name="existingNode"/> and <paramref name="node"/>. 
+    /// </summary>
+    /// <param name="nodeId">Duplicate node id.</param>
+    /// <param name="existingNode">Previously deserialized node with id <paramref name="nodeId"/>.</param>
+    /// <param name="node">Currently deserialized node with id <paramref name="nodeId"/>.</param>
+    /// <returns>Replacement node id to use for <paramref name="node"/>, or <c>null</c> to skip <paramref name="node"/>.</returns>
+    /// <remarks>For both <paramref name="existingNode"/> and <paramref name="node"/>, only node id and properties are populated -- no other features.</remarks>
+    string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node);
+
     #region features
 
     /// <summary>
@@ -79,6 +89,24 @@ public interface IDeserializerHandler
     /// <param name="node">Node that wants to have <paramref name="annotation"/> as annotation.</param>
     /// <returns>Replacement annotation node to use, or <c>null</c> to skip annotation <paramref name="annotation"/>.</returns>
     IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node);
+
+    /// <summary>
+    /// Adding <paramref name="containedNode"/> as containment or annotation to <paramref name="parent"/> would create a containment cycle.
+    /// </summary>
+    /// <param name="containedNode">Node that's already part of <paramref name="parent"/>'s ancestors, or is equal to <paramref name="parent"/>.</param>
+    /// <param name="parent">Node that already has <paramref name="containedNode"/> as ancestor, or is equal to <paramref name="containedNode"/>.</param>
+    /// <returns>Replacement to use, or <c>null</c> to skip <paramref name="containedNode"/> as containment / annotation.</returns>
+    IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent);
+
+    /// <summary>
+    /// <paramref name="containedNode"/> already has parent <paramref name="existingParent"/>, but is about to be added to <paramref name="newParent"/>.
+    /// </summary>
+    /// <param name="containedNode">Node that already has parent <paramref name="existingParent"/>, but is about to be added to <paramref name="newParent"/>.</param>
+    /// <param name="newParent">Already existing parent of <paramref name="containedNode"/>.</param>
+    /// <param name="existingParent">Newly requested parent of <paramref name="containedNode"/>.</param>
+    /// <returns><c>true</c> if <paramref name="containedNode"/> should be moved to <paramref name="newParent"/>,
+    /// <c>false</c> if <paramref name="containedNode"/> should stay at <paramref name="existingParent"/>.</returns>
+    bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent, IReadableNode existingParent);
 
     #endregion
 
@@ -195,6 +223,10 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new UnsupportedClassifierException(classifier, $"On node with id={id}: ");
 
     /// <inheritdoc />
+    public string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
+        throw new DeserializerException($"Duplicate node with id={existingNode.GetId()}");
+
+    /// <inheritdoc />
     public virtual Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature,
         Classifier classifier,
         IWritableNode node) where TFeature : class, Feature =>
@@ -246,7 +278,18 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     /// <inheritdoc />
     public virtual IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
         throw new DeserializerException(
-            $"On node with id={node?.GetId()}: unsuitable annotation {annotation}");
+            $"On node with id={node.GetId()}: unsuitable annotation {annotation}");
+
+    /// <inheritdoc />
+    public virtual IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent) =>
+        throw new DeserializerException(
+            $"On node with id={parent.GetId()}: adding {containedNode.GetId()} as child/annotation would result in circular containment.");
+
+    /// <inheritdoc />
+    public bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
+        IReadableNode existingParent) =>
+        throw new DeserializerException(
+            $"On node with id={containedNode.GetId()}: already has parent {existingParent.GetId()}, but also child/annotation of {newParent.GetId()}.");
 
     /// <inheritdoc />
     public virtual void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent) =>
@@ -283,6 +326,13 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id)
     {
         LogMessage($"On node with id={id}: couldn't find specified classifier {classifier} - skipping.");
+        return null;
+    }
+
+    /// <inheritdoc />
+    public string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node)
+    {
+        LogMessage($"Duplicate node with id={existingNode.GetId()}");
         return null;
     }
 
@@ -360,6 +410,23 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     {
         LogMessage($"On node with id={node?.GetId()}: unsuitable annotation {annotation} - skipping.");
         return null;
+    }
+
+    /// <inheritdoc />
+    public IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent)
+    {
+        LogMessage(
+            $"On node with id={parent.GetId()}: adding {containedNode.GetId()} as child/annotation would result in circular containment - skipping");
+        return null;
+    }
+
+    /// <inheritdoc />
+    public bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
+        IReadableNode existingParent)
+    {
+        LogMessage(
+            $"On node with id={containedNode.GetId()}: already has parent {existingParent.GetId()}, but also child/annotation of {newParent.GetId()} - keeping it in place.");
+        return false;
     }
 
     /// <inheritdoc />

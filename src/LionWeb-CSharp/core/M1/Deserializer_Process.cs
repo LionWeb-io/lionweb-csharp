@@ -28,17 +28,35 @@ public partial class Deserializer
     {
         var id = serializedNode.Id;
 
-        var compressedId = Compress(id);
-        if (IsInDependentNodes(compressedId) && Handler.SkipDeserializingDependentNode(compressedId))
-            return;
-        
-        var node = _deserializerMetaInfo.Instantiate(id, serializedNode.Classifier);
-        if (node == null)
-            return;
+        CompressedId compressedId;
+
+        INode? node;
+        bool duplicateFound = false;
+
+        do
+        {
+            compressedId = Compress(id);
+            if (IsInDependentNodes(compressedId) && Handler.SkipDeserializingDependentNode(compressedId))
+                return;
+
+            node = _deserializerMetaInfo.Instantiate(id, serializedNode.Classifier);
+            if (node == null)
+                return;
+
+            DeserializeProperties(serializedNode, node);
+            duplicateFound = false;
+
+            if (_deserializedNodesById.TryGetValue(compressedId, out var existingNode))
+            {
+                id = Handler.DuplicateNodeId(compressedId, existingNode, node);
+                if (id == null)
+                    return;
+                duplicateFound = true;
+            }
+        } while (duplicateFound);
 
         _deserializedNodesById[compressedId] = node;
 
-        DeserializeProperties(serializedNode, node);
         RegisterContainments(serializedNode, compressedId);
         RegisterReferences(serializedNode, compressedId);
         RegisterAnnotations(serializedNode, compressedId);
