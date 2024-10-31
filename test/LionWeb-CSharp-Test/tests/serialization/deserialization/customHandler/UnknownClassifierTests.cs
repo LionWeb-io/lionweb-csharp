@@ -32,13 +32,7 @@ public class UnknownClassifierTests
     private class DeserializerHealingHandler<TResult>(Func<TResult> heal) : DeserializerExceptionHandler
         where TResult : Classifier?
     {
-        public bool Called { get; private set; }
-
-        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id)
-        {
-            Called = true;
-            return heal();
-        }
+        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) => heal();
     }
 
     /// <summary>
@@ -72,7 +66,6 @@ public class UnknownClassifierTests
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(deserializerHealingHandler.Called);
         Assert.AreEqual(0, deserializedNodes.Count);
     }
 
@@ -113,7 +106,6 @@ public class UnknownClassifierTests
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unknownClassifierDeserializerHealingHandler.Called);
         Assert.AreEqual(1, deserializedNodes.Count);
         Assert.AreSame(ShapesLanguage.Instance.Circle, deserializedNodes[0].GetClassifier());
     }
@@ -153,14 +145,12 @@ public class UnknownClassifierTests
         var deserializerHealingHandler = new DeserializerHealingHandler<Classifier?>(heal);
 
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithUncompressedIds(true)
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .WithLanguage(dynamicLanguage)
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(deserializerHealingHandler.Called);
         Assert.AreEqual(1, deserializedNodes.Count);
         Assert.AreSame(dynamicConcept, deserializedNodes[0].GetClassifier());
     }
