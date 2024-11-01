@@ -270,7 +270,7 @@ public class DeserializationTests
     }
 
     [TestMethod]
-    public void deserializeUnsetRequiredContainment()
+    public void DeserializeUnsetRequiredContainment()
     {
         var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
 
@@ -282,5 +282,442 @@ public class DeserializationTests
 
         var comparer = new Comparer([line], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+    }
+
+    [TestMethod]
+    public void CircularContainment()
+    {
+        SerializationChunk serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["B"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = "B"
+                },
+                new SerializedNode
+                {
+                    Id = "B",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["A"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = "A"
+                },
+            ]
+        };
+
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(1, nodes.Count);
+        var a = nodes.OfType<INode>().First();
+        Assert.AreEqual("A", a.GetId());
+        Assert.IsNull(a.GetParent());
+
+        Assert.AreEqual(1, a.Children().Count());
+        var b = a.Children().First();
+        Assert.AreEqual("B", b.GetId());
+        Assert.AreSame(a, b.GetParent());
+
+        Assert.IsFalse(b.Children().Any());
+    }
+
+    [TestMethod]
+    public void CircularAnnotation()
+    {
+        SerializationChunk serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-BillOfMaterials"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-default-group"), Children = ["B"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = "B"
+                },
+                new SerializedNode
+                {
+                    Id = "B",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-MaterialGroup"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations =
+                    [
+                        "A"
+                    ],
+                    Parent = "A"
+                },
+            ]
+        };
+
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(1, nodes.Count);
+        var a = nodes.OfType<INode>().First();
+        Assert.AreEqual("A", a.GetId());
+        Assert.IsNull(a.GetParent());
+
+        Assert.AreEqual(1, a.Children().Count());
+        var b = a.Children().First();
+        Assert.AreEqual("B", b.GetId());
+        Assert.AreSame(a, b.GetParent());
+
+        Assert.IsFalse(b.GetAnnotations().Any());
+    }
+
+    [TestMethod]
+    public void DoubleContainment()
+    {
+        SerializationChunk serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["B"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "B",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "A"
+                },
+                new SerializedNode
+                {
+                    Id = "C",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["B"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+            ]
+        };
+
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(2, nodes.Count);
+        var a = nodes.OfType<INode>().First();
+        Assert.AreEqual("A", a.GetId());
+        Assert.IsNull(a.GetParent());
+        Assert.AreEqual(1, a.Children().Count());
+
+        var c = nodes.OfType<INode>().Last();
+        Assert.AreEqual("C", c.GetId());
+        Assert.IsNull(c.GetParent());
+        Assert.IsFalse(c.Children().Any());
+
+        var b = a.Children().First();
+        Assert.AreEqual("B", b.GetId());
+        Assert.AreSame(a, b.GetParent());
+        Assert.IsFalse(b.Children().Any());
+    }
+
+    [TestMethod]
+    public void DoubleAnnotation()
+    {
+        SerializationChunk serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations =
+                    [
+                        "B"
+                    ],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "B",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-BillOfMaterials"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "A"
+                },
+                new SerializedNode
+                {
+                    Id = "C",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations =
+                    [
+                        "B"
+                    ],
+                    Parent = null
+                },
+            ]
+        };
+
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(2, nodes.Count);
+        var a = nodes.OfType<INode>().First();
+        Assert.AreEqual("A", a.GetId());
+        Assert.IsNull(a.GetParent());
+        Assert.AreEqual(1, a.GetAnnotations().Count());
+
+        var c = nodes.OfType<INode>().Last();
+        Assert.AreEqual("C", c.GetId());
+        Assert.IsNull(c.GetParent());
+        Assert.IsFalse(c.GetAnnotations().Any());
+
+        var b = a.GetAnnotations().First();
+        Assert.AreEqual("B", b.GetId());
+        Assert.AreSame(a, b.GetParent());
+        Assert.IsFalse(b.GetAnnotations().Any());
+    }
+
+    [TestMethod]
+    public void DuplicateNodeId()
+    {
+        SerializationChunk serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                                "LionCore-builtins-INamed-name"),
+                            Value = "First"
+                        }
+                    ],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-offset"),
+                            Children =
+                            [
+                                "ChildFirst"
+                            ]
+                        }
+                    ],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "RefFirst" }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "ChildFirst",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "A"
+                },
+                new SerializedNode
+                {
+                    Id = "RefFirst",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                                "LionCore-builtins-INamed-name"),
+                            Value = "Second"
+                        }
+                    ],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-offset"),
+                            Children =
+                            [
+                                "ChildSecond"
+                            ]
+                        }
+                    ],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "RefSecond" }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "ChildSecond",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "A"
+                },
+                new SerializedNode
+                {
+                    Id = "RefSecond",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+            ]
+        };
+
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(4, nodes.Count);
+        var a = nodes.OfType<OffsetDuplicate>().First();
+        Assert.AreEqual("A", a.GetId());
+        Assert.AreEqual("First", a.Name);
+        
+        Assert.IsNotNull(a.Offset);
+        Assert.AreEqual("ChildFirst", a.Offset.GetId());
+        
+        Assert.IsNotNull(a.Source);
+        Assert.AreEqual("RefFirst", a.Source.GetId());
+        
+        Assert.AreEqual(2, nodes.OfType<Circle>().Count());
+        
+        Assert.AreEqual(1, nodes.OfType<Coord>().Count());
+        Assert.AreEqual("ChildSecond", nodes.OfType<Coord>().First().GetId());
     }
 }

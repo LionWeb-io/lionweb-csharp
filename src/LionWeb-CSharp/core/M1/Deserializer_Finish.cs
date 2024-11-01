@@ -27,40 +27,18 @@ public partial class Deserializer
     {
         foreach (var compressedId in _deserializedNodesById.Keys)
         {
-            InstallParent(compressedId);
             InstallContainments(compressedId);
             InstallReferences(compressedId);
             InstallAnnotations(compressedId);
         }
 
-        return FilterRootNodes()
-            .ToList();
+        return FilterRootNodes();
     }
 
     private IEnumerable<IWritableNode> FilterRootNodes() =>
         _deserializedNodesById
             .Values
             .Where(node => node.GetParent() == null);
-
-    #region Parent
-
-    private void InstallParent(CompressedId compressedId)
-    {
-        if (!_parentByNodeId.TryGetValue(compressedId, out var parentCompressedId))
-            return;
-
-        IWritableNode? parent = FindParent(compressedId, parentCompressedId);
-
-        if (parent != null)
-            _deserializedNodesById[compressedId].SetParent(parent);
-    }
-
-    private IWritableNode? FindParent(CompressedId compressedId, CompressedId parentId) =>
-        _deserializedNodesById.TryGetValue(parentId, out IWritableNode? existingParent)
-            ? existingParent
-            : Handler.UnresolvableParent(parentId, _deserializedNodesById[compressedId]);
-
-    #endregion
 
     #region Containments
 
@@ -92,13 +70,30 @@ public partial class Deserializer
             ? existingChild
             : Handler.UnresolvableChild(childId, containment, node);
 
-        if (M1Extensions.Ancestors(node, true).Contains(result))
-        {
-            throw new TreeShapeException(node, "circular containment");
-        }
-        
+        return PreventCircularContainment(node, result);
+    }
+
+    private IWritableNode? PreventCircularContainment(IWritableNode node, IWritableNode? result)
+    {
+        if (result == null)
+            return null;
+
+        while (result != null && ContainsAncestor(result, node))
+            result = Handler.CircularContainment(result, node);
+
+        if (result == null)
+            return null;
+
+        var existingParent = result.GetParent();
+        if (existingParent != null && existingParent != node &&
+            !Handler.DuplicateContainment(result, node, existingParent))
+            return null;
+
         return result;
     }
+
+    private bool ContainsAncestor(IWritableNode node, IReadableNode? parent) =>
+        ReferenceEquals(node, parent) || parent != null && ContainsAncestor(node, parent.GetParent());
 
     #endregion
 
@@ -179,15 +174,16 @@ public partial class Deserializer
 
     private IWritableNode? FindAnnotation(IWritableNode node, CompressedId annotationId)
     {
-        if (!_deserializedNodesById.TryGetValue(annotationId, out var existingAnnotation))
-            existingAnnotation = Handler.UnresolvableAnnotation(annotationId, node);
+        if (!_deserializedNodesById.TryGetValue(annotationId, out var result))
+            result = Handler.UnresolvableAnnotation(annotationId, node);
 
-        if (existingAnnotation == null)
+        if (result == null)
             return null;
 
-        if (existingAnnotation.GetClassifier() is not Annotation ann || !ann.CanAnnotate(node.GetClassifier()))
-            return Handler.InvalidAnnotation(existingAnnotation, node);
-        return existingAnnotation;
+        if (result.GetClassifier() is not Annotation ann || !ann.CanAnnotate(node.GetClassifier()))
+            result = Handler.InvalidAnnotation(result, node);
+
+        return PreventCircularContainment(node, result);
     }
 
     #endregion

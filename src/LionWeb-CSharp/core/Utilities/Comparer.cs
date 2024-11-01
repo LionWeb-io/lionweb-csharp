@@ -567,7 +567,7 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     private bool ContainsDeep(IList<IReadableNode?> list, IReadableNode target)
     {
         var allNodes = list.OfType<IReadableNode>()
-            .SelectMany(n => M1Extensions.Descendants<IReadableNode>(n, true, true)).ToList();
+            .SelectMany(n => M1Extensions.Descendants<IReadableNode>(n, [], true, true)).ToList();
         return allNodes.Contains(target);
     }
 

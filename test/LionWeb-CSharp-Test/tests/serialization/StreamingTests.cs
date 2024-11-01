@@ -59,7 +59,7 @@ public class StreamingTests
                 }
 
                 INode result;
-                if (lastCoord == null)
+                if (lastCoord == null || l % 2 == 0)
                 {
                     lastCoord = new Coord(id);
                     result = lastCoord;
