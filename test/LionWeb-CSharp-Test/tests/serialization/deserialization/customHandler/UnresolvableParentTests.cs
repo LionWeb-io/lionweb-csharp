@@ -22,24 +22,15 @@ using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.Serialization;
 
+/// <summary>
+/// Tests for <see cref="IDeserializerHandler.UnresolvableParent"/>
+/// </summary>
 [TestClass]
 public class UnresolvableParentTests
 {
-    /// <summary>
-    /// <see cref="IDeserializerHandler.UnresolvableParent"/>
-    /// </summary>
-
-    #region unresolvable parent
-
-    private class UnresolvableParentDeserializerHandler : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<IWritableNode?> heal) : DeserializerExceptionHandler
     {
-        public bool Called { get; private set; }
-
-        public override IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node)
-        {
-            Called = true;
-            return null;
-        }
+        public override IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node) => heal();
     }
 
     [TestMethod]
@@ -67,15 +58,13 @@ public class UnresolvableParentTests
             ]
         };
 
-        var unresolvableParentDeserializerHandler = new UnresolvableParentDeserializerHandler();
+        var deserializerHealingHandler = new DeserializerHealingHandler(() => null);
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unresolvableParentDeserializerHandler)
+            .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unresolvableParentDeserializerHandler.Called);
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
     }
-
-    #endregion
 }
