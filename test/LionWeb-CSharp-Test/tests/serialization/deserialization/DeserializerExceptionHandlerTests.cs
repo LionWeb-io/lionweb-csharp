@@ -37,6 +37,16 @@ public class DeserializerExceptionHandlerTests
     }
 
     [TestMethod]
+    public void duplicate_node_id()
+    {
+        Assert.ThrowsException<DeserializerException>(() => 
+            new DeserializerExceptionHandler().DuplicateNodeId(
+                CompressedId.Create("a", true), 
+                new Line("line"),
+                new Line("line")));
+    }
+    
+    [TestMethod]
     public void unknown_feature()
     {
         Assert.ThrowsException<UnknownFeatureException>(() =>
@@ -137,6 +147,25 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().InvalidAnnotation(new Documentation("doc"), new Line("line")));
+    }
+    
+    [TestMethod]
+    public void circular_containment()
+    {
+        Assert.ThrowsException<DeserializerException>(() => 
+            new DeserializerExceptionHandler().CircularContainment(
+                new Line("line"),
+                new Line("line")));
+    }
+    
+    [TestMethod]
+    public void duplicate_containment()
+    {
+        Assert.ThrowsException<DeserializerException>(() => 
+            new DeserializerExceptionHandler().DuplicateContainment(
+                new Line("line"),
+                new Line("line"),
+                new Line("line")));
     }
 
     [TestMethod]
