@@ -18,13 +18,9 @@
 namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.M2;
-using Examples.WithEnum.M2;
-using Examples.Library.M2;
-using Examples.TinyRefLang;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
-using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using LionWeb.Core.Utilities;
 
@@ -62,7 +58,7 @@ public class DeserializationTests
             .Build()
             .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.IsInstanceOfType<Geometry>(node);
         Assert.IsNull(node.GetParent());
     }
@@ -104,7 +100,7 @@ public class DeserializationTests
             .Build()
             .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.IsInstanceOfType<Geometry>(node);
         Assert.AreEqual(0, (node as Geometry).Shapes.Count);
     }
@@ -170,11 +166,11 @@ public class DeserializationTests
             .Build()
             .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.IsInstanceOfType<Geometry>(node);
         var geometry = node as Geometry;
         Assert.AreEqual(1, geometry.Shapes.Count);
-        var shape = geometry.Shapes.First();
+        var shape = geometry.Shapes[0];
         Assert.IsInstanceOfType<OffsetDuplicate>(shape);
         var offsetDuplicate = shape as OffsetDuplicate;
         Assert.IsFalse(offsetDuplicate.CollectAllSetFeatures().Contains(ShapesLanguage.Instance
@@ -225,7 +221,7 @@ public class DeserializationTests
             .Build()
             .Deserialize(serializationChunk, dependentGeometry.Descendants(true, true));
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.IsInstanceOfType<OffsetDuplicate>(node);
         var offsetDuplicate = node as OffsetDuplicate;
         Assert.AreEqual(lizard, offsetDuplicate.Source);
@@ -265,7 +261,7 @@ public class DeserializationTests
             .Build()
             .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.AreEqual(0, node.GetAnnotations().Count);
     }
 
@@ -283,6 +279,8 @@ public class DeserializationTests
         var comparer = new Comparer([line], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
+
+    #region circular containment
 
     [TestMethod]
     public void CircularContainment()
@@ -412,6 +410,10 @@ public class DeserializationTests
 
         Assert.IsFalse(b.GetAnnotations().Any());
     }
+
+    #endregion
+
+    #region duplicate containment
 
     [TestMethod]
     public void DoubleContainment()
@@ -561,11 +563,15 @@ public class DeserializationTests
         Assert.IsNull(c.GetParent());
         Assert.IsFalse(c.GetAnnotations().Any());
 
-        var b = a.GetAnnotations().First();
+        var b = a.GetAnnotations()[0];
         Assert.AreEqual("B", b.GetId());
         Assert.AreSame(a, b.GetParent());
         Assert.IsFalse(b.GetAnnotations().Any());
     }
+
+    #endregion
+
+    #region duplicate node id
 
     [TestMethod]
     public void DuplicateNodeId()
@@ -708,16 +714,192 @@ public class DeserializationTests
         var a = nodes.OfType<OffsetDuplicate>().First();
         Assert.AreEqual("A", a.GetId());
         Assert.AreEqual("First", a.Name);
-        
+
         Assert.IsNotNull(a.Offset);
         Assert.AreEqual("ChildFirst", a.Offset.GetId());
-        
+
         Assert.IsNotNull(a.Source);
         Assert.AreEqual("RefFirst", a.Source.GetId());
-        
+
         Assert.AreEqual(2, nodes.OfType<Circle>().Count());
-        
+
         Assert.AreEqual(1, nodes.OfType<Coord>().Count());
         Assert.AreEqual("ChildSecond", nodes.OfType<Coord>().First().GetId());
     }
+
+
+    private class DeserializerHealingHandler(Func<CompressedId, IWritableNode, INode, string?> heal)
+        : DeserializerExceptionHandler
+    {
+        public override string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
+            heal(nodeId, existingNode, node);
+    }
+
+
+    [TestMethod]
+    public void DuplicateNodeId_Heal()
+    {
+        SerializationChunk serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                                "LionCore-builtins-INamed-name"),
+                            Value = "First"
+                        }
+                    ],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-offset"),
+                            Children =
+                            [
+                                "ChildFirst"
+                            ]
+                        }
+                    ],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "RefFirst" }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "ChildFirst",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "A"
+                },
+                new SerializedNode
+                {
+                    Id = "RefFirst",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                                "LionCore-builtins-INamed-name"),
+                            Value = "Second"
+                        }
+                    ],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-offset"),
+                            Children =
+                            [
+                                "ChildSecond"
+                            ]
+                        }
+                    ],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "RefSecond" }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "ChildSecond",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "A"
+                },
+                new SerializedNode
+                {
+                    Id = "RefSecond",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+            ]
+        };
+
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, node, arg3) => "renamed-A");
+
+        var nodes = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(4, nodes.Count);
+        var first = nodes.OfType<OffsetDuplicate>().First();
+        Assert.AreEqual("A", first.GetId());
+        Assert.AreEqual("First", first.Name);
+
+        Assert.IsNotNull(first.Offset);
+        Assert.AreEqual("ChildFirst", first.Offset.GetId());
+
+        Assert.IsNotNull(first.Source);
+        Assert.AreEqual("RefFirst", first.Source.GetId());
+
+        var last = nodes.OfType<OffsetDuplicate>().Last();
+        Assert.AreEqual("renamed-A", last.GetId());
+        Assert.AreEqual("Second", last.Name);
+
+        Assert.IsNotNull(last.Offset);
+        Assert.AreEqual("ChildSecond", last.Offset.GetId());
+
+        Assert.IsNotNull(last.Source);
+        Assert.AreEqual("RefSecond", last.Source.GetId());
+
+        Assert.AreEqual(2, nodes.OfType<Circle>().Count());
+        Assert.AreEqual(0, nodes.OfType<Coord>().Count());
+    }
+
+    #endregion
 }
