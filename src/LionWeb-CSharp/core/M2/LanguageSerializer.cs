@@ -51,7 +51,7 @@ public class LanguageSerializer : SerializerBase
             [
                 SerializedLanguageReference(M3Language.Instance)
             ],
-            Nodes = _languages.SelectMany(language => M1Extensions.Descendants<IReadableNode>(language, true, true))
+            Nodes = _languages.SelectMany(language => M1Extensions.Descendants<IReadableNode>(language, [], true, true))
                 .Select(SerializeNode).ToArray()
         };
 

@@ -73,7 +73,7 @@ public class Deserializer
         NodesWithProperties(serializedNodesList);
 
         dependentNodesById = dependentNodes
-            .SelectMany(node => M1Extensions.Descendants<IReadableNode>(node, true, true))
+            .SelectMany(node => M1Extensions.Descendants<IReadableNode>(node, [], true, true))
             .Distinct()
             .ToDictionary(node => node.GetId());
 
