@@ -18,7 +18,6 @@
 namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 
 using Examples.Shapes.M2;
-using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
@@ -34,95 +33,89 @@ public class DeserializerIgnoringHandlerTests
             CompressedId.Create("a", true)));
     }
 
+
+    [TestMethod]
+    public void duplicate_node_id()
+    {
+        Assert.IsNull(new DeserializerIgnoringHandler().DuplicateNodeId(
+            CompressedId.Create("a", true),
+            new Line("line"),
+            new Line("line")));
+    }
+
     [TestMethod]
     public void unknown_feature()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnknownFeature<Containment>(
-                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
-                new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
-                new Line("line")));
+            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
+            new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
+            new Line("line")));
     }
 
     [TestMethod]
     public void invalid_feature()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().InvalidFeature<Containment>(
-                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
-                new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
-                new Line("line")));
+            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
+            new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
+            new Line("line")));
     }
 
     [TestMethod]
     public void invalid_link_value()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().InvalidLinkValue<Containment>(
-                [],
-                new DynamicReference("dyn-reference",
-                    new DynamicConcept("dyn-concept-1", new DynamicLanguage("dyn-lang-1") { Name = "lang-name" })
-                    {
-                        Name = "concept-name"
-                    })
+            [],
+            new DynamicReference("dyn-reference",
+                new DynamicConcept("dyn-concept-1", new DynamicLanguage("dyn-lang-1") { Name = "lang-name" })
                 {
-                    Name = "dynamic-reference",
-                    Type = new DynamicConcept("dyn-concept-2", new DynamicLanguage("dyn-lang-2") { Name = "lang-name" })
-                    {
-                        Name = "concept-name"
-                    }
-                },
-                new Line("line")));
-    }
-
-    [TestMethod]
-    [Ignore(message:"complete: test DeserializerIgnoringHandler")]
-    public void invalid_containment()
-    {
-        Assert.ThrowsException<UnsupportedClassifierException>(() =>
-            new DeserializerExceptionHandler().InvalidContainment(new Line("line")));
-    }
-
-    [TestMethod]
-    [Ignore(message:"complete: test DeserializerIgnoringHandler")]
-    public void invalid_reference()
-    {
-        Assert.ThrowsException<UnsupportedClassifierException>(() =>
-            new DeserializerExceptionHandler().InvalidReference(new Line("line")));
+                    Name = "concept-name"
+                })
+            {
+                Name = "dynamic-reference",
+                Type = new DynamicConcept("dyn-concept-2", new DynamicLanguage("dyn-lang-2") { Name = "lang-name" })
+                {
+                    Name = "concept-name"
+                }
+            },
+            new Line("line")));
     }
 
     [TestMethod]
     public void unresolvable_parent()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableParent(
-                CompressedId.Create("a", true),
-                new Line("line")));
+            CompressedId.Create("a", true),
+            new Line("line")));
     }
 
     [TestMethod]
     public void unresolvable_child()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableChild(
-                CompressedId.Create("a", true),
-                new DynamicContainment("dyn-containment",
-                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
-                new Line("line")));
+            CompressedId.Create("a", true),
+            new DynamicContainment("dyn-containment",
+                new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+            new Line("line")));
     }
 
     [TestMethod]
     public void unresolvable_reference_target()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableReferenceTarget(
-                CompressedId.Create("a", true),
-                "resolve-info",
-                new DynamicReference("dyn-reference",
-                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
-                new Line("line")));
+            CompressedId.Create("a", true),
+            "resolve-info",
+            new DynamicReference("dyn-reference",
+                new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+            new Line("line")));
     }
 
     [TestMethod]
     public void unresolvable_annotation()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableAnnotation(
-                CompressedId.Create("a", true),
-                new Line("line")));
+            CompressedId.Create("a", true),
+            new Line("line")));
     }
 
     [TestMethod]
@@ -132,41 +125,51 @@ public class DeserializerIgnoringHandlerTests
     }
 
     [TestMethod]
-    [Ignore(message:"complete: test DeserializerIgnoringHandler")]
-    public void invalid_annotation_parent()
+    public void circular_containment()
     {
-        Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().InvalidAnnotationParent(new Documentation("doc"), new Line("line")));
+        Assert.IsNull(new DeserializerIgnoringHandler().CircularContainment(
+            new Line("line"),
+            new Line("line")));
     }
+
+    [TestMethod]
+    public void duplicate_containment()
+    {
+        Assert.IsFalse(new DeserializerIgnoringHandler().DuplicateContainment(
+            new Line("line"),
+            new Line("line"),
+            new Line("line")));
+    }
+
 
     [TestMethod]
     public void unknown_enumeration_literal()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnknownEnumerationLiteral(
-                "a",
-                new DynamicEnumeration("dyn-enum", new DynamicLanguage("dyn-lang-1")),
-                new DynamicProperty("dyn-property",
-                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang-2"))),
-                new Line("line")
-            ));
+            "a",
+            new DynamicEnumeration("dyn-enum", new DynamicLanguage("dyn-lang-1")),
+            new DynamicProperty("dyn-property",
+                new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang-2"))),
+            new Line("line")
+        ));
     }
 
     [TestMethod]
     public void unknown_datatype()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnknownDatatype(
-                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
-                "a",
-                new Line("line")));
+            new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+            "a",
+            new Line("line")));
     }
 
     [TestMethod]
     public void invalid_property_value()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().InvalidPropertyValue<int>(
-                "a",
-                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
-                CompressedId.Create("b", true)));
+            "a",
+            new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+            CompressedId.Create("b", true)));
     }
 
     [TestMethod]
