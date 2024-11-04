@@ -23,29 +23,22 @@ using LionWeb.Core.M1;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
+/// <summary>
+/// Tests for <see cref="IDeserializerHandler.UnknownEnumerationLiteral"/>
+/// </summary>
 [TestClass]
 public class UnknownEnumerationLiteralTests
 {
-    /// <summary>
-    /// <see cref="IDeserializerHandler.UnknownEnumerationLiteral"/>
-    /// </summary>
-
-    #region unknown enumeration literal
-
-    private class UnknownEnumerationLiteralDeserializerHandler : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<string, Enumeration, Feature, IWritableNode, Enum?> heal)
+        : DeserializerExceptionHandler
     {
-        public bool Called { get; private set; }
-
         public override Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
-            IWritableNode nodeId)
-        {
-            Called = true;
-            return null;
-        }
+            IWritableNode node) =>
+            heal(key, enumeration, property, node);
     }
 
     [TestMethod]
-    public void unknown_enumeration_literal()
+    public void unknown_enumeration_literal_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -75,15 +68,60 @@ public class UnknownEnumerationLiteralTests
             ]
         };
 
-        var unknownEnumerationLiteralDeserializerHandler = new UnknownEnumerationLiteralDeserializerHandler();
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((s, enumeration, arg3, arg4) => null);
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unknownEnumerationLiteralDeserializerHandler)
+            .WithHandler(deserializerHealingHandler)
             .WithLanguage(WithEnumLanguage.Instance)
             .Build();
 
-        deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unknownEnumerationLiteralDeserializerHandler.Called);
-    }
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.IsFalse(deserializedNodes.OfType<EnumHolder>().FirstOrDefault()?.CollectAllSetFeatures()
+            .OfType<Property>().Contains(WithEnumLanguage.Instance.EnumHolder_enumValue));
+    }    
+    
+    [TestMethod]
+    public void unknown_enumeration_literal_heals()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "WithEnum", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("WithEnum", "1", "EnumHolder"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("WithEnum", "1", "enumValue"),
+                            Value = "unknown-enumeration-literal"
+                        }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
 
-    #endregion
+        MyEnum myEnumLiteral = MyEnum.literal1;
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((s, enumeration, arg3, arg4) => myEnumLiteral);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(WithEnumLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.IsTrue(deserializedNodes.OfType<EnumHolder>().FirstOrDefault()?.CollectAllSetFeatures()
+            .OfType<Property>().Contains(WithEnumLanguage.Instance.EnumHolder_enumValue));
+        Assert.AreEqual(myEnumLiteral, deserializedNodes.OfType<EnumHolder>().FirstOrDefault()?.EnumValue);
+    }
 }
