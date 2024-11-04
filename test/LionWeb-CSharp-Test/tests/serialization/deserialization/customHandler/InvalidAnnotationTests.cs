@@ -22,28 +22,21 @@ using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.Serialization;
 
+/// <summary>
+/// <see cref="IDeserializerHandler.InvalidAnnotation"/>
+/// </summary>
 [TestClass]
 public class InvalidAnnotationTests
 {
-    /// <summary>
-    /// <see cref="IDeserializerHandler.InvalidAnnotation"/>
-    /// </summary>
-
-    #region invalid annotation
-
-    private class InvalidAnnotationDeserializerHandler : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<IReadableNode, IWritableNode, INode?> heal)
+        : DeserializerExceptionHandler
     {
-        public bool Called { get; private set; }
-
-        public override INode? InvalidAnnotation(IReadableNode annotation, IWritableNode node)
-        {
-            Called = true;
-            return null;
-        }
+        public override IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+            heal(annotation, node);
     }
 
     [TestMethod]
-    public void invalid_annotation()
+    public void invalid_annotation_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -57,7 +50,7 @@ public class InvalidAnnotationTests
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
                     Properties = [],
                     Containments = [],
                     References = [],
@@ -67,7 +60,7 @@ public class InvalidAnnotationTests
                 new SerializedNode
                 {
                     Id = "annotation",
-                    Classifier = new MetaPointer("key-Shapes", "1", "key-Documentation"),
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
                     Properties = [],
                     Containments = [],
                     References = [],
@@ -76,15 +69,61 @@ public class InvalidAnnotationTests
             ]
         };
 
-        var invalidAnnotationDeserializerHandler = new InvalidAnnotationDeserializerHandler();
+        var deserializerHealingHandler = new DeserializerHealingHandler((node, writableNode) => null);
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(invalidAnnotationDeserializerHandler)
+            .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(invalidAnnotationDeserializerHandler.Called);
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(2, deserializedNodes.Count);
+        Assert.AreEqual(0, deserializedNodes.OfType<Circle>().FirstOrDefault()?.GetAnnotations().Count);
     }
 
-    #endregion
+    [TestMethod]
+    public void invalid_annotation_heals()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = ["annotation"],
+                },
+
+                new SerializedNode
+                {
+                    Id = "annotation",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var billOfMaterials = new BillOfMaterials("new-annotation") { };
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((node, writableNode) => billOfMaterials);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(2, deserializedNodes.Count);
+        Assert.AreEqual(billOfMaterials, deserializedNodes.OfType<Circle>().FirstOrDefault()?.GetAnnotations()[0]);
+    }
 }
