@@ -23,30 +23,21 @@ using LionWeb.Core.M1;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
+/// <summary>
+/// Tests for <see cref="IDeserializerHandler.UnresolvableReferenceTarget"/>
+/// </summary>
 [TestClass]
 public class UnresolvableReferenceTargetTests
 {
-    /// <summary>
-    /// <see cref="IDeserializerHandler.UnresolvableReferenceTarget"/>
-    /// </summary>
-
-    #region unresolvable reference target
-
-    private class UnresolvableReferenceTargetDeserializerHandler : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<CompressedId?, string?, Feature, IWritableNode, IReadableNode?> heal)
+        : DeserializerExceptionHandler
     {
-        public bool Called { get; private set; }
-
         public override IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo,
-            Feature reference,
-            IWritableNode node)
-        {
-            Called = true;
-            return null;
-        }
+            Feature reference, IWritableNode node) => heal(targetId, resolveInfo, reference, node);
     }
 
     [TestMethod]
-    public void unresolvable_reference_target()
+    public void unresolvable_reference_target_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -83,15 +74,67 @@ public class UnresolvableReferenceTargetTests
             ]
         };
 
-        var unresolvableReferenceTargetDeserializerHandler = new UnresolvableReferenceTargetDeserializerHandler();
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => null);
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unresolvableReferenceTargetDeserializerHandler)
+            .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unresolvableReferenceTargetDeserializerHandler.Called);
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
     }
 
-    #endregion
+
+    [TestMethod]
+    public void unresolvable_reference_target_heals()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget
+                                {
+                                    Reference = "unresolvable-reference-target",
+                                    ResolveInfo = "unresolvable-reference-target-resolve-info"
+                                }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var circle = new Circle("new-ref-target");
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => circle);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
+        
+        var source = deserializedNodes.OfType<OffsetDuplicate>().FirstOrDefault()?.Source;
+        Assert.AreSame(circle, source);
+        Assert.AreSame(circle.GetId(), source?.GetId());
+    }
 }
