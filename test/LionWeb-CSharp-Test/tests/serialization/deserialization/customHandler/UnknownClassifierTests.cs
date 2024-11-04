@@ -29,10 +29,11 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnknownClassifierTests
 {
-    private class DeserializerHealingHandler<TResult>(Func<TResult> heal) : DeserializerExceptionHandler
-        where TResult : Classifier?
+    private class DeserializerHealingHandler(Func<CompressedMetaPointer, CompressedId, Classifier?> heal)
+        : DeserializerExceptionHandler
     {
-        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) => heal();
+        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) =>
+            heal(classifier, id);
     }
 
     /// <summary>
@@ -59,7 +60,7 @@ public class UnknownClassifierTests
             ]
         };
 
-        var deserializerHealingHandler = new DeserializerHealingHandler<Classifier?>(() => null);
+        var deserializerHealingHandler = new DeserializerHealingHandler((pointer, id) => null);
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
@@ -97,8 +98,8 @@ public class UnknownClassifierTests
             ]
         };
 
-        Func<Classifier?> heal = () => ShapesLanguage.Instance.Circle;
-        var unknownClassifierDeserializerHealingHandler = new DeserializerHealingHandler<Classifier?>(heal);
+        var unknownClassifierDeserializerHealingHandler =
+            new DeserializerHealingHandler((pointer, id) => ShapesLanguage.Instance.Circle);
 
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(unknownClassifierDeserializerHealingHandler)
@@ -139,10 +140,10 @@ public class UnknownClassifierTests
         DynamicConcept dynamicConcept =
             dynamicLanguage.Concept("id-XLang-concept", "key-unknown-classifier", "name-XLang-concept:");
 
-        Func<Classifier?> heal = () => dynamicLanguage.Entities.OfType<Classifier>()
+        Classifier? heal = dynamicLanguage.Entities.OfType<Classifier>()
             .FirstOrDefault(classifier => classifier.Key == serializationChunk.Nodes[0].Classifier.Key);
 
-        var deserializerHealingHandler = new DeserializerHealingHandler<Classifier?>(heal);
+        var deserializerHealingHandler = new DeserializerHealingHandler((pointer, id) => heal);
 
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
