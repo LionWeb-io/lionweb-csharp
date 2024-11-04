@@ -29,14 +29,15 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnresolvableChildTests
 {
-    private class DeserializerHealingHandler<TResult>(Func<TResult> heal) : DeserializerExceptionHandler
-        where TResult : IWritableNode?
+    private class DeserializerHealingHandler(Func<CompressedId, Feature, IWritableNode, IWritableNode?> heal)
+        : DeserializerExceptionHandler
     {
-        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) => heal();
+        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) 
+            => heal(childId, containment, node);
     }
 
     [TestMethod]
-    public void unresolvable_child()
+    public void unresolvable_child_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -66,7 +67,7 @@ public class UnresolvableChildTests
             ]
         };
 
-        var deserializerHealingHandler = new DeserializerHealingHandler<IWritableNode?>(() => null);
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, feature, arg3) => null);
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
@@ -109,7 +110,7 @@ public class UnresolvableChildTests
 
         var circle = new Circle("new-child");
 
-        var deserializerHealingHandler = new DeserializerHealingHandler<IWritableNode?>(() => circle);
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, feature, arg3) => circle);
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
