@@ -23,28 +23,21 @@ using LionWeb.Core.M1;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
+/// <summary>
+/// Tests for <see cref="IDeserializerHandler.InvalidPropertyValue{TValue}"/>
+/// </summary>
 [TestClass]
 public class InvalidPropertyValueTests
 {
-    /// <summary>
-    /// <see cref="IDeserializerHandler.InvalidPropertyValue{TValue}"/>
-    /// </summary>
-
-    #region invalid property value
-
-    private class InvalidPropertyValueDeserializerHandler : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<string?, Feature, CompressedId, object?> heal)
+        : DeserializerExceptionHandler
     {
-        public bool Called { get; private set; }
-
-        public override object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId)
-        {
-            Called = true;
-            return null;
-        }
+        public override object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId) =>
+            heal(value, property, nodeId);
     }
 
     [TestMethod]
-    public void invalid_property_value()
+    public void invalid_property_value_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -73,15 +66,58 @@ public class InvalidPropertyValueTests
             ]
         };
 
-        var invalidPropertyValueDeserializerHandler = new InvalidPropertyValueDeserializerHandler();
+        var deserializerHealingHandler = new DeserializerHealingHandler((s, feature, arg3) => null);
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(invalidPropertyValueDeserializerHandler)
+            .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(invalidPropertyValueDeserializerHandler.Called);
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
+        Assert.IsFalse(deserializedNodes.OfType<Coord>().FirstOrDefault()?.CollectAllSetFeatures().OfType<Property>()
+            .Contains(ShapesLanguage.Instance.Coord_x));
     }
 
-    #endregion
+    [TestMethod]
+    public void invalid_property_value_heals()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("key-Shapes", "1", "key-x"), Value = "expects an integer"
+                        }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((s, feature, arg3) => 42);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
+        Assert.IsTrue(deserializedNodes.OfType<Coord>().FirstOrDefault()?.CollectAllSetFeatures().OfType<Property>()
+            .Contains(ShapesLanguage.Instance.Coord_x));
+    }
 }
