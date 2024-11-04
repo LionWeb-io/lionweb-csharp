@@ -28,13 +28,15 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnresolvableParentTests
 {
-    private class DeserializerHealingHandler(Func<IWritableNode?> heal) : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<CompressedId, IWritableNode, IWritableNode?> heal)
+        : DeserializerExceptionHandler
     {
-        public override IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node) => heal();
+        public override IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node) =>
+            heal(parentId, node);
     }
 
     [TestMethod]
-    public void unresolvable_parent()
+    public void unresolvable_parent_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -58,7 +60,7 @@ public class UnresolvableParentTests
             ]
         };
 
-        var deserializerHealingHandler = new DeserializerHealingHandler(() => null);
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, node) => null);
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
