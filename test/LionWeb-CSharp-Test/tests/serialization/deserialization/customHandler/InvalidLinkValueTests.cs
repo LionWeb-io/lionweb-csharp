@@ -213,7 +213,7 @@ public class InvalidLinkValueTests
     }
 
     [TestMethod]
-    public void containment_expects_single_child_heals()
+    public void containment_expects_single_child_heals_to_a_new_node()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -264,7 +264,7 @@ public class InvalidLinkValueTests
                 }
             ]
         };
-        
+
         var coord = new Coord("new-child");
         var deserializerHealingHandler =
             new DeserializerHealingHandler((list, feature, arg3) => new List<IReadableNode>() { coord });
@@ -276,6 +276,74 @@ public class InvalidLinkValueTests
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
 
         Assert.AreEqual(3, deserializedNodes.Count);
+        Circle circle = deserializedNodes.OfType<Circle>().First();
+        Assert.IsTrue(circle.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
+    }
+
+    [TestMethod]
+    public void containment_expects_single_child_heals_to_existing_node()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-center"),
+                            Children = ["child1", "child2"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "child1",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "foo"
+                },
+
+                new SerializedNode
+                {
+                    Id = "child2",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "foo"
+                }
+            ]
+        };
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((list, feature, arg3) =>
+                new List<IReadableNode>() { list.First(node => node.GetId() == "child1") });
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+
+        Assert.AreEqual(2, deserializedNodes.Count);
         Circle circle = deserializedNodes.OfType<Circle>().First();
         Assert.IsTrue(circle.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.Circle_center));
     }
@@ -460,9 +528,9 @@ public class InvalidLinkValueTests
         MyConcept myConcept = deserializedNodes.OfType<MyConcept>().First();
         Assert.IsFalse(myConcept.CollectAllSetFeatures().Contains(TinyRefLangLanguage.Instance.MyConcept_singularRef));
     }
-    
+
     [TestMethod]
-    public void reference_expects_single_target_heals()
+    public void reference_expects_single_target_heals_to_a_new_node()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -517,7 +585,78 @@ public class InvalidLinkValueTests
         };
 
         var concept = new MyConcept("new-reference");
-        var deserializerHealingHandler = new DeserializerHealingHandler((list, feature, arg3) => new List<IReadableNode>(){concept});
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((list, feature, arg3) => new List<IReadableNode>() { concept });
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(TinyRefLangLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(3, deserializedNodes.Count);
+        MyConcept myConcept = deserializedNodes.OfType<MyConcept>().First();
+        Assert.IsTrue(myConcept.CollectAllSetFeatures().Contains(TinyRefLangLanguage.Instance.MyConcept_singularRef));
+    }
+
+    [TestMethod]
+    public void reference_expects_single_target_heals_to_an_existing_node()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-tinyRefLang", Version = "0" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept-singularRef"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "ref_1", ResolveInfo = "ref" },
+                                new SerializedReferenceTarget { Reference = "ref_2", ResolveInfo = "ref" },
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "ref_1",
+                    Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "ref_2",
+                    Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+            ]
+        };
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((list, feature, arg3) =>
+                new List<IReadableNode>() { list.First(node => node.GetId() == "ref_1") });
+
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(TinyRefLangLanguage.Instance)
