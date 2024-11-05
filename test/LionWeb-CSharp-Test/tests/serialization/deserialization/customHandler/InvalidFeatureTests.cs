@@ -23,29 +23,21 @@ using LionWeb.Core.M1;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
+/// <summary>
+/// Tests for <see cref="IDeserializerHandler.InvalidFeature{TFeature}"/>
+/// </summary>
 [TestClass]
 public class InvalidFeatureTests
 {
-    /// <summary>
-    /// <see cref="IDeserializerHandler.InvalidFeature{TFeature}"/>
-    /// </summary>
-
-    #region invalid feature
-
-    private class InvalidFeatureDeserializerHandler : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<CompressedMetaPointer, Classifier, IWritableNode, Feature?> heal)
+        : DeserializerExceptionHandler
     {
-        public bool Called { get; private set; }
-
         public override Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-            IWritableNode node)
-        {
-            Called = true;
-            return null;
-        }
+            IWritableNode node) => heal(feature, classifier, node);
     }
 
     [TestMethod]
-    public void invalid_feature()
+    public void invalid_feature_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -74,15 +66,143 @@ public class InvalidFeatureTests
             ]
         };
 
-        var invalidFeatureDeserializerHandler = new InvalidFeatureDeserializerHandler();
+        var deserializerHealingHandler = new DeserializerHealingHandler((pointer, classifier, arg3) => null);
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(invalidFeatureDeserializerHandler)
+            .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(invalidFeatureDeserializerHandler.Called);
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
+        Assert.AreEqual(0,
+            deserializedNodes.OfType<Circle>().FirstOrDefault()?.CollectAllSetFeatures().OfType<Reference>().Count());
     }
 
-    #endregion
+    /// <summary>
+    /// Heals from using a <see cref="Property"/> feature type in <see cref="Reference"/> type
+    /// Heals to a <see cref="Containment"/> feature
+    /// </summary>
+    [TestMethod]
+    public void invalid_feature_heals_to_a_containment()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-r"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget
+                                {
+                                    Reference = "center", ResolveInfo = "center-resolve-info"
+                                }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "center",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((pointer, classifier, arg3) => ShapesLanguage.Instance.Circle_center);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .WithUncompressedIds(true)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1,
+            deserializedNodes.OfType<Circle>().FirstOrDefault()?.CollectAllSetFeatures().OfType<Containment>().Count());
+        Assert.AreEqual(1, deserializedNodes.Count);
+    }
+
+    /// <summary>
+    /// Heals from using a <see cref="Containment"/> feature type in <see cref="Reference"/> type
+    /// Heals to a <see cref="Reference"/> feature
+    /// </summary>
+    [TestMethod]
+    public void invalid_feature_heals_to_a_reference()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-offset"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "RefFirst" }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "RefFirst",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+            ]
+        };
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((pointer, classifier, arg3) => ShapesLanguage.Instance.OffsetDuplicate_source);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .WithUncompressedIds(true)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1,
+            deserializedNodes.OfType<OffsetDuplicate>().FirstOrDefault()?.CollectAllSetFeatures().OfType<Reference>().Count());
+        Assert.AreEqual(2, deserializedNodes.Count);
+    }
 }
