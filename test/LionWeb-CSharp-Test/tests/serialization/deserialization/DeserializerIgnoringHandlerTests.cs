@@ -82,14 +82,6 @@ public class DeserializerIgnoringHandlerTests
     }
 
     [TestMethod]
-    public void unresolvable_parent()
-    {
-        Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableParent(
-            CompressedId.Create("a", true),
-            new Line("line")));
-    }
-
-    [TestMethod]
     public void unresolvable_child()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableChild(

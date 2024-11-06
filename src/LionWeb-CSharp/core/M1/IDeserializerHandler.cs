@@ -148,14 +148,6 @@ public interface IDeserializerHandler
     #region unresolveable nodes
 
     /// <summary>
-    /// Cannot find node with id <paramref name="parentId"/>, mentioned as parent for <paramref name="node"/>.
-    /// </summary>
-    /// <param name="parentId">Unresolvable parent node id.</param>
-    /// <param name="node">Node that mentions <paramref name="parentId"/> as parent.</param>
-    /// <returns>Replacement parent node to use, or <c>null</c> to make <paramref name="node"/> a root node.</returns>
-    IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node);
-
-    /// <summary>
     /// Cannot find node with id <paramref name="childId"/> mentioned as child of <paramref name="node"/> in containment <paramref name="containment"/>. 
     /// </summary>
     /// <param name="childId">Unresolvable child node id.</param>
@@ -285,11 +277,6 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     #endregion
 
     #region unresolveable nodes
-
-    /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node) =>
-        throw new DeserializerException(
-            $"On node with id={node.GetId()}: couldn't find specified parent with id={parentId}");
 
     /// <inheritdoc />
     public virtual IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) =>
@@ -435,13 +422,6 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     #endregion
 
     #region unresolveable nodes
-
-    /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node)
-    {
-        LogMessage($"On node with id={node.GetId()}: couldn't find specified parent - leaving this node orphaned.");
-        return null;
-    }
 
     /// <inheritdoc />
     public virtual IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node)
