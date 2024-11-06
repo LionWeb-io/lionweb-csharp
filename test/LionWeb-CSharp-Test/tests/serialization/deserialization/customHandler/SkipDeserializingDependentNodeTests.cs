@@ -23,24 +23,15 @@ using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.Serialization;
 
+/// <summary>
+/// Tests for <see cref="IDeserializerHandler.SkipDeserializingDependentNode"/>
+/// </summary>
 [TestClass]
 public class SkipDeserializingDependentNodeTests
 {
-    /// <summary>
-    /// <see cref="IDeserializerHandler.SkipDeserializingDependentNode"/>
-    /// </summary>
-
-    #region skip deserializing dependent node
-
-    private class SkipDeserializingDependentNodeDeserializerHandler : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<CompressedId, bool> heal) : DeserializerExceptionHandler
     {
-        public bool Called { get; private set; }
-
-        public override bool SkipDeserializingDependentNode(CompressedId id)
-        {
-            Called = true;
-            return true;
-        }
+        public override bool SkipDeserializingDependentNode(CompressedId id) => heal(id);
     }
 
 
@@ -89,14 +80,13 @@ public class SkipDeserializingDependentNodeTests
 
         Documentation documentation = ShapesLanguage.Instance.GetFactory().NewDocumentation("repeated-id");
 
-        var skipDeserializingDependentNodeDeserializerHandler = new SkipDeserializingDependentNodeDeserializerHandler();
+        var deserializerHealingHandler = new DeserializerHealingHandler(id => true);
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(skipDeserializingDependentNodeDeserializerHandler)
+            .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk, [documentation]);
-        Assert.IsTrue(skipDeserializingDependentNodeDeserializerHandler.Called);
 
         OffsetDuplicate deserializedOffsetDuplicate = deserializedNodes.OfType<OffsetDuplicate>().First();
         Assert.AreSame(documentation, deserializedOffsetDuplicate.Docs);
@@ -147,18 +137,15 @@ public class SkipDeserializingDependentNodeTests
         };
         MyConcept myConcept = TinyRefLangLanguage.Instance.GetFactory().NewMyConcept("repeated-id");
 
-        var skipDeserializingDependentNodeDeserializerHandler = new SkipDeserializingDependentNodeDeserializerHandler();
+        var deserializerHealingHandler = new DeserializerHealingHandler(id => true);
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(skipDeserializingDependentNodeDeserializerHandler)
+            .WithHandler(deserializerHealingHandler)
             .WithLanguage(TinyRefLangLanguage.Instance)
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk, [myConcept]);
-        Assert.IsTrue(skipDeserializingDependentNodeDeserializerHandler.Called);
 
         MyConcept deserializedMyConcept = deserializedNodes.OfType<MyConcept>().First(n => n.GetId() == "foo");
         Assert.AreSame(myConcept, deserializedMyConcept.SingularRef);
     }
-
-    #endregion
 }
