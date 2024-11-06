@@ -17,72 +17,125 @@
 
 namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 
-using Examples.WithEnum.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
+/// <summary>
+/// Tests for <see cref="IDeserializerHandler.UnknownDatatype"/>
+/// </summary>
 [TestClass]
 public class UnknownDatatypeTests
 {
-    /// <summary>
-    /// <see cref="IDeserializerHandler.UnknownDatatype"/>
-    /// </summary>
-
-    #region unknown datatype
-
-    private class UnknownDatatypeDeserializerHandler : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<Feature, string?, IWritableNode, object?> heal)
+        : DeserializerExceptionHandler
     {
-        public bool Called { get; private set; }
-
-        public override object? UnknownDatatype(Feature property, string? value, IWritableNode node)
-        {
-            Called = true;
-            return null;
-        }
+        public override object? UnknownDatatype(Feature property, string? value, IWritableNode node) =>
+            heal(property, value, node);
     }
 
 
     [TestMethod]
-    public void unknown_datatype()
+    public void unknown_datatype_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
         {
             SerializationFormatVersion = ReleaseVersion.Current,
             Languages =
             [
-                new SerializedLanguageReference { Key = "WithEnum", Version = "1" }
+                new SerializedLanguageReference { Key = "key-myLang", Version = "1" }
             ],
             Nodes =
             [
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer("WithEnum", "1", "EnumHolder"),
+                    Classifier = new MetaPointer("key-myLang", "1", "key-Clock"),
                     Properties =
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("WithEnum", "1", "enumValue"), Value = "lit1"
+                            Property = new MetaPointer("key-myLang", "1", "key-wallClockTime"), Value = "17:43"
                         }
                     ],
                     Containments = [],
                     References = [],
                     Annotations = [],
-                },
+                }
             ]
         };
 
-        var unknownDatatypeDeserializerHandler = new UnknownDatatypeDeserializerHandler();
+        var myLang = new DynamicLanguage("id-myLang") { Key = "key-myLang", Name = "myLang", Version = "1" };
+        DynamicConcept clock = myLang.Concept("id-Clock", "key-Clock", "Clock");
+        DynamicPrimitiveType time = myLang.PrimitiveType("id-Time", "key-Time", "Time");
+        DynamicProperty wallClockTime =
+            clock.Property("id-wallClockTime", "key-wallClockTime", "wallClockTime").OfType(time);
+
+        myLang.NodeFactory = new SerializationLenientTests.LenientFactory(myLang);
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((feature, s, arg3) => null);
+
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithHandler(unknownDatatypeDeserializerHandler)
-            .WithLanguage(WithEnumLanguage.Instance)
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(myLang)
             .Build();
 
-        deserializer.Deserialize(serializationChunk);
-        Assert.IsTrue(unknownDatatypeDeserializerHandler.Called);
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
+        Assert.AreEqual(0, deserializedNodes[0].CollectAllSetFeatures().OfType<Property>().Count());
     }
 
-    #endregion
+    [TestMethod]
+    public void unknown_datatype_heals()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-myLang", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-myLang", "1", "key-Clock"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("key-myLang", "1", "key-wallClockTime"), Value = "17:43"
+                        }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var myLang = new DynamicLanguage("id-myLang") { Key = "key-myLang", Name = "myLang", Version = "1" };
+        DynamicConcept clock = myLang.Concept("id-Clock", "key-Clock", "Clock");
+        DynamicPrimitiveType time = myLang.PrimitiveType("id-Time", "key-Time", "Time");
+        DynamicProperty wallClockTime =
+            clock.Property("id-wallClockTime", "key-wallClockTime", "wallClockTime").OfType(time);
+
+        myLang.NodeFactory = new SerializationLenientTests.LenientFactory(myLang);
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((feature, s, arg3) => DateTime.Parse(s));
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(myLang)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
+        Assert.AreEqual(1, deserializedNodes[0].CollectAllSetFeatures().OfType<Property>().Count());
+        Assert.IsInstanceOfType<DateTime>(deserializedNodes[0].Get(wallClockTime));
+    }
 }

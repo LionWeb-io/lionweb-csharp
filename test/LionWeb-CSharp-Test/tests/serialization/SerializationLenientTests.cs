@@ -74,7 +74,7 @@ public class SerializationLenientTests
         Assert.AreEqual("lit1", diff.RightValue);
     }
 
-    class LenientFactory(Language language) : AbstractBaseNodeFactory(language)
+    public class LenientFactory(Language language) : AbstractBaseNodeFactory(language)
     {
         public override INode CreateNode(string id, Classifier classifier) =>
             new LenientNode(id, classifier);
