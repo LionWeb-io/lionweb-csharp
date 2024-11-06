@@ -86,7 +86,7 @@ public class CircularContainmentTests
     /// Test case:
     /// Direct circular dependency: A has B as child, B has A as child
     /// Healing:
-    /// Break containment link from B to A. As a result, B does not have A as a child  
+    /// Breaks containment link from B to A. As a result, B does not have A as a child  
     /// </summary>
     /// <remarks>Instead of breaking containment link from B to A, a reference link can be created from B to A</remarks>
     [TestMethod]
@@ -159,7 +159,7 @@ public class CircularContainmentTests
     /// Test case:
     /// Direct circular dependency: A has B as child, B has A as child 
     /// Healing:
-    /// Break containment link from A to B. As a result, A does not have B as a child and B has A as a child  
+    /// Breaks containment link from A to B. As a result, A does not have B as a child and B has A as a child  
     /// </summary>
     /// <remarks>Instead of breaking containment link from A to B, a reference link can be created from A to B</remarks>
     [TestMethod]
@@ -236,7 +236,7 @@ public class CircularContainmentTests
     /// Test case:
     /// Direct circular dependency: A has B, C as children. B has C as a child. C has A as a child.
     /// Healing:
-    /// Break containment link from C to A.
+    /// Breaks containment link from C to A.
     /// </summary>
     [TestMethod]
     public void direct_circular_containment_multiple_children_heals_case_1()
@@ -333,7 +333,7 @@ public class CircularContainmentTests
         Assert.AreEqual("B", b.GetId());
         Assert.AreSame(a, b.GetParent());
         Assert.IsTrue(b.Children().Any());
-        
+
         INode c = a.Children().Last();
         Assert.AreEqual("C", c.GetId());
         Assert.AreSame(a, c.GetParent());
@@ -349,7 +349,7 @@ public class CircularContainmentTests
     /// Test case:
     /// Direct circular dependency: A has B, C as children. B has C as a child. C has A as a child.
     /// Healing:
-    /// Break containment link from A to C.
+    /// Breaks containment link from A to C.
     /// </summary>
     [TestMethod]
     public void direct_circular_containment_multiple_children_heals_case_2()
@@ -452,20 +452,268 @@ public class CircularContainmentTests
         Assert.AreEqual("B", b.GetId());
         Assert.AreSame(a, b.GetParent());
         Assert.IsTrue(b.Children().Any());
-        
+
         INode d = b.Children().First();
         Assert.AreEqual("D", d.GetId());
         Assert.AreSame(b, d.GetParent());
         Assert.IsFalse(d.Children().Any());
     }
 
-    
+    /// <summary>
+    /// Test case:
+    /// Indirect circular dependency: A has B as a child, B has C as a child, C has A as a child.
+    /// Healing:
+    /// Breaks containment link from C to A.
+    /// </summary>
+    [TestMethod]
+    public void indirect_circular_containment_case_1()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["B"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+
+                new SerializedNode
+                {
+                    Id = "B",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["C"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = "A"
+                },
+
+                new SerializedNode
+                {
+                    Id = "C",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["A"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = "B"
+                },
+            ]
+        };
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((node, writableNode) => null);
+        List<IReadableNode> nodes = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(1, nodes.Count);
+
+        INode a = nodes.OfType<INode>().First();
+        Assert.AreEqual("A", a.GetId());
+        Assert.IsNull(a.GetParent());
+        Assert.AreEqual(1, a.Children().Count());
+        Assert.AreEqual(2, a.Descendants().Count());
+
+        INode b = a.Children().First();
+        Assert.AreEqual("B", b.GetId());
+        Assert.AreSame(a, b.GetParent());
+        Assert.IsTrue(b.Children().Any());
+
+        INode c = b.Children().Last();
+        Assert.AreEqual("C", c.GetId());
+        Assert.AreSame(b, c.GetParent());
+        Assert.IsFalse(c.Children().Any());
+    }
+
+    /// <summary>
+    /// Test case:
+    /// Indirect circular dependency: A has B as a child, B has C as a child, C has A as a child.
+    /// Healing:
+    /// Breaks containment link from B to C.
+    /// </summary>
+    [TestMethod]
+    public void indirect_circular_containment_case_2()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["B"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+
+                new SerializedNode
+                {
+                    Id = "B",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["C"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = "A"
+                },
+
+                new SerializedNode
+                {
+                    Id = "C",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-CompositeShape"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-parts"), Children = ["A"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = "B"
+                },
+            ]
+        };
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((containedNode, parent) =>
+        {
+            parent.DetachFromParent();
+            return containedNode;
+        });
+        List<IReadableNode> nodes = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(1, nodes.Count);
+
+        INode c = nodes.OfType<INode>().First();
+        Assert.AreEqual("C", c.GetId());
+        Assert.IsNull(c.GetParent());
+        Assert.AreEqual(1, c.Children().Count());
+        Assert.AreEqual(2, c.Descendants().Count());
+
+        INode a = c.Children().First();
+        Assert.AreEqual("A", a.GetId());
+        Assert.AreSame(c, a.GetParent());
+        Assert.IsTrue(a.Children().Any());
+
+        INode b = a.Children().Last();
+        Assert.AreEqual("B", b.GetId());
+        Assert.AreSame(a, b.GetParent());
+        Assert.IsFalse(b.Children().Any());
+    }
+
     #endregion
 
     #region annotation
 
     [TestMethod]
-    public void circular_annotation()
+    public void self_circular_annotation_heals()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-BillOfMaterials"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-default-group"), Children = []
+                        }
+                    ],
+                    References = [],
+                    Annotations = ["A"],
+                    Parent = null
+                },
+            ]
+        };
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((node, writableNode) => null);
+        List<IReadableNode> nodes = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(1, nodes.Count);
+        INode a = nodes.OfType<INode>().First();
+        Assert.AreEqual("A", a.GetId());
+        Assert.IsNull(a.GetParent());
+        Assert.IsFalse(a.GetAnnotations().Any());
+    }
+
+    /// <summary>
+    /// Test case:
+    /// Direct circular dependency: Annotation A has B as a child and B is annotated by A
+    /// Healing:
+    /// Removes annotation instance from B ( B is no longer annotated by A)
+    /// </summary>
+    [TestMethod]
+    public void direct_circular_annotation_heals()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -526,6 +774,98 @@ public class CircularContainmentTests
         Assert.AreSame(a, b.GetParent());
 
         Assert.IsFalse(b.GetAnnotations().Any());
+    }
+
+    /// <summary>
+    /// Test case:
+    /// Indirect circular dependency: A has B as a child, annotation C annotates B and has A as a child
+    /// Healing:
+    /// Breaks containment link from C to A
+    /// </summary>
+    [TestMethod]
+    public void indirect_circular_annotation_case()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-MaterialGroup"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-default-shape"), Children = ["B"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+
+                new SerializedNode
+                {
+                    Id = "B",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = ["C"],
+                    Parent = "A"
+                },
+
+                new SerializedNode
+                {
+                    Id = "C",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-BillOfMaterials"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment()
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-default-group"), Children = ["A"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = "B"
+                },
+            ]
+        };
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((node, writableNode) => null);
+        List<IReadableNode> nodes = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
+
+        Assert.AreEqual(1, nodes.Count);
+
+        INode a = nodes.OfType<INode>().First();
+        Assert.AreEqual("A", a.GetId());
+        Assert.IsNull(a.GetParent());
+        Assert.AreEqual(1, a.Children().Count());
+        Assert.AreEqual(1, a.Descendants().Count());
+
+        INode b = a.Children().First();
+        Assert.AreEqual("B", b.GetId());
+        Assert.AreSame(a, b.GetParent());
+        Assert.IsFalse(b.Children().Any());
+        Assert.IsTrue(b.GetAnnotations().Any());
+
+        INode c = b.GetAnnotations()[0];
+        Assert.AreEqual("C", c.GetId());
+        Assert.AreSame(b, c.GetParent());
+        Assert.IsFalse(c.Children().Any());
     }
 
     #endregion
