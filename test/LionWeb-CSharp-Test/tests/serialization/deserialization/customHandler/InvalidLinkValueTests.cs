@@ -147,6 +147,58 @@ public class InvalidLinkValueTests
     }
 
     [TestMethod]
+    public void invalid_containment_type_tries_to_heal_to_invalid_value()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-center"),
+                            Children = ["invalid-child"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "invalid-child",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var compositeShape = new CompositeShape("invalid-value");
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((list, feature, arg3) => new List<IReadableNode>() { compositeShape });
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    [TestMethod]
     public void containment_expects_single_child_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
