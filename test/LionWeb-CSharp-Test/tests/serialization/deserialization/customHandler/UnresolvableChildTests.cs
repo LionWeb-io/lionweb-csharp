@@ -32,7 +32,7 @@ public class UnresolvableChildTests
     private class DeserializerHealingHandler(Func<CompressedId, Feature, IWritableNode, IWritableNode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) 
+        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node)
             => heal(childId, containment, node);
     }
 
@@ -118,5 +118,47 @@ public class UnresolvableChildTests
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
         Assert.AreSame(circle, deserializedNodes.OfType<Geometry>().First().Shapes[0]);
+    }
+
+    [TestMethod]
+    public void unresolvable_child_tries_to_heal_to_invalid_child()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"),
+                            Children = ["unresolvable-child"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var coord = new Coord("invalid-child");
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, feature, arg3) => coord);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
     }
 }
