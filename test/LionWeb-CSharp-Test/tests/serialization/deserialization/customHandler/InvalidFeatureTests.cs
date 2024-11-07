@@ -83,6 +83,66 @@ public class InvalidFeatureTests
     }
 
     /// <summary>
+    /// Tries to heal to a feature which is not part of the classifier
+    /// </summary>
+    [TestMethod]
+    public void invalid_feature_tries_to_heal_to_invalid_feature()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-r"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget
+                                {
+                                    Reference = "center", ResolveInfo = "center-resolve-info"
+                                }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "center",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((pointer, classifier, arg3) => ShapesLanguage.Instance.CompositeShape_parts);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    /// <summary>
     /// Heals from using a <see cref="Property"/> feature type in <see cref="Reference"/> type
     /// Heals to a <see cref="Containment"/> feature
     /// </summary>
@@ -197,7 +257,8 @@ public class InvalidFeatureTests
         };
 
         var deserializerHealingHandler =
-            new DeserializerHealingHandler((pointer, classifier, arg3) => ShapesLanguage.Instance.OffsetDuplicate_source);
+            new DeserializerHealingHandler(
+                (pointer, classifier, arg3) => ShapesLanguage.Instance.OffsetDuplicate_source);
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
@@ -206,7 +267,8 @@ public class InvalidFeatureTests
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
         Assert.AreEqual(1,
-            deserializedNodes.OfType<OffsetDuplicate>().FirstOrDefault()?.CollectAllSetFeatures().OfType<Reference>().Count());
+            deserializedNodes.OfType<OffsetDuplicate>().FirstOrDefault()?.CollectAllSetFeatures().OfType<Reference>()
+                .Count());
         Assert.AreEqual(2, deserializedNodes.Count);
     }
 }
