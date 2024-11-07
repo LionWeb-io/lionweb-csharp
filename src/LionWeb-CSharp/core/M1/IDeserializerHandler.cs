@@ -38,7 +38,7 @@ public interface IDeserializerHandler
     /// <param name="node">Currently deserialized node with id <paramref name="nodeId"/>.</param>
     /// <returns>Replacement node id to use for <paramref name="node"/>, or <c>null</c> to skip <paramref name="node"/>.</returns>
     /// <remarks>For both <paramref name="existingNode"/> and <paramref name="node"/>, only node id and properties are populated -- no other features.</remarks>
-    /// <remarks>if returned replacement node id is not unique, deserializer keeps looking for an unique node id, this may lead to an infinite loop </remarks>
+    /// <remarks>if returned replacement node id is not unique, deserializer keeps calling this method, might lead to an infinite loop </remarks>
     string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node);
 
     #region features

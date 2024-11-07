@@ -86,7 +86,7 @@ public class CircularContainmentTests
     /// Test case:
     /// Direct circular dependency: A has B as child, B has A as child
     /// Healing:
-    /// Breaks containment link from B to A. As a result, B does not have A as a child  
+    /// Breaks containment link from B to A. As a result, B does not have A as a child, thus no circular dependency anymore.  
     /// </summary>
     /// <remarks>Instead of breaking containment link from B to A, a reference link can be created from B to A</remarks>
     [TestMethod]
@@ -159,7 +159,10 @@ public class CircularContainmentTests
     /// Test case:
     /// Direct circular dependency: A has B as child, B has A as child 
     /// Healing:
-    /// Breaks containment link from A to B. As a result, A does not have B as a child and B has A as a child  
+    /// This case heals by breaking containment link from A to B, not from B to A, which is in the case of <see cref="direct_circular_containment_heals_case_1"/>, 
+    /// As a result, A does not have B as a child and B has A as a child.
+    /// Node B becomes the root of the tree, in the case of <see cref="direct_circular_containment_heals_case_1"/>
+    /// after healing, node A is the root of the tree 
     /// </summary>
     /// <remarks>Instead of breaking containment link from A to B, a reference link can be created from A to B</remarks>
     [TestMethod]
@@ -234,7 +237,7 @@ public class CircularContainmentTests
 
     /// <summary>
     /// Test case:
-    /// Direct circular dependency: A has B, C as children. B has C as a child. C has A as a child.
+    /// Direct circular dependency: A has B, C as children. B has D as a child. C has A as a child.
     /// Healing:
     /// Breaks containment link from C to A.
     /// </summary>
@@ -347,9 +350,11 @@ public class CircularContainmentTests
 
     /// <summary>
     /// Test case:
-    /// Direct circular dependency: A has B, C as children. B has C as a child. C has A as a child.
+    /// Direct circular dependency: A has B, C as children. B has D as a child. C has A as a child.
     /// Healing:
-    /// Breaks containment link from A to C.
+    /// This case heals by breaking the containment link from A to C, not from C to A, which is in the case of
+    /// <see cref="direct_circular_containment_multiple_children_heals_case_1"/>
+    /// As a result, C becomes the new root of the tree.
     /// </summary>
     [TestMethod]
     public void direct_circular_containment_multiple_children_heals_case_2()
@@ -560,7 +565,9 @@ public class CircularContainmentTests
     /// Test case:
     /// Indirect circular dependency: A has B as a child, B has C as a child, C has A as a child.
     /// Healing:
-    /// Breaks containment link from B to C.
+    /// This case heals by breaking containment link from B to C, not from C to A, which is in the case of
+    /// <see cref="indirect_circular_containment_case_1"/>
+    /// As a result C becomes the new root of the tree.
     /// </summary>
     [TestMethod]
     public void indirect_circular_containment_case_2()
@@ -687,7 +694,7 @@ public class CircularContainmentTests
                     ],
                     References = [],
                     Annotations = ["A"],
-                    Parent = null
+                    Parent = "A"
                 },
             ]
         };
@@ -783,7 +790,7 @@ public class CircularContainmentTests
     /// Breaks containment link from C to A
     /// </summary>
     [TestMethod]
-    public void indirect_circular_annotation_case()
+    public void indirect_circular_annotation_heals()
     {
         var serializationChunk = new SerializationChunk
         {
