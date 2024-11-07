@@ -94,12 +94,8 @@ public class UnresolvableAnnotationTests
             ]
         };
 
-        var documentation = new Documentation("new-annotation")
-        {
-            Technical = true,
-            Text = "this is a doc"
-        };
-        
+        var documentation = new Documentation("new-annotation") { Technical = true, Text = "this is a doc" };
+
         var deserializerHealingHandler = new DeserializerHealingHandler((id, node) => documentation);
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
@@ -111,5 +107,39 @@ public class UnresolvableAnnotationTests
         INode? annotation = deserializedNodes.OfType<Circle>().FirstOrDefault()?.GetAnnotations()[0];
         Assert.AreSame(documentation, annotation);
         Assert.AreSame(documentation.GetId(), annotation?.GetId());
+    }
+
+    [TestMethod]
+    public void unresolvable_annotation_tries_to_heal_to_invalid_annotation()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = ["unresolvable-annotation"],
+                }
+            ]
+        };
+
+        var documentation = new Documentation("invalid-annotation") { Technical = true, Text = "this is a doc" };
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, node) => documentation);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<DeserializerException>(() => deserializer.Deserialize(serializationChunk));
     }
 }

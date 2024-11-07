@@ -127,7 +127,6 @@ public class InvalidAnnotationTests
         Assert.AreEqual(billOfMaterials, deserializedNodes.OfType<Circle>().FirstOrDefault()?.GetAnnotations()[0]);
     }
 
-
     [TestMethod]
     public void invalid_annotation_tries_to_heal_with_invalid_annotation()
     {
@@ -161,16 +160,15 @@ public class InvalidAnnotationTests
                 }
             ]
         };
-        
+
         var line = new Line("l");
         var deserializerHealingHandler = new DeserializerHealingHandler((node, writableNode) => line);
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
-        
+
         Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
-        
     }
 
     /// <summary>
