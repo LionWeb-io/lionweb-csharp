@@ -37,7 +37,7 @@ public class DuplicateContainmentTests
     }
 
     [TestMethod]
-    public void duplicate_containment_keeps_existing_parent()
+    public void duplicate_containment_keeps_current_parent()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -199,7 +199,7 @@ public class DuplicateContainmentTests
     }
     
     [TestMethod]
-    public void duplicate_annotation_keeps_existing_parent()
+    public void duplicate_annotation_keeps_current_parent()
     {
         var serializationChunk = new SerializationChunk
         {
