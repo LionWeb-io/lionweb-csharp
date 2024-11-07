@@ -120,4 +120,44 @@ public class InvalidPropertyValueTests
         Assert.IsTrue(deserializedNodes.OfType<Coord>().FirstOrDefault()?.CollectAllSetFeatures().OfType<Property>()
             .Contains(ShapesLanguage.Instance.Coord_x));
     }
+    
+    [TestMethod]
+    public void invalid_property_value_tries_to_heal_to_invalid_value()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer("key-Shapes", "1", "key-x"), Value = "expects an integer"
+                        }
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((s, feature, arg3) => 42.5);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+    }
 }
