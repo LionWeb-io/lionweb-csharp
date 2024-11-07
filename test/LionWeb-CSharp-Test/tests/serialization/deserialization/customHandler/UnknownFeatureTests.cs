@@ -140,6 +140,54 @@ public class UnknownFeatureTests
     }
 
     [TestMethod]
+    public void unknown_containment_tries_to_heal_to_invalid_feature()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages = [new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-unknown-containment"),
+                            Children = ["child"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "child",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+            ]
+        };
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((pointer, classifier, arg3) => ShapesLanguage.Instance.Circle_r);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<UnknownFeatureException>(() => deserializer.Deserialize(serializationChunk));
+    }
+
+    [TestMethod]
     public void unknown_property_does_not_heal()
     {
         var serializationChunk = new SerializationChunk
@@ -223,7 +271,7 @@ public class UnknownFeatureTests
         Assert.AreEqual(1, deserializedNodes.OfType<Coord>().FirstOrDefault()?.CollectAllSetFeatures()
             .OfType<Property>().Count());
     }
-    
+
     [TestMethod]
     public void unknown_reference_does_not_heal()
     {
