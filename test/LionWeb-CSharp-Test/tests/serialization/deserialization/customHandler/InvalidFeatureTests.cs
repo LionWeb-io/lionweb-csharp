@@ -36,6 +36,10 @@ public class InvalidFeatureTests
             IWritableNode node) => heal(feature, classifier, node);
     }
 
+    /// <summary>
+    /// Invalid feature: using existing feature in a wrong feature type: r is a property feature type,
+    /// but used in reference feature type 
+    /// </summary>
     [TestMethod]
     public void invalid_feature_does_not_heal()
     {
