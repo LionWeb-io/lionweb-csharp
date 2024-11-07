@@ -84,7 +84,6 @@ public class UnresolvableReferenceTargetTests
         Assert.AreEqual(1, deserializedNodes.Count);
     }
 
-
     [TestMethod]
     public void unresolvable_reference_target_heals()
     {
@@ -132,9 +131,110 @@ public class UnresolvableReferenceTargetTests
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
         Assert.AreEqual(1, deserializedNodes.Count);
-        
-        var source = deserializedNodes.OfType<OffsetDuplicate>().FirstOrDefault()?.Source;
+
+        Shape? source = deserializedNodes.OfType<OffsetDuplicate>().FirstOrDefault()?.Source;
         Assert.AreSame(circle, source);
         Assert.AreSame(circle.GetId(), source?.GetId());
+    }
+
+    [TestMethod]
+    public void unresolvable_reference_target_heals_based_on_resolveInfo()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget
+                                {
+                                    Reference = "unresolvable-reference-target", ResolveInfo = "circle"
+                                }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var deserializerHealingHandler = new DeserializerHealingHandler((targetId, resolveInfo, reference, node) =>
+            resolveInfo == "circle" ? new Circle("new-ref-target") : null);
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(1, deserializedNodes.Count);
+
+        Shape? source = deserializedNodes.OfType<OffsetDuplicate>().FirstOrDefault()?.Source;
+        Assert.IsTrue(source?.GetId() == "new-ref-target");
+        Assert.AreSame(source.GetClassifier(), ShapesLanguage.Instance.Circle);
+    }
+
+    [TestMethod]
+    public void unresolvable_reference_target_tries_to_heal_to_invalid_target()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget
+                                {
+                                    Reference = "unresolvable-reference-target",
+                                    ResolveInfo = "unresolvable-reference-target-resolve-info"
+                                }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var coord = new Coord("invalid-target");
+        var deserializerHealingHandler = new DeserializerHealingHandler((id, s, arg3, arg4) => coord);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
     }
 }
