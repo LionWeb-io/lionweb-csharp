@@ -23,7 +23,7 @@ using LionWeb.Core.M1;
 using LionWeb.Core.Serialization;
 
 /// <summary>
-/// <see cref="IDeserializerHandler.InvalidAnnotation"/>
+/// Tests for <see cref="IDeserializerHandler.InvalidAnnotation"/>
 /// </summary>
 [TestClass]
 public class InvalidAnnotationTests
@@ -125,5 +125,103 @@ public class InvalidAnnotationTests
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
         Assert.AreEqual(2, deserializedNodes.Count);
         Assert.AreEqual(billOfMaterials, deserializedNodes.OfType<Circle>().FirstOrDefault()?.GetAnnotations()[0]);
+    }
+
+
+    [TestMethod]
+    public void invalid_annotation_tries_to_heal_with_invalid_annotation()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = ["annotation"],
+                },
+
+                new SerializedNode
+                {
+                    Id = "annotation",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+        
+        var line = new Line("l");
+        var deserializerHealingHandler = new DeserializerHealingHandler((node, writableNode) => line);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+        
+        Assert.ThrowsException<InvalidValueException>(() => deserializer.Deserialize(serializationChunk));
+        
+    }
+
+    /// <summary>
+    /// Uses lenient node, accepts invalid annotation node returned by healing handler
+    /// </summary>
+    [TestMethod]
+    public void invalid_annotation_heals_with_invalid_annotation_lenient_node()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = ["annotation"],
+                },
+
+                new SerializedNode
+                {
+                    Id = "annotation",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                }
+            ]
+        };
+
+        var line = new Line("l");
+        var deserializerHealingHandler = new DeserializerHealingHandler((node, writableNode) => line);
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .WithCustomFactory(ShapesLanguage.Instance,
+                new SerializationLenientTests.LenientFactory(ShapesLanguage.Instance))
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(2, deserializedNodes.Count);
+        Assert.AreEqual(1, deserializedNodes.Find(node => node.GetId() == "foo")?.GetAnnotations().Count);
+        Assert.AreSame(line, deserializedNodes.Find(node => node.GetId() == "foo")?.GetAnnotations()[0]);
     }
 }
