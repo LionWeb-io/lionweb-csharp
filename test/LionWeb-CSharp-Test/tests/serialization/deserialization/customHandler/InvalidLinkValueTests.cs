@@ -721,11 +721,102 @@ public class InvalidLinkValueTests
     }
 
     /// <summary>
+    /// Test case: the last target in reference target list is not a valid target
+    /// Heals by manually selecting valid reference targets
+    /// </summary>
+    [TestMethod]
+    public void reference_multiple_targets_heals()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-tinyRefLang", Version = "0" },
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "foo",
+                    Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
+                    Properties = [],
+                    Containments = [],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept-multivaluedRef"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "ref_1", ResolveInfo = "ref_1" },
+                                new SerializedReferenceTarget { Reference = "ref_2", ResolveInfo = "ref_2" },
+                                new SerializedReferenceTarget { Reference = "ref_3", ResolveInfo = "ref_3" },
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "ref_1",
+                    Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "ref_2",
+                    Classifier = new MetaPointer("key-tinyRefLang", "0", "key-MyConcept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "ref_3",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                },
+            ]
+        };
+
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((list, feature, arg3) => new List<IReadableNode>() { list[0], list[1] });
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(TinyRefLangLanguage.Instance)
+            .WithLanguage(ShapesLanguage.Instance)
+            .WithUncompressedIds(true)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+
+        Assert.AreEqual(4, deserializedNodes.Count);
+        MyConcept myConcept = deserializedNodes.OfType<MyConcept>().First();
+        Assert.IsTrue(myConcept.CollectAllSetFeatures()
+            .Contains(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef));
+        Assert.AreEqual(2, myConcept.MultivaluedRef.Count);
+    }
+
+    /// <summary>
     /// Test case: the last child in children list is not a valid child
     /// Heals by manually selecting valid children
     /// </summary>
     [TestMethod]
-    public void containment_with_multiple_children_case_1()
+    public void containment_with_multiple_children_heals_case_1()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -789,7 +880,7 @@ public class InvalidLinkValueTests
         };
 
         var deserializerHealingHandler =
-            new DeserializerHealingHandler((value, link, node) 
+            new DeserializerHealingHandler((value, link, node)
                 => new List<IReadableNode>() { value[0], value[1] });
 
         IDeserializer deserializer = new DeserializerBuilder()
@@ -801,13 +892,13 @@ public class InvalidLinkValueTests
         Assert.AreEqual(2, deserializedNodes.Count);
         Assert.AreEqual(2, deserializedNodes.OfType<Geometry>().FirstOrDefault()?.Children().Count());
     }
-    
+
     /// <summary>
     /// Test case: the first child in children list is not a valid child
     /// Heals by selecting children which matches the certain classifiers 
     /// </summary>
     [TestMethod]
-    public void containment_with_multiple_children_case_2()
+    public void containment_with_multiple_children_heals_case_2()
     {
         var serializationChunk = new SerializationChunk
         {
@@ -873,8 +964,8 @@ public class InvalidLinkValueTests
         var deserializerHealingHandler =
             new DeserializerHealingHandler((value, link, node) =>
             {
-                var validNodes = new List<IReadableNode>(){};
-                var concepts = new List<Concept>(){ShapesLanguage.Instance.Circle, ShapesLanguage.Instance.Line};
+                var validNodes = new List<IReadableNode>() { };
+                var concepts = new List<Concept>() { ShapesLanguage.Instance.Circle, ShapesLanguage.Instance.Line };
                 validNodes.AddRange(value.Where(n => concepts.Contains(n.GetClassifier())));
                 return validNodes;
             });
@@ -888,5 +979,4 @@ public class InvalidLinkValueTests
         Assert.AreEqual(2, deserializedNodes.Count);
         Assert.AreEqual(2, deserializedNodes.OfType<Geometry>().FirstOrDefault()?.Children().Count());
     }
-    
 }
