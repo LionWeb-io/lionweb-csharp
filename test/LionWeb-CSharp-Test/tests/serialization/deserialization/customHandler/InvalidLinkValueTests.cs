@@ -719,4 +719,174 @@ public class InvalidLinkValueTests
         MyConcept myConcept = deserializedNodes.OfType<MyConcept>().First();
         Assert.IsTrue(myConcept.CollectAllSetFeatures().Contains(TinyRefLangLanguage.Instance.MyConcept_singularRef));
     }
+
+    /// <summary>
+    /// Test case: the last child in children list is not a valid child
+    /// Heals by manually selecting valid children
+    /// </summary>
+    [TestMethod]
+    public void containment_with_multiple_children_case_1()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "geo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"),
+                            Children = ["child-circle", "child-line", "child-invalid"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "child-circle",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "geo"
+                },
+
+                new SerializedNode
+                {
+                    Id = "child-line",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "geo"
+                },
+
+                new SerializedNode
+                {
+                    Id = "child-invalid",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "geo"
+                },
+            ]
+        };
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((value, link, node) 
+                => new List<IReadableNode>() { value[0], value[1] });
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(2, deserializedNodes.Count);
+        Assert.AreEqual(2, deserializedNodes.OfType<Geometry>().FirstOrDefault()?.Children().Count());
+    }
+    
+    /// <summary>
+    /// Test case: the first child in children list is not a valid child
+    /// Heals by selecting children which matches the certain classifiers 
+    /// </summary>
+    [TestMethod]
+    public void containment_with_multiple_children_case_2()
+    {
+        var serializationChunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "geo",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
+                    Properties = [],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"),
+                            Children = ["child-invalid", "child-circle", "child-line"]
+                        }
+                    ],
+                    References = [],
+                    Annotations = [],
+                },
+
+                new SerializedNode
+                {
+                    Id = "child-circle",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "geo"
+                },
+
+                new SerializedNode
+                {
+                    Id = "child-line",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Line"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "geo"
+                },
+
+                new SerializedNode
+                {
+                    Id = "child-invalid",
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "geo"
+                },
+            ]
+        };
+
+        var deserializerHealingHandler =
+            new DeserializerHealingHandler((value, link, node) =>
+            {
+                var validNodes = new List<IReadableNode>(){};
+                var concepts = new List<Concept>(){ShapesLanguage.Instance.Circle, ShapesLanguage.Instance.Line};
+                validNodes.AddRange(value.Where(n => concepts.Contains(n.GetClassifier())));
+                return validNodes;
+            });
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithHandler(deserializerHealingHandler)
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
+        Assert.AreEqual(2, deserializedNodes.Count);
+        Assert.AreEqual(2, deserializedNodes.OfType<Geometry>().FirstOrDefault()?.Children().Count());
+    }
+    
 }
