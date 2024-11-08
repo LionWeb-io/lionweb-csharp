@@ -36,9 +36,7 @@ public class SkipDeserializingDependentNodeTests
 
 
     [TestMethod]
-    [Ignore(
-        message:
-        "do we need to implement SkipDeserializingDependentNode for other nodes such as containment and annotations")]
+    [Ignore(message: " are we going to look for containment and annotations in dependent nodes ? ")]
     public void skip_deserializing_dependent_containment_node()
     {
         var serializationChunk = new SerializationChunk
@@ -50,7 +48,7 @@ public class SkipDeserializingDependentNodeTests
             ],
             Nodes =
             [
-                new SerializedNode()
+                new SerializedNode
                 {
                     Id = "bar",
                     Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
@@ -59,37 +57,43 @@ public class SkipDeserializingDependentNodeTests
                     [
                         new SerializedContainment
                         {
-                            Containment = new MetaPointer("key-Shapes", "1", "key-docs"), Children = ["repeated-id"]
+                            Containment = new MetaPointer("key-Shapes", "1", "key-offset"),
+                            Children = ["repeated-id"]
                         }
                     ],
                     References = [],
                     Annotations = [],
                     Parent = null
                 },
+
                 new SerializedNode
                 {
                     Id = "repeated-id",
-                    Classifier = new MetaPointer("key-Shapes", "1", "key-Documentation"),
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
                     Properties = [],
                     Containments = [],
                     References = [],
                     Annotations = [],
+                    Parent = "bar"
                 },
             ]
         };
 
-        Documentation documentation = ShapesLanguage.Instance.GetFactory().NewDocumentation("repeated-id");
+        Coord coord = ShapesLanguage.Instance.GetFactory().NewCoord("repeated-id");
 
         var deserializerHealingHandler = new DeserializerHealingHandler(id => true);
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
+            .WithUncompressedIds(true)
             .Build();
 
-        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk, [documentation]);
+        List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk, [coord]);
 
-        OffsetDuplicate deserializedOffsetDuplicate = deserializedNodes.OfType<OffsetDuplicate>().First();
-        Assert.AreSame(documentation, deserializedOffsetDuplicate.Docs);
+        Assert.AreEqual(1, deserializedNodes.Count);
+        OffsetDuplicate deserializedOffsetDuplicate =
+            deserializedNodes.OfType<OffsetDuplicate>().First(n => n.GetId() == "bar");
+        Assert.AreSame(coord, deserializedOffsetDuplicate.Offset);
     }
 
     [TestMethod]
@@ -135,6 +139,7 @@ public class SkipDeserializingDependentNodeTests
                 },
             ]
         };
+
         MyConcept myConcept = TinyRefLangLanguage.Instance.GetFactory().NewMyConcept("repeated-id");
 
         var deserializerHealingHandler = new DeserializerHealingHandler(id => true);
@@ -145,6 +150,7 @@ public class SkipDeserializingDependentNodeTests
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk, [myConcept]);
 
+        Assert.AreEqual(1, deserializedNodes.Count);
         MyConcept deserializedMyConcept = deserializedNodes.OfType<MyConcept>().First(n => n.GetId() == "foo");
         Assert.AreSame(myConcept, deserializedMyConcept.SingularRef);
     }
