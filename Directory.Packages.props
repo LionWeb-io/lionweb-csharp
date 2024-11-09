@@ -17,6 +17,6 @@ SPDX-License-Identifier: Apache-2.0
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
-    <PackageVersion Include="Utf8JsonAsyncStreamReader" Version="1.0.0" />
+    <PackageVersion Include="Utf8JsonAsyncStreamReader" Version="1.1.0" />
   </ItemGroup>
 </Project>
