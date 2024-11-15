@@ -128,6 +128,7 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             ReadOnlyProperty(AsProperty(entity).ToString(), AsType(type),
                 MemberAccess(IdentifierName(LanguageFieldName(entity)), IdentifierName("Value"))
             )
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(entity)]))
         ];
 
         switch (entity)
@@ -163,6 +164,7 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             ReadOnlyProperty(_names.AsProperty(feature).Identifier.Text, AsType(type),
                 MemberAccess(IdentifierName(LanguageFieldName(feature)), IdentifierName("Value"))
             )
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
         ];
     }
 

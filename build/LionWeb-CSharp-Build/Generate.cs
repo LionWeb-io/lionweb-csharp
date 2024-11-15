@@ -16,6 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 using Examples.Shapes.Dynamic;
+using Io.Lionweb.Mps.Specific;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
@@ -42,6 +43,8 @@ var libraryLanguage = DeserializeExternalLanguage("library").First();
 var multiLanguage = DeserializeExternalLanguage("multi", libraryLanguage).First();
 var withEnumLanguage = DeserializeExternalLanguage("with-enum").First();
 withEnumLanguage.Name = "WithEnum";
+var deprecatedLang = DeserializeExternalLanguage("deprecated", SpecificLanguage.Instance).First();
+deprecatedLang.Name = "Deprecated";
 var shapesLanguage = ShapesDefinition.Language;
 shapesLanguage.Name = "Shapes";
 var testLanguagesDefinitions = new TestLanguagesDefinitions();
@@ -69,6 +72,7 @@ List<Names> names =
         NamespaceMappings = { [aLang] = "Examples.Circular.A" }
     },
     new (tinyRefLang, "Examples.TinyRefLang"),
+    new (deprecatedLang, "Examples.DeprecatedLang"),
 ];
 
 

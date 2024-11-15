@@ -20,6 +20,7 @@ namespace LionWeb.CSharp.Generator.Impl;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using Io.Lionweb.Mps.Specific;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -101,5 +102,29 @@ public abstract class GeneratorBase
                 ("Key", keyed.Key.AsLiteral())
             ]
         );
+    }
+
+    /// <returns><c>[Obsolete(Message = "comment")]</c></returns>
+    protected AttributeSyntax? ObsoleteAttribute(IKeyed keyed)
+    {
+        var deprecatedAnnotation = keyed
+            .GetAnnotations()
+            .FirstOrDefault(a => a
+                .GetClassifier()
+                .EqualsIdentity(SpecificLanguage.Instance.Deprecated)
+            );
+        if (deprecatedAnnotation == null)
+            return null;
+
+        var result = Attribute(IdentifierName("Obsolete"));
+
+        var comment = deprecatedAnnotation.Get(SpecificLanguage.Instance.Deprecated_comment);
+        if (comment is not string s)
+            return result;
+
+        return result
+            .WithArgumentList(AttributeArgumentList(SingletonSeparatedList(
+                AttributeArgument(s.AsLiteral())
+            )));
     }
 }

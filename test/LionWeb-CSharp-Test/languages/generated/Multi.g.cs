@@ -81,8 +81,49 @@ public class MultiFactory : AbstractBaseNodeFactory, IMultiFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "Container")]
-public class Container : NodeBase
+public partial class Container : NodeBase
 {
+	private readonly List<Examples.Library.M2.Library> _libraries = [];
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Libraries is empty</exception>
+        [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "libraries")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public IReadOnlyList<Examples.Library.M2.Library> Libraries { get => AsNonEmptyReadOnly(_libraries, MultiLanguage.Instance.Container_libraries); init => AddLibraries(value); }
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
+        public Container AddLibraries(IEnumerable<Examples.Library.M2.Library> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
+		_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
+    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Libraries.Count</exception>
+        public Container InsertLibraries(int index, IEnumerable<Examples.Library.M2.Library> nodes)
+	{
+		AssureInRange(index, _libraries);
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
+		AssureNoSelfMove(index, safeNodes, _libraries);
+		_libraries.InsertRange(index, SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If Libraries would be empty</exception>
+        public Container RemoveLibraries(IEnumerable<Examples.Library.M2.Library> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, MultiLanguage.Instance.Container_libraries);
+		AssureNotClearing(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
+		RemoveSelfParent(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
+		return this;
+	}
+
 	public Container(string id) : base(id)
 	{
 	}
@@ -153,46 +194,5 @@ public class Container : NodeBase
 		if (child is Examples.Library.M2.Library child0 && _libraries.Contains(child0))
 			return MultiLanguage.Instance.Container_libraries;
 		return null;
-	}
-
-	private readonly List<Examples.Library.M2.Library> _libraries = [];
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Libraries is empty</exception>
-        [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "libraries")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public IReadOnlyList<Examples.Library.M2.Library> Libraries { get => AsNonEmptyReadOnly(_libraries, MultiLanguage.Instance.Container_libraries); init => AddLibraries(value); }
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
-        public Container AddLibraries(IEnumerable<Examples.Library.M2.Library> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
-    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Libraries.Count</exception>
-        public Container InsertLibraries(int index, IEnumerable<Examples.Library.M2.Library> nodes)
-	{
-		AssureInRange(index, _libraries);
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		AssureNoSelfMove(index, safeNodes, _libraries);
-		_libraries.InsertRange(index, SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If Libraries would be empty</exception>
-        public Container RemoveLibraries(IEnumerable<Examples.Library.M2.Library> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, MultiLanguage.Instance.Container_libraries);
-		AssureNotClearing(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		RemoveSelfParent(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		return this;
 	}
 }

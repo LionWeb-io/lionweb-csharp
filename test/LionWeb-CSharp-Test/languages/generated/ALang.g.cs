@@ -99,8 +99,21 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 /// crip
 ///    tion</summary>
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
-public class AConcept : NodeBase
+public partial class AConcept : NodeBase
 {
+	private Examples.Circular.B.BConcept? _bRef = null;
+	/// <remarks>Optional Single Reference</remarks>
+        [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-BRef")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	public Examples.Circular.B.BConcept? BRef { get => _bRef; set => SetBRef(value); }
+
+	/// <remarks>Optional Single Reference</remarks>
+        public AConcept SetBRef(Examples.Circular.B.BConcept? value)
+	{
+		_bRef = value;
+		return this;
+	}
+
 	public AConcept(string id) : base(id)
 	{
 	}
@@ -147,19 +160,6 @@ public class AConcept : NodeBase
 		if (_bRef != default)
 			result.Add(ALangLanguage.Instance.AConcept_BRef);
 		return result;
-	}
-
-	private Examples.Circular.B.BConcept? _bRef = null;
-	/// <remarks>Optional Single Reference</remarks>
-        [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-BRef")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public Examples.Circular.B.BConcept? BRef { get => _bRef; set => SetBRef(value); }
-
-	/// <remarks>Optional Single Reference</remarks>
-        public AConcept SetBRef(Examples.Circular.B.BConcept? value)
-	{
-		_bRef = value;
-		return this;
 	}
 }
 

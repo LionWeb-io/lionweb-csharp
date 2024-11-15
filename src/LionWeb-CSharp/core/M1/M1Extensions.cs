@@ -180,6 +180,12 @@ public static class M1Extensions
         bool includeAnnotations = false) =>
         new ResettingEnumerable(self, includeSelf, includeAnnotations);
 
+    /// <summary>
+    /// Resets the <c>visited</c> HashSet on each enumeration. 
+    /// Without that, double enumeration leads to false positive <see cref="TreeShapeException"/>s. 
+    /// </summary>
+    /// <seealso cref="LionWeb.Core.M1.Test.CircularContainmentTests.NonCircularMultipleEnumerationDescendants()">Test Case</seealso>
+    /// <inheritdoc cref="M1Extensions.Descendants"/>
     private class ResettingEnumerable(INode self, bool includeSelf, bool includeAnnotations) : IEnumerable<INode>
     {
         IEnumerator IEnumerable.GetEnumerator() =>

@@ -32,7 +32,11 @@ public class EnumGenerator(Enumeration enumeration, INames names) : GeneratorBas
     /// <inheritdoc cref="EnumGenerator"/>
     public EnumDeclarationSyntax EnumType() =>
         EnumDeclaration(enumeration.Name)
-            .WithAttributeLists(AsAttributes([MetaPointerAttribute(enumeration)]))
+            .WithAttributeLists(AsAttributes(
+                [
+                    MetaPointerAttribute(enumeration),
+                    ObsoleteAttribute(enumeration)
+                ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithMembers(SeparatedList(enumeration.Literals.Select(Literal)));
 
