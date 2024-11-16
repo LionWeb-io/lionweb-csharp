@@ -29,6 +29,14 @@ using CompressedReference = (CompressedMetaPointer, List<(CompressedId?, string?
 /// </summary>
 public partial class Deserializer : DeserializerBase<IWritableNode>
 {
+    /// Some design principles of this class:
+    /// 
+    /// * Don't throw any exception directly. Rather, delegate to <see cref="IDeserializerHandler"/>.
+    ///   Rationale: This way, a handler can decide to ignore the bad situation and continue deserializing the rest of the input chunk.
+    /// 
+    /// * Don't make any assumptions on feature validity. Rather, call <see cref="IWritableNode.Set"/>, let it decide, and react on exceptions.
+    ///   Rationale: Different implementations might accept different levels of "broken" nodes. 
+    
     private readonly Dictionary<CompressedId, List<CompressedContainment>> _containmentsByOwnerId = new();
     private readonly Dictionary<CompressedId, List<CompressedReference>> _referencesByOwnerId = new();
     private readonly Dictionary<CompressedId, List<CompressedId>> _annotationsByOwnerId = new();
