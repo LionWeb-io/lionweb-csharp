@@ -191,6 +191,19 @@ public interface Enumeration : Datatype
 /// </summary>
 public interface EnumerationLiteral : IKeyed;
 
+public interface StructuredDataType : Datatype
+{
+    public IReadOnlyList<Field> Fields { get; }
+}
+
+public interface Field : IKeyed
+{
+    /// <summary>
+    /// LionWeb type of this field.
+    /// </summary>
+    public Datatype Type { get; }
+}
+
 /// <summary>
 /// A Language will provide the Concepts necessary to describe ideas
 /// in a particular domain together with supporting elements necessary for the definition of those Concepts.

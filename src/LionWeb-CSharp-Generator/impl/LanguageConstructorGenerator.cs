@@ -48,6 +48,7 @@ public class LanguageConstructorGenerator(INames names) : LanguageGeneratorBase(
             Interface i => EntityConstructorInitialization(i),
             Enumeration e => EntityConstructorInitialization(e),
             PrimitiveType p => EntityConstructorInitialization(p),
+            StructuredDataType s => EntityConstructorInitialization(s),
             _ => throw new ArgumentException($"unsupported entity: {entity}", nameof(entity))
         };
 
@@ -70,9 +71,14 @@ public class LanguageConstructorGenerator(INames names) : LanguageGeneratorBase(
             case Enumeration enumeration:
                 result.AddRange(enumeration.Literals.Select(LiteralConstructorInitialization));
                 break;
-            default:
+            case StructuredDataType structuredDataType:
+                result.AddRange(structuredDataType.Fields.Select(FieldConstructorInitialization));
+                break;
+            case PrimitiveType:
                 // fall-through
                 break;
+            default:
+                throw new ArgumentException($"unsupported entity: {entity}", nameof(entity));
         }
 
         return result;
@@ -123,6 +129,15 @@ public class LanguageConstructorGenerator(INames names) : LanguageGeneratorBase(
     private (List<(string, ExpressionSyntax)>, TypeSyntax) EntityConstructorInitialization(PrimitiveType primitive) =>
         (KeyName(primitive), AsType(typeof(PrimitiveTypeBase<>), generics: LanguageType));
 
+    private (List<(string, ExpressionSyntax)>, TypeSyntax) EntityConstructorInitialization(
+        StructuredDataType structuredDataType)
+    {
+        var result = KeyName(structuredDataType);
+        result.Add(("FieldsLazy", NewLazy(Collection(structuredDataType.Fields.Select(AsProperty)))));
+
+        return (result, AsType(typeof(StructuredDataTypeBase<>), generics: LanguageType));
+    }
+
     private IEnumerable<(string, ExpressionSyntax)> Extends(Classifier? extends)
     {
         if (extends == null)
@@ -145,7 +160,10 @@ public class LanguageConstructorGenerator(INames names) : LanguageGeneratorBase(
         if (!classifier.Features.Any())
             return [];
 
-        return [("FeaturesLazy", NewLazy(Collection(classifier.Features.Select(feature => _names.AsProperty(feature)))))];
+        return
+        [
+            ("FeaturesLazy", NewLazy(Collection(classifier.Features.Select(feature => _names.AsProperty(feature)))))
+        ];
     }
 
     #endregion
@@ -197,6 +215,21 @@ public class LanguageConstructorGenerator(INames names) : LanguageGeneratorBase(
             NewCall(
                 [literal.GetId().AsLiteral(), AsProperty(literal.GetEnumeration()), ThisExpression()],
                 AsType(typeof(EnumerationLiteralBase<>), generics: LanguageType),
+                properties.ToArray()
+            )
+        ));
+    }
+
+    private StatementSyntax FieldConstructorInitialization(Field field)
+    {
+        var properties = KeyName(field);
+
+        properties.Add(("Type", AsProperty(field.Type)));
+
+        return Assignment(LanguageFieldName(field), NewLazy(
+            NewCall(
+                [field.GetId().AsLiteral(), AsProperty(field.GetStructuredDataType()), ThisExpression()],
+                AsType(typeof(FieldBase<>), generics: LanguageType),
                 properties.ToArray()
             )
         ));

@@ -18,6 +18,7 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using Io.Lionweb.Mps.Specific;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 
 public class TestLanguagesDefinitions
@@ -25,6 +26,7 @@ public class TestLanguagesDefinitions
     public readonly Language ALang;
     public readonly Language BLang;
     public readonly Language TinyRefLang;
+    public readonly Language SDTLang;
 
     public TestLanguagesDefinitions()
     {
@@ -78,5 +80,37 @@ public class TestLanguagesDefinitions
         myConcept.AddFeatures([singularRef, multivalueRef]);
 
         TinyRefLang = tinyRefLang;
+        
+        
+        var sdtLang = new DynamicLanguage("id-SDTLang") { Key = "key-SDTLang", Name = "SDTLang", Version = "0"};
+        var sdtConcept = sdtLang.Concept("id-SDTConcept", "key-SDTConcept", "SDTConcept");
+        var currency = sdtLang.Enumeration("id-SDTCurrency", "key-SDTCurrency", "Currency");
+        var amount = sdtLang.StructuredDataType("id-SDTAmount", "key-SDTAmount", "Amount");
+        var dec = sdtLang.StructuredDataType("id-SDTDecimal", "key-SDTDecimal", "Decimal");
+        var complex = sdtLang.StructuredDataType("id-SDTComplexNumber", "key-SDTComplexNumber", "ComplexNumber");
+        var fqn = sdtLang.StructuredDataType("id-SDTFullyQualifiedName", "key-SDTFullyQualifiedName", "FullyQualifiedName");
+        
+        sdtConcept.Property("id-SDTamountField", "key-SDTamountField", "amount").OfType(amount);
+        sdtConcept.Property("id-SDTDecimalField", "key-SDTDecimalField", "decimal").OfType(dec);
+        sdtConcept.Property("id-SDTComplexField", "key-SDTComplexField", "complex").OfType(complex);
+        sdtConcept.Property("id-SDTFqnField", "key-SDTFqnField", "fqn").OfType(fqn);
+        
+        currency.EnumerationLiteral("id-SDT-eur", "key-SDTEur", "EUR");
+        currency.EnumerationLiteral("id-SDT-gbp", "key-SDTGbp", "GBP");
+
+        amount.Field("id-SDTValue", "key-SDTValue", "value").OfType(BuiltInsLanguage.Instance.Integer);
+        amount.Field("id-SDTCurrency", "key-SDTCurrency", "currency").OfType(currency);
+        amount.Field("id-SDTDigital", "key-SDTDigital", "digital").OfType(BuiltInsLanguage.Instance.Boolean);
+        
+        dec.Field("id-SDTInt", "key-SDTInt", "int").OfType(BuiltInsLanguage.Instance.Integer);
+        dec.Field("id-SDTFrac", "key-SDTFrac", "frac").OfType(BuiltInsLanguage.Instance.Integer);
+
+        complex.Field("id-SDTReal", "key-SDTReal", "real").OfType(dec);
+        complex.Field("id-SDTImaginary", "key-SDTImaginary", "imaginary").OfType(dec);
+
+        fqn.Field("id-SDT-FQN-name", "key-SDTFqnName", "name").OfType(BuiltInsLanguage.Instance.String);
+        fqn.Field("id-SDT-FQN-nested", "key-SDTFqnNested", "nested").OfType(fqn);
+        
+        SDTLang = sdtLang;
     }
 }

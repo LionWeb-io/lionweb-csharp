@@ -47,6 +47,10 @@ public abstract class LanguageGeneratorBase : GeneratorBase
     protected string LanguageFieldName(EnumerationLiteral literal) =>
         $"_{literal.GetEnumeration().Name.ToFirstLower()}_{literal.Name}";
 
+    /// <returns><c>myStructuredDataType_MyField</c></returns>
+    protected string LanguageFieldName(Field field) =>
+        $"_{field.GetStructuredDataType().Name.ToFirstLower()}_{field.Name}";
+
     /// Returns FQN if <paramref name="entity">entity's</paramref> language is part of <see cref="INames.NamespaceMappings"/>.
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.LanguageEntity)"/>
     protected ExpressionSyntax AsProperty(LanguageEntity entity)
@@ -87,4 +91,8 @@ public abstract class LanguageGeneratorBase : GeneratorBase
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.EnumerationLiteral)"/>
     protected IdentifierNameSyntax AsProperty(EnumerationLiteral literal) =>
         _names.AsProperty(literal);
+
+    /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.Field)"/>
+    protected IdentifierNameSyntax AsProperty(Field field) =>
+        _names.AsProperty(field);
 }

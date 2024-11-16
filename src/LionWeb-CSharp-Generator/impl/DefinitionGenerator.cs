@@ -36,6 +36,7 @@ public class DefinitionGenerator(INames names) : GeneratorBase(names)
 
     private IEnumerable<Classifier> Classifiers => Language.Entities.OfType<Classifier>();
 
+    private IEnumerable<StructuredDataType> StructuredDataTypes => Language.Entities.OfType<StructuredDataType>();
     public CompilationUnitSyntax DefinitionFile() =>
         CompilationUnit()
             .WithMembers(List<MemberDeclarationSyntax>([
@@ -47,6 +48,7 @@ public class DefinitionGenerator(INames names) : GeneratorBase(names)
                                 .Concat(Classifiers.Select(
                                     c => new ClassifierGenerator(c, _names).ClassifierType()))
                                 .Concat(Enumerations.Select(e => new EnumGenerator(e, _names).EnumType()))
+                                .Concat(StructuredDataTypes.Select(s => new StructuredDataTypeGenerator(s, _names).SdtType()))
                         ))
                         .WithUsings(List(CollectUsings()))
                 ])

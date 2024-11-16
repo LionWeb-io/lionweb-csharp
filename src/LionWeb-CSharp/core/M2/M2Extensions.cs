@@ -280,6 +280,14 @@ public static class M2Extensions
         (Enumeration)literal.GetParent()!;
 
     /// <summary>
+    /// Returns the StructuredDataType that contains <paramref name="field"/>. 
+    /// </summary>
+    /// <param name="field">Field to find StructuredDataType of.</param>
+    /// <returns>StructuredDataType that contains <paramref name="field"/>.</returns>
+    public static StructuredDataType GetStructuredDataType(this Field field) =>
+        (StructuredDataType)field.GetParent()!;
+
+    /// <summary>
     /// Returns the type of <paramref name="feature"/>,
     /// i.e. a Datatype if <paramref name="feature"/> is a Property, a Classifier if <paramref name="feature"/> is a Link.
     /// </summary>

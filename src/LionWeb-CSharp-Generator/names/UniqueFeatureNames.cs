@@ -92,7 +92,16 @@ public class UniqueFeatureNames(INames parent) : INames
     public IdentifierNameSyntax AsProperty(EnumerationLiteral literal) => parent.AsProperty(literal);
 
     /// <inheritdoc />
+    public IdentifierNameSyntax AsProperty(Field field) => parent.AsProperty(field);
+
+    /// <inheritdoc />
     public NameSyntax MetaProperty(Language lang) => parent.MetaProperty(lang);
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax FieldField(Field field) => parent.FieldField(field);
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax FieldProperty(Field field) => parent.FieldProperty(field);
 
     /// <inheritdoc />
     public IdentifierNameSyntax FeatureField(Feature feature)

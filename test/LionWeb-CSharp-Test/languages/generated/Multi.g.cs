@@ -25,7 +25,7 @@ public class MultiLanguage : LanguageBase<IMultiFactory>
 	/// <inheritdoc/>
         public override IReadOnlyList<LanguageEntity> Entities => [Container];
 	/// <inheritdoc/>
-        public override IReadOnlyList<Language> DependsOn => [];
+        public override IReadOnlyList<Language> DependsOn => [Examples.Library.M2.LibraryLanguage.Instance, Examples.Library.M2.LibraryLanguage.Instance];
 
 	/// <inheritdoc/>
         public override IMultiFactory GetFactory() => new MultiFactory(this);

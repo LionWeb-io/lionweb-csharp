@@ -192,6 +192,10 @@ public partial class Names(Language language, string namespaceName) : INames
         IdentifierName($"{literal.GetEnumeration().Name}_{literal.Name}");
 
     /// <inheritdoc />
+    public IdentifierNameSyntax AsProperty(Field field) =>
+        IdentifierName($"{field.GetStructuredDataType().Name}_{field.Name}");
+
+    /// <inheritdoc />
     public NameSyntax MetaProperty(Language lang) =>
         QualifiedName(
             AsType(lang),
@@ -205,6 +209,14 @@ public partial class Names(Language language, string namespaceName) : INames
     /// <inheritdoc />
     public IdentifierNameSyntax FeatureProperty(Feature feature) =>
         IdentifierName(feature.Name.ToFirstUpper());
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax FieldField(Field field) =>
+        IdentifierName($"_{field.Name.ToFirstLower()}");
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax FieldProperty(Field field) =>
+        IdentifierName(field.Name.ToFirstUpper());
 
     [GeneratedRegex("`.*$")]
     private static partial Regex AfterIncludingBacktick();

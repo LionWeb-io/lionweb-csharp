@@ -51,6 +51,7 @@ var testLanguagesDefinitions = new TestLanguagesDefinitions();
 var aLang = testLanguagesDefinitions.ALang;
 var bLang = testLanguagesDefinitions.BLang;
 var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
+var sdtLang = testLanguagesDefinitions.SDTLang;
 
 List<Names> names =
 [
@@ -73,6 +74,7 @@ List<Names> names =
     },
     new (tinyRefLang, "Examples.TinyRefLang"),
     new (deprecatedLang, "Examples.DeprecatedLang"),
+    new (sdtLang, "Examples.SDTLang")
 ];
 
 

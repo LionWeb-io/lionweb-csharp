@@ -38,7 +38,7 @@ public abstract class LionCoreKeyAttribute : LionCoreAttribute
 /// </summary>
 /// <seealso cref="LionCoreLanguage">For "metapointer" of a Language.</seealso>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Enum | AttributeTargets.Class | AttributeTargets.Interface |
-                AttributeTargets.Property)]
+                AttributeTargets.Property | AttributeTargets.Struct)]
 public class LionCoreMetaPointer : LionCoreKeyAttribute
 {
     /// <summary>

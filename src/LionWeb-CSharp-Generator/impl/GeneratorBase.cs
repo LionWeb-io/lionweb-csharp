@@ -76,6 +76,14 @@ public abstract class GeneratorBase
     protected ExpressionSyntax FeatureProperty(Feature feature) =>
         _names.FeatureProperty(feature);
 
+    /// <inheritdoc cref="INames.FieldField"/>
+    protected ExpressionSyntax FieldField(Field field) =>
+        _names.FieldField(field);
+
+    /// <inheritdoc cref="INames.FieldProperty"/>
+    protected ExpressionSyntax FieldProperty(Field field) =>
+        _names.FieldProperty(field);
+
     /// <returns><c>MyLang.Instance.MyClassifier_MyFeature</c></returns>
     protected MemberAccessExpressionSyntax MetaProperty(Feature feature)
     {
@@ -84,6 +92,10 @@ public abstract class GeneratorBase
 
         return MemberAccess(_names.MetaProperty(feature.GetLanguage()), _names.AsProperty(feature));
     }
+
+    /// <returns><c>MyLang.Instance.MyStructuredDatatype_MyField</c></returns>
+    protected MemberAccessExpressionSyntax MetaProperty(Field field) =>
+        MemberAccess(_names.MetaProperty(field.GetLanguage()), _names.AsProperty(field));
 
     /// <returns><c>[LionCoreMetaPointer(Language = typeof(MyLangNameLanguage), Key = "keyedKey")]</c></returns>
     protected AttributeSyntax MetaPointerAttribute(IKeyed keyed)

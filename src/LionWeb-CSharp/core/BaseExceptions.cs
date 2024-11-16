@@ -75,6 +75,13 @@ public class UnsetFeatureException(Feature feature)
     : LionWebExceptionBase($"Required {feature.GetClassifier().Name} {feature.Name} is not set");
 
 /// <summary>
+/// Trying to retrieve a <see cref="Field"/> that hasn't been set.
+/// </summary>
+/// <param name="field">Field trying to retrieve.</param>
+public class UnsetFieldException(Field field)
+    : LionWebExceptionBase($"Required Field {field.Name} is not set");
+
+/// <summary>
 /// Trying to operate on a <see cref="Feature"/> unknown to a <see cref="Classifier"/>.
 /// </summary>
 public class UnknownFeatureException : LionWebExceptionBase
@@ -152,4 +159,5 @@ public class UnsupportedNodeTypeException(object? node, string? paramName)
 /// </summary>
 /// <param name="node">Node trying to operate on.</param>
 /// <param name="message">Description of failed operation.</param>
-public class TreeShapeException(IReadableNode node, string message) : LionWebExceptionBase($"{node.GetId()}: {message}");
+public class TreeShapeException(IReadableNode node, string message)
+    : LionWebExceptionBase($"{node.GetId()}: {message}");
