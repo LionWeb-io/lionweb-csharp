@@ -99,8 +99,8 @@ public partial class Deserializer
             var i when i == BuiltInsLanguage.Instance.Integer => int.TryParse(value, out var result)
                 ? result
                 : Handler.InvalidPropertyValue<int>(value, property, compressedId),
-            // leave both a String and JSON value as a string:
-            var s when s == BuiltInsLanguage.Instance.String || s == BuiltInsLanguage.Instance.Json => value,
+            // leave a String value as a string:
+            var s when s == BuiltInsLanguage.Instance.String => value,
             _ => Handler.UnknownDatatype(property, value, node)
         };
     }

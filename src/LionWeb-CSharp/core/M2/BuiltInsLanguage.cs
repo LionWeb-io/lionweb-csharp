@@ -45,11 +45,6 @@ public sealed class BuiltInsLanguage : LanguageBase<BuiltInsFactory>
             Key = $"{LionCoreBuiltInsIdAndKey}-Integer", Name = "Integer"
         });
 
-        _json = new(() => new PrimitiveTypeBase<BuiltInsLanguage>($"{LionCoreBuiltInsIdAndKey}-JSON", this)
-        {
-            Key = $"{LionCoreBuiltInsIdAndKey}-JSON", Name = "JSON"
-        });
-
         _string = new(() => new PrimitiveTypeBase<BuiltInsLanguage>($"{LionCoreBuiltInsIdAndKey}-String", this)
         {
             Key = $"{LionCoreBuiltInsIdAndKey}-String", Name = "String"
@@ -88,7 +83,6 @@ public sealed class BuiltInsLanguage : LanguageBase<BuiltInsFactory>
         [
             Boolean,
             Integer,
-            Json,
             String,
             INamed,
             Node
@@ -114,13 +108,6 @@ public sealed class BuiltInsLanguage : LanguageBase<BuiltInsFactory>
     /// The built-in primitive type Integer.
     /// </summary>
     public PrimitiveType Integer => _integer.Value;
-
-    private readonly Lazy<PrimitiveType> _json;
-
-    /// <summary>
-    /// The built-in primitive type Json.
-    /// </summary>
-    public PrimitiveType Json => _json.Value;
 
     private readonly Lazy<PrimitiveType> _string;
 
