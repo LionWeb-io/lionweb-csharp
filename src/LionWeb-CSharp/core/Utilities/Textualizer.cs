@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Utilities;
 
+using M1;
 using M2;
 using M3;
 
@@ -62,27 +63,17 @@ public static class Textualizer
                 _ => $"{value}" // TODO  enums? null?
             };
 
-        bool HasSetName(INamed named)
-            => named.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name);
-
-        string Name(INamed named)
-        {
-            try
-            {
-                return named.Name;
-            } catch (UnsetFeatureException e)
-            {
-                return noNameSetOutput;
-            }
-        }
+        string Name(INamed named) =>
+            named.GetNodeName() ?? noNameSetOutput;
 
         string PropertyAsString(Property property)
             => $"{Name(property)} = {ValueAsString(node.Get(property))}";
 
-        string ReferenceInfo(INode node)
-            => node switch
+        string ReferenceInfo(INode target)
+            => target switch
             {
-                INamed named => " " + (HasSetName(named) ? $"({named.Name})" : noNameSetOutput),
+                INamed named when named.GetNodeName() is  { } s => $" ({s})",
+                INamed => $" {noNameSetOutput}",
                 _ => ""
             };
 

@@ -26,266 +26,225 @@ using Serialization;
 /// The generic serializer isn't aware of the LionCore M3-types (and their idiosyncrasies),
 /// so that can't be used.
 /// </summary>
-public class LanguageSerializer : SerializerBase
+[Obsolete("Not needed anymore")]
+public abstract class LanguageSerializer : SerializerBase
 {
-    private readonly IEnumerable<Language> _languages;
-
-    public LanguageSerializer(IEnumerable<Language> languages)
-    {
-        _languages = languages;
-    }
-
     /// <summary>
     /// Serializes the given <paramref name="languages">language( definition)s</paramref>.
     /// </summary>
     /// 
     /// <returns>The serialization of the given language definitions as a <see cref="SerializationChunk"/>.</returns>
     public static SerializationChunk Serialize(params Language[] languages) =>
-        new LanguageSerializer(languages).Serialize();
+        new Serializer().SerializeToChunk(languages);
 
-    public SerializationChunk Serialize() =>
+    public override IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes) =>
+        allNodes.Select(SerializeNode);
+
+    private SerializedNode SerializeNode(IReadableNode node) => node switch
+    {
+        Annotation annotation => SerializeAnnotation(annotation),
+        Concept concept => SerializeConcept(concept),
+        Enumeration enumeration => SerializeEnumeration(enumeration),
+        EnumerationLiteral enumerationLiteral => SerializeEnumerationLiteral(enumerationLiteral),
+        Interface @interface => SerializeInterface(@interface),
+        Language language => SerializeLanguage(language),
+        Link link => SerializeLink(link),
+        PrimitiveType primitiveType => SerializePrimitiveType(primitiveType),
+        Property property => SerializeProperty(property),
+        _ => SerializeSimpleNode(node)
+    };
+
+    private SerializedNode SerializeAnnotation(Annotation annotation) =>
         new()
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
-            Languages =
-            [
-                SerializedLanguageReference(M3Language.Instance)
-            ],
-            Nodes = _languages.SelectMany(language => M1Extensions.Descendants<IReadableNode>(language, [], true, true))
-                .Select(SerializeNode).ToArray()
-        };
-
-    private SerializedNode SerializeNode(IReadableNode node)
-    {
-        var metaConcept = node switch
-        {
-            M3Language => M3Language.Instance.Language,
-            M3Concept => M3Language.Instance.Concept,
-            M3Interface => M3Language.Instance.Interface,
-            M3Property => M3Language.Instance.Property,
-            M3Containment => M3Language.Instance.Containment,
-            M3Reference => M3Language.Instance.Reference,
-            var k => k.GetClassifier()
-        };
-
-        var serializedNode = new SerializedNode
-        {
-            Id = node.GetId(),
-            Classifier = metaConcept.ToMetaPointer(),
-            Properties = [],
-            Containments = [],
-            References = [],
+            Id = annotation.GetId(),
+            Classifier = M3Language.Instance.Annotation.ToMetaPointer(),
             Annotations = [],
-            Parent = node.GetParent()?.GetId()
+            Parent = annotation.GetParent()?.GetId(),
+            Properties =
+            [
+                SerializeProperty(annotation, M3Language.Instance.IKeyed_key),
+                SerializeProperty(annotation, BuiltInsLanguage.Instance.INamed_name)
+            ],
+            Containments =
+            [
+                SerializeContainment(annotation.Features, M3Language.Instance.Classifier_features)
+            ],
+            References =
+            [
+                SerializeReference([annotation.Extends], M3Language.Instance.Annotation_extends),
+                SerializeReference(annotation.Implements, M3Language.Instance.Annotation_implements),
+                SerializeReference([annotation.Annotates], M3Language.Instance.Annotation_annotates)
+            ]
         };
 
-        switch (node)
+    private SerializedNode SerializeConcept(Concept concept) =>
+        new()
         {
-            case Annotation annotation:
-                SerializeAnnotation(serializedNode, metaConcept, annotation);
-                break;
-
-            case Concept concept:
-                SerializeConcept(serializedNode, metaConcept, concept);
-                break;
-
-            case Enumeration enumeration:
-                SerializeEnumeration(serializedNode, metaConcept, enumeration);
-                break;
-
-            case EnumerationLiteral enumerationLiteral:
-                SerializeEnumerationLiteral(serializedNode, metaConcept, enumerationLiteral);
-                break;
-
-            case Interface @interface:
-                SerializeInterface(serializedNode, metaConcept, @interface);
-                break;
-
-            case Language language:
-                SerializeLanguage(serializedNode, metaConcept, language);
-                break;
-
-            case Link link:
-                SerializeLink(serializedNode, metaConcept, link);
-                break;
-
-            case PrimitiveType primitiveType:
-                SerializePrimitiveType(serializedNode, metaConcept, primitiveType);
-                break;
-
-            case Property property:
-                SerializeProperty(serializedNode, metaConcept, property);
-                break;
-
-            default:
-                serializedNode = SerializeSimpleNode(node);
-                break;
-        }
-
-        return serializedNode;
-    }
-
-    private void SerializeAnnotation(SerializedNode serializedNode, Classifier metaConcept, Annotation annotation)
-    {
-        serializedNode.Properties =
-        [
-            SerializedPropertySetting(metaConcept, "IKeyed-key", annotation),
-            SerializedPropertySetting(metaConcept, "LionCore-builtins-INamed-name", annotation)
-        ];
-        serializedNode.Containments =
-        [
-            SerializedContainmentSettings(metaConcept, "Classifier-features", annotation.Features)
-        ];
-        serializedNode.References =
-        [
-            SerializedReferenceSetting(metaConcept, "Annotation-extends", annotation.Extends),
-            SerializedReferenceSettings(metaConcept, "Annotation-implements", annotation.Implements),
-            SerializedReferenceSetting(metaConcept, "Annotation-annotates", annotation.Annotates)
-        ];
-    }
-
-    private void SerializeConcept(SerializedNode serializedNode, Classifier metaConcept, Concept concept)
-    {
-        serializedNode.Properties =
-        [
-            SerializedPropertySetting(metaConcept, "IKeyed-key", concept),
-            SerializedPropertySetting(metaConcept, "LionCore-builtins-INamed-name", concept),
-            SerializedPropertySetting(metaConcept, "Concept-abstract", concept),
-            SerializedPropertySetting(metaConcept, "Concept-partition", concept)
-        ];
-        serializedNode.Containments =
-        [
-            SerializedContainmentSettings(metaConcept, "Classifier-features", concept.Features)
-        ];
-        serializedNode.References =
-        [
-            SerializedReferenceSetting(metaConcept, "Concept-extends", concept.Extends),
-            SerializedReferenceSettings(metaConcept, "Concept-implements", concept.Implements)
-        ];
-    }
-
-    private void SerializeEnumeration(SerializedNode serializedNode, Classifier metaConcept, Enumeration enumeration)
-    {
-        serializedNode.Properties =
-        [
-            SerializedPropertySetting(metaConcept, "IKeyed-key", enumeration),
-            SerializedPropertySetting(metaConcept, "LionCore-builtins-INamed-name", enumeration)
-        ];
-        serializedNode.Containments =
-        [
-            SerializedContainmentSettings(metaConcept, "Enumeration-literals", enumeration.Literals)
-        ];
-    }
-
-    private void SerializeEnumerationLiteral(SerializedNode serializedNode, Classifier metaConcept,
-        EnumerationLiteral enumerationLiteral)
-    {
-        serializedNode.Properties =
-        [
-            SerializedPropertySetting(metaConcept, "IKeyed-key", enumerationLiteral),
-            SerializedPropertySetting(metaConcept, "LionCore-builtins-INamed-name", enumerationLiteral)
-        ];
-    }
-
-    private void SerializeInterface(SerializedNode serializedNode, Classifier metaConcept, Interface @interface)
-    {
-        serializedNode.Properties =
-        [
-            SerializedPropertySetting(metaConcept, "IKeyed-key", @interface),
-            SerializedPropertySetting(metaConcept, "LionCore-builtins-INamed-name", @interface)
-        ];
-        serializedNode.Containments =
-        [
-            SerializedContainmentSettings(metaConcept, "Classifier-features", @interface.Features)
-        ];
-        serializedNode.References =
-        [
-            SerializedReferenceSettings(metaConcept, "Interface-extends", @interface.Extends)
-        ];
-    }
-
-    private void SerializeLanguage(SerializedNode serializedNode, Classifier metaConcept, Language language)
-    {
-        serializedNode.Properties =
-        [
-            SerializedPropertySetting(metaConcept, "IKeyed-key", language),
-            SerializedPropertySetting(metaConcept, "LionCore-builtins-INamed-name", language),
-            SerializedPropertySetting(metaConcept, "Language-version", language)
-        ];
-        serializedNode.Containments =
-        [
-            SerializedContainmentSettings(metaConcept, "Language-entities", language.Entities)
-        ];
-        serializedNode.References =
-        [
-            SerializedReferenceSettings(metaConcept, "Language-dependsOn", language.DependsOn)
-        ];
-    }
-
-    private void SerializeLink(SerializedNode serializedNode, Classifier metaConcept, Link link)
-    {
-        serializedNode.Properties =
-        [
-            SerializedPropertySetting(metaConcept, "IKeyed-key", link),
-            SerializedPropertySetting(metaConcept, "LionCore-builtins-INamed-name", link),
-            SerializedPropertySetting(metaConcept, "Feature-optional", link),
-            SerializedPropertySetting(metaConcept, "Link-multiple", link)
-        ];
-        serializedNode.References =
-        [
-            SerializedReferenceSetting(metaConcept, "Link-type", link.Type)
-        ];
-    }
-
-    private void SerializePrimitiveType(SerializedNode serializedNode, Classifier metaConcept,
-        PrimitiveType primitiveType)
-    {
-        serializedNode.Properties =
-        [
-            SerializedPropertySetting(metaConcept, "IKeyed-key", primitiveType),
-            SerializedPropertySetting(metaConcept, "LionCore-builtins-INamed-name", primitiveType)
-        ];
-    }
-
-    private void SerializeProperty(SerializedNode serializedNode, Classifier metaConcept, Property property)
-    {
-        serializedNode.Properties =
-        [
-            SerializedPropertySetting(metaConcept, "IKeyed-key", property),
-            SerializedPropertySetting(metaConcept, "LionCore-builtins-INamed-name", property),
-            SerializedPropertySetting(metaConcept, "Feature-optional", property)
-        ];
-        serializedNode.References =
-        [
-            SerializedReferenceSetting(metaConcept, "Property-type", property.Type)
-        ];
-    }
-
-    private SerializedProperty SerializedPropertySetting(Classifier metaConcept, string key, IReadableNode node)
-        => SerializedPropertySetting(node, (Property)metaConcept.FeatureByKey(key));
-
-    private SerializedContainment SerializedContainmentSettings(Classifier metaConcept, string key,
-        IEnumerable<IReadableNode> children)
-        => new()
-        {
-            Containment = metaConcept.FeatureByKey(key).ToMetaPointer(),
-            Children = children.Select(child => child.GetId()).ToArray()
+            Id = concept.GetId(),
+            Classifier = M3Language.Instance.Concept.ToMetaPointer(),
+            Parent = concept.GetParent()?.GetId(),
+            Annotations = [],
+            Properties =
+            [
+                SerializeProperty(concept, M3Language.Instance.IKeyed_key),
+                SerializeProperty(concept, BuiltInsLanguage.Instance.INamed_name),
+                SerializeProperty(concept, M3Language.Instance.Concept_abstract),
+                SerializeProperty(concept, M3Language.Instance.Concept_partition)
+            ],
+            Containments =
+            [
+                SerializeContainment(concept.Features, M3Language.Instance.Classifier_features)
+            ],
+            References =
+            [
+                SerializeReference([concept.Extends], M3Language.Instance.Concept_extends),
+                SerializeReference(concept.Implements, M3Language.Instance.Concept_implements)
+            ]
         };
 
-    private SerializedReference SerializedReferenceSetting(Classifier metaConcept, string key, IReadableNode? target)
-        => new()
+    private SerializedNode SerializeEnumeration(Enumeration enumeration) =>
+        new()
         {
-            Reference = metaConcept.FeatureByKey(key).ToMetaPointer(),
-            Targets = target == null
-                ? []
-                : [SerializedReferenceTarget(target)]
+            Id = enumeration.GetId(),
+            Classifier = M3Language.Instance.Enumeration.ToMetaPointer(),
+            Parent = enumeration.GetParent()?.GetId(),
+            Annotations = [],
+            Properties =
+            [
+                SerializeProperty(enumeration, M3Language.Instance.IKeyed_key),
+                SerializeProperty(enumeration, BuiltInsLanguage.Instance.INamed_name)
+            ],
+            Containments =
+            [
+                SerializeContainment(enumeration.Literals, M3Language.Instance.Enumeration_literals)
+            ],
+            References = []
         };
 
-    private SerializedReference SerializedReferenceSettings(Classifier metaConcept, string key,
-        IEnumerable<IReadableNode> targets)
-        => new()
+    private SerializedNode SerializeEnumerationLiteral(EnumerationLiteral enumerationLiteral) =>
+        new()
         {
-            Reference = metaConcept.FeatureByKey(key).ToMetaPointer(),
-            Targets = targets.Select(SerializedReferenceTarget).ToArray()
+            Id = enumerationLiteral.GetId(),
+            Classifier = M3Language.Instance.EnumerationLiteral.ToMetaPointer(),
+            Parent = enumerationLiteral.GetParent()?.GetId(),
+            Annotations = [],
+            Properties =
+            [
+                SerializeProperty(enumerationLiteral, M3Language.Instance.IKeyed_key),
+                SerializeProperty(enumerationLiteral, BuiltInsLanguage.Instance.INamed_name)
+            ],
+            Containments = [],
+            References = []
+        };
+
+    private SerializedNode SerializeInterface(Interface @interface) =>
+        new()
+        {
+            Id = @interface.GetId(),
+            Classifier = M3Language.Instance.Interface.ToMetaPointer(),
+            Parent = @interface.GetParent()?.GetId(),
+            Annotations = [],
+            Properties =
+            [
+                SerializeProperty(@interface, M3Language.Instance.IKeyed_key),
+                SerializeProperty(@interface, BuiltInsLanguage.Instance.INamed_name)
+            ],
+            Containments =
+            [
+                SerializeContainment(@interface.Features, M3Language.Instance.Classifier_features)
+            ],
+            References =
+            [
+                SerializeReference(@interface.Extends, M3Language.Instance.Interface_extends)
+            ]
+        };
+
+    private SerializedNode SerializeLanguage(Language language) =>
+        new()
+        {
+            Id = language.GetId(),
+            Classifier = M3Language.Instance.Language.ToMetaPointer(),
+            Parent = language.GetParent()?.GetId(),
+            Annotations = [],
+            Properties =
+            [
+                SerializeProperty(language, M3Language.Instance.IKeyed_key),
+                SerializeProperty(language, BuiltInsLanguage.Instance.INamed_name),
+                SerializeProperty(language, M3Language.Instance.Language_version)
+            ],
+            Containments =
+            [
+                SerializeContainment(language.Entities, M3Language.Instance.Language_entities)
+            ],
+            References =
+            [
+                SerializeReference(language.DependsOn, M3Language.Instance.Language_dependsOn)
+            ]
+        };
+
+    private SerializedNode SerializeLink(Link link)
+    {
+        var metaConcept = link switch
+        {
+            Containment => M3Language.Instance.Containment,
+            Reference => M3Language.Instance.Reference
+        };
+        return new SerializedNode
+        {
+            Id = link.GetId(),
+            Classifier = metaConcept.ToMetaPointer(),
+            Parent = link.GetParent()?.GetId(),
+            Annotations = [],
+            Properties =
+            [
+                SerializeProperty(link, M3Language.Instance.IKeyed_key),
+                SerializeProperty(link, BuiltInsLanguage.Instance.INamed_name),
+                SerializeProperty(link, M3Language.Instance.Feature_optional),
+                SerializeProperty(link, M3Language.Instance.Link_multiple)
+            ],
+            Containments = [],
+            References =
+            [
+                SerializeReference([link.Type], M3Language.Instance.Link_type)
+            ]
+        };
+    }
+
+    private SerializedNode SerializePrimitiveType(PrimitiveType primitiveType) =>
+        new()
+        {
+            Id = primitiveType.GetId(),
+            Classifier = M3Language.Instance.PrimitiveType.ToMetaPointer(),
+            Parent = primitiveType.GetParent()
+                ?.GetId(),
+            Annotations = [],
+            Properties =
+            [
+                SerializeProperty(primitiveType, M3Language.Instance.IKeyed_key),
+                SerializeProperty(primitiveType, BuiltInsLanguage.Instance.INamed_name)
+            ],
+            Containments = [],
+            References = []
+        };
+
+    private SerializedNode SerializeProperty(Property property) =>
+        new()
+        {
+            Id = property.GetId(),
+            Classifier = M3Language.Instance.Property.ToMetaPointer(),
+            Parent = property.GetParent()?.GetId(),
+            Annotations = [],
+            Properties =
+            [
+                SerializeProperty(property, M3Language.Instance.IKeyed_key),
+                SerializeProperty(property, BuiltInsLanguage.Instance.INamed_name),
+                SerializeProperty(property, M3Language.Instance.Feature_optional)
+            ],
+            Containments = [],
+            References =
+            [
+                SerializeReference([property.Type], M3Language.Instance.Property_type)
+            ]
         };
 }

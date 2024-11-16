@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1;
 using M2;
 using M3;
 using Serialization;
@@ -80,8 +81,8 @@ public class UnknownFeatureException : LionWebExceptionBase
 {
     /// <param name="classifier">Classifier trying to use.</param>
     /// <param name="feature">Feature unknown to <paramref name="classifier"/>.</param>
-    public UnknownFeatureException(Classifier classifier, Feature? feature) : base(
-        $"Classifier {classifier.Name} does not know feature {feature?.Name}")
+    public UnknownFeatureException(Classifier classifier, Feature? feature, string? message = null) : base(
+        $"{message}Classifier {classifier.Name} does not know feature {feature?.Name}")
     {
     }
 
@@ -90,6 +91,15 @@ public class UnknownFeatureException : LionWebExceptionBase
     /// <param name="message">Optional additional message.</param>
     public UnknownFeatureException(Classifier classifier, MetaPointer metaPointer, string? message = null) : base(
         $"{message}Classifier {classifier.Name} does not know feature {metaPointer}")
+    {
+    }
+
+    /// <param name="classifier">Classifier trying to use.</param>
+    /// <param name="compressedMetaPointer"><see cref="Feature"/> unknown to <paramref name="classifier"/>.</param>
+    /// <param name="message">Optional additional message.</param>
+    public UnknownFeatureException(Classifier classifier, CompressedMetaPointer compressedMetaPointer,
+        string? message = null) : base(
+        $"{message}Classifier {classifier.Name} does not know feature {compressedMetaPointer}")
     {
     }
 }
@@ -109,6 +119,13 @@ public class UnsupportedClassifierException : LionWebExceptionBase
     /// <param name="message">Optional additional message.</param>
     public UnsupportedClassifierException(MetaPointer metaPointer, string? message = null) : base(
         $"{message}Classifier {metaPointer} not supported")
+    {
+    }
+
+    /// <param name="compressedMetaPointer">Unsupported <see cref="Classifier"/>.</param>
+    /// <param name="message">Optional additional message.</param>
+    public UnsupportedClassifierException(CompressedMetaPointer compressedMetaPointer, string? message = null) : base(
+        $"{message}Classifier {compressedMetaPointer} not supported")
     {
     }
 }

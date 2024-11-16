@@ -15,54 +15,19 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test;
+namespace LionWeb_CSharp_Test.tests.serialization;
 
-using Examples.Shapes.Dynamic;
 using Examples.Shapes.M2;
-using M1;
-using M2;
-using M3;
-using Serialization;
-using System.Collections;
-using Utilities;
-using Comparer = Utilities.Comparer;
+using LionWeb.Core;
+using LionWeb.Core.M2;
+using LionWeb.Core.M3;
+using LionWeb.Core.Serialization;
+using LionWeb.Core.Utilities;
+using Comparer = LionWeb.Core.Utilities.Comparer;
 
 [TestClass]
-public class SerializationTests
+public class LanguageSerializationTests
 {
-    private readonly Language _language;
-    private readonly ShapesFactory _factory;
-
-    public SerializationTests()
-    {
-        _language = ShapesLanguage.Instance;
-        _factory = _language.GetFactory() as ShapesFactory;
-    }
-
-    [TestMethod]
-    public void test_serialization_shapes_model()
-    {
-        INode rootNode = ExampleModels.ExampleModel(_language);
-
-        var serializationChunk = Serializer.Serialize(new List<INode> { rootNode });
-        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
-
-        // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        new Deserializer([_language]).Deserialize(serializationChunk);
-    }
-
-    // Disabled until #19 is merged
-    // [TestMethod]
-    // public void test_serialization_shapes_language()
-    // {
-    //     var serializationChunk = LanguageSerializer.Serialize(ShapesLanguage.Instance);
-    //     Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
-    //
-    //     var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
-    //     var comparer = new Comparer([ShapesLanguage.Instance], redeserialized.Cast<IReadableNode>().ToList());
-    //     Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
-    // }
-
     [TestMethod]
     public void test_serialization_shapes_language_with_external_annotations()
     {
@@ -129,7 +94,8 @@ public class SerializationTests
         DynamicClassifier redeserializedCircle2 =
             (DynamicClassifier)redeserializedShapes2.ClassifierByKey(ShapesLanguage.Instance.Circle.Key);
 
-        var comparer = new Comparer(redeserializedCircle.GetAnnotations().ToList(), redeserializedCircle2.GetAnnotations().ToList());
+        var comparer = new Comparer(redeserializedCircle.GetAnnotations().ToList(),
+            redeserializedCircle2.GetAnnotations().ToList());
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
@@ -140,8 +106,12 @@ public class SerializationTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        var deserializer = new LanguageDeserializer(serializationChunk, false);
-        deserializer.DeserializeLanguages();
+        var deserializer = new LanguageDeserializer(false);
+        foreach (var serializedNode in serializationChunk.Nodes)
+        {
+            deserializer.Process(serializedNode);
+        }
+        deserializer.Finish();
     }
 
     [TestMethod]
@@ -155,63 +125,15 @@ public class SerializationTests
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
-    [TestMethod]
-    public void test_no_double_serialization()
+    private TestContext testContextInstance;
+
+    /// <summary>
+    /// Gets or sets the test context which provides
+    /// information about and functionality for the current test run.
+    /// </summary>
+    public TestContext TestContext
     {
-        var geometry = ExampleModels.ExampleModel(_language);
-        var shape0 = (geometry.Get(_language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes")) as IEnumerable)
-            .Cast<INode>().First();
-
-        Assert.IsInstanceOfType<INode>(shape0);
-        var serializationChunk = Serializer.Serialize([geometry, shape0]);
-        Assert.AreEqual(4, serializationChunk.Nodes.Length);
-    }
-
-    [TestMethod]
-    public void test_optional_string_property_serialization()
-    {
-        var documentation = _factory.CreateDocumentation();
-        var serializationChunk = Serializer.Serialize([documentation]);
-
-        var serializedProperty = serializationChunk.Nodes[0].Properties.First(p => p.Property.Key == "key-text");
-        Assert.IsNull(serializedProperty.Value);
-        Assert.AreEqual("key-text", serializedProperty.Property.Key);
-    }
-
-    [TestMethod]
-    public void SerializeRefToUnsetName()
-    {
-        var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
-        var refGeo = new ReferenceGeometry("ref") { Shapes = [line] };
-
-        var serializationChunk = Serializer.Serialize([line, refGeo]);
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
-
-        var comparer = new Comparer([line, refGeo], nodes);
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
-    }
-
-    [TestMethod]
-    public void SerializeUnsetRequiredContainment()
-    {
-        var compositeShape = new CompositeShape("comp");
-
-        var serializationChunk = Serializer.Serialize([compositeShape]);
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
-
-        var comparer = new Comparer([compositeShape], nodes);
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
-    }
-
-    [TestMethod]
-    public void SerializeUnsetRequiredReference()
-    {
-        var materialGroup = new MaterialGroup("goup");
-
-        var serializationChunk = Serializer.Serialize([materialGroup]);
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
-
-        var comparer = new Comparer([materialGroup], nodes);
-        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+        get { return testContextInstance; }
+        set { testContextInstance = value; }
     }
 }

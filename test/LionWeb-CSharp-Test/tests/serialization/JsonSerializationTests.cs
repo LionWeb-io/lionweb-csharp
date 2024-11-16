@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb_CSharp_Test.tests;
+namespace LionWeb_CSharp_Test.tests.serialization;
 
 using System.Text.Json;
 

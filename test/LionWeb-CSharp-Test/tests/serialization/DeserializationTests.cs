@@ -15,13 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test;
+namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.M2;
-using M1;
-using M2;
-using Serialization;
-using Utilities;
+using LionWeb.Core;
+using LionWeb.Core.M1;
+using LionWeb.Core.M2;
+using LionWeb.Core.Serialization;
+using LionWeb.Core.Utilities;
 
 [TestClass]
 public class DeserializationTests
@@ -32,19 +33,16 @@ public class DeserializationTests
         SerializationChunk serializationChunk = new SerializationChunk
         {
             SerializationFormatVersion = ReleaseVersion.Current,
-            Languages = [
+            Languages =
+            [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
             ],
-            Nodes = [
+            Nodes =
+            [
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-Geometry",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
                     Properties = [],
                     Containments = [],
                     References = [],
@@ -54,9 +52,13 @@ public class DeserializationTests
             ]
         };
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.IsInstanceOfType<Geometry>(node);
         Assert.IsNull(node.GetParent());
     }
@@ -67,30 +69,22 @@ public class DeserializationTests
         SerializationChunk serializationChunk = new SerializationChunk
         {
             SerializationFormatVersion = ReleaseVersion.Current,
-            Languages = [
+            Languages =
+            [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
             ],
-            Nodes = [
+            Nodes =
+            [
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-Geometry",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
                     Properties = [],
-                    Containments = [
+                    Containments =
+                    [
                         new SerializedContainment
                         {
-                            Containment = new MetaPointer
-                            {
-                                Key = "key-shapes",
-                                Language = "key-Shapes",
-                                Version = "1"
-                            },
-                            Children = [ "bar" ]
+                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"), Children = ["bar"]
                         }
                     ],
                     References = [],
@@ -100,9 +94,13 @@ public class DeserializationTests
             ]
         };
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.IsInstanceOfType<Geometry>(node);
         Assert.AreEqual(0, (node as Geometry).Shapes.Count);
     }
@@ -113,30 +111,24 @@ public class DeserializationTests
         SerializationChunk serializationChunk = new SerializationChunk
         {
             SerializationFormatVersion = ReleaseVersion.Current,
-            Languages = [
+            Languages =
+            [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
             ],
-            Nodes = [
+            Nodes =
+            [
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-Geometry",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
                     Properties = [],
-                    Containments = [
+                    Containments =
+                    [
                         new SerializedContainment
                         {
-                            Containment = new MetaPointer
-                            {
-                                Key = "key-shapes",
-                                Language = "key-Shapes",
-                                Version = "1"
-                            },
-                            Children = [
+                            Containment = new MetaPointer("key-Shapes", "1", "key-shapes"),
+                            Children =
+                            [
                                 "bar"
                             ]
                         }
@@ -148,29 +140,17 @@ public class DeserializationTests
                 new SerializedNode()
                 {
                     Id = "bar",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-OffsetDuplicate",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
                     Properties = [],
-                    Containments = [],  // should have an offset:Coord but can leave that one off
-                    References = [
+                    Containments = [], // should have an offset:Coord but can leave that one off
+                    References =
+                    [
                         new SerializedReference
                         {
-                            Reference = new MetaPointer
-                            {
-                                Key = "key-source",
-                                Language = "key-Shapes",
-                                Version = "1"
-                            },
-                            Targets = [
-                                new SerializedReferenceTarget
-                                {
-                                    Reference = "lizard",
-                                    ResolveInfo = "lizard"
-                                }
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "lizard", ResolveInfo = "lizard" }
                             ]
                         }
                     ],
@@ -180,16 +160,21 @@ public class DeserializationTests
             ]
         };
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.IsInstanceOfType<Geometry>(node);
         var geometry = node as Geometry;
         Assert.AreEqual(1, geometry.Shapes.Count);
-        var shape = geometry.Shapes.First();
+        var shape = geometry.Shapes[0];
         Assert.IsInstanceOfType<OffsetDuplicate>(shape);
         var offsetDuplicate = shape as OffsetDuplicate;
-        Assert.IsFalse(offsetDuplicate.CollectAllSetFeatures().Contains(ShapesLanguage.Instance.ClassifierByKey("key-OffsetDuplicate").FeatureByKey("key-source")));
+        Assert.IsFalse(offsetDuplicate.CollectAllSetFeatures().Contains(ShapesLanguage.Instance
+            .ClassifierByKey("key-OffsetDuplicate").FeatureByKey("key-source")));
     }
 
     [TestMethod]
@@ -198,36 +183,26 @@ public class DeserializationTests
         SerializationChunk serializationChunk = new SerializationChunk
         {
             SerializationFormatVersion = ReleaseVersion.Current,
-            Languages = [
+            Languages =
+            [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
             ],
-            Nodes = [
+            Nodes =
+            [
                 new SerializedNode()
                 {
                     Id = "bar",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-OffsetDuplicate",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate"),
                     Properties = [],
-                    Containments = [],  // should have an offset:Coord but can leave that one off
-                    References = [
+                    Containments = [], // should have an offset:Coord but can leave that one off
+                    References =
+                    [
                         new SerializedReference
                         {
-                            Reference = new MetaPointer
-                            {
-                                Key = "key-source",
-                                Language = "key-Shapes",
-                                Version = "1"
-                            },
-                            Targets = [
-                                new SerializedReferenceTarget
-                                {
-                                    Reference = "lizard",
-                                    ResolveInfo = "lizard"
-                                }
+                            Reference = new MetaPointer("key-Shapes", "1", "key-source"),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "lizard", ResolveInfo = "lizard" }
                             ]
                         }
                     ],
@@ -241,9 +216,12 @@ public class DeserializationTests
         var dependentGeometry = ShapesLanguage.Instance.GetFactory().CreateGeometry()
             .AddShapes([lizard]);
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk, [dependentGeometry]);
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk, dependentGeometry.Descendants(true, true));
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.IsInstanceOfType<OffsetDuplicate>(node);
         var offsetDuplicate = node as OffsetDuplicate;
         Assert.AreEqual(lizard, offsetDuplicate.Source);
@@ -255,23 +233,21 @@ public class DeserializationTests
         SerializationChunk serializationChunk = new SerializationChunk
         {
             SerializationFormatVersion = ReleaseVersion.Current,
-            Languages = [
+            Languages =
+            [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
             ],
-            Nodes = [
+            Nodes =
+            [
                 new SerializedNode
                 {
                     Id = "foo",
-                    Classifier = new MetaPointer
-                    {
-                        Key = "key-Geometry",
-                        Language = "key-Shapes",
-                        Version = "1"
-                    },
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Geometry"),
                     Properties = [],
                     Containments = [],
                     References = [],
-                    Annotations = [
+                    Annotations =
+                    [
                         "lizard"
                     ],
                     Parent = null
@@ -279,21 +255,29 @@ public class DeserializationTests
             ]
         };
 
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var nodes = new DeserializerBuilder()
+            .WithHandler(new DeserializerIgnoringHandler())
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
         Assert.AreEqual(1, nodes.Count);
-        var node = nodes.First();
+        var node = nodes[0];
         Assert.AreEqual(0, node.GetAnnotations().Count);
     }
 
     [TestMethod]
-    public void deserializeUnsetRequiredContainment()
+    public void DeserializeUnsetRequiredContainment()
     {
         var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
 
-        var serializationChunk = Serializer.Serialize([line]);
-        var nodes = new Deserializer([ShapesLanguage.Instance]).Deserialize(serializationChunk);
+        var serializationChunk = Serializer.SerializeToChunk([line]);
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build()
+            .Deserialize(serializationChunk);
 
         var comparer = new Comparer([line], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
+    
 }

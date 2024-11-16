@@ -20,13 +20,33 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
+using System.Collections;
+using Utilities;
 
-public abstract class SerializerBase
+public abstract class SerializerBase : ISerializer
 {
-    protected SerializedLanguageReference SerializedLanguageReference(Language language) =>
+    private readonly HashSet<Language> _usedLanguages = new();
+
+    /// <inheritdoc />
+    public ISerializerHandler Handler { get; init; } = new SerializerExceptionHandler();
+
+    /// <inheritdoc />
+    public IEnumerable<SerializedLanguageReference> UsedLanguages =>
+        _usedLanguages.Select(SerializeLanguageReference);
+
+
+    /// <summary>
+    /// Whether we store uncompressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
+    /// Uses more memory, but very helpful for debugging. 
+    /// </summary>
+    public bool StoreUncompressedIds { get; init; } = false;
+
+    public abstract IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes);
+
+    protected SerializedLanguageReference SerializeLanguageReference(Language language) =>
         new() { Key = language.Key, Version = language.Version };
 
-    protected SerializedProperty SerializedPropertySetting(IReadableNode node, Property property)
+    protected SerializedProperty SerializeProperty(IReadableNode node, Property property)
     {
         var value = GetValueIfSet(node, property);
 
@@ -36,26 +56,21 @@ public abstract class SerializerBase
             Value = property.Type switch
             {
                 _ when value == null => null,
-                PrimitiveType => AsString(value),
-                Enumeration => (value as Enum).LionCoreKey(),
-                _ => throw new ArgumentException($"unsupported property: {property}", nameof(property))
+                PrimitiveType => ConvertPrimitiveType(value),
+                Enumeration when value is Enum e => e.LionCoreKey(),
+                _ => Handler.UnknownDatatype(node, property, value)
             }
         };
     }
 
-    protected SerializedReferenceTarget SerializedReferenceTarget(IReadableNode target)
-    {
-        var resolveInfo = target switch
-        {
-            INamed namedTarget when namedTarget.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name)
-                => namedTarget.Name,
-            _ => null
-        };
-        return new() { Reference = target.GetId(), ResolveInfo = resolveInfo };
-    }
+    protected SerializedReferenceTarget SerializeReferenceTarget(IReadableNode? target) =>
+        new() { Reference = target?.GetId(), ResolveInfo = target?.GetNodeName() };
 
     protected object? GetValueIfSet(IReadableNode node, Feature feature) =>
         node.CollectAllSetFeatures().Contains(feature) ? node.Get(feature) : null;
+
+    protected CompressedId Compress(string id) =>
+        CompressedId.Create(id, StoreUncompressedIds);
 
     /// <summary>
     /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
@@ -64,57 +79,201 @@ public abstract class SerializerBase
     /// <em>Note!</em> No exception is thrown when the given runtime value doesn't correspond to a primitive type defined here.
     /// Instead, the runtime value is simply coerced to a string using its <c>ToString</c> method.
     /// </summary>
-    private string? AsString(object? value)
-        => value switch
-        {
-            null => null,
-            bool boolean => boolean ? "true" : "false",
-            string @string => @string,
-            _ => value.ToString() // Integer, Json (and anything else)
-        };
+    private string? ConvertPrimitiveType(object? value) => value switch
+    {
+        null => null,
+        bool boolean => boolean ? "true" : "false",
+        string @string => @string,
+        _ => value.ToString()
+    };
 
-    protected virtual void LogError(string message) =>
-        Console.Error.WriteLine(message);
+    /// <remarks>
+    /// Features with `string` or _value type_ values are treated as property.
+    /// Remaining features with single or IEnumerable&lt;IReadableNode> values with all values' parents == node are treated as containment.
+    /// Remaining features with single or IEnumerable&lt;IReadableNode> values are treated as reference.
+    /// If any feature still remaining, throws exception.
+    /// Only annotations are treated as annotations.
+    /// </remarks>
+    protected SerializedNode SerializeSimpleNode(IReadableNode node)
+    {
+        Classifier classifier = ExtractClassifier(node);
 
-    protected SerializedNode SerializeSimpleNode(IReadableNode node) =>
-        new()
+        var featureValues = node
+            .CollectAllSetFeatures()
+            .ToDictionary(f => f, node.Get);
+
+        Dictionary<Feature, object?> properties = CollectProperties(featureValues);
+        RemoveFromFeatureValues(properties);
+
+        Dictionary<Feature, object?> containments = CollectContainments(node, featureValues);
+        RemoveFromFeatureValues(containments);
+
+        Dictionary<Feature, object?> references = CollectReferences(featureValues);
+        RemoveFromFeatureValues(references);
+
+        if (featureValues.Count != 0)
+            throw new ArgumentException($"remaining features: {featureValues}");
+
+        var allFeatures = classifier.AllFeatures();
+
+        return new()
         {
             Id = node.GetId(),
-            Classifier = node.GetClassifier().ToMetaPointer(),
-            Properties = node.GetClassifier().AllFeatures().OfType<Property>()
-                .Select(property => SerializedPropertySetting(node, property)).ToArray(),
-            Containments = node.GetClassifier().AllFeatures().OfType<Containment>()
-                .Select<Containment, SerializedContainment>(containment =>
-                    SerializedContainmentSetting(node, containment)).ToArray(),
-            References = node.GetClassifier().AllFeatures().OfType<Reference>()
-                .Select<Reference, SerializedReference>(reference => SerializedReferenceSetting(node, reference))
+            Classifier = classifier.ToMetaPointer(),
+            Properties = properties.Select(pair => SerializeProperty(node, pair.Key, pair.Value))
+                .Concat(CollectUnsetProperties(node, allFeatures, properties))
                 .ToArray(),
-            Annotations = node.GetAnnotations()
-                .Select(annotation => annotation.GetId()).ToArray(),
+            Containments = containments.Select(SerializeContainment)
+                .Concat(CollectUnsetContainments(allFeatures, containments))
+                .ToArray(),
+            References = references.Select(SerializeReference)
+                .Concat(CollectUnsetReferences(allFeatures, references))
+                .ToArray(),
+            Annotations = node.GetAnnotations().Select(SerializeAnnotationTarget)
+                .ToArray(),
             Parent = node.GetParent()?.GetId()
         };
 
-    private SerializedContainment SerializedContainmentSetting(IReadableNode node, Containment containment)
-    {
-        var value = GetValueIfSet(node, containment);
-        return new SerializedContainment
+        void RemoveFromFeatureValues(Dictionary<Feature, object?> dictionary)
         {
-            Containment = containment.ToMetaPointer(),
-            Children = value != null
-                ? containment.AsNodes<INode>(value).Select((child) => child.GetId()).ToArray()
-                : []
+            foreach (var key in dictionary.Keys)
+            {
+                featureValues.Remove(key);
+            }
+        }
+    }
+
+    private Classifier ExtractClassifier(IReadableNode node)
+    {
+        Classifier classifier = node switch
+        {
+            Language => M3Language.Instance.Language,
+            Annotation => M3Language.Instance.Annotation,
+            Concept => M3Language.Instance.Concept,
+            Interface => M3Language.Instance.Interface,
+            Enumeration => M3Language.Instance.Enumeration,
+            PrimitiveType => M3Language.Instance.PrimitiveType,
+            EnumerationLiteral => M3Language.Instance.EnumerationLiteral,
+            Property => M3Language.Instance.Property,
+            Containment => M3Language.Instance.Containment,
+            Reference => M3Language.Instance.Reference,
+            _ => node.GetClassifier()
+        };
+        return classifier;
+    }
+
+    private Dictionary<Feature, object?> CollectProperties(Dictionary<Feature, object?> featureValues) =>
+        featureValues
+            .Where(pair => pair.Value is string
+                           || (pair.Value is not null && pair.Value.GetType().IsValueType)
+                           || pair is { Key: Property, Value: null }
+            )
+            .ToDictionary();
+
+    private Dictionary<Feature, object?> CollectContainments(IReadableNode node,
+        Dictionary<Feature, object?> featureValues)
+    {
+        var containments = featureValues
+            .Where(pair =>
+                pair.Key is Containment
+                || (pair.Value is IReadableNode n && ReferenceEquals(n.GetParent(), node))
+                || (pair.Value is IEnumerable<IReadableNode> en && en.All(c => ReferenceEquals(c.GetParent(), node)))
+                || (pair.Value is IEnumerable e &&
+                    e.Cast<IReadableNode>().All(c => ReferenceEquals(c.GetParent(), node)))
+            )
+            .ToDictionary();
+        return containments;
+    }
+
+    private Dictionary<Feature, object?> CollectReferences(Dictionary<Feature, object?> featureValues)
+    {
+        var references = featureValues
+            .Where(pair => pair.Key is Reference
+                           || pair.Value is IReadableNode
+                           || (pair.Value is IEnumerable e && M2Extensions.AreAll<IReadableNode>(e))
+            )
+            .ToDictionary();
+        return references;
+    }
+
+    private IEnumerable<SerializedProperty> CollectUnsetProperties(IReadableNode node, ISet<Feature> allFeatures,
+        Dictionary<Feature, object?> properties) =>
+        allFeatures
+            .OfType<Property>()
+            .Except(properties.Keys)
+            .Select(p => SerializeProperty(node, p, null));
+
+    private IEnumerable<SerializedContainment> CollectUnsetContainments(ISet<Feature> allFeatures,
+        Dictionary<Feature, object?> containments) =>
+        allFeatures
+            .OfType<Containment>()
+            .Except(containments.Keys)
+            .Select(c => SerializeContainment([], c));
+
+    private IEnumerable<SerializedReference> CollectUnsetReferences(ISet<Feature> allFeatures,
+        Dictionary<Feature, object?> references) =>
+        allFeatures
+            .OfType<Reference>()
+            .Except(references.Keys)
+            .Select(c => SerializeReference([], c));
+
+    private IEnumerable<IReadableNode> AsNodes(KeyValuePair<Feature, object?> pair) =>
+        pair.Value != null ? M2Extensions.AsNodes<IReadableNode>(pair.Value) : [];
+
+    private SerializedProperty SerializeProperty(IReadableNode node, Feature feature, object? value)
+    {
+        if (value is not null && feature is Property { Type: Enumeration enumeration })
+            RegisterUsedLanguage(enumeration.GetLanguage());
+
+        return new SerializedProperty
+        {
+            Property = feature.ToMetaPointer(),
+            Value = value switch
+            {
+                null => null,
+                Enum e => e.LionCoreKey(),
+                int or bool or string => ConvertPrimitiveType(value),
+                _ => Handler.UnknownDatatype(node, feature, value)
+            }
         };
     }
 
-    private SerializedReference SerializedReferenceSetting(IReadableNode node, Reference reference)
-    {
-        var value = GetValueIfSet(node, reference);
-        return new()
+    private SerializedContainment SerializeContainment(KeyValuePair<Feature, object?> pair) =>
+        SerializeContainment(AsNodes(pair), pair.Key);
+
+    protected SerializedContainment SerializeContainment(IEnumerable<IReadableNode> children, Feature containment) =>
+        new()
+        {
+            Containment = containment.ToMetaPointer(), Children = children.Select(child => child.GetId()).ToArray()
+        };
+
+    private SerializedReference SerializeReference(KeyValuePair<Feature, object?> pair) =>
+        SerializeReference(AsNodes(pair), pair.Key);
+
+    protected SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Feature reference) =>
+        new()
         {
             Reference = reference.ToMetaPointer(),
-            Targets = value != null
-                ? reference.AsNodes<INode>(value).Select(SerializedReferenceTarget).ToArray()
-                : []
+            Targets = targets.Where(t => t != null).Select(SerializeReferenceTarget).ToArray()
         };
+
+    private string SerializeAnnotationTarget(IReadableNode annotation) =>
+        annotation.GetId();
+
+    protected void RegisterUsedLanguage(Language language)
+    {
+        if (language.Key == BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
+            return;
+
+        Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.EqualsIdentity(language));
+        if (existingLanguage == null)
+        {
+            _usedLanguages.Add(language);
+            return;
+        }
+
+        Language? altLanguage = Handler.DuplicateUsedLanguage(existingLanguage, language);
+        if (altLanguage != null)
+            _usedLanguages.Add(altLanguage);
     }
 }

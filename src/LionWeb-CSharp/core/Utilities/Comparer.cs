@@ -488,7 +488,7 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
         return SetParent(result, new ReferenceDifference(left, leftRef, right));
     }
 
-    private List<IDifference> CompareTargets(IReadableNode leftOwner, List<IReadableNode> leftTargets,
+    protected List<IDifference> CompareTargets(IReadableNode leftOwner, List<IReadableNode> leftTargets,
         Reference reference,
         IReadableNode rightOwner,
         List<IReadableNode> rightTargets)

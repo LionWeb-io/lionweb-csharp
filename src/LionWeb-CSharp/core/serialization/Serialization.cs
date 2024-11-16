@@ -21,57 +21,49 @@ namespace LionWeb.Core.Serialization;
 /// This type, together with all the types in this file, represent data structures
 /// to capture a parsing of a LionWeb serialization chunk in JSON format.
 /// </summary>
-public class SerializationChunk
+public record SerializationChunk
 {
-    public string SerializationFormatVersion { get; set; }
-    public SerializedLanguageReference[] Languages { get; set; }
-    public SerializedNode[] Nodes { get; set; }
+    public required string SerializationFormatVersion { get; init; }
+    public required SerializedLanguageReference[] Languages { get; init; }
+    public required SerializedNode[] Nodes { get; init; }
 }
 
-public class SerializedLanguageReference {
-    public string Key { get; set; }
-    public string Version { get; set; }
+public record SerializedLanguageReference {
+    public required string Key { get; set; }
+    public required string Version { get; set; }
 }
 
-public class SerializedNode
+public record SerializedNode
 {
-    public string Id { get; set; }
-    public MetaPointer Classifier { get; set; }
-    public SerializedProperty[] Properties { get; set; }
-    public SerializedContainment[] Containments { get; set; }
-    public SerializedReference[] References { get; set; }
-    public string[] Annotations { get; set; }
-    public string? Parent { get; set; }
+    public required string Id { get; init; }
+    public required MetaPointer Classifier { get; init; }
+    public required SerializedProperty[] Properties { get; init; }
+    public required SerializedContainment[] Containments { get; init; }
+    public required SerializedReference[] References { get; init; }
+    public required string[] Annotations { get; init; }
+    public string? Parent { get; init; }
 }
 
-public class MetaPointer
+public record MetaPointer(string Language, string Version, string Key);
+
+public record SerializedProperty
 {
-    public string Language { get; set; }
-    public string Version { get; set; }
-    public string Key { get; set; }
-
-    public override string ToString()
-        => $"{Key} of ({Language}, {Version})";
+    public required MetaPointer Property { get; init; }
+    public string? Value { get; init; }
 }
 
-public class SerializedProperty
+public record SerializedContainment
 {
-    public MetaPointer Property { get; set; }
-    public string Value { get; set; }
+    public required MetaPointer Containment { get; init; }
+    public required string[] Children { get; init; }
 }
 
-public class SerializedContainment
-{
-    public MetaPointer Containment { get; set; }
-    public string[] Children { get; set; }
+public record SerializedReferenceTarget {
+    public string? ResolveInfo { get; init; }
+    public string? Reference { get; init; }
 }
 
-public class SerializedReferenceTarget {
-    public string? ResolveInfo { get; set; }
-    public string Reference { get; set; }
-}
-
-public class SerializedReference {
-    public MetaPointer Reference { get; set; }
-    public SerializedReferenceTarget[] Targets { get; set; }
+public record SerializedReference {
+    public required MetaPointer Reference { get; init; }
+    public required SerializedReferenceTarget[] Targets { get; init; }
 }

@@ -234,6 +234,24 @@ public static class M1Extensions
     public static IEnumerable<INode> Ancestors(this INode self, bool includeSelf = false) =>
         Ancestors<INode>(self, [], includeSelf);
 
+    /// <summary>
+    /// Returns the name of the node if it is set, <c>null</c>/> otherwise.
+    /// </summary>
+    /// <param name="self">Base node to get name of.</param>
+    public static string? GetNodeName(this IReadableNode self)
+    {
+        try
+        {
+            if (self.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name))
+                return self.Get(BuiltInsLanguage.Instance.INamed_name) as string ?? null;
+
+            return null;
+        } catch (UnsetFeatureException)
+        {
+            return null;
+        }
+    }
+
     private static List<INode> GetContainmentNodes(INode self)
     {
         INode? parent = self.GetParent();

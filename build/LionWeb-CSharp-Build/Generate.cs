@@ -34,7 +34,7 @@ SerializeLanguagesLocally("shapes", ShapesDefinition.Language);
 
 DynamicLanguage[] DeserializeExternalLanguage(string name, params Language[] dependentLanguages) =>
     LanguageDeserializer.Deserialize(
-        JsonUtils.ReadJsonFromFile<SerializationChunk>($"chunks/externalDefs/{name}.json"),
+        JsonUtils.ReadJsonFromString<SerializationChunk>(File.ReadAllText($"chunks/externalDefs/{name}.json")),
         dependentLanguages
     ).ToArray();
 

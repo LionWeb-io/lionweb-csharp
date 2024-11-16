@@ -20,42 +20,36 @@ namespace LionWeb.Core.M1;
 using M2;
 using Serialization;
 
-public class Serializer : SerializerBase
+/// <inheritdoc cref="ISerializer"/>
+public class Serializer : SerializerBase, ISerializer
 {
-    private readonly IEnumerable<INode> _nodes;
+    private readonly DuplicateIdChecker _duplicateIdChecker = new();
 
-    public Serializer(IEnumerable<INode> nodes)
+    /// <inheritdoc cref="ISerializerExtensions.SerializeToChunk"/>
+    public static SerializationChunk SerializeToChunk(IEnumerable<IReadableNode> nodes) =>
+        new Serializer().SerializeToChunk(nodes);
+
+    /// <inheritdoc />
+    public override IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes)
     {
-        _nodes = nodes;
+        foreach (var node in allNodes)
+        {
+            RegisterUsedLanguage(node.GetClassifier().GetLanguage());
+            var result = SerializeNode(node);
+            if (result != null)
+                yield return result;
+        }
     }
 
-    /// <summary>
-    /// Serializes a given <paramref name="nodes">iterable collection of nodes</paramref>.
-    /// </summary>
-    /// 
-    /// <returns>A data structure that can be directly serialized/unparsed to JSON.</returns>
-    public static SerializationChunk Serialize(IEnumerable<INode> nodes) =>
-        new Serializer(nodes).Serialize();
-
-    public SerializationChunk Serialize()
+    private SerializedNode? SerializeNode(IReadableNode node)
     {
-        var allNodes = _nodes
-            .SelectMany(node => node.Descendants(true, true))
-            .Distinct()
-            .ToList();
-        var languagesUsed = allNodes
-            .Select(node => node.GetClassifier().GetLanguage())
-            .Distinct();
-        return new SerializationChunk
+        var id = node.GetId();
+        if (_duplicateIdChecker.IsIdDuplicate(Compress(id)))
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
-            Languages = languagesUsed
-                .Where(language => language.Key != BuiltInsLanguage.LionCoreBuiltInsIdAndKey)
-                .Select(SerializedLanguageReference)
-                .ToArray(),
-            Nodes = allNodes
-                .Select(SerializeSimpleNode)
-                .ToArray()
-        };
+            Handler.DuplicateNodeId(node);
+            return null;
+        }
+
+        return SerializeSimpleNode(node);
     }
 }

@@ -19,7 +19,7 @@ namespace LionWeb.Core.M2;
 
 using M3;
 using System.Collections;
-using System.Collections.Frozen;
+using System.Collections.Immutable;
 using Utilities;
 
 /// <summary>
@@ -40,7 +40,8 @@ public static class M2Extensions
         IEnumerable<T> result = ts.Where(t => t.Key == key);
         if (!result.Any())
         {
-            throw new KeyNotFoundException($"could not find element with key=\"{key}\" among: {string.Join(", ", ts.Select(t => t.Key))}");
+            throw new KeyNotFoundException(
+                $"could not find element with key=\"{key}\" among: {string.Join(", ", ts.Select(t => t.Key))}");
         }
 
         return result.First();
@@ -81,7 +82,7 @@ public static class M2Extensions
         classifier.AllGeneralizations()
             .Prepend(classifier)
             .SelectMany(c => c.Features)
-            .ToFrozenSet();
+            .ToImmutableHashSet();
 
     /// <summary>
     /// Enumerates all direct generalizations (aka supertypes) of <paramref name="classifier"/>. 
@@ -115,7 +116,7 @@ public static class M2Extensions
         }
 
         result.AddRange(annotation.Implements);
-        return result.ToFrozenSet();
+        return result.ToImmutableHashSet();
     }
 
     /// <summary>
@@ -132,7 +133,7 @@ public static class M2Extensions
         }
 
         result.AddRange(concept.Implements);
-        return result.ToFrozenSet();
+        return result.ToImmutableHashSet();
     }
 
     /// <summary>
@@ -141,7 +142,7 @@ public static class M2Extensions
     /// <param name="iface">Interface to find generalizations of.</param>
     /// <returns><paramref name="iface"/>'s <i>extended</i> Interfaces.</returns>
     public static ISet<Classifier> DirectGeneralizations(this Interface iface) =>
-        iface.Extends.OfType<Classifier>().ToFrozenSet();
+        iface.Extends.OfType<Classifier>().ToImmutableHashSet();
 
     /// <summary>
     /// Enumerates all direct and indirect generalizations (aka supertypes) of <paramref name="classifier"/>.
@@ -159,7 +160,7 @@ public static class M2Extensions
         if (!includeSelf)
             result = result.Except([classifier]);
 
-        return result.ToFrozenSet();
+        return result.ToImmutableHashSet();
     }
 
     private static IEnumerable<Classifier> CollectGeneralizations(Classifier basis, ISet<Classifier> processed)
@@ -187,7 +188,7 @@ public static class M2Extensions
 
         return directSpecializations[classifier]
             .Except([classifier])
-            .ToFrozenSet();
+            .ToImmutableHashSet();
     }
 
     private static ILookup<Classifier, Classifier> MapAllSpecializations(IEnumerable<Language> languages) =>
@@ -213,12 +214,13 @@ public static class M2Extensions
     {
         ILookup<Classifier, Classifier> directSpecializations = MapAllSpecializations(languages);
 
-        IEnumerable<Classifier> result = CollectSpecializations(classifier, directSpecializations, new HashSet<Classifier>());
+        IEnumerable<Classifier> result =
+            CollectSpecializations(classifier, directSpecializations, new HashSet<Classifier>());
 
         if (!includeSelf)
             result = result.Except([classifier]);
 
-        return result.ToFrozenSet();
+        return result.ToImmutableHashSet();
     }
 
     private static IEnumerable<Classifier> CollectSpecializations(Classifier basis,
@@ -357,6 +359,9 @@ public static class M2Extensions
             }
         }
     }
+
+    public static bool AreAllReadableNodes(IEnumerable enumerable) =>
+        enumerable.Cast<object?>().All(o => o is IReadableNode and not INode);
 
     /// <summary>
     /// Checks whether all entries in <paramref name="enumerable"/> are of type <typeparamref name="T"/>.
