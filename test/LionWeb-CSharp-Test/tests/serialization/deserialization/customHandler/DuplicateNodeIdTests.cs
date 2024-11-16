@@ -55,7 +55,7 @@ public class DuplicateNodeIdTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "First"
                         }
@@ -113,7 +113,7 @@ public class DuplicateNodeIdTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "Second"
                         }
@@ -209,7 +209,7 @@ public class DuplicateNodeIdTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "First"
                         }
@@ -267,7 +267,7 @@ public class DuplicateNodeIdTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "Second"
                         }
@@ -375,7 +375,7 @@ public class DuplicateNodeIdTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "First"
                         }
@@ -433,7 +433,7 @@ public class DuplicateNodeIdTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "Second"
                         }
