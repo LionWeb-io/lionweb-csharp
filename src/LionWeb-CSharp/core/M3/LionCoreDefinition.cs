@@ -405,6 +405,7 @@ public sealed class M3Language : LanguageBase<M3Factory>
             Enumeration,
             EnumerationLiteral,
             Feature,
+            Field,
             IKeyed,
             Interface,
             Language,
