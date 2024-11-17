@@ -164,7 +164,7 @@ public sealed class BuiltInsFactory : INodeFactory
     /// <inheritdoc />
     public IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
         IFieldValues fieldValues) =>
-        throw new UnsupportedStructuredDatatypeException(structuredDataType);
+        throw new UnsupportedStructuredDataTypeException(structuredDataType);
 }
 
 /// <summary>

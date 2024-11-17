@@ -39,7 +39,7 @@ public interface INodeFactory
     public Enum GetEnumerationLiteral(EnumerationLiteral literal);
 
     /// <returns>An instance of <paramref name="structuredDataType"/>, initialized with <paramref name="fieldValues"/>.</returns>
-    /// <exception cref="UnsupportedStructuredDatatypeException">If <paramref name="structuredDataType"/> cannot be created.</exception>
+    /// <exception cref="UnsupportedStructuredDataTypeException">If <paramref name="structuredDataType"/> cannot be created.</exception>
     public IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues);
 }
 

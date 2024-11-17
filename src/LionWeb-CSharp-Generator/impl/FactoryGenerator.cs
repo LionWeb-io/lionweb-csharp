@@ -165,7 +165,7 @@ public class FactoryGenerator(INames names) : GeneratorBase(names)
                     .Select(GenCreateStructuredDataTypeInstance)
                     .Append(
                         ThrowStatement(NewCall([IdentifierName("structuredDataType")],
-                            AsType(typeof(UnsupportedStructuredDatatypeException))
+                            AsType(typeof(UnsupportedStructuredDataTypeException))
                         ))
                     )
             ));

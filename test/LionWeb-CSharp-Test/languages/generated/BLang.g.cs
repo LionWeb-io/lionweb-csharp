@@ -83,7 +83,7 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 	/// <inheritdoc/>
         public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
 	{
-		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
 	public virtual BConcept NewBConcept(string id) => new(id);

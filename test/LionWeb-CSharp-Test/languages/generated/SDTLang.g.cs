@@ -261,7 +261,7 @@ public class SDTLangFactory : AbstractBaseNodeFactory, ISDTLangFactory
 			return new E((string?)fieldValues.Get(_language.E_name), (F?)fieldValues.Get(_language.E_e2f), (B?)fieldValues.Get(_language.E_e2b));
 		if (_language.F.EqualsIdentity(structuredDataType))
 			return new F((string?)fieldValues.Get(_language.F_name), (C?)fieldValues.Get(_language.F_f2c));
-		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
 	public virtual SDTConcept NewSDTConcept(string id) => new(id);

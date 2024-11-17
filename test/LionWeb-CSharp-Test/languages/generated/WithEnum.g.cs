@@ -93,7 +93,7 @@ public class WithEnumFactory : AbstractBaseNodeFactory, IWithEnumFactory
 	/// <inheritdoc/>
         public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
 	{
-		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
 	public virtual EnumHolder NewEnumHolder(string id) => new(id);

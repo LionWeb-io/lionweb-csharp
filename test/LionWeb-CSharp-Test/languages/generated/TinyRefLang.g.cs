@@ -83,7 +83,7 @@ public class TinyRefLangFactory : AbstractBaseNodeFactory, ITinyRefLangFactory
 	/// <inheritdoc/>
         public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
 	{
-		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
 	public virtual MyConcept NewMyConcept(string id) => new(id);

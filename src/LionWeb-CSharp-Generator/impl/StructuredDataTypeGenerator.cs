@@ -26,7 +26,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
 
 /// <summary>
-/// Generates StructuredDatatype readonly record structs.
+/// Generates StructuredDataType readonly record structs.
 /// </summary>
 public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) : GeneratorBase(names)
 {

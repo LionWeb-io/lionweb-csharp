@@ -150,8 +150,8 @@ public class UnsupportedEnumerationLiteralException(EnumerationLiteral literal)
 /// Might happen if a NodeFactory cannot <see cref="INodeFactory.CreateStructuredDataTypeInstance">create</see> an instance of <paramref name="sdt"/>.
 /// </summary>
 /// <param name="sdt">Unsupported Structured Datatype.</param>
-public class UnsupportedStructuredDatatypeException(StructuredDataType sdt)
-    : LionWebExceptionBase($"StructuredDatatype {sdt.Name} not supported");
+public class UnsupportedStructuredDataTypeException(StructuredDataType sdt)
+    : LionWebExceptionBase($"StructuredDataType {sdt.Name} not supported");
 
 /// <summary>
 /// Trying to operate on an object that's not an <see cref="INode"/>.

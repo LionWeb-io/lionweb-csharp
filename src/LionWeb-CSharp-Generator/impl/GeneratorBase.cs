@@ -93,7 +93,7 @@ public abstract class GeneratorBase
         return MemberAccess(_names.MetaProperty(feature.GetLanguage()), _names.AsProperty(feature));
     }
 
-    /// <returns><c>MyLang.Instance.MyStructuredDatatype_MyField</c></returns>
+    /// <returns><c>MyLang.Instance.MyStructuredDataType_MyField</c></returns>
     protected MemberAccessExpressionSyntax MetaProperty(Field field) =>
         MemberAccess(_names.MetaProperty(field.GetLanguage()), _names.AsProperty(field));
 

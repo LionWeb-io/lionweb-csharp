@@ -157,7 +157,7 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 	/// <inheritdoc/>
         public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
 	{
-		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
 	public virtual Book NewBook(string id) => new(id);

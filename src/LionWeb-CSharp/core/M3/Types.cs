@@ -168,6 +168,10 @@ public interface Interface : Classifier
 /// <summary>
 /// A type of value which has no relevant identity in the context of a model.
 /// </summary>
+/// <remarks>
+/// In official LionWeb, the correct name is <tt>DataType</tt> (uppercase T).
+/// We keep the lowercase version for backwards compatibility.
+/// </remarks>
 public interface Datatype : LanguageEntity;
 
 /// <summary>

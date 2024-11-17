@@ -141,7 +141,7 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 	/// <inheritdoc/>
         public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
 	{
-		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
 	[Obsolete("deprConcept comment")]

@@ -98,7 +98,7 @@ public interface INames
     /// <returns><c>MyEnum_MyLiteral</c></returns>
     IdentifierNameSyntax AsProperty(EnumerationLiteral literal);
 
-    /// <returns><c>MyStructuredDatatype_MyField</c></returns>
+    /// <returns><c>MyStructuredDataType_MyField</c></returns>
     IdentifierNameSyntax AsProperty(Field field);
 
     /// <returns><c>MyLanguage.Instance</c></returns>

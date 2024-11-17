@@ -119,7 +119,7 @@ public class SpecificFactory : AbstractBaseNodeFactory, ISpecificFactory
     /// <inheritdoc/>
     public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
         IFieldValues fieldValues) =>
-        throw new UnsupportedStructuredDatatypeException(structuredDataType);
+        throw new UnsupportedStructuredDataTypeException(structuredDataType);
 
     public virtual ConceptDescription NewConceptDescription(string id) => new(id);
 	public virtual ConceptDescription CreateConceptDescription() => NewConceptDescription(GetNewId());

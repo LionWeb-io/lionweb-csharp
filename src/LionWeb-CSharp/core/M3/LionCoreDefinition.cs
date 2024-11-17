@@ -839,5 +839,5 @@ public sealed class M3Factory : INodeFactory
     /// <inheritdoc />
     public IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
         IFieldValues fieldValues) =>
-        throw new UnsupportedStructuredDatatypeException(structuredDataType);
+        throw new UnsupportedStructuredDataTypeException(structuredDataType);
 }
