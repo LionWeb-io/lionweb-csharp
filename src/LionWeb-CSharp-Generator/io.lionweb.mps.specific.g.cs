@@ -116,7 +116,12 @@ public class SpecificFactory : AbstractBaseNodeFactory, ISpecificFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public virtual ConceptDescription NewConceptDescription(string id) => new(id);
+    /// <inheritdoc/>
+    public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues) =>
+        throw new UnsupportedStructuredDatatypeException(structuredDataType);
+
+    public virtual ConceptDescription NewConceptDescription(string id) => new(id);
 	public virtual ConceptDescription CreateConceptDescription() => NewConceptDescription(GetNewId());
 	public virtual Deprecated NewDeprecated(string id) => new(id);
 	public virtual Deprecated CreateDeprecated() => NewDeprecated(GetNewId());

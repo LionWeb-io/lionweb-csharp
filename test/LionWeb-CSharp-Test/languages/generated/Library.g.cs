@@ -154,6 +154,12 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+	}
+
 	public virtual Book NewBook(string id) => new(id);
 	public virtual Book CreateBook() => NewBook(GetNewId());
 	public virtual Library NewLibrary(string id) => new(id);

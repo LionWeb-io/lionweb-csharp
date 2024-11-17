@@ -160,6 +160,11 @@ public sealed class BuiltInsFactory : INodeFactory
     /// <inheritdoc />
     public Enum GetEnumerationLiteral(EnumerationLiteral literal) =>
         throw new UnsupportedEnumerationLiteralException(literal);
+
+    /// <inheritdoc />
+    public IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues) =>
+        throw new UnsupportedStructuredDatatypeException(structuredDataType);
 }
 
 /// <summary>

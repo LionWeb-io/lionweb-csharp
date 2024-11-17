@@ -241,7 +241,7 @@ public class SerializationTests
         var serializedNode = serializedNodes.First();
 
         Assert.AreEqual(
-            """{"key-SDTValue":{"key-SDTInt":"23","key-SDTFrac":"42"},"key-SDTCurrency":"EUR","key-SDTDigital":"true"}""",
+            """{"key-SDTValue":{"key-SDTInt":"23","key-SDTFrac":"42"},"key-SDTCurrency":"key-SDTEur","key-SDTDigital":"true"}""",
             serializedNode.Properties.First(p => p.Property.Key == "key-SDTamountField").Value);
 
         Assert.AreEqual(
@@ -255,6 +255,16 @@ public class SerializationTests
         Assert.AreEqual(
             """{"key-SDTFqnName":"A","key-SDTFqnNested":{"key-SDTFqnName":"B","key-SDTFqnNested":{"key-SDTFqnName":"C"}}}""",
             serializedNode.Properties.First(p => p.Property.Key == "key-SDTFqnField").Value);
+
+
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(SDTLangLanguage.Instance)
+            .WithLanguage(SDTLangLanguage.Instance)
+            .Build()
+            .Deserialize(serializedNodes);
+
+        var comparer = new Comparer([node], nodes);
+        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
     private TestContext testContextInstance;

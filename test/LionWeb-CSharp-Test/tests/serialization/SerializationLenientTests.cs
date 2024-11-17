@@ -81,6 +81,11 @@ public class SerializationLenientTests
 
         public override Enum GetEnumerationLiteral(EnumerationLiteral literal) =>
             EnumValueFor<Enum>(literal);
+
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(
+            StructuredDataType structuredDataType,
+            IFieldValues fieldValues) =>
+            StructuredDataTypeInstanceFor(structuredDataType.GetType(), fieldValues);
     }
 
     class LenientHandler : DeserializerExceptionHandler

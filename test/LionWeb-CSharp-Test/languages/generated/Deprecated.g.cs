@@ -138,6 +138,12 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+	}
+
 	[Obsolete("deprConcept comment")]
 	public virtual DeprConcept NewDeprConcept(string id) => new(id);
 	[Obsolete("deprConcept comment")]

@@ -18,6 +18,7 @@
 namespace LionWeb.Core.M2;
 
 using M3;
+using System.Reflection;
 
 /// <summary>
 /// Common supertype of all LionCore attributes.
@@ -126,4 +127,12 @@ public static class AttributeExtensions
     /// <returns>The key declared on the given enumeration value</returns>
     public static string? LionCoreKey(this Enum enumValue)
         => enumValue.GetAttributeOfType<LionCoreMetaPointer>()?.Key;
+
+    /// <summary>
+    /// Gets the LionCore key from the given C# property.
+    /// </summary>
+    /// <param name="propertyInfo">The C# property</param>
+    /// <returns>The key declared on the given C# property</returns>
+    public static string? LionCoreKey(this PropertyInfo propertyInfo)
+        => propertyInfo.GetCustomAttributes<LionCoreMetaPointer>().FirstOrDefault()?.Key;
 }

@@ -90,6 +90,12 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+	}
+
 	public virtual AConcept NewAConcept(string id) => new(id);
 	public virtual AConcept CreateAConcept() => NewAConcept(GetNewId());
 }

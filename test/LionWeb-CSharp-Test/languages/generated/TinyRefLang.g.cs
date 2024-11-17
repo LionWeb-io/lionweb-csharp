@@ -80,6 +80,12 @@ public class TinyRefLangFactory : AbstractBaseNodeFactory, ITinyRefLangFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+	}
+
 	public virtual MyConcept NewMyConcept(string id) => new(id);
 	public virtual MyConcept CreateMyConcept() => NewMyConcept(GetNewId());
 }

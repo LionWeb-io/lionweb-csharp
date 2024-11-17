@@ -19,6 +19,7 @@ namespace LionWeb.Core.M2;
 
 using M3;
 using Serialization;
+using System.Collections;
 using System.Reflection;
 using System.Reflection.Emit;
 using Utilities;
@@ -30,10 +31,42 @@ using Utilities;
 public interface INodeFactory
 {
     /// <returns>A node created given the <paramref name="id">ID</paramref> and <paramref name="classifier">Classifier</paramref>.</returns>
+    /// <exception cref="UnsupportedClassifierException">If <paramref name="classifier"/> cannot be instantiated.</exception>
     public INode CreateNode(string id, Classifier classifier);
 
     /// <returns>The C# (runtime) enumeration literal corresponding to the given <paramref name="literal">LionCore M3 enumeration literal</paramref>.</returns>
+    /// <exception cref="UnsupportedEnumerationLiteralException">If <paramref name="literal"/> cannot be found.</exception>
     public Enum GetEnumerationLiteral(EnumerationLiteral literal);
+
+    /// <returns>An instance of <paramref name="structuredDataType"/>, initialized with <paramref name="fieldValues"/>.</returns>
+    /// <exception cref="UnsupportedStructuredDatatypeException">If <paramref name="structuredDataType"/> cannot be created.</exception>
+    public IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues);
+}
+
+public interface IFieldValues: IEnumerable<(Field, object?)>
+{
+    object? Get(Field field);
+}
+
+public class FieldValues: IFieldValues
+{
+    private readonly Dictionary<Field, object?> _fieldValues;
+
+    public FieldValues(IEnumerable<(Field, object?)> fieldValues)
+    {
+        _fieldValues = fieldValues.ToDictionary(new FieldIdentityComparer());
+    }
+
+    public object? Get(Field field) =>
+        _fieldValues.GetValueOrDefault(field);
+
+    /// <inheritdoc />
+    public IEnumerator<(Field, object?)> GetEnumerator() =>
+        _fieldValues.Select(p => (p.Key, p.Value)).GetEnumerator();
+
+    /// <inheritdoc />
+    IEnumerator IEnumerable.GetEnumerator() =>
+        GetEnumerator();
 }
 
 /// <summary>
@@ -79,6 +112,23 @@ public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
                .OfType<T>()
                .FirstOrDefault(enumValue => enumValue.LionCoreKey() == literal.Key)
            ?? throw new UnsupportedEnumerationLiteralException(literal);
+
+    protected IStructuredDataTypeInstance StructuredDataTypeInstanceFor(Type sdtType, IFieldValues fieldValues)
+    {
+        var result = sdtType.TypeInitializer.Invoke([]);
+
+        foreach ((Field field, var value) in fieldValues)
+        {
+            var propertyInfo = sdtType.GetProperties().FirstOrDefault(p => p.LionCoreKey() == field.Key);
+            propertyInfo.SetValue(result, value);
+        }
+
+        return (IStructuredDataTypeInstance)result;
+    }
+
+    /// <inheritdoc />
+    public abstract IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues);
 }
 
 /// <summary>
@@ -110,6 +160,11 @@ public class MultiLanguageNodeFactory : INodeFactory
     /// <inheritdoc />
     public Enum GetEnumerationLiteral(EnumerationLiteral literal)
         => _map[literal.GetEnumeration().GetLanguage()].GetEnumerationLiteral(literal);
+
+    /// <inheritdoc />
+    public IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues)
+        => _map[structuredDataType.GetLanguage()].CreateStructuredDataTypeInstance(structuredDataType, fieldValues);
 }
 
 /// Creates all requested node instances and enumerations dynamically.
@@ -152,4 +207,9 @@ public class ReflectiveBaseNodeFactory(Language language) : AbstractBaseNodeFact
         _enums[literal.GetEnumeration()] = type;
         return Enum.Parse(type, literal.Name) as Enum;
     }
+
+    /// <inheritdoc />
+    public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues) =>
+        StructuredDataTypeInstanceFor(structuredDataType.GetType(), fieldValues);
 }

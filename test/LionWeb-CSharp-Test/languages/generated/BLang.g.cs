@@ -80,6 +80,12 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+	}
+
 	public virtual BConcept NewBConcept(string id) => new(id);
 	public virtual BConcept CreateBConcept() => NewBConcept(GetNewId());
 }

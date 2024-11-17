@@ -72,37 +72,18 @@ public partial class Deserializer
             if (property == null)
                 continue;
 
-            var convertedValue = (property, value: serializedProperty.Value) switch
-            {
-                (_, null) => null,
-                (Property { Type: PrimitiveType } p, { } v) => ConvertPrimitiveType(node, p, v),
-                (Property { Type: Enumeration enumeration }, { } v) =>
-                    _deserializerMetaInfo.ConvertEnumeration(node, property, enumeration, v),
-                var (_, v) => Handler.UnknownDatatype(property, v, node)
-            };
+            var convertedValue = _deserializerMetaInfo.ConvertDatatype(
+                node,
+                property,
+                property.GetFeatureType(),
+                serializedProperty.Value
+            );
 
             if (convertedValue == null)
                 continue;
 
             node.Set(property, convertedValue);
         }
-    }
-
-    private object? ConvertPrimitiveType(IWritableNode node, Property property, string value)
-    {
-        CompressedId compressedId = Compress(node.GetId());
-        return property.Type switch
-        {
-            var b when b == BuiltInsLanguage.Instance.Boolean => bool.TryParse(value, out var result)
-                ? result
-                : Handler.InvalidPropertyValue<bool>(value, property, compressedId),
-            var i when i == BuiltInsLanguage.Instance.Integer => int.TryParse(value, out var result)
-                ? result
-                : Handler.InvalidPropertyValue<int>(value, property, compressedId),
-            // leave a String value as a string:
-            var s when s == BuiltInsLanguage.Instance.String => value,
-            _ => Handler.UnknownDatatype(property, value, node)
-        };
     }
 
     private void RegisterAnnotations(SerializedNode serializedNode, CompressedId compressedId)

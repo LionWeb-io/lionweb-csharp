@@ -238,6 +238,32 @@ public class SDTLangFactory : AbstractBaseNodeFactory, ISDTLangFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		if (_language.Amount.EqualsIdentity(structuredDataType))
+			return new Amount((Decimal?)fieldValues.Get(_language.Amount_value), (Currency?)fieldValues.Get(_language.Amount_currency), (bool?)fieldValues.Get(_language.Amount_digital));
+		if (_language.Decimal.EqualsIdentity(structuredDataType))
+			return new Decimal((int?)fieldValues.Get(_language.Decimal_int), (int?)fieldValues.Get(_language.Decimal_frac));
+		if (_language.ComplexNumber.EqualsIdentity(structuredDataType))
+			return new ComplexNumber((Decimal?)fieldValues.Get(_language.ComplexNumber_real), (Decimal?)fieldValues.Get(_language.ComplexNumber_imaginary));
+		if (_language.FullyQualifiedName.EqualsIdentity(structuredDataType))
+			return new FullyQualifiedName((string?)fieldValues.Get(_language.FullyQualifiedName_name), (FullyQualifiedName?)fieldValues.Get(_language.FullyQualifiedName_nested));
+		if (_language.A.EqualsIdentity(structuredDataType))
+			return new A((string?)fieldValues.Get(_language.A_name), (B?)fieldValues.Get(_language.A_a2b), (C?)fieldValues.Get(_language.A_a2c));
+		if (_language.B.EqualsIdentity(structuredDataType))
+			return new B((string?)fieldValues.Get(_language.B_name), (D?)fieldValues.Get(_language.B_b2d));
+		if (_language.C.EqualsIdentity(structuredDataType))
+			return new C((string?)fieldValues.Get(_language.C_name), (D?)fieldValues.Get(_language.C_c2d), (E?)fieldValues.Get(_language.C_c2e));
+		if (_language.D.EqualsIdentity(structuredDataType))
+			return new D((string?)fieldValues.Get(_language.D_name));
+		if (_language.E.EqualsIdentity(structuredDataType))
+			return new E((string?)fieldValues.Get(_language.E_name), (F?)fieldValues.Get(_language.E_e2f), (B?)fieldValues.Get(_language.E_e2b));
+		if (_language.F.EqualsIdentity(structuredDataType))
+			return new F((string?)fieldValues.Get(_language.F_name), (C?)fieldValues.Get(_language.F_f2c));
+		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+	}
+
 	public virtual SDTConcept NewSDTConcept(string id) => new(id);
 	public virtual SDTConcept CreateSDTConcept() => NewSDTConcept(GetNewId());
 }
@@ -479,6 +505,20 @@ public readonly record struct Amount : IStructuredDataTypeInstance
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTDigital")]
 	public bool Digital { get => _digital ?? throw new UnsetFieldException(SDTLangLanguage.Instance.Amount_digital); init => _digital = value; }
 
+	public Amount()
+	{
+		_value = null;
+		_currency = null;
+		_digital = null;
+	}
+
+	internal Amount(Decimal? value_, Currency? currency_, bool? digital_)
+	{
+		_value = value_;
+		_currency = currency_;
+		_digital = digital_;
+	}
+
 	/// <inheritdoc/>
         public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.Amount;
 	/// <inheritdoc/>
@@ -518,6 +558,18 @@ public readonly record struct Decimal : IStructuredDataTypeInstance
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTFrac")]
 	public int Frac { get => _frac ?? throw new UnsetFieldException(SDTLangLanguage.Instance.Decimal_frac); init => _frac = value; }
 
+	public Decimal()
+	{
+		_int = null;
+		_frac = null;
+	}
+
+	internal Decimal(int? int_, int? frac_)
+	{
+		_int = int_;
+		_frac = frac_;
+	}
+
 	/// <inheritdoc/>
         public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.Decimal;
 	/// <inheritdoc/>
@@ -552,6 +604,18 @@ public readonly record struct ComplexNumber : IStructuredDataTypeInstance
 	private readonly Decimal? _imaginary;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTImaginary")]
 	public Decimal Imaginary { get => _imaginary ?? throw new UnsetFieldException(SDTLangLanguage.Instance.ComplexNumber_imaginary); init => _imaginary = value; }
+
+	public ComplexNumber()
+	{
+		_real = null;
+		_imaginary = null;
+	}
+
+	internal ComplexNumber(Decimal? real_, Decimal? imaginary_)
+	{
+		_real = real_;
+		_imaginary = imaginary_;
+	}
 
 	/// <inheritdoc/>
         public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.ComplexNumber;
@@ -590,8 +654,14 @@ public readonly record struct FullyQualifiedName : IStructuredDataTypeInstance
 
 	public FullyQualifiedName()
 	{
-		_name = default;
+		_name = null;
 		_nested = new(null);
+	}
+
+	internal FullyQualifiedName(string? name_, FullyQualifiedName? nested_)
+	{
+		_name = name_;
+		_nested = new(nested_);
 	}
 
 	/// <inheritdoc/>
@@ -635,9 +705,16 @@ public readonly record struct A : IStructuredDataTypeInstance
 
 	public A()
 	{
-		_name = default;
-		_a2b = default;
+		_name = null;
+		_a2b = null;
 		_a2c = new(null);
+	}
+
+	internal A(string? name_, B? a2b_, C? a2c_)
+	{
+		_name = name_;
+		_a2b = a2b_;
+		_a2c = new(a2c_);
 	}
 
 	/// <inheritdoc/>
@@ -678,6 +755,18 @@ public readonly record struct B : IStructuredDataTypeInstance
 	private readonly D? _b2d;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTb2d")]
 	public D B2d { get => _b2d ?? throw new UnsetFieldException(SDTLangLanguage.Instance.B_b2d); init => _b2d = value; }
+
+	public B()
+	{
+		_name = null;
+		_b2d = null;
+	}
+
+	internal B(string? name_, D? b2d_)
+	{
+		_name = name_;
+		_b2d = b2d_;
+	}
 
 	/// <inheritdoc/>
         public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.B;
@@ -720,9 +809,16 @@ public readonly record struct C : IStructuredDataTypeInstance
 
 	public C()
 	{
-		_name = default;
-		_c2d = default;
+		_name = null;
+		_c2d = null;
 		_c2e = new(null);
+	}
+
+	internal C(string? name_, D? c2d_, E? c2e_)
+	{
+		_name = name_;
+		_c2d = c2d_;
+		_c2e = new(c2e_);
 	}
 
 	/// <inheritdoc/>
@@ -759,6 +855,16 @@ public readonly record struct D : IStructuredDataTypeInstance
 	private readonly string? _name;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTdName")]
 	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.D_name); init => _name = value; }
+
+	public D()
+	{
+		_name = null;
+	}
+
+	internal D(string? name_)
+	{
+		_name = name_;
+	}
 
 	/// <inheritdoc/>
         public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.D;
@@ -797,9 +903,16 @@ public readonly record struct E : IStructuredDataTypeInstance
 
 	public E()
 	{
-		_name = default;
+		_name = null;
 		_e2f = new(null);
-		_e2b = default;
+		_e2b = null;
+	}
+
+	internal E(string? name_, F? e2f_, B? e2b_)
+	{
+		_name = name_;
+		_e2f = new(e2f_);
+		_e2b = e2b_;
 	}
 
 	/// <inheritdoc/>
@@ -843,8 +956,14 @@ public readonly record struct F : IStructuredDataTypeInstance
 
 	public F()
 	{
-		_name = default;
+		_name = null;
 		_f2c = new(null);
+	}
+
+	internal F(string? name_, C? f2c_)
+	{
+		_name = name_;
+		_f2c = new(f2c_);
 	}
 
 	/// <inheritdoc/>

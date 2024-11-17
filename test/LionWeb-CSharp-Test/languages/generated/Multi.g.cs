@@ -76,6 +76,12 @@ public class MultiFactory : AbstractBaseNodeFactory, IMultiFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+	}
+
 	public virtual Container NewContainer(string id) => new(id);
 	public virtual Container CreateContainer() => NewContainer(GetNewId());
 }

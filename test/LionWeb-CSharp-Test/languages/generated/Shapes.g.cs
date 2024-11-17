@@ -295,6 +295,12 @@ public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDatatypeException(structuredDataType);
+	}
+
 	public virtual Circle NewCircle(string id) => new(id);
 	public virtual Circle CreateCircle() => NewCircle(GetNewId());
 	public virtual Coord NewCoord(string id) => new(id);

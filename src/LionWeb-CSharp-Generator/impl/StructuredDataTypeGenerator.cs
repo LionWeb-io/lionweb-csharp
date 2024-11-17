@@ -34,14 +34,10 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) :
     public RecordDeclarationSyntax SdtType()
     {
         var members = sdt.Fields.SelectMany(Field);
-        if (sdt.Fields.Any(IsLazyField))
-        {
-            members = members.Append(Constructor(sdt.Name)
-                .WithBody(AsStatements(sdt.Fields.Select(FieldInitializer)))
-            );
-        }
 
         members = members.Concat([
+            GenDefaultConstructor(),
+            GenInternalConstructor(),
             GenGetStructuredDataType(),
             GenCollectAllSetFields(),
             GenGet()
@@ -62,6 +58,47 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) :
             .WithCloseBraceToken(Token(SyntaxKind.CloseBraceToken));
     }
 
+    #region DefaultConstructor
+
+    private ConstructorDeclarationSyntax GenDefaultConstructor() =>
+        Constructor(sdt.Name)
+            .WithBody(AsStatements(sdt.Fields.Select(DefaultFieldInitializer)));
+
+    private StatementSyntax DefaultFieldInitializer(Field field)
+    {
+        ExpressionSyntax initializer = IsLazyField(field)
+            ? NewCall([Null()])
+            : Null();
+
+        return Assignment(FieldField(field).ToString(), initializer);
+    }
+
+    #endregion
+    
+    #region InternalConstructor
+    
+    private ConstructorDeclarationSyntax GenInternalConstructor() =>
+        Constructor(
+            sdt.Name, 
+            sdt.Fields.Select(f => Param(ParamField(f), NullableType(AsType(f.Type)))).ToArray()
+        )
+            .WithModifiers(AsModifiers(SyntaxKind.InternalKeyword))
+            .WithBody(AsStatements(sdt.Fields.Select(InternalFieldInitializer)));
+
+    private StatementSyntax InternalFieldInitializer(Field field)
+    {
+        var paramName = IdentifierName(ParamField(field));
+        ExpressionSyntax initializer = IsLazyField(field)
+            ? NewCall([paramName])
+            : paramName;
+
+        return Assignment(FieldField(field).ToString(), initializer);
+    }
+
+    private string ParamField(Field field) => FieldProperty(field).ToString().ToFirstLower() + "_";
+
+    #endregion
+    
     private MemberDeclarationSyntax GenGetStructuredDataType()
     {
         return Method("GetStructuredDataType", AsType(typeof(StructuredDataType)), exprBody: MetaProperty())
@@ -149,15 +186,6 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) :
         );
 
     #endregion
-
-    private StatementSyntax FieldInitializer(Field field)
-    {
-        ExpressionSyntax initializer = IsLazyField(field)
-            ? NewCall([Null()])
-            : Default();
-
-        return Assignment(FieldField(field).ToString(), initializer);
-    }
 
     private List<MemberDeclarationSyntax> Field(Field field)
     {

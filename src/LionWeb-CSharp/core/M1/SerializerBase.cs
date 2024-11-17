@@ -74,10 +74,10 @@ public abstract class SerializerBase : ISerializer
         _ => value.ToString()
     };
 
-    private string? ConvertStructuredDataType(IStructuredDataTypeInstance sdt) =>
-        SerializeStructuredDataType(sdt).ToJsonString();
+    private string? ConvertStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
+        SerializeStructuredDataType(node, feature, sdt).ToJsonString();
 
-    private JsonObject SerializeStructuredDataType(IStructuredDataTypeInstance sdt) =>
+    private JsonObject SerializeStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
         new(
             sdt.CollectAllSetFields().Select(f =>
             {
@@ -85,8 +85,8 @@ public abstract class SerializerBase : ISerializer
                 JsonNode? value = sdt.Get(f) switch
                 {
                     null => JsonValue.Create((string?)null),
-                    IStructuredDataTypeInstance s => SerializeStructuredDataType(s),
-                    var v => JsonValue.Create(ConvertPrimitiveType(v))
+                    IStructuredDataTypeInstance s => SerializeStructuredDataType(node,feature, s),
+                    var v => JsonValue.Create(ConvertDatatype(node, feature, v))
                 };
                 return KeyValuePair.Create(key, value);
             }), null
@@ -233,16 +233,19 @@ public abstract class SerializerBase : ISerializer
         return new SerializedProperty
         {
             Property = feature.ToMetaPointer(),
-            Value = value switch
-            {
-                null => null,
-                Enum e => e.LionCoreKey(),
-                int or bool or string => ConvertPrimitiveType(value),
-                IStructuredDataTypeInstance s => ConvertStructuredDataType(s),
-                _ => Handler.UnknownDatatype(node, feature, value)
-            }
+            Value = ConvertDatatype(node, feature, value)
         };
     }
+
+    private string? ConvertDatatype(IReadableNode node, Feature feature, object? value) =>
+        value switch
+        {
+            null => null,
+            Enum e => e.LionCoreKey(),
+            int or bool or string => ConvertPrimitiveType(value),
+            IStructuredDataTypeInstance s => ConvertStructuredDataType(node, feature, s),
+            _ => Handler.UnknownDatatype(node, feature, value)
+        };
 
     private SerializedContainment SerializeContainment(KeyValuePair<Feature, object?> pair) =>
         SerializeContainment(AsNodes(pair), pair.Key);
