@@ -269,7 +269,7 @@ public interface IStructuredDataTypeInstance
 /// if <see cref="Lazy{T}.Value"/> is <c>null</c>.
 /// </summary>
 /// <inheritdoc />
-public class NullableLazy<T> : Lazy<T?> where T : notnull
+public class NullableLazy<T> : Lazy<T?> where T : struct
 {
     /// <inheritdoc />
     public NullableLazy(T? value) : base(value)
@@ -307,7 +307,7 @@ public class NullableLazy<T> : Lazy<T?> where T : notnull
             return false;
         }
 
-        return EqualityComparer<T?>.Default.Equals(this.Value, ((NullableLazy<T?>)obj).Value);
+        return EqualityComparer<T?>.Default.Equals(this.Value, ((NullableLazy<T>)obj).Value);
     }
 
     /// <inheritdoc />

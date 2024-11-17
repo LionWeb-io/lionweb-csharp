@@ -51,7 +51,7 @@ var testLanguagesDefinitions = new TestLanguagesDefinitions();
 var aLang = testLanguagesDefinitions.ALang;
 var bLang = testLanguagesDefinitions.BLang;
 var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
-var sdtLang = testLanguagesDefinitions.SDTLang;
+var sdtLang = testLanguagesDefinitions.SdtLang;
 
 List<Names> names =
 [

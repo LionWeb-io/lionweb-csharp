@@ -17,6 +17,7 @@
 
 namespace LionWeb_CSharp_Test.tests.serialization;
 
+using Examples.SDTLang;
 using Examples.Shapes.Dynamic;
 using Examples.Shapes.M2;
 using LionWeb.Core;
@@ -216,6 +217,44 @@ public class SerializationTests
         var serializedNodes = serializer.Serialize(materialGroup.Descendants(true));
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.AreEqual(1, serializer.UsedLanguages.Count());
+    }
+
+    [TestMethod]
+    public void SerializeStructuredDataType()
+    {
+        var node = new SDTConcept("nodeId")
+        {
+            Amount =
+                new Amount { Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true },
+            Decimal = new Decimal { Int = 19 },
+            Complex = new ComplexNumber { Real = new Decimal { Int = 1, Frac = 0 }, Imaginary = new Decimal() },
+            Fqn = new FullyQualifiedName
+            {
+                Name = "A",
+                Nested = new FullyQualifiedName { Name = "B", Nested = new FullyQualifiedName { Name = "C" } }
+            }
+        };
+
+        var serializer = new Serializer();
+        var serializedNodes = serializer.Serialize([node]).ToList();
+        Assert.AreEqual(1, serializedNodes.Count);
+        var serializedNode = serializedNodes.First();
+
+        Assert.AreEqual(
+            """{"key-SDTValue":{"key-SDTInt":"23","key-SDTFrac":"42"},"key-SDTCurrency":"EUR","key-SDTDigital":"true"}""",
+            serializedNode.Properties.First(p => p.Property.Key == "key-SDTamountField").Value);
+
+        Assert.AreEqual(
+            """{"key-SDTInt":"19"}""",
+            serializedNode.Properties.First(p => p.Property.Key == "key-SDTDecimalField").Value);
+
+        Assert.AreEqual(
+            """{"key-SDTReal":{"key-SDTInt":"1","key-SDTFrac":"0"},"key-SDTImaginary":{}}""",
+            serializedNode.Properties.First(p => p.Property.Key == "key-SDTComplexField").Value);
+
+        Assert.AreEqual(
+            """{"key-SDTFqnName":"A","key-SDTFqnNested":{"key-SDTFqnName":"B","key-SDTFqnNested":{"key-SDTFqnName":"C"}}}""",
+            serializedNode.Properties.First(p => p.Property.Key == "key-SDTFqnField").Value);
     }
 
     private TestContext testContextInstance;

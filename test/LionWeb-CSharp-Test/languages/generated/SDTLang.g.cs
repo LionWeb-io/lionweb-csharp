@@ -465,7 +465,7 @@ public enum Currency
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTAmount")]
-public readonly record struct Amount
+public readonly record struct Amount : IStructuredDataTypeInstance
 {
 	private readonly Decimal? _value;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTValue")]
@@ -478,10 +478,37 @@ public readonly record struct Amount
 	private readonly bool? _digital;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTDigital")]
 	public bool Digital { get => _digital ?? throw new UnsetFieldException(SDTLangLanguage.Instance.Amount_digital); init => _digital = value; }
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.Amount;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_value != null)
+			result.Add(SDTLangLanguage.Instance.Amount_value);
+		if (_currency != null)
+			result.Add(SDTLangLanguage.Instance.Amount_currency);
+		if (_digital != null)
+			result.Add(SDTLangLanguage.Instance.Amount_digital);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.Amount_value.EqualsIdentity(field))
+			return Value;
+		if (SDTLangLanguage.Instance.Amount_currency.EqualsIdentity(field))
+			return Currency;
+		if (SDTLangLanguage.Instance.Amount_digital.EqualsIdentity(field))
+			return Digital;
+		throw new UnsetFieldException(field);
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTDecimal")]
-public readonly record struct Decimal
+public readonly record struct Decimal : IStructuredDataTypeInstance
 {
 	private readonly int? _int;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTInt")]
@@ -490,10 +517,33 @@ public readonly record struct Decimal
 	private readonly int? _frac;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTFrac")]
 	public int Frac { get => _frac ?? throw new UnsetFieldException(SDTLangLanguage.Instance.Decimal_frac); init => _frac = value; }
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.Decimal;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_int != null)
+			result.Add(SDTLangLanguage.Instance.Decimal_int);
+		if (_frac != null)
+			result.Add(SDTLangLanguage.Instance.Decimal_frac);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.Decimal_int.EqualsIdentity(field))
+			return Int;
+		if (SDTLangLanguage.Instance.Decimal_frac.EqualsIdentity(field))
+			return Frac;
+		throw new UnsetFieldException(field);
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTComplexNumber")]
-public readonly record struct ComplexNumber
+public readonly record struct ComplexNumber : IStructuredDataTypeInstance
 {
 	private readonly Decimal? _real;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTReal")]
@@ -502,22 +552,74 @@ public readonly record struct ComplexNumber
 	private readonly Decimal? _imaginary;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTImaginary")]
 	public Decimal Imaginary { get => _imaginary ?? throw new UnsetFieldException(SDTLangLanguage.Instance.ComplexNumber_imaginary); init => _imaginary = value; }
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.ComplexNumber;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_real != null)
+			result.Add(SDTLangLanguage.Instance.ComplexNumber_real);
+		if (_imaginary != null)
+			result.Add(SDTLangLanguage.Instance.ComplexNumber_imaginary);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.ComplexNumber_real.EqualsIdentity(field))
+			return Real;
+		if (SDTLangLanguage.Instance.ComplexNumber_imaginary.EqualsIdentity(field))
+			return Imaginary;
+		throw new UnsetFieldException(field);
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTFullyQualifiedName")]
-public readonly record struct FullyQualifiedName
+public readonly record struct FullyQualifiedName : IStructuredDataTypeInstance
 {
 	private readonly string? _name;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTFqnName")]
 	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.FullyQualifiedName_name); init => _name = value; }
 
-	private readonly Lazy<FullyQualifiedName?>? _nested;
+	private readonly NullableLazy<FullyQualifiedName> _nested;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTFqnNested")]
-	public FullyQualifiedName? Nested { get => _nested?.Value; init => _nested = new(value); }
+	public FullyQualifiedName? Nested { get => _nested.Value; init => _nested = new(value); }
+
+	public FullyQualifiedName()
+	{
+		_name = default;
+		_nested = new(null);
+	}
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.FullyQualifiedName;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_name != null)
+			result.Add(SDTLangLanguage.Instance.FullyQualifiedName_name);
+		if (_nested != null && _nested.Value != null)
+			result.Add(SDTLangLanguage.Instance.FullyQualifiedName_nested);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.FullyQualifiedName_name.EqualsIdentity(field))
+			return Name;
+		if (SDTLangLanguage.Instance.FullyQualifiedName_nested.EqualsIdentity(field) && _nested.Value != null)
+			return Nested;
+		throw new UnsetFieldException(field);
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTA")]
-public readonly record struct A
+public readonly record struct A : IStructuredDataTypeInstance
 {
 	private readonly string? _name;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTaName")]
@@ -527,13 +629,47 @@ public readonly record struct A
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTa2b")]
 	public B A2b { get => _a2b ?? throw new UnsetFieldException(SDTLangLanguage.Instance.A_a2b); init => _a2b = value; }
 
-	private readonly Lazy<C?>? _a2c;
+	private readonly NullableLazy<C> _a2c;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTa2c")]
-	public C? A2c { get => _a2c?.Value; init => _a2c = new(value); }
+	public C? A2c { get => _a2c.Value; init => _a2c = new(value); }
+
+	public A()
+	{
+		_name = default;
+		_a2b = default;
+		_a2c = new(null);
+	}
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.A;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_name != null)
+			result.Add(SDTLangLanguage.Instance.A_name);
+		if (_a2b != null)
+			result.Add(SDTLangLanguage.Instance.A_a2b);
+		if (_a2c != null && _a2c.Value != null)
+			result.Add(SDTLangLanguage.Instance.A_a2c);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.A_name.EqualsIdentity(field))
+			return Name;
+		if (SDTLangLanguage.Instance.A_a2b.EqualsIdentity(field))
+			return A2b;
+		if (SDTLangLanguage.Instance.A_a2c.EqualsIdentity(field) && _a2c.Value != null)
+			return A2c;
+		throw new UnsetFieldException(field);
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTB")]
-public readonly record struct B
+public readonly record struct B : IStructuredDataTypeInstance
 {
 	private readonly string? _name;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTbName")]
@@ -542,10 +678,33 @@ public readonly record struct B
 	private readonly D? _b2d;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTb2d")]
 	public D B2d { get => _b2d ?? throw new UnsetFieldException(SDTLangLanguage.Instance.B_b2d); init => _b2d = value; }
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.B;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_name != null)
+			result.Add(SDTLangLanguage.Instance.B_name);
+		if (_b2d != null)
+			result.Add(SDTLangLanguage.Instance.B_b2d);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.B_name.EqualsIdentity(field))
+			return Name;
+		if (SDTLangLanguage.Instance.B_b2d.EqualsIdentity(field))
+			return B2d;
+		throw new UnsetFieldException(field);
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDCT")]
-public readonly record struct C
+public readonly record struct C : IStructuredDataTypeInstance
 {
 	private readonly string? _name;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTcName")]
@@ -555,43 +714,159 @@ public readonly record struct C
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTc2d")]
 	public D C2d { get => _c2d ?? throw new UnsetFieldException(SDTLangLanguage.Instance.C_c2d); init => _c2d = value; }
 
-	private readonly Lazy<E?>? _c2e;
+	private readonly NullableLazy<E> _c2e;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTc2e")]
-	public E? C2e { get => _c2e?.Value; init => _c2e = new(value); }
+	public E? C2e { get => _c2e.Value; init => _c2e = new(value); }
+
+	public C()
+	{
+		_name = default;
+		_c2d = default;
+		_c2e = new(null);
+	}
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.C;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_name != null)
+			result.Add(SDTLangLanguage.Instance.C_name);
+		if (_c2d != null)
+			result.Add(SDTLangLanguage.Instance.C_c2d);
+		if (_c2e != null && _c2e.Value != null)
+			result.Add(SDTLangLanguage.Instance.C_c2e);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.C_name.EqualsIdentity(field))
+			return Name;
+		if (SDTLangLanguage.Instance.C_c2d.EqualsIdentity(field))
+			return C2d;
+		if (SDTLangLanguage.Instance.C_c2e.EqualsIdentity(field) && _c2e.Value != null)
+			return C2e;
+		throw new UnsetFieldException(field);
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDD")]
-public readonly record struct D
+public readonly record struct D : IStructuredDataTypeInstance
 {
 	private readonly string? _name;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTdName")]
 	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.D_name); init => _name = value; }
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.D;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_name != null)
+			result.Add(SDTLangLanguage.Instance.D_name);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.D_name.EqualsIdentity(field))
+			return Name;
+		throw new UnsetFieldException(field);
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDE")]
-public readonly record struct E
+public readonly record struct E : IStructuredDataTypeInstance
 {
 	private readonly string? _name;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTeName")]
 	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.E_name); init => _name = value; }
 
-	private readonly Lazy<F?>? _e2f;
+	private readonly NullableLazy<F> _e2f;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTf")]
-	public F? E2f { get => _e2f?.Value; init => _e2f = new(value); }
+	public F? E2f { get => _e2f.Value; init => _e2f = new(value); }
 
 	private readonly B? _e2b;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTb")]
 	public B E2b { get => _e2b ?? throw new UnsetFieldException(SDTLangLanguage.Instance.E_e2b); init => _e2b = value; }
+
+	public E()
+	{
+		_name = default;
+		_e2f = new(null);
+		_e2b = default;
+	}
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.E;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_name != null)
+			result.Add(SDTLangLanguage.Instance.E_name);
+		if (_e2f != null && _e2f.Value != null)
+			result.Add(SDTLangLanguage.Instance.E_e2f);
+		if (_e2b != null)
+			result.Add(SDTLangLanguage.Instance.E_e2b);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.E_name.EqualsIdentity(field))
+			return Name;
+		if (SDTLangLanguage.Instance.E_e2f.EqualsIdentity(field) && _e2f.Value != null)
+			return E2f;
+		if (SDTLangLanguage.Instance.E_e2b.EqualsIdentity(field))
+			return E2b;
+		throw new UnsetFieldException(field);
+	}
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDF")]
-public readonly record struct F
+public readonly record struct F : IStructuredDataTypeInstance
 {
 	private readonly string? _name;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTfName")]
 	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.F_name); init => _name = value; }
 
-	private readonly Lazy<C?>? _f2c;
+	private readonly NullableLazy<C> _f2c;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTf2c")]
-	public C? F2c { get => _f2c?.Value; init => _f2c = new(value); }
+	public C? F2c { get => _f2c.Value; init => _f2c = new(value); }
+
+	public F()
+	{
+		_name = default;
+		_f2c = new(null);
+	}
+
+	/// <inheritdoc/>
+        public StructuredDataType GetStructuredDataType() => SDTLangLanguage.Instance.F;
+	/// <inheritdoc/>
+        public IEnumerable<Field> CollectAllSetFields()
+	{
+		List<Field> result = [];
+		if (_name != null)
+			result.Add(SDTLangLanguage.Instance.F_name);
+		if (_f2c != null && _f2c.Value != null)
+			result.Add(SDTLangLanguage.Instance.F_f2c);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        public Object? Get(Field field)
+	{
+		if (SDTLangLanguage.Instance.F_name.EqualsIdentity(field))
+			return Name;
+		if (SDTLangLanguage.Instance.F_f2c.EqualsIdentity(field) && _f2c.Value != null)
+			return F2c;
+		throw new UnsetFieldException(field);
+	}
 }

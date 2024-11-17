@@ -31,8 +31,23 @@ using static AstExtensions;
 public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) : GeneratorBase(names)
 {
     /// <inheritdoc cref="StructuredDataTypeGenerator"/>
-    public RecordDeclarationSyntax SdtType() =>
-        RecordDeclaration(SyntaxKind.RecordStructDeclaration,
+    public RecordDeclarationSyntax SdtType()
+    {
+        var members = sdt.Fields.SelectMany(Field);
+        if (sdt.Fields.Any(IsLazyField))
+        {
+            members = members.Append(Constructor(sdt.Name)
+                .WithBody(AsStatements(sdt.Fields.Select(FieldInitializer)))
+            );
+        }
+
+        members = members.Concat([
+            GenGetStructuredDataType(),
+            GenCollectAllSetFields(),
+            GenGet()
+        ]);
+
+        return RecordDeclaration(SyntaxKind.RecordStructDeclaration,
                 Token(SyntaxKind.RecordKeyword), sdt.Name)
             .WithAttributeLists(AsAttributes(
             [
@@ -41,95 +56,187 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) :
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.ReadOnlyKeyword))
             .WithClassOrStructKeyword(Token(SyntaxKind.StructKeyword))
+            .WithBaseList(AsBase(AsType(typeof(IStructuredDataTypeInstance))))
             .WithOpenBraceToken(Token(SyntaxKind.OpenBraceToken))
-            .WithMembers(List(sdt.Fields.SelectMany(f => Field(f))))
+            .WithMembers(List(members))
             .WithCloseBraceToken(Token(SyntaxKind.CloseBraceToken));
+    }
 
-    private bool ContainsSelf(Datatype datatype, HashSet<StructuredDataType> owners)
+    private MemberDeclarationSyntax GenGetStructuredDataType()
     {
-        if (datatype is not StructuredDataType xxx)
-            return false;
-        
-        if (!owners.Add(xxx))
-            return true;
+        return Method("GetStructuredDataType", AsType(typeof(StructuredDataType)), exprBody: MetaProperty())
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .Xdoc(XdocInheritDoc());
+    }
 
-        return xxx.Fields.Any(f => ContainsSelf(f.Type, [..owners]));
-    } 
-    
+    private MemberAccessExpressionSyntax MetaProperty() =>
+        MemberAccess(MemberAccess(LanguageType, IdentifierName("Instance")), _names.AsProperty(sdt));
+
+    #region CollectAllSetFields
+
+    private MemberDeclarationSyntax GenCollectAllSetFields() =>
+        Method("CollectAllSetFields", AsType(typeof(IEnumerable<Field>)))
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .Xdoc(XdocInheritDoc())
+            .WithBody(AsStatements(
+                new List<StatementSyntax> { ParseStatement("List<Field> result = [];") }
+                    .Concat(sdt.Fields.Select(GenCollectAllSetFields))
+                    .Append(ReturnStatement(IdentifierName("result")))
+            ));
+
+    private StatementSyntax GenCollectAllSetFields(Field field)
+    {
+        ExpressionSyntax condition = BinaryExpression(
+            SyntaxKind.NotEqualsExpression,
+            FieldField(field),
+            Null()
+        );
+
+        if (IsLazyField(field))
+        {
+            condition = LazyFieldNotNull(field, condition);
+        }
+
+        return IfStatement(condition, ExpressionStatement(InvocationExpression(
+            MemberAccess(IdentifierName("result"), IdentifierName("Add")),
+            AsArguments([MetaProperty(field)])
+        )));
+    }
+
+    #endregion
+
+    #region Get
+
+    private MemberDeclarationSyntax GenGet() =>
+        Method("Get", NullableType(AsType(typeof(object))), [
+                Param("field", AsType(typeof(Field)))
+            ])
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .Xdoc(XdocInheritDoc())
+            .WithBody(AsStatements(
+                sdt.Fields.Select(GenGetInternal)
+                    .Append(ThrowStatement(NewCall([IdentifierName("field")], AsType(typeof(UnsetFieldException)))))
+            ));
+
+    private StatementSyntax GenGetInternal(Field field)
+    {
+        ExpressionSyntax condition = GenEqualsIdentityField(field);
+
+        if (IsLazyField(field))
+        {
+            condition = LazyFieldNotNull(field, condition);
+        }
+
+        return IfStatement(condition,
+            ReturnStatement(FieldProperty(field))
+        );
+    }
+
+    private BinaryExpressionSyntax LazyFieldNotNull(Field field, ExpressionSyntax condition) =>
+        BinaryExpression(
+            SyntaxKind.LogicalAndExpression,
+            condition,
+            BinaryExpression(
+                SyntaxKind.NotEqualsExpression,
+                LazyFieldValue(field),
+                Null()
+            )
+        );
+
+    private InvocationExpressionSyntax GenEqualsIdentityField(Field field) =>
+        InvocationExpression(MemberAccess(MetaProperty(field), IdentifierName("EqualsIdentity")),
+            AsArguments([IdentifierName("field")])
+        );
+
+    #endregion
+
+    private StatementSyntax FieldInitializer(Field field)
+    {
+        ExpressionSyntax initializer = IsLazyField(field)
+            ? NewCall([Null()])
+            : Default();
+
+        return Assignment(FieldField(field).ToString(), initializer);
+    }
+
     private List<MemberDeclarationSyntax> Field(Field field)
     {
         var propertyType = AsType(field.Type);
-        var memberFieldType = NullableType(propertyType);
+        TypeSyntax memberFieldType = NullableType(propertyType);
 
-        bool circumventSelfContainment = field.Type is StructuredDataType s && ContainsSelf(s, []);
-        
+        bool circumventSelfContainment = IsLazyField(field);
+
         if (circumventSelfContainment)
         {
+            memberFieldType = AsType(typeof(NullableLazy<>), propertyType);
             propertyType = NullableType(propertyType);
-            memberFieldType = NullableType(AsType(typeof(Lazy<>), propertyType));
         }
 
         var memberField = AstExtensions.Field(FieldField(field).ToString(), memberFieldType)
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
-        var property = PropertyDeclaration(propertyType, Identifier(FieldProperty(field).ToString()))
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword));
+        ExpressionSyntax getter;
+        ExpressionSyntax setter;
 
         if (circumventSelfContainment)
         {
-            property = property
-                .WithAccessorList(AccessorList(List([
-                                AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                                    .WithExpressionBody(ArrowExpressionClause(
-                                        ConditionalAccessExpression(
-                                            FieldField(field),
-                                            MemberBindingExpression(IdentifierName("Value"))
-                                        )
-                                    ))
-                                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                                AccessorDeclaration(SyntaxKind.InitAccessorDeclaration)
-                                    .WithExpressionBody(ArrowExpressionClause(
-                                        AssignmentExpression(
-                                            SyntaxKind.SimpleAssignmentExpression,
-                                            FieldField(field),
-                                            NewCall([Value()])
-                                        )
-                                    ))
-                                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-                            ]
-                        )
-                    )
-                );
+            getter = LazyFieldValue(field);
+            setter = AssignmentExpression(
+                SyntaxKind.SimpleAssignmentExpression,
+                FieldField(field),
+                NewCall([Value()])
+            );
         } else
         {
-            property = property
-                .WithAccessorList(AccessorList(List([
-                                AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                                    .WithExpressionBody(ArrowExpressionClause(
-                                        BinaryExpression(
-                                            SyntaxKind.CoalesceExpression,
-                                            FieldField(field),
-                                            ThrowExpression(NewCall([MetaProperty(field)],
-                                                AsType(typeof(UnsetFieldException))))
-                                        )
-                                    ))
-                                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                                AccessorDeclaration(SyntaxKind.InitAccessorDeclaration)
-                                    .WithExpressionBody(ArrowExpressionClause(
-                                        AssignmentExpression(
-                                            SyntaxKind.SimpleAssignmentExpression,
-                                            FieldField(field),
-                                            Value())))
-                                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-                            ]
-                        )
-                    )
-                );
+            getter = BinaryExpression(
+                SyntaxKind.CoalesceExpression,
+                FieldField(field),
+                ThrowExpression(NewCall([MetaProperty(field)],
+                    AsType(typeof(UnsetFieldException))))
+            );
+            setter = AssignmentExpression(
+                    SyntaxKind.SimpleAssignmentExpression,
+                    FieldField(field),
+                    Value())
+                ;
         }
 
-        property = property
-            .WithAttributeLists(AsAttributes([MetaPointerAttribute(field)]));
+        var property = PropertyDeclaration(propertyType, Identifier(FieldProperty(field).ToString()))
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithAttributeLists(AsAttributes([MetaPointerAttribute(field)]))
+            .WithAccessorList(AccessorList(List([
+                            AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                                .WithExpressionBody(ArrowExpressionClause(getter))
+                                .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                            AccessorDeclaration(SyntaxKind.InitAccessorDeclaration)
+                                .WithExpressionBody(ArrowExpressionClause(setter))
+                                .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                        ]
+                    )
+                )
+            );
 
         return [memberField, property];
+    }
+
+    private MemberAccessExpressionSyntax LazyFieldValue(Field field) =>
+        MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            FieldField(field),
+            IdentifierName("Value")
+        );
+
+    private bool IsLazyField(Field field) =>
+        field.Type is StructuredDataType s && ContainsSelf(s, []);
+
+    private bool ContainsSelf(Datatype datatype, HashSet<StructuredDataType> owners)
+    {
+        if (datatype is not StructuredDataType structuredDataType)
+            return false;
+
+        if (!owners.Add(structuredDataType))
+            return true;
+
+        return structuredDataType.Fields.Any(f => ContainsSelf(f.Type, [..owners]));
     }
 }

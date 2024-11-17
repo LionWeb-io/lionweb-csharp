@@ -19,6 +19,7 @@ namespace LionWeb_CSharp_Test.tests;
 
 using Examples.SDTLang;
 using LionWeb.Core;
+using LionWeb.Core.M3;
 
 [TestClass]
 public class StructuredDataTypeTests
@@ -52,7 +53,24 @@ public class StructuredDataTypeTests
     {
         var fqn = new FullyQualifiedName();
 
-        Assert.IsTrue(fqn.Equals(new FullyQualifiedName()));
+        Assert.IsTrue(fqn.Equals(new FullyQualifiedName{}));
+    }
+
+    [TestMethod]
+    public void Empty_CollectAllSetFields()
+    {
+        var fqn = new FullyQualifiedName();
+
+        CollectionAssert.AreEqual(new List<Field>(), fqn.CollectAllSetFields().ToList());
+    }
+
+    [TestMethod]
+    public void Empty_Get()
+    {
+        var fqn = new FullyQualifiedName();
+
+        Assert.ThrowsException<UnsetFieldException>(() => fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_name));
+        Assert.ThrowsException<UnsetFieldException>(() => fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_nested));
     }
 
     [TestMethod]
@@ -86,9 +104,105 @@ public class StructuredDataTypeTests
 
         Assert.IsTrue(fqn.Equals(new FullyQualifiedName { Name = "test" }));
 
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName()));
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName() }));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName{}));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName{} }));
         Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Name = "Test" }));
+    }
+
+    [TestMethod]
+    public void Partial_CollectAllSetFields()
+    {
+        var fqn = new FullyQualifiedName { Name = "test" };
+
+        CollectionAssert.AreEqual(new List<Field> { SDTLangLanguage.Instance.FullyQualifiedName_name },
+            fqn.CollectAllSetFields().ToList());
+    }
+
+    [TestMethod]
+    public void Partial_Get()
+    {
+        var fqn = new FullyQualifiedName { Name = "test" };
+
+        Assert.AreEqual("test", fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_name));
+        Assert.ThrowsException<UnsetFieldException>(() => fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_nested));
+    }
+
+    [TestMethod]
+    public void Partial_Null()
+    {
+        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+
+        Assert.AreEqual("test", fqn.Name);
+    }
+
+    [TestMethod]
+    public void Partial_Null_ToString()
+    {
+        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+
+        Assert.AreEqual("FullyQualifiedName { Name = test, Nested =  }", fqn.ToString());
+    }
+
+    [TestMethod]
+    public void Partial_Null_GetHashCode()
+    {
+        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+
+        Assert.AreNotEqual(0, fqn.GetHashCode());
+    }
+
+    [TestMethod]
+    public void Partial_Null_Equals()
+    {
+        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+
+        Assert.IsTrue(fqn.Equals(new FullyQualifiedName { Name = "test" }));
+
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName{}));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName{} }));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Name = "Test" }));
+    }
+
+    [TestMethod]
+    public void Partial_Null_Equals_Null()
+    {
+        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+
+        Assert.IsTrue(fqn.Equals(new FullyQualifiedName { Name = "test", Nested = null }));
+
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName{}));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName{} }));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Name = "Test" }));
+    }
+
+    [TestMethod]
+    public void Partial_Equals_Null()
+    {
+        var fqn = new FullyQualifiedName { Name = "test" };
+
+        Assert.IsTrue(fqn.Equals(new FullyQualifiedName { Name = "test", Nested = null }));
+
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName{}));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName{} }));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Name = "Test" }));
+    }
+
+    [TestMethod]
+    public void Partial_Null_CollectAllSetFields()
+    {
+        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+
+        CollectionAssert.AreEqual(new List<Field> { SDTLangLanguage.Instance.FullyQualifiedName_name },
+            fqn.CollectAllSetFields().ToList());
+    }
+
+    [TestMethod]
+    public void Partial_Null_Get()
+    {
+        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+
+        Assert.AreEqual("test", fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_name));
+        Assert.ThrowsException<UnsetFieldException>(() => fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_nested));
     }
 
     [TestMethod]
@@ -145,6 +259,36 @@ public class StructuredDataTypeTests
 
         Assert.IsFalse(amount.Equals(new Amount()));
         Assert.IsFalse(amount.Equals(new Amount { Currency = Currency.EUR }));
+    }
+
+    [TestMethod]
+    public void Complete_CollectAllSetFields()
+    {
+        var amount = new Amount
+        {
+            Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true
+        };
+
+        CollectionAssert.AreEqual(
+            new List<Field>
+            {
+                SDTLangLanguage.Instance.Amount_value,
+                SDTLangLanguage.Instance.Amount_currency,
+                SDTLangLanguage.Instance.Amount_digital,
+            }, amount.CollectAllSetFields().ToList());
+    }
+
+    [TestMethod]
+    public void Complete_Get()
+    {
+        var amount = new Amount
+        {
+            Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true
+        };
+
+        Assert.AreEqual(new Decimal { Int = 23, Frac = 42 }, amount.Get(SDTLangLanguage.Instance.Amount_value));
+        Assert.AreEqual(Currency.EUR, amount.Get(SDTLangLanguage.Instance.Amount_currency));
+        Assert.AreEqual(true, amount.Get(SDTLangLanguage.Instance.Amount_digital));
     }
 
     [TestMethod]

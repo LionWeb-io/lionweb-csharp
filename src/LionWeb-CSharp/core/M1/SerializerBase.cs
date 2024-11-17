@@ -21,6 +21,7 @@ using M2;
 using M3;
 using Serialization;
 using System.Collections;
+using System.Text.Json.Nodes;
 using Utilities;
 
 public abstract class SerializerBase : ISerializer
@@ -46,22 +47,8 @@ public abstract class SerializerBase : ISerializer
     protected SerializedLanguageReference SerializeLanguageReference(Language language) =>
         new() { Key = language.Key, Version = language.Version };
 
-    protected SerializedProperty SerializeProperty(IReadableNode node, Property property)
-    {
-        var value = GetValueIfSet(node, property);
-
-        return new SerializedProperty
-        {
-            Property = property.ToMetaPointer(),
-            Value = property.Type switch
-            {
-                _ when value == null => null,
-                PrimitiveType => ConvertPrimitiveType(value),
-                Enumeration when value is Enum e => e.LionCoreKey(),
-                _ => Handler.UnknownDatatype(node, property, value)
-            }
-        };
-    }
+    protected SerializedProperty SerializeProperty(IReadableNode node, Property property) =>
+        SerializeProperty(node, property, GetValueIfSet(node, property));
 
     protected SerializedReferenceTarget SerializeReferenceTarget(IReadableNode? target) =>
         new() { Reference = target?.GetId(), ResolveInfo = target?.GetNodeName() };
@@ -86,6 +73,24 @@ public abstract class SerializerBase : ISerializer
         string @string => @string,
         _ => value.ToString()
     };
+
+    private string? ConvertStructuredDataType(IStructuredDataTypeInstance sdt) =>
+        SerializeStructuredDataType(sdt).ToJsonString();
+
+    private JsonObject SerializeStructuredDataType(IStructuredDataTypeInstance sdt) =>
+        new(
+            sdt.CollectAllSetFields().Select(f =>
+            {
+                var key = f.Key;
+                JsonNode? value = sdt.Get(f) switch
+                {
+                    null => JsonValue.Create((string?)null),
+                    IStructuredDataTypeInstance s => SerializeStructuredDataType(s),
+                    var v => JsonValue.Create(ConvertPrimitiveType(v))
+                };
+                return KeyValuePair.Create(key, value);
+            }), null
+        );
 
     /// <remarks>
     /// Features with `string` or _value type_ values are treated as property.
@@ -233,6 +238,7 @@ public abstract class SerializerBase : ISerializer
                 null => null,
                 Enum e => e.LionCoreKey(),
                 int or bool or string => ConvertPrimitiveType(value),
+                IStructuredDataTypeInstance s => ConvertStructuredDataType(s),
                 _ => Handler.UnknownDatatype(node, feature, value)
             }
         };
