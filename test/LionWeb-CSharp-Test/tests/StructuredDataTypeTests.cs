@@ -56,6 +56,98 @@ public class StructuredDataTypeTests
     }
 
     [TestMethod]
+    public void Partial()
+    {
+        var fqn = new FullyQualifiedName { Name = "test" };
+
+        Assert.AreEqual("test", fqn.Name);
+    }
+
+    [TestMethod]
+    public void Partial_ToString()
+    {
+        var fqn = new FullyQualifiedName { Name = "test" };
+
+        Assert.AreEqual("FullyQualifiedName { Name = test, Nested =  }", fqn.ToString());
+    }
+
+    [TestMethod]
+    public void Partial_GetHashCode()
+    {
+        var fqn = new FullyQualifiedName { Name = "test" };
+
+        Assert.AreNotEqual(0, fqn.GetHashCode());
+    }
+
+    [TestMethod]
+    public void Partial_Equals()
+    {
+        var fqn = new FullyQualifiedName { Name = "test" };
+
+        Assert.IsTrue(fqn.Equals(new FullyQualifiedName { Name = "test" }));
+
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName()));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName() }));
+        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Name = "Test" }));
+    }
+
+    [TestMethod]
+    public void Complete()
+    {
+        var amount = new Amount
+        {
+            Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true
+        };
+
+        Assert.AreEqual(23, amount.Value.Int);
+        Assert.AreEqual(42, amount.Value.Frac);
+        Assert.AreEqual(Currency.EUR, amount.Currency);
+        Assert.AreEqual(true, amount.Digital);
+    }
+
+    [TestMethod]
+    public void Complete_ToString()
+    {
+        var amount = new Amount
+        {
+            Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true
+        };
+
+        Assert.AreEqual("Amount { Value = Decimal { Int = 23, Frac = 42 }, Currency = EUR, Digital = True }",
+            amount.ToString());
+    }
+
+    [TestMethod]
+    public void Complete_GetHashCode()
+    {
+        var amount = new Amount
+        {
+            Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true
+        };
+
+        Assert.AreNotEqual(0, amount.GetHashCode());
+        Assert.AreEqual(465354986, amount.GetHashCode());
+    }
+
+    [TestMethod]
+    public void Complete_Equals()
+    {
+        var amount = new Amount
+        {
+            Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true
+        };
+        var amount2 = new Amount
+        {
+            Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true
+        };
+
+        Assert.IsTrue(amount.Equals(amount2));
+
+        Assert.IsFalse(amount.Equals(new Amount()));
+        Assert.IsFalse(amount.Equals(new Amount { Currency = Currency.EUR }));
+    }
+
+    [TestMethod]
     public void Nested()
     {
         var fqn = new FullyQualifiedName
@@ -84,5 +176,43 @@ public class StructuredDataTypeTests
         Assert.AreEqual(
             "FullyQualifiedName { Name = a, Nested = FullyQualifiedName { Name = b, Nested = FullyQualifiedName { Name = c, Nested =  } } }",
             fqn.ToString());
+    }
+
+    [TestMethod]
+    public void ComplexStructure()
+    {
+        var a = new A
+        {
+            Name = "A1",
+            A2b = new B { Name = "B1", B2d = new D { Name = "D1" } },
+            A2c = new C
+            {
+                Name = "C1",
+                C2d = new D { Name = "D2" },
+                C2e = new E
+                {
+                    Name = "E1",
+                    E2b = new B { Name = "B2", B2d = new D { Name = "D3" } },
+                    E2f = new F
+                    {
+                        Name = "F1",
+                        F2c = new C
+                        {
+                            Name = "C2",
+                            C2d = new D { Name = "D4" },
+                            C2e = new E
+                            {
+                                Name = "E2",
+                                E2b = new B { Name = "B3", B2d = new D { Name = "D5" } }
+                            }
+                        }
+                    }
+                }
+            }
+        };
+
+        Assert.AreEqual(
+            "A { Name = A1, A2b = B { Name = B1, B2d = D { Name = D1 } }, A2c = C { Name = C1, C2d = D { Name = D2 }, C2e = E { Name = E1, E2f = F { Name = F1, F2c = C { Name = C2, C2d = D { Name = D4 }, C2e = E { Name = E2, E2f = , E2b = B { Name = B3, B2d = D { Name = D5 } } } } }, E2b = B { Name = B2, B2d = D { Name = D3 } } } } }",
+            a.ToString());
     }
 }

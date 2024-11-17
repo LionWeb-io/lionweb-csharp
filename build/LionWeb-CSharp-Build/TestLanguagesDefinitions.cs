@@ -26,7 +26,7 @@ public class TestLanguagesDefinitions
     public readonly Language ALang;
     public readonly Language BLang;
     public readonly Language TinyRefLang;
-    public readonly Language SDTLang;
+    public readonly Language SdtLang;
 
     public TestLanguagesDefinitions()
     {
@@ -98,7 +98,7 @@ public class TestLanguagesDefinitions
         currency.EnumerationLiteral("id-SDT-eur", "key-SDTEur", "EUR");
         currency.EnumerationLiteral("id-SDT-gbp", "key-SDTGbp", "GBP");
 
-        amount.Field("id-SDTValue", "key-SDTValue", "value").OfType(BuiltInsLanguage.Instance.Integer);
+        amount.Field("id-SDTValue", "key-SDTValue", "value").OfType(dec);
         amount.Field("id-SDTCurrency", "key-SDTCurrency", "currency").OfType(currency);
         amount.Field("id-SDTDigital", "key-SDTDigital", "digital").OfType(BuiltInsLanguage.Instance.Boolean);
         
@@ -111,6 +111,40 @@ public class TestLanguagesDefinitions
         fqn.Field("id-SDT-FQN-name", "key-SDTFqnName", "name").OfType(BuiltInsLanguage.Instance.String);
         fqn.Field("id-SDT-FQN-nested", "key-SDTFqnNested", "nested").OfType(fqn);
         
-        SDTLang = sdtLang;
+        // Shape:
+        //     A
+        //    / \
+        //   B   C
+        //    \ / \
+        //     D   E -- B
+        //          \
+        //           F -- C
+
+        var a = sdtLang.StructuredDataType("id-SDTA", "key-SDTA", "A");
+        var b = sdtLang.StructuredDataType("id-SDTB", "key-SDTB", "B");
+        var c = sdtLang.StructuredDataType("id-SDCT", "key-SDCT", "C");
+        var d = sdtLang.StructuredDataType("id-SDD", "key-SDD", "D");
+        var e = sdtLang.StructuredDataType("id-SDE", "key-SDE", "E");
+        var f = sdtLang.StructuredDataType("id-SDF", "key-SDF", "F");
+        
+        sdtConcept.Property("id-SDTAField", "key-SDTAField", "A").OfType(a);
+        
+        a.Field("id-SDTaName", "key-SDTaName", "name").OfType(BuiltInsLanguage.Instance.String);
+        b.Field("id-SDTbName", "key-SDTbName", "name").OfType(BuiltInsLanguage.Instance.String);
+        c.Field("id-SDTcName", "key-SDTcName", "name").OfType(BuiltInsLanguage.Instance.String);
+        d.Field("id-SDTdName", "key-SDTdName", "name").OfType(BuiltInsLanguage.Instance.String);
+        e.Field("id-SDTeName", "key-SDTeName", "name").OfType(BuiltInsLanguage.Instance.String);
+        f.Field("id-SDTfName", "key-SDTfName", "name").OfType(BuiltInsLanguage.Instance.String);
+        
+        a.Field("id-SDTa2b", "key-SDTa2b", "a2b").OfType(b);
+        a.Field("id-SDTa2c", "key-SDTa2c", "a2c").OfType(c);
+        b.Field("id-SDTb2d", "key-SDTb2d", "b2d").OfType(d);
+        c.Field("id-SDTc2d", "key-SDTc2d", "c2d").OfType(d);
+        c.Field("id-SDTc2e", "key-SDTc2e", "c2e").OfType(e);
+        e.Field("id-SDTe2f", "key-SDTf", "e2f").OfType(f);
+        e.Field("id-SDTe2b", "key-SDTb", "e2b").OfType(b);
+        f.Field("id-SDTf2c", "key-SDTf2c", "f2c").OfType(c);
+        
+        SdtLang = sdtLang;
     }
 }

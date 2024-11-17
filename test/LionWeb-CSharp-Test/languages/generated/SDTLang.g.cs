@@ -18,16 +18,17 @@ public class SDTLangLanguage : LanguageBase<ISDTLangFactory>
 	public static readonly SDTLangLanguage Instance = new Lazy<SDTLangLanguage>(() => new("id-SDTLang")).Value;
 	public SDTLangLanguage(string id) : base(id)
 	{
-		_sDTConcept = new(() => new ConceptBase<SDTLangLanguage>("id-SDTConcept", this) { Key = "key-SDTConcept", Name = "SDTConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [SDTConcept_amount, SDTConcept_decimal, SDTConcept_complex, SDTConcept_fqn]) });
+		_sDTConcept = new(() => new ConceptBase<SDTLangLanguage>("id-SDTConcept", this) { Key = "key-SDTConcept", Name = "SDTConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [SDTConcept_amount, SDTConcept_decimal, SDTConcept_complex, SDTConcept_fqn, SDTConcept_A]) });
 		_sDTConcept_amount = new(() => new PropertyBase<SDTLangLanguage>("id-SDTamountField", SDTConcept, this) { Key = "key-SDTamountField", Name = "amount", Optional = false, Type = Amount });
 		_sDTConcept_decimal = new(() => new PropertyBase<SDTLangLanguage>("id-SDTDecimalField", SDTConcept, this) { Key = "key-SDTDecimalField", Name = "decimal", Optional = false, Type = Decimal });
 		_sDTConcept_complex = new(() => new PropertyBase<SDTLangLanguage>("id-SDTComplexField", SDTConcept, this) { Key = "key-SDTComplexField", Name = "complex", Optional = false, Type = ComplexNumber });
 		_sDTConcept_fqn = new(() => new PropertyBase<SDTLangLanguage>("id-SDTFqnField", SDTConcept, this) { Key = "key-SDTFqnField", Name = "fqn", Optional = false, Type = FullyQualifiedName });
+		_sDTConcept_A = new(() => new PropertyBase<SDTLangLanguage>("id-SDTAField", SDTConcept, this) { Key = "key-SDTAField", Name = "A", Optional = false, Type = A });
 		_currency = new(() => new EnumerationBase<SDTLangLanguage>("id-SDTCurrency", this) { Key = "key-SDTCurrency", Name = "Currency", LiteralsLazy = new(() => [Currency_EUR, Currency_GBP]) });
 		_currency_EUR = new(() => new EnumerationLiteralBase<SDTLangLanguage>("id-SDT-eur", Currency, this) { Key = "key-SDTEur", Name = "EUR" });
 		_currency_GBP = new(() => new EnumerationLiteralBase<SDTLangLanguage>("id-SDT-gbp", Currency, this) { Key = "key-SDTGbp", Name = "GBP" });
 		_amount = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDTAmount", this) { Key = "key-SDTAmount", Name = "Amount", FieldsLazy = new(() => [Amount_value, Amount_currency, Amount_digital]) });
-		_amount_value = new(() => new FieldBase<SDTLangLanguage>("id-SDTValue", Amount, this) { Key = "key-SDTValue", Name = "value", Type = BuiltInsLanguage.Instance.Integer });
+		_amount_value = new(() => new FieldBase<SDTLangLanguage>("id-SDTValue", Amount, this) { Key = "key-SDTValue", Name = "value", Type = Decimal });
 		_amount_currency = new(() => new FieldBase<SDTLangLanguage>("id-SDTCurrency", Amount, this) { Key = "key-SDTCurrency", Name = "currency", Type = Currency });
 		_amount_digital = new(() => new FieldBase<SDTLangLanguage>("id-SDTDigital", Amount, this) { Key = "key-SDTDigital", Name = "digital", Type = BuiltInsLanguage.Instance.Boolean });
 		_decimal = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDTDecimal", this) { Key = "key-SDTDecimal", Name = "Decimal", FieldsLazy = new(() => [Decimal_int, Decimal_frac]) });
@@ -39,10 +40,30 @@ public class SDTLangLanguage : LanguageBase<ISDTLangFactory>
 		_fullyQualifiedName = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDTFullyQualifiedName", this) { Key = "key-SDTFullyQualifiedName", Name = "FullyQualifiedName", FieldsLazy = new(() => [FullyQualifiedName_name, FullyQualifiedName_nested]) });
 		_fullyQualifiedName_name = new(() => new FieldBase<SDTLangLanguage>("id-SDT-FQN-name", FullyQualifiedName, this) { Key = "key-SDTFqnName", Name = "name", Type = BuiltInsLanguage.Instance.String });
 		_fullyQualifiedName_nested = new(() => new FieldBase<SDTLangLanguage>("id-SDT-FQN-nested", FullyQualifiedName, this) { Key = "key-SDTFqnNested", Name = "nested", Type = FullyQualifiedName });
+		_a = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDTA", this) { Key = "key-SDTA", Name = "A", FieldsLazy = new(() => [A_name, A_a2b, A_a2c]) });
+		_a_name = new(() => new FieldBase<SDTLangLanguage>("id-SDTaName", A, this) { Key = "key-SDTaName", Name = "name", Type = BuiltInsLanguage.Instance.String });
+		_a_a2b = new(() => new FieldBase<SDTLangLanguage>("id-SDTa2b", A, this) { Key = "key-SDTa2b", Name = "a2b", Type = B });
+		_a_a2c = new(() => new FieldBase<SDTLangLanguage>("id-SDTa2c", A, this) { Key = "key-SDTa2c", Name = "a2c", Type = C });
+		_b = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDTB", this) { Key = "key-SDTB", Name = "B", FieldsLazy = new(() => [B_name, B_b2d]) });
+		_b_name = new(() => new FieldBase<SDTLangLanguage>("id-SDTbName", B, this) { Key = "key-SDTbName", Name = "name", Type = BuiltInsLanguage.Instance.String });
+		_b_b2d = new(() => new FieldBase<SDTLangLanguage>("id-SDTb2d", B, this) { Key = "key-SDTb2d", Name = "b2d", Type = D });
+		_c = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDCT", this) { Key = "key-SDCT", Name = "C", FieldsLazy = new(() => [C_name, C_c2d, C_c2e]) });
+		_c_name = new(() => new FieldBase<SDTLangLanguage>("id-SDTcName", C, this) { Key = "key-SDTcName", Name = "name", Type = BuiltInsLanguage.Instance.String });
+		_c_c2d = new(() => new FieldBase<SDTLangLanguage>("id-SDTc2d", C, this) { Key = "key-SDTc2d", Name = "c2d", Type = D });
+		_c_c2e = new(() => new FieldBase<SDTLangLanguage>("id-SDTc2e", C, this) { Key = "key-SDTc2e", Name = "c2e", Type = E });
+		_d = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDD", this) { Key = "key-SDD", Name = "D", FieldsLazy = new(() => [D_name]) });
+		_d_name = new(() => new FieldBase<SDTLangLanguage>("id-SDTdName", D, this) { Key = "key-SDTdName", Name = "name", Type = BuiltInsLanguage.Instance.String });
+		_e = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDE", this) { Key = "key-SDE", Name = "E", FieldsLazy = new(() => [E_name, E_e2f, E_e2b]) });
+		_e_name = new(() => new FieldBase<SDTLangLanguage>("id-SDTeName", E, this) { Key = "key-SDTeName", Name = "name", Type = BuiltInsLanguage.Instance.String });
+		_e_e2f = new(() => new FieldBase<SDTLangLanguage>("id-SDTe2f", E, this) { Key = "key-SDTf", Name = "e2f", Type = F });
+		_e_e2b = new(() => new FieldBase<SDTLangLanguage>("id-SDTe2b", E, this) { Key = "key-SDTb", Name = "e2b", Type = B });
+		_f = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDF", this) { Key = "key-SDF", Name = "F", FieldsLazy = new(() => [F_name, F_f2c]) });
+		_f_name = new(() => new FieldBase<SDTLangLanguage>("id-SDTfName", F, this) { Key = "key-SDTfName", Name = "name", Type = BuiltInsLanguage.Instance.String });
+		_f_f2c = new(() => new FieldBase<SDTLangLanguage>("id-SDTf2c", F, this) { Key = "key-SDTf2c", Name = "f2c", Type = C });
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [SDTConcept, Currency, Amount, Decimal, ComplexNumber, FullyQualifiedName];
+        public override IReadOnlyList<LanguageEntity> Entities => [SDTConcept, Currency, Amount, Decimal, ComplexNumber, FullyQualifiedName, A, B, C, D, E, F];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
@@ -74,6 +95,9 @@ public class SDTLangLanguage : LanguageBase<ISDTLangFactory>
 
 	private readonly Lazy<Property> _sDTConcept_fqn;
 	public Property SDTConcept_fqn => _sDTConcept_fqn.Value;
+
+	private readonly Lazy<Property> _sDTConcept_A;
+	public Property SDTConcept_A => _sDTConcept_A.Value;
 
 	private readonly Lazy<Enumeration> _currency;
 	public Enumeration Currency => _currency.Value;
@@ -122,6 +146,66 @@ public class SDTLangLanguage : LanguageBase<ISDTLangFactory>
 
 	private readonly Lazy<Field> _fullyQualifiedName_nested;
 	public Field FullyQualifiedName_nested => _fullyQualifiedName_nested.Value;
+
+	private readonly Lazy<StructuredDataType> _a;
+	public StructuredDataType A => _a.Value;
+
+	private readonly Lazy<Field> _a_name;
+	public Field A_name => _a_name.Value;
+
+	private readonly Lazy<Field> _a_a2b;
+	public Field A_a2b => _a_a2b.Value;
+
+	private readonly Lazy<Field> _a_a2c;
+	public Field A_a2c => _a_a2c.Value;
+
+	private readonly Lazy<StructuredDataType> _b;
+	public StructuredDataType B => _b.Value;
+
+	private readonly Lazy<Field> _b_name;
+	public Field B_name => _b_name.Value;
+
+	private readonly Lazy<Field> _b_b2d;
+	public Field B_b2d => _b_b2d.Value;
+
+	private readonly Lazy<StructuredDataType> _c;
+	public StructuredDataType C => _c.Value;
+
+	private readonly Lazy<Field> _c_name;
+	public Field C_name => _c_name.Value;
+
+	private readonly Lazy<Field> _c_c2d;
+	public Field C_c2d => _c_c2d.Value;
+
+	private readonly Lazy<Field> _c_c2e;
+	public Field C_c2e => _c_c2e.Value;
+
+	private readonly Lazy<StructuredDataType> _d;
+	public StructuredDataType D => _d.Value;
+
+	private readonly Lazy<Field> _d_name;
+	public Field D_name => _d_name.Value;
+
+	private readonly Lazy<StructuredDataType> _e;
+	public StructuredDataType E => _e.Value;
+
+	private readonly Lazy<Field> _e_name;
+	public Field E_name => _e_name.Value;
+
+	private readonly Lazy<Field> _e_e2f;
+	public Field E_e2f => _e_e2f.Value;
+
+	private readonly Lazy<Field> _e_e2b;
+	public Field E_e2b => _e_e2b.Value;
+
+	private readonly Lazy<StructuredDataType> _f;
+	public StructuredDataType F => _f.Value;
+
+	private readonly Lazy<Field> _f_name;
+	public Field F_name => _f_name.Value;
+
+	private readonly Lazy<Field> _f_f2c;
+	public Field F_f2c => _f_f2c.Value;
 }
 
 public interface ISDTLangFactory : INodeFactory
@@ -229,6 +313,23 @@ public partial class SDTConcept : NodeBase
 		return this;
 	}
 
+	private A? _a = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If A has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTAField")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public A A { get => _a ?? throw new UnsetFeatureException(SDTLangLanguage.Instance.SDTConcept_A); set => SetA(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public SDTConcept SetA(A value)
+	{
+		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_A);
+		_a = value;
+		return this;
+	}
+
 	public SDTConcept(string id) : base(id)
 	{
 	}
@@ -261,6 +362,12 @@ public partial class SDTConcept : NodeBase
 		if (SDTLangLanguage.Instance.SDTConcept_fqn.EqualsIdentity(feature))
 		{
 			result = Fqn;
+			return true;
+		}
+
+		if (SDTLangLanguage.Instance.SDTConcept_A.EqualsIdentity(feature))
+		{
+			result = A;
 			return true;
 		}
 
@@ -316,6 +423,17 @@ public partial class SDTConcept : NodeBase
 			throw new InvalidValueException(feature, value);
 		}
 
+		if (SDTLangLanguage.Instance.SDTConcept_A.EqualsIdentity(feature))
+		{
+			if (value is Examples.SDTLang.A v)
+			{
+				A = v;
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
 		return false;
 	}
 
@@ -331,6 +449,8 @@ public partial class SDTConcept : NodeBase
 			result.Add(SDTLangLanguage.Instance.SDTConcept_complex);
 		if (_fqn != default)
 			result.Add(SDTLangLanguage.Instance.SDTConcept_fqn);
+		if (_a != default)
+			result.Add(SDTLangLanguage.Instance.SDTConcept_A);
 		return result;
 	}
 }
@@ -347,9 +467,9 @@ public enum Currency
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTAmount")]
 public readonly record struct Amount
 {
-	private readonly int? _value;
+	private readonly Decimal? _value;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTValue")]
-	public int Value { get => _value ?? throw new UnsetFieldException(SDTLangLanguage.Instance.Amount_value); init => _value = value; }
+	public Decimal Value { get => _value ?? throw new UnsetFieldException(SDTLangLanguage.Instance.Amount_value); init => _value = value; }
 
 	private readonly Currency? _currency;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTCurrency")]
@@ -394,4 +514,84 @@ public readonly record struct FullyQualifiedName
 	private readonly Lazy<FullyQualifiedName?>? _nested;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTFqnNested")]
 	public FullyQualifiedName? Nested { get => _nested?.Value; init => _nested = new(value); }
+}
+
+[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTA")]
+public readonly record struct A
+{
+	private readonly string? _name;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTaName")]
+	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.A_name); init => _name = value; }
+
+	private readonly B? _a2b;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTa2b")]
+	public B A2b { get => _a2b ?? throw new UnsetFieldException(SDTLangLanguage.Instance.A_a2b); init => _a2b = value; }
+
+	private readonly Lazy<C?>? _a2c;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTa2c")]
+	public C? A2c { get => _a2c?.Value; init => _a2c = new(value); }
+}
+
+[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTB")]
+public readonly record struct B
+{
+	private readonly string? _name;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTbName")]
+	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.B_name); init => _name = value; }
+
+	private readonly D? _b2d;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTb2d")]
+	public D B2d { get => _b2d ?? throw new UnsetFieldException(SDTLangLanguage.Instance.B_b2d); init => _b2d = value; }
+}
+
+[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDCT")]
+public readonly record struct C
+{
+	private readonly string? _name;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTcName")]
+	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.C_name); init => _name = value; }
+
+	private readonly D? _c2d;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTc2d")]
+	public D C2d { get => _c2d ?? throw new UnsetFieldException(SDTLangLanguage.Instance.C_c2d); init => _c2d = value; }
+
+	private readonly Lazy<E?>? _c2e;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTc2e")]
+	public E? C2e { get => _c2e?.Value; init => _c2e = new(value); }
+}
+
+[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDD")]
+public readonly record struct D
+{
+	private readonly string? _name;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTdName")]
+	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.D_name); init => _name = value; }
+}
+
+[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDE")]
+public readonly record struct E
+{
+	private readonly string? _name;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTeName")]
+	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.E_name); init => _name = value; }
+
+	private readonly Lazy<F?>? _e2f;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTf")]
+	public F? E2f { get => _e2f?.Value; init => _e2f = new(value); }
+
+	private readonly B? _e2b;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTb")]
+	public B E2b { get => _e2b ?? throw new UnsetFieldException(SDTLangLanguage.Instance.E_e2b); init => _e2b = value; }
+}
+
+[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDF")]
+public readonly record struct F
+{
+	private readonly string? _name;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTfName")]
+	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.F_name); init => _name = value; }
+
+	private readonly Lazy<C?>? _f2c;
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTf2c")]
+	public C? F2c { get => _f2c?.Value; init => _f2c = new(value); }
 }

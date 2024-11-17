@@ -31,11 +31,8 @@ using static AstExtensions;
 public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) : GeneratorBase(names)
 {
     /// <inheritdoc cref="StructuredDataTypeGenerator"/>
-    public RecordDeclarationSyntax SdtType()
-    {
-        var containsSelf = ContainsSelf(sdt, []);
-        
-        return RecordDeclaration(SyntaxKind.RecordStructDeclaration,
+    public RecordDeclarationSyntax SdtType() =>
+        RecordDeclaration(SyntaxKind.RecordStructDeclaration,
                 Token(SyntaxKind.RecordKeyword), sdt.Name)
             .WithAttributeLists(AsAttributes(
             [
@@ -45,9 +42,8 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) :
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.ReadOnlyKeyword))
             .WithClassOrStructKeyword(Token(SyntaxKind.StructKeyword))
             .WithOpenBraceToken(Token(SyntaxKind.OpenBraceToken))
-            .WithMembers(List(sdt.Fields.SelectMany(f => Field(f, containsSelf))))
+            .WithMembers(List(sdt.Fields.SelectMany(f => Field(f))))
             .WithCloseBraceToken(Token(SyntaxKind.CloseBraceToken));
-    }
 
     private bool ContainsSelf(Datatype datatype, HashSet<StructuredDataType> owners)
     {
@@ -60,12 +56,12 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) :
         return xxx.Fields.Any(f => ContainsSelf(f.Type, [..owners]));
     } 
     
-    private List<MemberDeclarationSyntax> Field(Field field, bool containsSelf)
+    private List<MemberDeclarationSyntax> Field(Field field)
     {
         var propertyType = AsType(field.Type);
         var memberFieldType = NullableType(propertyType);
 
-        bool circumventSelfContainment = containsSelf && field.Type is StructuredDataType;
+        bool circumventSelfContainment = field.Type is StructuredDataType s && ContainsSelf(s, []);
         
         if (circumventSelfContainment)
         {
@@ -96,20 +92,7 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) :
                                         AssignmentExpression(
                                             SyntaxKind.SimpleAssignmentExpression,
                                             FieldField(field),
-                                            NewCall([
-                                                // ConditionalExpression(
-                                                //     IsPatternExpression(
-                                                //         Value(),
-                                                //         DeclarationPattern(
-                                                //             AsType(field.Type),
-                                                //             SingleVariableDesignation(Identifier("v"))
-                                                //         )
-                                                //     ),
-                                                //     IdentifierName("v"),
-                                                //     Default()
-                                                // )
-                                                Value()
-                                            ])
+                                            NewCall([Value()])
                                         )
                                     ))
                                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
@@ -148,23 +131,5 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) :
             .WithAttributeLists(AsAttributes([MetaPointerAttribute(field)]));
 
         return [memberField, property];
-    }
-}
-
-public readonly record struct FullyQualifiedName
-{
-    private readonly string _name;
-    private readonly Lazy<FullyQualifiedName?> _nested;
-
-    public string Name
-    {
-        get => _name ?? throw new InvalidValueException(null, null);
-        init => _name = value ?? throw new InvalidValueException(null, null);
-    }
-
-    public FullyQualifiedName? Nested
-    {
-        get => _nested.Value;
-        init => _nested = new(value);
     }
 }
