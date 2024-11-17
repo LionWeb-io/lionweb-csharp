@@ -242,6 +242,79 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
 }
 
 /// <summary>
+/// An interface that instances of LionWeb <see cref="StructuredDataType">StructuredDataTypes</see> implement.
+/// </summary>
+public interface IStructuredDataTypeInstance
+{
+    /// <summary>
+    /// The <see cref="StructuredDataType"/> that <c>this</c> is an instance of.
+    /// </summary>
+    public StructuredDataType GetStructuredDataType();
+
+    /// <summary>
+    /// Returns all fields for which a value has been set on <c>this</c>.
+    /// </summary>
+    public IEnumerable<Field> CollectAllSetFields();
+
+    /// <summary>
+    /// Gets the value of the given <paramref name="field"/> on <c>this</c>.
+    /// </summary>
+    /// <exception cref="UnsetFieldException">If <paramref name="field"/> has not been set.</exception>
+    /// <see cref="CollectAllSetFields"/>
+    public object? Get(Field field);
+}
+
+/// <summary>
+/// A variant of <see cref="Lazy{T}"/> that considers itself equal to <c>null</c>
+/// if <see cref="Lazy{T}.Value"/> is <c>null</c>.
+/// </summary>
+/// <inheritdoc />
+public class NullableLazy<T> : Lazy<T?> where T : notnull
+{
+    /// <inheritdoc />
+    public NullableLazy(T? value) : base(value)
+    {
+    }
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj)
+    {
+        if (ReferenceEquals(this, obj))
+        {
+            return true;
+        }
+
+        if (obj is null)
+        {
+            if (Value is null)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        var objType = obj.GetType();
+        if (typeof(NullableLazy<>) != objType.GetGenericTypeDefinition())
+        {
+            return false;
+        }
+
+        var thisType = typeof(T);
+        var otherType = objType.GetGenericArguments().First();
+
+        if (thisType != otherType)
+        {
+            return false;
+        }
+
+        return EqualityComparer<T?>.Default.Equals(this.Value, ((NullableLazy<T?>)obj).Value);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode() => Value?.GetHashCode() ?? 0;
+}
+
+/// <summary>
 /// Every model node is an instance of <see cref="INode"/>.
 /// </summary>
 public interface INode : IWritableNode<INode>;
