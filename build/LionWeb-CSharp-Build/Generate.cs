@@ -57,26 +57,30 @@ List<Names> names =
 [
     // TODO  get this working:
     // new Names(M3Language.Instance, "LionWeb.Duplicate.M3"),
-    new (libraryLanguage, "Examples.Library.M2"),
-    new (multiLanguage, "Examples.Multi.M2")
-    {
-        NamespaceMappings = { [libraryLanguage] = "Examples.Library.M2" }
-    },
-    new (withEnumLanguage, "Examples.WithEnum.M2"),
-    new (shapesLanguage, "Examples.Shapes.M2"),
-    new (aLang, "Examples.Circular.A")
-    {
-        NamespaceMappings = { [bLang] = "Examples.Circular.B" }
-    },
-    new (bLang, "Examples.Circular.B")
-    {
-        NamespaceMappings = { [aLang] = "Examples.Circular.A" }
-    },
-    new (tinyRefLang, "Examples.TinyRefLang"),
-    new (deprecatedLang, "Examples.DeprecatedLang"),
-    new (sdtLang, "Examples.SDTLang")
+    new(libraryLanguage, "Examples.Library.M2"),
+    new(multiLanguage, "Examples.Multi.M2") { NamespaceMappings = { [libraryLanguage] = "Examples.Library.M2" } },
+    new(withEnumLanguage, "Examples.WithEnum.M2"),
+    new(shapesLanguage, "Examples.Shapes.M2"),
+    new(aLang, "Examples.Circular.A") { NamespaceMappings = { [bLang] = "Examples.Circular.B" } },
+    new(bLang, "Examples.Circular.B") { NamespaceMappings = { [aLang] = "Examples.Circular.A" } },
+    new(tinyRefLang, "Examples.TinyRefLang"),
+    new(deprecatedLang, "Examples.DeprecatedLang"),
+    new(sdtLang, "Examples.SDTLang")
 ];
 
+names.AddRange(testLanguagesDefinitions
+    .MixedLangs
+    .Select(l =>
+        new Names(l, $"Examples.Mixed.{l.Name}")
+        {
+            NamespaceMappings = testLanguagesDefinitions
+                .MixedLangs
+                .Except([l])
+                .Select(n => (n, $"Examples.Mixed.{n.Name}"))
+                .ToDictionary()
+        }
+    )
+);
 
 var generationPath = "../../test/LionWeb-CSharp-Test/languages/generated";
 Directory.CreateDirectory(generationPath);

@@ -127,9 +127,9 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             Field(LanguageFieldName(entity), AsType(typeof(Lazy<>), generics: AsType(type)))
                 .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
             ReadOnlyProperty(AsProperty(entity).ToString(), AsType(type),
-                MemberAccess(IdentifierName(LanguageFieldName(entity)), IdentifierName("Value"))
-            )
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(entity)]))
+                    MemberAccess(IdentifierName(LanguageFieldName(entity)), IdentifierName("Value"))
+                )
+                .WithAttributeLists(AsAttributes([ObsoleteAttribute(entity)]))
         ];
 
         switch (entity)
@@ -140,9 +140,9 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             case Enumeration enumeration:
                 result.AddRange(enumeration.Literals.SelectMany(LiteralLanguageMember));
                 break;
-                case StructuredDataType structuredDataType:
-                    result.AddRange(structuredDataType.Fields.SelectMany(FieldLanguageMember));
-                    break;
+            case StructuredDataType structuredDataType:
+                result.AddRange(structuredDataType.Fields.SelectMany(FieldLanguageMember));
+                break;
             case PrimitiveType:
                 // fall-through
                 break;
@@ -168,9 +168,9 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             Field(LanguageFieldName(feature), AsType(typeof(Lazy<>), generics: AsType(type)))
                 .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
             ReadOnlyProperty(_names.AsProperty(feature).Identifier.Text, AsType(type),
-                MemberAccess(IdentifierName(LanguageFieldName(feature)), IdentifierName("Value"))
-            )
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
+                    MemberAccess(IdentifierName(LanguageFieldName(feature)), IdentifierName("Value"))
+                )
+                .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
         ];
     }
 

@@ -109,7 +109,7 @@ public static class AttributeExtensions
     /// <typeparam name="T">The type of the attribute you want to retrieve</typeparam>
     /// <param name="enumValue">The enumeration value</param>
     /// <returns>The attribute of type T that exists on the given object</returns>
-    private static T? GetAttributeOfType<T>(this Enum enumValue) where T : Attribute
+    public static T? GetAttributeOfType<T>(Enum enumValue) where T : Attribute
     {
         if (enumValue == null)
             return null;
@@ -126,7 +126,7 @@ public static class AttributeExtensions
     /// <param name="enumValue">The enumeration value</param>
     /// <returns>The key declared on the given enumeration value</returns>
     public static string? LionCoreKey(this Enum enumValue)
-        => enumValue.GetAttributeOfType<LionCoreMetaPointer>()?.Key;
+        => GetAttributeOfType<LionCoreMetaPointer>(enumValue)?.Key;
 
     /// <summary>
     /// Gets the LionCore key from the given C# property.

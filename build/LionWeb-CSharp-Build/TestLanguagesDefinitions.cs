@@ -21,14 +21,26 @@ using Io.Lionweb.Mps.Specific;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 
+// ReSharper disable SuggestVarOrType_SimpleTypes
+
 public class TestLanguagesDefinitions
 {
-    public readonly Language ALang;
-    public readonly Language BLang;
-    public readonly Language TinyRefLang;
-    public readonly Language SdtLang;
+    public Language ALang { get; private set; }
+    public Language BLang {get; private set;}
+    public Language TinyRefLang {get; private set;}
+    public Language SdtLang {get; private set;}
+    
+    public List<Language> MixedLangs { get; private set; }
 
     public TestLanguagesDefinitions()
+    {
+        CreateALangBLang();
+        CreateTinyRefLang();
+        CreateSdtLang();
+        CreateMixedLangs();
+    }
+
+    private void CreateALangBLang()
     {
         var aLang = new DynamicLanguage("id-ALang") { Key = "key-ALang", Name = "ALang", Version = "1" };
         var aConcept = aLang.Concept("id-AConcept", "key-AConcept", "AConcept");
@@ -62,8 +74,10 @@ public class TestLanguagesDefinitions
 
         ALang = aLang;
         BLang = bLang;
+    }
 
-
+    private void CreateTinyRefLang()
+    {
         var tinyRefLang = new DynamicLanguage("id-TinyRefLang") { Key = "key-tinyRefLang", Name = "TinyRefLang", Version = "0" };
         var myConcept = new DynamicConcept("id-Concept", tinyRefLang) { Key = "key-MyConcept", Name = "MyConcept" };
         tinyRefLang.AddEntities([myConcept]);
@@ -80,8 +94,10 @@ public class TestLanguagesDefinitions
         myConcept.AddFeatures([singularRef, multivalueRef]);
 
         TinyRefLang = tinyRefLang;
-        
-        
+    }
+
+    private void CreateSdtLang()
+    {
         var sdtLang = new DynamicLanguage("id-SDTLang") { Key = "key-SDTLang", Name = "SDTLang", Version = "0"};
         var sdtConcept = sdtLang.Concept("id-SDTConcept", "key-SDTConcept", "SDTConcept");
         var currency = sdtLang.Enumeration("id-SDTCurrency", "key-SDTCurrency", "Currency");
@@ -146,5 +162,53 @@ public class TestLanguagesDefinitions
         f.Field("id-SDTf2c", "key-SDTf2c", "f2c").OfType(c);
         
         SdtLang = sdtLang;
+    }
+
+    private void CreateMixedLangs()
+    {
+        var mixedBasePropertyLang = new DynamicLanguage("id-mixedBasePropertyLang") { Key = "key-mixedBasePropertyLang", Name = "MixedBasePropertyLang", Version = "1" };
+        var mixedBaseContainmentLang = new DynamicLanguage("id-mixedBaseContainmentLang") { Key = "key-mixedBaseContainmentLang", Name = "MixedBaseContainmentLang", Version = "1" };
+        var mixedBaseReferenceLang = new DynamicLanguage("id-mixedBaseReferenceLang") { Key = "key-mixedBaseReferenceLang", Name = "MixedBaseReferenceLang", Version = "1" };
+        var mixedBaseConceptLang = new DynamicLanguage("id-mixedBaseConceptLang") { Key = "key-mixedBaseConceptLang", Name = "MixedBaseConceptLang", Version = "1" };
+        var mixedConceptLang = new DynamicLanguage("id-mixedConceptLang") { Key = "key-mixedConceptLang", Name = "MixedConceptLang", Version = "1" };
+        var mixedDirectEnumLang = new DynamicLanguage("id-mixedDirectEnumLang") { Key = "key-mixedDirectEnumLang", Name = "MixedDirectEnumLang", Version = "1" };
+        var mixedNestedEnumLang = new DynamicLanguage("id-mixedNestedEnumLang") { Key = "key-mixedNestedEnumLang", Name = "MixedNestedEnumLang", Version = "1" };
+        var mixedDirectSdtLang = new DynamicLanguage("id-mixedDirectSdtLang") { Key = "key-mixedDirectSdtLang", Name = "MixedDirectSdtLang", Version = "1" };
+        var mixedNestedSdtLang = new DynamicLanguage("id-mixedNestedSdtLang") { Key = "key-mixedNestedSdtLang", Name = "MixedNestedSdtLang", Version = "1" };
+        
+        var nestedSdt = mixedNestedSdtLang.StructuredDataType("id-nestedSdt", "key-nestedSdt", "NestedSdt");
+        nestedSdt.Field("id-nestedSdtField", "key-nestedSdtField", "nestedSdtField").OfType(BuiltInsLanguage.Instance.String);
+        
+        var nestedEnum = mixedNestedEnumLang.Enumeration("id-nestedEnum", "key-nestedEnum", "NestedEnum");
+        nestedEnum.EnumerationLiteral("id-nestedLiteralA", "key-nestedLiteralA", "nestedLiteralA");
+        
+        var directSdt = mixedDirectSdtLang.StructuredDataType("id-directSdt", "key-directSdt", "DirectSdt");
+        directSdt.Field("id-directSdtEnum", "key-directSdtEnum", "directSdtEnum").OfType(nestedEnum);
+        directSdt.Field("id-directSdtSdt", "key-directSdtSdt", "directSdtSdt").OfType(nestedSdt);
+        
+        mixedDirectSdtLang.AddDependsOn([mixedNestedEnumLang, mixedNestedSdtLang]);
+        
+        var directEnum = mixedDirectEnumLang.Enumeration("id-directEnum", "key-directEnum", "DirectEnum");
+        directEnum.EnumerationLiteral("id-directEnumA", "key-directEnumA", "directEnumA");
+        
+        var basePropertyIface = mixedBasePropertyLang.Interface("id-basePropertyIface", "key-basePropertyIface","BasePropertyIface");
+        basePropertyIface.Property("id-basePropertyIface-prop", "key-basePropertyIface-prop", "Prop").OfType(BuiltInsLanguage.Instance.String);
+        
+        var baseContainmentIface = mixedBaseContainmentLang.Interface("id-baseContainmentIface", "key-baseContainmentIface", "BaseContainmentIface");
+        baseContainmentIface.Containment("id-baseContainemntIface-cont", "key-baseContainmentIface-cont", "Cont").OfType(BuiltInsLanguage.Instance.Node);
+        
+        var baseReferenceIface = mixedBaseReferenceLang.Interface("id-baseReferenceIface", "key-baseReferenceIface", "BaseReferenceIface");
+        baseReferenceIface.Reference("id-baseReferenceIface-ref", "key-baseReferenceIface-ref", "Ref").OfType(BuiltInsLanguage.Instance.Node);
+        
+        var baseConcept = mixedBaseConceptLang.Concept("id-baseConcept", "key-baseConcept", "BaseConcept").IsAbstract().Implementing(basePropertyIface, baseContainmentIface, baseReferenceIface);
+        baseConcept.Property("id-enumProp", "key-enumProp", "enumProp").OfType(directEnum);
+        baseConcept.Property("id-sdtProp", "key-sdtProp", "sdtProp").OfType(directSdt);
+        
+        mixedBaseConceptLang.AddDependsOn([mixedBasePropertyLang, mixedBaseContainmentLang, mixedBaseReferenceLang, mixedDirectEnumLang, mixedDirectSdtLang]);
+        
+        mixedConceptLang.Concept("id-mixedConcept", "key-mixedConcept", "MixedConcept").Extending(baseConcept);
+        mixedConceptLang.AddDependsOn([mixedBaseConceptLang]);
+        
+        MixedLangs = [mixedBasePropertyLang, mixedBaseContainmentLang, mixedBaseReferenceLang, mixedBaseConceptLang, mixedConceptLang, mixedDirectEnumLang, mixedNestedEnumLang, mixedDirectSdtLang, mixedNestedSdtLang];
     }
 }

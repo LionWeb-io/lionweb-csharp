@@ -139,7 +139,7 @@ public partial class Names(Language language, string namespaceName) : INames
             return PredefinedType(Token(SyntaxKind.IntKeyword));
         if (BuiltInsLanguage.Instance.String.EqualsIdentity(datatype))
             return PredefinedType(Token(SyntaxKind.StringKeyword));
-        if (datatype is Enumeration && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
+        if (datatype is Enumeration or StructuredDataType && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
         {
             return
                 QualifiedName(

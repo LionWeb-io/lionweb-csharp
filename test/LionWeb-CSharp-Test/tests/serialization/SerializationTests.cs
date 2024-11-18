@@ -17,6 +17,11 @@
 
 namespace LionWeb_CSharp_Test.tests.serialization;
 
+using Examples.Mixed.MixedConceptLang;
+using Examples.Mixed.MixedDirectEnumLang;
+using Examples.Mixed.MixedDirectSdtLang;
+using Examples.Mixed.MixedNestedEnumLang;
+using Examples.Mixed.MixedNestedSdtLang;
 using Examples.SDTLang;
 using Examples.Shapes.Dynamic;
 using Examples.Shapes.M2;
@@ -265,6 +270,36 @@ public class SerializationTests
 
         var comparer = new Comparer([node], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+    }
+
+    [TestMethod]
+    public void SerializePropertyUsedLanguages()
+    {
+        var node = new MixedConcept("mixedId")
+        {
+            EnumProp = DirectEnum.directEnumA,
+            SdtProp = new DirectSdt
+            {
+                DirectSdtEnum = NestedEnum.nestedLiteralA,
+                DirectSdtSdt = new NestedSdt { NestedSdtField = "hello" }
+            }
+        };
+
+        var serializer = new Serializer();
+        var serializedNodes = serializer.Serialize([node]).ToList();
+        Assert.AreEqual(1, serializedNodes.Count);
+        CollectionAssert.AreEquivalent(new List<SerializedLanguageReference>
+        {
+            new() { Key = "key-mixedBasePropertyLang", Version = "1" },
+            new() { Key = "key-mixedBaseContainmentLang", Version = "1" },
+            new() { Key = "key-mixedBaseReferenceLang", Version = "1" },
+            new() { Key = "key-mixedBaseConceptLang", Version = "1" },
+            new() { Key = "key-mixedConceptLang", Version = "1" },
+            new() { Key = "key-mixedDirectEnumLang", Version = "1" },
+            new() { Key = "key-mixedNestedEnumLang", Version = "1" },
+            new() { Key = "key-mixedDirectSdtLang", Version = "1" },
+            new() { Key = "key-mixedNestedSdtLang", Version = "1" },
+        }, serializer.UsedLanguages.ToList());
     }
 
     private TestContext testContextInstance;

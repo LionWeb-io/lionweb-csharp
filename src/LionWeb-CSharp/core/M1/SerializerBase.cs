@@ -192,35 +192,39 @@ public abstract class SerializerBase : ISerializer
     private IEnumerable<IReadableNode> AsNodes(KeyValuePair<Feature, object?> pair) =>
         pair.Value != null ? M2Extensions.AsNodes<IReadableNode>(pair.Value) : [];
 
-    private SerializedProperty SerializeProperty(IReadableNode node, Feature feature, object? value)
+    private SerializedProperty SerializeProperty(IReadableNode node, Feature property, object? value)
     {
-        if (value is not null && feature is Property { Type: Enumeration enumeration })
-            RegisterUsedLanguage(enumeration.GetLanguage());
-
+        RegisterUsedLanguage(property.GetLanguage());
         return new SerializedProperty
         {
-            Property = feature.ToMetaPointer(), Value = ConvertDatatype(node, feature, value)
+            Property = property.ToMetaPointer(), Value = ConvertDatatype(node, property, value)
         };
     }
 
     private SerializedContainment SerializeContainment(KeyValuePair<Feature, object?> pair) =>
         SerializeContainment(AsNodes(pair), pair.Key);
 
-    protected SerializedContainment SerializeContainment(IEnumerable<IReadableNode> children, Feature containment) =>
-        new()
+    protected SerializedContainment SerializeContainment(IEnumerable<IReadableNode> children, Feature containment)
+    {
+        RegisterUsedLanguage(containment.GetLanguage());
+        return new SerializedContainment
         {
             Containment = containment.ToMetaPointer(), Children = children.Select(child => child.GetId()).ToArray()
         };
+    }
 
     private SerializedReference SerializeReference(KeyValuePair<Feature, object?> pair) =>
         SerializeReference(AsNodes(pair), pair.Key);
 
-    protected SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Feature reference) =>
-        new()
+    protected SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Feature reference)
+    {
+        RegisterUsedLanguage(reference.GetLanguage());
+        return new SerializedReference
         {
             Reference = reference.ToMetaPointer(),
             Targets = targets.Where(t => t != null).Select(SerializeReferenceTarget).ToArray()
         };
+    }
 
     private string SerializeAnnotationTarget(IReadableNode annotation) =>
         annotation.GetId();
@@ -248,7 +252,7 @@ public abstract class SerializerBase : ISerializer
         value switch
         {
             null => null,
-            Enum e => e.LionCoreKey(),
+            Enum e => ConvertEnumeration(e),
             int or bool or string => ConvertPrimitiveType(value),
             IStructuredDataTypeInstance s => ConvertStructuredDataType(node, feature, s),
             _ => Handler.UnknownDatatype(node, feature, value)
@@ -269,23 +273,52 @@ public abstract class SerializerBase : ISerializer
         _ => value.ToString()
     };
 
+    private string? ConvertEnumeration(Enum e)
+    {
+        var lionCoreMetaPointer = AttributeExtensions.GetAttributeOfType<LionCoreMetaPointer>(e);
+
+        if (lionCoreMetaPointer == null)
+            return null;
+
+        var languageInstanceField = lionCoreMetaPointer.Language.GetField("Instance");
+        if (languageInstanceField != null)
+        {
+            var languageInstance = languageInstanceField.GetValue(null);
+            if (languageInstance is Language language)
+            {
+                RegisterUsedLanguage(language);
+            }
+        }
+
+        return lionCoreMetaPointer.Key;
+    }
+
     private string ConvertStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
         SerializeStructuredDataType(node, feature, sdt).ToJsonString();
 
     private JsonObject SerializeStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt)
-        => new(
-            sdt.CollectAllSetFields().Select(f =>
-            {
-                var key = f.Key;
-                JsonNode? value = sdt.Get(f) switch
-                {
-                    null => JsonValue.Create((string?)null),
-                    IStructuredDataTypeInstance s => SerializeStructuredDataType(node, feature, s),
-                    var v => JsonValue.Create(ConvertDatatype(node, feature, v))
-                };
-                return KeyValuePair.Create(key, value);
-            }), null
+    {
+        RegisterUsedLanguage(sdt.GetStructuredDataType().GetLanguage());
+
+        return new JsonObject(
+            sdt
+                .CollectAllSetFields()
+                .Select(f => SerializeField(node, feature, sdt, f)), null
         );
+    }
+
+    private KeyValuePair<string, JsonNode?> SerializeField(IReadableNode node, Feature feature,
+        IStructuredDataTypeInstance sdt, Field field)
+    {
+        var key = field.Key;
+        JsonNode? value = sdt.Get(field) switch
+        {
+            null => JsonValue.Create((string?)null),
+            IStructuredDataTypeInstance s => SerializeStructuredDataType(node, feature, s),
+            var v => JsonValue.Create(ConvertDatatype(node, feature, v))
+        };
+        return KeyValuePair.Create(key, value);
+    }
 
     #endregion
 }
