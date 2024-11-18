@@ -25,7 +25,7 @@ public record SerializationChunk
 {
     public required string SerializationFormatVersion { get; init; }
     public required SerializedLanguageReference[] Languages { get; init; }
-    public required SerializedNode[] Nodes { get; init; }
+    public required SerializedNode[] Nodes { get; set; }
 }
 
 public record SerializedLanguageReference {
@@ -36,8 +36,8 @@ public record SerializedLanguageReference {
 public record SerializedNode
 {
     public required string Id { get; init; }
-    public required MetaPointer Classifier { get; init; }
-    public required SerializedProperty[] Properties { get; init; }
+    public required MetaPointer Classifier { get; set; }
+    public required SerializedProperty[] Properties { get; set; }
     public required SerializedContainment[] Containments { get; init; }
     public required SerializedReference[] References { get; init; }
     public required string[] Annotations { get; init; }
