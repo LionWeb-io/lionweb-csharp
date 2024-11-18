@@ -15,12 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable SuggestVarOrType_SimpleTypes
 namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
+using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using LionWeb.Core.Utilities;
 
@@ -279,5 +281,169 @@ public class DeserializationTests
         var comparer = new Comparer([line], nodes);
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
+
+    [TestMethod]
+    public void UnfittingLanguageVersion()
+    {
+        var v1 = new DynamicLanguage("id-A") { Key = "lang", Version = "1" };
+        var v2 = new DynamicLanguage("id-B") { Key = "lang", Version = "2" };
+        var v3 = new DynamicLanguage("id-C") { Key = "lang", Version = "3" };
+
+        v1.Concept("id-A-concept", "key-A-concept", "AConcept");
+        v1.Concept("id-A-concept2", "key-D-concept", "DConcept-A");
+        v2.Concept("id-B-concept", "key-B-concept", "BConcept");
+        v3.Concept("id-C-concept", "key-C-concept", "CConcept");
+        v3.Concept("id-C-concept2", "key-D-concept", "DConcept-C");
+
+        var chunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "lang", Version = "1" },
+                new SerializedLanguageReference { Key = "lang", Version = "2" },
+                new SerializedLanguageReference { Key = "lang", Version = "3" }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A-id",
+                    Classifier = new MetaPointer("lang", "x", "key-A-concept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "B-id",
+                    Classifier = new MetaPointer("lang", "x", "key-B-concept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "C-id",
+                    Classifier = new MetaPointer("lang", "x", "key-C-concept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "D-id",
+                    Classifier = new MetaPointer("lang", "x", "key-D-concept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+            ]
+        };
+
+        var deserializer = new DeserializerBuilder()
+            .WithLanguage(v1)
+            .WithLanguage(v2)
+            .WithLanguage(v3)
+            .WithUncompressedIds(true)
+            .Build();
+
+        var nodes = deserializer.Deserialize(chunk);
+        
+        Assert.AreEqual(4, nodes.Count);
+        Assert.AreSame(v1, nodes[0].GetClassifier().GetLanguage());
+        Assert.AreSame(v2, nodes[1].GetClassifier().GetLanguage());
+        Assert.AreSame(v3, nodes[2].GetClassifier().GetLanguage());
+        Assert.AreSame(v3, nodes[3].GetClassifier().GetLanguage());
+    }
     
+    [TestMethod]
+    public void UnfittingLanguageVersion_StrangeVersions()
+    {
+        var v1 = new DynamicLanguage("id-A") { Key = "lang", Version = "1" };
+        var v2 = new DynamicLanguage("id-B") { Key = "lang", Version = "hä? llÖ" };
+        var v3 = new DynamicLanguage("id-C") { Key = "lang", Version = "\ud83d\ude00" };
+
+        v1.Concept("id-A-concept", "key-A-concept", "AConcept");
+        v1.Concept("id-A-concept2", "key-D-concept", "DConcept-A");
+        v2.Concept("id-B-concept", "key-B-concept", "BConcept");
+        v3.Concept("id-C-concept", "key-C-concept", "CConcept");
+        v3.Concept("id-C-concept2", "key-D-concept", "DConcept-C");
+
+        var chunk = new SerializationChunk
+        {
+            SerializationFormatVersion = ReleaseVersion.Current,
+            Languages =
+            [
+                new SerializedLanguageReference { Key = "lang", Version = v1.Version },
+                new SerializedLanguageReference { Key = "lang", Version = v2.Version },
+                new SerializedLanguageReference { Key = "lang", Version = v3.Version }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "A-id",
+                    Classifier = new MetaPointer("lang", "x", "key-A-concept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "B-id",
+                    Classifier = new MetaPointer("lang", "x", "key-B-concept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "C-id",
+                    Classifier = new MetaPointer("lang", "x", "key-C-concept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "D-id",
+                    Classifier = new MetaPointer("lang", "x", "key-D-concept"),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                },
+            ]
+        };
+
+        var deserializer = new DeserializerBuilder()
+            .WithLanguage(v1)
+            .WithLanguage(v2)
+            .WithLanguage(v3)
+            .Build();
+
+        var nodes = deserializer.Deserialize(chunk);
+        
+        Assert.AreEqual(4, nodes.Count);
+        Assert.AreSame(v1, nodes[0].GetClassifier().GetLanguage());
+        Assert.AreSame(v2, nodes[1].GetClassifier().GetLanguage());
+        Assert.AreSame(v3, nodes[2].GetClassifier().GetLanguage());
+        Assert.AreSame(v3, nodes[3].GetClassifier().GetLanguage());
+    }
 }

@@ -188,6 +188,9 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
     public string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
         @delegate.DuplicateNodeId(nodeId, existingNode, node);
 
+    public T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed =>
+        @delegate.SelectVersion<T>(metaPointer, languages);
+
     public Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IWritableNode node)
         where TFeature : class, Feature =>
         @delegate.UnknownFeature<TFeature>(feature, classifier, node);
