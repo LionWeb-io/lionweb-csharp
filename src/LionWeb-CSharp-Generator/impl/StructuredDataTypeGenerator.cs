@@ -196,7 +196,7 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names) :
 
         if (circumventSelfContainment)
         {
-            memberFieldType = AsType(typeof(NullableLazy<>), propertyType);
+            memberFieldType = AsType(typeof(NullableStructMember<>), propertyType);
             propertyType = NullableType(propertyType);
         }
 

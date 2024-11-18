@@ -265,17 +265,12 @@ public interface IStructuredDataTypeInstance
 }
 
 /// <summary>
-/// A variant of <see cref="Lazy{T}"/> that considers itself equal to <c>null</c>
+/// A variant of <see cref="Lazy{T}"/> that applies only to <c>struct</c>s and considers itself equal to <c>null</c>
 /// if <see cref="Lazy{T}.Value"/> is <c>null</c>.
 /// </summary>
 /// <inheritdoc />
-public class NullableLazy<T> : Lazy<T?> where T : struct
+public class NullableStructMember<T>(T? value) : Lazy<T?>(value) where T : struct
 {
-    /// <inheritdoc />
-    public NullableLazy(T? value) : base(value)
-    {
-    }
-
     /// <inheritdoc />
     public override bool Equals(object? obj)
     {
@@ -293,21 +288,12 @@ public class NullableLazy<T> : Lazy<T?> where T : struct
             return false;
         }
 
-        var objType = obj.GetType();
-        if (typeof(NullableLazy<>) != objType.GetGenericTypeDefinition())
+        if (this.GetType() != obj.GetType())
         {
             return false;
         }
 
-        var thisType = typeof(T);
-        var otherType = objType.GetGenericArguments().First();
-
-        if (thisType != otherType)
-        {
-            return false;
-        }
-
-        return EqualityComparer<T?>.Default.Equals(this.Value, ((NullableLazy<T>)obj).Value);
+        return EqualityComparer<T?>.Default.Equals(this.Value, ((NullableStructMember<T>)obj).Value);
     }
 
     /// <inheritdoc />

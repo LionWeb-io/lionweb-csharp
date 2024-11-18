@@ -16,17 +16,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable SuggestVarOrType_Elsewhere
+// ReSharper disable EqualExpressionComparison
 
 namespace LionWeb_CSharp_Test.tests;
 
 using LionWeb.Core;
 
 [TestClass]
-public class NullableLazyTests
+public class NullableStructMemberTests
 {
-    internal readonly record struct TestRecordA(int x);
+    private readonly record struct TestRecordA(int x);
 
-    internal enum TestRecordEnum { A, B }
+    private enum TestRecordEnum { A, B }
 
     #region Equals
 
@@ -34,7 +35,7 @@ public class NullableLazyTests
     public void Assign_Primitive()
     {
         int? value = 42;
-        var lazy = new NullableLazy<int>(value);
+        var lazy = new NullableStructMember<int>(value);
         Assert.IsTrue(lazy.Equals(lazy));
     }
     
@@ -42,7 +43,7 @@ public class NullableLazyTests
     public void Assign_Enum()
     {
         TestRecordEnum? value = TestRecordEnum.A;
-        var lazy = new NullableLazy<TestRecordEnum>(value);
+        var lazy = new NullableStructMember<TestRecordEnum>(value);
         Assert.IsTrue(lazy.Equals(lazy));
     }
     
@@ -50,29 +51,29 @@ public class NullableLazyTests
     public void Assign_Record()
     {
         TestRecordA? value = new TestRecordA { x = 42 };
-        var lazy = new NullableLazy<TestRecordA>(value);
+        var lazy = new NullableStructMember<TestRecordA>(value);
         Assert.IsTrue(lazy.Equals(lazy));
     }
     
     [TestMethod]
     public void Same_NonNull_Set()
     {
-        var lazy = new NullableLazy<TestRecordA>(new());
+        var lazy = new NullableStructMember<TestRecordA>(new());
         Assert.IsTrue(lazy.Equals(lazy));
     }
 
     [TestMethod]
     public void Same_NonNull_Unset()
     {
-        var lazy = new NullableLazy<TestRecordA>(null);
+        var lazy = new NullableStructMember<TestRecordA>(null);
         Assert.IsTrue(lazy.Equals(lazy));
     }
 
     [TestMethod]
     public void NonNull_Set()
     {
-        var a = new NullableLazy<TestRecordA>(new() { x = 1 });
-        var b = new NullableLazy<TestRecordA>(new() { x = 2 });
+        var a = new NullableStructMember<TestRecordA>(new() { x = 1 });
+        var b = new NullableStructMember<TestRecordA>(new() { x = 2 });
         Assert.IsFalse(a.Equals(b));
     }
 
@@ -80,83 +81,83 @@ public class NullableLazyTests
     public void NonNull_SameContents()
     {
         var contents = new TestRecordA();
-        var a = new NullableLazy<TestRecordA>(contents);
-        var b = new NullableLazy<TestRecordA>(contents);
+        var a = new NullableStructMember<TestRecordA>(contents);
+        var b = new NullableStructMember<TestRecordA>(contents);
         Assert.IsTrue(a.Equals(b));
     }
 
     [TestMethod]
     public void NonNull_EqualContents()
     {
-        var a = new NullableLazy<int>(42);
-        var b = new NullableLazy<int>(42);
+        var a = new NullableStructMember<int>(42);
+        var b = new NullableStructMember<int>(42);
         Assert.IsTrue(a.Equals(b));
     }
 
     [TestMethod]
     public void NonNull_DifferentContents()
     {
-        var a = new NullableLazy<int>(42);
-        var b = new NullableLazy<int>(23);
+        var a = new NullableStructMember<int>(42);
+        var b = new NullableStructMember<int>(23);
         Assert.IsFalse(a.Equals(b));
     }
 
     [TestMethod]
     public void NonNull_Unset()
     {
-        var a = new NullableLazy<TestRecordA>(null);
-        var b = new NullableLazy<TestRecordA>(null);
+        var a = new NullableStructMember<TestRecordA>(null);
+        var b = new NullableStructMember<TestRecordA>(null);
         Assert.IsTrue(a.Equals(b));
     }
 
     [TestMethod]
     public void NonNull_FirstSet()
     {
-        var a = new NullableLazy<TestRecordA>(new());
-        var b = new NullableLazy<TestRecordA>(null);
+        var a = new NullableStructMember<TestRecordA>(new());
+        var b = new NullableStructMember<TestRecordA>(null);
         Assert.IsFalse(a.Equals(b));
     }
 
     [TestMethod]
     public void NonNull_SecondSet()
     {
-        var a = new NullableLazy<TestRecordA>(null);
-        var b = new NullableLazy<TestRecordA>(new());
+        var a = new NullableStructMember<TestRecordA>(null);
+        var b = new NullableStructMember<TestRecordA>(new());
         Assert.IsFalse(a.Equals(b));
     }
 
     [TestMethod]
     public void NonNull_Unset_Null()
     {
-        var a = new NullableLazy<TestRecordA>(null);
-        NullableLazy<TestRecordA>? b = null;
+        var a = new NullableStructMember<TestRecordA>(null);
+        NullableStructMember<TestRecordA>? b = null;
         Assert.IsTrue(a.Equals(b));
     }
 
     [TestMethod]
     public void NonNull_Set_Null()
     {
-        var a = new NullableLazy<TestRecordA>(new());
-        NullableLazy<TestRecordA>? b = null;
+        var a = new NullableStructMember<TestRecordA>(new());
+        NullableStructMember<TestRecordA>? b = null;
         Assert.IsFalse(a.Equals(b));
     }
 
     #endregion
     
-    #region NonNull
+    #region GetHashCode
 
     [TestMethod]
     public void GetHashCode_Set()
     {
         var value = new TestRecordA();
-        var lazy = new NullableLazy<TestRecordA>(value);
+        var lazy = new NullableStructMember<TestRecordA>(value);
         Assert.AreEqual(value.GetHashCode(), lazy.GetHashCode());
     }
 
     [TestMethod]
     public void GetHashCode_Unset()
     {
-        var lazy = new NullableLazy<TestRecordA>(null);
+        var lazy = new NullableStructMember<TestRecordA>(null);
         Assert.AreEqual(0, lazy.GetHashCode());
     }
 

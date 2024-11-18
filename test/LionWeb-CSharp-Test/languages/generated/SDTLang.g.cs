@@ -648,7 +648,7 @@ public readonly record struct FullyQualifiedName : IStructuredDataTypeInstance
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTFqnName")]
 	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.FullyQualifiedName_name); init => _name = value; }
 
-	private readonly NullableLazy<FullyQualifiedName> _nested;
+	private readonly NullableStructMember<FullyQualifiedName> _nested;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTFqnNested")]
 	public FullyQualifiedName? Nested { get => _nested.Value; init => _nested = new(value); }
 
@@ -699,7 +699,7 @@ public readonly record struct A : IStructuredDataTypeInstance
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTa2b")]
 	public B A2b { get => _a2b ?? throw new UnsetFieldException(SDTLangLanguage.Instance.A_a2b); init => _a2b = value; }
 
-	private readonly NullableLazy<C> _a2c;
+	private readonly NullableStructMember<C> _a2c;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTa2c")]
 	public C? A2c { get => _a2c.Value; init => _a2c = new(value); }
 
@@ -803,7 +803,7 @@ public readonly record struct C : IStructuredDataTypeInstance
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTc2d")]
 	public D C2d { get => _c2d ?? throw new UnsetFieldException(SDTLangLanguage.Instance.C_c2d); init => _c2d = value; }
 
-	private readonly NullableLazy<E> _c2e;
+	private readonly NullableStructMember<E> _c2e;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTc2e")]
 	public E? C2e { get => _c2e.Value; init => _c2e = new(value); }
 
@@ -893,7 +893,7 @@ public readonly record struct E : IStructuredDataTypeInstance
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTeName")]
 	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.E_name); init => _name = value; }
 
-	private readonly NullableLazy<F> _e2f;
+	private readonly NullableStructMember<F> _e2f;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTf")]
 	public F? E2f { get => _e2f.Value; init => _e2f = new(value); }
 
@@ -950,7 +950,7 @@ public readonly record struct F : IStructuredDataTypeInstance
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTfName")]
 	public string Name { get => _name ?? throw new UnsetFieldException(SDTLangLanguage.Instance.F_name); init => _name = value; }
 
-	private readonly NullableLazy<C> _f2c;
+	private readonly NullableStructMember<C> _f2c;
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTf2c")]
 	public C? F2c { get => _f2c.Value; init => _f2c = new(value); }
 
