@@ -52,10 +52,18 @@ public class FieldValues: IFieldValues
 {
     private readonly Dictionary<Field, object?> _fieldValues;
 
+    public FieldValues()
+    {
+        _fieldValues = new Dictionary<Field, object?>(new FieldIdentityComparer());
+    }
+    
     public FieldValues(IEnumerable<(Field, object?)> fieldValues)
     {
         _fieldValues = fieldValues.ToDictionary(new FieldIdentityComparer());
     }
+    
+    public void Add(Field field, object? value) =>
+        _fieldValues.Add(field, value);
 
     public object? Get(Field field) =>
         _fieldValues.GetValueOrDefault(field);

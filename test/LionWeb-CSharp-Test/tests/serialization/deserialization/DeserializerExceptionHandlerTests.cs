@@ -183,10 +183,12 @@ public class DeserializerExceptionHandlerTests
     public void unknown_datatype()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().UnknownDatatype(
-                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
-                "a",
-                new Line("line")));
+        {
+            var concept = new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"));
+            return new DeserializerExceptionHandler().UnknownDatatype("a", concept,
+                new DynamicProperty("dyn-property", concept),
+                new Line("line"));
+        });
     }
 
     [TestMethod]

@@ -110,7 +110,8 @@ public class SerializationLenientTests
             return replacementFeature;
         }
 
-        public override object? UnknownDatatype(Feature property, string? value, IWritableNode nodeId) => value;
+        public override object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property,
+            IWritableNode nodeId) => value;
     }
 
     class LenientComparer : Comparer

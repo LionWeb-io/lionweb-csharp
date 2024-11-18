@@ -15,6 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable SuggestVarOrType_SimpleTypes
 namespace LionWeb.Core.M1;
 
 using M2;
@@ -23,7 +24,7 @@ using Serialization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
-public class DeserializerMetaInfo()
+public class DeserializerMetaInfo
 {
     private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
     private readonly Dictionary<CompressedMetaPointer, Classifier> _classifiers = new();
@@ -105,7 +106,7 @@ public class DeserializerMetaInfo()
             (PrimitiveType p, { } v) => ConvertPrimitiveType(node, property, p, v),
             (Enumeration enumeration, { } v) => ConvertEnumeration(node, property, enumeration, v),
             (StructuredDataType sdt, { } v) => ConvertStructuredDataType(node, property, sdt, v),
-            var (_, v) => Handler.UnknownDatatype(property, v, node)
+            var (_, v) => Handler.UnknownDatatype(v, datatype, property, node)
         };
         return convertedValue;
     }
@@ -123,47 +124,57 @@ public class DeserializerMetaInfo()
                 : Handler.InvalidPropertyValue<int>(value, property, compressedId),
             // leave a String value as a string:
             var s when s == BuiltInsLanguage.Instance.String => value,
-            _ => Handler.UnknownDatatype(property, value, node)
+            _ => Handler.UnknownDatatype(value, datatype, property, node)
         };
     }
 
 
-    private IStructuredDataTypeInstance ConvertStructuredDataType(IWritableNode node, Feature property,
+    private IStructuredDataTypeInstance? ConvertStructuredDataType(IWritableNode node, Feature property,
         StructuredDataType sdt, string s)
     {
         try
         {
-            JsonObject jsonObject = JsonSerializer.Deserialize<JsonObject>(s);
+            JsonObject? jsonObject = JsonSerializer.Deserialize<JsonObject>(s);
+            if(jsonObject == null)
+                return Handler.UnknownDatatype(s, sdt, property, node) as IStructuredDataTypeInstance;
             return ConvertStructuredDataType(node, property, sdt, jsonObject);
         } catch (Exception e) when (e is JsonException or NotSupportedException)
         {
-            return (IStructuredDataTypeInstance)Handler.UnknownDatatype(property, s, node);
+            return Handler.UnknownDatatype(s, sdt, property, node) as IStructuredDataTypeInstance;
         }
     }
 
-    private IStructuredDataTypeInstance ConvertStructuredDataType(IWritableNode node, Feature property,
+    private IStructuredDataTypeInstance? ConvertStructuredDataType(IWritableNode node, Feature property,
         StructuredDataType sdt, JsonObject jsonObject)
     {
-        var fieldValues = jsonObject.Select(it =>
+        var fieldValues = new FieldValues();
+        
+        foreach ((var key, JsonNode? jsonNode) in jsonObject)
         {
-            var field = sdt.Fields.FirstOrDefault(f => f.Key == it.Key);
-            var value = (field.Type, it.Value) switch
+            var field = sdt.Fields.FirstOrDefault(f => f.Key == key);
+            if (field == null)
+            {
+                field = Handler.UnknownField(key, sdt, property, node);
+                if (field == null)
+                    continue;
+            }
+            var value = (field.Type, jsonNode) switch
             {
                 (_, null) => null,
                 (not StructuredDataType, JsonValue j) when j.GetValueKind() == JsonValueKind.String =>
                     ConvertDatatype(node, property, field.Type, j.GetValue<string>()),
                 (StructuredDataType s, JsonObject o) => ConvertStructuredDataType(node, property, s, o),
-                _ => Handler.UnknownDatatype(property, it.Value.ToString(), node)
+                _ => Handler.UnknownDatatype(jsonNode.ToString(), sdt, property, node)
             };
-
-            return (field, value);
-        });
+            
+            fieldValues.Add(field, value);
+        }
 
         if (_language2NodeFactory.TryGetValue(property.GetLanguage(), out var factory))
         {
-            return factory.CreateStructuredDataTypeInstance(sdt, new FieldValues(fieldValues));
+            return factory.CreateStructuredDataTypeInstance(sdt, fieldValues);
         }
 
-        return (IStructuredDataTypeInstance)Handler.UnknownDatatype(property, jsonObject.ToString(), node);
+        return Handler.UnknownDatatype(jsonObject.ToString(), sdt, property, node) as IStructuredDataTypeInstance;
     }
 }

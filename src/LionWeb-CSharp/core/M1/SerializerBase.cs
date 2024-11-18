@@ -59,39 +59,6 @@ public abstract class SerializerBase : ISerializer
     protected CompressedId Compress(string id) =>
         CompressedId.Create(id, StoreUncompressedIds);
 
-    /// <summary>
-    /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
-    /// conforming to the LionWeb JSON serialization format.
-    /// 
-    /// <em>Note!</em> No exception is thrown when the given runtime value doesn't correspond to a primitive type defined here.
-    /// Instead, the runtime value is simply coerced to a string using its <c>ToString</c> method.
-    /// </summary>
-    private string? ConvertPrimitiveType(object? value) => value switch
-    {
-        null => null,
-        bool boolean => boolean ? "true" : "false",
-        string @string => @string,
-        _ => value.ToString()
-    };
-
-    private string? ConvertStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
-        SerializeStructuredDataType(node, feature, sdt).ToJsonString();
-
-    private JsonObject SerializeStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
-        new(
-            sdt.CollectAllSetFields().Select(f =>
-            {
-                var key = f.Key;
-                JsonNode? value = sdt.Get(f) switch
-                {
-                    null => JsonValue.Create((string?)null),
-                    IStructuredDataTypeInstance s => SerializeStructuredDataType(node,feature, s),
-                    var v => JsonValue.Create(ConvertDatatype(node, feature, v))
-                };
-                return KeyValuePair.Create(key, value);
-            }), null
-        );
-
     /// <remarks>
     /// Features with `string` or _value type_ values are treated as property.
     /// Remaining features with single or IEnumerable&lt;IReadableNode> values with all values' parents == node are treated as containment.
@@ -232,20 +199,9 @@ public abstract class SerializerBase : ISerializer
 
         return new SerializedProperty
         {
-            Property = feature.ToMetaPointer(),
-            Value = ConvertDatatype(node, feature, value)
+            Property = feature.ToMetaPointer(), Value = ConvertDatatype(node, feature, value)
         };
     }
-
-    private string? ConvertDatatype(IReadableNode node, Feature feature, object? value) =>
-        value switch
-        {
-            null => null,
-            Enum e => e.LionCoreKey(),
-            int or bool or string => ConvertPrimitiveType(value),
-            IStructuredDataTypeInstance s => ConvertStructuredDataType(node, feature, s),
-            _ => Handler.UnknownDatatype(node, feature, value)
-        };
 
     private SerializedContainment SerializeContainment(KeyValuePair<Feature, object?> pair) =>
         SerializeContainment(AsNodes(pair), pair.Key);
@@ -285,4 +241,51 @@ public abstract class SerializerBase : ISerializer
         if (altLanguage != null)
             _usedLanguages.Add(altLanguage);
     }
+
+    #region DataTypes
+
+    private string? ConvertDatatype(IReadableNode node, Feature feature, object? value) =>
+        value switch
+        {
+            null => null,
+            Enum e => e.LionCoreKey(),
+            int or bool or string => ConvertPrimitiveType(value),
+            IStructuredDataTypeInstance s => ConvertStructuredDataType(node, feature, s),
+            _ => Handler.UnknownDatatype(node, feature, value)
+        };
+
+    /// <summary>
+    /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
+    /// conforming to the LionWeb JSON serialization format.
+    /// 
+    /// <em>Note!</em> No exception is thrown when the given runtime value doesn't correspond to a primitive type defined here.
+    /// Instead, the runtime value is simply coerced to a string using its <c>ToString</c> method.
+    /// </summary>
+    private string? ConvertPrimitiveType(object value) => value switch
+    {
+        null => null,
+        bool boolean => boolean ? "true" : "false",
+        string @string => @string,
+        _ => value.ToString()
+    };
+
+    private string ConvertStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
+        SerializeStructuredDataType(node, feature, sdt).ToJsonString();
+
+    private JsonObject SerializeStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt)
+        => new(
+            sdt.CollectAllSetFields().Select(f =>
+            {
+                var key = f.Key;
+                JsonNode? value = sdt.Get(f) switch
+                {
+                    null => JsonValue.Create((string?)null),
+                    IStructuredDataTypeInstance s => SerializeStructuredDataType(node, feature, s),
+                    var v => JsonValue.Create(ConvertDatatype(node, feature, v))
+                };
+                return KeyValuePair.Create(key, value);
+            }), null
+        );
+
+    #endregion
 }
