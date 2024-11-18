@@ -220,10 +220,24 @@ public interface IDeserializerHandler
     #endregion
 }
 
-public abstract class DeserializerHandlerBase : IDeserializerHandler
+public static class DeserializerHandlerSelectOtherLanguageVersion
 {
-    /// <inheritdoc />
-    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+    /// <inheritdoc cref="SelectVersion{T}(LionWeb.Core.M1.CompressedMetaPointer,System.Collections.Generic.List{LionWeb.Core.M3.Language},Comparer{Language})"/>
+    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+        where T : class, IKeyed =>
+        SelectVersion<T>(metaPointer, languages, Comparer<Language>.Create(DefaultLanguageComparer));
+    
+    /// <summary>
+    /// Chooses the <typeparamref name="T"/> with the same key as <paramref name="metaPointer"/>
+    /// from the <paramref name="languages">language</paramref> with the
+    /// <paramref name="languageComparer">first</paramref> version.
+    /// </summary>
+    /// <param name="metaPointer">Unresolvable meta-pointer.</param>
+    /// <param name="languages">Languages with same key as <paramref name="metaPointer"/>.</param>
+    /// <param name="languageComparer">Comparer to select the preferred language.
+    /// Make sure to invert the result for choosing the latest version.</param>
+    /// <typeparam name="T">Kind of language element we're looking for.</typeparam>
+    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages, Comparer<Language> languageComparer)
         where T : class, IKeyed
     {
         IEnumerable<IKeyed> keyed = typeof(T) switch
@@ -239,130 +253,69 @@ public abstract class DeserializerHandlerBase : IDeserializerHandler
         };
 
         var candidates = keyed
-            .Where(k =>
-            {
-                var compressedId = CompressedId.Create(k.Key, false);
-                var equals = compressedId.Equals(metaPointer.Key);
-                return equals;
-            })
-            .OrderBy(f => f.GetLanguage(), LanguageComparer);
-        
+            .Where(k => CompressedId.Create(k.Key, false).Equals(metaPointer.Key))
+            .OrderBy(f => f.GetLanguage(), languageComparer);
+
         return candidates
             .FirstOrDefault() as T;
     }
 
-    protected virtual Comparer<Language> LanguageComparer { get; } = Comparer<Language>.Create(
-        (Language a, Language b) =>
+    public static int DefaultLanguageComparer(Language a, Language b)
+    {
+        if (Version.TryParse(a.Version, out Version? aVersion) && Version.TryParse(b.Version, out Version? bVersion))
         {
-            if (Version.TryParse(a.Version, out Version? aVersion) &&
-                Version.TryParse(b.Version, out Version? bVersion))
-            {
-                return -aVersion.CompareTo(bVersion);
-            }
+            return -aVersion.CompareTo(bVersion);
+        }
 
-            return -string.Compare(a.Version, b.Version, StringComparison.Ordinal);
-        });
-
-    /// <inheritdoc />
-    public abstract Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id);
-
-    /// <inheritdoc />
-    public abstract string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node);
-
-    /// <inheritdoc />
-    public abstract Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-        IWritableNode node) where TFeature : class, Feature;
-
-    /// <inheritdoc />
-    public abstract Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-        IWritableNode node) where TFeature : class, Feature;
-
-    /// <inheritdoc />
-    public abstract List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
-        where T : class, IReadableNode;
-
-    /// <inheritdoc />
-    public abstract IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node);
-
-    /// <inheritdoc />
-    public abstract IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent);
-
-    /// <inheritdoc />
-    public abstract bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
-        IReadableNode existingParent);
-
-    /// <inheritdoc />
-    public abstract Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
-        IWritableNode node);
-
-    /// <inheritdoc />
-    public abstract object? UnknownDatatype(Feature property, string? value, IWritableNode node);
-
-    /// <inheritdoc />
-    public abstract object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId);
-
-    /// <inheritdoc />
-    public abstract IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node);
-
-    /// <inheritdoc />
-    public abstract IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo,
-        Feature reference,
-        IWritableNode node);
-
-    /// <inheritdoc />
-    public abstract IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node);
-
-    /// <inheritdoc />
-    public abstract bool SkipDeserializingDependentNode(CompressedId id);
-
-    /// <inheritdoc />
-    public abstract void InvalidContainment(IReadableNode node);
-
-    /// <inheritdoc />
-    public abstract void InvalidReference(IReadableNode node);
-
-    /// <inheritdoc />
-    public abstract void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent);
+        return -string.Compare(a.Version, b.Version, StringComparison.Ordinal);
+    }
 }
 
-public class DeserializerExceptionHandler : DeserializerHandlerBase
+public class DeserializerExceptionHandler : IDeserializerHandler
 {
     /// <inheritdoc />
-    public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) =>
+    public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) =>
         throw new UnsupportedClassifierException(classifier, $"On node with id={id}: ");
 
     /// <inheritdoc />
-    public override string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
+    public virtual string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
         throw new DeserializerException($"Duplicate node with id={existingNode.GetId()}");
+
+    /// <inheritdoc />
+    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed =>
+        throw new DeserializerException($"Unknown meta-pointer {metaPointer}");
 
     #region features
 
     /// <inheritdoc />
-    public override Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-        IWritableNode node) =>
+    public virtual Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature,
+        Classifier classifier,
+        IWritableNode node) where TFeature : class, Feature =>
         throw new UnknownFeatureException(classifier, feature, $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public override Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-        IWritableNode node) =>
+    public virtual Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature,
+        Classifier classifier,
+        IWritableNode node) where TFeature : class, Feature =>
         throw new UnknownFeatureException(classifier, feature, $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public override List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node) =>
+    public virtual List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
+        where T : class, IReadableNode =>
         throw new InvalidValueException(link, value);
 
     /// <inheritdoc />
-    public override IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+    public virtual IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: unsuitable annotation {annotation}");
 
     /// <inheritdoc />
-    public override IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent) =>
+    public virtual IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent) =>
         throw new DeserializerException(
             $"On node with id={parent.GetId()}: adding {containedNode.GetId()} as child/annotation would result in circular containment.");
 
     /// <inheritdoc />
-    public override bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
+    public virtual bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
         IReadableNode existingParent) =>
         throw new DeserializerException(
             $"On node with id={containedNode.GetId()}: already has parent {existingParent.GetId()}, but also child/annotation of {newParent.GetId()}.");
@@ -372,18 +325,18 @@ public class DeserializerExceptionHandler : DeserializerHandlerBase
     #region properties
 
     /// <inheritdoc />
-    public override Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration,
+    public virtual Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration,
         Feature property, IWritableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: unknown enumeration literal for enumeration {enumeration} with key {key}");
 
     /// <inheritdoc />
-    public override object? UnknownDatatype(Feature property, string? value, IWritableNode node) =>
+    public virtual object? UnknownDatatype(Feature property, string? value, IWritableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: unknown property type {property /*.Type*/} with value {value}");
 
     /// <inheritdoc />
-    public override object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId) =>
+    public virtual object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId) =>
         throw new DeserializerException(
             $"On node with id={nodeId}: invalid property value {value} for property {property}");
 
@@ -392,11 +345,11 @@ public class DeserializerExceptionHandler : DeserializerHandlerBase
     #region unresolveable nodes
 
     /// <inheritdoc />
-    public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) =>
+    public virtual IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) =>
         throw new DeserializerException($"On node with id={node.GetId()}: couldn't find child with id={childId}");
 
     /// <inheritdoc />
-    public override IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId,
+    public virtual IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId,
         string? resolveInfo,
         Feature reference,
         IWritableNode node) =>
@@ -404,7 +357,7 @@ public class DeserializerExceptionHandler : DeserializerHandlerBase
             $"On node with id={node.GetId()}: couldn't find reference target with id={targetId}");
 
     /// <inheritdoc />
-    public override IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node) =>
+    public virtual IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: couldn't find annotation with id={annotationId}");
 
@@ -413,22 +366,22 @@ public class DeserializerExceptionHandler : DeserializerHandlerBase
     #region language deserializer
 
     /// <inheritdoc />
-    public override void InvalidContainment(IReadableNode node) =>
+    public virtual void InvalidContainment(IReadableNode node) =>
         throw new UnsupportedClassifierException(node.GetClassifier().ToMetaPointer(),
             $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public override void InvalidReference(IReadableNode node) =>
+    public virtual void InvalidReference(IReadableNode node) =>
         throw new UnsupportedClassifierException(node.GetClassifier().ToMetaPointer(),
             $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public override void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent) =>
+    public virtual void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent) =>
         throw new DeserializerException(
             $"Cannot attach annotation {annotation} to its parent with id={parent?.GetId()}.");
 
     /// <inheritdoc />
-    public override bool SkipDeserializingDependentNode(CompressedId id) =>
+    public virtual bool SkipDeserializingDependentNode(CompressedId id) =>
         throw new DeserializerException(
             $"Skip deserializing {id} because dependentLanguages contains node with same id");
 
@@ -437,27 +390,35 @@ public class DeserializerExceptionHandler : DeserializerHandlerBase
 
 public class DeserializerException(string? message) : LionWebExceptionBase(message);
 
-public class DeserializerIgnoringHandler : DeserializerHandlerBase
+public class DeserializerIgnoringHandler : IDeserializerHandler
 {
     /// <inheritdoc />
-    public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id)
+    public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id)
     {
         LogMessage($"On node with id={id}: couldn't find specified classifier {classifier} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
-    public override string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node)
+    public string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node)
     {
         LogMessage($"Duplicate node with id={existingNode.GetId()}");
+        return null;
+    }
+
+    /// <inheritdoc />
+    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed
+    {
+        LogMessage($"Unknown meta-pointer {metaPointer}");
         return null;
     }
 
     #region features
 
     /// <inheritdoc />
-    public override Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-        IWritableNode node)
+    public virtual Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature,
+        Classifier classifier,
+        IWritableNode node) where TFeature : class, Feature
     {
         LogMessage(
             $"On node with id={node.GetId()}: couldn't find specified feature {feature} - leaving this feature unset.");
@@ -465,29 +426,30 @@ public class DeserializerIgnoringHandler : DeserializerHandlerBase
     }
 
     /// <inheritdoc />
-    public override List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
+    public List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node) where T : class, IReadableNode
     {
         LogMessage($"On node with id={node.GetId()}: invalid link value {value} for link {link} - skipping");
         return null;
     }
 
     /// <inheritdoc />
-    public override Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-        IWritableNode node)
+    public Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature,
+        Classifier classifier,
+        IWritableNode node) where TFeature : class, Feature
     {
         LogMessage($"On node with id={node.GetId()}: wrong type of feature {feature} - leaving this feature unset.");
         return null;
     }
 
     /// <inheritdoc />
-    public override IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node)
+    public IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node)
     {
         LogMessage($"On node with id={node?.GetId()}: unsuitable annotation {annotation} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
-    public override IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent)
+    public IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent)
     {
         LogMessage(
             $"On node with id={parent.GetId()}: adding {containedNode.GetId()} as child/annotation would result in circular containment - skipping");
@@ -495,7 +457,7 @@ public class DeserializerIgnoringHandler : DeserializerHandlerBase
     }
 
     /// <inheritdoc />
-    public override bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
+    public bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
         IReadableNode existingParent)
     {
         LogMessage(
@@ -508,8 +470,7 @@ public class DeserializerIgnoringHandler : DeserializerHandlerBase
     #region properties
 
     /// <inheritdoc />
-    public override Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
-        IWritableNode node)
+    public Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property, IWritableNode node)
     {
         LogMessage(
             $"On node with id={node.GetId()}: unknown enumeration literal for enumeration {enumeration} with key {key} - skipping");
@@ -517,7 +478,7 @@ public class DeserializerIgnoringHandler : DeserializerHandlerBase
     }
 
     /// <inheritdoc />
-    public override object? UnknownDatatype(Feature property, string? value, IWritableNode node)
+    public object? UnknownDatatype(Feature property, string? value, IWritableNode node)
     {
         LogMessage(
             $"On node with id={node.GetId()}: unknown datatype {property /*.Type*/} with value {value} - skipping");
@@ -525,7 +486,7 @@ public class DeserializerIgnoringHandler : DeserializerHandlerBase
     }
 
     /// <inheritdoc />
-    public override object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId)
+    public object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId)
     {
         LogMessage($"On node with id={nodeId}: invalid property value {value} for property {property} - skipping");
         return null;
@@ -536,14 +497,14 @@ public class DeserializerIgnoringHandler : DeserializerHandlerBase
     #region unresolveable nodes
 
     /// <inheritdoc />
-    public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node)
+    public virtual IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node)
     {
         LogMessage($"On node with id={node.GetId()}: couldn't find child with id={childId} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
-    public override IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId,
+    public virtual IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId,
         string? resolveInfo,
         Feature reference,
         IWritableNode node)
@@ -553,7 +514,7 @@ public class DeserializerIgnoringHandler : DeserializerHandlerBase
     }
 
     /// <inheritdoc />
-    public override IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node)
+    public virtual IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node)
     {
         LogMessage($"On node with id={node.GetId()}: couldn't find annotation with id={annotationId} - skipping.");
         return null;
@@ -564,21 +525,21 @@ public class DeserializerIgnoringHandler : DeserializerHandlerBase
     #region language deserializer
 
     /// <inheritdoc />
-    public override void InvalidContainment(IReadableNode node) =>
+    public void InvalidContainment(IReadableNode node) =>
         LogMessage($"installing containments in node of meta-concept {node.GetType().Name} not implemented");
 
     /// <inheritdoc />
-    public override void InvalidReference(IReadableNode node) =>
+    public void InvalidReference(IReadableNode node) =>
         LogMessage($"installing references in node of meta-concept {node.GetType().Name} not implemented");
 
 
     /// <inheritdoc />
-    public override void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent) =>
+    public void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent) =>
         LogMessage($"Cannot attach annotation {annotation} to its parent with id={parent?.GetId()}.");
 
 
     /// <inheritdoc />
-    public override bool SkipDeserializingDependentNode(CompressedId id)
+    public bool SkipDeserializingDependentNode(CompressedId id)
     {
         LogMessage($"Skip deserializing {id} because dependent nodes contains node with same id");
         return true;

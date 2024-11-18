@@ -16,6 +16,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable SuggestVarOrType_SimpleTypes
+// ReSharper disable SuggestVarOrType_Elsewhere
+
 namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.M2;
@@ -282,6 +284,13 @@ public class DeserializationTests
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
+    private class ClosestVersionDeserializerHandler : DeserializerExceptionHandler
+    {
+        public override T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+            where T : class =>
+            DeserializerHandlerSelectOtherLanguageVersion.SelectVersion<T>(metaPointer, languages);
+    }
+
     [TestMethod]
     public void UnfittingLanguageVersion()
     {
@@ -354,17 +363,18 @@ public class DeserializationTests
             .WithLanguage(v2)
             .WithLanguage(v3)
             .WithUncompressedIds(true)
+            .WithHandler(new ClosestVersionDeserializerHandler())
             .Build();
 
         var nodes = deserializer.Deserialize(chunk);
-        
+
         Assert.AreEqual(4, nodes.Count);
         Assert.AreSame(v1, nodes[0].GetClassifier().GetLanguage());
         Assert.AreSame(v2, nodes[1].GetClassifier().GetLanguage());
         Assert.AreSame(v3, nodes[2].GetClassifier().GetLanguage());
         Assert.AreSame(v3, nodes[3].GetClassifier().GetLanguage());
     }
-    
+
     [TestMethod]
     public void UnfittingLanguageVersion_StrangeVersions()
     {
@@ -436,10 +446,11 @@ public class DeserializationTests
             .WithLanguage(v1)
             .WithLanguage(v2)
             .WithLanguage(v3)
+            .WithHandler(new ClosestVersionDeserializerHandler())
             .Build();
 
         var nodes = deserializer.Deserialize(chunk);
-        
+
         Assert.AreEqual(4, nodes.Count);
         Assert.AreSame(v1, nodes[0].GetClassifier().GetLanguage());
         Assert.AreSame(v2, nodes[1].GetClassifier().GetLanguage());
