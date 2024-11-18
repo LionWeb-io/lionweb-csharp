@@ -25,7 +25,7 @@ public class MultiLanguage : LanguageBase<IMultiFactory>
 	/// <inheritdoc/>
         public override IReadOnlyList<LanguageEntity> Entities => [Container];
 	/// <inheritdoc/>
-        public override IReadOnlyList<Language> DependsOn => [];
+        public override IReadOnlyList<Language> DependsOn => [Examples.Library.M2.LibraryLanguage.Instance, Examples.Library.M2.LibraryLanguage.Instance];
 
 	/// <inheritdoc/>
         public override IMultiFactory GetFactory() => new MultiFactory(this);
@@ -74,6 +74,12 @@ public class MultiFactory : AbstractBaseNodeFactory, IMultiFactory
         public override Enum GetEnumerationLiteral(EnumerationLiteral literal)
 	{
 		throw new UnsupportedEnumerationLiteralException(literal);
+	}
+
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
 	public virtual Container NewContainer(string id) => new(id);

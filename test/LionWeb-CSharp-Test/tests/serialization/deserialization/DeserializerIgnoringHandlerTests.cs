@@ -149,10 +149,9 @@ public class DeserializerIgnoringHandlerTests
     [TestMethod]
     public void unknown_datatype()
     {
-        Assert.IsNull(new DeserializerIgnoringHandler().UnknownDatatype(
-            new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
-            "a",
-            new Line("line")));
+        var concept = new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"));
+        Assert.IsNull(new DeserializerIgnoringHandler().UnknownDatatype("a", concept,
+            new DynamicProperty("dyn-property", concept), new Line("line")));
     }
 
     [TestMethod]

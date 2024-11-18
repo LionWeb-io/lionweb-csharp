@@ -118,6 +118,7 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             Interface => typeof(Interface),
             Enumeration => typeof(Enumeration),
             PrimitiveType => typeof(PrimitiveType),
+            StructuredDataType => typeof(StructuredDataType),
             _ => throw new ArgumentException($"unsupported entity: {entity}", nameof(entity))
         };
 
@@ -126,9 +127,9 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             Field(LanguageFieldName(entity), AsType(typeof(Lazy<>), generics: AsType(type)))
                 .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
             ReadOnlyProperty(AsProperty(entity).ToString(), AsType(type),
-                MemberAccess(IdentifierName(LanguageFieldName(entity)), IdentifierName("Value"))
-            )
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(entity)]))
+                    MemberAccess(IdentifierName(LanguageFieldName(entity)), IdentifierName("Value"))
+                )
+                .WithAttributeLists(AsAttributes([ObsoleteAttribute(entity)]))
         ];
 
         switch (entity)
@@ -139,9 +140,14 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             case Enumeration enumeration:
                 result.AddRange(enumeration.Literals.SelectMany(LiteralLanguageMember));
                 break;
-            default:
+            case StructuredDataType structuredDataType:
+                result.AddRange(structuredDataType.Fields.SelectMany(FieldLanguageMember));
+                break;
+            case PrimitiveType:
                 // fall-through
                 break;
+            default:
+                throw new ArgumentException($"unsupported entity: {entity}", nameof(entity));
         }
 
         return result;
@@ -162,9 +168,9 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             Field(LanguageFieldName(feature), AsType(typeof(Lazy<>), generics: AsType(type)))
                 .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
             ReadOnlyProperty(_names.AsProperty(feature).Identifier.Text, AsType(type),
-                MemberAccess(IdentifierName(LanguageFieldName(feature)), IdentifierName("Value"))
-            )
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
+                    MemberAccess(IdentifierName(LanguageFieldName(feature)), IdentifierName("Value"))
+                )
+                .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
         ];
     }
 
@@ -174,6 +180,15 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
         ReadOnlyProperty(AsProperty(literal).Identifier.Text, AsType(typeof(EnumerationLiteral)),
             MemberAccess(IdentifierName(LanguageFieldName(literal)), IdentifierName("Value"))
+        )
+    ];
+
+    private IEnumerable<MemberDeclarationSyntax> FieldLanguageMember(Field field) =>
+    [
+        Field(LanguageFieldName(field), AsType(typeof(Lazy<Field>)))
+            .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
+        ReadOnlyProperty(AsProperty(field).Identifier.Text, AsType(typeof(Field)),
+            MemberAccess(IdentifierName(LanguageFieldName(field)), IdentifierName("Value"))
         )
     ];
 

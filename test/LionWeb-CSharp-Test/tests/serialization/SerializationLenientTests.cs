@@ -81,6 +81,11 @@ public class SerializationLenientTests
 
         public override Enum GetEnumerationLiteral(EnumerationLiteral literal) =>
             EnumValueFor<Enum>(literal);
+
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(
+            StructuredDataType structuredDataType,
+            IFieldValues fieldValues) =>
+            StructuredDataTypeInstanceFor(structuredDataType.GetType(), fieldValues);
     }
 
     class LenientHandler : DeserializerExceptionHandler
@@ -105,7 +110,8 @@ public class SerializationLenientTests
             return replacementFeature;
         }
 
-        public override object? UnknownDatatype(Feature property, string? value, IWritableNode nodeId) => value;
+        public override object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property,
+            IWritableNode nodeId) => value;
     }
 
     class LenientComparer : Comparer

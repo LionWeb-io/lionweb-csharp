@@ -220,8 +220,12 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
         IWritableNode nodeId) =>
         @delegate.UnknownEnumerationLiteral(key, enumeration, property, nodeId);
 
-    public object? UnknownDatatype(Feature property, string? value, IWritableNode nodeId) =>
-        @delegate.UnknownDatatype(property, value, nodeId);
+    public Field? UnknownField(string key, StructuredDataType structuredDataType, Feature property,
+        IWritableNode node) =>
+        @delegate.UnknownField(key, structuredDataType, property, node);
+
+    public object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property, IWritableNode nodeId) =>
+        @delegate.UnknownDatatype(value, datatype, property, nodeId);
 
     public object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId) =>
         @delegate.InvalidPropertyValue<TValue>(value, property, nodeId);

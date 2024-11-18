@@ -84,18 +84,14 @@ public static class AstExtensions
     public static PropertyDeclarationSyntax Property(string name, TypeSyntax type, ExpressionSyntax getter,
         ExpressionSyntax setter) =>
         PropertyDeclaration(type, Identifier(name))
-            .WithAccessorList(
-                AccessorList(
-                    List([
-                        AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                            .WithExpressionBody(ArrowExpressionClause(getter))
-                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                        AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
-                            .WithExpressionBody(ArrowExpressionClause(setter))
-                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-                    ])
-                )
-            );
+            .WithAccessorList(AccessorList(List([
+                AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                    .WithExpressionBody(ArrowExpressionClause(getter))
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                    .WithExpressionBody(ArrowExpressionClause(setter))
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+            ])));
 
     /// <returns><c>type name = init;</c></returns>
     public static FieldDeclarationSyntax Field(string name, TypeSyntax? type, ExpressionSyntax? init = null)
@@ -451,6 +447,10 @@ public static class AstExtensions
     /// <returns><c>default</c></returns>
     public static LiteralExpressionSyntax Default() =>
         LiteralExpression(SyntaxKind.DefaultLiteralExpression, Token(SyntaxKind.DefaultKeyword));
+
+    /// <returns><c>value</c></returns>
+    public static IdentifierNameSyntax Value() =>
+        IdentifierName("value");
 
     /// <returns><c>this</c></returns>
     public static ThisExpressionSyntax This() =>

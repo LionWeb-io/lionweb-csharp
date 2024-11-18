@@ -168,6 +168,10 @@ public interface Interface : Classifier
 /// <summary>
 /// A type of value which has no relevant identity in the context of a model.
 /// </summary>
+/// <remarks>
+/// In official LionWeb, the correct name is <tt>DataType</tt> (uppercase T).
+/// We keep the lowercase version for backwards compatibility.
+/// </remarks>
 public interface Datatype : LanguageEntity;
 
 /// <summary>
@@ -190,6 +194,19 @@ public interface Enumeration : Datatype
 /// One of the possible values of an <see cref="Enumeration"/>.
 /// </summary>
 public interface EnumerationLiteral : IKeyed;
+
+public interface StructuredDataType : Datatype
+{
+    public IReadOnlyList<Field> Fields { get; }
+}
+
+public interface Field : IKeyed
+{
+    /// <summary>
+    /// LionWeb type of this field.
+    /// </summary>
+    public Datatype Type { get; }
+}
 
 /// <summary>
 /// A Language will provide the Concepts necessary to describe ideas

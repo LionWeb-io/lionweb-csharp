@@ -516,3 +516,72 @@ public class EnumerationLiteralBase<TLanguage> : IKeyedBase<TLanguage>, Enumerat
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
 }
+
+/// <inheritdoc cref="StructuredDataType"/>
+public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, StructuredDataType where TLanguage : Language
+{
+    /// <inheritdoc />
+    public StructuredDataTypeBase(string id, TLanguage parent) : base(id, parent)
+    {
+    }
+
+    /// <inheritdoc />
+    public override IEnumerable<Feature> CollectAllSetFeatures() =>
+        base.CollectAllSetFeatures().Concat([
+            M3Language.Instance.StructuredDataType_fields
+        ]);
+
+    /// <inheritdoc />
+    public override Classifier GetClassifier() => M3Language.Instance.StructuredDataType;
+
+    /// <inheritdoc />
+    public override object? Get(Feature feature)
+    {
+        var result = base.Get(feature);
+        if (result != null)
+            return result;
+        if (feature == M3Language.Instance.StructuredDataType_fields)
+            return Fields;
+
+        throw new UnknownFeatureException(GetClassifier(), feature);
+    }
+    
+    /// <inheritdoc />
+    public IReadOnlyList<Field> Fields => FieldsLazy.Value;
+    
+    /// <inheritdoc cref="Fields"/>
+    public required Lazy<IReadOnlyList<Field>> FieldsLazy { protected get; init; }
+}
+
+/// <inheritdoc cref="Field"/>
+public class FieldBase<TLanguage> : IKeyedBase<TLanguage>, Field where TLanguage : Language
+{
+    /// <inheritdoc />
+    public FieldBase(string id, StructuredDataType parent, TLanguage language) : base(id, parent, language)
+    {
+    }
+
+    /// <inheritdoc />
+    public override IEnumerable<Feature> CollectAllSetFeatures() =>
+        base.CollectAllSetFeatures().Concat([
+            M3Language.Instance.Field_type
+        ]);
+
+    /// <inheritdoc />
+    public override Classifier GetClassifier() => M3Language.Instance.Field;
+
+    /// <inheritdoc />
+    public override object? Get(Feature feature)
+    {
+        var result = base.Get(feature);
+        if (result != null)
+            return result;
+        if (feature == M3Language.Instance.Field_type)
+            return Type;
+
+        throw new UnknownFeatureException(GetClassifier(), feature);
+    }
+
+    /// <inheritdoc />
+    public required Datatype Type { get; init; }
+}

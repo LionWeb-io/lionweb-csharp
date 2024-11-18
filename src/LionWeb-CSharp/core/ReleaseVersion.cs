@@ -25,5 +25,5 @@ public static class ReleaseVersion
     /// <summary>
     /// Declares the <em>current</em> LionWeb release version.
     /// </summary>
-    public const string Current = "2023.1";
+    public const string Current = "2024.1";
 }

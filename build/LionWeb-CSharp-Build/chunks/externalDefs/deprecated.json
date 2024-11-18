@@ -1,13 +1,13 @@
 {
-  "serializationFormatVersion": "2023.1",
+  "serializationFormatVersion": "2024.1",
   "languages": [
     {
       "key": "LionCore-M3",
-      "version": "2023.1"
+      "version": "2024.1"
     },
     {
       "key": "LionCore-builtins",
-      "version": "2023.1"
+      "version": "2024.1"
     },
     {
       "key": "io-lionweb-mps-specific",
@@ -289,14 +289,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "Language"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh"
@@ -304,7 +304,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Language-version"
           },
           "value": "0"
@@ -312,7 +312,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "io.lionweb.mps.converter.TestDeprecated"
@@ -322,7 +322,7 @@
         {
           "containment": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Language-entities"
           },
           "children": [
@@ -339,7 +339,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Language-dependsOn"
           },
           "targets": []
@@ -352,14 +352,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "Concept"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Concept-abstract"
           },
           "value": "false"
@@ -367,7 +367,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Concept-partition"
           },
           "value": "false"
@@ -375,7 +375,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY"
@@ -383,7 +383,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "DeprConcept"
@@ -393,7 +393,7 @@
         {
           "containment": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Classifier-features"
           },
           "children": [
@@ -407,7 +407,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Concept-extends"
           },
           "targets": [
@@ -420,7 +420,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Concept-implements"
           },
           "targets": []
@@ -435,14 +435,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ0OQ",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "Property"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Feature-optional"
           },
           "value": "true"
@@ -450,7 +450,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ0OQ"
@@ -458,7 +458,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "deprProp"
@@ -469,7 +469,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Property-type"
           },
           "targets": [
@@ -489,14 +489,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "Containment"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Feature-optional"
           },
           "value": "true"
@@ -504,7 +504,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw"
@@ -512,7 +512,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Link-multiple"
           },
           "value": "true"
@@ -520,7 +520,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "deprChild"
@@ -531,7 +531,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Link-type"
           },
           "targets": [
@@ -551,14 +551,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1OA",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "Reference"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Feature-optional"
           },
           "value": "false"
@@ -566,7 +566,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1OA"
@@ -574,7 +574,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Link-multiple"
           },
           "value": "false"
@@ -582,7 +582,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "deprRef"
@@ -593,7 +593,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Link-type"
           },
           "targets": [
@@ -613,14 +613,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NTU",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "Interface"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NTU"
@@ -628,7 +628,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "DeprIface"
@@ -638,7 +638,7 @@
         {
           "containment": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Classifier-features"
           },
           "children": []
@@ -648,7 +648,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Interface-extends"
           },
           "targets": []
@@ -663,14 +663,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "Annotation"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE"
@@ -678,7 +678,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "DeprAnnotation"
@@ -688,7 +688,7 @@
         {
           "containment": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Classifier-features"
           },
           "children": []
@@ -698,7 +698,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Annotation-annotates"
           },
           "targets": [
@@ -711,7 +711,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Annotation-extends"
           },
           "targets": []
@@ -719,7 +719,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Annotation-implements"
           },
           "targets": []
@@ -734,14 +734,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzE",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "Enumeration"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzE"
@@ -749,7 +749,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "DeprEnum"
@@ -759,7 +759,7 @@
         {
           "containment": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Enumeration-literals"
           },
           "children": [
@@ -778,14 +778,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3Mg",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "EnumerationLiteral"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3Mg"
@@ -793,7 +793,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "A"
@@ -808,14 +808,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3NQ",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "EnumerationLiteral"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3NQ"
@@ -823,7 +823,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "B"
@@ -838,14 +838,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0ODQ",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "PrimitiveType"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0ODQ"
@@ -853,7 +853,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "DeprDatatype"
@@ -870,14 +870,14 @@
       "id": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk1MDc1ODcyODk",
       "classifier": {
         "language": "LionCore-M3",
-        "version": "2023.1",
+        "version": "2024.1",
         "key": "Concept"
       },
       "properties": [
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Concept-abstract"
           },
           "value": "false"
@@ -885,7 +885,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Concept-partition"
           },
           "value": "false"
@@ -893,7 +893,7 @@
         {
           "property": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "IKeyed-key"
           },
           "value": "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk1MDc1ODcyODk"
@@ -901,7 +901,7 @@
         {
           "property": {
             "language": "LionCore-builtins",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "LionCore-builtins-INamed-name"
           },
           "value": "DeprNoComment"
@@ -911,7 +911,7 @@
         {
           "containment": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Classifier-features"
           },
           "children": []
@@ -921,7 +921,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Concept-extends"
           },
           "targets": [
@@ -934,7 +934,7 @@
         {
           "reference": {
             "language": "LionCore-M3",
-            "version": "2023.1",
+            "version": "2024.1",
             "key": "Concept-implements"
           },
           "targets": []

@@ -21,6 +21,7 @@ using M2;
 using M3;
 using Serialization;
 using System.Collections;
+using System.Text.Json.Nodes;
 using Utilities;
 
 public abstract class SerializerBase : ISerializer
@@ -46,22 +47,8 @@ public abstract class SerializerBase : ISerializer
     protected SerializedLanguageReference SerializeLanguageReference(Language language) =>
         new() { Key = language.Key, Version = language.Version };
 
-    protected SerializedProperty SerializeProperty(IReadableNode node, Property property)
-    {
-        var value = GetValueIfSet(node, property);
-
-        return new SerializedProperty
-        {
-            Property = property.ToMetaPointer(),
-            Value = property.Type switch
-            {
-                _ when value == null => null,
-                PrimitiveType => ConvertPrimitiveType(value),
-                Enumeration when value is Enum e => e.LionCoreKey(),
-                _ => Handler.UnknownDatatype(node, property, value)
-            }
-        };
-    }
+    protected SerializedProperty SerializeProperty(IReadableNode node, Property property) =>
+        SerializeProperty(node, property, GetValueIfSet(node, property));
 
     protected SerializedReferenceTarget SerializeReferenceTarget(IReadableNode? target) =>
         new() { Reference = target?.GetId(), ResolveInfo = target?.GetNodeName() };
@@ -71,21 +58,6 @@ public abstract class SerializerBase : ISerializer
 
     protected CompressedId Compress(string id) =>
         CompressedId.Create(id, StoreUncompressedIds);
-
-    /// <summary>
-    /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
-    /// conforming to the LionWeb JSON serialization format.
-    /// 
-    /// <em>Note!</em> No exception is thrown when the given runtime value doesn't correspond to a primitive type defined here.
-    /// Instead, the runtime value is simply coerced to a string using its <c>ToString</c> method.
-    /// </summary>
-    private string? ConvertPrimitiveType(object? value) => value switch
-    {
-        null => null,
-        bool boolean => boolean ? "true" : "false",
-        string @string => @string,
-        _ => value.ToString()
-    };
 
     /// <remarks>
     /// Features with `string` or _value type_ values are treated as property.
@@ -220,42 +192,39 @@ public abstract class SerializerBase : ISerializer
     private IEnumerable<IReadableNode> AsNodes(KeyValuePair<Feature, object?> pair) =>
         pair.Value != null ? M2Extensions.AsNodes<IReadableNode>(pair.Value) : [];
 
-    private SerializedProperty SerializeProperty(IReadableNode node, Feature feature, object? value)
+    private SerializedProperty SerializeProperty(IReadableNode node, Feature property, object? value)
     {
-        if (value is not null && feature is Property { Type: Enumeration enumeration })
-            RegisterUsedLanguage(enumeration.GetLanguage());
-
+        RegisterUsedLanguage(property.GetLanguage());
         return new SerializedProperty
         {
-            Property = feature.ToMetaPointer(),
-            Value = value switch
-            {
-                null => null,
-                Enum e => e.LionCoreKey(),
-                int or bool or string => ConvertPrimitiveType(value),
-                _ => Handler.UnknownDatatype(node, feature, value)
-            }
+            Property = property.ToMetaPointer(), Value = ConvertDatatype(node, property, value)
         };
     }
 
     private SerializedContainment SerializeContainment(KeyValuePair<Feature, object?> pair) =>
         SerializeContainment(AsNodes(pair), pair.Key);
 
-    protected SerializedContainment SerializeContainment(IEnumerable<IReadableNode> children, Feature containment) =>
-        new()
+    protected SerializedContainment SerializeContainment(IEnumerable<IReadableNode> children, Feature containment)
+    {
+        RegisterUsedLanguage(containment.GetLanguage());
+        return new SerializedContainment
         {
             Containment = containment.ToMetaPointer(), Children = children.Select(child => child.GetId()).ToArray()
         };
+    }
 
     private SerializedReference SerializeReference(KeyValuePair<Feature, object?> pair) =>
         SerializeReference(AsNodes(pair), pair.Key);
 
-    protected SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Feature reference) =>
-        new()
+    protected SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Feature reference)
+    {
+        RegisterUsedLanguage(reference.GetLanguage());
+        return new SerializedReference
         {
             Reference = reference.ToMetaPointer(),
             Targets = targets.Where(t => t != null).Select(SerializeReferenceTarget).ToArray()
         };
+    }
 
     private string SerializeAnnotationTarget(IReadableNode annotation) =>
         annotation.GetId();
@@ -276,4 +245,80 @@ public abstract class SerializerBase : ISerializer
         if (altLanguage != null)
             _usedLanguages.Add(altLanguage);
     }
+
+    #region DataTypes
+
+    private string? ConvertDatatype(IReadableNode node, Feature feature, object? value) =>
+        value switch
+        {
+            null => null,
+            Enum e => ConvertEnumeration(e),
+            int or bool or string => ConvertPrimitiveType(value),
+            IStructuredDataTypeInstance s => ConvertStructuredDataType(node, feature, s),
+            _ => Handler.UnknownDatatype(node, feature, value)
+        };
+
+    /// <summary>
+    /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
+    /// conforming to the LionWeb JSON serialization format.
+    /// 
+    /// <em>Note!</em> No exception is thrown when the given runtime value doesn't correspond to a primitive type defined here.
+    /// Instead, the runtime value is simply coerced to a string using its <c>ToString</c> method.
+    /// </summary>
+    private string? ConvertPrimitiveType(object value) => value switch
+    {
+        null => null,
+        bool boolean => boolean ? "true" : "false",
+        string @string => @string,
+        _ => value.ToString()
+    };
+
+    private string? ConvertEnumeration(Enum e)
+    {
+        var lionCoreMetaPointer = AttributeExtensions.GetAttributeOfType<LionCoreMetaPointer>(e);
+
+        if (lionCoreMetaPointer == null)
+            return null;
+
+        var languageInstanceField = lionCoreMetaPointer.Language.GetField("Instance");
+        if (languageInstanceField != null)
+        {
+            var languageInstance = languageInstanceField.GetValue(null);
+            if (languageInstance is Language language)
+            {
+                RegisterUsedLanguage(language);
+            }
+        }
+
+        return lionCoreMetaPointer.Key;
+    }
+
+    private string ConvertStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
+        SerializeStructuredDataType(node, feature, sdt).ToJsonString();
+
+    private JsonObject SerializeStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt)
+    {
+        RegisterUsedLanguage(sdt.GetStructuredDataType().GetLanguage());
+
+        return new JsonObject(
+            sdt
+                .CollectAllSetFields()
+                .Select(f => SerializeField(node, feature, sdt, f)), null
+        );
+    }
+
+    private KeyValuePair<string, JsonNode?> SerializeField(IReadableNode node, Feature feature,
+        IStructuredDataTypeInstance sdt, Field field)
+    {
+        var key = field.Key;
+        JsonNode? value = sdt.Get(field) switch
+        {
+            null => JsonValue.Create((string?)null),
+            IStructuredDataTypeInstance s => SerializeStructuredDataType(node, feature, s),
+            var v => JsonValue.Create(ConvertDatatype(node, feature, v))
+        };
+        return KeyValuePair.Create(key, value);
+    }
+
+    #endregion
 }

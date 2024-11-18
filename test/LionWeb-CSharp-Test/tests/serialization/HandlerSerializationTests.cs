@@ -21,6 +21,7 @@ using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M3;
+using System.Collections.Concurrent;
 
 [TestClass]
 public class HandlerSerializationTests
@@ -55,9 +56,9 @@ public class HandlerSerializationTests
         Assert.AreEqual(1, count);
     }
 
-    class DuplicateLanguageHandler(Func<Language?> incrementer) : ISerializerHandler
+    class DuplicateLanguageHandler(Func<Language, Language, Language?> incrementer) : ISerializerHandler
     {
-        Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) => incrementer();
+        Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) => incrementer(a,b);
 
         public void DuplicateNodeId(IReadableNode n) => throw new NotImplementedException();
         
@@ -80,14 +81,15 @@ public class HandlerSerializationTests
         var b = new Circle("b");
         a.Set(defaultShape, b);
 
-        int count = 0;
+        var dictionary = new ConcurrentDictionary<Language, byte>();
 
         var serializer =
             new Serializer
             {
-                Handler = new DuplicateLanguageHandler(() =>
+                Handler = new DuplicateLanguageHandler((a, b) =>
                 {
-                    Interlocked.Increment(ref count);
+                    dictionary[a] = 1;
+                    dictionary[b] = 1;
                     return null;
                 })
             };
@@ -99,7 +101,7 @@ public class HandlerSerializationTests
         {
         }
 
-        Assert.AreEqual(1, count);
+        Assert.AreEqual(2, dictionary.Count);
     }
 
     [TestMethod]
@@ -118,21 +120,22 @@ public class HandlerSerializationTests
         var b = new Circle("b");
         a.Set(defaultShape, b);
 
-        int count = 0;
+        var dictionary = new ConcurrentDictionary<Language, byte>();
 
         var serializer =
             new Serializer
             {
-                Handler = new DuplicateLanguageHandler(() =>
+                Handler = new DuplicateLanguageHandler((a, b) =>
                 {
-                    Interlocked.Increment(ref count);
+                    dictionary[a] = 1;
+                    dictionary[b] = 1;
                     return ShapesLanguage.Instance;
                 })
             };
 
         ISerializerExtensions.Serialize(serializer, a.Descendants(true, true));
 
-        Assert.AreEqual(1, count);
+        Assert.AreEqual(2, dictionary.Count);
     }
 
     private TestContext testContextInstance;
