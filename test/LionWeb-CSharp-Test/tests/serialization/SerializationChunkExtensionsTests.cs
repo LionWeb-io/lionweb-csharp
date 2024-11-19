@@ -23,7 +23,6 @@ using LionWeb.Core;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
-
 /*
   serializationChunk.Node("A").Classifier("key-Shapes", "1", "key-OffsetDuplicate")
   serializationChunk.Node("A").Classifier(ShapesLanguage.Instance.OffsetDuplicate)
@@ -47,6 +46,7 @@ public class SerializationChunkExtensionsTests
             ],
         };
 
+        serializationChunk.Initialize();
         SerializedNode nodeA = serializationChunk.Node("A", ShapesLanguage.Instance.Coord);
         SerializedNode nodeB = serializationChunk.Node("B", ShapesLanguage.Instance.Circle);
 
@@ -66,13 +66,14 @@ public class SerializationChunkExtensionsTests
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
             ],
         };
-        
+
+        serializationChunk.Initialize();
         var metaPointer = new MetaPointer("key-Shapes", "1", "key-OffsetDuplicate");
-        serializationChunk.Node("A", metaPointer);
+        serializationChunk.Node("C", metaPointer);
 
         SerializedNode[] serializedNodes = serializationChunk.Nodes();
-        MetaPointer classifier = serializedNodes.First(node => node.Id == "A").Classifier;
-        Assert.AreEqual(metaPointer, classifier);
+        MetaPointer classifier = serializedNodes.First(node => node.Id == "C").Classifier;
+        Assert.AreSame(metaPointer, classifier);
         Assert.AreEqual(1, serializedNodes.Length);
     }
 
@@ -89,6 +90,7 @@ public class SerializationChunkExtensionsTests
             Nodes = []
         };
 
+        serializationChunk.Initialize();
         Concept offsetDuplicate = ShapesLanguage.Instance.OffsetDuplicate;
         serializationChunk.Node("A", offsetDuplicate);
 
@@ -108,13 +110,13 @@ public class SerializationChunkExtensionsTests
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
             ],
         };
-
+        serializationChunk.Initialize();
         SerializedNode nodeA = serializationChunk.Node("A", ShapesLanguage.Instance.Coord);
         Property propertyX = ShapesLanguage.Instance.Coord_x;
         Property propertyY = ShapesLanguage.Instance.Coord_y;
         Property propertyZ = ShapesLanguage.Instance.Coord_z;
         nodeA.Property(propertyX).Property(propertyY).Property(propertyZ);
-        
+
         SerializedNode nodeB = serializationChunk.Node("B", ShapesLanguage.Instance.Circle);
         Property propertyR = ShapesLanguage.Instance.Circle_r;
         nodeB.Property(propertyR);
@@ -122,19 +124,19 @@ public class SerializationChunkExtensionsTests
         SerializedNode[] serializedNodes = serializationChunk.Nodes();
         SerializedNode serializedNodeA = serializedNodes.First(node => node.Id == "A");
         SerializedProperty[] propertiesNodeA = serializedNodeA.Properties();
-        
+
         Assert.AreEqual(3, propertiesNodeA.Length);
         Assert.AreEqual(propertyX.ToMetaPointer(), propertiesNodeA[0].Property);
         Assert.AreEqual(propertyY.ToMetaPointer(), propertiesNodeA[1].Property);
         Assert.AreEqual(propertyZ.ToMetaPointer(), propertiesNodeA[2].Property);
-        
+
         SerializedNode serializedNodeB = serializedNodes.First(node => node.Id == "B");
         SerializedProperty[] propertiesNodeB = serializedNodeB.Properties();
         Assert.AreEqual(propertyR.ToMetaPointer(), propertiesNodeB[0].Property);
         Assert.AreEqual(1, propertiesNodeB.Length);
         Assert.AreEqual(2, serializedNodes.Length);
     }
-    
+
     /*
     [TestMethod]
     public void test_property_with_MetaPointer()

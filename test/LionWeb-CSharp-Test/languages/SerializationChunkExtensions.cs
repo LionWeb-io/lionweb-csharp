@@ -22,8 +22,14 @@ using LionWeb.Core.Serialization;
 
 public static class SerializationChunkExtensions
 {
-    private static readonly List<SerializedNode> _nodes = [];
-    private static readonly Dictionary<string, List<SerializedProperty>> _properties = [];
+    private static List<SerializedNode> _nodes;
+    private static Dictionary<string, List<SerializedProperty>> _properties;
+
+    public static void Initialize(this SerializationChunk serializationChunk)
+    {
+        _nodes = [];
+        _properties = [];
+    }
 
     public static SerializedNode Node(this SerializationChunk serializationChunk, string id, MetaPointer metaPointer)
     {
@@ -65,7 +71,7 @@ public static class SerializationChunkExtensions
         AddProperty(serializedNode, property);
         return serializedNode;
     }
-    
+
     public static SerializedNode Property(this SerializedNode serializedNode, Property property, string? value)
     {
         var serializedProperty = new SerializedProperty { Property = property.ToMetaPointer(), Value = value };
