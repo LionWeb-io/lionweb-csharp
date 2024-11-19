@@ -20,85 +20,67 @@ namespace LionWeb_CSharp_Test.languages;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
-/*
-  serializationChunk.Node("A").Classifier("key-Shapes", "1", "key-OffsetDuplicate")
-  serializationChunk.Node("A").Classifier(ShapesLanguage.Instance.OffsetDuplicate)
-  serializationChunk.Node("A").Classifier(typeof(OffsetDuplicate)) //reflection
-  serializationChunk.Node("A").Properties().Property(...).Value(...)
-
-*/
-
 public static class SerializationChunkExtensions
 {
-    public static SerializedNode Node(this SerializationChunk serializationChunk, string id)
-    {
-        var serializedNode = new SerializedNode
-        {
-            Id = id,
-            Classifier = null!,
-            Properties = new SerializedProperty[] { },
-            Containments = new SerializedContainment[] { },
-            References = new SerializedReference[] { },
-            Annotations = new string[] { }
-        };
+    private static readonly List<SerializedNode> _nodes = [];
+    private static readonly Dictionary<string, List<SerializedProperty>> _properties = [];
 
-        SerializedNode[] serializationChunkNodes = serializationChunk.Nodes;
-        Array.Resize(ref serializationChunkNodes, serializationChunkNodes.Length + 1);
-        serializationChunkNodes[^1] = serializedNode;
-        serializationChunk.Nodes = serializationChunkNodes;
+    public static SerializedNode Node(this SerializationChunk serializationChunk, string id, MetaPointer metaPointer)
+    {
+        var serializedNode = new SerializedNode { Id = id, Classifier = metaPointer };
+        _nodes.Add(serializedNode);
         return serializedNode;
     }
 
-    public static SerializedNode Classifier(this SerializedNode serializedNode, MetaPointer metaPointer)
+    public static SerializedNode Node(this SerializationChunk serializationChunk, string id, Concept concept)
     {
-        serializedNode.Classifier = metaPointer;
+        var serializedNode = new SerializedNode { Id = id, Classifier = concept.ToMetaPointer() };
+        _nodes.Add(serializedNode);
         return serializedNode;
     }
 
-    public static SerializedNode Classifier(this SerializedNode serializedNode, Concept concept)
+    public static SerializedNode[] Nodes(this SerializationChunk serializationChunk)
+        => _nodes.ToArray();
+
+    public static SerializedProperty[] Properties(this SerializedNode serializedNode)
+        => _properties[serializedNode.Id].ToArray();
+
+    public static SerializedNode Property(this SerializedNode serializedNode, Property property)
     {
-        serializedNode.Classifier = concept.ToMetaPointer();
+        var serializedProperty = new SerializedProperty { Property = property.ToMetaPointer() };
+        AddProperty(serializedNode, serializedProperty);
         return serializedNode;
     }
 
     public static SerializedNode Property(this SerializedNode serializedNode, MetaPointer metaPointer)
     {
         var property = new SerializedProperty { Property = metaPointer };
-        SerializedProperty[] serializedNodeProperties = serializedNode.Properties;
-        Array.Resize(ref serializedNodeProperties, serializedNodeProperties.Length + 1);
-        serializedNodeProperties[^1] = property;
-        serializedNode.Properties = serializedNodeProperties;
+        AddProperty(serializedNode, property);
         return serializedNode;
     }
-
 
     public static SerializedNode Property(this SerializedNode serializedNode, MetaPointer metaPointer, string? value)
     {
         var property = new SerializedProperty { Property = metaPointer, Value = value };
-        SerializedProperty[] serializedNodeProperties = serializedNode.Properties;
-        Array.Resize(ref serializedNodeProperties, serializedNodeProperties.Length + 1);
-        serializedNodeProperties[^1] = property;
-        serializedNode.Properties = serializedNodeProperties;
+        AddProperty(serializedNode, property);
         return serializedNode;
     }
-
-    public static SerializedNode Property(this SerializedNode serializedNode, Property property)
-    {
-        var serializedProperty = new SerializedProperty { Property = property.ToMetaPointer() };
-        SerializedProperty[] serializedNodeProperties = serializedNode.Properties;
-        Array.Resize(ref serializedNodeProperties, serializedNodeProperties.Length + 1);
-        serializedNodeProperties[^1] = serializedProperty;
-        serializedNode.Properties = serializedNodeProperties;
-        return serializedNode;
-    }
-
+    
     public static SerializedNode Property(this SerializedNode serializedNode, Property property, string? value)
     {
         var serializedProperty = new SerializedProperty { Property = property.ToMetaPointer(), Value = value };
-        SerializedProperty[] serializedNodeProperties = serializedNode.Properties;
-        Array.Resize(ref serializedNodeProperties, serializedNodeProperties.Length + 1);
-        serializedNodeProperties[^1] = serializedProperty;
-        serializedNode.Properties = serializedNodeProperties;
+        AddProperty(serializedNode, serializedProperty);
         return serializedNode;
+    }
+
+    private static void AddProperty(SerializedNode serializedNode, SerializedProperty serializedProperty)
+    {
+        if (!_properties.TryGetValue(serializedNode.Id, out List<SerializedProperty> valueList))
+        {
+            valueList = new List<SerializedProperty>();
+            _properties.Add(serializedNode.Id, valueList);
+        }
+
+        valueList.Add(serializedProperty);
     }
 }
