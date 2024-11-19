@@ -15,8 +15,9 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M2;
+namespace LionWeb.Core;
 
+using M2;
 using M3;
 
 public abstract class LionWebVersions
@@ -59,4 +60,14 @@ public abstract class LionWebVersions
         public override ILionCoreLanguage LionCore =>
             new Lazy<ILionCoreLanguage>(() => LionCoreLanguage_2024_1.Instance).Value;
     }
+}
+
+public interface ILionWebVersionUser<out TVersion, out TBuiltIns, out TM3>
+    where TVersion: LionWebVersions
+    where TBuiltIns : IBuiltInsLanguage<TVersion, TBuiltIns, TM3>
+    where TM3 : ILionCoreLanguage<TVersion, TBuiltIns, TM3>
+{
+    TVersion ULionWebVersion { get; }
+    protected TBuiltIns UBuiltIns { get; }
+    protected TM3 UM3 { get; }
 }

@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 
-public partial class Deserializer
+public partial class Deserializer<TVersion, TBuiltIns, TM3>
 {
     /// <inheritdoc />
     public override IEnumerable<IWritableNode> Finish()

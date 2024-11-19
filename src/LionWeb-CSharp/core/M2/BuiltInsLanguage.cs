@@ -27,11 +27,6 @@ using M3;
 public interface IBuiltInsLanguage : Language
 {
     /// <summary>
-    /// The definition of the LionCore built-ins language.
-    /// </summary>
-    public static IBuiltInsLanguage GetInstance(LionWebVersions version) => version.BuiltIns;
-
-    /// <summary>
     /// The built-in primitive type Boolean.
     /// </summary>
     PrimitiveType Boolean { get; }
@@ -40,11 +35,6 @@ public interface IBuiltInsLanguage : Language
     /// The built-in primitive type Integer.
     /// </summary>
     PrimitiveType Integer { get; }
-
-    /// <summary>
-    /// The built-in primitive type Json.
-    /// </summary>
-    PrimitiveType Json { get; }
 
     /// <summary>
     /// The built-in primitive type String.
@@ -67,11 +57,16 @@ public interface IBuiltInsLanguage : Language
     Concept Node { get; }
 }
 
+public interface IBuiltInsLanguage<out TVersion, out TBuiltIns, out TM3> : IBuiltInsLanguage,
+    ILionWebVersionUser<TVersion, TBuiltIns, TM3>
+    where TVersion : LionWebVersions
+    where TBuiltIns : IBuiltInsLanguage<TVersion, TBuiltIns, TM3>
+    where TM3 : ILionCoreLanguage<TVersion, TBuiltIns, TM3>;
+
 /// <inheritdoc cref="IBuiltInsLanguage"/>
 [Obsolete("Use IBuiltInsLanguage instead")]
 public sealed class BuiltInsLanguage
 {
-    /// <inheritdoc cref="IBuiltInsLanguage.GetInstance"/>
     [Obsolete("Use IBuiltInsLanguage instead")]
     public static readonly IBuiltInsLanguage Instance = LionWebVersions.Current.BuiltIns;
 }

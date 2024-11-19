@@ -17,6 +17,7 @@
 
 namespace LionWeb_CSharp_Test.languages;
 
+using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 

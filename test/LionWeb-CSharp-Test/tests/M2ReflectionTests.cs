@@ -25,7 +25,7 @@ using M2;
 public class M2ReflectionTests
 {
     private static readonly ILionCoreLanguage _m3 = LionCoreLanguage_2023_1.Instance;
-    private static readonly BuiltInsLanguage_2023_1 _builtIns = BuiltInsLanguage_2023_1.Instance;
+    private static readonly IBuiltInsLanguage_2023_1 _builtIns = BuiltInsLanguage_2023_1.Instance;
 
     private static Classifier Concept = _m3.Concept;
 

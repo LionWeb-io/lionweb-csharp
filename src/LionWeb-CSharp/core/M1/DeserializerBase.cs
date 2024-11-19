@@ -21,21 +21,27 @@ using M2;
 using M3;
 using Serialization;
 
-public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadableNode
+public abstract class DeserializerBase<TVersion, TBuiltIns, TM3> : IDeserializer, ILionWebVersionUser<TVersion, TBuiltIns, TM3>
+where TVersion: LionWebVersions
+where TBuiltIns : IBuiltInsLanguage
+where TM3 : ILionCoreLanguage
 {
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
 
     protected readonly DeserializerMetaInfo _deserializerMetaInfo = new();
     protected readonly Dictionary<CompressedId, IReadableNode> _dependentNodesById = new();
-    protected readonly Dictionary<CompressedId, T> _deserializedNodesById = new();
-
-    protected DeserializerBase(LionWebVersions lionWebVersion)
+    
+    protected DeserializerBase(TVersion lionWebVersion)
     {
         LionWebVersion = lionWebVersion;
         _m3 = lionWebVersion.LionCore;
         _builtIns = lionWebVersion.BuiltIns;
     }
+
+    TBuiltIns ILionWebVersionUser<TVersion, TBuiltIns, TM3>.UBuiltIns => (TBuiltIns)_builtIns;
+    TM3 ILionWebVersionUser<TVersion, TBuiltIns, TM3>.UM3 => (TM3)_m3;
+    TVersion ILionWebVersionUser<TVersion, TBuiltIns, TM3>.ULionWebVersion => (TVersion)LionWebVersion;
 
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; }
@@ -70,11 +76,14 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadable
     public virtual void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
         => _deserializerMetaInfo.RegisterInstantiatedLanguage(language, factory);
 
+    /// <inheritdoc />
     public abstract void Process(SerializedNode serializedNode);
 
-    public abstract IEnumerable<T> Finish();
+    /// <inheritdoc />
+    public abstract IEnumerable<IReadableNode> Finish();
 
-    protected CompressedId Compress(string id) =>
+    
+    protected internal CompressedId Compress(string id) =>
         CompressedId.Create(id, StoreUncompressedIds);
 
     protected CompressedMetaPointer Compress(MetaPointer metaPointer) =>
@@ -82,4 +91,22 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadable
 
     protected bool IsInDependentNodes(CompressedId compressedId) =>
         _dependentNodesById.ContainsKey(compressedId);
+}
+
+public abstract class DeserializerBase<T, TVersion, TBuiltIns, TM3>(TVersion lionWebVersion)
+    : DeserializerBase<TVersion, TBuiltIns, TM3>(lionWebVersion), IDeserializer<T>
+    where T : IReadableNode
+    where TVersion: LionWebVersions
+    where TBuiltIns : IBuiltInsLanguage
+    where TM3 : ILionCoreLanguage
+{
+    protected readonly Dictionary<CompressedId, T> _deserializedNodesById = new();
+
+    /// <inheritdoc />
+    public abstract override void Process(SerializedNode serializedNode);
+
+    IEnumerable<T> IDeserializer<T>.Finish() => (IEnumerable<T>)Finish();
+
+    /// <inheritdoc />
+    public abstract override IEnumerable<IReadableNode> Finish();
 }

@@ -17,6 +17,7 @@
 
 namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 
+using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;

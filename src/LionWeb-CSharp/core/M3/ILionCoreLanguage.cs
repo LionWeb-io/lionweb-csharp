@@ -26,11 +26,6 @@ using M2;
 /// </summary>
 public interface ILionCoreLanguage : Language
 {
-    /// <summary>
-    /// Self-definition of the LionCore M3.
-    /// </summary>
-    public static ILionCoreLanguage GetInstance(LionWebVersions version) => version.LionCore;
-
     /// <inheritdoc cref="M3.Annotation"/>
     Concept Annotation { get; }
 
@@ -133,6 +128,12 @@ public interface ILionCoreLanguage : Language
     /// <inheritdoc cref="M3.Reference"/>
     Concept Reference { get; }
 }
+
+public interface ILionCoreLanguage<out TVersion, out TBuiltIns, out TM3> : ILionCoreLanguage,
+    ILionWebVersionUser<TVersion, TBuiltIns, TM3>
+    where TVersion : LionWebVersions
+    where TBuiltIns : IBuiltInsLanguage<TVersion, TBuiltIns, TM3>
+    where TM3 : ILionCoreLanguage<TVersion, TBuiltIns, TM3>;
 
 /// <inheritdoc cref="ILionCoreLanguage"/>
 [Obsolete("Use ILionCoreLanguage instead")]

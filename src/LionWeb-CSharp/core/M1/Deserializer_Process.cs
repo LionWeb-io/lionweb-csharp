@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1;
 using M3;
 using Serialization;
 
-public partial class Deserializer
+public partial class Deserializer<TVersion, TBuiltIns, TM3>
 {
     /// <inheritdoc />
     public override void Process(SerializedNode serializedNode)
@@ -87,22 +87,10 @@ public partial class Deserializer
         }
     }
 
-    private object? ConvertPrimitiveType(IWritableNode node, Property property, string value)
-    {
-        CompressedId compressedId = Compress(node.GetId());
-        return property.Type switch
-        {
-            var b when b == _builtIns.Boolean => bool.TryParse(value, out var result)
-                ? result
-                : Handler.InvalidPropertyValue<bool>(value, property, compressedId),
-            var i when i == _builtIns.Integer => int.TryParse(value, out var result)
-                ? result
-                : Handler.InvalidPropertyValue<int>(value, property, compressedId),
-            // leave both a String and JSON value as a string:
-            var s when s == _builtIns.String || s == _builtIns.Json => value,
-            _ => Handler.UnknownDatatype(property, value, node)
-        };
-    }
+    public required Func<DeserializerBase<TVersion, TBuiltIns, TM3>, IWritableNode, Property, string, object?> PrimitiveTypeConverter { private get; init; }
+    
+    private object? ConvertPrimitiveType(IWritableNode node, Property property, string value) =>
+        PrimitiveTypeConverter(this, node, property, value);
 
     private void RegisterAnnotations(SerializedNode serializedNode, CompressedId compressedId)
     {

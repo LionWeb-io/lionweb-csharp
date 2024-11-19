@@ -27,7 +27,10 @@ using CompressedReference = (CompressedMetaPointer, List<(CompressedId?, string?
 /// Instances of this class can deserialize a <see cref="SerializationChunk"/> as a list of <see cref="IWritableNode"/>s that are root nodes.
 /// An instance is parametrized with a collection of <see cref="Language"/> definitions with a corresponding <see cref="INodeFactory"/>.
 /// </summary>
-public partial class Deserializer : DeserializerBase<IWritableNode>
+public partial class Deserializer<TVersion, TBuiltIns, TM3> : DeserializerBase<IWritableNode, TVersion, TBuiltIns, TM3>
+    where TVersion: LionWebVersions
+    where TBuiltIns : IBuiltInsLanguage
+    where TM3 : ILionCoreLanguage
 {
     /// Some design principles of this class:
     /// 
@@ -45,7 +48,7 @@ public partial class Deserializer : DeserializerBase<IWritableNode>
     /// TODO
     /// </summary>
     /// <param name="lionWebVersion"></param>
-    public Deserializer(LionWebVersions lionWebVersion) : base(lionWebVersion)
+    public Deserializer(TVersion lionWebVersion) : base(lionWebVersion)
     {
         RegisterInstantiatedLanguage(_builtIns, _builtIns.GetFactory());
     }

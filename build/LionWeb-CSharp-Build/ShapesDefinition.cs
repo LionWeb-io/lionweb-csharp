@@ -20,6 +20,7 @@
 
 namespace Examples.Shapes.Dynamic;
 
+using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 

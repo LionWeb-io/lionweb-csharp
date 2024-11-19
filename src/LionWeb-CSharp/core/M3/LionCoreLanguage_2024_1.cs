@@ -21,17 +21,19 @@ namespace LionWeb.Core.M3;
 
 using M2;
 
+public interface ILionCoreLanguage_2024_1 : ILionCoreLanguage<LionWebVersions.Version2024_1, IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>;
+
 /// <inheritdoc cref="ILionCoreLanguage"/>
-public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_1>, ILionCoreLanguage
+public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_1, LionWebVersions.Version2024_1, IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>, ILionCoreLanguage_2024_1
 {
     /// <inheritdoc cref="ILionCoreLanguage.GetInstance"/>
-    public static readonly ILionCoreLanguage Instance = new Lazy<LionCoreLanguage_2024_1>(() => new()).Value;
+    public static readonly ILionCoreLanguage_2024_1 Instance = new Lazy<LionCoreLanguage_2024_1>(() => new()).Value;
 
     private const string _name = "LionCore_M3";
     private const string _key = "LionCore-M3";
 
-    protected override IBuiltInsLanguage _builtIns => BuiltInsLanguage_2024_1.Instance;
-    protected override ILionCoreLanguage _m3 => this;
+    protected override IBuiltInsLanguage_2024_1 _builtIns => BuiltInsLanguage_2024_1.Instance;
+    protected override ILionCoreLanguage_2024_1 _m3 => this;
 
     internal LionCoreLanguage_2024_1() : base("-id-LionCore-M3", LionWebVersions.v2024_1)
     {

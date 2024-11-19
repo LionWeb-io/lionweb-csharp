@@ -21,6 +21,7 @@ namespace LionWeb_CSharp_Test.tests;
 
 using Examples.Shapes.Dynamic;
 using languages;
+using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 

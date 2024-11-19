@@ -19,17 +19,22 @@ namespace LionWeb.Core.M2;
 
 using M3;
 
-public sealed class BuiltInsLanguage_2024_1 : LanguageBase<BuiltInsFactory_2024_1>, IBuiltInsLanguage
+public interface IBuiltInsLanguage_2024_1 : IBuiltInsLanguage<LionWebVersions.Version2024_1, IBuiltInsLanguage_2024_1,
+    ILionCoreLanguage_2024_1>;
+
+public sealed class BuiltInsLanguage_2024_1 :
+    LanguageBase<BuiltInsFactory_2024_1, LionWebVersions.Version2024_1, IBuiltInsLanguage_2024_1,
+        ILionCoreLanguage_2024_1>, IBuiltInsLanguage_2024_1
 {
     /// <summary>
     /// The definition of the LionCore built-ins language.
     /// </summary>
-    public static readonly BuiltInsLanguage_2024_1 Instance = new Lazy<BuiltInsLanguage_2024_1>(() => new()).Value;
+    public static readonly IBuiltInsLanguage_2024_1 Instance = new Lazy<BuiltInsLanguage_2024_1>(() => new()).Value;
 
     private const string _name = "LionCore_builtins";
 
-    protected override IBuiltInsLanguage _builtIns => this;
-    protected override ILionCoreLanguage _m3 => LionCoreLanguage_2024_1.Instance;
+    protected override IBuiltInsLanguage_2024_1 _builtIns => this;
+    protected override ILionCoreLanguage_2024_1 _m3 => LionCoreLanguage_2024_1.Instance;
 
     internal BuiltInsLanguage_2024_1() : base(LionCoreBuiltInsIdAndKey, LionWebVersions.v2024_1)
     {
@@ -41,11 +46,6 @@ public sealed class BuiltInsLanguage_2024_1 : LanguageBase<BuiltInsFactory_2024_
         _integer = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-Integer", this)
         {
             Key = $"{LionCoreBuiltInsIdAndKey}-Integer", Name = "Integer"
-        });
-
-        _json = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-JSON", this)
-        {
-            Key = $"{LionCoreBuiltInsIdAndKey}-JSON", Name = "JSON"
         });
 
         _string = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-String", this)
@@ -86,7 +86,6 @@ public sealed class BuiltInsLanguage_2024_1 : LanguageBase<BuiltInsFactory_2024_
         [
             Boolean,
             Integer,
-            Json,
             String,
             INamed,
             Node
@@ -112,13 +111,6 @@ public sealed class BuiltInsLanguage_2024_1 : LanguageBase<BuiltInsFactory_2024_
     /// The built-in primitive type Integer.
     /// </summary>
     public PrimitiveType Integer => _integer.Value;
-
-    private readonly Lazy<PrimitiveType> _json;
-
-    /// <summary>
-    /// The built-in primitive type Json.
-    /// </summary>
-    public PrimitiveType Json => _json.Value;
 
     private readonly Lazy<PrimitiveType> _string;
 

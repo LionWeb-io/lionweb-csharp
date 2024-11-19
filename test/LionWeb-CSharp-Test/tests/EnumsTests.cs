@@ -17,6 +17,7 @@
 
 namespace LionWeb.Enums.Test;
 
+using Core;
 using Core.M1;
 using Core.M2;
 using Core.M3;
