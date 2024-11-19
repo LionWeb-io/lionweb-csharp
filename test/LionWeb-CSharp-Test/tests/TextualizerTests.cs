@@ -27,6 +27,9 @@ using Examples.Shapes.M2;
 [TestClass]
 public class TextualizerTests
 {
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.GetBuiltIns();
+
     [TestMethod]
     public void smoke_test_textualizer()
     {
@@ -67,17 +70,17 @@ public class TextualizerTests
     [TestMethod]
     public void does_not_crash_on_features_with_unset_names()
     {
-        var language = new DynamicLanguage("lang");
+        var language = new DynamicLanguage("lang", _lionWebVersion);
 
         var concept = new DynamicConcept("concept", language);
         language.AddEntities([concept]);
 
         // shows that INamed_name is declared as a set feature, but its getter still throws:
-        Assert.IsTrue(concept.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name));
+        Assert.IsTrue(concept.CollectAllSetFeatures().Contains(_builtIns.INamed_name));
         Assert.ThrowsException<UnsetFeatureException>(() => concept.Name);
 
         var property = new DynamicProperty("prop", concept);
-        property.Type = BuiltInsLanguage.Instance.String;
+        property.Type = _builtIns.String;
         var containment = new DynamicContainment("cont", concept);
         containment.Type = concept;
         var reference = new DynamicReference("ref", concept);
@@ -89,7 +92,7 @@ public class TextualizerTests
 
         instance1.Set(property, "val-prop");
         instance1.Set(containment, instance2);
-        instance1.Set(reference, instance1);    // (self-ref.)
+        instance1.Set(reference, instance1); // (self-ref.)
 
         Assert.AreEqual("""
                         <no name set!> (id: instance1) {

@@ -18,6 +18,7 @@
 namespace LionWeb.CSharp.Generator.Impl;
 
 using Core;
+using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -31,7 +32,8 @@ using static AstExtensions;
 /// - DetachChild()
 /// - GetContainmentOf()
 /// </summary>
-public class ContainmentMethodsGenerator(Classifier classifier, INames names) : ClassifierGeneratorBase(names)
+public class ContainmentMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion)
+    : ClassifierGeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="ContainmentMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> ContainmentMethods()

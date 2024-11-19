@@ -27,6 +27,8 @@ using LionWeb.Core.M3;
 [TestClass]
 public class DirectSpecializationsTests
 {
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+
     [TestMethod]
     public void LeafInterface()
     {
@@ -170,7 +172,7 @@ public class DirectSpecializationsTests
     {
         Language lang = ShapesDynamic.Language;
 
-        var actual = BuiltInsLanguage.Instance.INamed.DirectSpecializations([lang, InvalidLanguage.Language]);
+        var actual = _builtIns.INamed.DirectSpecializations([lang, InvalidLanguage.Language]);
 
         CollectionAssert.AreEquivalent(new List<Classifier> { lang.ClassifierByKey("key-Shape"), lang.ClassifierByKey("key-Line"), }, actual.ToList());
     }

@@ -23,10 +23,20 @@ using Serialization;
 
 public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadableNode
 {
+    protected readonly LionWebVersions _lionWebVersion;
+    protected readonly ILionCoreLanguage _m3;
+    protected readonly IBuiltInsLanguage _builtIns;
+
     protected readonly DeserializerMetaInfo _deserializerMetaInfo = new();
     protected readonly Dictionary<CompressedId, IReadableNode> _dependentNodesById = new();
     protected readonly Dictionary<CompressedId, T> _deserializedNodesById = new();
 
+    protected DeserializerBase(LionWebVersions lionWebVersion)
+    {
+        _lionWebVersion = lionWebVersion;
+        _m3 = lionWebVersion.GetLionCore();
+        _builtIns = lionWebVersion.GetBuiltIns();
+    }
 
     /// <inheritdoc />
     public IDeserializerHandler Handler

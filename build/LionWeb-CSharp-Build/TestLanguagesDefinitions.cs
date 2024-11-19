@@ -18,17 +18,23 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
 using Io.Lionweb.Mps.Specific;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 
 public class TestLanguagesDefinitions
 {
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+
     public readonly Language ALang;
     public readonly Language BLang;
     public readonly Language TinyRefLang;
 
     public TestLanguagesDefinitions()
     {
-        var aLang = new DynamicLanguage("id-ALang") { Key = "key-ALang", Name = "ALang", Version = "1" };
+        var aLang = new DynamicLanguage("id-ALang", _lionWebVersion)
+        {
+            Key = "key-ALang", Name = "ALang", Version = "1"
+        };
         var aConcept = aLang.Concept("id-AConcept", "key-AConcept", "AConcept");
         aConcept.AddAnnotations([
             new ConceptDescription("aaa-desc")
@@ -44,7 +50,10 @@ public class TestLanguagesDefinitions
         ]);
         var aEnum = aLang.Enumeration("id-aEnum", "key-AEnum", "AEnum");
 
-        var bLang = new DynamicLanguage("id-BLang") { Key = "key-BLang", Name = "BLang", Version = "2" };
+        var bLang = new DynamicLanguage("id-BLang", _lionWebVersion)
+        {
+            Key = "key-BLang", Name = "BLang", Version = "2"
+        };
         var bConcept = bLang.Concept("id-BConcept", "key-BConcept", "BConcept");
         bConcept.AddAnnotations([new ConceptDescription("xxx") { ConceptShortDescription = "Some enum" }]);
 
@@ -62,7 +71,11 @@ public class TestLanguagesDefinitions
         BLang = bLang;
 
 
-        var tinyRefLang = new DynamicLanguage("id-TinyRefLang") { Key = "key-tinyRefLang", Name = "TinyRefLang", Version = "0" };
+        var tinyRefLang =
+            new DynamicLanguage("id-TinyRefLang", _lionWebVersion)
+            {
+                Key = "key-tinyRefLang", Name = "TinyRefLang", Version = "0"
+            };
         var myConcept = new DynamicConcept("id-Concept", tinyRefLang) { Key = "key-MyConcept", Name = "MyConcept" };
         tinyRefLang.AddEntities([myConcept]);
 

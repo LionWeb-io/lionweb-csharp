@@ -21,12 +21,15 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
 [TestClass]
 public class DeserializerExceptionHandlerTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+
     [TestMethod]
     public void unknown_classifier()
     {
@@ -52,7 +55,7 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<UnknownFeatureException>(() =>
             new DeserializerExceptionHandler().UnknownFeature<Containment>(
                 CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
-                new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
+                new DynamicConcept("concept", new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
                 new Line("line")));
     }
 
@@ -62,7 +65,7 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<UnknownFeatureException>(() =>
             new DeserializerExceptionHandler().InvalidFeature<Containment>(
                 CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
-                new DynamicConcept("concept", new DynamicLanguage("lang")) { Name = "concept-name" },
+                new DynamicConcept("concept", new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
                 new Line("line")));
     }
 
@@ -73,13 +76,13 @@ public class DeserializerExceptionHandlerTests
             new DeserializerExceptionHandler().InvalidLinkValue<Containment>(
                 [],
                 new DynamicReference("dyn-reference",
-                    new DynamicConcept("dyn-concept-1", new DynamicLanguage("dyn-lang-1") { Name = "lang-name" })
+                    new DynamicConcept("dyn-concept-1", new DynamicLanguage("dyn-lang-1", _lionWebVersion) { Name = "lang-name" })
                     {
                         Name = "concept-name"
                     })
                 {
                     Name = "dynamic-reference",
-                    Type = new DynamicConcept("dyn-concept-2", new DynamicLanguage("dyn-lang-2") { Name = "lang-name" })
+                    Type = new DynamicConcept("dyn-concept-2", new DynamicLanguage("dyn-lang-2", _lionWebVersion) { Name = "lang-name" })
                     {
                         Name = "concept-name"
                     }
@@ -108,7 +111,7 @@ public class DeserializerExceptionHandlerTests
             new DeserializerExceptionHandler().UnresolvableChild(
                 CompressedId.Create("a", true),
                 new DynamicContainment("dyn-containment",
-                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
                 new Line("line")));
     }
 
@@ -120,7 +123,7 @@ public class DeserializerExceptionHandlerTests
                 CompressedId.Create("a", true),
                 "resolve-info",
                 new DynamicReference("dyn-reference",
-                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
                 new Line("line")));
     }
 
@@ -172,9 +175,9 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnknownEnumerationLiteral(
                 "a",
-                new DynamicEnumeration("dyn-enum", new DynamicLanguage("dyn-lang-1")),
+                new DynamicEnumeration("dyn-enum", new DynamicLanguage("dyn-lang-1", _lionWebVersion)),
                 new DynamicProperty("dyn-property",
-                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang-2"))),
+                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang-2", _lionWebVersion))),
                 new Line("line")
             ));
     }
@@ -184,7 +187,7 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnknownDatatype(
-                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
                 "a",
                 new Line("line")));
     }
@@ -195,7 +198,7 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().InvalidPropertyValue<int>(
                 "a",
-                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang"))),
+                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
                 CompressedId.Create("b", true)));
     }
 

@@ -27,6 +27,8 @@ using LionWeb.Core.M3;
 [TestClass]
 public class AllGeneralizationsTests
 {
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+
     [TestMethod]
     public void RootInterface()
     {
@@ -247,7 +249,7 @@ public class AllGeneralizationsTests
         CollectionAssert.AreEquivalent(
             new List<Classifier>
             {
-                BuiltInsLanguage.Instance.INamed,
+                _builtIns.INamed,
                 lang.ClassifierByKey("key-Shape"),
                 lang.ClassifierByKey("key-IShape")
             },

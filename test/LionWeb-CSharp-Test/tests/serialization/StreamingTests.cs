@@ -20,6 +20,7 @@ namespace LionWeb_CSharp_Test.tests.serialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using System.Diagnostics;
@@ -28,6 +29,7 @@ using System.Diagnostics;
 public class StreamingTests
 {
     private readonly Language _language;
+    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
 
     public StreamingTests()
     {
@@ -41,7 +43,7 @@ public class StreamingTests
     public void MassSerialization()
     {
         using Stream stream = File.Create("output.json");
-        JsonUtils.WriteNodesToStream(stream, new Serializer(), CreateNodes(_maxSize));
+        JsonUtils.WriteNodesToStream(stream, new Serializer(_lionWebVersion), CreateNodes(_maxSize));
 
         IEnumerable<INode> CreateNodes(long count)
         {

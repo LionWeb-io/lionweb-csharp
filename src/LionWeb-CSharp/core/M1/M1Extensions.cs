@@ -242,8 +242,9 @@ public static class M1Extensions
     {
         try
         {
-            if (self.CollectAllSetFeatures().Contains(BuiltInsLanguage.Instance.INamed_name))
-                return self.Get(BuiltInsLanguage.Instance.INamed_name) as string ?? null;
+            var iNamedName = self.GetClassifier().GetLanguage().LionWebVersion.GetBuiltIns().INamed_name;
+            if (self.CollectAllSetFeatures().Contains(iNamedName))
+                return self.Get(iNamedName) as string ?? null;
 
             return null;
         } catch (UnsetFeatureException)
@@ -278,7 +279,8 @@ public static class M1Extensions
                 $"{self.GetId()} contains itself as descendant: [{string.Join(",", visited.Select(a => a.GetId()))}]");
 
         var result = Children(self, false, includeAnnotations)
-            .SelectMany(child => Descendants(child, visited, includeSelf: true, includeAnnotations: includeAnnotations));
+            .SelectMany(child =>
+                Descendants(child, visited, includeSelf: true, includeAnnotations: includeAnnotations));
 
         if (includeSelf)
             result = result.Prepend(self);

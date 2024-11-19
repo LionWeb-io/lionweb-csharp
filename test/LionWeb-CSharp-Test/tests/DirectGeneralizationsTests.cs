@@ -27,6 +27,8 @@ using LionWeb.Core.M3;
 [TestClass]
 public class DirectGeneralizationsTests
 {
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+
     [TestMethod]
     public void RootInterface()
     {
@@ -241,7 +243,7 @@ public class DirectGeneralizationsTests
         var actual = lang.ClassifierByKey("key-Shape").DirectGeneralizations();
 
         CollectionAssert.AreEquivalent(
-            new List<Classifier> { BuiltInsLanguage.Instance.INamed, lang.ClassifierByKey("key-IShape") },
+            new List<Classifier> { _builtIns.INamed, lang.ClassifierByKey("key-IShape") },
             actual.ToList());
     }
 }

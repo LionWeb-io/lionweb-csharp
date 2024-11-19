@@ -39,7 +39,7 @@ using Property = Core.M3.Property;
 /// - InsertFeature()
 /// - RemoveFeature()
 /// </summary>
-public class FeatureGenerator(Classifier classifier, Feature feature, INames names) : GeneratorBase(names)
+public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="FeatureGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> Members() =>
@@ -318,9 +318,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ])
         );
 
-    private static bool IsReferenceType(Property property) =>
-        !(BuiltInsLanguage.Instance.Boolean.EqualsIdentity(property.Type) ||
-          BuiltInsLanguage.Instance.Integer.EqualsIdentity(property.Type));
+    private bool IsReferenceType(Property property) =>
+        !(_builtIns.Boolean.EqualsIdentity(property.Type) ||
+          _builtIns.Integer.EqualsIdentity(property.Type));
 
     private ExpressionStatementSyntax AssureNoSelfMoveCall(Containment containment) =>
         ExpressionStatement(Call("AssureNoSelfMove",

@@ -24,6 +24,8 @@ using Utilities;
 [TestClass]
 public class ReflectionTests
 {
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+
     [TestMethod]
     public void GetClassifier()
     {
@@ -39,14 +41,14 @@ public class ReflectionTests
     public void GetInheritedProperty()
     {
         var node = new Circle("id") { Name = "hi" };
-        Assert.AreEqual("hi", node.Get(BuiltInsLanguage.Instance.INamed_name));
+        Assert.AreEqual("hi", node.Get(_builtIns.INamed_name));
     }
 
     [TestMethod]
     public void GetInheritedProperty_Unset()
     {
         var node = new Circle("id");
-        Assert.ThrowsException<UnsetFeatureException>(() => node.Get(BuiltInsLanguage.Instance.INamed_name));
+        Assert.ThrowsException<UnsetFeatureException>(() => node.Get(_builtIns.INamed_name));
     }
 
     [TestMethod]
@@ -76,7 +78,7 @@ public class ReflectionTests
     public void SetInheritedProperty_Reflective()
     {
         var node = new Circle("id");
-        node.Set(BuiltInsLanguage.Instance.INamed_name, "hi");
+        node.Set(_builtIns.INamed_name, "hi");
         Assert.AreEqual("hi", node.Name);
     }
 

@@ -18,16 +18,19 @@
 namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 
 [TestClass]
 public class DeserializerHandlerSelectOtherLanguageVersionTests
 {
+    private readonly LionWebVersions _lionWebVersion= LionWebVersionsExtensions.GetCurrent();
+
     [TestMethod]
     public void Empty()
     {
-        var a = new DynamicLanguage("a") { Version = "" };
-        var b = new DynamicLanguage("b") { Version = "" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "" };
 
         Assert.AreEqual(0, DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b));
     }
@@ -37,8 +40,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void SameInt()
     {
-        var a = new DynamicLanguage("a") { Version = "1" };
-        var b = new DynamicLanguage("b") { Version = "1" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "1" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "1" };
 
         Assert.AreEqual(0, DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b));
     }
@@ -46,8 +49,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void SameFourSegments()
     {
-        var a = new DynamicLanguage("a") { Version = "1.2.3.4" };
-        var b = new DynamicLanguage("b") { Version = "1.2.3.4" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "1.2.3.4" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "1.2.3.4" };
 
         Assert.AreEqual(0, DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b));
     }
@@ -55,8 +58,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void SameSevenSegments()
     {
-        var a = new DynamicLanguage("a") { Version = "1.2.3.4.5.6.7" };
-        var b = new DynamicLanguage("b") { Version = "1.2.3.4.5.6.7" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "1.2.3.4.5.6.7" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "1.2.3.4.5.6.7" };
 
         Assert.AreEqual(0, DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b));
     }
@@ -64,8 +67,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void SameChar()
     {
-        var a = new DynamicLanguage("a") { Version = "a" };
-        var b = new DynamicLanguage("b") { Version = "a" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "a" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "a" };
 
         Assert.AreEqual(0, DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b));
     }
@@ -73,8 +76,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void SameText()
     {
-        var a = new DynamicLanguage("a") { Version = "hello" };
-        var b = new DynamicLanguage("b") { Version = "hello" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "hello" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "hello" };
 
         Assert.AreEqual(0, DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b));
     }
@@ -86,8 +89,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void DifferentInt()
     {
-        var a = new DynamicLanguage("a") { Version = "1" };
-        var b = new DynamicLanguage("b") { Version = "2" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "1" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "2" };
 
         Assert.IsTrue(DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b) > 0);
     }
@@ -95,8 +98,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void DifferentFourSegments()
     {
-        var a = new DynamicLanguage("a") { Version = "1.2.33.4" };
-        var b = new DynamicLanguage("b") { Version = "1.2.3.4" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "1.2.33.4" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "1.2.3.4" };
 
         Assert.IsTrue(DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b) < 0);
     }
@@ -104,8 +107,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void DifferentIntPrefix()
     {
-        var a = new DynamicLanguage("a") { Version = "01" };
-        var b = new DynamicLanguage("b") { Version = "1" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "01" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "1" };
 
         Assert.IsTrue(DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b) > 0);
     }
@@ -113,8 +116,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void DifferentIntSecondPrefix()
     {
-        var a = new DynamicLanguage("a") { Version = "1.0" };
-        var b = new DynamicLanguage("b") { Version = "1.01" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "1.0" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "1.01" };
 
         Assert.IsTrue(DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b) > 0);
     }
@@ -122,8 +125,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void DifferentSevenSegments()
     {
-        var a = new DynamicLanguage("a") { Version = "13.2.30.4.0.06.7" };
-        var b = new DynamicLanguage("b") { Version = "13.2.30.4.0.06.77" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "13.2.30.4.0.06.7" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "13.2.30.4.0.06.77" };
 
         Assert.IsTrue(DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b) > 0);
     }
@@ -131,8 +134,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void DifferentChar()
     {
-        var a = new DynamicLanguage("a") { Version = "a" };
-        var b = new DynamicLanguage("b") { Version = "A" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "a" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "A" };
 
         Assert.IsTrue(DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b) < 0);
     }
@@ -140,8 +143,8 @@ public class DeserializerHandlerSelectOtherLanguageVersionTests
     [TestMethod]
     public void DifferentText()
     {
-        var a = new DynamicLanguage("a") { Version = "hello" };
-        var b = new DynamicLanguage("b") { Version = "helo" };
+        var a = new DynamicLanguage("a", _lionWebVersion) { Version = "hello" };
+        var b = new DynamicLanguage("b", _lionWebVersion) { Version = "helo" };
 
         Assert.IsTrue(DeserializerHandlerSelectOtherLanguageVersion.DefaultLanguageComparer(a, b) > 0);
     }

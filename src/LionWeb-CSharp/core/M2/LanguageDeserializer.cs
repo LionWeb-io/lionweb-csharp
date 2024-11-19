@@ -15,6 +15,8 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable SuggestVarOrType_SimpleTypes
+
 namespace LionWeb.Core.M2;
 
 using M1;
@@ -28,8 +30,6 @@ using Serialization;
 /// </summary>
 public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILanguageDeserializer
 {
-    private static readonly M3Language _m3 = M3Language.Instance;
-
     private readonly Dictionary<CompressedId, SerializedNode> _serializedNodesById = new();
 
     private readonly DeserializerBuilder _deserializerBuilder = new();
@@ -41,22 +41,28 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     /// </summary>
     ///
     /// <param name="serializationChunk">Chunk to deserialize.</param>
-    /// <param name="preloadM3Language">Whether <see cref="M3Language"/> should be preloaded. Keep at <c>true</c> unless deserializing meta-languages.</param>
+    /// <param name="preloadLionCoreLanguage">Whether <see cref="ILionCoreLanguage"/> should be preloaded. Keep at <c>true</c> unless deserializing meta-languages.</param>
     /// <param name="dependentLanguages">Referred languages.</param>
     /// 
     /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
-    public LanguageDeserializer(bool preloadM3Language = true)
+    public LanguageDeserializer(LionWebVersions lionWebVersion, bool preloadLionCoreLanguage = true) : base(
+        lionWebVersion)
     {
-        RegisterDependentLanguage(BuiltInsLanguage.Instance);
+        RegisterDependentLanguage(_builtIns);
 
-        if (preloadM3Language)
+        if (preloadLionCoreLanguage)
             RegisterDependentLanguage(_m3);
     }
 
     /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
     public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
         params Language[] dependentLanguages) =>
-        new LanguageDeserializer().Deserialize(serializationChunk, dependentLanguages);
+        Deserialize(serializationChunk, LionWebVersionsExtensions.GetCurrent(), dependentLanguages);
+
+    /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
+    public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
+        LionWebVersions lionWebVersion, params Language[] dependentLanguages) =>
+        new LanguageDeserializer(lionWebVersion).Deserialize(serializationChunk, dependentLanguages);
 
     /// <inheritdoc />
     public override void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
@@ -106,7 +112,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
         );
         var id = serializedNode.Id;
         string key = LookupString(_m3.IKeyed_key);
-        string name = LookupString(BuiltInsLanguage.Instance.INamed_name);
+        string name = LookupString(_builtIns.INamed_name);
 
         return serializedNode.Classifier switch
         {
@@ -131,7 +137,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
                 Key = key, Name = name
             },
             var s when s.Matches(_m3.Interface) => new DynamicInterface(id, null) { Key = key, Name = name },
-            var s when s.Matches(_m3.Language) => new DynamicLanguage(id)
+            var s when s.Matches(_m3.Language) => new DynamicLanguage(id, _lionWebVersion)
             {
                 Key = key, Name = name, Version = LookupString(_m3.Language_version)
             },
@@ -173,7 +179,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
 
     #endregion
 
-    private static bool IsLanguageNode(SerializedNode serializedNode) =>
+    private bool IsLanguageNode(SerializedNode serializedNode) =>
         serializedNode.Classifier.Language == _m3.Key;
 }
 

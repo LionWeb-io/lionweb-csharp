@@ -33,6 +33,9 @@ using Comparer = LionWeb.Core.Utilities.Comparer;
 [TestClass]
 public class SerializationLenientTests
 {
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.GetBuiltIns();
+
     [TestMethod]
     public void InvalidValues()
     {
@@ -40,13 +43,14 @@ public class SerializationLenientTests
 
         var childA = new Book("bookA");
         var childB = new BConcept("bConceptB");
-        rootNode.Set(BuiltInsLanguage.Instance.INamed_name, new List<INode> { childA, childB });
+        rootNode.Set(_builtIns.INamed_name, new List<INode> { childA, childB });
         rootNode.Set(ShapesLanguage.Instance.IShape_uuid, new List<IReadableNode> { childA, childB });
         rootNode.Set(ShapesLanguage.Instance.Shape_shapeDocs, "hello");
         rootNode.Set(ShapesLanguage.Instance.Line_start, new List<INode> { childA, childB });
         rootNode.Set(ShapesLanguage.Instance.Line_end, MyEnum.literal1);
 
-        var serializationChunk = Serializer.SerializeToChunk(new List<INode> { rootNode, childA, childB });
+        IEnumerable<IReadableNode> nodes = new List<INode> { rootNode, childA, childB };
+        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk(nodes);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         var readableNodes = new DeserializerBuilder()
@@ -90,7 +94,7 @@ public class SerializationLenientTests
         {
             var replacementFeature = new List<Language>
                 {
-                    BuiltInsLanguage.Instance,
+                    _builtIns,
                     ShapesLanguage.Instance,
                     LibraryLanguage.Instance,
                     BLangLanguage.Instance,
@@ -136,7 +140,7 @@ public class SerializationLenientTests
                         {
                             Key = "a", Name = "a", LiteralsLazy = new([])
                         }
-                        : BuiltInsLanguage.Instance.String
+                        : feature.GetLanguage().LionWebVersion.GetBuiltIns().String
                 };
         }
 
@@ -156,7 +160,7 @@ public class SerializationLenientTests
                     Key = feature.Key,
                     Optional = feature.Optional,
                     Multiple = false,
-                    Type = BuiltInsLanguage.Instance.Node
+                    Type = feature.GetLanguage().LionWebVersion.GetBuiltIns().Node
                 };
         }
 
@@ -174,7 +178,7 @@ public class SerializationLenientTests
                     Key = feature.Key,
                     Optional = feature.Optional,
                     Multiple = false,
-                    Type = BuiltInsLanguage.Instance.Node
+                    Type = feature.GetLanguage().LionWebVersion.GetBuiltIns().Node
                 };
         }
 
@@ -186,7 +190,7 @@ public class SerializationLenientTests
 
             Containment leftCont = leftFeature as Containment ?? LenientContainment.Create(leftFeature);
             Reference leftRef = leftFeature as Reference ?? LenientReference.Create(leftFeature);
-            ;
+            
             Property leftProp = leftFeature as Property ?? LenientProperty.Create(leftFeature, leftValue);
             Property rightProp = rightFeature as Property ?? LenientProperty.Create(rightFeature, rightValue);
 

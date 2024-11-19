@@ -31,6 +31,8 @@ using LionWeb.Core.Utilities;
 [TestClass]
 public class DeserializationTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+
     [TestMethod]
     public void test_deserialization_of_a_node_with_missing_parent_does_not_fail()
     {
@@ -274,7 +276,7 @@ public class DeserializationTests
     {
         var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
 
-        var serializationChunk = Serializer.SerializeToChunk([line]);
+        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([line]);
         var nodes = new DeserializerBuilder()
             .WithLanguage(ShapesLanguage.Instance)
             .Build()
@@ -294,9 +296,9 @@ public class DeserializationTests
     [TestMethod]
     public void UnfittingLanguageVersion()
     {
-        var v1 = new DynamicLanguage("id-A") { Key = "lang", Version = "1" };
-        var v2 = new DynamicLanguage("id-B") { Key = "lang", Version = "2" };
-        var v3 = new DynamicLanguage("id-C") { Key = "lang", Version = "3" };
+        var v1 = new DynamicLanguage("id-A", _lionWebVersion) { Key = "lang", Version = "1" };
+        var v2 = new DynamicLanguage("id-B", _lionWebVersion) { Key = "lang", Version = "2" };
+        var v3 = new DynamicLanguage("id-C", _lionWebVersion) { Key = "lang", Version = "3" };
 
         v1.Concept("id-A-concept", "key-A-concept", "AConcept");
         v1.Concept("id-A-concept2", "key-D-concept", "DConcept-A");
@@ -378,9 +380,9 @@ public class DeserializationTests
     [TestMethod]
     public void UnfittingLanguageVersion_StrangeVersions()
     {
-        var v1 = new DynamicLanguage("id-A") { Key = "lang", Version = "1" };
-        var v2 = new DynamicLanguage("id-B") { Key = "lang", Version = "hä? llÖ" };
-        var v3 = new DynamicLanguage("id-C") { Key = "lang", Version = "\ud83d\ude00" };
+        var v1 = new DynamicLanguage("id-A", _lionWebVersion) { Key = "lang", Version = "1" };
+        var v2 = new DynamicLanguage("id-B", _lionWebVersion) { Key = "lang", Version = "hä? llÖ" };
+        var v3 = new DynamicLanguage("id-C", _lionWebVersion) { Key = "lang", Version = "\ud83d\ude00" };
 
         v1.Concept("id-A-concept", "key-A-concept", "AConcept");
         v1.Concept("id-A-concept2", "key-D-concept", "DConcept-A");

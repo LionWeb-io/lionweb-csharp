@@ -226,7 +226,7 @@ public static class DeserializerHandlerSelectOtherLanguageVersion
     public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
         where T : class, IKeyed =>
         SelectVersion<T>(metaPointer, languages, Comparer<Language>.Create(DefaultLanguageComparer));
-    
+
     /// <summary>
     /// Chooses the <typeparamref name="T"/> with the same key as <paramref name="metaPointer"/>
     /// from the <paramref name="languages">language</paramref> with the
@@ -237,7 +237,8 @@ public static class DeserializerHandlerSelectOtherLanguageVersion
     /// <param name="languageComparer">Comparer to select the preferred language.
     /// Make sure to invert the result for choosing the latest version.</param>
     /// <typeparam name="T">Kind of language element we're looking for.</typeparam>
-    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages, Comparer<Language> languageComparer)
+    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages,
+        Comparer<Language> languageComparer)
         where T : class, IKeyed
     {
         IEnumerable<IKeyed> keyed = typeof(T) switch
@@ -282,8 +283,11 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new DeserializerException($"Duplicate node with id={existingNode.GetId()}");
 
     /// <inheritdoc />
-    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed =>
-        throw new DeserializerException($"Unknown meta-pointer {metaPointer}");
+    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+        where T : class, IKeyed =>
+        // TODO think about correct handling
+        // throw new DeserializerException($"Unknown meta-pointer {metaPointer}");
+        null;
 
     #region features
 
@@ -407,7 +411,8 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed
+    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+        where T : class, IKeyed
     {
         LogMessage($"Unknown meta-pointer {metaPointer}");
         return null;

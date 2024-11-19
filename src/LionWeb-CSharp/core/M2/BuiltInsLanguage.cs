@@ -24,155 +24,61 @@ using M3;
 /// <summary>
 /// The definition of the LionCore language containing the built-ins: primitive types, <see cref="INamed"/> and <see cref="Node"/>.
 /// </summary>
-public sealed class BuiltInsLanguage : LanguageBase<BuiltInsFactory>
+public interface IBuiltInsLanguage : Language
 {
     /// <summary>
     /// The definition of the LionCore built-ins language.
     /// </summary>
-    public static readonly BuiltInsLanguage Instance = new Lazy<BuiltInsLanguage>(() => new()).Value;
-
-    private const string _name = "LionCore_builtins";
-
-    internal BuiltInsLanguage() : base(LionCoreBuiltInsIdAndKey)
+    public static IBuiltInsLanguage GetInstance(LionWebVersions version) => version switch
     {
-        _boolean = new(() => new PrimitiveTypeBase<BuiltInsLanguage>($"{LionCoreBuiltInsIdAndKey}-Boolean", this)
-        {
-            Key = $"{LionCoreBuiltInsIdAndKey}-Boolean", Name = "Boolean"
-        });
-
-        _integer = new(() => new PrimitiveTypeBase<BuiltInsLanguage>($"{LionCoreBuiltInsIdAndKey}-Integer", this)
-        {
-            Key = $"{LionCoreBuiltInsIdAndKey}-Integer", Name = "Integer"
-        });
-
-        _json = new(() => new PrimitiveTypeBase<BuiltInsLanguage>($"{LionCoreBuiltInsIdAndKey}-JSON", this)
-        {
-            Key = $"{LionCoreBuiltInsIdAndKey}-JSON", Name = "JSON"
-        });
-
-        _string = new(() => new PrimitiveTypeBase<BuiltInsLanguage>($"{LionCoreBuiltInsIdAndKey}-String", this)
-        {
-            Key = $"{LionCoreBuiltInsIdAndKey}-String", Name = "String"
-        });
-
-        _iNamed = new(() =>
-            new InterfaceBase<BuiltInsLanguage>($"{LionCoreBuiltInsIdAndKey}-INamed", this)
-            {
-                Key = $"{LionCoreBuiltInsIdAndKey}-INamed", Name = "INamed", FeaturesLazy = new(() => [INamed_name])
-            });
-        _iNamed_name = new(() =>
-            new PropertyBase<BuiltInsLanguage>($"{LionCoreBuiltInsIdAndKey}-INamed-name", INamed, this)
-            {
-                Key = $"{LionCoreBuiltInsIdAndKey}-INamed-name", Name = "name", Optional = false, Type = String
-            });
-
-        _node = new(() => new ConceptBase<BuiltInsLanguage>($"{LionCoreBuiltInsIdAndKey}-Node", this)
-        {
-            Key = $"{LionCoreBuiltInsIdAndKey}-Node", Name = "Node", Abstract = true, Partition = false
-        });
-    }
-
-    /// <inheritdoc />
-    public override string Name => _name;
-
-    /// <inheritdoc />
-    public override string Key => LionCoreBuiltInsIdAndKey;
-
-    /// <inheritdoc />
-    public override string Version => ReleaseVersion.Current;
-
-    /// <inheritdoc />
-    public override IReadOnlyList<LanguageEntity> Entities
-    {
-        get =>
-        [
-            Boolean,
-            Integer,
-            Json,
-            String,
-            INamed,
-            Node
-        ];
-    }
-
-    /// <inheritdoc />
-    public override IReadOnlyList<Language> DependsOn { get => []; }
-
-    /// <inheritdoc />
-    public override BuiltInsFactory GetFactory() => new(this);
-
-    private readonly Lazy<PrimitiveType> _boolean;
+        LionWebVersions.v2023_1 => BuiltInsLanguage_2023_1.Instance,
+        LionWebVersions.v2024_1 => BuiltInsLanguage_2024_1.Instance,
+        _ => throw new UnsupportedVersionException(version)
+    };
 
     /// <summary>
     /// The built-in primitive type Boolean.
     /// </summary>
-    public PrimitiveType Boolean => _boolean.Value;
-
-    private readonly Lazy<PrimitiveType> _integer;
+    PrimitiveType Boolean { get; }
 
     /// <summary>
     /// The built-in primitive type Integer.
     /// </summary>
-    public PrimitiveType Integer => _integer.Value;
-
-    private readonly Lazy<PrimitiveType> _json;
+    PrimitiveType Integer { get; }
 
     /// <summary>
     /// The built-in primitive type Json.
     /// </summary>
-    public PrimitiveType Json => _json.Value;
-
-    private readonly Lazy<PrimitiveType> _string;
+    PrimitiveType Json { get; }
 
     /// <summary>
     /// The built-in primitive type String.
     /// </summary>
-    public PrimitiveType String => _string.Value;
-
-    private readonly Lazy<Interface> _iNamed;
+    PrimitiveType String { get; }
 
     /// <summary>
     /// Generic concept for "named things".
     /// </summary>
-    public Interface INamed => _iNamed.Value;
-
-    private readonly Lazy<Property> _iNamed_name;
+    Interface INamed { get; }
 
     /// <summary>
     /// The "name" <see cref="Property"/> of <c>INamed</c>.
     /// </summary>
-    public Property INamed_name => _iNamed_name.Value;
-
-    private readonly Lazy<Concept> _node;
+    Property INamed_name { get; }
 
     /// <summary>
     /// Generic concept that corresponds to a model node, i.e. <see cref="INode"/>.
     /// </summary>
-    public Concept Node => _node.Value;
-
-    /// <summary>
-    /// The ID and key of 
-    /// </summary>
-    public const string LionCoreBuiltInsIdAndKey = "LionCore-builtins";
+    Concept Node { get; }
 }
 
-/// Factory for <see cref="BuiltInsLanguage"/>.
-public sealed class BuiltInsFactory : INodeFactory
+/// <inheritdoc cref="IBuiltInsLanguage"/>
+[Obsolete("Use IBuiltInsLanguage instead")]
+public sealed class BuiltInsLanguage
 {
-    private readonly BuiltInsLanguage _language;
-
-    internal BuiltInsFactory(BuiltInsLanguage language)
-    {
-        _language = language;
-    }
-
-    /// <inheritdoc />
-    public INode CreateNode(string id, Classifier classifier) =>
-        throw new UnsupportedClassifierException(classifier);
-
-    /// <inheritdoc />
-    public Enum GetEnumerationLiteral(EnumerationLiteral literal) =>
-        throw new UnsupportedEnumerationLiteralException(literal);
+    /// <inheritdoc cref="IBuiltInsLanguage.GetInstance"/>
+    [Obsolete("Use IBuiltInsLanguage instead")]
+    public static readonly IBuiltInsLanguage Instance = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
 }
 
 /// <summary>

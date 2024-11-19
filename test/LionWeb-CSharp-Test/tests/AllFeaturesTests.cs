@@ -27,13 +27,15 @@ using LionWeb.Core.M3;
 [TestClass]
 public class AllFeaturesTests
 {
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+
     [TestMethod]
     public void Interface()
     {
-        var actual = BuiltInsLanguage.Instance.INamed.AllFeatures();
+        var actual = _builtIns.INamed.AllFeatures();
 
         CollectionAssert.AreEquivalent(
-            new List<Feature> { BuiltInsLanguage.Instance.INamed_name }, actual.ToList());
+            new List<Feature> { _builtIns.INamed_name }, actual.ToList());
     }
 
     [TestMethod]
@@ -72,7 +74,7 @@ public class AllFeaturesTests
         CollectionAssert.AreEquivalent(
             new List<Feature>
             {
-                BuiltInsLanguage.Instance.INamed_name,
+                _builtIns.INamed_name,
                 lang.ClassifierByKey("key-Shape").FeatureByKey("key-shape-docs"),
                 lang.ClassifierByKey("key-Line").FeatureByKey("key-start"),
                 lang.ClassifierByKey("key-Line").FeatureByKey("key-end"),
@@ -158,7 +160,7 @@ public class AllFeaturesTests
         CollectionAssert.AreEquivalent(
             new List<Feature>
             {
-                BuiltInsLanguage.Instance.INamed_name,
+                _builtIns.INamed_name,
                 lang.ClassifierByKey("key-Shape").FeatureByKey("key-shape-docs"),
                 lang.ClassifierByKey("key-Circle").FeatureByKey("key-r"),
                 lang.ClassifierByKey("key-Circle").FeatureByKey("key-center"),

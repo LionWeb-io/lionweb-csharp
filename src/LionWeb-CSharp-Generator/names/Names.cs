@@ -33,14 +33,34 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 /// - to automatically generate `using` statements.
 /// - to mangle names in a uniform manner. 
 /// </summary>
-public partial class Names(Language language, string namespaceName) : INames
+public partial class Names : INames
 {
     private readonly HashSet<Type> _usedTypes = [];
 
     /// <inheritdoc />
     public IReadOnlySet<Type> UsedTypes => _usedTypes;
 
+    private readonly Language _language;
+    private readonly string _namespaceName;
+    protected readonly ILionCoreLanguage _m3;
+    protected readonly IBuiltInsLanguage _builtIns;
+    
     private readonly Dictionary<Language, string> _namespaceMappings = new();
+
+    /// <summary>
+    /// Central handling of all naming.
+    /// This helps
+    /// - to automatically generate `using` statements.
+    /// - to mangle names in a uniform manner. 
+    /// </summary>
+    public Names(Language language, string namespaceName)
+    {
+        _language = language;
+        _namespaceName = namespaceName;
+        
+        _m3 = language.LionWebVersion.GetLionCore();
+        _builtIns = language.LionWebVersion.GetBuiltIns();
+    }
 
     /// <inheritdoc />
     public IDictionary<Language, string> NamespaceMappings
@@ -65,21 +85,21 @@ public partial class Names(Language language, string namespaceName) : INames
     private string LanguageBaseName(Language lang) => lang.Name.Split('.').Last().ToFirstUpper();
 
     /// <inheritdoc />
-    public NameSyntax LanguageType => AsType(language);
+    public NameSyntax LanguageType => AsType(_language);
 
     /// <inheritdoc />
     public string FactoryInterfaceName => $"I{FactoryName}";
 
     /// <inheritdoc />
-    public string FactoryName => $"{LanguageBaseName(language)}Factory";
+    public string FactoryName => $"{LanguageBaseName(_language)}Factory";
     /// <inheritdoc />
     public IdentifierNameSyntax FactoryInterfaceType => IdentifierName(FactoryInterfaceName);
     /// <inheritdoc />
     public IdentifierNameSyntax FactoryType => IdentifierName(FactoryName);
     /// <inheritdoc />
-    public Language Language => language;
+    public Language Language => _language;
     /// <inheritdoc />
-    public string NamespaceName => namespaceName;
+    public string NamespaceName => _namespaceName;
 
     /// <inheritdoc />
     public TypeSyntax AsType(Type type, params TypeSyntax?[] generics)
@@ -114,9 +134,9 @@ public partial class Names(Language language, string namespaceName) : INames
     /// <inheritdoc />
     public TypeSyntax AsType(Classifier classifier, bool disambiguate = false)
     {
-        if (BuiltInsLanguage.Instance.Node.EqualsIdentity(classifier))
+        if (_builtIns.Node.EqualsIdentity(classifier))
             return AsType(typeof(NodeBase));
-        if (BuiltInsLanguage.Instance.INamed.EqualsIdentity(classifier))
+        if (_builtIns.INamed.EqualsIdentity(classifier))
             return AsType(typeof(INamedWritable));
 
         if (_namespaceMappings.TryGetValue(classifier.GetLanguage(), out var ns))
@@ -133,13 +153,13 @@ public partial class Names(Language language, string namespaceName) : INames
     /// <inheritdoc />
     public TypeSyntax AsType(Datatype datatype, bool disambiguate = false)
     {
-        if (BuiltInsLanguage.Instance.Boolean.EqualsIdentity(datatype))
+        if (_builtIns.Boolean.EqualsIdentity(datatype))
             return PredefinedType(Token(SyntaxKind.BoolKeyword));
-        if (BuiltInsLanguage.Instance.Integer.EqualsIdentity(datatype))
+        if (_builtIns.Integer.EqualsIdentity(datatype))
             return PredefinedType(Token(SyntaxKind.IntKeyword));
-        if (BuiltInsLanguage.Instance.String.EqualsIdentity(datatype))
+        if (_builtIns.String.EqualsIdentity(datatype))
             return PredefinedType(Token(SyntaxKind.StringKeyword));
-        if (BuiltInsLanguage.Instance.Json.EqualsIdentity(datatype))
+        if (_builtIns.Json.EqualsIdentity(datatype))
             return PredefinedType(Token(SyntaxKind.StringKeyword));
         if (datatype is Enumeration && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
         {

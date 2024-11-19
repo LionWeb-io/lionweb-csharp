@@ -22,35 +22,48 @@ namespace LionWeb.Core.M3;
 using M2;
 
 /// <inheritdoc cref="Language"/>
-public abstract class LanguageBase<TNodeFactory>(string id)
+public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lionWebVersion)
     : ReadableNodeBase<IReadableNode>(id, null), Language<TNodeFactory>
     where TNodeFactory : INodeFactory
 {
     /// <inheritdoc />
+    public LionWebVersions LionWebVersion { get; } = lionWebVersion;
+
+    protected override IBuiltInsLanguage _builtIns
+    {
+        get => new Lazy<IBuiltInsLanguage>(() => LionWebVersion.GetBuiltIns()).Value;
+    }
+
+    protected override ILionCoreLanguage _m3
+    {
+        get => new Lazy<ILionCoreLanguage>(() => LionWebVersion.GetLionCore()).Value;
+    }
+
+    /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
     [
-        BuiltInsLanguage.Instance.INamed_name,
-        M3Language.Instance.IKeyed_key,
-        M3Language.Instance.Language_version,
-        M3Language.Instance.Language_entities,
-        M3Language.Instance.Language_dependsOn
+        _builtIns.INamed_name,
+        _m3.IKeyed_key,
+        _m3.Language_version,
+        _m3.Language_entities,
+        _m3.Language_dependsOn
     ];
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Language;
+    public override Classifier GetClassifier() => _m3.Language;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
     {
-        if (feature == BuiltInsLanguage.Instance.INamed_name)
+        if (feature == _builtIns.INamed_name)
             return Name;
-        if (feature == M3Language.Instance.IKeyed_key)
+        if (feature == _m3.IKeyed_key)
             return Key;
-        if (feature == M3Language.Instance.Language_version)
+        if (feature == _m3.Language_version)
             return Version;
-        if (feature == M3Language.Instance.Language_entities)
+        if (feature == _m3.Language_entities)
             return Entities;
-        if (feature == M3Language.Instance.Language_dependsOn)
+        if (feature == _m3.Language_dependsOn)
             return DependsOn;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
@@ -80,6 +93,16 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
 {
     private readonly TLanguage _language;
 
+    protected override IBuiltInsLanguage _builtIns
+    {
+        get => new Lazy<IBuiltInsLanguage>(() => _language.LionWebVersion.GetBuiltIns()).Value;
+    }
+
+    protected override ILionCoreLanguage _m3
+    {
+        get => new Lazy<ILionCoreLanguage>(() => _language.LionWebVersion.GetLionCore()).Value;
+    }
+
     /// <inheritdoc />
     protected IKeyedBase(string id, TLanguage language) : this(id, language, language) { }
 
@@ -92,16 +115,16 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
     [
-        BuiltInsLanguage.Instance.INamed_name,
-        M3Language.Instance.IKeyed_key
+        _builtIns.INamed_name,
+        _m3.IKeyed_key
     ];
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
     {
-        if (feature == BuiltInsLanguage.Instance.INamed_name)
+        if (feature == _builtIns.INamed_name)
             return Name;
-        if (feature == M3Language.Instance.IKeyed_key)
+        if (feature == _m3.IKeyed_key)
             return Key;
 
         return null;
@@ -128,7 +151,7 @@ public abstract class ClassifierBase<TLanguage>(string id, TLanguage parent)
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Classifier_features
+            _m3.Classifier_features
         ]);
 
     /// <inheritdoc />
@@ -138,7 +161,7 @@ public abstract class ClassifierBase<TLanguage>(string id, TLanguage parent)
         if (result != null)
             return result;
 
-        if (feature == M3Language.Instance.Classifier_features)
+        if (feature == _m3.Classifier_features)
             return Features;
 
         return null;
@@ -158,13 +181,13 @@ public class AnnotationBase<TLanguage>(string id, TLanguage parent) : Classifier
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Annotation_annotates,
-            M3Language.Instance.Annotation_extends,
-            M3Language.Instance.Annotation_implements
+            _m3.Annotation_annotates,
+            _m3.Annotation_extends,
+            _m3.Annotation_implements
         ]);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Annotation;
+    public override Classifier GetClassifier() => _m3.Annotation;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
@@ -172,11 +195,11 @@ public class AnnotationBase<TLanguage>(string id, TLanguage parent) : Classifier
         var result = base.Get(feature);
         if (result != null)
             return result;
-        if (feature == M3Language.Instance.Annotation_annotates)
+        if (feature == _m3.Annotation_annotates)
             return Annotates;
-        if (feature == M3Language.Instance.Annotation_extends)
+        if (feature == _m3.Annotation_extends)
             return Extends;
-        if (feature == M3Language.Instance.Annotation_implements)
+        if (feature == _m3.Annotation_implements)
             return Implements;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
@@ -190,7 +213,7 @@ public class AnnotationBase<TLanguage>(string id, TLanguage parent) : Classifier
 
     /// <inheritdoc />
     public Annotation? Extends => ExtendsLazy.Value;
-    
+
     /// <inheritdoc cref="Extends"/>
     public Lazy<Annotation?> ExtendsLazy { protected get; init; } = new((Annotation?)null);
 
@@ -208,14 +231,14 @@ public class ConceptBase<TLanguage>(string id, TLanguage parent) : ClassifierBas
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Concept_abstract,
-            M3Language.Instance.Concept_partition,
-            M3Language.Instance.Concept_extends,
-            M3Language.Instance.Concept_implements
+            _m3.Concept_abstract,
+            _m3.Concept_partition,
+            _m3.Concept_extends,
+            _m3.Concept_implements
         ]);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Concept;
+    public override Classifier GetClassifier() => _m3.Concept;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
@@ -223,13 +246,13 @@ public class ConceptBase<TLanguage>(string id, TLanguage parent) : ClassifierBas
         var result = base.Get(feature);
         if (result != null)
             return result;
-        if (feature == M3Language.Instance.Concept_abstract)
+        if (feature == _m3.Concept_abstract)
             return Abstract;
-        if (feature == M3Language.Instance.Concept_partition)
+        if (feature == _m3.Concept_partition)
             return Partition;
-        if (feature == M3Language.Instance.Concept_extends)
+        if (feature == _m3.Concept_extends)
             return Extends;
-        if (feature == M3Language.Instance.Concept_implements)
+        if (feature == _m3.Concept_implements)
             return Implements;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
@@ -261,11 +284,11 @@ public class InterfaceBase<TLanguage>(string id, TLanguage parent) : ClassifierB
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Interface_extends
+            _m3.Interface_extends
         ]);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Interface;
+    public override Classifier GetClassifier() => _m3.Interface;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
@@ -274,7 +297,7 @@ public class InterfaceBase<TLanguage>(string id, TLanguage parent) : ClassifierB
         if (result != null)
             return result;
 
-        if (feature == M3Language.Instance.Interface_extends)
+        if (feature == _m3.Interface_extends)
             return Extends;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
@@ -282,7 +305,7 @@ public class InterfaceBase<TLanguage>(string id, TLanguage parent) : ClassifierB
 
     /// <inheritdoc />
     public IReadOnlyList<Interface> Extends => ExtendsLazy.Value;
-    
+
     /// <inheritdoc cref="Extends"/>
     public Lazy<IReadOnlyList<Interface>> ExtendsLazy { protected get; init; } = new([]);
 }
@@ -297,7 +320,7 @@ public abstract class FeatureBase<TLanguage> : IKeyedBase<TLanguage>, Feature wh
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Feature_optional
+            _m3.Feature_optional
         ]);
 
     /// <inheritdoc />
@@ -306,7 +329,7 @@ public abstract class FeatureBase<TLanguage> : IKeyedBase<TLanguage>, Feature wh
         var result = base.Get(feature);
         if (result != null)
             return result;
-        if (feature == M3Language.Instance.Feature_optional)
+        if (feature == _m3.Feature_optional)
             return Optional;
 
         return null;
@@ -326,8 +349,8 @@ public abstract class LinkBase<TLanguage> : FeatureBase<TLanguage>, Link where T
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Link_multiple,
-            M3Language.Instance.Link_type
+            _m3.Link_multiple,
+            _m3.Link_type
         ]);
 
     /// <inheritdoc />
@@ -336,9 +359,9 @@ public abstract class LinkBase<TLanguage> : FeatureBase<TLanguage>, Link where T
         var result = base.Get(feature);
         if (result != null)
             return result;
-        if (feature == M3Language.Instance.Link_multiple)
+        if (feature == _m3.Link_multiple)
             return Multiple;
-        if (feature == M3Language.Instance.Link_type)
+        if (feature == _m3.Link_type)
             return Type;
 
         return null;
@@ -360,7 +383,7 @@ public class ReferenceBase<TLanguage> : LinkBase<TLanguage>, Reference where TLa
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Reference;
+    public override Classifier GetClassifier() => _m3.Reference;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
@@ -382,7 +405,7 @@ public class ContainmentBase<TLanguage> : LinkBase<TLanguage>, Containment where
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Containment;
+    public override Classifier GetClassifier() => _m3.Containment;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
@@ -406,11 +429,11 @@ public class PropertyBase<TLanguage> : FeatureBase<TLanguage>, Property where TL
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Property_type
+            _m3.Property_type
         ]);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Property;
+    public override Classifier GetClassifier() => _m3.Property;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
@@ -418,7 +441,7 @@ public class PropertyBase<TLanguage> : FeatureBase<TLanguage>, Property where TL
         var result = base.Get(feature);
         if (result != null)
             return result;
-        if (feature == M3Language.Instance.Property_type)
+        if (feature == _m3.Property_type)
             return Type;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
@@ -446,7 +469,7 @@ public class PrimitiveTypeBase<TLanguage> : DatatypeBase<TLanguage>, PrimitiveTy
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.PrimitiveType;
+    public override Classifier GetClassifier() => _m3.PrimitiveType;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
@@ -470,11 +493,11 @@ public class EnumerationBase<TLanguage> : DatatypeBase<TLanguage>, Enumeration w
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Enumeration_literals
+            _m3.Enumeration_literals
         ]);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Enumeration;
+    public override Classifier GetClassifier() => _m3.Enumeration;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)
@@ -482,7 +505,7 @@ public class EnumerationBase<TLanguage> : DatatypeBase<TLanguage>, Enumeration w
         var result = base.Get(feature);
         if (result != null)
             return result;
-        if (feature == M3Language.Instance.Enumeration_literals)
+        if (feature == _m3.Enumeration_literals)
             return Literals;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
@@ -490,7 +513,7 @@ public class EnumerationBase<TLanguage> : DatatypeBase<TLanguage>, Enumeration w
 
     /// <inheritdoc />
     public IReadOnlyList<EnumerationLiteral> Literals => LiteralsLazy.Value;
-    
+
     /// <inheritdoc cref="Literals"/>
     public required Lazy<IReadOnlyList<EnumerationLiteral>> LiteralsLazy { protected get; init; }
 }
@@ -504,7 +527,7 @@ public class EnumerationLiteralBase<TLanguage> : IKeyedBase<TLanguage>, Enumerat
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.EnumerationLiteral;
+    public override Classifier GetClassifier() => _m3.EnumerationLiteral;
 
     /// <inheritdoc />
     public override object? Get(Feature feature)

@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M1;
 
-using M2;
 using M3;
 using Serialization;
 
@@ -93,14 +92,14 @@ public partial class Deserializer
         CompressedId compressedId = Compress(node.GetId());
         return property.Type switch
         {
-            var b when b == BuiltInsLanguage.Instance.Boolean => bool.TryParse(value, out var result)
+            var b when b == _builtIns.Boolean => bool.TryParse(value, out var result)
                 ? result
                 : Handler.InvalidPropertyValue<bool>(value, property, compressedId),
-            var i when i == BuiltInsLanguage.Instance.Integer => int.TryParse(value, out var result)
+            var i when i == _builtIns.Integer => int.TryParse(value, out var result)
                 ? result
                 : Handler.InvalidPropertyValue<int>(value, property, compressedId),
             // leave both a String and JSON value as a string:
-            var s when s == BuiltInsLanguage.Instance.String || s == BuiltInsLanguage.Instance.Json => value,
+            var s when s == _builtIns.String || s == _builtIns.Json => value,
             _ => Handler.UnknownDatatype(property, value, node)
         };
     }

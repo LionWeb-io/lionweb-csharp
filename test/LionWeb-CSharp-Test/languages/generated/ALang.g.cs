@@ -16,7 +16,7 @@ using System.Collections.Generic;
 public class ALangLanguage : LanguageBase<IALangFactory>
 {
 	public static readonly ALangLanguage Instance = new Lazy<ALangLanguage>(() => new("id-ALang")).Value;
-	public ALangLanguage(string id) : base(id)
+	public ALangLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
 		_aConcept = new(() => new ConceptBase<ALangLanguage>("id-AConcept", this) { Key = "key-AConcept", Name = "AConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [AConcept_BRef]) });
 		_aConcept_BRef = new(() => new ReferenceBase<ALangLanguage>("id-AConcept-BRef", AConcept, this) { Key = "key-BRef", Name = "BRef", Optional = true, Multiple = false, Type = Examples.Circular.B.BLangLanguage.Instance.BConcept });

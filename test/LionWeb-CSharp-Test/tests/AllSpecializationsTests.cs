@@ -27,6 +27,8 @@ using LionWeb.Core.M3;
 [TestClass]
 public class AllSpecializationsTests
 {
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+
     [TestMethod]
     public void Interface()
     {
@@ -212,7 +214,7 @@ public class AllSpecializationsTests
     {
         Language lang = ShapesDynamic.Language;
 
-        var actual = BuiltInsLanguage.Instance.INamed.AllSpecializations([lang, InvalidLanguage.Language]);
+        var actual = _builtIns.INamed.AllSpecializations([lang, InvalidLanguage.Language]);
 
         CollectionAssert.AreEquivalent(new List<Classifier>
         {

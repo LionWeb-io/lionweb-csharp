@@ -16,7 +16,7 @@ using System.Collections.Generic;
 public class WithEnumLanguage : LanguageBase<IWithEnumFactory>
 {
 	public static readonly WithEnumLanguage Instance = new Lazy<WithEnumLanguage>(() => new("RkXMUe9zMRUQpw3bzQjSbBX6ju1a0UplEYsVa799WPQ")).Value;
-	public WithEnumLanguage(string id) : base(id)
+	public WithEnumLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
 		_myEnum = new(() => new EnumerationBase<WithEnumLanguage>("uLnvTaBlWPqfYfLjfN9HG9Qjt4VQHhFVRorDLFeYhZE", this) { Key = "MyEnum", Name = "MyEnum", LiteralsLazy = new(() => [MyEnum_literal1, MyEnum_literal2]) });
 		_myEnum_literal1 = new(() => new EnumerationLiteralBase<WithEnumLanguage>("0euWZGmWfx0iPC66yajzWqv3gIv--pvo55hqY82nREc", MyEnum, this) { Key = "lit1", Name = "literal1" });

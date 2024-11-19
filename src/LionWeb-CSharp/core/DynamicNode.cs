@@ -128,10 +128,10 @@ public class DynamicNode : NodeBase
     {
         switch (value)
         {
-            case string when property.Type.EqualsIdentity(BuiltInsLanguage.Instance.String):
-            case string when property.Type.EqualsIdentity(BuiltInsLanguage.Instance.Json):
-            case int when property.Type.EqualsIdentity(BuiltInsLanguage.Instance.Integer):
-            case bool when property.Type.EqualsIdentity(BuiltInsLanguage.Instance.Boolean):
+            case string when property.Type.EqualsIdentity(_builtIns.String):
+            case string when property.Type.EqualsIdentity(_builtIns.Json):
+            case int when property.Type.EqualsIdentity(_builtIns.Integer):
+            case bool when property.Type.EqualsIdentity(_builtIns.Boolean):
                 _settings[property] = value;
                 return true;
 

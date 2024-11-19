@@ -16,7 +16,7 @@ using System.Collections.Generic;
 public class TinyRefLangLanguage : LanguageBase<ITinyRefLangFactory>
 {
 	public static readonly TinyRefLangLanguage Instance = new Lazy<TinyRefLangLanguage>(() => new("id-TinyRefLang")).Value;
-	public TinyRefLangLanguage(string id) : base(id)
+	public TinyRefLangLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
 		_myConcept = new(() => new ConceptBase<TinyRefLangLanguage>("id-Concept", this) { Key = "key-MyConcept", Name = "MyConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [MyConcept_singularRef, MyConcept_multivaluedRef]) });
 		_myConcept_singularRef = new(() => new ReferenceBase<TinyRefLangLanguage>("id-MyConcept-singularRef", MyConcept, this) { Key = "key-MyConcept-singularRef", Name = "singularRef", Optional = false, Multiple = false, Type = MyConcept });
