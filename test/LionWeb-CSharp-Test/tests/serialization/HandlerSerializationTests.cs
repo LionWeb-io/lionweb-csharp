@@ -26,7 +26,7 @@ using LionWeb.Core.M3;
 [TestClass]
 public class HandlerSerializationTests
 {
-    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     class DuplicateNodeHandler(Action incrementer) : ISerializerHandler
     {

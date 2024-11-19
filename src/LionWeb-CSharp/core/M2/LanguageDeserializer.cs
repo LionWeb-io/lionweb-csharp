@@ -57,7 +57,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
     public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
         params Language[] dependentLanguages) =>
-        Deserialize(serializationChunk, LionWebVersionsExtensions.GetCurrent(), dependentLanguages);
+        Deserialize(serializationChunk, LionWebVersions.Current, dependentLanguages);
 
     /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
     public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,

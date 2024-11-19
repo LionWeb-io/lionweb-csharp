@@ -29,15 +29,8 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;
 
-    protected override IBuiltInsLanguage _builtIns
-    {
-        get => new Lazy<IBuiltInsLanguage>(() => LionWebVersion.GetBuiltIns()).Value;
-    }
-
-    protected override ILionCoreLanguage _m3
-    {
-        get => new Lazy<ILionCoreLanguage>(() => LionWebVersion.GetLionCore()).Value;
-    }
+    protected override IBuiltInsLanguage _builtIns=> new Lazy<IBuiltInsLanguage>(() => LionWebVersion.BuiltIns).Value;
+    protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
@@ -93,15 +86,8 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
 {
     private readonly TLanguage _language;
 
-    protected override IBuiltInsLanguage _builtIns
-    {
-        get => new Lazy<IBuiltInsLanguage>(() => _language.LionWebVersion.GetBuiltIns()).Value;
-    }
-
-    protected override ILionCoreLanguage _m3
-    {
-        get => new Lazy<ILionCoreLanguage>(() => _language.LionWebVersion.GetLionCore()).Value;
-    }
+    protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => _language.LionWebVersion.BuiltIns).Value;
+    protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => _language.LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     protected IKeyedBase(string id, TLanguage language) : this(id, language, language) { }

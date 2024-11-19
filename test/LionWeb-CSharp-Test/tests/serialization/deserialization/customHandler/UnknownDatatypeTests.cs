@@ -29,7 +29,7 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnknownDatatypeTests
 {
-    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     private class DeserializerHealingHandler(Func<Feature, string?, IWritableNode, object?> heal)
         : DeserializerExceptionHandler

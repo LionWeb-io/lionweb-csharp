@@ -33,8 +33,8 @@ using Comparer = LionWeb.Core.Utilities.Comparer;
 [TestClass]
 public class SerializationLenientTests
 {
-    private static readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
-    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.GetBuiltIns();
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.BuiltIns;
 
     [TestMethod]
     public void InvalidValues()
@@ -140,7 +140,7 @@ public class SerializationLenientTests
                         {
                             Key = "a", Name = "a", LiteralsLazy = new([])
                         }
-                        : feature.GetLanguage().LionWebVersion.GetBuiltIns().String
+                        : feature.GetLanguage().LionWebVersion.BuiltIns.String
                 };
         }
 
@@ -160,7 +160,7 @@ public class SerializationLenientTests
                     Key = feature.Key,
                     Optional = feature.Optional,
                     Multiple = false,
-                    Type = feature.GetLanguage().LionWebVersion.GetBuiltIns().Node
+                    Type = feature.GetLanguage().LionWebVersion.BuiltIns.Node
                 };
         }
 
@@ -178,7 +178,7 @@ public class SerializationLenientTests
                     Key = feature.Key,
                     Optional = feature.Optional,
                     Multiple = false,
-                    Type = feature.GetLanguage().LionWebVersion.GetBuiltIns().Node
+                    Type = feature.GetLanguage().LionWebVersion.BuiltIns.Node
                 };
         }
 

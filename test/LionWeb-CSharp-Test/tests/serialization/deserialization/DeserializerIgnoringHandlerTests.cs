@@ -26,7 +26,7 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class DeserializerIgnoringHandlerTests
 {
-    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     [TestMethod]
     public void unknown_classifier()

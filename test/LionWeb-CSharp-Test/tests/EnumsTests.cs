@@ -28,7 +28,7 @@ public class EnumsTests
 {
     private readonly Language _language;
     private readonly WithEnumFactory _factory;
-    private readonly LionWebVersions _lionWebVersions = LionWebVersionsExtensions.GetCurrent();
+    private readonly LionWebVersions _lionWebVersions = LionWebVersions.Current;
 
     public EnumsTests()
     {

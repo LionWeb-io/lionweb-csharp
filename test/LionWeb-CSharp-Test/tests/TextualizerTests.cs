@@ -27,8 +27,8 @@ using Examples.Shapes.M2;
 [TestClass]
 public class TextualizerTests
 {
-    private static readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
-    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.GetBuiltIns();
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.BuiltIns;
 
     [TestMethod]
     public void smoke_test_textualizer()

@@ -242,7 +242,7 @@ public static class M1Extensions
     {
         try
         {
-            var iNamedName = self.GetClassifier().GetLanguage().LionWebVersion.GetBuiltIns().INamed_name;
+            var iNamedName = self.GetClassifier().GetLanguage().LionWebVersion.BuiltIns.INamed_name;
             if (self.CollectAllSetFeatures().Contains(iNamedName))
                 return self.Get(iNamedName) as string ?? null;
 

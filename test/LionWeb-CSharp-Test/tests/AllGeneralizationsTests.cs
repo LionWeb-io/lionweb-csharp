@@ -27,7 +27,7 @@ using LionWeb.Core.M3;
 [TestClass]
 public class AllGeneralizationsTests
 {
-    private static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
 
     [TestMethod]
     public void RootInterface()

@@ -300,7 +300,7 @@ public static class M2Extensions
     /// <param name="candidate">Classifier to check.</param>
     /// <returns><c>true</c> if <paramref name="annotation"/> can annotate <paramref name="candidate"/>, <c>false</c> otherwise.</returns>
     public static bool CanAnnotate(this Annotation annotation, Classifier candidate) =>
-        ReferenceEquals(annotation.Annotates, annotation.GetLanguage().LionWebVersion.GetBuiltIns().Node) ||
+        ReferenceEquals(annotation.Annotates, annotation.GetLanguage().LionWebVersion.BuiltIns.Node) ||
         candidate.AllGeneralizations(true).Contains(annotation.Annotates, new LanguageEntityIdentityComparer());
 
     /// <summary>

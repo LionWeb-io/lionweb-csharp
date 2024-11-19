@@ -27,7 +27,7 @@ public static class LanguagesUtils
 {
     /// <inheritdoc cref="LoadLanguages(string,string, LionWebVersions)"/>
     public static IEnumerable<DynamicLanguage> LoadLanguages(string assemblyName, string resourceName) =>
-        LoadLanguages(assemblyName, resourceName, LionWebVersionsExtensions.GetCurrent());
+        LoadLanguages(assemblyName, resourceName, LionWebVersions.Current);
 
     /// <summary>
     /// Loads the languages defined in the resource with the given <paramref name="resourceName" /> inside the assembly with the given <paramref name="assemblyName" />,

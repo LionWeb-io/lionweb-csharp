@@ -29,12 +29,7 @@ public interface IBuiltInsLanguage : Language
     /// <summary>
     /// The definition of the LionCore built-ins language.
     /// </summary>
-    public static IBuiltInsLanguage GetInstance(LionWebVersions version) => version switch
-    {
-        LionWebVersions.v2023_1 => BuiltInsLanguage_2023_1.Instance,
-        LionWebVersions.v2024_1 => BuiltInsLanguage_2024_1.Instance,
-        _ => throw new UnsupportedVersionException(version)
-    };
+    public static IBuiltInsLanguage GetInstance(LionWebVersions version) => version.BuiltIns;
 
     /// <summary>
     /// The built-in primitive type Boolean.
@@ -78,7 +73,7 @@ public sealed class BuiltInsLanguage
 {
     /// <inheritdoc cref="IBuiltInsLanguage.GetInstance"/>
     [Obsolete("Use IBuiltInsLanguage instead")]
-    public static readonly IBuiltInsLanguage Instance = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+    public static readonly IBuiltInsLanguage Instance = LionWebVersions.Current.BuiltIns;
 }
 
 /// <summary>

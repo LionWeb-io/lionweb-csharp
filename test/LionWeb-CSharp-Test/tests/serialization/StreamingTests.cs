@@ -29,7 +29,7 @@ using System.Diagnostics;
 public class StreamingTests
 {
     private readonly Language _language;
-    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     public StreamingTests()
     {

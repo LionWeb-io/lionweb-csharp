@@ -54,7 +54,7 @@ public class DeserializerBuilder
     private readonly HashSet<IReadableNode> _dependentNodes = new();
     private IDeserializerHandler? _handler;
     private bool _storeUncompressedIds = false;
-    private LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     public DeserializerBuilder WithHandler(IDeserializerHandler handler)
     {

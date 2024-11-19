@@ -24,7 +24,7 @@ using Utilities;
 [TestClass]
 public class ReflectionTests : LenientNodeTestsBase
 {
-    private static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
 
     [TestMethod]
     public void GetClassifier()

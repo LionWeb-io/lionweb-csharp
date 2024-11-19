@@ -28,15 +28,8 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
     private string? _key;
     private string? _name;
 
-    protected override IBuiltInsLanguage _builtIns
-    {
-        get => new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.GetBuiltIns()).Value;
-    }
-
-    protected override ILionCoreLanguage _m3
-    {
-        get => new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.GetLionCore()).Value;
-    }
+    protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.BuiltIns).Value;
+    protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     public string Key

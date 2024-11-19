@@ -22,8 +22,8 @@ using LionWeb.Core.M3;
 
 public static class InvalidLanguage
 {
-    private static readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
-    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.GetBuiltIns();
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.BuiltIns;
 
     public static readonly DynamicLanguage Language = new("id-Invalid", _lionWebVersion)
     {

@@ -30,6 +30,9 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
     private const string _name = "LionCore_M3";
     private const string _key = "LionCore-M3";
 
+    protected override IBuiltInsLanguage _builtIns => BuiltInsLanguage_2023_1.Instance;
+    protected override ILionCoreLanguage _m3 => this;
+    
     internal LionCoreLanguage_2023_1() : base("-id-LionCore-M3", LionWebVersions.v2023_1)
     {
         _annotation = new(() => new M3Concept("-id-Annotation", this)

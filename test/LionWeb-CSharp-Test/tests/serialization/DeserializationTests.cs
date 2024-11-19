@@ -31,7 +31,7 @@ using LionWeb.Core.Utilities;
 [TestClass]
 public class DeserializationTests
 {
-    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     [TestMethod]
     public void test_deserialization_of_a_node_with_missing_parent_does_not_fail()

@@ -57,7 +57,7 @@ public class GeneratorFacade
     /// <inheritdoc cref="INames"/>
     public required INames Names { get; init; }
 
-    public LionWebVersions LionWebVersion { get; init; } = LionWebVersionsExtensions.GetCurrent();
+    public LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
 
     /// Stores the output of <see cref="Generate"/> to the file at <paramref name="path"/>.
     public void Persist(string path)

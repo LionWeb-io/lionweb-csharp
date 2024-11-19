@@ -35,7 +35,7 @@ public abstract class ComparerTestsBase
 {
     private static readonly Language leftLanguage = ShapesLanguage.Instance;
 
-    protected static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+    protected static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
 
     protected static readonly ShapesFactory lF = leftLanguage.GetFactory() as ShapesFactory;
 
@@ -193,7 +193,7 @@ public static class ReflectiveShapesFactory
 static class ShapeNodeExtension
 {
     internal static void SetName(this INode node, string name) =>
-        node.Set(LionWebVersionsExtensions.GetCurrent().GetBuiltIns().INamed_name, name);
+        node.Set(LionWebVersions.Current.BuiltIns.INamed_name, name);
 
     internal static void SetX(this INode node, int x) =>
         node.Set(node.GetClassifier().FeatureByKey("key-x"), x);

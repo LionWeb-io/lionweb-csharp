@@ -45,8 +45,8 @@ public abstract class GeneratorBase
     {
         _names = names;
         _lionWebVersion = lionWebVersion;
-        _m3 = lionWebVersion.GetLionCore();
-        _builtIns = lionWebVersion.GetBuiltIns();
+        _m3 = lionWebVersion.LionCore;
+        _builtIns = lionWebVersion.BuiltIns;
     }
 
     /// <inheritdoc cref="INames.Language"/>

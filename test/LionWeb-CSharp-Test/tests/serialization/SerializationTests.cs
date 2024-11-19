@@ -32,7 +32,7 @@ using Comparer = LionWeb.Core.Utilities.Comparer;
 [TestClass]
 public class SerializationTests
 {
-    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
     private readonly Language _language;
 
     public SerializationTests()

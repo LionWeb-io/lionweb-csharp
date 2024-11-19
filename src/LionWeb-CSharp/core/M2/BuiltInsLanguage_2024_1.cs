@@ -28,6 +28,9 @@ public sealed class BuiltInsLanguage_2024_1 : LanguageBase<BuiltInsFactory_2024_
 
     private const string _name = "LionCore_builtins";
 
+    protected override IBuiltInsLanguage _builtIns => this;
+    protected override ILionCoreLanguage _m3 => LionCoreLanguage_2024_1.Instance;
+
     internal BuiltInsLanguage_2024_1() : base(LionCoreBuiltInsIdAndKey, LionWebVersions.v2024_1)
     {
         _boolean = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-Boolean", this)

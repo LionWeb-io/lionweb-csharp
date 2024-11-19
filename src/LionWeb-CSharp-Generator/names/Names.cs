@@ -58,8 +58,8 @@ public partial class Names : INames
         _language = language;
         _namespaceName = namespaceName;
         
-        _m3 = language.LionWebVersion.GetLionCore();
-        _builtIns = language.LionWebVersion.GetBuiltIns();
+        _m3 = language.LionWebVersion.LionCore;
+        _builtIns = language.LionWebVersion.BuiltIns;
     }
 
     /// <inheritdoc />

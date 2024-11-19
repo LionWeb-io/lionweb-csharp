@@ -30,7 +30,7 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnknownClassifierTests
 {
-    private readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     private class DeserializerHealingHandler(Func<CompressedMetaPointer, CompressedId, Classifier?> heal)
         : DeserializerExceptionHandler

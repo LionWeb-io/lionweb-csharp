@@ -24,7 +24,7 @@ using LionWeb.Core.M3;
 [TestClass]
 public class DeserializerHandlerSelectOtherLanguageVersionTests
 {
-    private readonly LionWebVersions _lionWebVersion= LionWebVersionsExtensions.GetCurrent();
+    private readonly LionWebVersions _lionWebVersion= LionWebVersions.Current;
 
     [TestMethod]
     public void Empty()

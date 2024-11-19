@@ -31,9 +31,9 @@ using Comparer = LionWeb.Core.Utilities.Comparer;
 [TestClass]
 public class LanguageSerializationTests
 {
-    private static readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
-    private readonly ILionCoreLanguage _m3=_lionWebVersion.GetLionCore();
-    private readonly IBuiltInsLanguage _builtIns=_lionWebVersion.GetBuiltIns();
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    private readonly ILionCoreLanguage _m3=_lionWebVersion.LionCore;
+    private readonly IBuiltInsLanguage _builtIns=_lionWebVersion.BuiltIns;
     
     [TestMethod]
     public void test_serialization_shapes_language_with_external_annotations()

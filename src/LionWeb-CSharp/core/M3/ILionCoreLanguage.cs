@@ -29,12 +29,7 @@ public interface ILionCoreLanguage : Language
     /// <summary>
     /// Self-definition of the LionCore M3.
     /// </summary>
-    public static ILionCoreLanguage GetInstance(LionWebVersions version) => version switch
-    {
-        LionWebVersions.v2023_1 => LionCoreLanguage_2023_1.Instance,
-        LionWebVersions.v2024_1 => LionCoreLanguage_2024_1.Instance,
-        _ => throw new UnsupportedVersionException(version)
-    };
+    public static ILionCoreLanguage GetInstance(LionWebVersions version) => version.LionCore;
 
     /// <inheritdoc cref="M3.Annotation"/>
     Concept Annotation { get; }
@@ -145,7 +140,7 @@ public sealed class M3Language
 {
     /// <inheritdoc cref="ILionCoreLanguage.GetInstance"/>
     [Obsolete("Use ILionCoreLanguage instead")]
-    public static readonly ILionCoreLanguage Instance = LionWebVersionsExtensions.GetCurrent().GetLionCore();
+    public static readonly ILionCoreLanguage Instance = LionWebVersions.Current.LionCore;
 }
 
 /// <inheritdoc />
@@ -161,7 +156,7 @@ public sealed class M3Concept : ConceptBase<ILionCoreLanguage>
     /// <inheritdoc />
     public override object? Get(Feature feature)
     {
-        if (feature == GetLanguage().LionWebVersion.GetBuiltIns().INamed_name)
+        if (feature == GetLanguage().LionWebVersion.BuiltIns.INamed_name)
             return Name;
         if (feature == GetLanguage().IKeyed_key)
             return Key;
@@ -193,7 +188,7 @@ public sealed class M3Interface : InterfaceBase<ILionCoreLanguage>
     /// <inheritdoc />
     public override object? Get(Feature feature)
     {
-        if (feature == GetLanguage().LionWebVersion.GetBuiltIns().INamed_name)
+        if (feature == GetLanguage().LionWebVersion.BuiltIns.INamed_name)
             return Name;
         if (feature == GetLanguage().IKeyed_key)
             return Key;
@@ -219,7 +214,7 @@ public sealed class M3Reference : ReferenceBase<ILionCoreLanguage>
     /// <inheritdoc />
     public override object? Get(Feature feature)
     {
-        if (feature == GetLanguage().LionWebVersion.GetBuiltIns().INamed_name)
+        if (feature == GetLanguage().LionWebVersion.BuiltIns.INamed_name)
             return Name;
         if (feature == GetLanguage().IKeyed_key)
             return Key;
@@ -247,7 +242,7 @@ public sealed class M3Containment : ContainmentBase<ILionCoreLanguage>
     /// <inheritdoc />
     public override object? Get(Feature feature)
     {
-        if (feature == GetLanguage().LionWebVersion.GetBuiltIns().INamed_name)
+        if (feature == GetLanguage().LionWebVersion.BuiltIns.INamed_name)
             return Name;
         if (feature == GetLanguage().IKeyed_key)
             return Key;
@@ -275,7 +270,7 @@ public sealed class M3Property : PropertyBase<ILionCoreLanguage>
     /// <inheritdoc />
     public override object? Get(Feature feature)
     {
-        if (feature == GetLanguage().LionWebVersion.GetBuiltIns().INamed_name)
+        if (feature == GetLanguage().LionWebVersion.BuiltIns.INamed_name)
             return Name;
         if (feature == GetLanguage().IKeyed_key)
             return Key;

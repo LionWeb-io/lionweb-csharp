@@ -29,7 +29,7 @@ using Examples.Shapes.M2;
 public class ReadOnlyLine(string id, IReadableNode? parent)
     : ReadableNodeBase<IReadableNode>(id, parent), INamed
 {
-    private static readonly IBuiltInsLanguage _builtIns = LionWebVersionsExtensions.GetCurrent().GetBuiltIns();
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
 
     /// <inheritdoc/>
     public override Classifier GetClassifier() => ShapesLanguage.Instance.Line;
