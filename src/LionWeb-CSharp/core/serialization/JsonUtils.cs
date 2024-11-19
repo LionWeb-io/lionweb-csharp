@@ -56,7 +56,7 @@ public static class JsonUtils
     public static void WriteJsonToFile(string path, object data) =>
         File.WriteAllText(path, WriteJsonToString(data));
 
-    public static void WriteNodesToStream(Stream stream, ISerializer serializer, IEnumerable<INode> nodes)
+    public static void WriteNodesToStream(Stream stream, ISerializer serializer, IEnumerable<IReadableNode> nodes)
     {
         object data = new LazySerializationChunk
         {

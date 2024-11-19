@@ -34,7 +34,10 @@ public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebV
     /// <inheritdoc cref="LanguageConstructorGenerator"/>
     public ConstructorDeclarationSyntax GenConstructor() =>
         Constructor(LanguageName, Param("id", AsType(typeof(string))))
-            .WithInitializer(Initializer("id", $"{AsType(typeof(LionWebVersions))}.{_lionWebVersion}"))
+            .WithInitializer(Initializer(
+                "id",
+                $"{AsType(typeof(LionWebVersions))}.v{_lionWebVersion.VersionString.Replace('.', '_')}"
+            ))
             .WithBody(AsStatements(
                 Language.Entities.SelectMany(EntityConstructorInitialization)
             ));

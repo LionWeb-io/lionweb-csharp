@@ -19,6 +19,7 @@
 
 using Examples.Shapes.Dynamic;
 using Io.Lionweb.Mps.Specific;
+using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -30,8 +31,9 @@ var lionWebVersion = LionWebVersions.Current;
 
 void SerializeLanguagesLocally(string name, params Language[] languages)
 {
-    JsonUtils.WriteJsonToFile($"chunks/localDefs/{name}.json",
-        new Serializer(lionWebVersion).SerializeDescendants(languages));
+    JsonUtils.WriteNodesToStream(new FileStream($"chunks/localDefs/{name}.json", FileMode.Create),
+        new Serializer(lionWebVersion),
+        languages.SelectMany(l => M1Extensions.Descendants<IReadableNode>(l, [], true, true)));
 }
 
 SerializeLanguagesLocally("lioncore", lionWebVersion.LionCore);

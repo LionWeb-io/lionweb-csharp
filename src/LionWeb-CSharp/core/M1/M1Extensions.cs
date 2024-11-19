@@ -271,7 +271,7 @@ public static class M1Extensions
         return [..containment.AsNodes<INode>(enumerable)];
     }
 
-    internal static IEnumerable<T> Descendants<T>(T self, HashSet<T> visited, bool includeSelf = false,
+    public static IEnumerable<T> Descendants<T>(T self, HashSet<T> visited, bool includeSelf = false,
         bool includeAnnotations = false) where T : class, IReadableNode
     {
         if (!visited.Add(self))
