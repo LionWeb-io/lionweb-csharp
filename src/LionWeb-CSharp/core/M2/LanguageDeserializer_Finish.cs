@@ -20,7 +20,7 @@ namespace LionWeb.Core.M2;
 using M1;
 using M3;
 
-public partial class LanguageDeserializer
+public partial class LanguageDeserializer<TVersion>
 {
     /// <inheritdoc />
     public override IEnumerable<DynamicLanguage> Finish()

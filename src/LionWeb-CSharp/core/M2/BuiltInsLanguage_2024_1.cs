@@ -19,12 +19,10 @@ namespace LionWeb.Core.M2;
 
 using M3;
 
-public interface IBuiltInsLanguage_2024_1 : IBuiltInsLanguage<LionWebVersions.Version2024_1, IBuiltInsLanguage_2024_1,
-    ILionCoreLanguage_2024_1>;
+public interface IBuiltInsLanguage_2024_1 : IBuiltInsLanguage<LionWebVersions.Version2024_1>;
 
 public sealed class BuiltInsLanguage_2024_1 :
-    LanguageBase<BuiltInsFactory_2024_1, LionWebVersions.Version2024_1, IBuiltInsLanguage_2024_1,
-        ILionCoreLanguage_2024_1>, IBuiltInsLanguage_2024_1
+    LanguageBase<BuiltInsFactory_2024_1, LionWebVersions.Version2024_1>, IBuiltInsLanguage_2024_1
 {
     /// <summary>
     /// The definition of the LionCore built-ins language.

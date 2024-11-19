@@ -20,7 +20,7 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 
-public abstract class LionWebVersions
+public interface LionWebVersions
 {
     public abstract string VersionString { get; }
     public abstract IBuiltInsLanguage BuiltIns { get; }
@@ -28,46 +28,43 @@ public abstract class LionWebVersions
 
     public static LionWebVersions Current => v2023_1;
 
-    private LionWebVersions() {}
-    
-    public static readonly Version2023_1 v2023_1 = Version2023_1.Instance;
-    public sealed class Version2023_1 : LionWebVersions
+    public static readonly IVersion2023_1 v2023_1 = Version2023_1.Instance;
+
+    public interface IVersion2023_1 : LionWebVersions;
+
+    public class Version2023_1 : IVersion2023_1
     {
         internal static readonly Version2023_1 Instance = new(); 
         
         private Version2023_1() {}
         
-        public override string VersionString { get; } = "2023.1";
+        public string VersionString { get; } = "2023.1";
 
-        public override IBuiltInsLanguage BuiltIns =>
+        public IBuiltInsLanguage BuiltIns =>
             new Lazy<IBuiltInsLanguage>(() => BuiltInsLanguage_2023_1.Instance).Value;
 
-        public override ILionCoreLanguage LionCore =>
+        public ILionCoreLanguage LionCore =>
             new Lazy<ILionCoreLanguage>(() => LionCoreLanguage_2023_1.Instance).Value;
     }
 
-    public static readonly Version2024_1 v2024_1 = Version2024_1.Instance;
-    public sealed class Version2024_1 : LionWebVersions
+    public interface IVersion2024_1 : LionWebVersions;
+    public static readonly IVersion2024_1 v2024_1 = Version2024_1.Instance;
+    public sealed class Version2024_1 : IVersion2024_1
     {
         internal static readonly Version2024_1 Instance = new(); 
         private Version2024_1() {}
         
-        public override string VersionString { get; } = "2024.1";
+        public string VersionString { get; } = "2024.1";
 
-        public override IBuiltInsLanguage BuiltIns =>
+        public IBuiltInsLanguage BuiltIns =>
             new Lazy<IBuiltInsLanguage>(() => BuiltInsLanguage_2024_1.Instance).Value;
 
-        public override ILionCoreLanguage LionCore =>
+        public ILionCoreLanguage LionCore =>
             new Lazy<ILionCoreLanguage>(() => LionCoreLanguage_2024_1.Instance).Value;
     }
 }
 
-public interface ILionWebVersionUser<out TVersion, out TBuiltIns, out TM3>
-    where TVersion: LionWebVersions
-    where TBuiltIns : IBuiltInsLanguage<TVersion, TBuiltIns, TM3>
-    where TM3 : ILionCoreLanguage<TVersion, TBuiltIns, TM3>
+public interface ILionWebVersionUser<out TVersion> where TVersion: LionWebVersions
 {
     TVersion ULionWebVersion { get; }
-    protected TBuiltIns UBuiltIns { get; }
-    protected TM3 UM3 { get; }
 }

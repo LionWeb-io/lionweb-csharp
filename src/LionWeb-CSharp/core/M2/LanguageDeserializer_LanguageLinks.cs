@@ -22,7 +22,7 @@ using M3;
 using Serialization;
 using Utilities;
 
-public partial class LanguageDeserializer
+public partial class LanguageDeserializer<TVersion>
 {
     private void InstallLanguageLinks()
     {

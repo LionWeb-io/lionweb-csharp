@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1;
 using M3;
 using Serialization;
 
-public partial class Deserializer<TVersion, TBuiltIns, TM3>
+public partial class Deserializer<TVersion>
 {
     /// <inheritdoc />
     public override void Process(SerializedNode serializedNode)
@@ -87,10 +87,8 @@ public partial class Deserializer<TVersion, TBuiltIns, TM3>
         }
     }
 
-    public required Func<DeserializerBase<TVersion, TBuiltIns, TM3>, IWritableNode, Property, string, object?> PrimitiveTypeConverter { private get; init; }
-    
     private object? ConvertPrimitiveType(IWritableNode node, Property property, string value) =>
-        PrimitiveTypeConverter(this, node, property, value);
+        DeserializerDelegates.ConvertPrimitiveType(this, node, property, value);
 
     private void RegisterAnnotations(SerializedNode serializedNode, CompressedId compressedId)
     {

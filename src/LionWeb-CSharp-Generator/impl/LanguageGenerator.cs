@@ -62,7 +62,7 @@ public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : L
                 ])
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .WithBaseList(AsBase(AsType(typeof(LanguageBase<>), generics: FactoryInterfaceType)))
+            .WithBaseList(AsBase(AsType(typeof(LanguageBase<,>), generics: [FactoryInterfaceType, AsType(_lionWebVersion.GetType())])))
             .WithMembers(List(new List<MemberDeclarationSyntax>
                 {
                     GenLanguageInstance(),

@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "0")]
-public class SpecificLanguage : LanguageBase<ISpecificFactory>
+public class SpecificLanguage : LanguageBase<ISpecificFactory, LionWebVersions.Version2023_1>
 {
 	public static readonly SpecificLanguage Instance = new Lazy<SpecificLanguage>(() => new("io-lionweb-mps-specific")).Value;
 	public SpecificLanguage(string id) : base(id, LionWebVersions.v2023_1)

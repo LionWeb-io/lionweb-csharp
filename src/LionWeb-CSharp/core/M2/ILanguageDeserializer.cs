@@ -51,4 +51,14 @@ public static class ILanguageDeserializerExtensions
 
         return deserializer.Finish();
     }
+    
+    /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
+    public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk, params Language[] dependentLanguages) =>
+        Deserialize(serializationChunk, LionWebVersions.Current, dependentLanguages);
+
+    /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
+    public static IEnumerable<DynamicLanguage> Deserialize<T>(SerializationChunk serializationChunk,
+        T lionWebVersion, params Language[] dependentLanguages) where T : LionWebVersions =>
+        new LanguageDeserializer<T>(lionWebVersion).Deserialize(serializationChunk, dependentLanguages);
+
 }

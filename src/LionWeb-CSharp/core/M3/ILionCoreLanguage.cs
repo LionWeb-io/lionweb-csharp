@@ -129,11 +129,8 @@ public interface ILionCoreLanguage : Language
     Concept Reference { get; }
 }
 
-public interface ILionCoreLanguage<out TVersion, out TBuiltIns, out TM3> : ILionCoreLanguage,
-    ILionWebVersionUser<TVersion, TBuiltIns, TM3>
-    where TVersion : LionWebVersions
-    where TBuiltIns : IBuiltInsLanguage<TVersion, TBuiltIns, TM3>
-    where TM3 : ILionCoreLanguage<TVersion, TBuiltIns, TM3>;
+public interface ILionCoreLanguage<out TVersion> : ILionCoreLanguage, ILionWebVersionUser<TVersion>
+    where TVersion : LionWebVersions;
 
 /// <inheritdoc cref="ILionCoreLanguage"/>
 [Obsolete("Use ILionCoreLanguage instead")]

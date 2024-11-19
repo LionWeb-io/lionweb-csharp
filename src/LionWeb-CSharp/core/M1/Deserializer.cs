@@ -23,14 +23,21 @@ using Serialization;
 using CompressedContainment = (CompressedMetaPointer, List<CompressedId>);
 using CompressedReference = (CompressedMetaPointer, List<(CompressedId?, string?)>);
 
+public interface IDeserializerDelegates;
+
+public interface IDeserializerDelegates<TVersion> : IDeserializerDelegates where TVersion : LionWebVersions
+{
+    // IDeserializerDelegates<T> Create<T>() where T : TVersion, new(); 
+    
+    object? ConvertPrimitiveType(DeserializerBase<TVersion> self, IWritableNode node, Property property, string value);
+}
+
 /// <summary>
 /// Instances of this class can deserialize a <see cref="SerializationChunk"/> as a list of <see cref="IWritableNode"/>s that are root nodes.
 /// An instance is parametrized with a collection of <see cref="Language"/> definitions with a corresponding <see cref="INodeFactory"/>.
 /// </summary>
-public partial class Deserializer<TVersion, TBuiltIns, TM3> : DeserializerBase<IWritableNode, TVersion, TBuiltIns, TM3>
-    where TVersion: LionWebVersions
-    where TBuiltIns : IBuiltInsLanguage
-    where TM3 : ILionCoreLanguage
+public partial class Deserializer<TVersion> : DeserializerBase<IWritableNode, TVersion>
+    where TVersion : LionWebVersions
 {
     /// Some design principles of this class:
     /// 
@@ -52,4 +59,6 @@ public partial class Deserializer<TVersion, TBuiltIns, TM3> : DeserializerBase<I
     {
         RegisterInstantiatedLanguage(_builtIns, _builtIns.GetFactory());
     }
+
+    public required IDeserializerDelegates<TVersion> DeserializerDelegates { private get; init; }
 }

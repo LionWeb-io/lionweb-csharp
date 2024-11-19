@@ -29,6 +29,9 @@ using LionWeb.CSharp.Generator.Names;
 
 var lionWebVersion = LionWebVersions.Current;
 
+Whatever.CreateUser(new V1()).Run();
+return;
+
 void SerializeLanguagesLocally(string name, params Language[] languages)
 {
     JsonUtils.WriteNodesToStream(new FileStream($"chunks/localDefs/{name}.json", FileMode.Create),
@@ -41,8 +44,9 @@ SerializeLanguagesLocally("shapes", ShapesDefinition.Language);
 
 
 DynamicLanguage[] DeserializeExternalLanguage(string name, params Language[] dependentLanguages) =>
-    LanguageDeserializer.Deserialize(
+    ILanguageDeserializerExtensions.Deserialize(
         JsonUtils.ReadJsonFromString<SerializationChunk>(File.ReadAllText($"chunks/externalDefs/{name}.json")),
+        lionWebVersion,
         dependentLanguages
     ).ToArray();
 

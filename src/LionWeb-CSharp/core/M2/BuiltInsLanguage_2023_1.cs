@@ -19,7 +19,7 @@ namespace LionWeb.Core.M2;
 
 using M3;
 
-public interface IBuiltInsLanguage_2023_1 : IBuiltInsLanguage<LionWebVersions.Version2023_1, IBuiltInsLanguage_2023_1, ILionCoreLanguage_2023_1>
+public interface IBuiltInsLanguage_2023_1 : IBuiltInsLanguage<LionWebVersions.Version2023_1>
 {
     /// <summary>
     /// The built-in primitive type Json.
@@ -27,7 +27,7 @@ public interface IBuiltInsLanguage_2023_1 : IBuiltInsLanguage<LionWebVersions.Ve
     PrimitiveType Json { get; }
 }
 
-public sealed class BuiltInsLanguage_2023_1 : LanguageBase<BuiltInsFactory_2023_1, LionWebVersions.Version2023_1, IBuiltInsLanguage_2023_1, ILionCoreLanguage_2023_1>, IBuiltInsLanguage_2023_1 
+public sealed class BuiltInsLanguage_2023_1 : LanguageBase<BuiltInsFactory_2023_1, LionWebVersions.Version2023_1>, IBuiltInsLanguage_2023_1 
 {
     /// <summary>
     /// The definition of the LionCore built-ins language.

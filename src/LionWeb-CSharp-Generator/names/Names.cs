@@ -159,8 +159,9 @@ public partial class Names : INames
             return PredefinedType(Token(SyntaxKind.IntKeyword));
         if (_builtIns.String.EqualsIdentity(datatype))
             return PredefinedType(Token(SyntaxKind.StringKeyword));
-        if (_builtIns.Json.EqualsIdentity(datatype))
-            return PredefinedType(Token(SyntaxKind.StringKeyword));
+// TODO
+        // if (_builtIns.Json.EqualsIdentity(datatype))
+        //     return PredefinedType(Token(SyntaxKind.StringKeyword));
         if (datatype is Enumeration && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
         {
             return

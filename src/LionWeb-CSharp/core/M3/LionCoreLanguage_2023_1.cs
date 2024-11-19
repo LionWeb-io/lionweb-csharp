@@ -21,10 +21,10 @@ namespace LionWeb.Core.M3;
 
 using M2;
 
-public interface ILionCoreLanguage_2023_1 : ILionCoreLanguage<LionWebVersions.Version2023_1, IBuiltInsLanguage_2023_1, ILionCoreLanguage_2023_1>;
+public interface ILionCoreLanguage_2023_1 : ILionCoreLanguage<LionWebVersions.Version2023_1>;
 
 /// <inheritdoc cref="ILionCoreLanguage"/>
-public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_1, LionWebVersions.Version2023_1, IBuiltInsLanguage_2023_1, ILionCoreLanguage_2023_1>, ILionCoreLanguage_2023_1
+public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_1, LionWebVersions.Version2023_1>, ILionCoreLanguage_2023_1
 {
     /// <inheritdoc cref="ILionCoreLanguage.GetInstance"/>
     public static readonly ILionCoreLanguage_2023_1 Instance = new Lazy<LionCoreLanguage_2023_1>(() => new()).Value;

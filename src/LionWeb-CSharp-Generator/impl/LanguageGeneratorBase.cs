@@ -60,8 +60,9 @@ public abstract class LanguageGeneratorBase : GeneratorBase
             return ParseExpression("_builtIns.Boolean");
         if (entity.EqualsIdentity(_builtIns.Integer))
             return ParseExpression("_builtIns.Integer");
-        if (entity.EqualsIdentity(_builtIns.Json))
-            return ParseExpression("_builtIns.Json");
+        // TODO
+        // if (entity.EqualsIdentity(_builtIns.Json))
+        //     return ParseExpression("_builtIns.Json");
         if (entity.EqualsIdentity(_builtIns.String))
             return ParseExpression("_builtIns.String");
         if (entity.EqualsIdentity(_m3.IKeyed))

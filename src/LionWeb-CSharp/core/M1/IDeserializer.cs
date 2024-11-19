@@ -108,38 +108,20 @@ public class DeserializerBuilder
         return this;
     }
 
+    // var primitiveTypeConverter = _lionWebVersion switch
+    // {
+    //     LionWebVersions.Version2023_1 => PrimitiveTypeConverter_2023_1,
+    //     LionWebVersions.Version2024_1 => PrimitiveTypeConverter_2024_1,
+    //     _ => throw new UnsupportedVersionException(_lionWebVersion)
+    // };
+    //     
+    // IDeserializer result = _handler != null
+    //     ? new Deserializer(_lionWebVersion) { Handler = _handler, StoreUncompressedIds = _storeUncompressedIds, PrimitiveTypeConverter = primitiveTypeConverter}
+    //     : new Deserializer(_lionWebVersion) { StoreUncompressedIds = _storeUncompressedIds, PrimitiveTypeConverter = primitiveTypeConverter };
+
     public IDeserializer Build()
     {
-        IDeserializer result = _lionWebVersion switch
-        {
-            LionWebVersions.Version2023_1 v => _handler != null
-                ? new Deserializer<LionWebVersions.Version2023_1, IBuiltInsLanguage_2023_1, ILionCoreLanguage_2023_1>(v)
-                {
-                    Handler = _handler,
-                    StoreUncompressedIds = _storeUncompressedIds,
-                    PrimitiveTypeConverter = PrimitiveTypeConverter_2023_1
-                }
-                : new Deserializer<LionWebVersions.Version2023_1, IBuiltInsLanguage_2023_1, ILionCoreLanguage_2023_1>(v)
-                {
-                    StoreUncompressedIds = _storeUncompressedIds,
-                    PrimitiveTypeConverter = PrimitiveTypeConverter_2023_1
-                },
-            LionWebVersions.Version2024_1 v => _handler != null
-                ? new Deserializer<LionWebVersions.Version2024_1, IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>(v)
-                {
-                    Handler = _handler,
-                    StoreUncompressedIds = _storeUncompressedIds,
-                    PrimitiveTypeConverter = PrimitiveTypeConverter_2024_1
-                }
-                : new Deserializer<LionWebVersions.Version2024_1, IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>(v)
-                {
-                    StoreUncompressedIds = _storeUncompressedIds,
-                    PrimitiveTypeConverter = PrimitiveTypeConverter_2024_1
-                },
-            _ => throw new UnsupportedVersionException(_lionWebVersion)
-
-        };
-
+        IDeserializer result = CreateDeserializer(_lionWebVersion);
         foreach ((Language language, INodeFactory factory) in _languages)
         {
             result.RegisterInstantiatedLanguage(language, factory);
@@ -150,41 +132,79 @@ public class DeserializerBuilder
         return result;
     }
 
-    private object? PrimitiveTypeConverter_2023_1(DeserializerBase<LionWebVersions.Version2023_1, IBuiltInsLanguage_2023_1, ILionCoreLanguage_2023_1> self, IWritableNode node, Property property,
-        string value)
+    private IDeserializer CreateDeserializer<T>(T lionWebVersion) where T : LionWebVersions
     {
-        CompressedId compressedId = self.Compress(node.GetId());
-        return property.Type switch
+        IDeserializer result = Create(lionWebVersion,
+            _storeUncompressedIds, _handler);
+        return result;
+    }
+
+    public static Deserializer<TVersion> Create<TVersion>(TVersion lionWebVersion, bool storeUncompressedIds,
+        IDeserializerHandler? handler = null) where TVersion : LionWebVersions
+    {
+        object deserializerDelegates = (lionWebVersion switch
         {
-            var b when b == BuiltInsLanguage_2023_1.Instance.Boolean => bool.TryParse(value, out var result)
-                ? result
-                : self.Handler.InvalidPropertyValue<bool>(value, property, compressedId),
-            var i when i == BuiltInsLanguage_2023_1.Instance.Integer => int.TryParse(value, out var result)
-                ? result
-                : self.Handler.InvalidPropertyValue<int>(value, property, compressedId),
-            // leave both a String and JSON value as a string:
-            var s when s == BuiltInsLanguage_2023_1.Instance.String ||
-                       s == BuiltInsLanguage_2023_1.Instance.Json => value,
-            _ => self.Handler.UnknownDatatype(property, value, node)
+            LionWebVersions.Version2023_1 v => new DeserializerDelegates_2023_1(),
+
+            LionWebVersions.Version2024_1 v => new DeserializerDelegates_2024_1(),
+            _ => throw new UnsupportedVersionException(lionWebVersion)
+        });
+        if (handler == null)
+            return new Deserializer<TVersion>(lionWebVersion)
+            {
+                DeserializerDelegates = (IDeserializerDelegates<TVersion>)(object)deserializerDelegates, StoreUncompressedIds = storeUncompressedIds
+            };
+        return new Deserializer<TVersion>(lionWebVersion)
+        {
+            DeserializerDelegates = (IDeserializerDelegates<TVersion>)(object)deserializerDelegates,
+            StoreUncompressedIds = storeUncompressedIds,
+            Handler = handler
         };
     }
 
-    private object? PrimitiveTypeConverter_2024_1(DeserializerBase<LionWebVersions.Version2024_1, IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1> self, IWritableNode node, Property property,
-        string value)
+    private class DeserializerDelegates_2023_1 : IDeserializerDelegates<LionWebVersions.IVersion2023_1>
     {
-        CompressedId compressedId = self.Compress(node.GetId());
-        return property.Type switch
+        // public IDeserializerDelegates<T> Create<T>() where T : LionWebVersions.IVersion2023_1, new() => new DeserializerDelegates_2023_1();
+
+        public object? ConvertPrimitiveType(DeserializerBase<LionWebVersions.IVersion2023_1> self, IWritableNode node,
+            Property property, string value)
         {
-            var b when b == BuiltInsLanguage_2024_1.Instance.Boolean => bool.TryParse(value, out var result)
-                ? result
-                : self.Handler.InvalidPropertyValue<bool>(value, property, compressedId),
-            var i when i == BuiltInsLanguage_2024_1.Instance.Integer => int.TryParse(value, out var result)
-                ? result
-                : self.Handler.InvalidPropertyValue<int>(value, property, compressedId),
-            // leave a String value as a string:
-            var s when s == BuiltInsLanguage_2024_1.Instance.String => value,
-            _ => self.Handler.UnknownDatatype(property, value, node)
-        };
+            CompressedId compressedId = self.Compress(node.GetId());
+            return property.Type switch
+            {
+                var b when b == BuiltInsLanguage_2023_1.Instance.Boolean => bool.TryParse(value, out var result)
+                    ? result
+                    : self.Handler.InvalidPropertyValue<bool>(value, property, compressedId),
+                var i when i == BuiltInsLanguage_2023_1.Instance.Integer => int.TryParse(value, out var result)
+                    ? result
+                    : self.Handler.InvalidPropertyValue<int>(value, property, compressedId),
+                // leave both a String and JSON value as a string:
+                var s when s == BuiltInsLanguage_2023_1.Instance.String ||
+                           s == BuiltInsLanguage_2023_1.Instance.Json => value,
+                _ => self.Handler.UnknownDatatype(property, value, node)
+            };
+        }
+    }
+
+    private class DeserializerDelegates_2024_1 : IDeserializerDelegates<LionWebVersions.IVersion2024_1>
+    {
+        public object? ConvertPrimitiveType(DeserializerBase<LionWebVersions.IVersion2024_1> self, IWritableNode node,
+            Property property, string value)
+        {
+            CompressedId compressedId = self.Compress(node.GetId());
+            return property.Type switch
+            {
+                var b when b == BuiltInsLanguage_2024_1.Instance.Boolean => bool.TryParse(value, out var result)
+                    ? result
+                    : self.Handler.InvalidPropertyValue<bool>(value, property, compressedId),
+                var i when i == BuiltInsLanguage_2024_1.Instance.Integer => int.TryParse(value, out var result)
+                    ? result
+                    : self.Handler.InvalidPropertyValue<int>(value, property, compressedId),
+                // leave a String value as a string:
+                var s when s == BuiltInsLanguage_2024_1.Instance.String => value,
+                _ => self.Handler.UnknownDatatype(property, value, node)
+            };
+        }
     }
 }
 

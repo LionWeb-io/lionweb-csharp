@@ -28,7 +28,7 @@ using Serialization;
 /// The generic deserializer isn't aware of the LionCore M3-types (and their idiosyncrasies),
 /// so that can't be used.
 /// </summary>
-public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILanguageDeserializer
+public partial class LanguageDeserializer<TVersion> : DeserializerBase<IReadableNode, TVersion>, ILanguageDeserializer where TVersion : LionWebVersions
 {
     private readonly Dictionary<CompressedId, SerializedNode> _serializedNodesById = new();
 
@@ -45,7 +45,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     /// <param name="dependentLanguages">Referred languages.</param>
     /// 
     /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
-    public LanguageDeserializer(LionWebVersions lionWebVersion, bool preloadLionCoreLanguage = true) : base(
+    public LanguageDeserializer(TVersion lionWebVersion, bool preloadLionCoreLanguage = true) : base(
         lionWebVersion)
     {
         RegisterDependentLanguage(_builtIns);
@@ -53,17 +53,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
         if (preloadLionCoreLanguage)
             RegisterDependentLanguage(_m3);
     }
-
-    /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
-    public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
-        params Language[] dependentLanguages) =>
-        Deserialize(serializationChunk, LionWebVersions.Current, dependentLanguages);
-
-    /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
-    public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
-        LionWebVersions lionWebVersion, params Language[] dependentLanguages) =>
-        new LanguageDeserializer(lionWebVersion).Deserialize(serializationChunk, dependentLanguages);
-
+    
     /// <inheritdoc />
     public override void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
     {

@@ -21,10 +21,8 @@ using M2;
 using M3;
 using Serialization;
 
-public abstract class DeserializerBase<TVersion, TBuiltIns, TM3> : IDeserializer, ILionWebVersionUser<TVersion, TBuiltIns, TM3>
+public abstract class DeserializerBase<TVersion> : IDeserializer, ILionWebVersionUser<TVersion>
 where TVersion: LionWebVersions
-where TBuiltIns : IBuiltInsLanguage
-where TM3 : ILionCoreLanguage
 {
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
@@ -39,9 +37,7 @@ where TM3 : ILionCoreLanguage
         _builtIns = lionWebVersion.BuiltIns;
     }
 
-    TBuiltIns ILionWebVersionUser<TVersion, TBuiltIns, TM3>.UBuiltIns => (TBuiltIns)_builtIns;
-    TM3 ILionWebVersionUser<TVersion, TBuiltIns, TM3>.UM3 => (TM3)_m3;
-    TVersion ILionWebVersionUser<TVersion, TBuiltIns, TM3>.ULionWebVersion => (TVersion)LionWebVersion;
+    TVersion ILionWebVersionUser<TVersion>.ULionWebVersion => (TVersion)LionWebVersion;
 
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; }
@@ -93,12 +89,10 @@ where TM3 : ILionCoreLanguage
         _dependentNodesById.ContainsKey(compressedId);
 }
 
-public abstract class DeserializerBase<T, TVersion, TBuiltIns, TM3>(TVersion lionWebVersion)
-    : DeserializerBase<TVersion, TBuiltIns, TM3>(lionWebVersion), IDeserializer<T>
+public abstract class DeserializerBase<T, TVersion>(TVersion lionWebVersion)
+    : DeserializerBase<TVersion>(lionWebVersion), IDeserializer<T>
     where T : IReadableNode
     where TVersion: LionWebVersions
-    where TBuiltIns : IBuiltInsLanguage
-    where TM3 : ILionCoreLanguage
 {
     protected readonly Dictionary<CompressedId, T> _deserializedNodesById = new();
 
