@@ -23,7 +23,7 @@ using LionWeb.Core.M3;
 
 public class TestLanguagesDefinitions
 {
-    private static readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     public readonly Language ALang;
     public readonly Language BLang;

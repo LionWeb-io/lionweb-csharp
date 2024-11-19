@@ -77,7 +77,7 @@ public sealed class BuiltInsLanguage_2023_1 : LanguageBase<BuiltInsFactory_2023_
     public override string Key => LionCoreBuiltInsIdAndKey;
 
     /// <inheritdoc />
-    public override string Version => ReleaseVersion.Current;
+    public override string Version => LionWebVersion.VersionString;
 
     /// <inheritdoc />
     public override IReadOnlyList<LanguageEntity> Entities

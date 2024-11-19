@@ -60,7 +60,7 @@ public static class JsonUtils
     {
         object data = new LazySerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = serializer.LionWebVersion.VersionString,
             Nodes = serializer.Serialize(nodes),
             Languages = serializer.UsedLanguages
         };
@@ -79,7 +79,7 @@ public static class JsonUtils
                 case JsonTokenType.PropertyName when streamReader.GetString() == "serializationFormatVersion":
                     await Advance();
                     string? version = streamReader.GetString();
-                    if (version != ReleaseVersion.Current)
+                    if (version != deserializer.LionWebVersion.VersionString)
                     {
                     }
 

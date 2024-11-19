@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
+using M2;
 using Serialization;
 
 public interface ISerializer
@@ -37,6 +38,8 @@ public interface ISerializer
     /// Lazily populated while processing <i>allNodes</i> of <see cref="Serialize"/>.
     /// </remarks>
     IEnumerable<SerializedLanguageReference> UsedLanguages { get; }
+    
+    LionWebVersions LionWebVersion { get; }
 }
 
 public static class ISerializerExtensions
@@ -51,7 +54,7 @@ public static class ISerializerExtensions
         SerializedNode[] serializedNodes = serializer.Serialize(allNodes).ToArray();
         return new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = serializer.LionWebVersion.VersionString,
             Languages = serializer.UsedLanguages.ToArray(),
             Nodes = serializedNodes
         };

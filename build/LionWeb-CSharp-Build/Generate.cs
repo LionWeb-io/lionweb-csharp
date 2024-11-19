@@ -26,7 +26,7 @@ using LionWeb.Core.Serialization;
 using LionWeb.CSharp.Generator;
 using LionWeb.CSharp.Generator.Names;
 
-var lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+var lionWebVersion = LionWebVersions.Current;
 
 void SerializeLanguagesLocally(string name, params Language[] languages)
 {
@@ -34,7 +34,7 @@ void SerializeLanguagesLocally(string name, params Language[] languages)
         new Serializer(lionWebVersion).SerializeDescendants(languages));
 }
 
-SerializeLanguagesLocally("lioncore", lionWebVersion.GetLionCore());
+SerializeLanguagesLocally("lioncore", lionWebVersion.LionCore);
 SerializeLanguagesLocally("shapes", ShapesDefinition.Language);
 
 

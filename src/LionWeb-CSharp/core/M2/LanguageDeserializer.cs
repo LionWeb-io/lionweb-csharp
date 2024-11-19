@@ -137,7 +137,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
                 Key = key, Name = name
             },
             var s when s.Matches(_m3.Interface) => new DynamicInterface(id, null) { Key = key, Name = name },
-            var s when s.Matches(_m3.Language) => new DynamicLanguage(id, _lionWebVersion)
+            var s when s.Matches(_m3.Language) => new DynamicLanguage(id, LionWebVersion)
             {
                 Key = key, Name = name, Version = LookupString(_m3.Language_version)
             },

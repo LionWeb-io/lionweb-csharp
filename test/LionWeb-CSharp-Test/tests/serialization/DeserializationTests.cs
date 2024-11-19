@@ -38,7 +38,7 @@ public class DeserializationTests
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -74,7 +74,7 @@ public class DeserializationTests
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -116,7 +116,7 @@ public class DeserializationTests
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -188,7 +188,7 @@ public class DeserializationTests
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -238,7 +238,7 @@ public class DeserializationTests
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -308,7 +308,7 @@ public class DeserializationTests
 
         var chunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "lang", Version = "1" },
@@ -392,7 +392,7 @@ public class DeserializationTests
 
         var chunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "lang", Version = v1.Version },

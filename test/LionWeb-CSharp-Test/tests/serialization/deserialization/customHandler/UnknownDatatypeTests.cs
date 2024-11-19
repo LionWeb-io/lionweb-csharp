@@ -44,7 +44,7 @@ public class UnknownDatatypeTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-myLang", Version = "1" }
@@ -96,7 +96,7 @@ public class UnknownDatatypeTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-myLang", Version = "1" }

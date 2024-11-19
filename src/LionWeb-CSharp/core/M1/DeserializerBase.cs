@@ -23,7 +23,6 @@ using Serialization;
 
 public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadableNode
 {
-    protected readonly LionWebVersions _lionWebVersion;
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
 
@@ -33,10 +32,13 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadable
 
     protected DeserializerBase(LionWebVersions lionWebVersion)
     {
-        _lionWebVersion = lionWebVersion;
+        LionWebVersion = lionWebVersion;
         _m3 = lionWebVersion.LionCore;
         _builtIns = lionWebVersion.BuiltIns;
     }
+
+    /// <inheritdoc />
+    public LionWebVersions LionWebVersion { get; }
 
     /// <inheritdoc />
     public IDeserializerHandler Handler

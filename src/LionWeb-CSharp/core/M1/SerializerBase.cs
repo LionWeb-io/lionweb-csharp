@@ -27,7 +27,6 @@ using Utilities;
 
 public abstract class SerializerBase : ISerializer
 {
-    private readonly LionWebVersions _lionWebVersion;
     private readonly ILionCoreLanguage _m3;
     private readonly IBuiltInsLanguage _builtIns;
 
@@ -35,13 +34,16 @@ public abstract class SerializerBase : ISerializer
 
     protected SerializerBase(LionWebVersions lionWebVersion)
     {
-        _lionWebVersion = lionWebVersion;
+        LionWebVersion = lionWebVersion;
         _m3 = lionWebVersion.LionCore;
         _builtIns = lionWebVersion.BuiltIns;
     }
 
     /// <inheritdoc />
     public ISerializerHandler Handler { get; init; } = new SerializerExceptionHandler();
+
+    /// <inheritdoc />
+    public LionWebVersions LionWebVersion { get; }
 
     /// <inheritdoc />
     public IEnumerable<SerializedLanguageReference> UsedLanguages =>

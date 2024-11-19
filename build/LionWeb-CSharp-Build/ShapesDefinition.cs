@@ -28,7 +28,7 @@ using LionWeb.Core.M3;
 /// </summary>
 public static class ShapesDefinition
 {
-    private static readonly LionWebVersions _lionWebVersion = LionWebVersionsExtensions.GetCurrent();
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     /// <summary>
     /// Definition of the Shapes language.
@@ -40,7 +40,7 @@ public static class ShapesDefinition
 
     static ShapesDefinition()
     {
-        var builtIns = _lionWebVersion.GetBuiltIns();
+        var builtIns = _lionWebVersion.BuiltIns;
 
         var Circle = Language.Concept("id-Circle", "key-Circle", "Circle");
         var Coord = Language.Concept("id-Coord", "key-Coord", "Coord");

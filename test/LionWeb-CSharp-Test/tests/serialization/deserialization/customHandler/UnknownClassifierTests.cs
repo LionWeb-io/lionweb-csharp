@@ -47,7 +47,7 @@ public class UnknownClassifierTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages = [new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }],
             Nodes =
             [
@@ -86,7 +86,7 @@ public class UnknownClassifierTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages = [new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }],
             Nodes =
             [
@@ -123,7 +123,7 @@ public class UnknownClassifierTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages = [new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }],
             Nodes =
             [

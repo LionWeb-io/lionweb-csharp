@@ -21,7 +21,7 @@ using M3;
 
 public abstract class LionWebVersions
 {
-    public abstract string Version { get; }
+    public abstract string VersionString { get; }
     public abstract IBuiltInsLanguage BuiltIns { get; }
     public abstract ILionCoreLanguage LionCore { get; }
 
@@ -36,7 +36,7 @@ public abstract class LionWebVersions
         
         private Version2023_1() {}
         
-        public override string Version { get; } = "2023.1";
+        public override string VersionString { get; } = "2023.1";
 
         public override IBuiltInsLanguage BuiltIns =>
             new Lazy<IBuiltInsLanguage>(() => BuiltInsLanguage_2023_1.Instance).Value;
@@ -51,7 +51,7 @@ public abstract class LionWebVersions
         internal static readonly Version2024_1 Instance = new(); 
         private Version2024_1() {}
         
-        public override string Version { get; } = "2024.1";
+        public override string VersionString { get; } = "2024.1";
 
         public override IBuiltInsLanguage BuiltIns =>
             new Lazy<IBuiltInsLanguage>(() => BuiltInsLanguage_2024_1.Instance).Value;

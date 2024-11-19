@@ -24,6 +24,8 @@ using Serialization;
 public interface IDeserializer
 {
     IDeserializerHandler Handler { get; init; }
+    
+    LionWebVersions LionWebVersion { get; }
 
     void RegisterInstantiatedLanguage(Language language, INodeFactory factory);
 

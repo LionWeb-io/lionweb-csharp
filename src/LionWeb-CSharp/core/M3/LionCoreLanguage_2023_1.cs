@@ -360,7 +360,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
     public override string Key => _key;
 
     /// <inheritdoc />
-    public override string Version => ReleaseVersion.Current;
+    public override string Version => LionWebVersion.VersionString;
 
     /// <inheritdoc />
     public override IReadOnlyList<LanguageEntity> Entities
