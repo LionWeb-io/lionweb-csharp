@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
+using M2;
 using M3;
 using Serialization;
 
@@ -40,6 +41,16 @@ public interface IDeserializerHandler
     /// <remarks>For both <paramref name="existingNode"/> and <paramref name="node"/>, only node id and properties are populated -- no other features.</remarks>
     /// <remarks>if returned replacement node id is not unique, deserializer keeps calling this method, might lead to an infinite loop </remarks>
     string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node);
+
+    /// <summary>
+    /// Cannot resolve <paramref name="metaPointer"/>, but know about at least one language
+    /// with <see cref="IKeyed.Key"/> <paramref name="metaPointer"/>.<see cref="CompressedMetaPointer.Language"/>.
+    /// </summary>
+    /// <param name="metaPointer">Unresolvable meta-pointer.</param>
+    /// <param name="languages">Languages with same key as <paramref name="metaPointer"/>.</param>
+    /// <typeparam name="T">Kind of language element we're looking for.</typeparam>
+    /// <returns>Resolved <paramref name="metaPointer"/>, typically from one of <paramref name="languages"/>.</returns>
+    T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed;
 
     #region features
 
@@ -209,6 +220,58 @@ public interface IDeserializerHandler
     #endregion
 }
 
+public static class DeserializerHandlerSelectOtherLanguageVersion
+{
+    /// <inheritdoc cref="SelectVersion{T}(LionWeb.Core.M1.CompressedMetaPointer,System.Collections.Generic.List{LionWeb.Core.M3.Language},Comparer{Language})"/>
+    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+        where T : class, IKeyed =>
+        SelectVersion<T>(metaPointer, languages, Comparer<Language>.Create(DefaultLanguageComparer));
+
+    /// <summary>
+    /// Chooses the <typeparamref name="T"/> with the same key as <paramref name="metaPointer"/>
+    /// from the <paramref name="languages">language</paramref> with the
+    /// <paramref name="languageComparer">first</paramref> version.
+    /// </summary>
+    /// <param name="metaPointer">Unresolvable meta-pointer.</param>
+    /// <param name="languages">Languages with same key as <paramref name="metaPointer"/>.</param>
+    /// <param name="languageComparer">Comparer to select the preferred language.
+    /// Make sure to invert the result for choosing the latest version.</param>
+    /// <typeparam name="T">Kind of language element we're looking for.</typeparam>
+    public static T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages,
+        Comparer<Language> languageComparer)
+        where T : class, IKeyed
+    {
+        IEnumerable<IKeyed> keyed = typeof(T) switch
+        {
+            { } f when f == typeof(Feature) => languages
+                .SelectMany(l => l.Entities.OfType<Classifier>())
+                .SelectMany(c => c.Features),
+            { } l when l == typeof(EnumerationLiteral) => languages
+                .SelectMany(l => l.Entities.OfType<Enumeration>())
+                .SelectMany(e => e.Literals),
+            _ => languages
+                .SelectMany(l => l.Entities.OfType<T>())
+        };
+
+        var candidates = keyed
+            .Where(k => CompressedId.Create(k.Key, false).Equals(metaPointer.Key))
+            .OrderBy(f => f.GetLanguage(), languageComparer);
+
+        return candidates
+            .FirstOrDefault() as T;
+    }
+
+    public static int DefaultLanguageComparer(Language a, Language b)
+    {
+        if (Version.TryParse(a.Version, out Version? aVersion) && Version.TryParse(b.Version, out Version? bVersion))
+        {
+            return -aVersion.CompareTo(bVersion);
+        }
+
+        return -string.Compare(a.Version, b.Version, StringComparison.Ordinal);
+    }
+}
+
 public class DeserializerExceptionHandler : IDeserializerHandler
 {
     /// <inheritdoc />
@@ -218,6 +281,13 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     /// <inheritdoc />
     public virtual string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
         throw new DeserializerException($"Duplicate node with id={existingNode.GetId()}");
+
+    /// <inheritdoc />
+    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+        where T : class, IKeyed =>
+        // TODO think about correct handling
+        // throw new DeserializerException($"Unknown meta-pointer {metaPointer}");
+        null;
 
     #region features
 
@@ -337,6 +407,14 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     public string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node)
     {
         LogMessage($"Duplicate node with id={existingNode.GetId()}");
+        return null;
+    }
+
+    /// <inheritdoc />
+    public virtual T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages)
+        where T : class, IKeyed
+    {
+        LogMessage($"Unknown meta-pointer {metaPointer}");
         return null;
     }
 

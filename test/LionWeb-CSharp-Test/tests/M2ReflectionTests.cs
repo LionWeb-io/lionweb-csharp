@@ -15,6 +15,8 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable InconsistentNaming
+
 namespace LionWeb.Core.M3.Test;
 
 using M2;
@@ -22,45 +24,49 @@ using M2;
 [TestClass]
 public class M2ReflectionTests
 {
-    private static Classifier Concept = M3Language.Instance.Concept;
+    private static readonly ILionCoreLanguage _m3 = LionCoreLanguage_2023_1.Instance;
+    private static readonly BuiltInsLanguage_2023_1 _builtIns = BuiltInsLanguage_2023_1.Instance;
 
-    private static Feature INamedName = BuiltInsLanguage.Instance.INamed_name;
-    private static Feature IKeyedKey = M3Language.Instance.IKeyed_key;
+    private static Classifier Concept = _m3.Concept;
 
-    private static Feature LanguageVersion = M3Language.Instance.Language_version;
+    private static Feature INamedName = _builtIns.INamed_name;
+    private static Feature IKeyedKey = _m3.IKeyed_key;
 
-    private static Feature LanguageEntities = M3Language.Instance.Language_entities;
+    private static Feature LanguageVersion = _m3.Language_version;
 
-    private static Feature LanguageDependsOn = M3Language.Instance.Language_dependsOn;
+    private static Feature LanguageEntities = _m3.Language_entities;
 
-    private static Feature ClassifierFeatures = M3Language.Instance.Classifier_features;
+    private static Feature LanguageDependsOn = _m3.Language_dependsOn;
 
-    private static Feature AnnotationAnnotates = M3Language.Instance.Annotation_annotates;
+    private static Feature ClassifierFeatures = _m3.Classifier_features;
 
-    private static Feature AnnotationExtends = M3Language.Instance.Annotation_extends;
+    private static Feature AnnotationAnnotates = _m3.Annotation_annotates;
 
-    private static Feature AnnotationImplements = M3Language.Instance.Annotation_implements;
+    private static Feature AnnotationExtends = _m3.Annotation_extends;
 
-    private static Feature ConceptAbstract = M3Language.Instance.Concept_abstract;
+    private static Feature AnnotationImplements = _m3.Annotation_implements;
 
-    private static Feature ConceptPartition = M3Language.Instance.Concept_partition;
+    private static Feature ConceptAbstract = _m3.Concept_abstract;
 
-    private static Feature ConceptExtends = M3Language.Instance.Concept_extends;
+    private static Feature ConceptPartition = _m3.Concept_partition;
 
-    private static Feature ConceptImplements = M3Language.Instance.Concept_implements;
+    private static Feature ConceptExtends = _m3.Concept_extends;
 
-    private static Feature FeatureOptional = M3Language.Instance.Feature_optional;
+    private static Feature ConceptImplements = _m3.Concept_implements;
 
-    private static Feature LinkMultiple = M3Language.Instance.Link_multiple;
+    private static Feature FeatureOptional = _m3.Feature_optional;
 
-    private static Feature LinkType = M3Language.Instance.Link_type;
+    private static Feature LinkMultiple = _m3.Link_multiple;
 
-    private static Feature EnumerationLiterals = M3Language.Instance.Enumeration_literals;
+    private static Feature LinkType = _m3.Link_type;
 
-    private static Feature InterfaceExtends = M3Language.Instance.Interface_extends;
+    private static Feature EnumerationLiterals = _m3.Enumeration_literals;
+
+    private static Feature InterfaceExtends = _m3.Interface_extends;
 
     DynamicLanguage shapesLang;
     DynamicLanguage enumLang;
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.v2023_1;
 
     DynamicLanguage lang { get => shapesLang; }
     DynamicAnnotation ann { get => shapesLang.ClassifierByKey("key-Documentation") as DynamicAnnotation; }
@@ -74,7 +80,12 @@ public class M2ReflectionTests
 
     DynamicEnumeration enm { get => enumLang.Enumerations().First() as DynamicEnumeration; }
     DynamicEnumerationLiteral enLit { get => enm.Literals.Last() as DynamicEnumerationLiteral; }
-    private DynamicPrimitiveType prim { get => shapesLang.Entities.First(e => e.Key == "key-Time") as DynamicPrimitiveType; }
+
+    private DynamicPrimitiveType prim
+    {
+        get => shapesLang.Entities.First(e => e.Key == "key-Time") as DynamicPrimitiveType;
+    }
+
     DynamicInterface iface { get => shapesLang.ClassifierByKey("key-IShape") as DynamicInterface; }
 
     [TestInitialize]
@@ -89,7 +100,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Language_Meta()
     {
-        Assert.AreEqual(M3Language.Instance.Language, lang.GetClassifier());
+        Assert.AreEqual(_m3.Language, lang.GetClassifier());
 
         CollectionAssert.AreEqual(new List<Feature>
             {
@@ -161,8 +172,10 @@ public class M2ReflectionTests
     [TestMethod]
     public void Language_Set_DependsOn()
     {
-        Language langA = new DynamicLanguage("langAId") { Version = "123", Key = "langAKey", Name = "LangA" };
-        Language langB = new DynamicLanguage("langBId") { Version = "23", Key = "langBKey", Name = "LangB" };
+        Language langA =
+            new DynamicLanguage("langAId", _lionWebVersion) { Version = "123", Key = "langAKey", Name = "LangA" };
+        Language langB =
+            new DynamicLanguage("langBId", _lionWebVersion) { Version = "23", Key = "langBKey", Name = "LangB" };
         lang.Set(LanguageDependsOn, new List<Language> { langA, langB });
         CollectionAssert.AreEqual(new List<Language> { langA, langB }, lang.DependsOn.ToList());
         lang.Set(LanguageDependsOn, Enumerable.Empty<Language>());
@@ -179,7 +192,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_Meta()
     {
-        Assert.AreEqual(M3Language.Instance.Annotation, ann.GetClassifier());
+        Assert.AreEqual(_m3.Annotation, ann.GetClassifier());
 
         CollectionAssert.AreEqual(new List<Feature>
             {
@@ -399,7 +412,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Containment_Meta()
     {
-        Assert.AreEqual(M3Language.Instance.Containment, cont.GetClassifier());
+        Assert.AreEqual(_m3.Containment, cont.GetClassifier());
 
         CollectionAssert.AreEqual(new List<Feature>
             {
@@ -482,7 +495,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Reference_Meta()
     {
-        Assert.AreEqual(M3Language.Instance.Reference, refe.GetClassifier());
+        Assert.AreEqual(_m3.Reference, refe.GetClassifier());
 
         var collection = refe.CollectAllSetFeatures().ToList();
         CollectionAssert.AreEqual(new List<Feature>
@@ -566,7 +579,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Enumeration_Meta()
     {
-        Assert.AreEqual(M3Language.Instance.Enumeration, enm.GetClassifier());
+        Assert.AreEqual(_m3.Enumeration, enm.GetClassifier());
 
         CollectionAssert.AreEqual(new List<Feature> { INamedName, IKeyedKey, EnumerationLiterals },
             enm.CollectAllSetFeatures().ToList());
@@ -624,7 +637,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void EnumerationLiteral_Meta()
     {
-        Assert.AreEqual(M3Language.Instance.EnumerationLiteral, enLit.GetClassifier());
+        Assert.AreEqual(_m3.EnumerationLiteral, enLit.GetClassifier());
 
         CollectionAssert.AreEqual(new List<Feature> { INamedName, IKeyedKey },
             enLit.CollectAllSetFeatures().ToList());
@@ -668,7 +681,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void PrimitiveType_Meta()
     {
-        Assert.AreEqual(M3Language.Instance.PrimitiveType, prim.GetClassifier());
+        Assert.AreEqual(_m3.PrimitiveType, prim.GetClassifier());
 
         CollectionAssert.AreEqual(new List<Feature> { INamedName, IKeyedKey },
             prim.CollectAllSetFeatures().ToList());
@@ -712,7 +725,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Interface_Meta()
     {
-        Assert.AreEqual(M3Language.Instance.Interface, iface.GetClassifier());
+        Assert.AreEqual(_m3.Interface, iface.GetClassifier());
 
         CollectionAssert.AreEqual(new List<Feature> { INamedName, IKeyedKey, ClassifierFeatures, InterfaceExtends },
             iface.CollectAllSetFeatures().ToList());

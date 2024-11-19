@@ -30,7 +30,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 public abstract class LanguageGeneratorBase : GeneratorBase
 {
     /// <inheritdoc cref="LanguageGeneratorBase"/>
-    protected LanguageGeneratorBase(INames names) : base(names) { }
+    protected LanguageGeneratorBase(INames names, LionWebVersions lionWebVersion) : base(names, lionWebVersion) { }
 
     /// <inheritdoc cref="INames.LanguageName"/>
     protected string LanguageName => _names.LanguageName(_names.Language);
@@ -51,28 +51,28 @@ public abstract class LanguageGeneratorBase : GeneratorBase
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.LanguageEntity)"/>
     protected ExpressionSyntax AsProperty(LanguageEntity entity)
     {
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.Node))
-            return ParseExpression("BuiltInsLanguage.Instance.Node");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.INamed))
-            return ParseExpression("BuiltInsLanguage.Instance.INamed");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.Boolean))
-            return ParseExpression("BuiltInsLanguage.Instance.Boolean");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.Integer))
-            return ParseExpression("BuiltInsLanguage.Instance.Integer");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.Json))
-            return ParseExpression("BuiltInsLanguage.Instance.Json");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.String))
-            return ParseExpression("BuiltInsLanguage.Instance.String");
-        if (entity.EqualsIdentity(M3Language.Instance.IKeyed))
-            return ParseExpression("M3Language.Instance.IKeyed");
-        if (entity.EqualsIdentity(M3Language.Instance.Classifier))
-            return ParseExpression("M3Language.Instance.Classifier");
-        if (entity.EqualsIdentity(M3Language.Instance.Concept))
-            return ParseExpression("M3Language.Instance.Concept");
-        if (entity.EqualsIdentity(M3Language.Instance.Annotation))
-            return ParseExpression("M3Language.Instance.Annotation");
-        if (entity.EqualsIdentity(M3Language.Instance.Interface))
-            return ParseExpression("M3Language.Instance.Interface");
+        if (entity.EqualsIdentity(_builtIns.Node))
+            return ParseExpression("_builtIns.Node");
+        if (entity.EqualsIdentity(_builtIns.INamed))
+            return ParseExpression("_builtIns.INamed");
+        if (entity.EqualsIdentity(_builtIns.Boolean))
+            return ParseExpression("_builtIns.Boolean");
+        if (entity.EqualsIdentity(_builtIns.Integer))
+            return ParseExpression("_builtIns.Integer");
+        if (entity.EqualsIdentity(_builtIns.Json))
+            return ParseExpression("_builtIns.Json");
+        if (entity.EqualsIdentity(_builtIns.String))
+            return ParseExpression("_builtIns.String");
+        if (entity.EqualsIdentity(_m3.IKeyed))
+            return ParseExpression("_m3.IKeyed");
+        if (entity.EqualsIdentity(_m3.Classifier))
+            return ParseExpression("_m3.Classifier");
+        if (entity.EqualsIdentity(_m3.Concept))
+            return ParseExpression("_m3.Concept");
+        if (entity.EqualsIdentity(_m3.Annotation))
+            return ParseExpression("_m3.Annotation");
+        if (entity.EqualsIdentity(_m3.Interface))
+            return ParseExpression("_m3.Interface");
 
         if (_names.NamespaceMappings.ContainsKey(entity.GetLanguage()))
         {

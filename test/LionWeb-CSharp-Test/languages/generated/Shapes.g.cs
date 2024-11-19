@@ -17,22 +17,22 @@ using Time = string;
 public class ShapesLanguage : LanguageBase<IShapesFactory>
 {
 	public static readonly ShapesLanguage Instance = new Lazy<ShapesLanguage>(() => new("id-Shapes")).Value;
-	public ShapesLanguage(string id) : base(id)
+	public ShapesLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
 		_circle = new(() => new ConceptBase<ShapesLanguage>("id-Circle", this) { Key = "key-Circle", Name = "Circle", Abstract = false, Partition = false, ExtendsLazy = new(() => Shape), FeaturesLazy = new(() => [Circle_r, Circle_center]) });
-		_circle_r = new(() => new PropertyBase<ShapesLanguage>("id-r", Circle, this) { Key = "key-r", Name = "r", Optional = false, Type = BuiltInsLanguage.Instance.Integer });
+		_circle_r = new(() => new PropertyBase<ShapesLanguage>("id-r", Circle, this) { Key = "key-r", Name = "r", Optional = false, Type = _builtIns.Integer });
 		_circle_center = new(() => new ContainmentBase<ShapesLanguage>("id-center", Circle, this) { Key = "key-center", Name = "center", Optional = false, Multiple = false, Type = Coord });
 		_coord = new(() => new ConceptBase<ShapesLanguage>("id-Coord", this) { Key = "key-Coord", Name = "Coord", Abstract = false, Partition = false, FeaturesLazy = new(() => [Coord_x, Coord_y, Coord_z]) });
-		_coord_x = new(() => new PropertyBase<ShapesLanguage>("id-x", Coord, this) { Key = "key-x", Name = "x", Optional = false, Type = BuiltInsLanguage.Instance.Integer });
-		_coord_y = new(() => new PropertyBase<ShapesLanguage>("id-y", Coord, this) { Key = "key-y", Name = "y", Optional = false, Type = BuiltInsLanguage.Instance.Integer });
-		_coord_z = new(() => new PropertyBase<ShapesLanguage>("id-z", Coord, this) { Key = "key-z", Name = "z", Optional = false, Type = BuiltInsLanguage.Instance.Integer });
+		_coord_x = new(() => new PropertyBase<ShapesLanguage>("id-x", Coord, this) { Key = "key-x", Name = "x", Optional = false, Type = _builtIns.Integer });
+		_coord_y = new(() => new PropertyBase<ShapesLanguage>("id-y", Coord, this) { Key = "key-y", Name = "y", Optional = false, Type = _builtIns.Integer });
+		_coord_z = new(() => new PropertyBase<ShapesLanguage>("id-z", Coord, this) { Key = "key-z", Name = "z", Optional = false, Type = _builtIns.Integer });
 		_geometry = new(() => new ConceptBase<ShapesLanguage>("id-Geometry", this) { Key = "key-Geometry", Name = "Geometry", Abstract = false, Partition = false, FeaturesLazy = new(() => [Geometry_shapes, Geometry_documentation]) });
 		_geometry_shapes = new(() => new ContainmentBase<ShapesLanguage>("id-shapes", Geometry, this) { Key = "key-shapes", Name = "shapes", Optional = true, Multiple = true, Type = IShape });
 		_geometry_documentation = new(() => new ContainmentBase<ShapesLanguage>("id-documentation", Geometry, this) { Key = "key-documentation", Name = "documentation", Optional = true, Multiple = false, Type = Documentation });
 		_iShape = new(() => new InterfaceBase<ShapesLanguage>("id-IShape", this) { Key = "key-IShape", Name = "IShape", FeaturesLazy = new(() => [IShape_uuid, IShape_fixpoints]) });
-		_iShape_uuid = new(() => new PropertyBase<ShapesLanguage>("id-uuid", IShape, this) { Key = "key-uuid", Name = "uuid", Optional = false, Type = BuiltInsLanguage.Instance.String });
+		_iShape_uuid = new(() => new PropertyBase<ShapesLanguage>("id-uuid", IShape, this) { Key = "key-uuid", Name = "uuid", Optional = false, Type = _builtIns.String });
 		_iShape_fixpoints = new(() => new ContainmentBase<ShapesLanguage>("id-fixpoints", IShape, this) { Key = "key-fixpoints", Name = "fixpoints", Optional = true, Multiple = true, Type = Coord });
-		_line = new(() => new ConceptBase<ShapesLanguage>("id-Line", this) { Key = "key-Line", Name = "Line", Abstract = false, Partition = false, ExtendsLazy = new(() => Shape), ImplementsLazy = new(() => [BuiltInsLanguage.Instance.INamed]), FeaturesLazy = new(() => [Line_start, Line_end]) });
+		_line = new(() => new ConceptBase<ShapesLanguage>("id-Line", this) { Key = "key-Line", Name = "Line", Abstract = false, Partition = false, ExtendsLazy = new(() => Shape), ImplementsLazy = new(() => [_builtIns.INamed]), FeaturesLazy = new(() => [Line_start, Line_end]) });
 		_line_start = new(() => new ContainmentBase<ShapesLanguage>("id-start", Line, this) { Key = "key-start", Name = "start", Optional = false, Multiple = false, Type = Coord });
 		_line_end = new(() => new ContainmentBase<ShapesLanguage>("id-end", Line, this) { Key = "key-end", Name = "end", Optional = false, Multiple = false, Type = Coord });
 		_offsetDuplicate = new(() => new ConceptBase<ShapesLanguage>("id-OffsetDuplicate", this) { Key = "key-OffsetDuplicate", Name = "OffsetDuplicate", Abstract = false, Partition = false, ExtendsLazy = new(() => Shape), FeaturesLazy = new(() => [OffsetDuplicate_offset, OffsetDuplicate_source, OffsetDuplicate_altSource, OffsetDuplicate_docs, OffsetDuplicate_secretDocs]) });
@@ -41,7 +41,7 @@ public class ShapesLanguage : LanguageBase<IShapesFactory>
 		_offsetDuplicate_altSource = new(() => new ReferenceBase<ShapesLanguage>("id-alt-source", OffsetDuplicate, this) { Key = "key-alt-source", Name = "altSource", Optional = true, Multiple = false, Type = Shape });
 		_offsetDuplicate_docs = new(() => new ContainmentBase<ShapesLanguage>("id-docs", OffsetDuplicate, this) { Key = "key-docs", Name = "docs", Optional = true, Multiple = false, Type = Documentation });
 		_offsetDuplicate_secretDocs = new(() => new ContainmentBase<ShapesLanguage>("id-secret-docs", OffsetDuplicate, this) { Key = "key-secret-docs", Name = "secretDocs", Optional = true, Multiple = false, Type = Documentation });
-		_shape = new(() => new ConceptBase<ShapesLanguage>("id-Shape", this) { Key = "key-Shape", Name = "Shape", Abstract = true, Partition = false, ImplementsLazy = new(() => [BuiltInsLanguage.Instance.INamed, IShape]), FeaturesLazy = new(() => [Shape_shapeDocs]) });
+		_shape = new(() => new ConceptBase<ShapesLanguage>("id-Shape", this) { Key = "key-Shape", Name = "Shape", Abstract = true, Partition = false, ImplementsLazy = new(() => [_builtIns.INamed, IShape]), FeaturesLazy = new(() => [Shape_shapeDocs]) });
 		_shape_shapeDocs = new(() => new ContainmentBase<ShapesLanguage>("id-shape-docs", Shape, this) { Key = "key-shape-docs", Name = "shapeDocs", Optional = true, Multiple = false, Type = Documentation });
 		_compositeShape = new(() => new ConceptBase<ShapesLanguage>("id-CompositeShape", this) { Key = "key-CompositeShape", Name = "CompositeShape", Abstract = false, Partition = false, ExtendsLazy = new(() => Shape), FeaturesLazy = new(() => [CompositeShape_parts, CompositeShape_disabledParts, CompositeShape_evilPart]) });
 		_compositeShape_parts = new(() => new ContainmentBase<ShapesLanguage>("id-parts", CompositeShape, this) { Key = "key-parts", Name = "parts", Optional = false, Multiple = true, Type = IShape });
@@ -50,9 +50,9 @@ public class ShapesLanguage : LanguageBase<IShapesFactory>
 		_referenceGeometry = new(() => new ConceptBase<ShapesLanguage>("id-ReferenceGeometry", this) { Key = "key-ReferenceGeometry", Name = "ReferenceGeometry", Abstract = false, Partition = false, FeaturesLazy = new(() => [ReferenceGeometry_shapes]) });
 		_referenceGeometry_shapes = new(() => new ReferenceBase<ShapesLanguage>("id-shape-references", ReferenceGeometry, this) { Key = "key-shapes-references", Name = "shapes", Optional = true, Multiple = true, Type = IShape });
 		_documentation = new(() => new AnnotationBase<ShapesLanguage>("id-Documentation", this) { Key = "key-Documentation", Name = "Documentation", AnnotatesLazy = new(() => Shape), FeaturesLazy = new(() => [Documentation_text, Documentation_technical]) });
-		_documentation_text = new(() => new PropertyBase<ShapesLanguage>("id-text", Documentation, this) { Key = "key-text", Name = "text", Optional = true, Type = BuiltInsLanguage.Instance.String });
-		_documentation_technical = new(() => new PropertyBase<ShapesLanguage>("id-technical", Documentation, this) { Key = "key-technical", Name = "technical", Optional = true, Type = BuiltInsLanguage.Instance.Boolean });
-		_billOfMaterials = new(() => new AnnotationBase<ShapesLanguage>("id-BillOfMaterials", this) { Key = "key-BillOfMaterials", Name = "BillOfMaterials", AnnotatesLazy = new(() => BuiltInsLanguage.Instance.Node), FeaturesLazy = new(() => [BillOfMaterials_materials, BillOfMaterials_groups, BillOfMaterials_altGroups, BillOfMaterials_defaultGroup]) });
+		_documentation_text = new(() => new PropertyBase<ShapesLanguage>("id-text", Documentation, this) { Key = "key-text", Name = "text", Optional = true, Type = _builtIns.String });
+		_documentation_technical = new(() => new PropertyBase<ShapesLanguage>("id-technical", Documentation, this) { Key = "key-technical", Name = "technical", Optional = true, Type = _builtIns.Boolean });
+		_billOfMaterials = new(() => new AnnotationBase<ShapesLanguage>("id-BillOfMaterials", this) { Key = "key-BillOfMaterials", Name = "BillOfMaterials", AnnotatesLazy = new(() => _builtIns.Node), FeaturesLazy = new(() => [BillOfMaterials_materials, BillOfMaterials_groups, BillOfMaterials_altGroups, BillOfMaterials_defaultGroup]) });
 		_billOfMaterials_materials = new(() => new ReferenceBase<ShapesLanguage>("id-materials", BillOfMaterials, this) { Key = "key-materials", Name = "materials", Optional = true, Multiple = true, Type = IShape });
 		_billOfMaterials_groups = new(() => new ContainmentBase<ShapesLanguage>("id-groups", BillOfMaterials, this) { Key = "key-groups", Name = "groups", Optional = true, Multiple = true, Type = MaterialGroup });
 		_billOfMaterials_altGroups = new(() => new ContainmentBase<ShapesLanguage>("id-alt-groups", BillOfMaterials, this) { Key = "key-alt-groups", Name = "altGroups", Optional = true, Multiple = true, Type = MaterialGroup });
@@ -1143,27 +1143,8 @@ public partial class OffsetDuplicate : Shape
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Shape")]
-public abstract partial class Shape : NodeBase, INamedWritable, IShape
+public abstract partial class Shape : NodeBase, IShape, INamedWritable
 {
-	private string? _name = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(BuiltInsLanguage), Key = "LionCore-builtins-INamed-name")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Name { get => _name ?? throw new UnsetFeatureException(BuiltInsLanguage.Instance.INamed_name); set => SetName(value); }
-/// <remarks>Required Property</remarks>
-/// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value) => SetName(value);
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Shape SetName(string value)
-	{
-		AssureNotNull(value, BuiltInsLanguage.Instance.INamed_name);
-		_name = value;
-		return this;
-	}
-
 	private string? _uuid = null;
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Uuid has not been set</exception>
@@ -1217,6 +1198,25 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 		return this;
 	}
 
+	private string? _name = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LionWeb.Core.M2.BuiltInsLanguage_2023_1), Key = "LionCore-builtins-INamed-name")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Name { get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name); set => SetName(value); }
+/// <remarks>Required Property</remarks>
+/// <exception cref="InvalidValueException">If set to null</exception>
+ INamedWritable INamedWritable.SetName(string value) => SetName(value);
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Shape SetName(string value)
+	{
+		AssureNotNull(value, _builtIns.INamed_name);
+		_name = value;
+		return this;
+	}
+
 	private Documentation? _shapeDocs = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shape-docs")]
@@ -1243,12 +1243,6 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
-		if (BuiltInsLanguage.Instance.INamed_name.EqualsIdentity(feature))
-		{
-			result = Name;
-			return true;
-		}
-
 		if (ShapesLanguage.Instance.IShape_uuid.EqualsIdentity(feature))
 		{
 			result = Uuid;
@@ -1258,6 +1252,12 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature))
 		{
 			result = Fixpoints;
+			return true;
+		}
+
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			result = Name;
 			return true;
 		}
 
@@ -1275,17 +1275,6 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 	{
 		if (base.SetInternal(feature, value))
 			return true;
-		if (BuiltInsLanguage.Instance.INamed_name.EqualsIdentity(feature))
-		{
-			if (value is string v)
-			{
-				Name = v;
-				return true;
-			}
-
-			throw new InvalidValueException(feature, value);
-		}
-
 		if (ShapesLanguage.Instance.IShape_uuid.EqualsIdentity(feature))
 		{
 			if (value is string v)
@@ -1303,6 +1292,17 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 			RemoveSelfParent(_fixpoints.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
 			AddFixpoints(enumerable);
 			return true;
+		}
+
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
+		{
+			if (value is string v)
+			{
+				Name = v;
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
 		}
 
 		if (ShapesLanguage.Instance.Shape_shapeDocs.EqualsIdentity(feature))
@@ -1323,12 +1323,12 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		var result = base.CollectAllSetFeatures().ToList();
-		if (_name != default)
-			result.Add(BuiltInsLanguage.Instance.INamed_name);
 		if (_uuid != default)
 			result.Add(ShapesLanguage.Instance.IShape_uuid);
 		if (_fixpoints.Count != 0)
 			result.Add(ShapesLanguage.Instance.IShape_fixpoints);
+		if (_name != default)
+			result.Add(_builtIns.INamed_name);
 		if (_shapeDocs != default)
 			result.Add(ShapesLanguage.Instance.Shape_shapeDocs);
 		return result;

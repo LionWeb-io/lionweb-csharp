@@ -30,7 +30,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 // use https://roslynquoter.azurewebsites.net/ to learn how to build C# ASTs
 
-public class DefinitionGenerator(INames names) : GeneratorBase(names)
+public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
 {
     private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>();
 
@@ -42,11 +42,15 @@ public class DefinitionGenerator(INames names) : GeneratorBase(names)
                     FileScopedNamespaceDeclaration(ParseName(_names.NamespaceName))
                         .WithNamespaceKeyword(Prelude())
                         .WithMembers(List(
-                            new List<MemberDeclarationSyntax> { new LanguageGenerator(_names).LanguageClass() }
-                                .Concat(new FactoryGenerator(_names).FactoryTypes())
+                            new List<MemberDeclarationSyntax>
+                                {
+                                    new LanguageGenerator(_names, _lionWebVersion).LanguageClass()
+                                }
+                                .Concat(new FactoryGenerator(_names, _lionWebVersion).FactoryTypes())
                                 .Concat(Classifiers.Select(
-                                    c => new ClassifierGenerator(c, _names).ClassifierType()))
-                                .Concat(Enumerations.Select(e => new EnumGenerator(e, _names).EnumType()))
+                                    c => new ClassifierGenerator(c, _names, _lionWebVersion).ClassifierType()))
+                                .Concat(Enumerations.Select(e =>
+                                    new EnumGenerator(e, _names, _lionWebVersion).EnumType()))
                         ))
                         .WithUsings(List(CollectUsings()))
                 ])
@@ -75,7 +79,7 @@ public class DefinitionGenerator(INames names) : GeneratorBase(names)
             .Select(t => t.Namespace)
             .Where(n => n != null)
             .Prepend(typeof(EqualityExtensions).Namespace)
-            .Prepend(typeof(BuiltInsLanguage).Namespace)
+            .Prepend(_builtIns.GetType().Namespace)
             .Distinct()
             .Order()
             .Select(n => UsingDirective(ParseName(n)))

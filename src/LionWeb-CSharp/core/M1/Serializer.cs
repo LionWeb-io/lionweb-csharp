@@ -21,13 +21,9 @@ using M2;
 using Serialization;
 
 /// <inheritdoc cref="ISerializer"/>
-public class Serializer : SerializerBase, ISerializer
+public class Serializer(LionWebVersions lionWebVersion) : SerializerBase(lionWebVersion), ISerializer
 {
     private readonly DuplicateIdChecker _duplicateIdChecker = new();
-
-    /// <inheritdoc cref="ISerializerExtensions.SerializeToChunk"/>
-    public static SerializationChunk SerializeToChunk(IEnumerable<IReadableNode> nodes) =>
-        new Serializer().SerializeToChunk(nodes);
 
     /// <inheritdoc />
     public override IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes)

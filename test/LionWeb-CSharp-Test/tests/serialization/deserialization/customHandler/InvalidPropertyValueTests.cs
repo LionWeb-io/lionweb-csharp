@@ -20,6 +20,7 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
@@ -29,6 +30,8 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class InvalidPropertyValueTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     private class DeserializerHealingHandler(Func<string?, Feature, CompressedId, object?> heal)
         : DeserializerExceptionHandler
     {
@@ -41,7 +44,7 @@ public class InvalidPropertyValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -83,7 +86,7 @@ public class InvalidPropertyValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -126,7 +129,7 @@ public class InvalidPropertyValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }

@@ -29,6 +29,8 @@ using Examples.Shapes.M2;
 public class ReadOnlyLine(string id, IReadableNode? parent)
     : ReadableNodeBase<IReadableNode>(id, parent), INamed
 {
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
+
     /// <inheritdoc/>
     public override Classifier GetClassifier() => ShapesLanguage.Instance.Line;
 
@@ -36,7 +38,7 @@ public class ReadOnlyLine(string id, IReadableNode? parent)
     public override object? Get(Feature feature) => feature switch
     {
         null => GetAnnotations(),
-        not null when BuiltInsLanguage.Instance.INamed_name.EqualsIdentity(feature) => Name,
+        not null when _builtIns.INamed_name.EqualsIdentity(feature) => Name,
         not null when ShapesLanguage.Instance.IShape_uuid.EqualsIdentity(feature) => Uuid,
         not null when ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) => Fixpoints,
         not null when ShapesLanguage.Instance.Shape_shapeDocs.EqualsIdentity(feature) => ShapeDocs,
@@ -50,7 +52,7 @@ public class ReadOnlyLine(string id, IReadableNode? parent)
     {
         List<Feature> result = [];
         if (Name != default)
-            result.Add(BuiltInsLanguage.Instance.INamed_name);
+            result.Add(_builtIns.INamed_name);
         if (Uuid != default)
             result.Add(ShapesLanguage.Instance.IShape_uuid);
         if (Fixpoints != default && Fixpoints.Any())

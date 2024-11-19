@@ -20,10 +20,12 @@ namespace LionWeb.Core;
 /// <summary>
 ///  Declares the LionWeb release versions.
 /// </summary>
+[Obsolete("Use LionWebVersions.Current instead")] 
 public static class ReleaseVersion
 {
     /// <summary>
     /// Declares the <em>current</em> LionWeb release version.
     /// </summary>
+    [Obsolete("Use LionWebVersions.Current.VersionString instead")] 
     public const string Current = "2023.1";
 }

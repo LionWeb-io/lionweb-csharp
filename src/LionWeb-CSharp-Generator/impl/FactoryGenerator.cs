@@ -29,7 +29,7 @@ using static AstExtensions;
 /// <summary>
 /// Generates Factory class.
 /// </summary>
-public class FactoryGenerator(INames names) : GeneratorBase(names)
+public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
 {
     private string FactoryName => _names.FactoryName;
     private string FactoryInterfaceName => _names.FactoryInterfaceName;

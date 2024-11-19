@@ -24,6 +24,8 @@ using Serialization;
 public interface IDeserializer
 {
     IDeserializerHandler Handler { get; init; }
+    
+    LionWebVersions LionWebVersion { get; }
 
     void RegisterInstantiatedLanguage(Language language, INodeFactory factory);
 
@@ -54,6 +56,7 @@ public class DeserializerBuilder
     private readonly HashSet<IReadableNode> _dependentNodes = new();
     private IDeserializerHandler? _handler;
     private bool _storeUncompressedIds = false;
+    private LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     public DeserializerBuilder WithHandler(IDeserializerHandler handler)
     {
@@ -93,17 +96,23 @@ public class DeserializerBuilder
         return this;
     }
 
-    public DeserializerBuilder WithUncompressedIds(bool storeUncompressedIds)
+    public DeserializerBuilder WithUncompressedIds(bool storeUncompressedIds = true)
     {
         _storeUncompressedIds = storeUncompressedIds;
+        return this;
+    }
+
+    public DeserializerBuilder WithLionWebVersion(LionWebVersions lionWebVersion)
+    {
+        _lionWebVersion = lionWebVersion;
         return this;
     }
 
     public IDeserializer Build()
     {
         Deserializer result = _handler != null
-            ? new Deserializer { Handler = _handler, StoreUncompressedIds = _storeUncompressedIds }
-            : new Deserializer() { StoreUncompressedIds = _storeUncompressedIds };
+            ? new Deserializer(_lionWebVersion) { Handler = _handler, StoreUncompressedIds = _storeUncompressedIds }
+            : new Deserializer(_lionWebVersion) { StoreUncompressedIds = _storeUncompressedIds };
 
         foreach ((Language language, INodeFactory factory) in _languages)
         {

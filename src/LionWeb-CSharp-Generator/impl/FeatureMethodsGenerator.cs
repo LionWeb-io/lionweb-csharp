@@ -34,7 +34,7 @@ using Property = Core.M3.Property;
 /// - SetInternal()
 /// - CollectAllSetFeatures()
 /// </summary>
-public class FeatureMethodsGenerator(Classifier classifier, INames names) : ClassifierGeneratorBase(names)
+public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion) : ClassifierGeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="FeatureMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> FeatureMethods()

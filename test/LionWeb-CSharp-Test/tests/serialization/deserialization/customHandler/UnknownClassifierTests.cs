@@ -20,6 +20,7 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
@@ -29,6 +30,8 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnknownClassifierTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     private class DeserializerHealingHandler(Func<CompressedMetaPointer, CompressedId, Classifier?> heal)
         : DeserializerExceptionHandler
     {
@@ -44,7 +47,7 @@ public class UnknownClassifierTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages = [new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }],
             Nodes =
             [
@@ -64,6 +67,7 @@ public class UnknownClassifierTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
+            .WithUncompressedIds()
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);
@@ -82,7 +86,7 @@ public class UnknownClassifierTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages = [new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }],
             Nodes =
             [
@@ -119,7 +123,7 @@ public class UnknownClassifierTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages = [new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }],
             Nodes =
             [
@@ -136,7 +140,7 @@ public class UnknownClassifierTests
         };
 
         DynamicLanguage dynamicLanguage =
-            new("id-XLang") { Key = "key-XLang", Name = "XLang", Version = "1" };
+            new("id-XLang", _lionWebVersion) { Key = "key-XLang", Name = "XLang", Version = "1" };
         DynamicConcept dynamicConcept =
             dynamicLanguage.Concept("id-XLang-concept", "key-unknown-classifier", "name-XLang-concept:");
 
