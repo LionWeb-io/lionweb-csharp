@@ -98,7 +98,8 @@ public class ClassifierGenerator(Classifier classifier, INames names)
     private IEnumerable<Interface> Interfaces =>
         classifier
             .DirectGeneralizations()
-            .OfType<Interface>();
+            .OfType<Interface>()
+            .Ordered();
 
 
     private ConstructorDeclarationSyntax GenConstructor() =>
@@ -116,7 +117,7 @@ public class ClassifierGenerator(Classifier classifier, INames names)
 
     private InterfaceDeclarationSyntax ClassifierInterface(Interface iface)
     {
-        var bases = iface.Extends.Select(e => AsType(e, false)).ToList();
+        var bases = iface.Extends.Ordered().Select(e => AsType(e, false)).ToList();
         if (bases.Count == 0)
             bases = [AsType(typeof(INode))];
 
@@ -128,7 +129,7 @@ public class ClassifierGenerator(Classifier classifier, INames names)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
-            .WithMembers(List(iface.Features.SelectMany(f =>
+            .WithMembers(List(iface.Features.Ordered().SelectMany(f =>
                 new FeatureGenerator(classifier, f, _names).AbstractMembers())));
         return AttachConceptDescription(decl);
     }

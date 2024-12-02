@@ -38,9 +38,10 @@ public class FactoryGenerator(INames names) : GeneratorBase(names)
         Language
             .Entities
             .OfType<Classifier>()
-            .Where(c => c is Concept { Abstract: false } or Annotation);
+            .Where(c => c is Concept { Abstract: false } or Annotation)
+            .Ordered();
 
-    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>();
+    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
 
     /// <inheritdoc cref="FactoryGenerator"/>
     public IEnumerable<TypeDeclarationSyntax> FactoryTypes() =>

@@ -38,7 +38,7 @@ public class EnumGenerator(Enumeration enumeration, INames names) : GeneratorBas
                     ObsoleteAttribute(enumeration)
                 ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .WithMembers(SeparatedList(enumeration.Literals.Select(Literal)));
+            .WithMembers(SeparatedList(enumeration.Literals.Ordered().Select(Literal)));
 
     private EnumMemberDeclarationSyntax Literal(EnumerationLiteral literal) =>
         EnumMember(literal.Name)
