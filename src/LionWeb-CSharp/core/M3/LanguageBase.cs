@@ -26,6 +26,8 @@ public abstract class LanguageBase<TNodeFactory>(string id)
     : ReadableNodeBase<IReadableNode>(id, null), Language<TNodeFactory>
     where TNodeFactory : INodeFactory
 {
+    protected TNodeFactory _factory;
+
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
     [
@@ -72,7 +74,10 @@ public abstract class LanguageBase<TNodeFactory>(string id)
     public abstract IReadOnlyList<Language> DependsOn { get; }
 
     /// <inheritdoc />
-    public abstract TNodeFactory GetFactory();
+    public virtual TNodeFactory GetFactory() => _factory;
+
+    /// <inheritdoc />
+    public virtual void SetFactory(TNodeFactory factory) => _factory = factory;
 }
 
 /// <inheritdoc cref="IKeyed"/>

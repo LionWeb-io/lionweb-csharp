@@ -341,6 +341,8 @@ public sealed class M3Language : LanguageBase<M3Factory>
             Partition = false,
             ExtendsLazy = new(() => Link)
         });
+
+        _factory = new(this);
     }
 
     /// <inheritdoc />
@@ -381,9 +383,6 @@ public sealed class M3Language : LanguageBase<M3Factory>
 
     /// <inheritdoc />
     public override IReadOnlyList<Language> DependsOn { get; } = [BuiltInsLanguage.Instance];
-
-    /// <inheritdoc />
-    public override M3Factory GetFactory() => new(this);
 
     private readonly Lazy<Concept> _annotation;
 

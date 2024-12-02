@@ -35,9 +35,12 @@ public class LanguageConstructorGenerator(INames names) : LanguageGeneratorBase(
         Constructor(LanguageName, Param("id", AsType(typeof(string))))
             .WithInitializer(Initializer("id"))
             .WithBody(AsStatements(
-                Language.Entities.SelectMany(EntityConstructorInitialization)
+                Language.Entities.Ordered().SelectMany(EntityConstructorInitialization)
+                    .Append(GenFactoryInitialization())
             ));
 
+    private StatementSyntax GenFactoryInitialization() =>
+        Assignment("_factory", NewCall([This()], _names.FactoryType));
 
     private IEnumerable<StatementSyntax> EntityConstructorInitialization(LanguageEntity entity)
     {

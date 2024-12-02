@@ -218,14 +218,22 @@ public interface Language : IKeyed
     /// </summary>
     /// <returns>A node factory, capable of creating instances of this language's <see cref="Classifier">Classifiers</see>.</returns>
     public INodeFactory GetFactory();
+    
+    public void SetFactory(INodeFactory factory);
 }
 
 /// <inheritdoc/>
-public interface Language<out T> : Language where T : INodeFactory
+public interface Language<T> : Language where T : INodeFactory
 {
     /// <inheritdoc/>
     INodeFactory Language.GetFactory() => GetFactory();
 
     /// <inheritdoc cref="Language.GetFactory"/>
     public new T GetFactory();
+
+    /// <inheritdoc />
+    void Language.SetFactory(INodeFactory factory) => SetFactory((T) factory);
+
+    /// <inheritdoc cref="Language.SetFactory"/>
+    public void SetFactory(T factory);
 }
