@@ -13,25 +13,24 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "WithEnum", Version = "1")]
-public class WithEnumLanguage : LanguageBase<IWithEnumFactory>
+public partial class WithEnumLanguage : LanguageBase<IWithEnumFactory>
 {
 	public static readonly WithEnumLanguage Instance = new Lazy<WithEnumLanguage>(() => new("RkXMUe9zMRUQpw3bzQjSbBX6ju1a0UplEYsVa799WPQ")).Value;
 	public WithEnumLanguage(string id) : base(id)
 	{
+		_enumHolder = new(() => new ConceptBase<WithEnumLanguage>("PHrmcBTHnKIQD5HKKaWjhGp2U8Ndc99uZ0JftEqCjms", this) { Key = "EnumHolder", Name = "EnumHolder", Abstract = false, Partition = false, FeaturesLazy = new(() => [EnumHolder_enumValue]) });
+		_enumHolder_enumValue = new(() => new PropertyBase<WithEnumLanguage>("kzHwP_f-H6_UOSDM4Au_XDc-Jb-sIcxw3vu7XvqotgU", EnumHolder, this) { Key = "enumValue", Name = "enumValue", Optional = false, Type = MyEnum });
 		_myEnum = new(() => new EnumerationBase<WithEnumLanguage>("uLnvTaBlWPqfYfLjfN9HG9Qjt4VQHhFVRorDLFeYhZE", this) { Key = "MyEnum", Name = "MyEnum", LiteralsLazy = new(() => [MyEnum_literal1, MyEnum_literal2]) });
 		_myEnum_literal1 = new(() => new EnumerationLiteralBase<WithEnumLanguage>("0euWZGmWfx0iPC66yajzWqv3gIv--pvo55hqY82nREc", MyEnum, this) { Key = "lit1", Name = "literal1" });
 		_myEnum_literal2 = new(() => new EnumerationLiteralBase<WithEnumLanguage>("ArZRq3V1eIqmZBN88UlVbeRFfp3YVf-_JMd9-s64Yjg", MyEnum, this) { Key = "lit2", Name = "literal2" });
-		_enumHolder = new(() => new ConceptBase<WithEnumLanguage>("PHrmcBTHnKIQD5HKKaWjhGp2U8Ndc99uZ0JftEqCjms", this) { Key = "EnumHolder", Name = "EnumHolder", Abstract = false, Partition = false, FeaturesLazy = new(() => [EnumHolder_enumValue]) });
-		_enumHolder_enumValue = new(() => new PropertyBase<WithEnumLanguage>("kzHwP_f-H6_UOSDM4Au_XDc-Jb-sIcxw3vu7XvqotgU", EnumHolder, this) { Key = "enumValue", Name = "enumValue", Optional = false, Type = MyEnum });
+		_factory = new WithEnumFactory(this);
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [MyEnum, EnumHolder];
+        public override IReadOnlyList<LanguageEntity> Entities => [EnumHolder, MyEnum];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override IWithEnumFactory GetFactory() => new WithEnumFactory(this);
 	private const string _key = "WithEnum";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -44,6 +43,12 @@ public class WithEnumLanguage : LanguageBase<IWithEnumFactory>
 	/// <inheritdoc/>
         public override string Version => _version;
 
+	private readonly Lazy<Concept> _enumHolder;
+	public Concept EnumHolder => _enumHolder.Value;
+
+	private readonly Lazy<Property> _enumHolder_enumValue;
+	public Property EnumHolder_enumValue => _enumHolder_enumValue.Value;
+
 	private readonly Lazy<Enumeration> _myEnum;
 	public Enumeration MyEnum => _myEnum.Value;
 
@@ -52,15 +57,9 @@ public class WithEnumLanguage : LanguageBase<IWithEnumFactory>
 
 	private readonly Lazy<EnumerationLiteral> _myEnum_literal2;
 	public EnumerationLiteral MyEnum_literal2 => _myEnum_literal2.Value;
-
-	private readonly Lazy<Concept> _enumHolder;
-	public Concept EnumHolder => _enumHolder.Value;
-
-	private readonly Lazy<Property> _enumHolder_enumValue;
-	public Property EnumHolder_enumValue => _enumHolder_enumValue.Value;
 }
 
-public interface IWithEnumFactory : INodeFactory
+public partial interface IWithEnumFactory : INodeFactory
 {
 	public EnumHolder NewEnumHolder(string id);
 	public EnumHolder CreateEnumHolder();
