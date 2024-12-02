@@ -52,7 +52,7 @@ public class FactoryGenerator(INames names) : GeneratorBase(names)
 
     private InterfaceDeclarationSyntax FactoryInterface() =>
         InterfaceDeclaration(FactoryInterfaceName)
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(AsType(typeof(INodeFactory))))
             .WithMembers(List(new List<MemberDeclarationSyntax>(
                 ConcreteClassifiers

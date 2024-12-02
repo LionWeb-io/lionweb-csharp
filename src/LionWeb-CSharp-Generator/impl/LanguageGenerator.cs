@@ -60,7 +60,7 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
                     ("Version", names.Language.Version.AsLiteral())
                 ])
             ]))
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(AsType(typeof(LanguageBase<>), generics: FactoryInterfaceType)))
             .WithMembers(List(new List<MemberDeclarationSyntax>
                 {
