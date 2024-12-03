@@ -22,18 +22,20 @@ using Core.M3;
 
 public static class OrderedExtensions
 {
+    private const string _separator = ".";
+
     public static IEnumerable<Feature> Ordered(this IEnumerable<Feature> features) =>
-        features.OrderBy(f => f.GetLanguage().Name + f.GetFeatureClassifier().Name + f.Name);
+        features.OrderBy(f => f.GetLanguage().Name + _separator + f.GetFeatureClassifier().Name + _separator + f.Name);
 
     public static IEnumerable<EnumerationLiteral> Ordered(this IEnumerable<EnumerationLiteral> literals) =>
-        literals.OrderBy(f => f.GetEnumeration().Name + f.Name);
+        literals.OrderBy(f => f.GetEnumeration().Name + _separator + f.Name);
 
     public static IEnumerable<Interface> Ordered(this IEnumerable<Interface> interfaces) =>
-        interfaces.OrderBy(f => f.GetLanguage().Name + f.Name);
+        interfaces.OrderBy(f => f.GetLanguage().Name + _separator + f.Name);
 
     public static IEnumerable<T> Ordered<T>(this IEnumerable<T> entities) where T : LanguageEntity =>
         entities.OrderBy(f => f.Name);
 
-    public static IEnumerable<Language> Ordered(this IEnumerable<Language> features) =>
-        features.OrderBy(f => f.Name);
+    public static IEnumerable<Language> Ordered(this IEnumerable<Language> languages) =>
+        languages.OrderBy(f => f.Name);
 }
