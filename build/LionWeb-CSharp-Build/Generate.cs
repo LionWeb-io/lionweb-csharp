@@ -51,7 +51,6 @@ var testLanguagesDefinitions = new TestLanguagesDefinitions();
 var aLang = testLanguagesDefinitions.ALang;
 var bLang = testLanguagesDefinitions.BLang;
 var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
-var mpsSpecific = DeserializeExternalLanguage("Io.Lionweb.Mps.Specific").First();
 
 List<Names> names =
 [
@@ -73,8 +72,7 @@ List<Names> names =
         NamespaceMappings = { [aLang] = "Examples.Circular.A" }
     },
     new (tinyRefLang, "Examples.TinyRefLang"),
-    new (deprecatedLang, "Examples.DeprecatedLang"),
-    // new (mpsSpecific, "Io.Lionweb.Mps.Specific")
+    new (deprecatedLang, "Examples.DeprecatedLang")
 ];
 
 
