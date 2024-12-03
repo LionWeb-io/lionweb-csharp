@@ -33,7 +33,8 @@ public abstract class ClassifierGeneratorBase(INames names) : GeneratorBase(name
     /// </summary>
     protected IEnumerable<Feature> FeaturesToImplement(Classifier classifier) =>
         InterfaceFeatures(classifier)
-            .Concat(classifier.Features);
+            .Concat(classifier.Features)
+            .Ordered();
 
     /// Returns features directly inherited from an interface,
     /// and not yet implemented by <paramref name="classifier">classifier's</paramref> super-classifier.

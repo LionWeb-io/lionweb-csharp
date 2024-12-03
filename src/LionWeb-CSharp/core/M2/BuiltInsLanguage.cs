@@ -70,6 +70,8 @@ public sealed class BuiltInsLanguage : LanguageBase<BuiltInsFactory>
         {
             Key = $"{LionCoreBuiltInsIdAndKey}-Node", Name = "Node", Abstract = true, Partition = false
         });
+
+        _factory = new(this);
     }
 
     /// <inheritdoc />
@@ -97,9 +99,6 @@ public sealed class BuiltInsLanguage : LanguageBase<BuiltInsFactory>
 
     /// <inheritdoc />
     public override IReadOnlyList<Language> DependsOn { get => []; }
-
-    /// <inheritdoc />
-    public override BuiltInsFactory GetFactory() => new(this);
 
     private readonly Lazy<PrimitiveType> _boolean;
 

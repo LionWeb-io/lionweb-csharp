@@ -934,4 +934,7 @@ public class DynamicLanguage(string id) : DynamicIKeyed(id), Language
 
     /// <inheritdoc />
     public INodeFactory GetFactory() => NodeFactory ??= new ReflectiveBaseNodeFactory(this);
+
+    /// <inheritdoc />
+    public void SetFactory(INodeFactory factory) => NodeFactory = factory;
 }

@@ -35,7 +35,8 @@ public partial class LanguageDeserializer
 
     private void InstallContainments(SerializedNode serializedNode)
     {
-        var node = _deserializedNodesById[Compress(serializedNode.Id)];
+        if (!_deserializedNodesById.TryGetValue(Compress(serializedNode.Id), out var node))
+            return;
 
         ILookup<CompressedMetaPointer, IKeyed> serializedContainmentsLookup = serializedNode
             .Containments
@@ -98,7 +99,9 @@ public partial class LanguageDeserializer
 
     private void InstallReferences(SerializedNode serializedNode)
     {
-        var node = _deserializedNodesById[Compress(serializedNode.Id)];
+        if (!_deserializedNodesById.TryGetValue(Compress(serializedNode.Id), out var node))
+            return;
+            
         ILookup<CompressedMetaPointer, IKeyed?> serializedReferencesLookup = serializedNode
             .References
             .SelectMany(reference => reference.Targets.Select(target => (reference, target)))

@@ -101,8 +101,8 @@ public class ModelAccessTests
         Assert.IsFalse(allDescendants.Contains(geometry));
         var line = geometry.Shapes[0] as Line;
         Assert.AreEqual(line, allDescendants.ElementAt(0));
-        Assert.AreEqual(line.Start, allDescendants.ElementAt(1));
-        Assert.AreEqual(line.End, allDescendants.ElementAt(2));
+        Assert.AreEqual(line.End, allDescendants.ElementAt(1));
+        Assert.AreEqual(line.Start, allDescendants.ElementAt(2));
     }
 
     [TestMethod]
@@ -114,7 +114,7 @@ public class ModelAccessTests
         Assert.AreEqual(geometry, allNodes.ElementAt(0));
         var line = geometry.Shapes[0] as Line;
         Assert.AreEqual(line, allNodes.ElementAt(1));
-        Assert.AreEqual(line.Start, allNodes.ElementAt(2));
-        Assert.AreEqual(line.End, allNodes.ElementAt(3));
+        Assert.AreEqual(line.End, allNodes.ElementAt(2));
+        Assert.AreEqual(line.Start, allNodes.ElementAt(3));
     }
 }

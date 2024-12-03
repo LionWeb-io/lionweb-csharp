@@ -447,7 +447,7 @@ public class TreeTraversalTests
         var childA = new Line("cA");
         var childB = new Circle("cB");
         var node = new CompositeShape("n") { Parts = [childA], EvilPart = childB };
-        CollectionAssert.AreEqual(new List<INode> { childA, childB }, node.Children(false, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { childA, childB }, node.Children(false, false).ToList());
     }
 
     [TestMethod]
@@ -456,7 +456,7 @@ public class TreeTraversalTests
         var childA = new Line("cA");
         var childB = new Circle("cB");
         var node = new CompositeShape("n") { Parts = [childA], EvilPart = childB };
-        CollectionAssert.AreEqual(new List<INode> { node, childA, childB }, node.Children(true, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB }, node.Children(true, false).ToList());
     }
 
     [TestMethod]
@@ -465,7 +465,7 @@ public class TreeTraversalTests
         var childA = new Line("cA");
         var childB = new Circle("cB");
         var node = new CompositeShape("n") { Parts = [childA], EvilPart = childB };
-        CollectionAssert.AreEqual(new List<INode> { childA, childB }, node.Children(false, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { childA, childB }, node.Children(false, true).ToList());
     }
 
     [TestMethod]
@@ -474,7 +474,7 @@ public class TreeTraversalTests
         var childA = new Line("cA");
         var childB = new Circle("cB");
         var node = new CompositeShape("n") { Parts = [childA], EvilPart = childB };
-        CollectionAssert.AreEqual(new List<INode> { node, childA, childB }, node.Children(true, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB }, node.Children(true, true).ToList());
     }
 
     [TestMethod]
@@ -485,7 +485,7 @@ public class TreeTraversalTests
         var node = new CompositeShape("n") { Parts = [childA], EvilPart = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode> { childA, childB }, node.Children(false, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { childA, childB }, node.Children(false, false).ToList());
     }
 
     [TestMethod]
@@ -496,7 +496,7 @@ public class TreeTraversalTests
         var node = new CompositeShape("n") { Parts = [childA], EvilPart = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode> { node, childA, childB }, node.Children(true, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB }, node.Children(true, false).ToList());
     }
 
     [TestMethod]
@@ -507,7 +507,7 @@ public class TreeTraversalTests
         var node = new CompositeShape("n") { Parts = [childA], EvilPart = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode> { childA, childB, ann }, node.Children(false, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { childA, childB, ann }, node.Children(false, true).ToList());
     }
 
     [TestMethod]
@@ -518,7 +518,7 @@ public class TreeTraversalTests
         var node = new CompositeShape("n") { Parts = [childA], EvilPart = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode> { node, childA, childB, ann }, node.Children(true, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB, ann }, node.Children(true, true).ToList());
     }
 
     #endregion
@@ -675,7 +675,7 @@ public class TreeTraversalTests
         var childA = new Line("cA");
         var childB = new Documentation("cB");
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
-        CollectionAssert.AreEqual(new List<INode> { childA, childB }, node.Descendants(false, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { childA, childB }, node.Descendants(false, false).ToList());
     }
 
     [TestMethod]
@@ -684,7 +684,7 @@ public class TreeTraversalTests
         var childA = new Line("cA");
         var childB = new Documentation("cB");
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
-        CollectionAssert.AreEqual(new List<INode> { node, childA, childB }, node.Descendants(true, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB }, node.Descendants(true, false).ToList());
     }
 
     [TestMethod]
@@ -693,7 +693,7 @@ public class TreeTraversalTests
         var childA = new Line("cA");
         var childB = new Documentation("cB");
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
-        CollectionAssert.AreEqual(new List<INode> { childA, childB }, node.Descendants(false, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { childA, childB }, node.Descendants(false, true).ToList());
     }
 
     [TestMethod]
@@ -702,7 +702,7 @@ public class TreeTraversalTests
         var childA = new Line("cA");
         var childB = new Documentation("cB");
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
-        CollectionAssert.AreEqual(new List<INode> { node, childA, childB }, node.Descendants(true, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB }, node.Descendants(true, true).ToList());
     }
 
     [TestMethod]
@@ -713,7 +713,7 @@ public class TreeTraversalTests
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode> { childA, childB }, node.Descendants(false, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { childA, childB }, node.Descendants(false, false).ToList());
     }
 
     [TestMethod]
@@ -724,7 +724,7 @@ public class TreeTraversalTests
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode> { node, childA, childB }, node.Descendants(true, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB }, node.Descendants(true, false).ToList());
     }
 
     [TestMethod]
@@ -735,7 +735,7 @@ public class TreeTraversalTests
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode> { childA, childB, ann }, node.Descendants(false, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { childA, childB, ann }, node.Descendants(false, true).ToList());
     }
 
     [TestMethod]
@@ -746,7 +746,7 @@ public class TreeTraversalTests
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode> { node, childA, childB, ann }, node.Descendants(true, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB, ann }, node.Descendants(true, true).ToList());
     }
 
     #endregion
@@ -761,7 +761,7 @@ public class TreeTraversalTests
         var childA = new Line("cA") { Start = grandchildAA, End = grandchildAB };
         var childB = new Documentation("cB");
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
-        CollectionAssert.AreEqual(new List<INode> { childA, grandchildAA, grandchildAB, childB },
+        CollectionAssert.AreEquivalent(new List<INode> { childA, grandchildAA, grandchildAB, childB },
             node.Descendants(false, false).ToList());
     }
 
@@ -773,7 +773,7 @@ public class TreeTraversalTests
         var childA = new Line("cA") { Start = grandchildAA, End = grandchildAB };
         var childB = new Documentation("cB");
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
-        CollectionAssert.AreEqual(new List<INode>
+        CollectionAssert.AreEquivalent(new List<INode>
         {
             node,
             childA,
@@ -791,7 +791,7 @@ public class TreeTraversalTests
         var childA = new Line("cA") { Start = grandchildAA, End = grandchildAB };
         var childB = new Documentation("cB");
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
-        CollectionAssert.AreEqual(new List<INode> { childA, grandchildAA, grandchildAB, childB },
+        CollectionAssert.AreEquivalent(new List<INode> { childA, grandchildAA, grandchildAB, childB },
             node.Descendants(false, true).ToList());
     }
 
@@ -803,7 +803,7 @@ public class TreeTraversalTests
         var childA = new Line("cA") { Start = grandchildAA, End = grandchildAB };
         var childB = new Documentation("cB");
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
-        CollectionAssert.AreEqual(new List<INode>
+        CollectionAssert.AreEquivalent(new List<INode>
         {
             node,
             childA,
@@ -831,7 +831,7 @@ public class TreeTraversalTests
         var annAnn = new BillOfMaterials("aa");
         ann.AddAnnotations([annAnn]);
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode> { childA, grandchildAA, grandchildAB, childB },
+        CollectionAssert.AreEquivalent(new List<INode> { childA, grandchildAA, grandchildAB, childB },
             node.Descendants(false, false).ToList());
     }
 
@@ -853,7 +853,7 @@ public class TreeTraversalTests
         var annAnn = new BillOfMaterials("aa");
         ann.AddAnnotations([annAnn]);
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode>
+        CollectionAssert.AreEquivalent(new List<INode>
         {
             node,
             childA,
@@ -881,7 +881,7 @@ public class TreeTraversalTests
         var annAnn = new BillOfMaterials("aa");
         ann.AddAnnotations([annAnn]);
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode>
+        CollectionAssert.AreEquivalent(new List<INode>
         {
             childA,
             grandchildAA,
@@ -913,7 +913,7 @@ public class TreeTraversalTests
         var annAnn = new BillOfMaterials("aa");
         ann.AddAnnotations([annAnn]);
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEqual(new List<INode>
+        CollectionAssert.AreEquivalent(new List<INode>
         {
             node,
             childA,

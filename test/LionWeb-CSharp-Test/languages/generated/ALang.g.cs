@@ -13,7 +13,7 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-ALang", Version = "1")]
-public class ALangLanguage : LanguageBase<IALangFactory>
+public partial class ALangLanguage : LanguageBase<IALangFactory>
 {
 	public static readonly ALangLanguage Instance = new Lazy<ALangLanguage>(() => new("id-ALang")).Value;
 	public ALangLanguage(string id) : base(id)
@@ -23,6 +23,7 @@ public class ALangLanguage : LanguageBase<IALangFactory>
 		_aEnum = new(() => new EnumerationBase<ALangLanguage>("id-aEnum", this) { Key = "key-AEnum", Name = "AEnum", LiteralsLazy = new(() => [AEnum_left, AEnum_right]) });
 		_aEnum_left = new(() => new EnumerationLiteralBase<ALangLanguage>("id-left", AEnum, this) { Key = "key-left", Name = "left" });
 		_aEnum_right = new(() => new EnumerationLiteralBase<ALangLanguage>("id-right", AEnum, this) { Key = "key-right", Name = "right" });
+		_factory = new ALangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -30,8 +31,6 @@ public class ALangLanguage : LanguageBase<IALangFactory>
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [Examples.Circular.B.BLangLanguage.Instance];
 
-	/// <inheritdoc/>
-        public override IALangFactory GetFactory() => new ALangFactory(this);
 	private const string _key = "key-ALang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -60,7 +59,7 @@ public class ALangLanguage : LanguageBase<IALangFactory>
 	public EnumerationLiteral AEnum_right => _aEnum_right.Value;
 }
 
-public interface IALangFactory : INodeFactory
+public partial interface IALangFactory : INodeFactory
 {
 	public AConcept NewAConcept(string id);
 	public AConcept CreateAConcept();
