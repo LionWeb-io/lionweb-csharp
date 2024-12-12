@@ -14,31 +14,30 @@ using System.Collections.Generic;
 using DeprDatatype = string;
 
 [LionCoreLanguage(Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh", Version = "0")]
-public class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
+public partial class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
 {
 	public static readonly DeprecatedLanguage Instance = new Lazy<DeprecatedLanguage>(() => new("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh")).Value;
 	public DeprecatedLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
-		_deprConcept = new(() => new ConceptBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY", Name = "DeprConcept", Abstract = false, Partition = false, ExtendsLazy = new(() => _builtIns.Node), FeaturesLazy = new(() => [DeprConcept_deprProp, DeprConcept_deprChild, DeprConcept_deprRef]) });
-		_deprConcept_deprProp = new(() => new PropertyBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ0OQ", DeprConcept, this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ0OQ", Name = "deprProp", Optional = true, Type = _builtIns.String });
-		_deprConcept_deprChild = new(() => new ContainmentBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw", DeprConcept, this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw", Name = "deprChild", Optional = true, Multiple = true, Type = DeprIface });
-		_deprConcept_deprRef = new(() => new ReferenceBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1OA", DeprConcept, this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1OA", Name = "deprRef", Optional = false, Multiple = false, Type = DeprAnnotation });
-		_deprIface = new(() => new InterfaceBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NTU", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NTU", Name = "DeprIface" });
 		_deprAnnotation = new(() => new AnnotationBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE", Name = "DeprAnnotation", AnnotatesLazy = new(() => _builtIns.Node) });
+		_deprConcept = new(() => new ConceptBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY", Name = "DeprConcept", Abstract = false, Partition = false, ExtendsLazy = new(() => _builtIns.Node), FeaturesLazy = new(() => [DeprConcept_deprChild, DeprConcept_deprProp, DeprConcept_deprRef]) });
+		_deprConcept_deprChild = new(() => new ContainmentBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw", DeprConcept, this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw", Name = "deprChild", Optional = true, Multiple = true, Type = DeprIface });
+		_deprConcept_deprProp = new(() => new PropertyBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ0OQ", DeprConcept, this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ0OQ", Name = "deprProp", Optional = true, Type = _builtIns.String });
+		_deprConcept_deprRef = new(() => new ReferenceBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1OA", DeprConcept, this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1OA", Name = "deprRef", Optional = false, Multiple = false, Type = DeprAnnotation });
+		_deprDatatype = new(() => new PrimitiveTypeBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0ODQ", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0ODQ", Name = "DeprDatatype" });
 		_deprEnum = new(() => new EnumerationBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzE", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzE", Name = "DeprEnum", LiteralsLazy = new(() => [DeprEnum_A, DeprEnum_B]) });
 		_deprEnum_A = new(() => new EnumerationLiteralBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3Mg", DeprEnum, this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3Mg", Name = "A" });
 		_deprEnum_B = new(() => new EnumerationLiteralBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3NQ", DeprEnum, this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3NQ", Name = "B" });
-		_deprDatatype = new(() => new PrimitiveTypeBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0ODQ", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0ODQ", Name = "DeprDatatype" });
+		_deprIface = new(() => new InterfaceBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NTU", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NTU", Name = "DeprIface" });
 		_deprNoComment = new(() => new ConceptBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk1MDc1ODcyODk", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk1MDc1ODcyODk", Name = "DeprNoComment", Abstract = false, Partition = false, ExtendsLazy = new(() => _builtIns.Node) });
+		_factory = new DeprecatedFactory(this);
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [DeprConcept, DeprIface, DeprAnnotation, DeprEnum, DeprNoComment];
+        public override IReadOnlyList<LanguageEntity> Entities => [DeprAnnotation, DeprConcept, DeprEnum, DeprIface, DeprNoComment];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override IDeprecatedFactory GetFactory() => new DeprecatedFactory(this);
 	private const string _key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -51,29 +50,29 @@ public class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
 	/// <inheritdoc/>
         public override string Version => _version;
 
+	private readonly Lazy<Annotation> _deprAnnotation;
+	[Obsolete("deprAnnotation comment")]
+	public Annotation DeprAnnotation => _deprAnnotation.Value;
+
 	private readonly Lazy<Concept> _deprConcept;
 	[Obsolete("deprConcept comment")]
 	public Concept DeprConcept => _deprConcept.Value;
-
-	private readonly Lazy<Property> _deprConcept_deprProp;
-	[Obsolete("deprProp comment")]
-	public Property DeprConcept_deprProp => _deprConcept_deprProp.Value;
 
 	private readonly Lazy<Containment> _deprConcept_deprChild;
 	[Obsolete("deprChild comment")]
 	public Containment DeprConcept_deprChild => _deprConcept_deprChild.Value;
 
+	private readonly Lazy<Property> _deprConcept_deprProp;
+	[Obsolete("deprProp comment")]
+	public Property DeprConcept_deprProp => _deprConcept_deprProp.Value;
+
 	private readonly Lazy<Reference> _deprConcept_deprRef;
 	[Obsolete("deprRef comment")]
 	public Reference DeprConcept_deprRef => _deprConcept_deprRef.Value;
 
-	private readonly Lazy<Interface> _deprIface;
-	[Obsolete("deprIface comment")]
-	public Interface DeprIface => _deprIface.Value;
-
-	private readonly Lazy<Annotation> _deprAnnotation;
-	[Obsolete("deprAnnotation comment")]
-	public Annotation DeprAnnotation => _deprAnnotation.Value;
+	private readonly Lazy<PrimitiveType> _deprDatatype;
+	[Obsolete("deprDatatype comment")]
+	public PrimitiveType DeprDatatype => _deprDatatype.Value;
 
 	private readonly Lazy<Enumeration> _deprEnum;
 	[Obsolete("deprEnum comment")]
@@ -85,25 +84,25 @@ public class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
 	private readonly Lazy<EnumerationLiteral> _deprEnum_B;
 	public EnumerationLiteral DeprEnum_B => _deprEnum_B.Value;
 
-	private readonly Lazy<PrimitiveType> _deprDatatype;
-	[Obsolete("deprDatatype comment")]
-	public PrimitiveType DeprDatatype => _deprDatatype.Value;
+	private readonly Lazy<Interface> _deprIface;
+	[Obsolete("deprIface comment")]
+	public Interface DeprIface => _deprIface.Value;
 
 	private readonly Lazy<Concept> _deprNoComment;
 	[Obsolete]
 	public Concept DeprNoComment => _deprNoComment.Value;
 }
 
-public interface IDeprecatedFactory : INodeFactory
+public partial interface IDeprecatedFactory : INodeFactory
 {
-	[Obsolete("deprConcept comment")]
-	public DeprConcept NewDeprConcept(string id);
-	[Obsolete("deprConcept comment")]
-	public DeprConcept CreateDeprConcept();
 	[Obsolete("deprAnnotation comment")]
 	public DeprAnnotation NewDeprAnnotation(string id);
 	[Obsolete("deprAnnotation comment")]
 	public DeprAnnotation CreateDeprAnnotation();
+	[Obsolete("deprConcept comment")]
+	public DeprConcept NewDeprConcept(string id);
+	[Obsolete("deprConcept comment")]
+	public DeprConcept CreateDeprConcept();
 	[Obsolete]
 	public DeprNoComment NewDeprNoComment(string id);
 	[Obsolete]
@@ -121,10 +120,10 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 	/// <inheritdoc/>
         public override INode CreateNode(string id, Classifier classifier)
 	{
-		if (_language.DeprConcept.EqualsIdentity(classifier))
-			return NewDeprConcept(id);
 		if (_language.DeprAnnotation.EqualsIdentity(classifier))
 			return NewDeprAnnotation(id);
+		if (_language.DeprConcept.EqualsIdentity(classifier))
+			return NewDeprConcept(id);
 		if (_language.DeprNoComment.EqualsIdentity(classifier))
 			return NewDeprNoComment(id);
 		throw new UnsupportedClassifierException(classifier);
@@ -138,39 +137,36 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	[Obsolete("deprConcept comment")]
-	public virtual DeprConcept NewDeprConcept(string id) => new(id);
-	[Obsolete("deprConcept comment")]
-	public virtual DeprConcept CreateDeprConcept() => NewDeprConcept(GetNewId());
 	[Obsolete("deprAnnotation comment")]
 	public virtual DeprAnnotation NewDeprAnnotation(string id) => new(id);
 	[Obsolete("deprAnnotation comment")]
 	public virtual DeprAnnotation CreateDeprAnnotation() => NewDeprAnnotation(GetNewId());
+	[Obsolete("deprConcept comment")]
+	public virtual DeprConcept NewDeprConcept(string id) => new(id);
+	[Obsolete("deprConcept comment")]
+	public virtual DeprConcept CreateDeprConcept() => NewDeprConcept(GetNewId());
 	[Obsolete]
 	public virtual DeprNoComment NewDeprNoComment(string id) => new(id);
 	[Obsolete]
 	public virtual DeprNoComment CreateDeprNoComment() => NewDeprNoComment(GetNewId());
 }
 
+[LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE")]
+[Obsolete("deprAnnotation comment")]
+public partial class DeprAnnotation : NodeBase
+{
+	public DeprAnnotation(string id) : base(id)
+	{
+	}
+
+	/// <inheritdoc/>
+        public override Classifier GetClassifier() => DeprecatedLanguage.Instance.DeprAnnotation;
+}
+
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY")]
 [Obsolete("deprConcept comment")]
 public partial class DeprConcept : NodeBase
 {
-	private string? _deprProp = null;
-	/// <remarks>Optional Property</remarks>
-        [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ0OQ")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
-	[Obsolete("deprProp comment")]
-	public string? DeprProp { get => _deprProp; set => SetDeprProp(value); }
-
-	/// <remarks>Optional Property</remarks>
-        [Obsolete("deprProp comment")]
-	public DeprConcept SetDeprProp(string? value)
-	{
-		_deprProp = value;
-		return this;
-	}
-
 	private readonly List<DeprIface> _deprChild = [];
 	/// <remarks>Optional Multiple Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ1Mw")]
@@ -206,6 +202,21 @@ public partial class DeprConcept : NodeBase
 		return this;
 	}
 
+	private string? _deprProp = null;
+	/// <remarks>Optional Property</remarks>
+        [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDYvNzgxNTI0MzQ3OTQ4Nzk5MzQ0OQ")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
+	[Obsolete("deprProp comment")]
+	public string? DeprProp { get => _deprProp; set => SetDeprProp(value); }
+
+	/// <remarks>Optional Property</remarks>
+        [Obsolete("deprProp comment")]
+	public DeprConcept SetDeprProp(string? value)
+	{
+		_deprProp = value;
+		return this;
+	}
+
 	private DeprAnnotation? _deprRef = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If DeprRef has not been set</exception>
@@ -236,15 +247,15 @@ public partial class DeprConcept : NodeBase
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
-		if (DeprecatedLanguage.Instance.DeprConcept_deprProp.EqualsIdentity(feature))
-		{
-			result = DeprProp;
-			return true;
-		}
-
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
 		{
 			result = DeprChild;
+			return true;
+		}
+
+		if (DeprecatedLanguage.Instance.DeprConcept_deprProp.EqualsIdentity(feature))
+		{
+			result = DeprProp;
 			return true;
 		}
 
@@ -262,6 +273,14 @@ public partial class DeprConcept : NodeBase
 	{
 		if (base.SetInternal(feature, value))
 			return true;
+		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
+		{
+			var enumerable = DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<Examples.DeprecatedLang.DeprIface>(value);
+			RemoveSelfParent(_deprChild.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
+			AddDeprChild(enumerable);
+			return true;
+		}
+
 		if (DeprecatedLanguage.Instance.DeprConcept_deprProp.EqualsIdentity(feature))
 		{
 			if (value is null or string)
@@ -271,14 +290,6 @@ public partial class DeprConcept : NodeBase
 			}
 
 			throw new InvalidValueException(feature, value);
-		}
-
-		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
-		{
-			var enumerable = DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<Examples.DeprecatedLang.DeprIface>(value);
-			RemoveSelfParent(_deprChild.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-			AddDeprChild(enumerable);
-			return true;
 		}
 
 		if (DeprecatedLanguage.Instance.DeprConcept_deprRef.EqualsIdentity(feature))
@@ -299,10 +310,10 @@ public partial class DeprConcept : NodeBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		var result = base.CollectAllSetFeatures().ToList();
-		if (_deprProp != default)
-			result.Add(DeprecatedLanguage.Instance.DeprConcept_deprProp);
 		if (_deprChild.Count != 0)
 			result.Add(DeprecatedLanguage.Instance.DeprConcept_deprChild);
+		if (_deprProp != default)
+			result.Add(DeprecatedLanguage.Instance.DeprConcept_deprProp);
 		if (_deprRef != default)
 			result.Add(DeprecatedLanguage.Instance.DeprConcept_deprRef);
 		return result;
@@ -339,18 +350,6 @@ public partial class DeprConcept : NodeBase
 [Obsolete("deprIface comment")]
 public partial interface DeprIface : INode
 {
-}
-
-[LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE")]
-[Obsolete("deprAnnotation comment")]
-public partial class DeprAnnotation : NodeBase
-{
-	public DeprAnnotation(string id) : base(id)
-	{
-	}
-
-	/// <inheritdoc/>
-        public override Classifier GetClassifier() => DeprecatedLanguage.Instance.DeprAnnotation;
 }
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk1MDc1ODcyODk")]

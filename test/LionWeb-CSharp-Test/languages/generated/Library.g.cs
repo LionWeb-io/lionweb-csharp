@@ -13,37 +13,36 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "library", Version = "1")]
-public class LibraryLanguage : LanguageBase<ILibraryFactory>
+public partial class LibraryLanguage : LanguageBase<ILibraryFactory>
 {
 	public static readonly LibraryLanguage Instance = new Lazy<LibraryLanguage>(() => new("txjxNU9yRzEuyghtmgJK_l-nF93qWt7d1vErz5RbLow")).Value;
 	public LibraryLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
-		_book = new(() => new ConceptBase<LibraryLanguage>("uEoqgTU-BImmpne9vdcqM-o2JWS8yGAveLounJcncVU", this) { Key = "Book", Name = "Book", Abstract = false, Partition = false, FeaturesLazy = new(() => [Book_title, Book_pages, Book_author, Book_type]) });
-		_book_title = new(() => new PropertyBase<LibraryLanguage>("ydTFbSaxS3-iPy4Z0BXupobIaWIpdtL9c_WfbzpBeOw", Book, this) { Key = "title", Name = "title", Optional = false, Type = _builtIns.String });
-		_book_pages = new(() => new PropertyBase<LibraryLanguage>("kGSV8eFs5WIxjUKXyNoBIDW7pL4gyszY2LHKmmzvegU", Book, this) { Key = "pages", Name = "pages", Optional = false, Type = _builtIns.Integer });
+		_book = new(() => new ConceptBase<LibraryLanguage>("uEoqgTU-BImmpne9vdcqM-o2JWS8yGAveLounJcncVU", this) { Key = "Book", Name = "Book", Abstract = false, Partition = false, FeaturesLazy = new(() => [Book_author, Book_pages, Book_title, Book_type]) });
 		_book_author = new(() => new ReferenceBase<LibraryLanguage>("LGawCEgHtaqYxRhVWTlQSf6NuCpW5MDpi7QWLbGG3DM", Book, this) { Key = "author", Name = "author", Optional = false, Multiple = false, Type = Writer });
+		_book_pages = new(() => new PropertyBase<LibraryLanguage>("kGSV8eFs5WIxjUKXyNoBIDW7pL4gyszY2LHKmmzvegU", Book, this) { Key = "pages", Name = "pages", Optional = false, Type = _builtIns.Integer });
+		_book_title = new(() => new PropertyBase<LibraryLanguage>("ydTFbSaxS3-iPy4Z0BXupobIaWIpdtL9c_WfbzpBeOw", Book, this) { Key = "title", Name = "title", Optional = false, Type = _builtIns.String });
 		_book_type = new(() => new PropertyBase<LibraryLanguage>("cOLUxl-SXt_fm3d3FEBhf6XSdeNKo3N9iW7oJpDfx3k", Book, this) { Key = "type", Name = "type", Optional = true, Type = BookType });
 		_bookType = new(() => new EnumerationBase<LibraryLanguage>("6S4CvZSArQGBLCO7FvP8hXw2gMpIzIjXGGz6pyTy-rA", this) { Key = "BookType", Name = "BookType", LiteralsLazy = new(() => [BookType_Normal, BookType_Special]) });
 		_bookType_Normal = new(() => new EnumerationLiteralBase<LibraryLanguage>("I5CCX1NbCOzV2c_vtCJKrp0iHdqwYgNPeiQfLL4Gejg", BookType, this) { Key = "Normal", Name = "Normal" });
 		_bookType_Special = new(() => new EnumerationLiteralBase<LibraryLanguage>("U5NXStjkSAQJfuMgoi5zUDKJVbckzm_97dtBgm-AVLI", BookType, this) { Key = "Special", Name = "Special" });
-		_library = new(() => new ConceptBase<LibraryLanguage>("J3-V1k6rqq4Ml8qX_SuUOFhhjXoxLkHrt4mShDRJH1g", this) { Key = "Library", Name = "Library", Abstract = false, Partition = false, FeaturesLazy = new(() => [Library_name, Library_books]) });
-		_library_name = new(() => new PropertyBase<LibraryLanguage>("Rfy7VBCRh_jJSNcJTaqprdD1YcQS0OnoCMXnbmLCm8Y", Library, this) { Key = "library_Library_name", Name = "name", Optional = false, Type = _builtIns.String });
-		_library_books = new(() => new ContainmentBase<LibraryLanguage>("ZAYPfVsZ-nRe7ICpRe_3LzKufog84Unh9qT4jpT4Izc", Library, this) { Key = "books", Name = "books", Optional = false, Multiple = true, Type = Book });
-		_writer = new(() => new ConceptBase<LibraryLanguage>("7GwNCVubFACsj8FdlnwwIOaPbJ-mLJ5UvU5EnZRjLds", this) { Key = "Writer", Name = "Writer", Abstract = false, Partition = false, FeaturesLazy = new(() => [Writer_name]) });
-		_writer_name = new(() => new PropertyBase<LibraryLanguage>("6ephvryVAYXE1bm1LDlUBl0Ib9MOGcM23RDej6kyuqo", Writer, this) { Key = "library_Writer_name", Name = "name", Optional = false, Type = _builtIns.String });
 		_guideBookWriter = new(() => new ConceptBase<LibraryLanguage>("z4c4dBOvVtSw9UN9T3k5v608cRvRmBgqFIo3nyHo_QA", this) { Key = "GuideBookWriter", Name = "GuideBookWriter", Abstract = false, Partition = false, ExtendsLazy = new(() => Writer), FeaturesLazy = new(() => [GuideBookWriter_countries]) });
 		_guideBookWriter_countries = new(() => new PropertyBase<LibraryLanguage>("ajxn2_nvTlZaETaH5NBSdjg-4ecBXAz0PLI9ZISNtfo", GuideBookWriter, this) { Key = "countries", Name = "countries", Optional = false, Type = _builtIns.String });
+		_library = new(() => new ConceptBase<LibraryLanguage>("J3-V1k6rqq4Ml8qX_SuUOFhhjXoxLkHrt4mShDRJH1g", this) { Key = "Library", Name = "Library", Abstract = false, Partition = false, FeaturesLazy = new(() => [Library_books, Library_name]) });
+		_library_books = new(() => new ContainmentBase<LibraryLanguage>("ZAYPfVsZ-nRe7ICpRe_3LzKufog84Unh9qT4jpT4Izc", Library, this) { Key = "books", Name = "books", Optional = false, Multiple = true, Type = Book });
+		_library_name = new(() => new PropertyBase<LibraryLanguage>("Rfy7VBCRh_jJSNcJTaqprdD1YcQS0OnoCMXnbmLCm8Y", Library, this) { Key = "library_Library_name", Name = "name", Optional = false, Type = _builtIns.String });
 		_specialistBookWriter = new(() => new ConceptBase<LibraryLanguage>("rs6OGi3yUdrLwpsDHxfQOFx6cb1GsMDT8XzJhcVK988", this) { Key = "SpecialistBookWriter", Name = "SpecialistBookWriter", Abstract = false, Partition = false, ExtendsLazy = new(() => Writer), FeaturesLazy = new(() => [SpecialistBookWriter_subject]) });
 		_specialistBookWriter_subject = new(() => new PropertyBase<LibraryLanguage>("JH7BxhpDr9L7f6UBOKtFQBr0TV6r2nAK_6NajM1ij2Q", SpecialistBookWriter, this) { Key = "subject", Name = "subject", Optional = false, Type = _builtIns.String });
+		_writer = new(() => new ConceptBase<LibraryLanguage>("7GwNCVubFACsj8FdlnwwIOaPbJ-mLJ5UvU5EnZRjLds", this) { Key = "Writer", Name = "Writer", Abstract = false, Partition = false, FeaturesLazy = new(() => [Writer_name]) });
+		_writer_name = new(() => new PropertyBase<LibraryLanguage>("6ephvryVAYXE1bm1LDlUBl0Ib9MOGcM23RDej6kyuqo", Writer, this) { Key = "library_Writer_name", Name = "name", Optional = false, Type = _builtIns.String });
+		_factory = new LibraryFactory(this);
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [Book, BookType, Library, Writer, GuideBookWriter, SpecialistBookWriter];
+        public override IReadOnlyList<LanguageEntity> Entities => [Book, BookType, GuideBookWriter, Library, SpecialistBookWriter, Writer];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override ILibraryFactory GetFactory() => new LibraryFactory(this);
 	private const string _key = "library";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -59,14 +58,14 @@ public class LibraryLanguage : LanguageBase<ILibraryFactory>
 	private readonly Lazy<Concept> _book;
 	public Concept Book => _book.Value;
 
-	private readonly Lazy<Property> _book_title;
-	public Property Book_title => _book_title.Value;
+	private readonly Lazy<Reference> _book_author;
+	public Reference Book_author => _book_author.Value;
 
 	private readonly Lazy<Property> _book_pages;
 	public Property Book_pages => _book_pages.Value;
 
-	private readonly Lazy<Reference> _book_author;
-	public Reference Book_author => _book_author.Value;
+	private readonly Lazy<Property> _book_title;
+	public Property Book_title => _book_title.Value;
 
 	private readonly Lazy<Property> _book_type;
 	public Property Book_type => _book_type.Value;
@@ -80,46 +79,46 @@ public class LibraryLanguage : LanguageBase<ILibraryFactory>
 	private readonly Lazy<EnumerationLiteral> _bookType_Special;
 	public EnumerationLiteral BookType_Special => _bookType_Special.Value;
 
-	private readonly Lazy<Concept> _library;
-	public Concept Library => _library.Value;
-
-	private readonly Lazy<Property> _library_name;
-	public Property Library_name => _library_name.Value;
-
-	private readonly Lazy<Containment> _library_books;
-	public Containment Library_books => _library_books.Value;
-
-	private readonly Lazy<Concept> _writer;
-	public Concept Writer => _writer.Value;
-
-	private readonly Lazy<Property> _writer_name;
-	public Property Writer_name => _writer_name.Value;
-
 	private readonly Lazy<Concept> _guideBookWriter;
 	public Concept GuideBookWriter => _guideBookWriter.Value;
 
 	private readonly Lazy<Property> _guideBookWriter_countries;
 	public Property GuideBookWriter_countries => _guideBookWriter_countries.Value;
 
+	private readonly Lazy<Concept> _library;
+	public Concept Library => _library.Value;
+
+	private readonly Lazy<Containment> _library_books;
+	public Containment Library_books => _library_books.Value;
+
+	private readonly Lazy<Property> _library_name;
+	public Property Library_name => _library_name.Value;
+
 	private readonly Lazy<Concept> _specialistBookWriter;
 	public Concept SpecialistBookWriter => _specialistBookWriter.Value;
 
 	private readonly Lazy<Property> _specialistBookWriter_subject;
 	public Property SpecialistBookWriter_subject => _specialistBookWriter_subject.Value;
+
+	private readonly Lazy<Concept> _writer;
+	public Concept Writer => _writer.Value;
+
+	private readonly Lazy<Property> _writer_name;
+	public Property Writer_name => _writer_name.Value;
 }
 
-public interface ILibraryFactory : INodeFactory
+public partial interface ILibraryFactory : INodeFactory
 {
 	public Book NewBook(string id);
 	public Book CreateBook();
-	public Library NewLibrary(string id);
-	public Library CreateLibrary();
-	public Writer NewWriter(string id);
-	public Writer CreateWriter();
 	public GuideBookWriter NewGuideBookWriter(string id);
 	public GuideBookWriter CreateGuideBookWriter();
+	public Library NewLibrary(string id);
+	public Library CreateLibrary();
 	public SpecialistBookWriter NewSpecialistBookWriter(string id);
 	public SpecialistBookWriter CreateSpecialistBookWriter();
+	public Writer NewWriter(string id);
+	public Writer CreateWriter();
 }
 
 public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
@@ -135,14 +134,14 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 	{
 		if (_language.Book.EqualsIdentity(classifier))
 			return NewBook(id);
-		if (_language.Library.EqualsIdentity(classifier))
-			return NewLibrary(id);
-		if (_language.Writer.EqualsIdentity(classifier))
-			return NewWriter(id);
 		if (_language.GuideBookWriter.EqualsIdentity(classifier))
 			return NewGuideBookWriter(id);
+		if (_language.Library.EqualsIdentity(classifier))
+			return NewLibrary(id);
 		if (_language.SpecialistBookWriter.EqualsIdentity(classifier))
 			return NewSpecialistBookWriter(id);
+		if (_language.Writer.EqualsIdentity(classifier))
+			return NewWriter(id);
 		throw new UnsupportedClassifierException(classifier);
 	}
 
@@ -156,33 +155,33 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 
 	public virtual Book NewBook(string id) => new(id);
 	public virtual Book CreateBook() => NewBook(GetNewId());
-	public virtual Library NewLibrary(string id) => new(id);
-	public virtual Library CreateLibrary() => NewLibrary(GetNewId());
-	public virtual Writer NewWriter(string id) => new(id);
-	public virtual Writer CreateWriter() => NewWriter(GetNewId());
 	public virtual GuideBookWriter NewGuideBookWriter(string id) => new(id);
 	public virtual GuideBookWriter CreateGuideBookWriter() => NewGuideBookWriter(GetNewId());
+	public virtual Library NewLibrary(string id) => new(id);
+	public virtual Library CreateLibrary() => NewLibrary(GetNewId());
 	public virtual SpecialistBookWriter NewSpecialistBookWriter(string id) => new(id);
 	public virtual SpecialistBookWriter CreateSpecialistBookWriter() => NewSpecialistBookWriter(GetNewId());
+	public virtual Writer NewWriter(string id) => new(id);
+	public virtual Writer CreateWriter() => NewWriter(GetNewId());
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Book")]
 public partial class Book : NodeBase
 {
-	private string? _title = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Title has not been set</exception>
+	private Writer? _author = null;
+	/// <remarks>Required Single Reference</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Author has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "title")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Title { get => _title ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_title); set => SetTitle(value); }
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "author")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
+	public Writer Author { get => _author ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
 
-	/// <remarks>Required Property</remarks>
+	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Book SetTitle(string value)
+        public Book SetAuthor(Writer value)
 	{
-		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
-		_title = value;
+		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
+		_author = value;
 		return this;
 	}
 
@@ -200,20 +199,20 @@ public partial class Book : NodeBase
 		return this;
 	}
 
-	private Writer? _author = null;
-	/// <remarks>Required Single Reference</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Author has not been set</exception>
+	private string? _title = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Title has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "author")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public Writer Author { get => _author ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "title")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Title { get => _title ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_title); set => SetTitle(value); }
 
-	/// <remarks>Required Single Reference</remarks>
+	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Book SetAuthor(Writer value)
+        public Book SetTitle(string value)
 	{
-		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
-		_author = value;
+		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
+		_title = value;
 		return this;
 	}
 
@@ -241,9 +240,9 @@ public partial class Book : NodeBase
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
-		if (LibraryLanguage.Instance.Book_title.EqualsIdentity(feature))
+		if (LibraryLanguage.Instance.Book_author.EqualsIdentity(feature))
 		{
-			result = Title;
+			result = Author;
 			return true;
 		}
 
@@ -253,9 +252,9 @@ public partial class Book : NodeBase
 			return true;
 		}
 
-		if (LibraryLanguage.Instance.Book_author.EqualsIdentity(feature))
+		if (LibraryLanguage.Instance.Book_title.EqualsIdentity(feature))
 		{
-			result = Author;
+			result = Title;
 			return true;
 		}
 
@@ -273,11 +272,11 @@ public partial class Book : NodeBase
 	{
 		if (base.SetInternal(feature, value))
 			return true;
-		if (LibraryLanguage.Instance.Book_title.EqualsIdentity(feature))
+		if (LibraryLanguage.Instance.Book_author.EqualsIdentity(feature))
 		{
-			if (value is string v)
+			if (value is Examples.Library.M2.Writer v)
 			{
-				Title = v;
+				Author = v;
 				return true;
 			}
 
@@ -295,11 +294,11 @@ public partial class Book : NodeBase
 			throw new InvalidValueException(feature, value);
 		}
 
-		if (LibraryLanguage.Instance.Book_author.EqualsIdentity(feature))
+		if (LibraryLanguage.Instance.Book_title.EqualsIdentity(feature))
 		{
-			if (value is Examples.Library.M2.Writer v)
+			if (value is string v)
 			{
-				Author = v;
+				Title = v;
 				return true;
 			}
 
@@ -324,236 +323,14 @@ public partial class Book : NodeBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		var result = base.CollectAllSetFeatures().ToList();
-		if (_title != default)
-			result.Add(LibraryLanguage.Instance.Book_title);
-		if (_pages != default)
-			result.Add(LibraryLanguage.Instance.Book_pages);
 		if (_author != default)
 			result.Add(LibraryLanguage.Instance.Book_author);
+		if (_pages != default)
+			result.Add(LibraryLanguage.Instance.Book_pages);
+		if (_title != default)
+			result.Add(LibraryLanguage.Instance.Book_title);
 		if (_type != default)
 			result.Add(LibraryLanguage.Instance.Book_type);
-		return result;
-	}
-}
-
-[LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Library")]
-public partial class Library : NodeBase
-{
-	private string? _name = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Library_name")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Library_name); set => SetName(value); }
-
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Library SetName(string value)
-	{
-		AssureNotNull(value, LibraryLanguage.Instance.Library_name);
-		_name = value;
-		return this;
-	}
-
-	private readonly List<Book> _books = [];
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Books is empty</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "books")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public IReadOnlyList<Book> Books { get => AsNonEmptyReadOnly(_books, LibraryLanguage.Instance.Library_books); init => AddBooks(value); }
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
-        public Library AddBooks(IEnumerable<Book> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
-    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Books.Count</exception>
-        public Library InsertBooks(int index, IEnumerable<Book> nodes)
-	{
-		AssureInRange(index, _books);
-		var safeNodes = nodes?.ToList();
-		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		AssureNoSelfMove(index, safeNodes, _books);
-		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		return this;
-	}
-
-	/// <remarks>Required Multiple Containment</remarks>
-    	/// <exception cref = "InvalidValueException">If Books would be empty</exception>
-        public Library RemoveBooks(IEnumerable<Book> nodes)
-	{
-		var safeNodes = nodes?.ToList();
-		AssureNotNull(safeNodes, LibraryLanguage.Instance.Library_books);
-		AssureNotClearing(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		RemoveSelfParent(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		return this;
-	}
-
-	public Library(string id) : base(id)
-	{
-	}
-
-	/// <inheritdoc/>
-        public override Classifier GetClassifier() => LibraryLanguage.Instance.Library;
-	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
-	{
-		if (base.GetInternal(feature, out result))
-			return true;
-		if (LibraryLanguage.Instance.Library_name.EqualsIdentity(feature))
-		{
-			result = Name;
-			return true;
-		}
-
-		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
-		{
-			result = Books;
-			return true;
-		}
-
-		return false;
-	}
-
-	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
-	{
-		if (base.SetInternal(feature, value))
-			return true;
-		if (LibraryLanguage.Instance.Library_name.EqualsIdentity(feature))
-		{
-			if (value is string v)
-			{
-				Name = v;
-				return true;
-			}
-
-			throw new InvalidValueException(feature, value);
-		}
-
-		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
-		{
-			var enumerable = LibraryLanguage.Instance.Library_books.AsNodes<Examples.Library.M2.Book>(value).ToList();
-			AssureNonEmpty(enumerable, LibraryLanguage.Instance.Library_books);
-			RemoveSelfParent(_books.ToList(), _books, LibraryLanguage.Instance.Library_books);
-			AddBooks(enumerable);
-			return true;
-		}
-
-		return false;
-	}
-
-	/// <inheritdoc/>
-        public override IEnumerable<Feature> CollectAllSetFeatures()
-	{
-		var result = base.CollectAllSetFeatures().ToList();
-		if (_name != default)
-			result.Add(LibraryLanguage.Instance.Library_name);
-		if (_books.Count != 0)
-			result.Add(LibraryLanguage.Instance.Library_books);
-		return result;
-	}
-
-	/// <inheritdoc/>
-        protected override bool DetachChild(INode child)
-	{
-		if (base.DetachChild(child))
-			return true;
-		var c = GetContainmentOf(child);
-		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(c))
-		{
-			RemoveSelfParent(child, _books, LibraryLanguage.Instance.Library_books);
-			return true;
-		}
-
-		return false;
-	}
-
-	/// <inheritdoc/>
-        public override Containment? GetContainmentOf(INode child)
-	{
-		var result = base.GetContainmentOf(child);
-		if (result != null)
-			return result;
-		if (child is Book child0 && _books.Contains(child0))
-			return LibraryLanguage.Instance.Library_books;
-		return null;
-	}
-}
-
-[LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Writer")]
-public partial class Writer : NodeBase
-{
-	private string? _name = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Writer_name")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Writer_name); set => SetName(value); }
-
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Writer SetName(string value)
-	{
-		AssureNotNull(value, LibraryLanguage.Instance.Writer_name);
-		_name = value;
-		return this;
-	}
-
-	public Writer(string id) : base(id)
-	{
-	}
-
-	/// <inheritdoc/>
-        public override Classifier GetClassifier() => LibraryLanguage.Instance.Writer;
-	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
-	{
-		if (base.GetInternal(feature, out result))
-			return true;
-		if (LibraryLanguage.Instance.Writer_name.EqualsIdentity(feature))
-		{
-			result = Name;
-			return true;
-		}
-
-		return false;
-	}
-
-	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
-	{
-		if (base.SetInternal(feature, value))
-			return true;
-		if (LibraryLanguage.Instance.Writer_name.EqualsIdentity(feature))
-		{
-			if (value is string v)
-			{
-				Name = v;
-				return true;
-			}
-
-			throw new InvalidValueException(feature, value);
-		}
-
-		return false;
-	}
-
-	/// <inheritdoc/>
-        public override IEnumerable<Feature> CollectAllSetFeatures()
-	{
-		var result = base.CollectAllSetFeatures().ToList();
-		if (_name != default)
-			result.Add(LibraryLanguage.Instance.Writer_name);
 		return result;
 	}
 }
@@ -627,6 +404,159 @@ public partial class GuideBookWriter : Writer
 	}
 }
 
+[LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Library")]
+public partial class Library : NodeBase
+{
+	private readonly List<Book> _books = [];
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Books is empty</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "books")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	public IReadOnlyList<Book> Books { get => AsNonEmptyReadOnly(_books, LibraryLanguage.Instance.Library_books); init => AddBooks(value); }
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
+        public Library AddBooks(IEnumerable<Book> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
+    	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Books.Count</exception>
+        public Library InsertBooks(int index, IEnumerable<Book> nodes)
+	{
+		AssureInRange(index, _books);
+		var safeNodes = nodes?.ToList();
+		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		AssureNoSelfMove(index, safeNodes, _books);
+		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
+		return this;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
+    	/// <exception cref = "InvalidValueException">If Books would be empty</exception>
+        public Library RemoveBooks(IEnumerable<Book> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, LibraryLanguage.Instance.Library_books);
+		AssureNotClearing(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		RemoveSelfParent(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		return this;
+	}
+
+	private string? _name = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Library_name")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Library_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Library SetName(string value)
+	{
+		AssureNotNull(value, LibraryLanguage.Instance.Library_name);
+		_name = value;
+		return this;
+	}
+
+	public Library(string id) : base(id)
+	{
+	}
+
+	/// <inheritdoc/>
+        public override Classifier GetClassifier() => LibraryLanguage.Instance.Library;
+	/// <inheritdoc/>
+        protected override bool GetInternal(Feature? feature, out Object? result)
+	{
+		if (base.GetInternal(feature, out result))
+			return true;
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
+		{
+			result = Books;
+			return true;
+		}
+
+		if (LibraryLanguage.Instance.Library_name.EqualsIdentity(feature))
+		{
+			result = Name;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, Object? value)
+	{
+		if (base.SetInternal(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
+		{
+			var enumerable = LibraryLanguage.Instance.Library_books.AsNodes<Examples.Library.M2.Book>(value).ToList();
+			AssureNonEmpty(enumerable, LibraryLanguage.Instance.Library_books);
+			RemoveSelfParent(_books.ToList(), _books, LibraryLanguage.Instance.Library_books);
+			AddBooks(enumerable);
+			return true;
+		}
+
+		if (LibraryLanguage.Instance.Library_name.EqualsIdentity(feature))
+		{
+			if (value is string v)
+			{
+				Name = v;
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        public override IEnumerable<Feature> CollectAllSetFeatures()
+	{
+		var result = base.CollectAllSetFeatures().ToList();
+		if (_books.Count != 0)
+			result.Add(LibraryLanguage.Instance.Library_books);
+		if (_name != default)
+			result.Add(LibraryLanguage.Instance.Library_name);
+		return result;
+	}
+
+	/// <inheritdoc/>
+        protected override bool DetachChild(INode child)
+	{
+		if (base.DetachChild(child))
+			return true;
+		var c = GetContainmentOf(child);
+		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(c))
+		{
+			RemoveSelfParent(child, _books, LibraryLanguage.Instance.Library_books);
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        public override Containment? GetContainmentOf(INode child)
+	{
+		var result = base.GetContainmentOf(child);
+		if (result != null)
+			return result;
+		if (child is Book child0 && _books.Contains(child0))
+			return LibraryLanguage.Instance.Library_books;
+		return null;
+	}
+}
+
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "SpecialistBookWriter")]
 public partial class SpecialistBookWriter : Writer
 {
@@ -692,6 +622,75 @@ public partial class SpecialistBookWriter : Writer
 		var result = base.CollectAllSetFeatures().ToList();
 		if (_subject != default)
 			result.Add(LibraryLanguage.Instance.SpecialistBookWriter_subject);
+		return result;
+	}
+}
+
+[LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Writer")]
+public partial class Writer : NodeBase
+{
+	private string? _name = null;
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Writer_name")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
+	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Writer_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public Writer SetName(string value)
+	{
+		AssureNotNull(value, LibraryLanguage.Instance.Writer_name);
+		_name = value;
+		return this;
+	}
+
+	public Writer(string id) : base(id)
+	{
+	}
+
+	/// <inheritdoc/>
+        public override Classifier GetClassifier() => LibraryLanguage.Instance.Writer;
+	/// <inheritdoc/>
+        protected override bool GetInternal(Feature? feature, out Object? result)
+	{
+		if (base.GetInternal(feature, out result))
+			return true;
+		if (LibraryLanguage.Instance.Writer_name.EqualsIdentity(feature))
+		{
+			result = Name;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, Object? value)
+	{
+		if (base.SetInternal(feature, value))
+			return true;
+		if (LibraryLanguage.Instance.Writer_name.EqualsIdentity(feature))
+		{
+			if (value is string v)
+			{
+				Name = v;
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        public override IEnumerable<Feature> CollectAllSetFeatures()
+	{
+		var result = base.CollectAllSetFeatures().ToList();
+		if (_name != default)
+			result.Add(LibraryLanguage.Instance.Writer_name);
 		return result;
 	}
 }
