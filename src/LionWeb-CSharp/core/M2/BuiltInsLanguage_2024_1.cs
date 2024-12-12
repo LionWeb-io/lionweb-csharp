@@ -19,20 +19,20 @@ namespace LionWeb.Core.M2;
 
 using M3;
 
-public interface IBuiltInsLanguage_2024_1 : IBuiltInsLanguage<LionWebVersions.Version2024_1>;
+public interface IBuiltInsLanguage_2024_1 : IBuiltInsLanguage;
 
 public sealed class BuiltInsLanguage_2024_1 :
-    LanguageBase<BuiltInsFactory_2024_1, LionWebVersions.Version2024_1>, IBuiltInsLanguage_2024_1
+    LanguageBase<BuiltInsFactory_2024_1>, IBuiltInsLanguage_2024_1
 {
     /// <summary>
     /// The definition of the LionCore built-ins language.
     /// </summary>
-    public static readonly IBuiltInsLanguage_2024_1 Instance = new Lazy<BuiltInsLanguage_2024_1>(() => new()).Value;
+    public static readonly BuiltInsLanguage_2024_1 Instance = new Lazy<BuiltInsLanguage_2024_1>(() => new()).Value;
 
     private const string _name = "LionCore_builtins";
 
-    protected override IBuiltInsLanguage_2024_1 _builtIns => this;
-    protected override ILionCoreLanguage_2024_1 _m3 => LionCoreLanguage_2024_1.Instance;
+    protected override IBuiltInsLanguage _builtIns => this;
+    protected override ILionCoreLanguage _m3 => LionCoreLanguage_2024_1.Instance;
 
     internal BuiltInsLanguage_2024_1() : base(LionCoreBuiltInsIdAndKey, LionWebVersions.v2024_1)
     {

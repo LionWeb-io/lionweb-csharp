@@ -36,7 +36,7 @@ public class UnresolvableReferenceTargetTests
         : DeserializerExceptionHandler
     {
         public override IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo,
-            Feature reference, IWritableNode node) => heal(targetId, resolveInfo, reference, node);
+            Feature reference, IReadableNode node) => heal(targetId, resolveInfo, reference, (IWritableNode)node);
     }
 
     [TestMethod]

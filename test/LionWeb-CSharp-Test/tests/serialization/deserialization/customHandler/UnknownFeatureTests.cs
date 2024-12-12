@@ -37,7 +37,7 @@ public class UnknownFeatureTests
         : DeserializerExceptionHandler
     {
         public override Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-            IWritableNode node) => heal(feature, classifier, node);
+            IReadableNode node) => heal(feature, classifier, (IWritableNode)node);
     }
 
 

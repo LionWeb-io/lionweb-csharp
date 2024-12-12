@@ -57,9 +57,6 @@ public interface IBuiltInsLanguage : Language
     Concept Node { get; }
 }
 
-public interface IBuiltInsLanguage<out TVersion> : IBuiltInsLanguage, ILionWebVersionUser<TVersion>
-    where TVersion : LionWebVersions;
-
 /// <inheritdoc cref="IBuiltInsLanguage"/>
 [Obsolete("Use IBuiltInsLanguage instead")]
 public sealed class BuiltInsLanguage

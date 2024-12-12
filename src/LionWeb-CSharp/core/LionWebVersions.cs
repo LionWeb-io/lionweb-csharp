@@ -63,8 +63,3 @@ public interface LionWebVersions
             new Lazy<ILionCoreLanguage>(() => LionCoreLanguage_2024_1.Instance).Value;
     }
 }
-
-public interface ILionWebVersionUser<out TVersion> where TVersion: LionWebVersions
-{
-    TVersion ULionWebVersion { get; }
-}

@@ -36,7 +36,7 @@ public class InvalidFeatureTests
         : DeserializerExceptionHandler
     {
         public override Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-            IWritableNode node) => heal(feature, classifier, node);
+            IReadableNode node) => heal(feature, classifier, (IWritableNode)node);
     }
 
     /// <summary>

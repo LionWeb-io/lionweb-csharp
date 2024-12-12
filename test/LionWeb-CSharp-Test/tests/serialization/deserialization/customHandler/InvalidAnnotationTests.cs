@@ -34,8 +34,8 @@ public class InvalidAnnotationTests
     private class DeserializerHealingHandler(Func<IReadableNode, IWritableNode, INode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
-            heal(annotation, node);
+        public override IWritableNode? InvalidAnnotation(IReadableNode annotation, IReadableNode node) =>
+            heal(annotation, (IWritableNode)node);
     }
 
     [TestMethod]

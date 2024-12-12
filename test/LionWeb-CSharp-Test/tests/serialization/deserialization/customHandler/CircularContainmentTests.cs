@@ -34,8 +34,8 @@ public class CircularContainmentTests
     private class DeserializerHealingHandler(Func<IWritableNode, IWritableNode, IWritableNode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent)
-            => heal(containedNode, parent);
+        public override IWritableNode? CircularContainment(IReadableNode containedNode, IReadableNode parent)
+            => heal((IWritableNode)containedNode, (IWritableNode)parent);
     }
 
     #region containment

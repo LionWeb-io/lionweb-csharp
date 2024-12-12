@@ -35,8 +35,8 @@ public class UnresolvableChildTests
     private class DeserializerHealingHandler(Func<CompressedId, Feature, IWritableNode, IWritableNode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node)
-            => heal(childId, containment, node);
+        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IReadableNode node)
+            => heal(childId, containment, (IWritableNode)node);
     }
 
     [TestMethod]

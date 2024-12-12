@@ -34,8 +34,8 @@ public class UnresolvableAnnotationTests
     private class DeserializerHealingHandler(Func<CompressedId, IWritableNode, IWritableNode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node) =>
-            heal(annotationId, node);
+        public override IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IReadableNode node) =>
+            heal(annotationId, (IWritableNode)node);
     }
 
 

@@ -90,7 +90,7 @@ public class SerializationLenientTests
     class LenientHandler : DeserializerExceptionHandler
     {
         public override Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
-            IWritableNode node) where TFeature : class
+            IReadableNode node) where TFeature : class
         {
             var replacementFeature = new List<Language>
                 {
@@ -109,7 +109,7 @@ public class SerializationLenientTests
             return replacementFeature;
         }
 
-        public override object? UnknownDatatype(Feature property, string? value, IWritableNode nodeId) => value;
+        public override object? UnknownDatatype(Feature property, string? value, IReadableNode nodeId) => value;
     }
 
     class LenientComparer : Comparer

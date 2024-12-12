@@ -22,15 +22,12 @@ namespace LionWeb.Core.M3;
 using M2;
 
 /// <inheritdoc cref="Language"/>
-public abstract class LanguageBase<TNodeFactory, TVersion>(string id, LionWebVersions lionWebVersion)
-    : ReadableNodeBase<IReadableNode>(id, null), Language<TNodeFactory>, ILionWebVersionUser<TVersion>
+public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lionWebVersion)
+    : ReadableNodeBase<IReadableNode>(id, null), Language<TNodeFactory>
     where TNodeFactory : INodeFactory
-    where TVersion: LionWebVersions
 {
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;
-
-    TVersion ILionWebVersionUser<TVersion>.ULionWebVersion => (TVersion)LionWebVersion;
 
     protected override IBuiltInsLanguage _builtIns=> new Lazy<IBuiltInsLanguage>(() => LionWebVersion.BuiltIns).Value;
     protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => LionWebVersion.LionCore).Value;

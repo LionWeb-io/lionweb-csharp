@@ -34,9 +34,9 @@ public class DuplicateContainmentTests
     private class DeserializerHealingHandler(Func<IWritableNode, IWritableNode, IReadableNode, bool> heal)
         : DeserializerExceptionHandler
     {
-        public override bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
+        public override bool DuplicateContainment(IReadableNode containedNode, IReadableNode newParent,
             IReadableNode existingParent) =>
-            heal(containedNode, newParent, existingParent);
+            heal((IWritableNode)containedNode, (IWritableNode)newParent, existingParent);
     }
 
     [TestMethod]

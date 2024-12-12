@@ -36,8 +36,8 @@ public class UnknownEnumerationLiteralTests
         : DeserializerExceptionHandler
     {
         public override Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
-            IWritableNode node) =>
-            heal(key, enumeration, property, node);
+            IReadableNode node) =>
+            heal(key, enumeration, property, (IWritableNode)node);
     }
 
     [TestMethod]

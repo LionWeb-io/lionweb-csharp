@@ -32,8 +32,8 @@ public class DuplicateNodeIdTests
     private class DeserializerHealingHandler(Func<CompressedId, IWritableNode, INode, string?> heal)
         : DeserializerExceptionHandler
     {
-        public override string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
-            heal(nodeId, existingNode, node);
+        public override string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, INode node) =>
+            heal(nodeId, (IWritableNode)existingNode, node);
     }
 
     [TestMethod]

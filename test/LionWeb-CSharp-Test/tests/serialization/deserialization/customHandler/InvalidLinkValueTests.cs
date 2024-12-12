@@ -37,8 +37,8 @@ public class InvalidLinkValueTests
     private class DeserializerHealingHandler(
         Func<List<IReadableNode>, Feature, IWritableNode, List<IReadableNode>?> heal) : DeserializerExceptionHandler
     {
-        public override List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node) =>
-            heal([..value], link, node)?.Cast<T>().ToList();
+        public override List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IReadableNode node) =>
+            heal([..value], link, (IWritableNode)node)?.Cast<T>().ToList();
     }
 
     [TestMethod]

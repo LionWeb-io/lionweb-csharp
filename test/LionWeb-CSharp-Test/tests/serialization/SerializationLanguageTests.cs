@@ -40,7 +40,7 @@ public class LanguageSerializationTests
     {
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
 
-        var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
+        var redeserialized = ILanguageDeserializerExtensions.Deserialize(serializationChunk);
         Language redeserializedShapes = redeserialized.Cast<INode>().OfType<Language>().First();
 
         var language = new DynamicLanguage("id-anns", _lionWebVersion) { Key = "key-anns", Name = "Anns", Version = "1" };
@@ -60,7 +60,7 @@ public class LanguageSerializationTests
 
         var serializationChunk2 = new Serializer(_lionWebVersion).SerializeToChunk([redeserializedShapes]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
-        var redeserialized2 = LanguageDeserializer.Deserialize(serializationChunk2, language);
+        var redeserialized2 = ILanguageDeserializerExtensions.Deserialize(serializationChunk2, language);
         Language redeserializedShapes2 = redeserialized2.Cast<INode>().OfType<Language>().First();
         DynamicClassifier redeserializedCircle2 =
             (DynamicClassifier)redeserializedShapes2.ClassifierByKey(ShapesLanguage.Instance.Circle.Key);
@@ -75,7 +75,7 @@ public class LanguageSerializationTests
     {
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
 
-        var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
+        var redeserialized = ILanguageDeserializerExtensions.Deserialize(serializationChunk);
         Language redeserializedShapes = redeserialized.Cast<INode>().OfType<Language>().First();
 
         var language = new DynamicLanguage("id-anns", _lionWebVersion) { Key = "key-anns", Name = "Anns", Version = "1" };
@@ -95,7 +95,7 @@ public class LanguageSerializationTests
 
         var serializationChunk2 = new Serializer(_lionWebVersion).SerializeToChunk([redeserializedShapes, language]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
-        var redeserialized2 = LanguageDeserializer.Deserialize(serializationChunk2);
+        var redeserialized2 = ILanguageDeserializerExtensions.Deserialize(serializationChunk2);
         Language redeserializedShapes2 = redeserialized2.Cast<INode>().OfType<Language>()
             .First(l => l.Key == ShapesLanguage.Instance.Key);
         DynamicClassifier redeserializedCircle2 =
@@ -113,7 +113,7 @@ public class LanguageSerializationTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        var deserializer = new LanguageDeserializer(_lionWebVersion, false);
+        var deserializer = new LanguageDeserializer(IDeserializerVersionSpecifics<IReadableNode>.Create<IReadableNode>(_lionWebVersion), false);
         foreach (var serializedNode in serializationChunk.Nodes)
         {
             deserializer.Process(serializedNode);
@@ -127,7 +127,7 @@ public class LanguageSerializationTests
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
-        var redeserialized = LanguageDeserializer.Deserialize(serializationChunk);
+        var redeserialized = ILanguageDeserializerExtensions.Deserialize(serializationChunk);
         var comparer = new Comparer([ShapesLanguage.Instance], redeserialized.Cast<IReadableNode>().ToList());
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }

@@ -29,9 +29,6 @@ using LionWeb.CSharp.Generator.Names;
 
 var lionWebVersion = LionWebVersions.Current;
 
-Whatever.CreateUser(new V1()).Run();
-return;
-
 void SerializeLanguagesLocally(string name, params Language[] languages)
 {
     JsonUtils.WriteNodesToStream(new FileStream($"chunks/localDefs/{name}.json", FileMode.Create),

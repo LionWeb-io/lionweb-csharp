@@ -129,9 +129,6 @@ public interface ILionCoreLanguage : Language
     Concept Reference { get; }
 }
 
-public interface ILionCoreLanguage<out TVersion> : ILionCoreLanguage, ILionWebVersionUser<TVersion>
-    where TVersion : LionWebVersions;
-
 /// <inheritdoc cref="ILionCoreLanguage"/>
 [Obsolete("Use ILionCoreLanguage instead")]
 public sealed class M3Language

@@ -28,7 +28,7 @@ using Serialization;
 /// The generic deserializer isn't aware of the LionCore M3-types (and their idiosyncrasies),
 /// so that can't be used.
 /// </summary>
-public partial class LanguageDeserializer<TVersion> : DeserializerBase<IReadableNode, TVersion>, ILanguageDeserializer where TVersion : LionWebVersions
+public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILanguageDeserializer
 {
     private readonly Dictionary<CompressedId, SerializedNode> _serializedNodesById = new();
 
@@ -45,8 +45,7 @@ public partial class LanguageDeserializer<TVersion> : DeserializerBase<IReadable
     /// <param name="dependentLanguages">Referred languages.</param>
     /// 
     /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
-    public LanguageDeserializer(TVersion lionWebVersion, bool preloadLionCoreLanguage = true) : base(
-        lionWebVersion)
+    public LanguageDeserializer(IDeserializerVersionSpecifics<IReadableNode> versionSpecifics , bool preloadLionCoreLanguage = true) : base(versionSpecifics)
     {
         RegisterDependentLanguage(_builtIns);
 
@@ -175,51 +174,51 @@ public partial class LanguageDeserializer<TVersion> : DeserializerBase<IReadable
 
 internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : IDeserializerHandler
 {
-    public IWritableNode? UnresolvableParent(CompressedId parentId, IWritableNode node) =>
+    public IWritableNode? UnresolvableParent(CompressedId parentId, IReadableNode node) =>
         null;
 
     public Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) =>
         @delegate.UnknownClassifier(classifier, id);
 
-    public string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
+    public string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, INode node) =>
         @delegate.DuplicateNodeId(nodeId, existingNode, node);
 
     public T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed =>
         @delegate.SelectVersion<T>(metaPointer, languages);
 
-    public Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IWritableNode node)
+    public Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IReadableNode node)
         where TFeature : class, Feature =>
         @delegate.UnknownFeature<TFeature>(feature, classifier, node);
 
-    public List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node)
+    public List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IReadableNode node)
         where T : class, IReadableNode =>
         @delegate.InvalidLinkValue(value, link, node);
 
-    public IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IWritableNode node) =>
+    public IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IReadableNode node) =>
         @delegate.UnresolvableChild(childId, containment, node);
 
     public IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo, Feature reference,
-        IWritableNode node) =>
+        IReadableNode node) =>
         @delegate.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
 
-    public IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node) =>
+    public IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IReadableNode node) =>
         @delegate.UnresolvableAnnotation(annotationId, node);
 
-    public IWritableNode? InvalidAnnotation(IReadableNode annotation, IWritableNode node) =>
+    public IWritableNode? InvalidAnnotation(IReadableNode annotation, IReadableNode node) =>
         @delegate.InvalidAnnotation(annotation, node);
 
-    public IWritableNode? CircularContainment(IWritableNode containedNode, IWritableNode parent) =>
+    public IWritableNode? CircularContainment(IReadableNode containedNode, IReadableNode parent) =>
         @delegate.CircularContainment(containedNode, parent);
 
-    public bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
+    public bool DuplicateContainment(IReadableNode containedNode, IReadableNode newParent,
         IReadableNode existingParent) =>
         @delegate.DuplicateContainment(containedNode, newParent, existingParent);
 
     public Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
-        IWritableNode nodeId) =>
+        IReadableNode nodeId) =>
         @delegate.UnknownEnumerationLiteral(key, enumeration, property, nodeId);
 
-    public object? UnknownDatatype(Feature property, string? value, IWritableNode nodeId) =>
+    public object? UnknownDatatype(Feature property, string? value, IReadableNode nodeId) =>
         @delegate.UnknownDatatype(property, value, nodeId);
 
     public object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId) =>
@@ -228,7 +227,7 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
     public bool SkipDeserializingDependentNode(CompressedId id) =>
         @delegate.SkipDeserializingDependentNode(id);
 
-    public Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IWritableNode node)
+    public Feature? InvalidFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier, IReadableNode node)
         where TFeature : class, Feature =>
         @delegate.InvalidFeature<TFeature>(feature, classifier, node);
 
@@ -238,6 +237,6 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
     public void InvalidReference(IReadableNode node) =>
         @delegate.InvalidReference(node);
 
-    public void InvalidAnnotationParent(IWritableNode annotation, IReadableNode? parent) =>
+    public void InvalidAnnotationParent(IReadableNode annotation, IReadableNode? parent) =>
         @delegate.InvalidAnnotationParent(annotation, parent);
 }

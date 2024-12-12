@@ -21,26 +21,25 @@ using M2;
 using M3;
 using Serialization;
 
-public abstract class DeserializerBase<TVersion> : IDeserializer, ILionWebVersionUser<TVersion>
-where TVersion: LionWebVersions
+public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadableNode
 {
+    protected readonly IDeserializerVersionSpecifics<T> VersionSpecifics;
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
 
     protected readonly DeserializerMetaInfo _deserializerMetaInfo = new();
     protected readonly Dictionary<CompressedId, IReadableNode> _dependentNodesById = new();
-    
-    protected DeserializerBase(TVersion lionWebVersion)
+    protected readonly Dictionary<CompressedId, T> _deserializedNodesById = new();
+
+    protected DeserializerBase(IDeserializerVersionSpecifics<T> versionSpecifics)
     {
-        LionWebVersion = lionWebVersion;
-        _m3 = lionWebVersion.LionCore;
-        _builtIns = lionWebVersion.BuiltIns;
+        VersionSpecifics = versionSpecifics;
+        _m3 = versionSpecifics.Version.LionCore;
+        _builtIns = versionSpecifics.Version.BuiltIns;
     }
 
-    TVersion ILionWebVersionUser<TVersion>.ULionWebVersion => (TVersion)LionWebVersion;
-
     /// <inheritdoc />
-    public LionWebVersions LionWebVersion { get; }
+    public LionWebVersions LionWebVersion { get => VersionSpecifics.Version; }
 
     /// <inheritdoc />
     public IDeserializerHandler Handler
@@ -76,7 +75,7 @@ where TVersion: LionWebVersions
     public abstract void Process(SerializedNode serializedNode);
 
     /// <inheritdoc />
-    public abstract IEnumerable<IReadableNode> Finish();
+    public abstract IEnumerable<T> Finish();
 
     
     protected internal CompressedId Compress(string id) =>
@@ -87,20 +86,4 @@ where TVersion: LionWebVersions
 
     protected bool IsInDependentNodes(CompressedId compressedId) =>
         _dependentNodesById.ContainsKey(compressedId);
-}
-
-public abstract class DeserializerBase<T, TVersion>(TVersion lionWebVersion)
-    : DeserializerBase<TVersion>(lionWebVersion), IDeserializer<T>
-    where T : IReadableNode
-    where TVersion: LionWebVersions
-{
-    protected readonly Dictionary<CompressedId, T> _deserializedNodesById = new();
-
-    /// <inheritdoc />
-    public abstract override void Process(SerializedNode serializedNode);
-
-    IEnumerable<T> IDeserializer<T>.Finish() => (IEnumerable<T>)Finish();
-
-    /// <inheritdoc />
-    public abstract override IEnumerable<IReadableNode> Finish();
 }
