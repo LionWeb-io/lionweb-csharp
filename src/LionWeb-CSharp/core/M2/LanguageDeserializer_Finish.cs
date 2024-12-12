@@ -40,7 +40,8 @@ public partial class LanguageDeserializer
             .WithHandler(new AnnotationDeserializerHandler(Handler))
             .WithUncompressedIds(StoreUncompressedIds)
             .WithLanguages(_deserializedNodesById.Values.OfType<Language>())
-            .WithDependentNodes(_deserializedNodesById.Values);
+            .WithDependentNodes(_deserializedNodesById.Values)
+            .WithLionWebVersion(LionWebVersion);
 
         var deserializer = _deserializerBuilder.Build();
 

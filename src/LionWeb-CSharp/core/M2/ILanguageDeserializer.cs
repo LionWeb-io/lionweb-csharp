@@ -40,6 +40,9 @@ public static class ILanguageDeserializerExtensions
         SerializationChunk serializationChunk,
         params Language[] dependentLanguages)
     {
+        if (serializationChunk.SerializationFormatVersion != deserializer.LionWebVersion.VersionString)
+            throw new VersionMismatchException(serializationChunk.SerializationFormatVersion, deserializer.LionWebVersion.VersionString);
+        
         foreach (var dependentLanguage in dependentLanguages)
         {
             deserializer.RegisterDependentLanguage(dependentLanguage);

@@ -70,7 +70,12 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadable
 
     /// <inheritdoc />
     public virtual void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
-        => _deserializerMetaInfo.RegisterInstantiatedLanguage(language, factory);
+    {
+        if(!language.LionWebVersion.Equals(LionWebVersion))
+            throw new VersionMismatchException(language.LionWebVersion.VersionString, LionWebVersion.VersionString, $"[{language.Key}, {language.Version}]");
+            
+        _deserializerMetaInfo.RegisterInstantiatedLanguage(language, factory);
+    }
 
     /// <inheritdoc />
     public abstract void Process(SerializedNode serializedNode);

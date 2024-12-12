@@ -166,5 +166,5 @@ public class UnsupportedVersionException : LionWebExceptionBase
     }
 }
 
-public class VersionMismatchException(string? versionA, string versionB)
-    : LionWebExceptionBase($"Mismatched LionWeb versions: {versionA} vs. {versionB}");
+public class VersionMismatchException(string? versionA, string versionB, string? message = null)
+    : LionWebExceptionBase($"Mismatched LionWeb versions: {versionA} vs. {versionB}" + (message != null ? $": {message}" : ""));

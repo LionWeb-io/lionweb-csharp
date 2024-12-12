@@ -283,6 +283,9 @@ public abstract class SerializerBase : ISerializer
         Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.EqualsIdentity(language));
         if (existingLanguage == null)
         {
+            if(!language.LionWebVersion.Equals(LionWebVersion))
+                throw new VersionMismatchException(language.LionWebVersion.VersionString, LionWebVersion.VersionString, $"[{language.Key}, {language.Version}]");
+            
             _usedLanguages.Add(language);
             return;
         }

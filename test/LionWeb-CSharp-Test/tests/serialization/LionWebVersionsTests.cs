@@ -29,6 +29,8 @@ public class LionWebVersionsTests
 {
     int id = 0;
 
+    #region Instance
+
     [TestMethod]
     [DataRow("2023.1")]
     [DataRow("2024.1")]
@@ -64,6 +66,30 @@ public class LionWebVersionsTests
     }
 
     [TestMethod]
+    public void InstanceLanguage23_Chunk24()
+    {
+        CreateInstances(LionWebVersions.v2023_1, out _, out _, out var input);
+
+        Assert.ThrowsException<VersionMismatchException>(() =>
+            new Serializer(LionWebVersions.v2024_1) { StoreUncompressedIds = true }.SerializeToChunk(input)
+        );
+    }
+
+    [TestMethod]
+    public void InstanceLanguage24_Chunk23()
+    {
+        CreateInstances(LionWebVersions.v2024_1, out _, out _, out var input);
+
+        Assert.ThrowsException<VersionMismatchException>(() =>
+            new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk(input)
+        );
+    }
+
+    #endregion
+
+    #region Language
+
+    [TestMethod]
     [DataRow("2023.1")]
     [DataRow("2024.1")]
     public void SameVersion_Language(string versionString)
@@ -95,14 +121,9 @@ public class LionWebVersionsTests
                 language.Descendants(true, true));
 
         var versionSpecifics = IDeserializerVersionSpecifics.Create(LionWebVersions.v2024_1);
-        var deserialized = new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }
-            .Deserialize(chunk, new Language[0])
-            .Cast<IReadableNode>().ToList();
-
-        Assert.AreEqual(1, deserialized.Count);
-
-        var differences = new Comparer([language], deserialized).Compare();
-        Assert.IsFalse(differences.Any(), differences.DescribeAll(new()));
+        Assert.ThrowsException<VersionMismatchException>(() =>
+            new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }.Deserialize(chunk)
+        );
     }
 
     [TestMethod]
@@ -114,53 +135,34 @@ public class LionWebVersionsTests
                 language.Descendants(true, true));
 
         var versionSpecifics = IDeserializerVersionSpecifics.Create(LionWebVersions.v2023_1);
-        var deserialized = new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }
-            .Deserialize(chunk, new Language[0])
-            .Cast<IReadableNode>().ToList();
-
-        Assert.AreEqual(1, deserialized.Count);
-
-        var differences = new Comparer([language], deserialized).Compare();
-        Assert.IsFalse(differences.Any(), differences.DescribeAll(new()));
+        Assert.ThrowsException<VersionMismatchException>(() =>
+            new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }.Deserialize(chunk)
+        );
     }
 
     [TestMethod]
     public void Language23_Chunk24()
     {
         var language = CreateLanguage("2023_1_", LionWebVersions.v2023_1);
-        SerializationChunk chunk =
+
+        Assert.ThrowsException<VersionMismatchException>(() =>
             new Serializer(LionWebVersions.v2024_1) { StoreUncompressedIds = true }.SerializeToChunk(
-                language.Descendants(true, true));
-
-        var versionSpecifics = IDeserializerVersionSpecifics.Create(LionWebVersions.v2024_1);
-        var deserialized = new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }
-            .Deserialize(chunk, new Language[0])
-            .Cast<IReadableNode>().ToList();
-
-        Assert.AreEqual(1, deserialized.Count);
-
-        var differences = new Comparer([language], deserialized).Compare();
-        Assert.IsFalse(differences.Any(), differences.DescribeAll(new()));
+                language.Descendants(true, true))
+        );
     }
 
     [TestMethod]
     public void Language24_Chunk23()
     {
         var language = CreateLanguage("2024_1_", LionWebVersions.v2024_1);
-        SerializationChunk chunk =
+
+        Assert.ThrowsException<VersionMismatchException>(() =>
             new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk(
-                language.Descendants(true, true));
-
-        var versionSpecifics = IDeserializerVersionSpecifics.Create(LionWebVersions.v2023_1);
-        var deserialized = new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }
-            .Deserialize(chunk, new Language[0])
-            .Cast<IReadableNode>().ToList();
-
-        Assert.AreEqual(1, deserialized.Count);
-
-        var differences = new Comparer([language], deserialized).Compare();
-        Assert.IsFalse(differences.Any(), differences.DescribeAll(new()));
+                language.Descendants(true, true))
+        );
     }
+
+    #endregion
 
     private List<IReadableNode> Deserialize(DynamicLanguage language, LionWebVersions lionWebVersion,
         SerializationChunk chunk)
@@ -176,6 +178,16 @@ public class LionWebVersionsTests
 
     private DynamicLanguage Serialize(LionWebVersions lionWebVersion, out INode conceptNodeA, out INode conceptNodeB,
         out SerializationChunk chunk)
+    {
+        DynamicLanguage language = CreateInstances(lionWebVersion, out conceptNodeA, out conceptNodeB,
+            out List<IReadableNode> input);
+        chunk = new Serializer(lionWebVersion) { StoreUncompressedIds = true }.SerializeToChunk(input);
+        return language;
+    }
+
+    private DynamicLanguage CreateInstances(LionWebVersions lionWebVersion, out INode conceptNodeA,
+        out INode conceptNodeB,
+        out List<IReadableNode> input)
     {
         var language = CreateLanguage(lionWebVersion.VersionString.Replace(".", "_"), lionWebVersion);
         var myConcept = language.ClassifierByKey("key-myConcept") as Concept;
@@ -193,8 +205,7 @@ public class LionWebVersionsTests
         var annotation = factory.CreateNode(NextId("n"), myAnnotation);
         conceptNodeA.AddAnnotations([annotation]);
 
-        List<IReadableNode> input = [conceptNodeA, conceptNodeB, annotation];
-        chunk = new Serializer(lionWebVersion) { StoreUncompressedIds = true }.SerializeToChunk(input);
+        input = [conceptNodeA, conceptNodeB, annotation];
         return language;
     }
 
