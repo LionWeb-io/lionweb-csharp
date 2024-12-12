@@ -22,44 +22,56 @@ using M3;
 
 public interface LionWebVersions
 {
-    public abstract string VersionString { get; }
-    public abstract IBuiltInsLanguage BuiltIns { get; }
-    public abstract ILionCoreLanguage LionCore { get; }
+    public string VersionString { get; }
+    public IBuiltInsLanguage BuiltIns { get; }
+    public ILionCoreLanguage LionCore { get; }
 
     public static LionWebVersions Current => v2023_1;
 
     public static readonly IVersion2023_1 v2023_1 = Version2023_1.Instance;
-
     public interface IVersion2023_1 : LionWebVersions;
-
-    public class Version2023_1 : IVersion2023_1
-    {
-        internal static readonly Version2023_1 Instance = new(); 
-        
-        private Version2023_1() {}
-        
-        public string VersionString { get; } = "2023.1";
-
-        public IBuiltInsLanguage BuiltIns =>
-            new Lazy<IBuiltInsLanguage>(() => BuiltInsLanguage_2023_1.Instance).Value;
-
-        public ILionCoreLanguage LionCore =>
-            new Lazy<ILionCoreLanguage>(() => LionCoreLanguage_2023_1.Instance).Value;
-    }
-
+    
     public interface IVersion2024_1 : LionWebVersions;
     public static readonly IVersion2024_1 v2024_1 = Version2024_1.Instance;
-    public sealed class Version2024_1 : IVersion2024_1
-    {
-        internal static readonly Version2024_1 Instance = new(); 
-        private Version2024_1() {}
+}
+
+internal abstract class VersionBase<TBuiltIns, TLionCore> : LionWebVersions where TBuiltIns : IBuiltInsLanguage where TLionCore : ILionCoreLanguage
+{
+    public abstract string VersionString { get; }
+    
+    IBuiltInsLanguage LionWebVersions.BuiltIns { get => BuiltIns; }
+    public abstract TBuiltIns BuiltIns { get; }
+    
+    ILionCoreLanguage LionWebVersions.LionCore { get => LionCore; }
+    public abstract TLionCore LionCore { get; }
+    
+}
+
+internal sealed class Version2023_1 : VersionBase<IBuiltInsLanguage_2023_1, ILionCoreLanguage_2023_1>, LionWebVersions.IVersion2023_1
+{
+    internal static readonly Version2023_1 Instance = new Lazy<Version2023_1>(() => new()).Value; 
         
-        public string VersionString { get; } = "2024.1";
+    private Version2023_1() {}
+        
+    public override string VersionString => "2023.1";
 
-        public IBuiltInsLanguage BuiltIns =>
-            new Lazy<IBuiltInsLanguage>(() => BuiltInsLanguage_2024_1.Instance).Value;
+    public override IBuiltInsLanguage_2023_1 BuiltIns =>
+        new Lazy<IBuiltInsLanguage_2023_1>(() => BuiltInsLanguage_2023_1.Instance).Value;
 
-        public ILionCoreLanguage LionCore =>
-            new Lazy<ILionCoreLanguage>(() => LionCoreLanguage_2024_1.Instance).Value;
-    }
+    public override ILionCoreLanguage_2023_1 LionCore =>
+        new Lazy<ILionCoreLanguage_2023_1>(() => LionCoreLanguage_2023_1.Instance).Value;
+}
+
+internal sealed class Version2024_1 : VersionBase<IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>, LionWebVersions.IVersion2024_1
+{
+    internal static readonly Version2024_1 Instance = new Lazy<Version2024_1>(() => new()).Value; 
+    private Version2024_1() {}
+        
+    public override string VersionString => "2024.1";
+
+    public override IBuiltInsLanguage_2024_1 BuiltIns =>
+        new Lazy<IBuiltInsLanguage_2024_1>(() => BuiltInsLanguage_2024_1.Instance).Value;
+
+    public override ILionCoreLanguage_2024_1 LionCore =>
+        new Lazy<ILionCoreLanguage_2024_1>(() => LionCoreLanguage_2024_1.Instance).Value;
 }

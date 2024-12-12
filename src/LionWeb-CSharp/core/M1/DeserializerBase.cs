@@ -21,9 +21,10 @@ using M2;
 using M3;
 using Serialization;
 
+/// <inheritdoc />
 public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadableNode
 {
-    protected readonly IDeserializerVersionSpecifics<T> VersionSpecifics;
+    protected readonly IDeserializerVersionSpecifics VersionSpecifics;
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
 
@@ -31,7 +32,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : IReadable
     protected readonly Dictionary<CompressedId, IReadableNode> _dependentNodesById = new();
     protected readonly Dictionary<CompressedId, T> _deserializedNodesById = new();
 
-    protected DeserializerBase(IDeserializerVersionSpecifics<T> versionSpecifics)
+    protected DeserializerBase(IDeserializerVersionSpecifics versionSpecifics)
     {
         VersionSpecifics = versionSpecifics;
         _m3 = versionSpecifics.Version.LionCore;

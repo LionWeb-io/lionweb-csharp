@@ -19,8 +19,10 @@ namespace LionWeb.Core.M2;
 
 using M3;
 
+/// <inheritdoc />
 public interface IBuiltInsLanguage_2024_1 : IBuiltInsLanguage;
 
+/// <inheritdoc cref="IBuiltInsLanguage_2024_1" />
 public sealed class BuiltInsLanguage_2024_1 :
     LanguageBase<BuiltInsFactory_2024_1>, IBuiltInsLanguage_2024_1
 {
@@ -31,8 +33,11 @@ public sealed class BuiltInsLanguage_2024_1 :
 
     private const string _name = "LionCore_builtins";
 
-    protected override IBuiltInsLanguage _builtIns => this;
-    protected override ILionCoreLanguage _m3 => LionCoreLanguage_2024_1.Instance;
+    /// <inheritdoc />
+    protected override IBuiltInsLanguage_2024_1 _builtIns => this;
+
+    /// <inheritdoc />
+    protected override ILionCoreLanguage_2024_1 _m3 => LionCoreLanguage_2024_1.Instance;
 
     internal BuiltInsLanguage_2024_1() : base(LionCoreBuiltInsIdAndKey, LionWebVersions.v2024_1)
     {
@@ -98,44 +103,32 @@ public sealed class BuiltInsLanguage_2024_1 :
 
     private readonly Lazy<PrimitiveType> _boolean;
 
-    /// <summary>
-    /// The built-in primitive type Boolean.
-    /// </summary>
+    /// <inheritdoc />
     public PrimitiveType Boolean => _boolean.Value;
 
     private readonly Lazy<PrimitiveType> _integer;
 
-    /// <summary>
-    /// The built-in primitive type Integer.
-    /// </summary>
+    /// <inheritdoc />
     public PrimitiveType Integer => _integer.Value;
 
     private readonly Lazy<PrimitiveType> _string;
 
-    /// <summary>
-    /// The built-in primitive type String.
-    /// </summary>
+    /// <inheritdoc />
     public PrimitiveType String => _string.Value;
 
     private readonly Lazy<Interface> _iNamed;
 
-    /// <summary>
-    /// Generic concept for "named things".
-    /// </summary>
+    /// <inheritdoc />
     public Interface INamed => _iNamed.Value;
 
     private readonly Lazy<Property> _iNamed_name;
 
-    /// <summary>
-    /// The "name" <see cref="Property"/> of <c>INamed</c>.
-    /// </summary>
+    /// <inheritdoc />
     public Property INamed_name => _iNamed_name.Value;
 
     private readonly Lazy<Concept> _node;
 
-    /// <summary>
-    /// Generic concept that corresponds to a model node, i.e. <see cref="INode"/>.
-    /// </summary>
+    /// <inheritdoc />
     public Concept Node => _node.Value;
 
     /// <summary>

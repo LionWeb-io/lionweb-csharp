@@ -20,27 +20,26 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 
-public interface IDeserializerVersionSpecifics<T> where T : IReadableNode
+public interface IDeserializerVersionSpecifics
 {
-    public static IDeserializerVersionSpecifics<U> Create<U>(LionWebVersions lionWebVersion) where U : IReadableNode =>lionWebVersion switch
+    public static IDeserializerVersionSpecifics Create(LionWebVersions lionWebVersion) =>lionWebVersion switch
     {
-        LionWebVersions.Version2023_1 v => new DeserializerVersionSpecifics_2023_1<U>(),
-
-        LionWebVersions.Version2024_1 v => new DeserializerVersionSpecifics_2024_1<U>(),
+        LionWebVersions.IVersion2023_1 => new DeserializerVersionSpecifics_2023_1(),
+        LionWebVersions.IVersion2024_1 => new DeserializerVersionSpecifics_2024_1(),
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
     
     LionWebVersions Version { get; }
 
-    object? ConvertPrimitiveType(DeserializerBase<T> self, T node, Property property, string value);
+    object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node, Property property, string value) where T : IReadableNode;
 }
 
-class DeserializerVersionSpecifics_2023_1<T> : IDeserializerVersionSpecifics<T> where T : IReadableNode
+class DeserializerVersionSpecifics_2023_1 : IDeserializerVersionSpecifics
 {
     public LionWebVersions Version => LionWebVersions.v2023_1;
 
-    public object? ConvertPrimitiveType(DeserializerBase<T> self, T node,
-        Property property, string value)
+    public object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node,
+        Property property, string value) where T : IReadableNode
     {
         CompressedId compressedId = self.Compress(node.GetId());
         return property.Type switch
@@ -59,12 +58,12 @@ class DeserializerVersionSpecifics_2023_1<T> : IDeserializerVersionSpecifics<T> 
     }
 }
 
-class DeserializerVersionSpecifics_2024_1<T> : IDeserializerVersionSpecifics<T> where T : IReadableNode
+class DeserializerVersionSpecifics_2024_1 : IDeserializerVersionSpecifics
 {
     public LionWebVersions Version => LionWebVersions.v2024_1;
 
-    public object? ConvertPrimitiveType(DeserializerBase<T> self, T node,
-        Property property, string value)
+    public object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node,
+        Property property, string value) where T : IReadableNode
     {
         CompressedId compressedId = self.Compress(node.GetId());
         return property.Type switch

@@ -113,7 +113,7 @@ public class LanguageSerializationTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        var deserializer = new LanguageDeserializer(IDeserializerVersionSpecifics<IReadableNode>.Create<IReadableNode>(_lionWebVersion), false);
+        var deserializer = new LanguageDeserializer(IDeserializerVersionSpecifics.Create(_lionWebVersion), false);
         foreach (var serializedNode in serializationChunk.Nodes)
         {
             deserializer.Process(serializedNode);

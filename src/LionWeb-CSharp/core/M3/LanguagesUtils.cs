@@ -39,7 +39,7 @@ public static class LanguagesUtils
     {
         Stream stream = ResourcesUtils.GetAssemblyByName(assemblyName).GetManifestResourceStream(resourceName) ??
                         throw new ArgumentException($"Cannot read resource: {resourceName}", nameof(resourceName));
-        return JsonUtils.ReadNodesFromStream(stream, new LanguageDeserializer(IDeserializerVersionSpecifics<IReadableNode>.Create<IReadableNode>(lionWebVersion))).GetAwaiter().GetResult()
+        return JsonUtils.ReadNodesFromStream(stream, new LanguageDeserializer(IDeserializerVersionSpecifics.Create(lionWebVersion))).GetAwaiter().GetResult()
             .Cast<DynamicLanguage>();
     }
 }

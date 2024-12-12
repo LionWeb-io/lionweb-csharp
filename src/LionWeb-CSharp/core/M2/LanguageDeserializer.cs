@@ -45,7 +45,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     /// <param name="dependentLanguages">Referred languages.</param>
     /// 
     /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
-    public LanguageDeserializer(IDeserializerVersionSpecifics<IReadableNode> versionSpecifics , bool preloadLionCoreLanguage = true) : base(versionSpecifics)
+    public LanguageDeserializer(IDeserializerVersionSpecifics versionSpecifics , bool preloadLionCoreLanguage = true) : base(versionSpecifics)
     {
         RegisterDependentLanguage(_builtIns);
 

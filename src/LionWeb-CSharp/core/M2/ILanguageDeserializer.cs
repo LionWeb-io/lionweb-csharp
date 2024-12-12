@@ -21,6 +21,7 @@ using M1;
 using M3;
 using Serialization;
 
+/// <inheritdoc />
 public interface ILanguageDeserializer : IDeserializer<DynamicLanguage>
 {
     void RegisterDependentLanguage(Language language);
@@ -60,7 +61,7 @@ public static class ILanguageDeserializerExtensions
     public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
         LionWebVersions lionWebVersion, params Language[] dependentLanguages)
     {
-        var versionSpecifics = IDeserializerVersionSpecifics<IReadableNode>.Create<IReadableNode>(lionWebVersion);
+        var versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion);
         return new LanguageDeserializer(versionSpecifics).Deserialize(serializationChunk, dependentLanguages);
     }
 }

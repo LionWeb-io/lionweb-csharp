@@ -44,8 +44,8 @@ public partial class Deserializer : DeserializerBase<IWritableNode>
     /// <summary>
     /// TODO
     /// </summary>
-    /// <param name="lionWebVersion"></param>
-    public Deserializer(IDeserializerVersionSpecifics<IWritableNode> versionSpecifics) : base(versionSpecifics)
+    /// <param name="versionSpecifics"></param>
+    public Deserializer(IDeserializerVersionSpecifics versionSpecifics) : base(versionSpecifics)
     {
         RegisterInstantiatedLanguage(_builtIns, _builtIns.GetFactory());
     }

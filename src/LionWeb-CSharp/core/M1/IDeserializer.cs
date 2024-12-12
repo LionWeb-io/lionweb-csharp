@@ -32,7 +32,7 @@ public interface IDeserializer
     void RegisterDependentNodes(IEnumerable<IReadableNode> dependentNodes);
 
     /// <returns>
-    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNodes">serialized nodes</paramref>.
+    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNode">serialized nodes</paramref>.
     /// References to any of the given dependent nodes are resolved as well.
     /// </returns>
     /// <exception cref="DeserializerException"/>
@@ -110,17 +110,6 @@ public class DeserializerBuilder
         return this;
     }
 
-    // var primitiveTypeConverter = _lionWebVersion switch
-    // {
-    //     LionWebVersions.Version2023_1 => PrimitiveTypeConverter_2023_1,
-    //     LionWebVersions.Version2024_1 => PrimitiveTypeConverter_2024_1,
-    //     _ => throw new UnsupportedVersionException(_lionWebVersion)
-    // };
-    //     
-    // IDeserializer result = _handler != null
-    //     ? new Deserializer(_lionWebVersion) { Handler = _handler, StoreUncompressedIds = _storeUncompressedIds, PrimitiveTypeConverter = primitiveTypeConverter}
-    //     : new Deserializer(_lionWebVersion) { StoreUncompressedIds = _storeUncompressedIds, PrimitiveTypeConverter = primitiveTypeConverter };
-
     public IDeserializer Build()
     {
         IDeserializer result = CreateDeserializer(_lionWebVersion);
@@ -136,17 +125,12 @@ public class DeserializerBuilder
 
     private IDeserializer CreateDeserializer(LionWebVersions lionWebVersion)
     {
-        var iDeserializerVersionSpecifics =
-            IDeserializerVersionSpecifics<IWritableNode>.Create<IWritableNode>(lionWebVersion);
-        if (_handler == null)
-        {
-            return new Deserializer(iDeserializerVersionSpecifics) { StoreUncompressedIds = _storeUncompressedIds };
-        }
+        var versionSpecifics =
+            IDeserializerVersionSpecifics.Create(lionWebVersion);
 
-        return new Deserializer(iDeserializerVersionSpecifics)
-        {
-            StoreUncompressedIds = _storeUncompressedIds, Handler = _handler
-        };
+        return _handler == null
+            ? new Deserializer(versionSpecifics) { StoreUncompressedIds = _storeUncompressedIds }
+            : new Deserializer(versionSpecifics) { StoreUncompressedIds = _storeUncompressedIds, Handler = _handler };
     }
 }
 
