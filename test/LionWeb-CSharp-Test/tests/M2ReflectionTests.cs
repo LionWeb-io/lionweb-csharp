@@ -20,6 +20,7 @@
 namespace LionWeb.Core.M3.Test;
 
 using M2;
+using VersionSpecific.V2023_1;
 
 [TestClass]
 public class M2ReflectionTests

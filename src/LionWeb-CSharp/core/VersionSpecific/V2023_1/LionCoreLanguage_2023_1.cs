@@ -16,10 +16,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable InconsistentNaming
-
-namespace LionWeb.Core.M3;
+namespace LionWeb.Core.VersionSpecific.V2023_1;
 
 using M2;
+using M3;
 
 /// <inheritdoc />
 public interface ILionCoreLanguage_2023_1 : ILionCoreLanguage;
@@ -40,7 +40,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
 
     /// <inheritdoc />
     protected override ILionCoreLanguage_2023_1 _m3 => this;
-    
+
     internal LionCoreLanguage_2023_1() : base("-id-LionCore-M3", LionWebVersions.v2023_1)
     {
         _annotation = new(() => new M3Concept("-id-Annotation", this)

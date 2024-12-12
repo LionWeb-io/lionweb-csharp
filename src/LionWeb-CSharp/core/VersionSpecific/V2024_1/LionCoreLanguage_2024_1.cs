@@ -16,10 +16,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable InconsistentNaming
-
-namespace LionWeb.Core.M3;
+namespace LionWeb.Core.VersionSpecific.V2024_1;
 
 using M2;
+using M3;
 
 /// <inheritdoc />
 public interface ILionCoreLanguage_2024_1 : ILionCoreLanguage;
@@ -402,172 +402,172 @@ public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_
 
     private readonly Lazy<Concept> _annotation;
 
-    /// <inheritdoc cref="M3.Annotation"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Annotation"/>
     public Concept Annotation => _annotation.Value;
 
     private readonly Lazy<Reference> _annotation_annotates;
 
-    /// <inheritdoc cref="M3.Annotation.Annotates"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Annotation.Annotates"/>
     public Reference Annotation_annotates => _annotation_annotates.Value;
 
     private readonly Lazy<Reference> _annotation_extends;
 
-    /// <inheritdoc cref="M3.Annotation.Extends"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Annotation.Extends"/>
     public Reference Annotation_extends => _annotation_extends.Value;
 
     private readonly Lazy<Reference> _annotation_implements;
 
-    /// <inheritdoc cref="M3.Annotation.Implements"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Annotation.Implements"/>
     public Reference Annotation_implements => _annotation_implements.Value;
 
     private readonly Lazy<Concept> _classifier;
 
-    /// <inheritdoc cref="M3.Classifier"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Classifier"/>
     public Concept Classifier => _classifier.Value;
 
     private readonly Lazy<Containment> _classifier_features;
 
-    /// <inheritdoc cref="M3.Classifier.Features"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Classifier.Features"/>
     public Containment Classifier_features => _classifier_features.Value;
 
     private readonly Lazy<Concept> _concept;
 
-    /// <inheritdoc cref="M3.Concept"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Concept"/>
     public Concept Concept => _concept.Value;
 
     private readonly Lazy<Property> _concept_abstract;
 
-    /// <inheritdoc cref="M3.Concept.Abstract"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Concept.Abstract"/>
     public Property Concept_abstract => _concept_abstract.Value;
 
     private readonly Lazy<Property> _concept_partition;
 
-    /// <inheritdoc cref="M3.Concept.Partition"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Concept.Partition"/>
     public Property Concept_partition => _concept_partition.Value;
 
     private readonly Lazy<Reference> _concept_extends;
 
-    /// <inheritdoc cref="M3.Concept.Extends"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Concept.Extends"/>
     public Reference Concept_extends => _concept_extends.Value;
 
     private readonly Lazy<Reference> _concept_implements;
 
-    /// <inheritdoc cref="M3.Concept.Implements"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Concept.Implements"/>
     public Reference Concept_implements => _concept_implements.Value;
 
     private readonly Lazy<Concept> _containment;
 
-    /// <inheritdoc cref="M3.Containment"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Containment"/>
     public Concept Containment => _containment.Value;
 
     private readonly Lazy<Concept> _dataType;
 
-    /// <inheritdoc cref="M3.Datatype"/>
+    /// <inheritdoc cref="Datatype"/>
     public Concept DataType => _dataType.Value;
 
     private readonly Lazy<Concept> _enumeration;
 
-    /// <inheritdoc cref="M3.Enumeration"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Enumeration"/>
     public Concept Enumeration => _enumeration.Value;
 
     private readonly Lazy<Containment> _enumeration_literals;
 
-    /// <inheritdoc cref="M3.Enumeration.Literals"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Enumeration.Literals"/>
     public Containment Enumeration_literals => _enumeration_literals.Value;
 
     private readonly Lazy<Concept> _enumerationLiteral;
 
-    /// <inheritdoc cref="M3.EnumerationLiteral"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.EnumerationLiteral"/>
     public Concept EnumerationLiteral => _enumerationLiteral.Value;
 
     private readonly Lazy<Concept> _feature;
 
-    /// <inheritdoc cref="M3.Feature"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Feature"/>
     public Concept Feature => _feature.Value;
 
     private readonly Lazy<Property> _feature_optional;
 
-    /// <inheritdoc cref="M3.Feature.Optional"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Feature.Optional"/>
     public Property Feature_optional => _feature_optional.Value;
 
     private readonly Lazy<Interface> _iKeyed;
 
-    /// <inheritdoc cref="M3.IKeyed"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.IKeyed"/>
     public Interface IKeyed => _iKeyed.Value;
 
     private readonly Lazy<Property> _iKeyed_key;
 
-    /// <inheritdoc cref="M3.IKeyed.Key"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.IKeyed.Key"/>
     public Property IKeyed_key => _iKeyed_key.Value;
 
     private readonly Lazy<Concept> _interface;
 
-    /// <inheritdoc cref="M3.Interface"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Interface"/>
     public Concept Interface => _interface.Value;
 
     private readonly Lazy<Reference> _interface_extends;
 
-    /// <inheritdoc cref="M3.Interface.Extends"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Interface.Extends"/>
     public Reference Interface_extends => _interface_extends.Value;
 
     private readonly Lazy<Concept> _language;
 
-    /// <inheritdoc cref="M3.Language"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Language"/>
     public Concept Language => _language.Value;
 
     private readonly Lazy<Property> _language_version;
 
-    /// <inheritdoc cref="M3.Language.Version"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Language.Version"/>
     public Property Language_version => _language_version.Value;
 
     private readonly Lazy<Containment> _language_entities;
 
-    /// <inheritdoc cref="M3.Language.Entities"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Language.Entities"/>
     public Containment Language_entities => _language_entities.Value;
 
     private readonly Lazy<Reference> _language_dependsOn;
 
-    /// <inheritdoc cref="M3.Language.DependsOn"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Language.DependsOn"/>
     public Reference Language_dependsOn => _language_dependsOn.Value;
 
     private readonly Lazy<Concept> _languageEntity;
 
-    /// <inheritdoc cref="M3.LanguageEntity"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.LanguageEntity"/>
     public Concept LanguageEntity => _languageEntity.Value;
 
     private readonly Lazy<Concept> _link;
 
-    /// <inheritdoc cref="M3.Link"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Link"/>
     public Concept Link => _link.Value;
 
     private readonly Lazy<Property> _link_multiple;
 
-    /// <inheritdoc cref="M3.Link.Multiple"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Link.Multiple"/>
     public Property Link_multiple => _link_multiple.Value;
 
     private readonly Lazy<Reference> _link_type;
 
-    /// <inheritdoc cref="M3.Link.Type"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Link.Type"/>
     public Reference Link_type => _link_type.Value;
 
     private readonly Lazy<Concept> _primitiveType;
 
-    /// <inheritdoc cref="M3.PrimitiveType"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.PrimitiveType"/>
     public Concept PrimitiveType => _primitiveType.Value;
 
     private readonly Lazy<Concept> _property;
 
-    /// <inheritdoc cref="M3.Property"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Property"/>
     public Concept Property => _property.Value;
 
     private readonly Lazy<Reference> _property_type;
 
-    /// <inheritdoc cref="M3.Property.Type"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Property.Type"/>
     public Reference Property_type => _property_type.Value;
 
     private readonly Lazy<Concept> _reference;
 
-    /// <inheritdoc cref="M3.Reference"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Reference"/>
     public Concept Reference => _reference.Value;
 }
 
@@ -581,34 +581,34 @@ public sealed class LionCoreFactory_2024_1 : INodeFactory
         _language = language;
     }
 
-    /// <inheritdoc cref="M3.Annotation"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Annotation"/>
     public DynamicAnnotation Annotation(string id) => new(id, null);
 
-    /// <inheritdoc cref="M3.Concept"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Concept"/>
     public DynamicConcept Concept(string id) => new(id, null);
 
-    /// <inheritdoc cref="M3.Containment"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Containment"/>
     public DynamicContainment Containment(string id) => new(id, null);
 
-    /// <inheritdoc cref="M3.Enumeration"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Enumeration"/>
     public DynamicEnumeration Enumeration(string id) => new(id, null);
 
-    /// <inheritdoc cref="M3.EnumerationLiteral"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.EnumerationLiteral"/>
     public DynamicEnumerationLiteral EnumerationLiteral(string id) => new(id, null);
 
-    /// <inheritdoc cref="M3.Interface"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Interface"/>
     public DynamicInterface Interface(string id) => new(id, null);
 
-    /// <inheritdoc cref="M3.Language"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Language"/>
     public DynamicLanguage Language(string id) => new(id, _language.LionWebVersion);
 
-    /// <inheritdoc cref="M3.PrimitiveType"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.PrimitiveType"/>
     public DynamicPrimitiveType PrimitiveType(string id) => new(id, null);
 
-    /// <inheritdoc cref="M3.Property"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Property"/>
     public DynamicProperty Property(string id) => new(id, null);
 
-    /// <inheritdoc cref="M3.Reference"/>
+    /// <inheritdoc cref="LionWeb.Core.M3.Reference"/>
     public DynamicReference Reference(string id) => new(id, null);
 
     /// <inheritdoc />

@@ -15,23 +15,20 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1;
+// ReSharper disable InconsistentNaming
+namespace LionWeb.Core.VersionSpecific.V2024_1;
 
-using M3;
-using VersionSpecific.V2023_1;
-using VersionSpecific.V2024_1;
-
-public interface IDeserializerVersionSpecifics
+internal sealed class Version2024_1 : VersionBase<IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>,
+    LionWebVersions.IVersion2024_1
 {
-    public static IDeserializerVersionSpecifics Create(LionWebVersions lionWebVersion) => lionWebVersion switch
-    {
-        LionWebVersions.IVersion2023_1 => new DeserializerVersionSpecifics_2023_1(),
-        LionWebVersions.IVersion2024_1 => new DeserializerVersionSpecifics_2024_1(),
-        _ => throw new UnsupportedVersionException(lionWebVersion)
-    };
+    internal static readonly Version2024_1 Instance = new Lazy<Version2024_1>(() => new()).Value;
+    private Version2024_1() { }
 
-    LionWebVersions Version { get; }
+    public override string VersionString => "2024.1";
 
-    object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node, Property property, string value)
-        where T : IReadableNode;
+    public override IBuiltInsLanguage_2024_1 BuiltIns =>
+        new Lazy<IBuiltInsLanguage_2024_1>(() => BuiltInsLanguage_2024_1.Instance).Value;
+
+    public override ILionCoreLanguage_2024_1 LionCore =>
+        new Lazy<ILionCoreLanguage_2024_1>(() => LionCoreLanguage_2024_1.Instance).Value;
 }
