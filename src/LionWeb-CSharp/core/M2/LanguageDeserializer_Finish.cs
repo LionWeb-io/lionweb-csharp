@@ -44,7 +44,9 @@ public partial class LanguageDeserializer
 
         var deserializer = _deserializerBuilder.Build();
 
-        var annotationNodes = _serializedNodesById.Where(p => !_deserializedNodesById.ContainsKey(p.Key))
+        var annotationNodes = _serializedNodesById
+            .Where(p => !_deserializedNodesById.ContainsKey(p.Key))
+            .Where(p => !IsInDependentNodes(p.Key))
             .Select(p => p.Value);
         List<IReadableNode> deserializedAnnotations = deserializer.Deserialize(annotationNodes);
 
@@ -72,7 +74,11 @@ public partial class LanguageDeserializer
             if (parentId == null)
                 continue;
 
-            if (!_deserializedNodesById.TryGetValue(Compress(parentId), out var parent) ||
+            CompressedId compressedParentId = Compress(parentId);
+            if(IsInDependentNodes(compressedParentId))
+                continue;
+            
+            if (!_deserializedNodesById.TryGetValue(compressedParentId, out var parent) ||
                 parent is not IWritableNode writableParent)
             {
                 Handler.InvalidAnnotationParent(deserializedAnnotation, parent);

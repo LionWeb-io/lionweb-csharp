@@ -33,9 +33,9 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
 {
-    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>();
+    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
 
-    private IEnumerable<Classifier> Classifiers => Language.Entities.OfType<Classifier>();
+    private IEnumerable<Classifier> Classifiers => Language.Entities.OfType<Classifier>().Ordered();
 
     public CompilationUnitSyntax DefinitionFile() =>
         CompilationUnit()
@@ -88,7 +88,7 @@ public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) :
             .ToArray();
 
     private IEnumerable<UsingDirectiveSyntax> PrimitiveTypesAsUsings() =>
-        Language.Entities.OfType<PrimitiveType>().Select(p =>
+        Language.Entities.OfType<PrimitiveType>().Ordered().Select(p =>
             UsingDirective(
                 NameEquals(IdentifierName(p.Name)),
                 AsType(typeof(string))

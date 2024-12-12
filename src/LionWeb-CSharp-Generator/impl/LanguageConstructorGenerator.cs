@@ -40,9 +40,12 @@ public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebV
                 $"{AsType(typeof(LionWebVersions))}.v{_lionWebVersion.VersionString.Replace('.', '_')}"
             ))
             .WithBody(AsStatements(
-                Language.Entities.SelectMany(EntityConstructorInitialization)
+                Language.Entities.Ordered().SelectMany(EntityConstructorInitialization)
+                    .Append(GenFactoryInitialization())
             ));
 
+    private StatementSyntax GenFactoryInitialization() =>
+        Assignment("_factory", NewCall([This()], _names.FactoryType));
 
     private IEnumerable<StatementSyntax> EntityConstructorInitialization(LanguageEntity entity)
     {
@@ -70,10 +73,10 @@ public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebV
         switch (entity)
         {
             case Classifier classifier:
-                result.AddRange(classifier.Features.Select(FeatureConstructorInitialization));
+                result.AddRange(classifier.Features.Ordered().Select(FeatureConstructorInitialization));
                 break;
             case Enumeration enumeration:
-                result.AddRange(enumeration.Literals.Select(LiteralConstructorInitialization));
+                result.AddRange(enumeration.Literals.Ordered().Select(LiteralConstructorInitialization));
                 break;
             default:
                 // fall-through
@@ -120,7 +123,7 @@ public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebV
     private (List<(string, ExpressionSyntax)>, TypeSyntax) EntityConstructorInitialization(Enumeration enumeration)
     {
         var result = KeyName(enumeration);
-        result.Add(("LiteralsLazy", NewLazy(Collection(enumeration.Literals.Select(AsProperty)))));
+        result.Add(("LiteralsLazy", NewLazy(Collection(enumeration.Literals.Ordered().Select(AsProperty)))));
 
         return (result, AsType(typeof(EnumerationBase<>), generics: LanguageType));
     }
@@ -138,7 +141,7 @@ public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebV
 
     private IEnumerable<(string, ExpressionSyntax)> Implements(string key, IEnumerable<Interface>? ifaces)
     {
-        var enumerable = ifaces?.ToList();
+        var enumerable = ifaces?.Ordered().ToList();
         if (enumerable == null || enumerable.Count == 0)
             return [];
 
@@ -150,10 +153,7 @@ public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebV
         if (!classifier.Features.Any())
             return [];
 
-        return
-        [
-            ("FeaturesLazy", NewLazy(Collection(classifier.Features.Select(feature => _names.AsProperty(feature)))))
-        ];
+        return [("FeaturesLazy", NewLazy(Collection(classifier.Features.Ordered().Select(feature => _names.AsProperty(feature)))))];
     }
 
     #endregion

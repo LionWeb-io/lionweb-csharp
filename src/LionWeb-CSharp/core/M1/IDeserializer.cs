@@ -35,12 +35,14 @@ public interface IDeserializer
     /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNodes">serialized nodes</paramref>.
     /// References to any of the given dependent nodes are resolved as well.
     /// </returns>
-    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
+    /// <exception cref="DeserializerException"/>
     void Process(SerializedNode serializedNode);
 
     IEnumerable<IReadableNode> Finish();
 }
 
+/// <inheritdoc />
+/// <typeparam name="T">Type of node to return</typeparam>
 public interface IDeserializer<out T> : IDeserializer where T : IReadableNode
 {
     IEnumerable<IReadableNode> IDeserializer.Finish() =>

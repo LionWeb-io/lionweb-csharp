@@ -61,20 +61,19 @@ public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : L
                     ("Version", names.Language.Version.AsLiteral())
                 ])
             ]))
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(AsType(typeof(LanguageBase<>), generics: FactoryInterfaceType)))
             .WithMembers(List(new List<MemberDeclarationSyntax>
                 {
                     GenLanguageInstance(),
                     new LanguageConstructorGenerator(_names, _lionWebVersion).GenConstructor(),
                     GenEntities(),
-                    GenDependsOn(),
-                    GenGetFactory()
+                    GenDependsOn()
                 }
                 .Concat(LanguageKeyMembers())
                 .Concat(LanguageNameMembers())
                 .Concat(LanguageVersionFieldMembers())
-                .Concat(Language.Entities.SelectMany(EntityLanguageMembers))));
+                .Concat(Language.Entities.Ordered().SelectMany(EntityLanguageMembers))));
 
     private FieldDeclarationSyntax GenLanguageInstance() =>
         Field("Instance", LanguageType,
@@ -87,7 +86,7 @@ public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : L
     private PropertyDeclarationSyntax GenEntities() =>
         ReadOnlyProperty("Entities", AsType(typeof(IReadOnlyList<LanguageEntity>)),
                 Collection(
-                    Language.Entities.Where(e => e is not PrimitiveType)
+                    Language.Entities.Where(e => e is not PrimitiveType).Ordered()
                         .Select(AsProperty)
                 )
             )
@@ -97,14 +96,9 @@ public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : L
     private PropertyDeclarationSyntax GenDependsOn() =>
         ReadOnlyProperty("DependsOn", AsType(typeof(IReadOnlyList<Language>)),
                 Collection(
-                    Language.DependsOn.Select(d => _names.MetaProperty(d))
+                    Language.DependsOn.Ordered().Select(d => _names.MetaProperty(d))
                 )
             )
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
-            .Xdoc(XdocInheritDoc());
-
-    private MethodDeclarationSyntax GenGetFactory() =>
-        Method("GetFactory", FactoryInterfaceType, exprBody: NewCall([ThisExpression()], _names.FactoryType))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc());
 
@@ -127,18 +121,18 @@ public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : L
             Field(LanguageFieldName(entity), AsType(typeof(Lazy<>), generics: AsType(type)))
                 .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
             ReadOnlyProperty(AsProperty(entity).ToString(), AsType(type),
-                MemberAccess(IdentifierName(LanguageFieldName(entity)), IdentifierName("Value"))
-            )
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(entity)]))
+                    MemberAccess(IdentifierName(LanguageFieldName(entity)), IdentifierName("Value"))
+                )
+                .WithAttributeLists(AsAttributes([ObsoleteAttribute(entity)]))
         ];
 
         switch (entity)
         {
             case Classifier classifier:
-                result.AddRange(classifier.Features.SelectMany(FeatureLanguageMember));
+                result.AddRange(classifier.Features.Ordered().SelectMany(FeatureLanguageMember));
                 break;
             case Enumeration enumeration:
-                result.AddRange(enumeration.Literals.SelectMany(LiteralLanguageMember));
+                result.AddRange(enumeration.Literals.Ordered().SelectMany(LiteralLanguageMember));
                 break;
             default:
                 // fall-through
@@ -163,9 +157,9 @@ public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : L
             Field(LanguageFieldName(feature), AsType(typeof(Lazy<>), generics: AsType(type)))
                 .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
             ReadOnlyProperty(_names.AsProperty(feature).Identifier.Text, AsType(type),
-                MemberAccess(IdentifierName(LanguageFieldName(feature)), IdentifierName("Value"))
-            )
-            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
+                    MemberAccess(IdentifierName(LanguageFieldName(feature)), IdentifierName("Value"))
+                )
+                .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
         ];
     }
 

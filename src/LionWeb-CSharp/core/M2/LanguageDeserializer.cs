@@ -64,7 +64,15 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     public void RegisterDependentLanguage(Language language)
     {
         _deserializerBuilder.WithLanguage(language);
-        RegisterDependentNodes(M1Extensions.Descendants<IKeyed>(language, [], true));
+        RegisterDependentNodes(M1Extensions.Descendants<IKeyed>(language, [], true, true));
+    }
+
+    /// <inheritdoc />
+    public override void RegisterDependentNodes(IEnumerable<IReadableNode> dependentNodes)
+    {
+        var nodes = dependentNodes.ToList();
+        base.RegisterDependentNodes(nodes);
+        _deserializerBuilder.WithDependentNodes(nodes);
     }
 
     #region Process

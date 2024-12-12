@@ -940,4 +940,7 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
 
     /// <inheritdoc />
     public INodeFactory GetFactory() => NodeFactory ??= new ReflectiveBaseNodeFactory(this);
+
+    /// <inheritdoc />
+    public void SetFactory(INodeFactory factory) => NodeFactory = factory;
 }

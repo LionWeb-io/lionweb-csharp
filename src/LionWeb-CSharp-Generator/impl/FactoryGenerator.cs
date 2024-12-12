@@ -38,9 +38,10 @@ public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : Ge
         Language
             .Entities
             .OfType<Classifier>()
-            .Where(c => c is Concept { Abstract: false } or Annotation);
+            .Where(c => c is Concept { Abstract: false } or Annotation)
+            .Ordered();
 
-    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>();
+    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
 
     /// <inheritdoc cref="FactoryGenerator"/>
     public IEnumerable<TypeDeclarationSyntax> FactoryTypes() =>
@@ -51,7 +52,7 @@ public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : Ge
 
     private InterfaceDeclarationSyntax FactoryInterface() =>
         InterfaceDeclaration(FactoryInterfaceName)
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(AsType(typeof(INodeFactory))))
             .WithMembers(List(new List<MemberDeclarationSyntax>(
                 ConcreteClassifiers

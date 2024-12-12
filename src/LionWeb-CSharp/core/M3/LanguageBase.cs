@@ -26,6 +26,8 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     : ReadableNodeBase<IReadableNode>(id, null), Language<TNodeFactory>
     where TNodeFactory : INodeFactory
 {
+    protected TNodeFactory _factory;
+
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;
 
@@ -78,7 +80,10 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     public abstract IReadOnlyList<Language> DependsOn { get; }
 
     /// <inheritdoc />
-    public abstract TNodeFactory GetFactory();
+    public virtual TNodeFactory GetFactory() => _factory;
+
+    /// <inheritdoc />
+    public virtual void SetFactory(TNodeFactory factory) => _factory = factory;
 }
 
 /// <inheritdoc cref="IKeyed"/>
