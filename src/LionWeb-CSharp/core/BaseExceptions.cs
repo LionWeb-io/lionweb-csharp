@@ -155,5 +155,16 @@ public class UnsupportedNodeTypeException(object? node, string? paramName)
 public class TreeShapeException(IReadableNode node, string message)
     : LionWebExceptionBase($"{node.GetId()}: {message}");
 
-public class UnsupportedVersionException(LionWebVersions version)
-    : LionWebExceptionBase($"Unsupported LionWeb version: {version}");
+public class UnsupportedVersionException : LionWebExceptionBase
+{
+    public UnsupportedVersionException(LionWebVersions version) : base($"Unsupported LionWeb version: {version}")
+    {
+    }
+    
+    public UnsupportedVersionException(string version) : base($"Unsupported LionWeb version: {version}")
+    {
+    }
+}
+
+public class VersionMismatchException(string? versionA, string versionB)
+    : LionWebExceptionBase($"Mismatched LionWeb versions: {versionA} vs. {versionB}");

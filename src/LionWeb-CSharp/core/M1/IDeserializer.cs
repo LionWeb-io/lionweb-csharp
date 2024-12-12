@@ -149,8 +149,12 @@ public static class IDeserializerExtensions
     /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
     public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
         SerializationChunk serializationChunk,
-        IEnumerable<INode> dependentNodes) =>
-        deserializer.Deserialize(serializationChunk.Nodes, dependentNodes);
+        IEnumerable<INode> dependentNodes)
+    {
+        if (serializationChunk.SerializationFormatVersion != deserializer.LionWebVersion.VersionString)
+            throw new VersionMismatchException(serializationChunk.SerializationFormatVersion, deserializer.LionWebVersion.VersionString);
+        return deserializer.Deserialize(serializationChunk.Nodes, dependentNodes);
+    }
 
     public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
         IEnumerable<SerializedNode> serializedNodes) =>

@@ -342,7 +342,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     /// <inheritdoc />
     public virtual object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId) =>
         throw new DeserializerException(
-            $"On node with id={nodeId}: invalid property value {value} for property {property}");
+            $"On node with id={nodeId}: invalid property value '{value}' for property {property}");
 
     #endregion
 

@@ -19,7 +19,7 @@
 namespace LionWeb.Core.VersionSpecific.V2024_1;
 
 internal sealed class Version2024_1 : VersionBase<IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>,
-    LionWebVersions.IVersion2024_1
+    IVersion2024_1
 {
     internal static readonly Version2024_1 Instance = new Lazy<Version2024_1>(() => new()).Value;
     private Version2024_1() { }

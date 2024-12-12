@@ -30,21 +30,30 @@ public interface LionWebVersions
 
     public static LionWebVersions Current => v2023_1;
 
-    public static readonly IVersion2023_1 v2023_1 = Version2023_1.Instance;
-    public interface IVersion2023_1 : LionWebVersions;
-    
-    public interface IVersion2024_1 : LionWebVersions;
-    public static readonly IVersion2024_1 v2024_1 = Version2024_1.Instance;
+    public static IReadOnlyList<LionWebVersions> AllVersions { get => [v2023_1, v2024_1]; }
+
+    public static LionWebVersions GetByVersionString(string versionString) =>
+        AllVersions.FirstOrDefault(v => v.VersionString == versionString) ??
+        throw new UnsupportedVersionException(versionString);
+
+    public static IVersion2023_1 v2023_1 => Version2023_1.Instance;
+
+    public static IVersion2024_1 v2024_1 => Version2024_1.Instance;
 }
 
-internal abstract class VersionBase<TBuiltIns, TLionCore> : LionWebVersions where TBuiltIns : IBuiltInsLanguage where TLionCore : ILionCoreLanguage
+public interface IVersion2023_1 : LionWebVersions;
+
+public interface IVersion2024_1 : LionWebVersions;
+
+
+internal abstract class VersionBase<TBuiltIns, TLionCore> : LionWebVersions where TBuiltIns : IBuiltInsLanguage
+    where TLionCore : ILionCoreLanguage
 {
     public abstract string VersionString { get; }
-    
+
     IBuiltInsLanguage LionWebVersions.BuiltIns { get => BuiltIns; }
     public abstract TBuiltIns BuiltIns { get; }
-    
+
     ILionCoreLanguage LionWebVersions.LionCore { get => LionCore; }
     public abstract TLionCore LionCore { get; }
-    
 }

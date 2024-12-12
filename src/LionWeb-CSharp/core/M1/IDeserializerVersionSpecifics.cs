@@ -25,8 +25,8 @@ public interface IDeserializerVersionSpecifics
 {
     public static IDeserializerVersionSpecifics Create(LionWebVersions lionWebVersion) => lionWebVersion switch
     {
-        LionWebVersions.IVersion2023_1 => new DeserializerVersionSpecifics_2023_1(),
-        LionWebVersions.IVersion2024_1 => new DeserializerVersionSpecifics_2024_1(),
+        IVersion2023_1 => new DeserializerVersionSpecifics_2023_1(),
+        IVersion2024_1 => new DeserializerVersionSpecifics_2024_1(),
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 

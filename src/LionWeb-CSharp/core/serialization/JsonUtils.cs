@@ -81,6 +81,7 @@ public static class JsonUtils
                     string? version = streamReader.GetString();
                     if (version != deserializer.LionWebVersion.VersionString)
                     {
+                        throw new VersionMismatchException(version, deserializer.LionWebVersion.VersionString);
                     }
 
                     break;
