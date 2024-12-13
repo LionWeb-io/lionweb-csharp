@@ -23,6 +23,8 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using LionWeb.Core.Utilities;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 [TestClass]
 public class LionWebVersionsTests
@@ -84,6 +86,179 @@ public class LionWebVersionsTests
             new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk(input)
         );
     }
+
+    [TestMethod]
+    public void SerializeInstancesFromDifferentVersions()
+    {
+        var lang23 = CreateLanguage("2023_1_", LionWebVersions.v2023_1);
+        lang23.Version = "xx2023.1";
+
+        var lang24 = CreateLanguage("2024_1_", LionWebVersions.v2024_1);
+        lang24.Version = "xx2024.1";
+
+        var concept23 = lang23.ClassifierByKey("key-myConcept");
+        var concept24 = lang24.ClassifierByKey("key-myConcept");
+
+        var node23 = lang23.GetFactory().CreateNode(NextId("2023_1_inst_"), concept23);
+        var node24 = lang24.GetFactory().CreateNode(NextId("2024_1_inst_"), concept24);
+
+        node23.Set(concept23.FeatureByKey("key-myRef"), node24);
+
+        Assert.ThrowsException<VersionMismatchException>(() =>
+            new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk([node23, node24])
+        );
+    }
+
+    [TestMethod]
+    public void DeserializeInstancesFromDifferentVersions()
+    {
+        var lang23 = CreateLanguage("2023_1_", LionWebVersions.v2023_1);
+        lang23.Version = "xx2023.1";
+
+        var lang24 = CreateLanguage("2024_1_", LionWebVersions.v2024_1);
+        lang24.Version = "xx2024.1";
+
+        Assert.ThrowsException<VersionMismatchException>(() =>
+            new DeserializerBuilder()
+                .WithLanguage(lang23)
+                .WithLanguage(lang24)
+                .WithLionWebVersion(LionWebVersions.v2023_1)
+                .WithUncompressedIds(true)
+                .Build()
+        );
+    }
+
+    [TestMethod]
+    public void DeserializeStream_FormatStart()
+    {
+        var lang23 = CreateLanguage("2023_1_", LionWebVersions.v2023_1);
+        lang23.Version = "xx2023.1";
+
+        var deserializer = new DeserializerBuilder()
+            .WithLanguage(lang23)
+            .WithLionWebVersion(LionWebVersions.v2023_1)
+            .WithUncompressedIds(true)
+            .Build();
+
+        var stream = new MemoryStream();
+
+        var chunk = new SerializationChunk { SerializationFormatVersion = "2024.1", Languages = [], Nodes = [] };
+        JsonSerializer.Serialize(stream, chunk,
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true });
+
+        stream.Seek(0, SeekOrigin.Begin);
+
+        try
+        {
+            var x = JsonUtils.ReadNodesFromStream(stream, deserializer).Result;
+        } catch (AggregateException e)
+        {
+            Assert.IsInstanceOfType<VersionMismatchException>(e.InnerExceptions.First());
+        }
+    }
+
+    [TestMethod]
+    public void DeserializeStream_FormatEnd()
+    {
+        var lang23 = CreateLanguage("2023_1_", LionWebVersions.v2023_1);
+        lang23.Version = "xx2023.1";
+
+        var deserializer = new DeserializerBuilder()
+            .WithLanguage(lang23)
+            .WithLionWebVersion(LionWebVersions.v2023_1)
+            .WithUncompressedIds(true)
+            .Build();
+
+        var stream = new MemoryStream();
+
+        var chunk = new LazySerializationChunk
+        {
+            SerializationFormatVersion = "2024.1",
+            Languages =
+            [
+                new SerializedLanguageReference { Key = lang23.Key, Version = lang23.Version },
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "a",
+                    Classifier = new MetaPointer(lang23.Key, lang23.Version, "key-myConcept"),
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer(lang23.Key, lang23.Version, "key-myRef"),
+                            Targets = [new SerializedReferenceTarget { Reference = "b" }]
+                        }
+                    ],
+                    Properties = [],
+                    Containments = [],
+                    Annotations = []
+                },
+                new SerializedNode
+                {
+                    Id = "b",
+                    Classifier = new MetaPointer(lang23.Key, lang23.Version, "key-myConcept"),
+                    References = [],
+                    Properties = [],
+                    Containments = [],
+                    Annotations = []
+                }
+            ]
+        };
+        JsonSerializer.Serialize(stream, chunk,
+            new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true });
+
+        stream.Seek(0, SeekOrigin.Begin);
+
+        try
+        {
+            var x = JsonUtils.ReadNodesFromStream(stream, deserializer).Result;
+        } catch (AggregateException e)
+        {
+            Assert.IsInstanceOfType<VersionMismatchException>(e.InnerExceptions.First());
+        }
+    }
+
+    private static SerializationChunk CreateMixedChunk(DynamicLanguage lang23, DynamicLanguage lang24) =>
+        new()
+        {
+            SerializationFormatVersion = "2023.1",
+            Languages =
+            [
+                new SerializedLanguageReference { Key = lang23.Key, Version = lang23.Version },
+                new SerializedLanguageReference { Key = lang24.Key, Version = lang24.Version }
+            ],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "a",
+                    Classifier = new MetaPointer(lang23.Key, lang23.Version, "key-myConcept"),
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer(lang23.Key, lang23.Version, "key-myRef"),
+                            Targets = [new SerializedReferenceTarget { Reference = "b" }]
+                        }
+                    ],
+                    Properties = [],
+                    Containments = [],
+                    Annotations = []
+                },
+                new SerializedNode
+                {
+                    Id = "b",
+                    Classifier = new MetaPointer(lang24.Key, lang24.Version, "key-myConcept"),
+                    References = [],
+                    Properties = [],
+                    Containments = [],
+                    Annotations = []
+                }
+            ]
+        };
 
     #endregion
 
@@ -235,4 +410,19 @@ public class LionWebVersionsTests
     /// information about and functionality for the current test run.
     /// </summary>
     public TestContext TestContext { get; set; }
+}
+
+internal class LazySerializationChunk
+{
+    /// <inheritdoc cref="SerializationChunk.SerializationFormatVersion"/>
+    [JsonPropertyOrder(0)]
+    public string SerializationFormatVersion { get; init; }
+
+    /// <inheritdoc cref="SerializationChunk.Nodes"/>
+    [JsonPropertyOrder(1)]
+    public IEnumerable<SerializedNode> Nodes { get; init; }
+
+    /// <inheritdoc cref="SerializationChunk.Languages"/>
+    [JsonPropertyOrder(2)]
+    public IEnumerable<SerializedLanguageReference> Languages { get; init; }
 }
