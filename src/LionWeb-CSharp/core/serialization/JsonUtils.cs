@@ -41,7 +41,7 @@ public static class JsonUtils
 
     private static readonly JsonSerializerOptions _writeOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
     /// <summary>
