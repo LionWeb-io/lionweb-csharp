@@ -22,6 +22,14 @@ namespace LionWeb.Core.M3;
 /// The self-definition of the LionCore M3.
 public interface ILionCoreLanguage : Language
 {
+    /// Key of all LionWeb LionCore M3 language implementations.
+    public const string LanguageKey = "LionCore-M3";
+
+    /// Name of all LionWeb LionCore M3 language implementations.
+    protected const string LanguageName = "LionCore_M3";
+
+    internal const string ResolveInfoPrefix = "LionWeb.LionCore_M3.";
+
     /// <inheritdoc cref="M3.Annotation"/>
     Concept Annotation { get; }
 
@@ -176,7 +184,7 @@ public sealed class M3Interface : InterfaceBase<ILionCoreLanguage>
     public override Classifier GetClassifier() => GetLanguage().Concept;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         if (feature == GetLanguage().LionWebVersion.BuiltIns.INamed_name)
             return Name;
@@ -202,7 +210,7 @@ public sealed class M3Reference : ReferenceBase<ILionCoreLanguage>
     public override Classifier GetClassifier() => GetLanguage().Concept;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         if (feature == GetLanguage().LionWebVersion.BuiltIns.INamed_name)
             return Name;
@@ -230,7 +238,7 @@ public sealed class M3Containment : ContainmentBase<ILionCoreLanguage>
     public override Classifier GetClassifier() => GetLanguage().Concept;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         if (feature == GetLanguage().LionWebVersion.BuiltIns.INamed_name)
             return Name;
@@ -258,7 +266,7 @@ public sealed class M3Property : PropertyBase<ILionCoreLanguage>
     public override Classifier GetClassifier() => GetLanguage().Concept;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         if (feature == GetLanguage().LionWebVersion.BuiltIns.INamed_name)
             return Name;
