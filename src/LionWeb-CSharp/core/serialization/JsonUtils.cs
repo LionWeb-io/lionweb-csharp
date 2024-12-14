@@ -68,7 +68,13 @@ public static class JsonUtils
         JsonSerializer.Serialize(stream, data, _writeOptions);
     }
 
-    public static async Task<List<IReadableNode>> ReadNodesFromStream(Stream stream, IDeserializer deserializer)
+    /// <summary>
+    /// Uses <paramref name="deserializer"/> to read nodes from <paramref name="stream"/>.  
+    /// </summary>
+    /// <param name="stream">Stream to read from.</param>
+    /// <param name="deserializer">Deserializer to use.</param>
+    /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
+    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream stream, IDeserializer deserializer)
     {
         var streamReader = new Utf8JsonAsyncStreamReader(stream, leaveOpen: true);
 
@@ -80,10 +86,8 @@ public static class JsonUtils
                 case JsonTokenType.PropertyName when streamReader.GetString() == "serializationFormatVersion":
                     await Advance();
                     string? version = streamReader.GetString();
-                    if (version != deserializer.LionWebVersion.VersionString)
-                    {
-                        throw new VersionMismatchException(version, deserializer.LionWebVersion.VersionString);
-                    }
+                    if (version != null)
+                        deserializer.LionWebVersion.AssureCompatible(version);
 
                     break;
 

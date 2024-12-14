@@ -173,5 +173,12 @@ public class UnsupportedVersionException : LionWebExceptionBase
     }
 }
 
-public class VersionMismatchException(string? versionA, string versionB, string? message = null)
-    : LionWebExceptionBase($"Mismatched LionWeb versions: {versionA} vs. {versionB}" + (message != null ? $": {message}" : ""));
+/// <summary>
+/// Trying to mix incompatible versions of LionWeb standard.
+/// </summary>
+/// <param name="versionA">One version of LionWeb standard.</param>
+/// <param name="versionB">Version of LionWeb standard incompatible with <paramref name="versionA"/>.</param>
+/// <param name="message">Optional additional message.</param>
+public class VersionMismatchException(LionWebVersions versionA, LionWebVersions versionB, string? message = null)
+    : LionWebExceptionBase($"Mismatched LionWeb versions: {versionA} vs. {versionB}" +
+                           (message != null ? $": {message}" : ""));
