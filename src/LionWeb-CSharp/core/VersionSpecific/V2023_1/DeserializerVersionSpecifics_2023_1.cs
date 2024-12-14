@@ -16,6 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable InconsistentNaming
+
 namespace LionWeb.Core.VersionSpecific.V2023_1;
 
 using M1;
@@ -27,21 +28,26 @@ internal class DeserializerVersionSpecifics_2023_1 : IDeserializerVersionSpecifi
     public LionWebVersions Version => LionWebVersions.v2023_1;
 
     public object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node,
-        Property property, string value) where T : IReadableNode
+        Property property, string value) where T : class, IReadableNode
     {
         CompressedId compressedId = self.Compress(node.GetId());
         return property.Type switch
         {
-            var b when b == BuiltInsLanguage_2023_1.Instance.Boolean => bool.TryParse(value, out var result)
-                ? result
-                : self.Handler.InvalidPropertyValue<bool>(value, property, compressedId),
-            var i when i == BuiltInsLanguage_2023_1.Instance.Integer => int.TryParse(value, out var result)
-                ? result
-                : self.Handler.InvalidPropertyValue<int>(value, property, compressedId),
+            var b when b == BuiltInsLanguage_2023_1.Instance.Boolean =>
+                bool.TryParse(value, out var result)
+                    ? result
+                    : self.Handler.InvalidPropertyValue<bool>(value, property, compressedId),
+            var i when i == BuiltInsLanguage_2023_1.Instance.Integer =>
+                int.TryParse(value, out var result)
+                    ? result
+                    : self.Handler.InvalidPropertyValue<int>(value, property, compressedId),
             // leave both a String and JSON value as a string:
             var s when s == BuiltInsLanguage_2023_1.Instance.String ||
                        s == BuiltInsLanguage_2023_1.Instance.Json => value,
             _ => self.Handler.UnknownDatatype(property, value, node)
         };
     }
+
+    public void RegisterBuiltins(IDeserializer self) =>
+        this.RegisterLanguage(self, BuiltInsLanguage_2023_1.Instance);
 }

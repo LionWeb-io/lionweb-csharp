@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
+using M2;
 using M3;
 using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1;
@@ -32,6 +33,7 @@ public interface IDeserializerVersionSpecifics
     {
         IVersion2023_1 => new DeserializerVersionSpecifics_2023_1(),
         IVersion2024_1 => new DeserializerVersionSpecifics_2024_1(),
+        IVersion2024_1_Compatible => new DeserializerVersionSpecifics_2024_1_Compatible(),
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 
@@ -40,5 +42,25 @@ public interface IDeserializerVersionSpecifics
 
     /// Converts the low-level string representation <paramref name="value"/> of <paramref name="property"/> into the internal LionWeb-C# representation.
     object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node, Property property, string value)
-        where T : IReadableNode;
+        where T : class, IReadableNode;
+
+    /// Registers all relevant builtins to <paramref name="self"/>. 
+    void RegisterBuiltins(IDeserializer self);
+}
+
+internal static class IDeserializerVersionSpecificsExtensions
+{
+    public static void RegisterLanguage(this IDeserializerVersionSpecifics specifics, IDeserializer self,
+        Language language)
+    {
+        switch (self)
+        {
+            case ILanguageDeserializer l:
+                l.RegisterDependentLanguage(language);
+                break;
+            default:
+                self.RegisterInstantiatedLanguage(language);
+                break;
+        }
+    }
 }

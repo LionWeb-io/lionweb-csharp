@@ -21,33 +21,37 @@ namespace LionWeb.Core.VersionSpecific.V2024_1;
 
 using M1;
 using M3;
+using V2023_1;
 
-/// Deserializer parts specific to LionWeb <see cref="IVersion2023_1"/>.  
-internal class DeserializerVersionSpecifics_2024_1 : IDeserializerVersionSpecifics
+/// Deserializer parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
+internal class DeserializerVersionSpecifics_2024_1_Compatible : DeserializerVersionSpecifics_2024_1
 {
-    public virtual LionWebVersions Version => LionWebVersions.v2024_1;
+    public override LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
 
-    public virtual object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node,
-        Property property, string value) where T : class, IReadableNode
+    public override object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node,
+        Property property, string value)
     {
         CompressedId compressedId = self.Compress(node.GetId());
         return property.Type switch
         {
-            var b when b == BuiltInsLanguage_2024_1.Instance.Boolean =>
+            var b when b == BuiltInsLanguage_2023_1.Instance.Boolean || b == BuiltInsLanguage_2024_1.Instance.Boolean =>
                 bool.TryParse(value, out var result)
                     ? result
                     : self.Handler.InvalidPropertyValue<bool>(value, property, compressedId),
-            var i when i == BuiltInsLanguage_2024_1.Instance.Integer =>
+            var i when i == BuiltInsLanguage_2023_1.Instance.Integer || i == BuiltInsLanguage_2024_1.Instance.Integer =>
                 int.TryParse(value, out var result)
                     ? result
                     : self.Handler.InvalidPropertyValue<int>(value, property, compressedId),
             // leave a String value as a string:
-            var s when s == BuiltInsLanguage_2024_1.Instance.String =>
+            var s when s == BuiltInsLanguage_2023_1.Instance.String || s == BuiltInsLanguage_2024_1.Instance.String =>
                 value,
             _ => self.Handler.UnknownDatatype(property, value, node)
         };
     }
 
-    public virtual void RegisterBuiltins(IDeserializer self) =>
+    public override void RegisterBuiltins(IDeserializer self)
+    {
+        this.RegisterLanguage(self, BuiltInsLanguage_2023_1.Instance);
         this.RegisterLanguage(self, BuiltInsLanguage_2024_1.Instance);
+    }
 }

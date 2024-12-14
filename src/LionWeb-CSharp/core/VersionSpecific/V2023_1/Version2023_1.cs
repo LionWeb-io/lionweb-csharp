@@ -16,6 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable InconsistentNaming
+
 namespace LionWeb.Core.VersionSpecific.V2023_1;
 
 /// <inheritdoc cref="IVersion2023_1" />
@@ -28,9 +29,7 @@ internal sealed class Version2023_1 : VersionBase<IBuiltInsLanguage_2023_1, ILio
 
     public override string VersionString => "2023.1";
 
-    public override IBuiltInsLanguage_2023_1 BuiltIns =>
-        new Lazy<IBuiltInsLanguage_2023_1>(() => BuiltInsLanguage_2023_1.Instance).Value;
+    public override IBuiltInsLanguage_2023_1 BuiltIns => BuiltInsLanguage_2023_1.Instance;
 
-    public override ILionCoreLanguage_2023_1 LionCore =>
-        new Lazy<ILionCoreLanguage_2023_1>(() => LionCoreLanguage_2023_1.Instance).Value;
+    public override ILionCoreLanguage_2023_1 LionCore => LionCoreLanguage_2023_1.Instance;
 }

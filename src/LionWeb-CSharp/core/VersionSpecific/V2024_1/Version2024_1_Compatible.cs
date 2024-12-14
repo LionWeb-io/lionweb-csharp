@@ -19,16 +19,21 @@
 
 namespace LionWeb.Core.VersionSpecific.V2024_1;
 
-/// <inheritdoc cref="IVersion2024_1" />
-internal sealed class Version2024_1 : VersionBase<IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>,
-    IVersion2024_1
+/// <inheritdoc cref="IVersion2024_1_Compatible" />
+internal sealed class Version2024_1_Compatible : VersionBase<IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>,
+    IVersion2024_1_Compatible
 {
-    internal static readonly Version2024_1 Instance = new Lazy<Version2024_1>(() => new()).Value;
-    private Version2024_1() { }
+    internal static readonly Version2024_1_Compatible Instance = new Lazy<Version2024_1_Compatible>(() => new()).Value;
+    private Version2024_1_Compatible() { }
 
     public override string VersionString => "2024.1";
 
     public override IBuiltInsLanguage_2024_1 BuiltIns => BuiltInsLanguage_2024_1.Instance;
 
     public override ILionCoreLanguage_2024_1 LionCore => LionCoreLanguage_2024_1.Instance;
+
+    public override bool IsCompatibleWithInternal(LionWebVersions other) =>
+        base.IsCompatibleWithInternal(other) ||
+        ReferenceEquals(other, LionWebVersions.v2023_1) ||
+        ReferenceEquals(other, LionWebVersions.v2024_1);
 }

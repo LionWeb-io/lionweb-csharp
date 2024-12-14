@@ -49,12 +49,25 @@ public interface LionWebVersions
     /// The LionCore M3 language adhering to this LionWeb standard.
     public ILionCoreLanguage LionCore { get; }
 
+    /// Whether this LionWeb standard is compatible with <paramref name="other"/>.
+    /// <remarks>
+    /// The implementation MUST be symmetric!
+    /// </remarks>
+    public bool IsCompatibleWith(LionWebVersions other);
+
+    /// The current default version.
     public static LionWebVersions Current => v2023_1;
 
-    public static IReadOnlyList<LionWebVersions> AllVersions { get => [v2023_1, v2024_1]; }
+    /// All supported <i>pure</i> versions of LionWeb standard.
+    public static IReadOnlyList<LionWebVersions> AllPureVersions { get => [v2023_1, v2024_1]; }
 
+    /// All supported <i>mixed</i> versions of LionWeb standard.
+    public static IReadOnlyList<LionWebVersions> AllMixedVersions { get => [v2024_1_Compatible]; }
+
+    /// Finds the <i>pure</i> version of LionWeb standard defined by <paramref name="versionString"/>.
+    /// <exception cref="UnsupportedVersionException">If LionWeb standard <paramref name="versionString"/> is not supported.</exception>
     public static LionWebVersions GetByVersionString(string versionString) =>
-        AllVersions.FirstOrDefault(v => v.VersionString == versionString) ??
+        AllPureVersions.FirstOrDefault(v => v.VersionString == versionString) ??
         throw new UnsupportedVersionException(versionString);
 
     /// <inheritdoc cref="IVersion2023_1"/>
@@ -62,8 +75,35 @@ public interface LionWebVersions
 
     /// <inheritdoc cref="IVersion2024_1"/>
     public static IVersion2024_1 v2024_1 => Version2024_1.Instance;
+
+    /// <inheritdoc cref="IVersion2024_1_Compatible"/>
+    public static IVersion2024_1_Compatible v2024_1_Compatible => Version2024_1_Compatible.Instance;
 }
 
+/// Extensions for <see cref="LionWebVersions"/>.
+public static class LionWebVersionsExtensions
+{
+    /// Assures <paramref name="self"/> and <paramref name="other"/> are compatible.
+    /// <exception cref="VersionMismatchException">If <paramref name="self"/> and <paramref name="other"/> are NOT compatible.</exception>
+    public static void AssureCompatible(this LionWebVersions self, LionWebVersions other, string? message = null)
+    {
+        if (!self.IsCompatibleWith(other))
+            throw new VersionMismatchException(self, other, message);
+    }
+
+    /// Assures <paramref name="self"/> and <paramref name="otherVersionString"/> are compatible.
+    /// <exception cref="UnsupportedVersionException">If LionWeb standard <paramref name="otherVersionString"/> is not supported.</exception>
+    /// <exception cref="VersionMismatchException">If <paramref name="self"/> and <paramref name="otherVersionString"/> are NOT compatible.</exception>
+    public static void AssureCompatible(this LionWebVersions self, string otherVersionString, string? message = null) =>
+        AssureCompatible(self, LionWebVersions.GetByVersionString(otherVersionString), message);
+
+    /// Assures <paramref name="self"/> and <paramref name="language"/>'s <see cref="Language.LionWebVersion"/> are compatible.
+    /// <exception cref="VersionMismatchException">If <paramref name="self"/> and <paramref name="language"/>'s <see cref="Language.LionWebVersion"/> are NOT compatible.</exception>
+    public static void AssureCompatible(this LionWebVersions self, Language language) =>
+        AssureCompatible(language.LionWebVersion, self, $"[{language.Key}, {language.Version}]");
+}
+
+/// LionWeb standard 2023.1, defined at https://lionweb.io/specification/2023.1
 public interface IVersion2023_1 : LionWebVersions;
 
 /// LionWeb standard 2024.1, defined at https://lionweb.io/specification/2024.1
@@ -72,7 +112,12 @@ public interface IVersion2024_1 : LionWebVersions;
 /// LionWeb standard 2024.1, backwards-compatible with 2023.1
 public interface IVersion2024_1_Compatible : LionWebVersions;
 
-internal abstract class VersionBase<TBuiltIns, TLionCore> : LionWebVersions where TBuiltIns : IBuiltInsLanguage
+internal interface IVersionBase : LionWebVersions
+{
+    bool IsCompatibleWithInternal(LionWebVersions other);
+}
+
+internal abstract class VersionBase<TBuiltIns, TLionCore> : IVersionBase where TBuiltIns : IBuiltInsLanguage
     where TLionCore : ILionCoreLanguage
 {
     public abstract string VersionString { get; }
@@ -82,4 +127,10 @@ internal abstract class VersionBase<TBuiltIns, TLionCore> : LionWebVersions wher
 
     ILionCoreLanguage LionWebVersions.LionCore { get => LionCore; }
     public abstract TLionCore LionCore { get; }
+
+    bool LionWebVersions.IsCompatibleWith(LionWebVersions other) =>
+        this.IsCompatibleWithInternal(other) || ((IVersionBase)other).IsCompatibleWithInternal(this);
+
+    public virtual bool IsCompatibleWithInternal(LionWebVersions other) =>
+        ReferenceEquals(this, other);
 }
