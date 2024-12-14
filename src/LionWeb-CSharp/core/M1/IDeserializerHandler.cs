@@ -21,6 +21,14 @@ using M2;
 using M3;
 using Serialization;
 
+/// <summary>
+/// Callbacks to customize an <see cref="IDeserializer"/>'s behaviour in non-regular situations.
+///
+/// <para>
+/// Each method of this interface is one callback. It should provide all relevant information as parameters.
+/// If the method returns non-null, the returned value is used to <i>heal</i> the issue; otherwise, the offender is skipped (if possible).
+/// </para>
+/// </summary>
 public interface IDeserializerHandler
 {
     /// <summary>
@@ -191,7 +199,7 @@ public interface IDeserializerHandler
     #region language deserializer
 
     /// <summary>
-    /// Whether to skip node with id <paramref name="id"/> that appears both in deserialized nodes and dependent nodes.
+    /// Whether to skip node with id <paramref name="id"/> that appears both in deserialized nodes and <see cref="IDeserializer.RegisterDependentNodes">dependent nodes</see>.
     /// </summary>
     /// <param name="id">Node id appearing in both deserialized nodes and dependent nodes.</param>
     /// <returns><c>true</c> if we should skip the deserialized node if the same node id appears in dependent nodes;

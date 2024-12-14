@@ -15,19 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable SuggestVarOrType_SimpleTypes
-
 namespace LionWeb.Core.M2;
 
 using M1;
 using M3;
 using Serialization;
 
-/// <summary>
-/// A deserializer that deserializes serializations of <see cref="Language"/>s.
-/// The generic deserializer isn't aware of the LionCore M3-types (and their idiosyncrasies),
-/// so that can't be used.
-/// </summary>
+/// <inheritdoc cref="ILanguageDeserializer"/>
 public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILanguageDeserializer
 {
     private readonly Dictionary<CompressedId, SerializedNode> _serializedNodesById = new();
@@ -35,17 +29,12 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     private readonly DeserializerBuilder _deserializerBuilder = new();
 
     /// <summary>
-    /// Deserializes the given <paramref name="serializationChunk">serialization chunk</paramref> as an iterable collection of <see cref="Language"/>s.
-    /// The <paramref name="dependentLanguages">dependent languages</paramref> should contain all languages that are referenced by the top-level
-    /// <c>languages</c> property of the serialization chunk.
+    /// Deserializes languages based on LionWeb version encoded in <paramref name="versionSpecifics"/>.
     /// </summary>
-    ///
-    /// <param name="serializationChunk">Chunk to deserialize.</param>
-    /// <param name="preloadLionCoreLanguage">Whether <see cref="ILionCoreLanguage"/> should be preloaded. Keep at <c>true</c> unless deserializing meta-languages.</param>
-    /// <param name="dependentLanguages">Referred languages.</param>
-    /// 
-    /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
-    public LanguageDeserializer(IDeserializerVersionSpecifics versionSpecifics , bool preloadLionCoreLanguage = true) : base(versionSpecifics)
+    /// <param name="versionSpecifics">Version of LionWeb standard to use for deserializing.</param>
+    /// <param name="preloadLionCoreLanguage"><c>true</c> if LionCore M3 should be preloaded (defaults to <c>true</c>).</param>
+    public LanguageDeserializer(IDeserializerVersionSpecifics versionSpecifics, bool preloadLionCoreLanguage = true) :
+        base(versionSpecifics)
     {
         RegisterDependentLanguage(_builtIns);
 

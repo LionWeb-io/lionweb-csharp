@@ -18,6 +18,7 @@
 // ReSharper disable InconsistentNaming
 namespace LionWeb.Core.VersionSpecific.V2024_1;
 
+/// <inheritdoc cref="IVersion2024_1" />
 internal sealed class Version2024_1 : VersionBase<IBuiltInsLanguage_2024_1, ILionCoreLanguage_2024_1>,
     IVersion2024_1
 {

@@ -22,7 +22,10 @@ using M3;
 using Serialization;
 using System.Diagnostics.CodeAnalysis;
 
-public class DeserializerMetaInfo()
+/// Stores information required do deserialize meta-elements of nodes.
+/// <remarks>Should be internal, but the compiler doesn't like it in
+/// <see cref="DeserializerBase{T}._deserializerMetaInfo"/>.</remarks>
+public class DeserializerMetaInfo
 {
     private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
     private readonly Dictionary<CompressedId, List<Language>> _languagesByKey = new();

@@ -21,8 +21,13 @@ using M3;
 using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1;
 
+/// Externalized logic of <see cref="IDeserializer"/>, specific to one version of LionWeb standard.
 public interface IDeserializerVersionSpecifics
 {
+    /// <summary>
+    /// Creates an instance of <see cref="IDeserializerVersionSpecifics"/> that implements <paramref name="lionWebVersion"/>.
+    /// </summary>
+    /// <exception cref="UnsupportedVersionException"></exception>
     public static IDeserializerVersionSpecifics Create(LionWebVersions lionWebVersion) => lionWebVersion switch
     {
         IVersion2023_1 => new DeserializerVersionSpecifics_2023_1(),
@@ -30,8 +35,10 @@ public interface IDeserializerVersionSpecifics
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 
+    /// Version of LionWeb supported by this class.
     LionWebVersions Version { get; }
 
+    /// Converts the low-level string representation <paramref name="value"/> of <paramref name="property"/> into the internal LionWeb-C# representation.
     object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node, Property property, string value)
         where T : IReadableNode;
 }

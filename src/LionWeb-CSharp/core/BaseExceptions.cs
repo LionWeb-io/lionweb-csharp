@@ -81,6 +81,7 @@ public class UnknownFeatureException : LionWebExceptionBase
 {
     /// <param name="classifier">Classifier trying to use.</param>
     /// <param name="feature">Feature unknown to <paramref name="classifier"/>.</param>
+    /// <param name="message">Optional additional message.</param>
     public UnknownFeatureException(Classifier classifier, Feature? feature, string? message = null) : base(
         $"{message}Classifier {classifier.Name} does not know feature {feature?.Name}")
     {
@@ -155,12 +156,18 @@ public class UnsupportedNodeTypeException(object? node, string? paramName)
 public class TreeShapeException(IReadableNode node, string message)
     : LionWebExceptionBase($"{node.GetId()}: {message}");
 
+/// <summary>
+/// Trying to use an unsupported version of LionWeb standard.
+/// </summary>
+/// <seealso cref="LionWebVersions"/>
 public class UnsupportedVersionException : LionWebExceptionBase
 {
+    /// <inheritdoc cref="UnsupportedVersionException" />
     public UnsupportedVersionException(LionWebVersions version) : base($"Unsupported LionWeb version: {version}")
     {
     }
-    
+
+    /// <inheritdoc cref="UnsupportedVersionException" />
     public UnsupportedVersionException(string version) : base($"Unsupported LionWeb version: {version}")
     {
     }

@@ -21,15 +21,13 @@ namespace LionWeb.Core.VersionSpecific.V2024_1;
 using M2;
 using M3;
 
-/// <inheritdoc />
+/// The self-definition of the LionCore <see cref="IVersion2024_1"/> M3.
 public interface ILionCoreLanguage_2024_1 : ILionCoreLanguage;
 
 /// <inheritdoc cref="ILionCoreLanguage"/>
 public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_1>, ILionCoreLanguage_2024_1
 {
-    /// <summary>
-    /// The definition of the LionCore built-ins language.
-    /// </summary>
+    /// The definition of the LionCore <see cref="IVersion2024_1"/> M3 language.
     public static readonly ILionCoreLanguage_2024_1 Instance = new Lazy<LionCoreLanguage_2024_1>(() => new()).Value;
 
     private const string _name = "LionCore_M3";

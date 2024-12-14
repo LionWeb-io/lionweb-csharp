@@ -21,39 +21,27 @@ namespace LionWeb.Core.M2;
 
 using M3;
 
-/// <summary>
-/// The definition of the LionCore language containing the built-ins: primitive types, <see cref="INamed"/> and <see cref="Node"/>.
-/// </summary>
+/// The definition of the LionCore language containing the built-ins:
+/// primitive types, <see cref="INamed"/> and <see cref="Node"/>.
 public interface IBuiltInsLanguage : Language
 {
     /// <summary>
     /// The built-in primitive type Boolean.
-    /// </summary>
     PrimitiveType Boolean { get; }
 
-    /// <summary>
     /// The built-in primitive type Integer.
-    /// </summary>
     PrimitiveType Integer { get; }
 
-    /// <summary>
     /// The built-in primitive type String.
-    /// </summary>
     PrimitiveType String { get; }
 
-    /// <summary>
     /// Generic concept for "named things".
-    /// </summary>
     Interface INamed { get; }
 
-    /// <summary>
     /// The "name" <see cref="Property"/> of <c>INamed</c>.
-    /// </summary>
     Property INamed_name { get; }
 
-    /// <summary>
     /// Generic concept that corresponds to a model node, i.e. <see cref="INode"/>.
-    /// </summary>
     Concept Node { get; }
 }
 
@@ -67,13 +55,11 @@ public sealed class BuiltInsLanguage
 
 /// <summary>
 /// An interface for "named things".
-/// It corresponds nominally to the <c>INamed</c> Concept defined above.
+/// It corresponds nominally to <see cref="IBuiltInsLanguage.INamed"/>.
 /// </summary>
 public interface INamed : IReadableNode
 {
-    /// <summary>
     /// The human-readable name.
-    /// </summary>
     public string Name { get; }
 }
 

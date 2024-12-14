@@ -41,10 +41,7 @@ public partial class Deserializer : DeserializerBase<IWritableNode>
     private readonly Dictionary<CompressedId, List<CompressedReference>> _referencesByOwnerId = new();
     private readonly Dictionary<CompressedId, List<CompressedId>> _annotationsByOwnerId = new();
 
-    /// <summary>
-    /// TODO
-    /// </summary>
-    /// <param name="versionSpecifics"></param>
+    /// <inheritdoc />
     public Deserializer(IDeserializerVersionSpecifics versionSpecifics) : base(versionSpecifics)
     {
         RegisterInstantiatedLanguage(_builtIns, _builtIns.GetFactory());

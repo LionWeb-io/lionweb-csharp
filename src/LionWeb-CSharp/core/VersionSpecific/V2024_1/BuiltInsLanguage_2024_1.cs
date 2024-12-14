@@ -21,16 +21,15 @@ namespace LionWeb.Core.VersionSpecific.V2024_1;
 using M2;
 using M3;
 
-/// <inheritdoc />
+/// The definition of the LionCore <see cref="IVersion2024_1"/> language containing the built-ins:
+/// primitive types, <see cref="IBuiltInsLanguage.INamed"/> and <see cref="IBuiltInsLanguage.Node"/>.
 public interface IBuiltInsLanguage_2024_1 : IBuiltInsLanguage;
 
 /// <inheritdoc cref="IBuiltInsLanguage_2024_1" />
 public sealed class BuiltInsLanguage_2024_1 :
     LanguageBase<BuiltInsFactory_2024_1>, IBuiltInsLanguage_2024_1
 {
-    /// <summary>
-    /// The definition of the LionCore built-ins language.
-    /// </summary>
+    /// The definition of the LionCore <see cref="IVersion2024_1"/> built-ins language.
     public static readonly BuiltInsLanguage_2024_1 Instance = new Lazy<BuiltInsLanguage_2024_1>(() => new()).Value;
 
     private const string _name = "LionCore_builtins";

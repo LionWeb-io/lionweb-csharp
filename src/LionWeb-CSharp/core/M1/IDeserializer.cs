@@ -21,24 +21,59 @@ using M2;
 using M3;
 using Serialization;
 
+/// <summary>
+/// Converts <see cref="SerializedNode">SerializedNodes</see> into <see cref="IReadableNode">IReadableNodes</see>.
+///
+/// <para>
+/// API contract:
+/// <list type="number">
+/// <item>Create the deserializer, either via <see cref="DeserializerBuilder"/> (for M1) or <see cref="LanguageDeserializer"/> (M2).</item>
+/// <item>Set it up by <see cref="RegisterInstantiatedLanguage"/> and/or <see cref="RegisterDependentNodes"/>.</item>
+/// <item>Call <see cref="Process"/> for each SerializedNode.</item>
+/// <item>Retrieve the deserialized nodes from <see cref="Finish"/></item>
+/// </list>
+/// </para>
+/// </summary>
+/// <seealso cref="JsonUtils">Higher-level API</seealso>
+/// <seealso cref="IDeserializerExtensions">Extensions</seealso>
 public interface IDeserializer
 {
+    /// Optional handler to customize this deserializer's behaviour in non-regular situations.
     IDeserializerHandler Handler { get; init; }
 
-    LionWebVersions LionWebVersion { get; }
+    /// <summary>
+    /// Enables this deserializer to create instances of <paramref name="language"/>'s entities.
+    /// </summary>
+    /// <param name="language">Language to make known to this deserializer.</param>
+    /// <param name="factory">Special factory to use for instantiating entities of <paramref name="language"/>.</param>
+    /// <exception cref="VersionMismatchException">If <paramref name="language"/>'s LionWeb version is not compatible with <see cref="LionWebVersion"/>.</exception>
+    void RegisterInstantiatedLanguage(Language language, INodeFactory? factory = null);
 
-    void RegisterInstantiatedLanguage(Language language, INodeFactory factory);
-
+    /// <summary>
+    /// Enables this deserializer to create references to <paramref name="dependentNodes"/>.
+    /// </summary>
+    /// <param name="dependentNodes">Nodes that should be referenceable by deserialized nodes.</param>
     void RegisterDependentNodes(IEnumerable<IReadableNode> dependentNodes);
 
+    /// <summary>
+    /// Starts internal processing of <paramref name="serializedNode"/>.
+    /// </summary>
+    /// <param name="serializedNode">Node to process.</param>
+    /// <remarks>We separate processing single nodes from <see cref="Finish">finishing</see> to enable streaming.</remarks>
+    void Process(SerializedNode serializedNode);
+
+    /// <summary>
+    /// Takes all <see cref="Process">processed</see> nodes, shapes them into a (forest of) trees, and establishes references. 
+    /// </summary>
     /// <returns>
-    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNode">serialized nodes</paramref>.
+    /// The root (i.e.: parent-less) nodes among the deserialization of the processed nodes.
     /// References to any of the given dependent nodes are resolved as well.
     /// </returns>
     /// <exception cref="DeserializerException"/>
-    void Process(SerializedNode serializedNode);
-
     IEnumerable<IReadableNode> Finish();
+
+    /// Version of LionWeb standard to use.
+    LionWebVersions LionWebVersion { get; }
 }
 
 /// <inheritdoc />

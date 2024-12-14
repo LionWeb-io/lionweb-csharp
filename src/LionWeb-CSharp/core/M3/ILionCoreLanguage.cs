@@ -19,11 +19,7 @@
 
 namespace LionWeb.Core.M3;
 
-using M2;
-
-/// <summary>
 /// The self-definition of the LionCore M3.
-/// </summary>
 public interface ILionCoreLanguage : Language
 {
     /// <inheritdoc cref="M3.Annotation"/>
@@ -133,7 +129,6 @@ public interface ILionCoreLanguage : Language
 [Obsolete("Use ILionCoreLanguage instead")]
 public sealed class M3Language
 {
-    /// <inheritdoc cref="ILionCoreLanguage.GetInstance"/>
     [Obsolete("Use ILionCoreLanguage instead")]
     public static readonly ILionCoreLanguage Instance = LionWebVersions.Current.LionCore;
 }
