@@ -187,24 +187,20 @@ public class Serializer : ISerializer
         }
     }
 
-    private Classifier ExtractClassifier(IReadableNode node)
+    private Classifier ExtractClassifier(IReadableNode node) => node switch
     {
-        Classifier classifier = node switch
-        {
-            Language => _m3.Language,
-            Annotation => _m3.Annotation,
-            Concept => _m3.Concept,
-            Interface => _m3.Interface,
-            Enumeration => _m3.Enumeration,
-            PrimitiveType => _m3.PrimitiveType,
-            EnumerationLiteral => _m3.EnumerationLiteral,
-            Property => _m3.Property,
-            Containment => _m3.Containment,
-            Reference => _m3.Reference,
-            _ => node.GetClassifier()
-        };
-        return classifier;
-    }
+        Language => _m3.Language,
+        Annotation => _m3.Annotation,
+        Concept => _m3.Concept,
+        Interface => _m3.Interface,
+        Enumeration => _m3.Enumeration,
+        PrimitiveType => _m3.PrimitiveType,
+        EnumerationLiteral => _m3.EnumerationLiteral,
+        Property => _m3.Property,
+        Containment => _m3.Containment,
+        Reference => _m3.Reference,
+        _ => node.GetClassifier()
+    };
 
     private Dictionary<Feature, object?> CollectProperties(Dictionary<Feature, object?> featureValues) =>
         featureValues
@@ -240,25 +236,37 @@ public class Serializer : ISerializer
         return references;
     }
 
+    private class FeatureComparer : IEqualityComparer<Feature>
+    {
+        public bool Equals(Feature? x, Feature? y) =>
+            EqualityExtensions.Equals(x, y) || (IsLionCore(x) && IsLionCore(y) && x?.Key == y?.Key);
+
+        public int GetHashCode(Feature obj) =>
+            IsLionCore(obj) ? obj.Key.GetHashCode() : obj.GetHashCodeIdentity();
+
+        private bool IsLionCore(Feature? feature) =>
+            feature?.GetLanguage().Key is ILionCoreLanguage.LanguageKey or IBuiltInsLanguage.LanguageKey;
+    }
+
     private IEnumerable<SerializedProperty> CollectUnsetProperties(IReadableNode node, ISet<Feature> allFeatures,
         Dictionary<Feature, object?> properties) =>
         allFeatures
             .OfType<Property>()
-            .Except(properties.Keys)
+            .Except(properties.Keys, new FeatureComparer())
             .Select(p => SerializeProperty(node, p, null));
 
     private IEnumerable<SerializedContainment> CollectUnsetContainments(ISet<Feature> allFeatures,
         Dictionary<Feature, object?> containments) =>
         allFeatures
             .OfType<Containment>()
-            .Except(containments.Keys)
+            .Except(containments.Keys, new FeatureComparer())
             .Select<Feature, SerializedContainment>(c => SerializeContainment([], c));
 
     private IEnumerable<SerializedReference> CollectUnsetReferences(ISet<Feature> allFeatures,
         Dictionary<Feature, object?> references) =>
         allFeatures
             .OfType<Reference>()
-            .Except(references.Keys)
+            .Except(references.Keys, new FeatureComparer())
             .Select<Feature, SerializedReference>(c => SerializeReference([], c));
 
     private IEnumerable<IReadableNode> AsNodes(KeyValuePair<Feature, object?> pair) =>

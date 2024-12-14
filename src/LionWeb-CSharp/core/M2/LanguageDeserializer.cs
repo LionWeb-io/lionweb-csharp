@@ -32,14 +32,11 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     /// Deserializes languages based on LionWeb version encoded in <paramref name="versionSpecifics"/>.
     /// </summary>
     /// <param name="versionSpecifics">Version of LionWeb standard to use for deserializing.</param>
-    /// <param name="preloadLionCoreLanguage"><c>true</c> if LionCore M3 should be preloaded (defaults to <c>true</c>).</param>
-    public LanguageDeserializer(IDeserializerVersionSpecifics versionSpecifics, bool preloadLionCoreLanguage = true) :
+    public LanguageDeserializer(IDeserializerVersionSpecifics versionSpecifics) :
         base(versionSpecifics)
     {
         versionSpecifics.RegisterBuiltins(this);
-
-        if (preloadLionCoreLanguage)
-            RegisterDependentLanguage(_m3);
+        RegisterDependentLanguage(_m3);
     }
 
     /// <inheritdoc />

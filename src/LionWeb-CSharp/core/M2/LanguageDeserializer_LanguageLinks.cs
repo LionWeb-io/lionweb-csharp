@@ -53,9 +53,9 @@ public partial class LanguageDeserializer
                 pair =>
                 {
                     var compressedId = Compress(pair.child);
-                    return (IKeyed)(_dependentNodesById.TryGetValue(compressedId, out var node1)
-                        ? node1
-                        : _deserializedNodesById[compressedId]);
+                    return (IKeyed)(_deserializedNodesById.TryGetValue(compressedId, out var deserialized)
+                        ? deserialized
+                        : _dependentNodesById[compressedId]);
                 }
             );
 

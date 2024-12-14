@@ -34,7 +34,7 @@ public class LanguageSerializationTests
     private readonly IBuiltInsLanguage _builtIns = _lionWebVersion.BuiltIns;
 
     [TestMethod]
-    public void test_serialization_shapes_language_with_external_annotations()
+    public void shapes_language_with_external_annotations()
     {
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
 
@@ -70,7 +70,7 @@ public class LanguageSerializationTests
     }
 
     [TestMethod]
-    public void test_serialization_shapes_language_together_with_annotations()
+    public void shapes_language_together_with_annotations()
     {
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
 
@@ -123,13 +123,16 @@ public class LanguageSerializationTests
     }
 
     [TestMethod]
-    public void test_serialization_lioncore()
+    public void LionCore()
     {
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([_m3]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        var deserializer = new LanguageDeserializer(IDeserializerVersionSpecifics.Create(_lionWebVersion), false);
+        var deserializer = new LanguageDeserializer(IDeserializerVersionSpecifics.Create(_lionWebVersion))
+        {
+            Handler = new SkipDeserializationHandler()
+        };
         foreach (var serializedNode in serializationChunk.Nodes)
         {
             deserializer.Process(serializedNode);
@@ -138,8 +141,52 @@ public class LanguageSerializationTests
         deserializer.Finish();
     }
 
+    private class SkipDeserializationHandler : DeserializerExceptionHandler
+    {
+        public override bool SkipDeserializingDependentNode(CompressedId id) => false;
+    }
+
     [TestMethod]
-    public void test_serialization_shapes_language()
+    public void LionCore_Builtins_24_Compatible()
+    {
+        List<Language> input =
+        [
+            LionWebVersions.v2023_1.LionCore,
+            LionWebVersions.v2023_1.BuiltIns,
+            LionWebVersions.v2024_1.LionCore,
+            LionWebVersions.v2024_1.BuiltIns
+        ];
+        var chunk =
+            new Serializer(LionWebVersions.v2024_1_Compatible) { StoreUncompressedIds = true }.SerializeToChunk(input);
+
+        var deserializer =
+            new LanguageDeserializer(IDeserializerVersionSpecifics.Create(LionWebVersions.v2024_1_Compatible))
+            {
+                StoreUncompressedIds = true, Handler = new SkipDeserializationHandler()
+            };
+
+        var actual = deserializer.Deserialize(chunk).Cast<Language>().ToList();
+
+        // We can't just compare the language nodes, because M3 concepts are self-defined (e.g. LionCore.Classifier = Concept, not Language)
+        
+        using var expectedEnumerator = input.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, [], true, true)).GetEnumerator();
+        using var actualEnumerator = actual.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, [], true, true)).GetEnumerator();
+
+        while (expectedEnumerator.MoveNext() && actualEnumerator.MoveNext())
+        {
+            var ex = expectedEnumerator.Current;
+            var act = actualEnumerator.Current;
+            Assert.AreEqual(ex.Key, act.Key);
+            Assert.AreEqual(ex.GetId(), act.GetId());
+            Assert.AreEqual(ex.Name, act.Name);
+        }
+        
+        Assert.IsFalse(expectedEnumerator.MoveNext());
+        Assert.IsFalse(actualEnumerator.MoveNext());
+    }
+
+    [TestMethod]
+    public void shapes_language()
     {
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
