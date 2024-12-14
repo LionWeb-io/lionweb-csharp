@@ -87,119 +87,35 @@ public interface IDeserializer<out T> : IDeserializer where T : IReadableNode
     new IEnumerable<T> Finish();
 }
 
-public class DeserializerBuilder
-{
-    private readonly Dictionary<Language, INodeFactory> _languages = new();
-    private readonly HashSet<IReadableNode> _dependentNodes = new();
-    private IDeserializerHandler? _handler;
-    private bool _storeUncompressedIds = false;
-    private LionWebVersions _lionWebVersion = LionWebVersions.Current;
-
-    public DeserializerBuilder WithHandler(IDeserializerHandler handler)
-    {
-        _handler = handler;
-        return this;
-    }
-
-    public DeserializerBuilder WithLanguage(Language language)
-    {
-        WithCustomFactory(language, language.GetFactory());
-        return this;
-    }
-
-    public DeserializerBuilder WithLanguages(IEnumerable<Language> languages)
-    {
-        foreach (Language language in languages)
-        {
-            WithLanguage(language);
-        }
-
-        return this;
-    }
-
-    public DeserializerBuilder WithCustomFactory(Language language, INodeFactory factory)
-    {
-        _languages[language] = factory;
-        return this;
-    }
-
-    public DeserializerBuilder WithDependentNodes(IEnumerable<IReadableNode> dependentNodes)
-    {
-        foreach (var dependentNode in dependentNodes)
-        {
-            _dependentNodes.Add(dependentNode);
-        }
-
-        return this;
-    }
-
-    public DeserializerBuilder WithUncompressedIds(bool storeUncompressedIds = true)
-    {
-        _storeUncompressedIds = storeUncompressedIds;
-        return this;
-    }
-
-    public DeserializerBuilder WithLionWebVersion(LionWebVersions lionWebVersion)
-    {
-        _lionWebVersion = lionWebVersion;
-        return this;
-    }
-
-    public IDeserializer Build()
-    {
-        IDeserializer result = CreateDeserializer(_lionWebVersion);
-        foreach ((Language language, INodeFactory factory) in _languages)
-        {
-            result.RegisterInstantiatedLanguage(language, factory);
-        }
-
-        result.RegisterDependentNodes(_dependentNodes);
-
-        return result;
-    }
-
-    private IDeserializer CreateDeserializer(LionWebVersions lionWebVersion)
-    {
-        var versionSpecifics =
-            IDeserializerVersionSpecifics.Create(lionWebVersion);
-
-        return _handler == null
-            ? new Deserializer(versionSpecifics) { StoreUncompressedIds = _storeUncompressedIds }
-            : new Deserializer(versionSpecifics) { StoreUncompressedIds = _storeUncompressedIds, Handler = _handler };
-    }
-}
-
+/// Extensions to <see cref="IDeserializer"/>.
 public static class IDeserializerExtensions
 {
+    /// <summary>Deserializes <paramref name="serializationChunk"/>.</summary>
+    /// <param name="deserializer">Deserializer to use.</param>
+    /// <param name="serializationChunk">Chunk to deserialize.</param>
+    /// <param name="dependentNodes">Nodes that should be referencable during deserialization.</param>
     /// <returns>The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.</returns>
-    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
-    public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
-        SerializationChunk serializationChunk) =>
-        deserializer.Deserialize(serializationChunk, []);
-
-    /// <returns>
-    /// The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializationChunk">serialization chunk</paramref>.
-    /// References to any of the given dependent nodes are resolved as well.
-    /// </returns>
-    /// <exception cref="InvalidDataException">Thrown when the serialization references a <see cref="Concept"/> that couldn't be found in the languages this instance is parametrized with.</exception>
+    /// <exception cref="DeserializerException"/>
+    /// <exception cref="VersionMismatchException">If <paramref name="serializationChunk"/>'s LionWeb version is not compatible with <paramref name="deserializer"/>'s <see cref="IDeserializer.LionWebVersion"/>.</exception>
     public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
         SerializationChunk serializationChunk,
-        IEnumerable<INode> dependentNodes)
+        IEnumerable<INode>? dependentNodes = null)
     {
-        if (serializationChunk.SerializationFormatVersion != deserializer.LionWebVersion.VersionString)
-            throw new VersionMismatchException(serializationChunk.SerializationFormatVersion, deserializer.LionWebVersion.VersionString);
-        return deserializer.Deserialize(serializationChunk.Nodes, dependentNodes);
+        deserializer.LionWebVersion.AssureCompatible(serializationChunk.SerializationFormatVersion);
+        return deserializer.Deserialize(serializationChunk.Nodes, dependentNodes ?? []);
     }
 
-    public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
-        IEnumerable<SerializedNode> serializedNodes) =>
-        deserializer.Deserialize(serializedNodes, []);
-
+    /// <summary>Deserializes all of <paramref name="serializedNodes"/>.</summary>
+    /// <param name="deserializer">Deserializer to use.</param>
+    /// <param name="serializedNodes">Low-level nodes to deserialize.</param>
+    /// <param name="dependentNodes">High-level nodes that should be referencable during deserialization.</param>
+    /// <returns>The root (i.e.: parent-less) nodes among the deserialization of the given <paramref name="serializedNodes"/>.</returns>
+    /// <exception cref="DeserializerException"/>
     public static List<IReadableNode> Deserialize(this IDeserializer deserializer,
         IEnumerable<SerializedNode> serializedNodes,
-        IEnumerable<IReadableNode> dependentNodes)
+        IEnumerable<IReadableNode>? dependentNodes = null)
     {
-        deserializer.RegisterDependentNodes(dependentNodes);
+        deserializer.RegisterDependentNodes(dependentNodes ?? []);
         foreach (SerializedNode serializedNode in serializedNodes)
         {
             deserializer.Process(serializedNode);
