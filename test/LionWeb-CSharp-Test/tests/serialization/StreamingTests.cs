@@ -20,7 +20,6 @@ namespace LionWeb_CSharp_Test.tests.serialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
-using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using System.Diagnostics;
@@ -103,7 +102,7 @@ public class StreamingTests
             .WithLanguage(_language)
             .Build();
 
-        List<IReadableNode> nodes = JsonUtils.ReadNodesFromStream(stream, deserializer).GetAwaiter().GetResult();
+        List<IReadableNode> nodes = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).GetAwaiter().GetResult();
 
         Assert.AreEqual(_maxSize, nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count());
     }
