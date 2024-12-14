@@ -19,6 +19,7 @@ namespace LionWeb.Core.M2;
 
 using M1;
 using M3;
+using Serialization;
 
 public partial class LanguageDeserializer
 {
@@ -54,8 +55,8 @@ public partial class LanguageDeserializer
         return deserializedAnnotations
             .Select(deserializedAnnotation =>
             {
-                if (deserializedAnnotation is not IWritableNode node)
-                    node = Handler.InvalidAnnotation(deserializedAnnotation, null);
+                IWritableNode? node = deserializedAnnotation as IWritableNode ??
+                                      Handler.InvalidAnnotation(deserializedAnnotation, null);
 
                 if (node != null)
                     _deserializedNodesById[Compress(node.GetId())] = node;
@@ -66,23 +67,30 @@ public partial class LanguageDeserializer
             .ToList()!;
     }
 
+
     private void InstallAnnotationParents(List<IWritableNode> deserializedAnnotationInstances)
     {
         foreach (var deserializedAnnotation in deserializedAnnotationInstances)
         {
+            IReadableNode? readableParent = null;
+            IWritableNode? writableParent = null;
+
             var serializedAnnotation = _serializedNodesById[Compress(deserializedAnnotation.GetId())];
             var parentId = serializedAnnotation.Parent;
-            if (parentId == null)
-                continue;
-
-            CompressedId compressedParentId = Compress(parentId);
-            if(IsInDependentNodes(compressedParentId))
-                continue;
-            
-            if (!_deserializedNodesById.TryGetValue(compressedParentId, out var parent) ||
-                parent is not IWritableNode writableParent)
+            if (parentId != null)
             {
-                Handler.InvalidAnnotationParent(deserializedAnnotation, parent);
+                CompressedId compressedParentId = Compress(parentId);
+
+                if (_deserializedNodesById.TryGetValue(compressedParentId, out readableParent) &&
+                    readableParent is IWritableNode w)
+                {
+                    writableParent = w;
+                }
+            }
+
+            if (writableParent == null)
+            {
+                Handler.InvalidAnnotationParent(deserializedAnnotation, readableParent);
                 continue;
             }
 
@@ -95,23 +103,21 @@ public partial class LanguageDeserializer
                     continue;
             }
 
-            writableParent.AddAnnotations([annotation]);
+            annotation = PreventCircularContainment(writableParent, annotation);
+
+            if (annotation != null)
+                writableParent.AddAnnotations([annotation]);
         }
     }
 
     private void InstallAnnotationReferences()
     {
-        foreach (var serializedNode in _serializedNodesById.Values)
+        foreach (var serializedNode in _serializedNodesById.Values.Where(n => !IsLanguageNode(n)))
         {
-            InstallReferences(serializedNode);
+            InstallAnnotationReferences(serializedNode);
         }
     }
 
-    private T LookupNode<T>(string id) where T : class, IKeyed
-    {
-        CompressedId compressedId = Compress(id);
-        if (_dependentNodesById.TryGetValue(compressedId, out var node))
-            return (T)node;
-        return (T)_deserializedNodesById[compressedId];
-    }
+    private void InstallAnnotationReferences(SerializedNode serializedNode) =>
+        InstallReferences(Compress(serializedNode.Id), serializedNode.References.Select(Compress));
 }

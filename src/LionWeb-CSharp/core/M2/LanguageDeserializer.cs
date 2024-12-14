@@ -36,17 +36,17 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     public LanguageDeserializer(IDeserializerVersionSpecifics versionSpecifics, bool preloadLionCoreLanguage = true) :
         base(versionSpecifics)
     {
-        RegisterDependentLanguage(_builtIns);
+        versionSpecifics.RegisterBuiltins(this);
 
         if (preloadLionCoreLanguage)
             RegisterDependentLanguage(_m3);
     }
-    
+
     /// <inheritdoc />
-    public override void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
+    public override void RegisterInstantiatedLanguage(Language language, INodeFactory? factory = null)
     {
         base.RegisterInstantiatedLanguage(language, factory);
-        _deserializerBuilder.WithCustomFactory(language, factory);
+        _deserializerBuilder.WithCustomFactory(language, factory ?? language.GetFactory());
     }
 
     /// <inheritdoc />
@@ -64,120 +64,17 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
         _deserializerBuilder.WithDependentNodes(nodes);
     }
 
-    #region Process
-
-    /// <inheritdoc />
-    public override void Process(SerializedNode serializedNode)
-    {
-        _serializedNodesById[Compress(serializedNode.Id)] = serializedNode;
-        if (!IsLanguageNode(serializedNode))
-            return;
-
-        var id = serializedNode.Id;
-        var compressedId = Compress(id);
-        if (!IsInDependentNodes(compressedId) || !Handler.SkipDeserializingDependentNode(compressedId))
-            _deserializedNodesById[compressedId] = DeserializeMemoized(compressedId);
-    }
-
-    private IReadableNode DeserializeMemoized(CompressedId compressedId)
-    {
-        var serializedNode = _serializedNodesById[compressedId];
-        if (!_deserializedNodesById.TryGetValue(compressedId, out var node))
-        {
-            node = CreateNodeWithProperties(serializedNode);
-        }
-
-        return node;
-    }
-
-    private DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode)
-    {
-        var serializedPropertiesByKey = serializedNode.Properties.ToDictionary(
-            serializedProperty => Compress(serializedProperty.Property),
-            serializedProperty => serializedProperty.Value
-        );
-        var id = serializedNode.Id;
-        string key = LookupString(_m3.IKeyed_key);
-        string name = LookupString(_builtIns.INamed_name);
-
-        return serializedNode.Classifier switch
-        {
-            var s when s.Matches(_m3.Annotation) => new DynamicAnnotation(id, null) { Key = key, Name = name },
-            var s when s.Matches(_m3.Concept) => new DynamicConcept(id, null)
-            {
-                Key = key,
-                Name = name,
-                Abstract = LookupBool(_m3.Concept_abstract),
-                Partition = LookupBool(_m3.Concept_partition)
-            },
-            var s when s.Matches(_m3.Containment) => new DynamicContainment(id, null)
-            {
-                Key = key,
-                Name = name,
-                Optional = LookupBool(_m3.Feature_optional),
-                Multiple = LookupBool(_m3.Link_multiple)
-            },
-            var s when s.Matches(_m3.Enumeration) => new DynamicEnumeration(id, null) { Key = key, Name = name },
-            var s when s.Matches(_m3.EnumerationLiteral) => new DynamicEnumerationLiteral(id, null)
-            {
-                Key = key, Name = name
-            },
-            var s when s.Matches(_m3.Interface) => new DynamicInterface(id, null) { Key = key, Name = name },
-            var s when s.Matches(_m3.Language) => new DynamicLanguage(id, LionWebVersion)
-            {
-                Key = key, Name = name, Version = LookupString(_m3.Language_version)
-            },
-            var s when s.Matches(_m3.PrimitiveType) => new DynamicPrimitiveType(id, null) { Key = key, Name = name },
-            var s when s.Matches(_m3.Property) => new DynamicProperty(id, null)
-            {
-                Key = key, Name = name, Optional = LookupBool(_m3.Feature_optional)
-            },
-            var s when s.Matches(_m3.Reference) => new DynamicReference(id, null)
-            {
-                Key = key,
-                Name = name,
-                Optional = LookupBool(_m3.Feature_optional),
-                Multiple = LookupBool(_m3.Link_multiple)
-            },
-            _ => throw new UnsupportedClassifierException(serializedNode.Classifier)
-        };
-
-        bool LookupBool(Property property)
-        {
-            var compressedMetaPointer = Compress(property.ToMetaPointer());
-            if (serializedPropertiesByKey.TryGetValue(compressedMetaPointer, out var value))
-                return value == "true";
-
-            var result = Handler.InvalidPropertyValue<bool>(null, property, Compress(id));
-            return result as bool? ?? throw new InvalidValueException(property, result);
-        }
-
-        string LookupString(Property property)
-        {
-            var compressedMetaPointer = Compress(property.ToMetaPointer());
-            if (serializedPropertiesByKey.TryGetValue(compressedMetaPointer, out var s) && s != null)
-                return s;
-
-            var result = Handler.InvalidPropertyValue<string>(null, property, Compress(id));
-            return result as string ?? throw new InvalidValueException(property, result);
-        }
-    }
-
-    #endregion
-
     private bool IsLanguageNode(SerializedNode serializedNode) =>
         serializedNode.Classifier.Language == _m3.Key;
 }
 
+// TODO still needed?
 internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : IDeserializerHandler
 {
-    public IWritableNode? UnresolvableParent(CompressedId parentId, IReadableNode node) =>
-        null;
-
     public Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) =>
         @delegate.UnknownClassifier(classifier, id);
 
-    public string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, INode node) =>
+    public string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
         @delegate.DuplicateNodeId(nodeId, existingNode, node);
 
     public T? SelectVersion<T>(CompressedMetaPointer metaPointer, List<Language> languages) where T : class, IKeyed =>
@@ -201,7 +98,7 @@ internal class AnnotationDeserializerHandler(IDeserializerHandler @delegate) : I
     public IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IReadableNode node) =>
         @delegate.UnresolvableAnnotation(annotationId, node);
 
-    public IWritableNode? InvalidAnnotation(IReadableNode annotation, IReadableNode node) =>
+    public IWritableNode? InvalidAnnotation(IReadableNode annotation, IReadableNode? node) =>
         @delegate.InvalidAnnotation(annotation, node);
 
     public IWritableNode? CircularContainment(IReadableNode containedNode, IReadableNode parent) =>

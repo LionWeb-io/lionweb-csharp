@@ -35,7 +35,7 @@ public class DeserializerMetaInfo
     internal IDeserializerHandler Handler { get; set; } = new DeserializerExceptionHandler();
     internal bool StoreUncompressedIds { get; set; } = false;
 
-    public void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
+    internal void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
     {
         _language2NodeFactory[language] = factory;
         var compressedKey = Compress(language.Key);
@@ -89,7 +89,7 @@ public class DeserializerMetaInfo
         return Handler.UnknownEnumerationLiteral(value, enumeration, property, nodeId);
     }
 
-    internal Feature? FindFeature<TFeature>(IWritableNode node, CompressedMetaPointer compressedMetaPointer)
+    internal Feature? FindFeature<TFeature>(IReadableNode node, CompressedMetaPointer compressedMetaPointer)
         where TFeature : class, Feature
     {
         Classifier classifier = node.GetClassifier();

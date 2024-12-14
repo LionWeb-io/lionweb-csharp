@@ -46,12 +46,11 @@ public static class ILanguageDeserializerExtensions
     /// <exception cref="DeserializerException"/>
     public static IEnumerable<DynamicLanguage> Deserialize(this ILanguageDeserializer deserializer,
         SerializationChunk serializationChunk,
-        params Language[] dependentLanguages)
+        IEnumerable<Language>? dependentLanguages = null)
     {
-        if (serializationChunk.SerializationFormatVersion != deserializer.LionWebVersion.VersionString)
-            throw new VersionMismatchException(serializationChunk.SerializationFormatVersion, deserializer.LionWebVersion.VersionString);
-        
-        foreach (var dependentLanguage in dependentLanguages)
+        deserializer.LionWebVersion.AssureCompatible(serializationChunk.SerializationFormatVersion);
+
+        foreach (var dependentLanguage in dependentLanguages ?? [])
         {
             deserializer.RegisterDependentLanguage(dependentLanguage);
         }
@@ -63,14 +62,34 @@ public static class ILanguageDeserializerExtensions
 
         return deserializer.Finish();
     }
-    
-    /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
-    public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk, params Language[] dependentLanguages) =>
+
+    /// <summary>
+    /// Deserializes the given <paramref name="serializationChunk"/> as an iterable collection of <see cref="Language"/>s.
+    /// </summary>
+    /// <param name="serializationChunk">Chunk to deserialize.</param>
+    /// <param name="dependentLanguages"><see cref="ILanguageDeserializer.RegisterDependentLanguage">Dependent languages</see> to register.</param>
+    /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
+    /// <exception cref="VersionMismatchException">
+    /// If <paramref name="serializationChunk"/>'s LionWeb version is not compatible with <see cref="LionWebVersions.Current"/>.
+    /// </exception>
+    /// <exception cref="DeserializerException"/>
+    public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
+        IEnumerable<Language>? dependentLanguages = null) =>
         Deserialize(serializationChunk, LionWebVersions.Current, dependentLanguages);
 
-    /// <inheritdoc cref="ILanguageDeserializerExtensions.Deserialize"/>
+    /// <summary>
+    /// Deserializes the given <paramref name="serializationChunk"/> as an iterable collection of <see cref="Language"/>s.
+    /// </summary>
+    /// <param name="serializationChunk">Chunk to deserialize.</param>
+    /// <param name="lionWebVersion">Version of LionWeb standard to use.</param>
+    /// <param name="dependentLanguages"><see cref="ILanguageDeserializer.RegisterDependentLanguage">Dependent languages</see> to register.</param>
+    /// <returns>The deserialization of the language definitions present in the given <paramref name="serializationChunk"/>.</returns>
+    /// <exception cref="VersionMismatchException">
+    /// If <paramref name="serializationChunk"/>'s LionWeb version is not compatible <paramref name="lionWebVersion"/>.
+    /// </exception>
+    /// <exception cref="DeserializerException"/>
     public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
-        LionWebVersions lionWebVersion, params Language[] dependentLanguages)
+        LionWebVersions lionWebVersion, IEnumerable<Language>? dependentLanguages = null)
     {
         var versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion);
         return new LanguageDeserializer(versionSpecifics).Deserialize(serializationChunk, dependentLanguages);
