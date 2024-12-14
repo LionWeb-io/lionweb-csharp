@@ -31,7 +31,7 @@ public class DeserializationTests
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     [TestMethod]
-    public void test_deserialization_of_a_node_with_missing_parent_does_not_fail()
+    public void node_with_missing_parent_does_not_fail()
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
@@ -67,7 +67,7 @@ public class DeserializationTests
     }
 
     [TestMethod]
-    public void test_deserialization_of_a_node_with_a_missing_child_does_not_fail()
+    public void node_with_a_missing_child_does_not_fail()
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
@@ -109,7 +109,7 @@ public class DeserializationTests
     }
 
     [TestMethod]
-    public void test_deserialization_of_a_node_with_a_missing_reference_target_does_not_fail()
+    public void node_with_a_missing_reference_target_does_not_fail()
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
@@ -181,7 +181,7 @@ public class DeserializationTests
     }
 
     [TestMethod]
-    public void test_deserialization_of_a_node_referencing_a_dependent_node_succeeds()
+    public void node_referencing_a_dependent_node_succeeds()
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
@@ -231,7 +231,7 @@ public class DeserializationTests
     }
 
     [TestMethod]
-    public void test_deserialization_of_a_node_with_missing_annotation_does_not_fail()
+    public void node_with_missing_annotation_does_not_fail()
     {
         SerializationChunk serializationChunk = new SerializationChunk
         {
@@ -269,7 +269,7 @@ public class DeserializationTests
     }
 
     [TestMethod]
-    public void DeserializeUnsetRequiredContainment()
+    public void UnsetRequiredContainment()
     {
         var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
 
