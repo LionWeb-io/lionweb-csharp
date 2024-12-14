@@ -16,7 +16,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable InconsistentNaming
-// ReSharper disable SuggestVarOrType_SimpleTypes
 
 namespace LionWeb.Utils.Tests.Comparer;
 

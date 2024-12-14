@@ -15,13 +15,9 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable SuggestVarOrType_SimpleTypes
-// ReSharper disable InconsistentNaming
-
 namespace Examples.Shapes.Dynamic;
 
 using LionWeb.Core;
-using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 
 /// <summary>

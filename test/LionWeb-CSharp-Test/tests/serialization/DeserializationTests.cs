@@ -15,9 +15,6 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable SuggestVarOrType_SimpleTypes
-// ReSharper disable SuggestVarOrType_Elsewhere
-
 namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.M2;

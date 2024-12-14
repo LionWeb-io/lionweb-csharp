@@ -15,8 +15,6 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable SuggestVarOrType_SimpleTypes
-
 namespace LionWeb.CSharp.Generator.Impl;
 
 using Core;

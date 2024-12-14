@@ -15,10 +15,6 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable ReturnTypeCanBeEnumerable.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable SuggestVarOrType_SimpleTypes
-
 namespace LionWeb.Core.Utilities;
 
 using M1;
