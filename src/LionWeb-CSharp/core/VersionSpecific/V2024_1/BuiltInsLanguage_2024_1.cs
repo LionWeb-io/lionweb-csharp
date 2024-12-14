@@ -16,6 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable InconsistentNaming
+
 namespace LionWeb.Core.VersionSpecific.V2024_1;
 
 using M2;
@@ -26,13 +27,13 @@ using M3;
 public interface IBuiltInsLanguage_2024_1 : IBuiltInsLanguage;
 
 /// <inheritdoc cref="IBuiltInsLanguage_2024_1" />
-public sealed class BuiltInsLanguage_2024_1 :
-    LanguageBase<BuiltInsFactory_2024_1>, IBuiltInsLanguage_2024_1
+public sealed class BuiltInsLanguage_2024_1 : LanguageBase<BuiltInsFactory_2024_1>, IBuiltInsLanguage_2024_1
 {
     /// The definition of the LionCore <see cref="IVersion2024_1"/> built-ins language.
     public static readonly BuiltInsLanguage_2024_1 Instance = new Lazy<BuiltInsLanguage_2024_1>(() => new()).Value;
 
-    private const string _name = "LionCore_builtins";
+    private const string _idPrefix = "LionCore-builtins-2024_1";
+    private const string _keyPrefix = IBuiltInsLanguage.LanguageKey;
 
     /// <inheritdoc />
     protected override IBuiltInsLanguage_2024_1 _builtIns => this;
@@ -40,45 +41,45 @@ public sealed class BuiltInsLanguage_2024_1 :
     /// <inheritdoc />
     protected override ILionCoreLanguage_2024_1 _m3 => LionCoreLanguage_2024_1.Instance;
 
-    internal BuiltInsLanguage_2024_1() : base(LionCoreBuiltInsIdAndKey, LionWebVersions.v2024_1)
+    internal BuiltInsLanguage_2024_1() : base(_idPrefix, LionWebVersions.v2024_1)
     {
-        _boolean = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-Boolean", this)
+        _boolean = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{_idPrefix}-Boolean", this)
         {
-            Key = $"{LionCoreBuiltInsIdAndKey}-Boolean", Name = "Boolean"
+            Key = $"{_keyPrefix}-Boolean", Name = "Boolean"
         });
 
-        _integer = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-Integer", this)
+        _integer = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{_idPrefix}-Integer", this)
         {
-            Key = $"{LionCoreBuiltInsIdAndKey}-Integer", Name = "Integer"
+            Key = $"{_keyPrefix}-Integer", Name = "Integer"
         });
 
-        _string = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-String", this)
+        _string = new(() => new PrimitiveTypeBase<BuiltInsLanguage_2024_1>($"{_idPrefix}-String", this)
         {
-            Key = $"{LionCoreBuiltInsIdAndKey}-String", Name = "String"
+            Key = $"{_keyPrefix}-String", Name = "String"
         });
 
         _iNamed = new(() =>
-            new InterfaceBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-INamed", this)
+            new InterfaceBase<BuiltInsLanguage_2024_1>($"{_idPrefix}-INamed", this)
             {
-                Key = $"{LionCoreBuiltInsIdAndKey}-INamed", Name = "INamed", FeaturesLazy = new(() => [INamed_name])
+                Key = $"{_keyPrefix}-INamed", Name = "INamed", FeaturesLazy = new(() => [INamed_name])
             });
         _iNamed_name = new(() =>
-            new PropertyBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-INamed-name", INamed, this)
+            new PropertyBase<BuiltInsLanguage_2024_1>($"{_idPrefix}-INamed-name", INamed, this)
             {
-                Key = $"{LionCoreBuiltInsIdAndKey}-INamed-name", Name = "name", Optional = false, Type = String
+                Key = $"{_keyPrefix}-INamed-name", Name = "name", Optional = false, Type = String
             });
 
-        _node = new(() => new ConceptBase<BuiltInsLanguage_2024_1>($"{LionCoreBuiltInsIdAndKey}-Node", this)
+        _node = new(() => new ConceptBase<BuiltInsLanguage_2024_1>($"{_idPrefix}-Node", this)
         {
-            Key = $"{LionCoreBuiltInsIdAndKey}-Node", Name = "Node", Abstract = true, Partition = false
+            Key = $"{_keyPrefix}-Node", Name = "Node", Abstract = true, Partition = false
         });
     }
 
     /// <inheritdoc />
-    public override string Name => _name;
+    public override string Name => IBuiltInsLanguage.LanguageName;
 
     /// <inheritdoc />
-    public override string Key => LionCoreBuiltInsIdAndKey;
+    public override string Key => IBuiltInsLanguage.LanguageKey;
 
     /// <inheritdoc />
     public override string Version => LionWebVersion.VersionString;
@@ -131,11 +132,6 @@ public sealed class BuiltInsLanguage_2024_1 :
 
     /// <inheritdoc />
     public Concept Node => _node.Value;
-
-    /// <summary>
-    /// The ID and key of 
-    /// </summary>
-    public const string LionCoreBuiltInsIdAndKey = "LionCore-builtins";
 }
 
 /// Factory for <see cref="BuiltInsLanguage_2024_1"/>.

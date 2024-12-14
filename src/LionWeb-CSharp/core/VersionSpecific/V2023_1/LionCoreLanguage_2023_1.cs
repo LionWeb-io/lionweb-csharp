@@ -16,6 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable InconsistentNaming
+
 namespace LionWeb.Core.VersionSpecific.V2023_1;
 
 using M2;
@@ -30,8 +31,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
     /// The definition of the LionCore <see cref="IVersion2023_1"/> M3 language.
     public static readonly ILionCoreLanguage_2023_1 Instance = new Lazy<LionCoreLanguage_2023_1>(() => new()).Value;
 
-    private const string _name = "LionCore_M3";
-    private const string _key = "LionCore-M3";
+    private const string _idPrefix = "-id";
 
     /// <inheritdoc />
     protected override IBuiltInsLanguage_2023_1 _builtIns => BuiltInsLanguage_2023_1.Instance;
@@ -39,9 +39,9 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
     /// <inheritdoc />
     protected override ILionCoreLanguage_2023_1 _m3 => this;
 
-    internal LionCoreLanguage_2023_1() : base("-id-LionCore-M3", LionWebVersions.v2023_1)
+    internal LionCoreLanguage_2023_1() : base($"{_idPrefix}-LionCore-M3", LionWebVersions.v2023_1)
     {
-        _annotation = new(() => new M3Concept("-id-Annotation", this)
+        _annotation = new(() => new M3Concept($"{_idPrefix}-Annotation", this)
         {
             Key = "Annotation",
             Name = "Annotation",
@@ -56,7 +56,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             ])
         });
         _annotation_annotates = new(() =>
-            new M3Reference("-id-Annotation-annotates", Annotation, this)
+            new M3Reference($"{_idPrefix}-Annotation-annotates", Annotation, this)
             {
                 Key = "Annotation-annotates",
                 Name = "annotates",
@@ -64,7 +64,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
                 Optional = true,
                 Type = Classifier
             });
-        _annotation_extends = new(() => new M3Reference("-id-Annotation-extends", Annotation, this)
+        _annotation_extends = new(() => new M3Reference($"{_idPrefix}-Annotation-extends", Annotation, this)
         {
             Key = "Annotation-extends",
             Name = "extends",
@@ -72,7 +72,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             Optional = true,
             Type = Annotation
         });
-        _annotation_implements = new(() => new M3Reference("-id-Annotation-implements", Annotation, this)
+        _annotation_implements = new(() => new M3Reference($"{_idPrefix}-Annotation-implements", Annotation, this)
         {
             Key = "Annotation-implements",
             Name = "implements",
@@ -81,7 +81,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             Type = Interface
         });
 
-        _classifier = new(() => new M3Concept("-id-Classifier", this)
+        _classifier = new(() => new M3Concept($"{_idPrefix}-Classifier", this)
         {
             Key = "Classifier",
             Name = "Classifier",
@@ -90,7 +90,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             ExtendsLazy = new(() => LanguageEntity),
             FeaturesLazy = new(() => [Classifier_features])
         });
-        _classifier_features = new(() => new M3Containment("-id-Classifier-features", Classifier, this)
+        _classifier_features = new(() => new M3Containment($"{_idPrefix}-Classifier-features", Classifier, this)
         {
             Key = "Classifier-features",
             Name = "features",
@@ -99,7 +99,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             Type = Feature
         });
 
-        _concept = new(() => new M3Concept("-id-Concept", this)
+        _concept = new(() => new M3Concept($"{_idPrefix}-Concept", this)
         {
             Key = "Concept",
             Name = "Concept",
@@ -114,14 +114,14 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
                 Concept_implements
             ])
         });
-        _concept_abstract = new(() => new M3Property("-id-Concept-abstract", Concept, this)
+        _concept_abstract = new(() => new M3Property($"{_idPrefix}-Concept-abstract", Concept, this)
         {
             Key = "Concept-abstract",
             Name = "abstract",
             Optional = false,
             Type = BuiltInsLanguage_2023_1.Instance.Boolean
         });
-        _concept_partition = new(() => new M3Property("-id-Concept-partition", Concept, this)
+        _concept_partition = new(() => new M3Property($"{_idPrefix}-Concept-partition", Concept, this)
         {
             Key = "Concept-partition",
             Name = "partition",
@@ -129,7 +129,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             Type = BuiltInsLanguage_2023_1.Instance.Boolean
         });
         _concept_extends = new(() =>
-            new M3Reference("-id-Concept-extends", Concept, this)
+            new M3Reference($"{_idPrefix}-Concept-extends", Concept, this)
             {
                 Key = "Concept-extends",
                 Name = "extends",
@@ -138,7 +138,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
                 Type = Concept
             });
         _concept_implements = new(() =>
-            new M3Reference("-id-Concept-implements", Concept, this)
+            new M3Reference($"{_idPrefix}-Concept-implements", Concept, this)
             {
                 Key = "Concept-implements",
                 Name = "implements",
@@ -147,7 +147,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
                 Type = Interface
             });
 
-        _containment = new(() => new M3Concept("-id-Containment", this)
+        _containment = new(() => new M3Concept($"{_idPrefix}-Containment", this)
         {
             Key = "Containment",
             Name = "Containment",
@@ -156,7 +156,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             ExtendsLazy = new(() => Link)
         });
 
-        _dataType = new(() => new M3Concept("-id-DataType", this)
+        _dataType = new(() => new M3Concept($"{_idPrefix}-DataType", this)
         {
             Key = "DataType",
             Name = "DataType",
@@ -165,7 +165,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             ExtendsLazy = new(() => LanguageEntity)
         });
 
-        _enumeration = new(() => new M3Concept("-id-Enumeration", this)
+        _enumeration = new(() => new M3Concept($"{_idPrefix}-Enumeration", this)
         {
             Key = "Enumeration",
             Name = "Enumeration",
@@ -174,7 +174,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             ExtendsLazy = new(() => DataType),
             FeaturesLazy = new(() => [Enumeration_literals])
         });
-        _enumeration_literals = new(() => new M3Containment("-id-Enumeration-literals", Enumeration, this)
+        _enumeration_literals = new(() => new M3Containment($"{_idPrefix}-Enumeration-literals", Enumeration, this)
         {
             Key = "Enumeration-literals",
             Name = "literals",
@@ -183,7 +183,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             Type = EnumerationLiteral
         });
 
-        _enumerationLiteral = new(() => new M3Concept("-id-EnumerationLiteral", this)
+        _enumerationLiteral = new(() => new M3Concept($"{_idPrefix}-EnumerationLiteral", this)
         {
             Key = "EnumerationLiteral",
             Name = "EnumerationLiteral",
@@ -192,7 +192,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             ImplementsLazy = new(() => [IKeyed])
         });
 
-        _feature = new(() => new M3Concept("-id-Feature", this)
+        _feature = new(() => new M3Concept($"{_idPrefix}-Feature", this)
         {
             Key = "Feature",
             Name = "Feature",
@@ -201,7 +201,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             ImplementsLazy = new(() => [IKeyed]),
             FeaturesLazy = new(() => [Feature_optional])
         });
-        _feature_optional = new(() => new M3Property("-id-Feature-optional", Feature, this)
+        _feature_optional = new(() => new M3Property($"{_idPrefix}-Feature-optional", Feature, this)
         {
             Key = "Feature-optional",
             Name = "optional",
@@ -210,19 +210,19 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
         });
 
         _iKeyed = new(() =>
-            new M3Interface("-id-IKeyed", this)
+            new M3Interface($"{_idPrefix}-IKeyed", this)
             {
                 Key = "IKeyed",
                 Name = "IKeyed",
                 ExtendsLazy = new(() => [BuiltInsLanguage_2023_1.Instance.INamed]),
                 FeaturesLazy = new(() => [IKeyed_key])
             });
-        _iKeyed_key = new(() => new M3Property("-id-IKeyed-key", IKeyed, this)
+        _iKeyed_key = new(() => new M3Property($"{_idPrefix}-IKeyed-key", IKeyed, this)
         {
             Key = "IKeyed-key", Name = "key", Optional = false, Type = BuiltInsLanguage_2023_1.Instance.String
         });
 
-        _interface = new(() => new M3Concept("-id-Interface", this)
+        _interface = new(() => new M3Concept($"{_idPrefix}-Interface", this)
         {
             Key = "Interface",
             Name = "Interface",
@@ -232,7 +232,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             FeaturesLazy = new(() => [Interface_extends])
         });
         _interface_extends = new(() =>
-            new M3Reference("-id-Interface-extends", Interface, this)
+            new M3Reference($"{_idPrefix}-Interface-extends", Interface, this)
             {
                 Key = "Interface-extends",
                 Name = "extends",
@@ -241,7 +241,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
                 Type = Interface
             });
 
-        _language = new(() => new M3Concept("-id-Language", this)
+        _language = new(() => new M3Concept($"{_idPrefix}-Language", this)
         {
             Key = "Language",
             Name = "Language",
@@ -255,14 +255,14 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
                 Language_dependsOn
             ])
         });
-        _language_version = new(() => new M3Property("-id-Language-version", Language, this)
+        _language_version = new(() => new M3Property($"{_idPrefix}-Language-version", Language, this)
         {
             Key = "Language-version",
             Name = "version",
             Optional = false,
             Type = BuiltInsLanguage_2023_1.Instance.String
         });
-        _language_entities = new(() => new M3Containment("-id-Language-entities", Language, this)
+        _language_entities = new(() => new M3Containment($"{_idPrefix}-Language-entities", Language, this)
         {
             Key = "Language-entities",
             Name = "entities",
@@ -271,7 +271,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             Type = LanguageEntity
         });
         _language_dependsOn = new(() =>
-            new M3Reference("-id-Language-dependsOn", Language, this)
+            new M3Reference($"{_idPrefix}-Language-dependsOn", Language, this)
             {
                 Key = "Language-dependsOn",
                 Name = "dependsOn",
@@ -280,7 +280,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
                 Type = Language
             });
 
-        _languageEntity = new(() => new M3Concept("-id-LanguageEntity", this)
+        _languageEntity = new(() => new M3Concept($"{_idPrefix}-LanguageEntity", this)
         {
             Key = "LanguageEntity",
             Name = "LanguageEntity",
@@ -289,7 +289,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             ImplementsLazy = new(() => [IKeyed])
         });
 
-        _link = new(() => new M3Concept("-id-Link", this)
+        _link = new(() => new M3Concept($"{_idPrefix}-Link", this)
         {
             Key = "Link",
             Name = "Link",
@@ -302,14 +302,14 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
                 Link_type
             ])
         });
-        _link_multiple = new(() => new M3Property("-id-Link-multiple", Link, this)
+        _link_multiple = new(() => new M3Property($"{_idPrefix}-Link-multiple", Link, this)
         {
             Key = "Link-multiple",
             Name = "multiple",
             Optional = false,
             Type = BuiltInsLanguage_2023_1.Instance.Boolean
         });
-        _link_type = new(() => new M3Reference("-id-Link-type", Link, this)
+        _link_type = new(() => new M3Reference($"{_idPrefix}-Link-type", Link, this)
         {
             Key = "Link-type",
             Name = "type",
@@ -318,7 +318,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             Type = Classifier
         });
 
-        _primitiveType = new(() => new M3Concept("-id-PrimitiveType", this)
+        _primitiveType = new(() => new M3Concept($"{_idPrefix}-PrimitiveType", this)
         {
             Key = "PrimitiveType",
             Name = "PrimitiveType",
@@ -327,7 +327,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             ExtendsLazy = new(() => DataType)
         });
 
-        _property = new(() => new M3Concept("-id-Property", this)
+        _property = new(() => new M3Concept($"{_idPrefix}-Property", this)
         {
             Key = "Property",
             Name = "Property",
@@ -337,7 +337,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
             FeaturesLazy = new(() => [Property_type])
         });
         _property_type = new(() =>
-            new M3Reference("-id-Property-type", Property, this)
+            new M3Reference($"{_idPrefix}-Property-type", Property, this)
             {
                 Key = "Property-type",
                 Name = "type",
@@ -346,7 +346,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
                 Type = DataType
             });
 
-        _reference = new(() => new M3Concept("-id-Reference", this)
+        _reference = new(() => new M3Concept($"{_idPrefix}-Reference", this)
         {
             Key = "Reference",
             Name = "Reference",
@@ -360,10 +360,10 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
     public override Classifier GetClassifier() => Concept;
 
     /// <inheritdoc />
-    public override string Name => _name;
+    public override string Name => ILionCoreLanguage.LanguageName;
 
     /// <inheritdoc />
-    public override string Key => _key;
+    public override string Key => ILionCoreLanguage.LanguageKey;
 
     /// <inheritdoc />
     public override string Version => LionWebVersion.VersionString;

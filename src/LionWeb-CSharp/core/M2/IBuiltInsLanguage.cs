@@ -25,7 +25,14 @@ using M3;
 /// primitive types, <see cref="INamed"/> and <see cref="Node"/>.
 public interface IBuiltInsLanguage : Language
 {
-    /// <summary>
+    /// Key of all LionWeb BuiltIns language implementations.
+    public const string LanguageKey = "LionCore-builtins";
+
+    /// Name of all LionWeb BuiltIns language implementations.
+    protected const string LanguageName = "LionCore_builtins";
+
+    internal const string ResolveInfoPrefix = "LionWeb.LionCore_builtins.";
+
     /// The built-in primitive type Boolean.
     PrimitiveType Boolean { get; }
 
@@ -66,6 +73,8 @@ public interface INamed : IReadableNode
 /// Writable variant of <see cref="INamed"/>.
 public interface INamedWritable : INamed, IWritableNode
 {
+    string INamed.Name => Name;
+
     /// <inheritdoc cref="INamed.Name"/>
     public new string Name { get; set; }
 
