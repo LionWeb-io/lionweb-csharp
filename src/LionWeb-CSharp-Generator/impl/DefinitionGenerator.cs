@@ -20,7 +20,6 @@
 namespace LionWeb.CSharp.Generator.Impl;
 
 using Core;
-using Core.M2;
 using Core.M3;
 using Core.Utilities;
 using Microsoft.CodeAnalysis;

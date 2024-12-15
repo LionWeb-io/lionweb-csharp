@@ -42,6 +42,7 @@ public abstract class GeneratorBase
     /// <inheritdoc cref="GeneratorBase"/>
     protected GeneratorBase(INames names, LionWebVersions lionWebVersion)
     {
+        lionWebVersion.AssureCompatible(names.Language.LionWebVersion);
         _names = names;
         _lionWebVersion = lionWebVersion;
         _m3 = lionWebVersion.LionCore;
