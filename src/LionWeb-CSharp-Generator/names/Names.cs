@@ -153,15 +153,10 @@ public partial class Names : INames
     /// <inheritdoc />
     public TypeSyntax AsType(Datatype datatype, bool disambiguate = false)
     {
-        if (_builtIns.Boolean.EqualsIdentity(datatype))
-            return PredefinedType(Token(SyntaxKind.BoolKeyword));
-        if (_builtIns.Integer.EqualsIdentity(datatype))
-            return PredefinedType(Token(SyntaxKind.IntKeyword));
-        if (_builtIns.String.EqualsIdentity(datatype))
-            return PredefinedType(Token(SyntaxKind.StringKeyword));
-// TODO
-        // if (_builtIns.Json.EqualsIdentity(datatype))
-        //     return PredefinedType(Token(SyntaxKind.StringKeyword));
+        var result = VersionSpecifics.AsType(datatype);
+        if (result != null)
+            return result;
+
         if (datatype is Enumeration && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
         {
             return
@@ -178,6 +173,11 @@ public partial class Names : INames
 
         return QualifiedName(ParseName(NamespaceName), type);
     }
+    
+    /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
+    protected IGeneratorVersionSpecifics VersionSpecifics =>
+        new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_language.LionWebVersion)).Value;
+    
 
     /// <inheritdoc />
     public NameSyntax AsType(Language lang)

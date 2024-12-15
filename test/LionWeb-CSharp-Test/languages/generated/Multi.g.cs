@@ -27,7 +27,7 @@ public partial class MultiLanguage : LanguageBase<IMultiFactory>
 	/// <inheritdoc/>
         public override IReadOnlyList<LanguageEntity> Entities => [Container];
 	/// <inheritdoc/>
-        public override IReadOnlyList<Language> DependsOn => [Examples.Library.M2.LibraryLanguage.Instance, Examples.Library.M2.LibraryLanguage.Instance];
+        public override IReadOnlyList<Language> DependsOn => [Examples.Library.M2.LibraryLanguage.Instance];
 
 	private const string _key = "multi";
 	/// <inheritdoc/>

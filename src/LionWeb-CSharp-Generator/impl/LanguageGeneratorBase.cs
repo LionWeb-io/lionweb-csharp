@@ -52,29 +52,9 @@ public abstract class LanguageGeneratorBase : GeneratorBase
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.LanguageEntity)"/>
     protected ExpressionSyntax AsProperty(LanguageEntity entity)
     {
-        if (entity.EqualsIdentity(_builtIns.Node))
-            return ParseExpression("_builtIns.Node");
-        if (entity.EqualsIdentity(_builtIns.INamed))
-            return ParseExpression("_builtIns.INamed");
-        if (entity.EqualsIdentity(_builtIns.Boolean))
-            return ParseExpression("_builtIns.Boolean");
-        if (entity.EqualsIdentity(_builtIns.Integer))
-            return ParseExpression("_builtIns.Integer");
-        // TODO
-        // if (entity.EqualsIdentity(_builtIns.Json))
-        //     return ParseExpression("_builtIns.Json");
-        if (entity.EqualsIdentity(_builtIns.String))
-            return ParseExpression("_builtIns.String");
-        if (entity.EqualsIdentity(_m3.IKeyed))
-            return ParseExpression("_m3.IKeyed");
-        if (entity.EqualsIdentity(_m3.Classifier))
-            return ParseExpression("_m3.Classifier");
-        if (entity.EqualsIdentity(_m3.Concept))
-            return ParseExpression("_m3.Concept");
-        if (entity.EqualsIdentity(_m3.Annotation))
-            return ParseExpression("_m3.Annotation");
-        if (entity.EqualsIdentity(_m3.Interface))
-            return ParseExpression("_m3.Interface");
+        var result = VersionSpecifics.AsProperty(entity);
+        if (result != null)
+            return result;
 
         if (_names.NamespaceMappings.ContainsKey(entity.GetLanguage()))
         {
@@ -87,6 +67,10 @@ public abstract class LanguageGeneratorBase : GeneratorBase
 
         return _names.AsProperty(entity);
     }
+
+    /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
+    protected IGeneratorVersionSpecifics VersionSpecifics =>
+        new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_lionWebVersion)).Value;
 
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.EnumerationLiteral)"/>
     protected IdentifierNameSyntax AsProperty(EnumerationLiteral literal) =>
