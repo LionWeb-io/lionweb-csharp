@@ -176,7 +176,7 @@ public partial class Names : INames
     }
     
     /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
-    protected IGeneratorVersionSpecifics VersionSpecifics =>
+    internal IGeneratorVersionSpecifics VersionSpecifics =>
         new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_language.LionWebVersion)).Value;
     
 

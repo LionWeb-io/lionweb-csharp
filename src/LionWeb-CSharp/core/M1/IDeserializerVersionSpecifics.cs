@@ -37,7 +37,8 @@ public interface IDeserializerVersionSpecifics : IVersionSpecifics
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 
-    void Initialize<T>(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler) where T : class, IReadableNode;
+    void Initialize<T>(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler)
+        where T : class, IReadableNode;
 
     /// Registers all relevant builtins. 
     void RegisterBuiltins();
@@ -54,7 +55,8 @@ internal abstract class DeserializerVersionSpecificsBase : IDeserializerVersionS
 
     public abstract LionWebVersions Version { get; }
 
-    public virtual void Initialize<T>(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler) where T : class, IReadableNode
+    public virtual void Initialize<T>(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo,
+        IDeserializerHandler handler) where T : class, IReadableNode
     {
         _deserializer = deserializer;
         _metaInfo = metaInfo;

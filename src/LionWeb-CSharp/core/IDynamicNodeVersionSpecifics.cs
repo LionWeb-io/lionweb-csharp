@@ -17,12 +17,13 @@
 
 namespace LionWeb.Core;
 
+using M2;
 using M3;
 using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1;
 
 /// Externalized logic of <see cref="DynamicNode"/>, specific to one version of LionWeb standard.
-public interface IDynamicNodeVersionSpecifics : IVersionSpecifics
+internal interface IDynamicNodeVersionSpecifics : IVersionSpecifics
 {
     /// <summary>
     /// Creates an instance of <see cref="IDynamicNodeVersionSpecifics"/> that implements <paramref name="lionWebVersion"/>.
@@ -39,4 +40,30 @@ public interface IDynamicNodeVersionSpecifics : IVersionSpecifics
     /// Prepares <paramref name="value"/> to be set as value of <paramref name="property"/>.
     /// <exception cref="InvalidValueException">If <paramref name="value"/> cannot be set as value for <paramref name="property"/>.</exception>
     object PrepareSetProperty(Property property, object? value);
+}
+
+internal abstract class DynamicNodeVersionSpecificsBase : IDynamicNodeVersionSpecifics
+{
+    public abstract LionWebVersions Version { get; }
+
+    public abstract object PrepareSetProperty(Property property, object? value);
+
+    protected object? PrepareSetEnum(object value, Enumeration e)
+    {
+        try
+        {
+            var factory = e.GetLanguage().GetFactory();
+            var enumerationLiteral = e.Literals[0];
+            Enum literal = factory.GetEnumerationLiteral(enumerationLiteral);
+            if (literal.GetType().IsEnumDefined(value))
+            {
+                return value;
+            }
+        } catch (ArgumentException)
+        {
+            // fall-through
+        }
+
+        return null;
+    }
 }

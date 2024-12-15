@@ -19,16 +19,15 @@
 
 namespace LionWeb.Core.VersionSpecific.V2024_1;
 
-using M2;
 using M3;
 using Utilities;
 
 /// <see cref="DynamicNode"/> parts specific to LionWeb <see cref="IVersion2024_1"/>.  
-internal class DynamicNodeVersionSpecifics_2024_1 : IDynamicNodeVersionSpecifics
+internal class DynamicNodeVersionSpecifics_2024_1 : DynamicNodeVersionSpecificsBase
 {
-    public LionWebVersions Version => LionWebVersions.v2024_1;
+    public override LionWebVersions Version => LionWebVersions.v2024_1;
 
-    public object PrepareSetProperty(Property property, object? value)
+    public override object PrepareSetProperty(Property property, object? value)
     {
         switch (value)
         {
@@ -38,21 +37,19 @@ internal class DynamicNodeVersionSpecifics_2024_1 : IDynamicNodeVersionSpecifics
                 return value;
 
             case Enum when property.Type is Enumeration e:
-                try
-                {
-                    var factory = e.GetLanguage().GetFactory();
-                    var enumerationLiteral = e.Literals[0];
-                    Enum literal = factory.GetEnumerationLiteral(enumerationLiteral);
-                    if (literal.GetType().IsEnumDefined(value))
-                    {
-                        return value;
-                    }
-                } catch (ArgumentException)
-                {
-                    // fall-through
-                }
+                var result = PrepareSetEnum(value, e);
+                if (result != null)
+                    return result;
 
                 break;
+
+            // TODO
+            // implement
+            // case IStructuredDataTypeInstance i when property.Type is StructuredDataType s:
+            //     if (i.GetStructuredDataType().EqualsIdentity(s))
+            //         return value;
+            //     
+            //     break;
         }
 
         throw new InvalidValueException(property, value);

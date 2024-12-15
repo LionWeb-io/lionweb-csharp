@@ -25,11 +25,11 @@ using Utilities;
 using V2023_1;
 
 /// <see cref="DynamicNode"/> parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
-internal class DynamicNodeVersionSpecifics_2024_1_Compatible : IDynamicNodeVersionSpecifics
+internal class DynamicNodeVersionSpecifics_2024_1_Compatible : DynamicNodeVersionSpecificsBase
 {
-    public LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
+    public override LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
 
-    public object PrepareSetProperty(Property property, object? value)
+    public override object PrepareSetProperty(Property property, object? value)
     {
         switch (value)
         {
@@ -42,19 +42,9 @@ internal class DynamicNodeVersionSpecifics_2024_1_Compatible : IDynamicNodeVersi
                 return value;
 
             case Enum when property.Type is Enumeration e:
-                try
-                {
-                    var factory = e.GetLanguage().GetFactory();
-                    var enumerationLiteral = e.Literals[0];
-                    Enum literal = factory.GetEnumerationLiteral(enumerationLiteral);
-                    if (literal.GetType().IsEnumDefined(value))
-                    {
-                        return value;
-                    }
-                } catch (ArgumentException)
-                {
-                    // fall-through
-                }
+                var result = PrepareSetEnum(value, e);
+                if (result != null)
+                    return result;
 
                 break;
         }

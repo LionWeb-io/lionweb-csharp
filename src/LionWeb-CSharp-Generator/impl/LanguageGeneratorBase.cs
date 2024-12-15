@@ -72,7 +72,7 @@ public abstract class LanguageGeneratorBase : GeneratorBase
     }
 
     /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
-    protected IGeneratorVersionSpecifics VersionSpecifics =>
+    internal IGeneratorVersionSpecifics VersionSpecifics =>
         new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_lionWebVersion)).Value;
 
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.EnumerationLiteral)"/>

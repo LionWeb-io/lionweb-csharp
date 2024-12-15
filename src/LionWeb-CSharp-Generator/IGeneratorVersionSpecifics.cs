@@ -25,7 +25,7 @@ using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1;
 
 /// Externalized logic of <see cref="GeneratorFacade"/>, specific to one version of LionWeb standard.
-public interface IGeneratorVersionSpecifics : IVersionSpecifics
+internal interface IGeneratorVersionSpecifics : IVersionSpecifics
 {
     /// <summary>
     /// Creates an instance of <see cref="IGeneratorVersionSpecifics"/> that implements <paramref name="lionWebVersion"/>.
@@ -41,7 +41,7 @@ public interface IGeneratorVersionSpecifics : IVersionSpecifics
 
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.LanguageEntity)"/>
     ExpressionSyntax? AsProperty(LanguageEntity entity);
-    
+
     /// <inheritdoc cref="INames.AsType(System.Type,Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax?[])"/>
     TypeSyntax? AsType(Datatype datatype);
 }
