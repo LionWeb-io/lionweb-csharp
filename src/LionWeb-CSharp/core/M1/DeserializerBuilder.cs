@@ -137,10 +137,3 @@ public class DeserializerBuilder
             };
     }
 }
-
-public enum ReferenceResolveInfoHandling
-{
-    None,
-    NameIfUnique,
-    Name
-}
