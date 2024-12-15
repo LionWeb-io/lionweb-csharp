@@ -31,7 +31,7 @@ void SerializeLanguagesLocally(string name, params Language[] languages)
 {
     JsonUtils.WriteNodesToStream(new FileStream($"chunks/localDefs/{name}.json", FileMode.Create),
         new Serializer(lionWebVersion),
-        languages.SelectMany(l => M1Extensions.Descendants<IReadableNode>(l, [], true, true)));
+        languages.SelectMany(l => M1Extensions.Descendants<IReadableNode>(l, true, true)));
 }
 
 SerializeLanguagesLocally("lioncore", lionWebVersion.LionCore);
@@ -61,8 +61,6 @@ var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
 
 List<Names> names =
 [
-    // TODO  get this working:
-    // new Names(M3Language.Instance, "LionWeb.Duplicate.M3"),
     new (libraryLanguage, "Examples.Library.M2"),
     new (multiLanguage, "Examples.Multi.M2")
     {
