@@ -73,6 +73,7 @@ public class InvalidPropertyValueTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
+            .WithUncompressedIds()
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);

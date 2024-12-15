@@ -109,7 +109,7 @@ public class DeserializationNameTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "targetName"
                         }
@@ -127,7 +127,7 @@ public class DeserializationNameTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "targetName"
                         }
@@ -214,7 +214,7 @@ public class DeserializationNameTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "otherName"
                         }
@@ -232,7 +232,7 @@ public class DeserializationNameTests
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "targetName"
                         }

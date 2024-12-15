@@ -209,37 +209,37 @@ public class LanguageSerializationTests
 
         var chunk = new SerializationChunk()
         {
-            SerializationFormatVersion = "2023.1",
+            SerializationFormatVersion = "2024.1",
             Languages = [new SerializedLanguageReference { Key = "key-myLanguage", Version = "1" }],
             Nodes =
             [
                 new SerializedNode
                 {
                     Id = "testDuplicateNodeId",
-                    Classifier = new MetaPointer("LionCore-M3", "2023.1", "Language"),
+                    Classifier = new MetaPointer("LionCore-M3", "2024.1", "Language"),
                     Properties =
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "myLanguage"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "IKeyed-key"),
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "IKeyed-key"),
                             Value = "key-myLanguage"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "Language-version"), Value = "1"
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "Language-version"), Value = "1"
                         }
                     ],
                     Containments =
                     [
                         new SerializedContainment
                         {
-                            Containment = new MetaPointer("LionCore-M3", "2023.1", "Language-entities"),
+                            Containment = new MetaPointer("LionCore-M3", "2024.1", "Language-entities"),
                             Children = ["testDuplicateNodeId", "otherNodeId"]
                         }
                     ],
@@ -249,27 +249,27 @@ public class LanguageSerializationTests
                 new SerializedNode
                 {
                     Id = "otherNodeId",
-                    Classifier = new MetaPointer("LionCore-M3", "2023.1", "Concept"),
+                    Classifier = new MetaPointer("LionCore-M3", "2024.1", "Concept"),
                     Properties =
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "myConcept"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "IKeyed-key"),
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "IKeyed-key"),
                             Value = "key-myConcept"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "Concept-abstract"), Value = "false"
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "Concept-abstract"), Value = "false"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "Concept-partition"),
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "Concept-partition"),
                             Value = "false"
                         }
                     ],
@@ -281,18 +281,18 @@ public class LanguageSerializationTests
                 new SerializedNode
                 {
                     Id = "testDuplicateNodeId",
-                    Classifier = new MetaPointer("LionCore-M3", "2023.1", "Annotation"),
+                    Classifier = new MetaPointer("LionCore-M3", "2024.1", "Annotation"),
                     Properties =
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "myAnnotation"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "IKeyed-key"),
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "IKeyed-key"),
                             Value = "key-myAnnotation"
                         }
                     ],
