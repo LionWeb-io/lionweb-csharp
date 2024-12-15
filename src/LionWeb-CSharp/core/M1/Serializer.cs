@@ -50,11 +50,15 @@ public class Serializer : ISerializer
     public IEnumerable<SerializedLanguageReference> UsedLanguages =>
         _usedLanguages.Select(SerializeLanguageReference);
 
-    /// <summary>
     /// Whether we store uncompressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
-    /// Uses more memory, but very helpful for debugging. 
-    /// </summary>
+    /// Uses more memory, but very helpful for debugging.
+    /// Defaults to <c>false</c>. 
     public bool StoreUncompressedIds { get; init; } = false;
+    
+    /// Whether references to LionCore nodes (<see cref="ILionCoreLanguage"/>, <see cref="IBuiltInsLanguage"/>)
+    /// should include the target node's id, or only the resolveInfo.
+    /// Defaults to false.
+    public bool PersistLionCoreReferenceTargetIds { get; init; } = false;
 
     /// <inheritdoc />
     public IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes)
@@ -285,15 +289,17 @@ public class Serializer : ISerializer
             .OfType<Language>()
             .FirstOrDefault();
 
+        var referenceTarget = PersistLionCoreReferenceTargetIds ? target.GetId() : null;
+        
         return hostingLanguage?.Key switch
         {
             ILionCoreLanguage.LanguageKey => new SerializedReferenceTarget
             {
-                Reference = null, ResolveInfo = ConcatResolveInfo(target, ILionCoreLanguage.ResolveInfoPrefix),
+                Reference = referenceTarget, ResolveInfo = ConcatResolveInfo(target, ILionCoreLanguage.ResolveInfoPrefix),
             },
             IBuiltInsLanguage.LanguageKey => new SerializedReferenceTarget
             {
-                Reference = null, ResolveInfo = ConcatResolveInfo(target, IBuiltInsLanguage.ResolveInfoPrefix),
+                Reference = referenceTarget, ResolveInfo = ConcatResolveInfo(target, IBuiltInsLanguage.ResolveInfoPrefix),
             },
             _ => new SerializedReferenceTarget { Reference = target.GetId(), ResolveInfo = target.GetNodeName() }
         };

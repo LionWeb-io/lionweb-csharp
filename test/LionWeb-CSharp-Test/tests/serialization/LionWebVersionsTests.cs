@@ -405,13 +405,59 @@ public class LionWebVersionsTests
         var lionWebVersion = LionWebVersions.GetByInterface(versionIface);
 
         var language = CreateLanguage(lionWebVersion.VersionString.Replace(".", "_"), lionWebVersion);
-        SerializationChunk chunk = new Serializer(lionWebVersion) { StoreUncompressedIds = true }.SerializeToChunk(
-            language.Descendants(true, true)
-        );
+        SerializationChunk chunk = new Serializer(lionWebVersion)
+        {
+            StoreUncompressedIds = true, PersistLionCoreReferenceTargetIds = false
+        }.SerializeToChunk(language.Descendants(true, true));
+
+        foreach (var target in chunk
+                     .Nodes
+                     .SelectMany(n => n.References)
+                     .SelectMany(r => r.Targets)
+                     .Where(t => chunk.Nodes.All(n => n.Id != t.Reference))
+                )
+        {
+            Assert.IsNull(target.Reference);
+            Assert.IsNotNull(target.ResolveInfo);
+        }
 
         var versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion);
         var deserialized = new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }
-            .Deserialize(chunk, new Language[0]).Cast<IReadableNode>()
+            .Deserialize(chunk).Cast<IReadableNode>()
+            .ToList();
+
+        Assert.AreEqual(1, deserialized.Count);
+
+        AssertEquals(language, deserialized);
+    }
+
+    [TestMethod]
+    [DataRow(typeof(IVersion2023_1))]
+    [DataRow(typeof(IVersion2024_1))]
+    [DataRow(typeof(IVersion2024_1_Compatible))]
+    public void SameVersion_Language_WithIds(Type versionIface)
+    {
+        var lionWebVersion = LionWebVersions.GetByInterface(versionIface);
+
+        var language = CreateLanguage(lionWebVersion.VersionString.Replace(".", "_"), lionWebVersion);
+        SerializationChunk chunk = new Serializer(lionWebVersion)
+        {
+            StoreUncompressedIds = true, PersistLionCoreReferenceTargetIds = true
+        }.SerializeToChunk(language.Descendants(true, true));
+
+        foreach (var target in chunk
+                     .Nodes
+                     .SelectMany(n => n.References)
+                     .SelectMany(r => r.Targets)
+                )
+        {
+            Assert.IsNotNull(target.Reference);
+            Assert.IsNotNull(target.ResolveInfo);
+        }
+
+        var versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion);
+        var deserialized = new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }
+            .Deserialize(chunk).Cast<IReadableNode>()
             .ToList();
 
         Assert.AreEqual(1, deserialized.Count);
@@ -446,11 +492,11 @@ public class LionWebVersionsTests
             .Deserialize(chunk)
             .Cast<IReadableNode>()
             .ToList();
-        
+
         Assert.AreEqual(1, deserialized.Count);
 
         var expected = CreateLanguage("2024_1_", LionWebVersions.v2024_1);
-        
+
         AssertEquals(expected, deserialized);
     }
 
@@ -545,7 +591,7 @@ public class LionWebVersionsTests
                 Key = "key-myLanguage", Version = "1", Name = "myLanguage"
             };
         var myConcept = language.Concept(NextId(idBase), "key-myConcept", "myConcept")
-        .Implementing(lionWebVersion.BuiltIns.INamed);
+            .Implementing(lionWebVersion.BuiltIns.INamed);
         var myAnnotation = language.Annotation(NextId(idBase), "key-myAnnotation", "myAnnotation")
             .Annotating(myConcept);
         myConcept.Reference(NextId(idBase), "key-myRef", "myRef")
