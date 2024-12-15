@@ -169,8 +169,8 @@ public class LanguageSerializationTests
 
         // We can't just compare the language nodes, because M3 concepts are self-defined (e.g. LionCore.Classifier = Concept, not Language)
         
-        using var expectedEnumerator = input.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, [], true, true)).GetEnumerator();
-        using var actualEnumerator = actual.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, [], true, true)).GetEnumerator();
+        using var expectedEnumerator = input.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, true, true)).GetEnumerator();
+        using var actualEnumerator = actual.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, true, true)).GetEnumerator();
 
         while (expectedEnumerator.MoveNext() && actualEnumerator.MoveNext())
         {

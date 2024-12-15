@@ -50,7 +50,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     public void RegisterDependentLanguage(Language language)
     {
         _deserializerBuilder.WithLanguage(language);
-        RegisterDependentNodes(M1Extensions.Descendants<IKeyed>(language, [], true, true));
+        RegisterDependentNodes(M1Extensions.Descendants<IKeyed>(language, true, true));
     }
 
     /// <inheritdoc />
