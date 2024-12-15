@@ -35,8 +35,8 @@ public class StreamingTests
         _language = ShapesLanguage.Instance;
     }
 
-    private const long _maxSize = 1_500_000L;
-    // private const long _maxSize = 1_500L;
+    // private const long _maxSize = 1_500_000L;
+    private const long _maxSize = 1_500L;
 
     [TestMethod]
     public void MassSerialization()

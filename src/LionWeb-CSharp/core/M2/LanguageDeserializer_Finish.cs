@@ -38,7 +38,7 @@ public partial class LanguageDeserializer
     private List<IWritableNode> DeserializeAnnotations()
     {
         _deserializerBuilder
-            .WithHandler(new AnnotationDeserializerHandler(Handler))
+            .WithHandler(Handler)
             .WithUncompressedIds(StoreUncompressedIds)
             .WithLanguages(_deserializedNodesById.Values.OfType<Language>())
             .WithDependentNodes(_deserializedNodesById.Values)
