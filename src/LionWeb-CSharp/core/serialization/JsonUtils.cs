@@ -27,7 +27,6 @@ using System.Text.Json.Stream;
 /// </summary>
 public static class JsonUtils
 {
-    // TODO  write and read JSON as UTF-8
     private static readonly JsonSerializerOptions _readOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase

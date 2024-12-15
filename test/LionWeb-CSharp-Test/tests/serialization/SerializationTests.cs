@@ -27,6 +27,7 @@ using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using LionWeb.Core.Utilities;
 using System.Collections;
+using System.Text;
 using Comparer = LionWeb.Core.Utilities.Comparer;
 
 [TestClass]
@@ -130,7 +131,8 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
 
-        Assert.ThrowsException<ArgumentException>(() => new Serializer(_lionWebVersion).SerializeToChunk([materialGroup]));
+        Assert.ThrowsException<ArgumentException>(() =>
+            new Serializer(_lionWebVersion).SerializeToChunk([materialGroup]));
     }
 
     [TestMethod]
@@ -217,6 +219,28 @@ public class SerializationTests
         var serializedNodes = serializer.Serialize(materialGroup.Descendants(true));
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.AreEqual(1, serializer.UsedLanguages.Count());
+    }
+
+    [TestMethod]
+    public void Utf8()
+    {
+        const string text = "\ud83d\ude0a Hällö 😊";
+        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") { Name = text } };
+
+        var serializer = new Serializer(_lionWebVersion);
+        var stream = new MemoryStream();
+        JsonUtils.WriteNodesToStream(stream, serializer, materialGroup.Descendants(true));
+
+        stream.Seek(0, SeekOrigin.Begin);
+
+        var deserializer = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        var readableNodes = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).Result;
+
+        Assert.AreEqual(text,
+            readableNodes.OfType<INode>().SelectMany(n => n.Descendants(true)).OfType<Circle>().First().Name);
     }
 
     private TestContext testContextInstance;
