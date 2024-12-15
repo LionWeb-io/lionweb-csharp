@@ -58,6 +58,7 @@ var testLanguagesDefinitions = new TestLanguagesDefinitions();
 var aLang = testLanguagesDefinitions.ALang;
 var bLang = testLanguagesDefinitions.BLang;
 var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
+var sdtLang = testLanguagesDefinitions.SdtLang;
 
 List<Names> names =
 [
@@ -77,9 +78,23 @@ List<Names> names =
         NamespaceMappings = { [aLang] = "Examples.Circular.A" }
     },
     new (tinyRefLang, "Examples.TinyRefLang"),
-    new (deprecatedLang, "Examples.DeprecatedLang")
+    new (deprecatedLang, "Examples.DeprecatedLang"),
+    new(sdtLang, "Examples.SDTLang")
 ];
 
+names.AddRange(testLanguagesDefinitions
+    .MixedLangs
+    .Select(l =>
+        new Names(l, $"Examples.Mixed.{l.Name}")
+        {
+            NamespaceMappings = testLanguagesDefinitions
+                .MixedLangs
+                .Except([l])
+                .Select(n => (n, $"Examples.Mixed.{n.Name}"))
+                .ToDictionary()
+        }
+    )
+);
 
 var generationPath = "../../test/LionWeb-CSharp-Test/languages/generated";
 Directory.CreateDirectory(generationPath);

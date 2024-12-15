@@ -23,7 +23,7 @@ using M2;
 using M3;
 
 /// The self-definition of the LionCore <see cref="IVersion2024_1"/> M3.
-public interface ILionCoreLanguage_2024_1 : ILionCoreLanguage;
+public interface ILionCoreLanguage_2024_1 : ILionCoreLanguageWithStructuredDataType;
 
 /// <inheritdoc cref="ILionCoreLanguage"/>
 public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_1>, ILionCoreLanguage_2024_1
@@ -209,6 +209,25 @@ public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_
             Type = BuiltInsLanguage_2024_1.Instance.Boolean
         });
 
+        _field = new(() => new M3Concept("-id-Field", this)
+        {
+            Key = "Field",
+            Name = "Field",
+            Abstract = false,
+            Partition = false,
+            ImplementsLazy = new(() => [IKeyed]),
+            FeaturesLazy = new(() => [Field_type])
+        });
+        _field_type = new(() =>
+            new M3Reference("-id-Field-type", Field, this)
+            {
+                Key = "Field-type",
+                Name = "type",
+                Multiple = false,
+                Optional = false,
+                Type = DataType
+            });
+
         _iKeyed = new(() =>
             new M3Interface($"{_idPrefix}-IKeyed", this)
             {
@@ -354,6 +373,24 @@ public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_
             Partition = false,
             ExtendsLazy = new(() => Link)
         });
+
+        _structuredDataType = new(() => new M3Concept("-id-StructuredDataType", this)
+        {
+            Key = "StructuredDataType",
+            Name = "StructuredDataType",
+            Abstract = false,
+            Partition = false,
+            ExtendsLazy = new(() => DataType),
+            FeaturesLazy = new(() => [StructuredDataType_fields])
+        });
+        _structuredDataType_fields = new(() => new M3Containment("-id-StructuredDataType-fields", Enumeration, this)
+        {
+            Key = "StructuredDataType-fields",
+            Name = "fields",
+            Multiple = true,
+            Optional = true,
+            Type = Field
+        });
     }
 
     /// <inheritdoc />
@@ -381,6 +418,7 @@ public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_
             Enumeration,
             EnumerationLiteral,
             Feature,
+            Field,
             IKeyed,
             Interface,
             Language,
@@ -388,7 +426,8 @@ public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_
             Link,
             PrimitiveType,
             Property,
-            Reference
+            Reference,
+            StructuredDataType
         ];
     }
 
@@ -488,6 +527,16 @@ public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_
     /// <inheritdoc cref="LionWeb.Core.M3.Feature.Optional"/>
     public Property Feature_optional => _feature_optional.Value;
 
+    private readonly Lazy<Concept> _field;
+
+    /// <inheritdoc cref="M3.Field"/>
+    public Concept Field => _field.Value;
+
+    private readonly Lazy<Reference> _field_type;
+
+    /// <inheritdoc cref="M3.Field.Type"/>
+    public Reference Field_type => _field_type.Value;
+
     private readonly Lazy<Interface> _iKeyed;
 
     /// <inheritdoc cref="LionWeb.Core.M3.IKeyed"/>
@@ -567,6 +616,16 @@ public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_
 
     /// <inheritdoc cref="LionWeb.Core.M3.Reference"/>
     public Concept Reference => _reference.Value;
+
+    private readonly Lazy<Concept> _structuredDataType;
+
+    /// <inheritdoc cref="M3.StructuredDataType"/>
+    public Concept StructuredDataType => _structuredDataType.Value;
+
+    private readonly Lazy<Containment> _structuredDataType_fields;
+
+    /// <inheritdoc cref="M3.StructuredDataType"/>
+    public Containment StructuredDataType_fields => _structuredDataType_fields.Value;
 }
 
 /// <inheritdoc />
@@ -594,6 +653,9 @@ public sealed class LionCoreFactory_2024_1 : INodeFactory
     /// <inheritdoc cref="LionWeb.Core.M3.EnumerationLiteral"/>
     public DynamicEnumerationLiteral EnumerationLiteral(string id) => new(id, null);
 
+    /// <inheritdoc cref="M3.Field"/>
+    public DynamicField Field(string id) => new(id, null);
+
     /// <inheritdoc cref="LionWeb.Core.M3.Interface"/>
     public DynamicInterface Interface(string id) => new(id, null);
 
@@ -609,6 +671,9 @@ public sealed class LionCoreFactory_2024_1 : INodeFactory
     /// <inheritdoc cref="LionWeb.Core.M3.Reference"/>
     public DynamicReference Reference(string id) => new(id, null);
 
+    /// <inheritdoc cref="M3.StructuredDataType"/>
+    public DynamicStructuredDataType StructuredDataType(string id) => new(id, null);
+
     /// <inheritdoc />
     public INode CreateNode(string id, Classifier classifier)
     {
@@ -618,6 +683,8 @@ public sealed class LionCoreFactory_2024_1 : INodeFactory
             return Concept(id);
         if (classifier == _language.Containment)
             return Containment(id);
+        if (classifier == _language.Field)
+            return Field(id);
         if (classifier == _language.Enumeration)
             return Enumeration(id);
         if (classifier == _language.EnumerationLiteral)
@@ -632,6 +699,8 @@ public sealed class LionCoreFactory_2024_1 : INodeFactory
             return Property(id);
         if (classifier == _language.Reference)
             return Reference(id);
+        if (classifier == _language.StructuredDataType)
+            return StructuredDataType(id);
 
         throw new UnsupportedClassifierException(classifier);
     }
@@ -639,4 +708,9 @@ public sealed class LionCoreFactory_2024_1 : INodeFactory
     /// <inheritdoc />
     public Enum GetEnumerationLiteral(EnumerationLiteral literal) =>
         throw new UnsupportedEnumerationLiteralException(literal);
+
+    /// <inheritdoc />
+    public IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues) =>
+        throw new UnsupportedStructuredDataTypeException(structuredDataType);
 }

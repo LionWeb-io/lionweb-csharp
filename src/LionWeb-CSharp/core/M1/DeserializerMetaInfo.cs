@@ -15,6 +15,8 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable SuggestVarOrType_SimpleTypes
+
 namespace LionWeb.Core.M1;
 
 using M2;
@@ -73,22 +75,6 @@ public class DeserializerMetaInfo
         return factory.CreateNode(id, classifier);
     }
 
-    internal Enum? ConvertEnumeration(IWritableNode nodeId, Feature property, Enumeration enumeration, string value)
-    {
-        var literal = enumeration.Literals.FirstOrDefault(literal => literal.Key == value);
-
-        if (literal != null && LookupFactory(enumeration.GetLanguage(), out var factory))
-        {
-            Enum? result = factory.GetEnumerationLiteral(literal);
-            if (result != null)
-            {
-                return result;
-            }
-        }
-
-        return Handler.UnknownEnumerationLiteral(value, enumeration, property, nodeId);
-    }
-
     internal Feature? FindFeature<TFeature>(IReadableNode node, CompressedMetaPointer compressedMetaPointer)
         where TFeature : class, Feature
     {
@@ -126,10 +112,10 @@ public class DeserializerMetaInfo
         [MaybeNullWhen(false)] out Feature feature) =>
         _features.TryGetValue(compressedMetaPointer, out feature) || SelectVersion(compressedMetaPointer, out feature);
 
-    private bool LookupFactory(Language language, [MaybeNullWhen(false)] out INodeFactory factory) =>
+    internal bool LookupFactory(Language language, [MaybeNullWhen(false)] out INodeFactory factory) =>
         _language2NodeFactory.TryGetValue(language, out factory);
 
-    private CompressedId Compress(string id) =>
+    internal CompressedId Compress(string id) =>
         CompressedId.Create(id, StoreUncompressedIds);
 
     private CompressedMetaPointer Compress(MetaPointer metaPointer) =>

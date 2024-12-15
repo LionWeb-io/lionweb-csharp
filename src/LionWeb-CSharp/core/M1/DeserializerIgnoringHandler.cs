@@ -109,7 +109,15 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public object? UnknownDatatype(Feature property, string? value, IReadableNode node)
+    public Field? UnknownField(string key, StructuredDataType structuredDataType, Feature property, IReadableNode node)
+    {
+        LogMessage(
+            $"On node with id={node.GetId()}: unknown field for structured datatype {structuredDataType} with key {key} = skipping");
+        return null;
+    }
+
+    /// <inheritdoc />
+    public object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property, IReadableNode node)
     {
         LogMessage(
             $"On node with id={node.GetId()}: unknown datatype {property /*.Type*/} with value {value} - skipping");

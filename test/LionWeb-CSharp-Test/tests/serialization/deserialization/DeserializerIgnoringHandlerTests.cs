@@ -20,7 +20,6 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
-using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
@@ -71,16 +70,15 @@ public class DeserializerIgnoringHandlerTests
         Assert.IsNull(new DeserializerIgnoringHandler().InvalidLinkValue<Containment>(
             [],
             new DynamicReference("dyn-reference",
-                new DynamicConcept("dyn-concept-1", new DynamicLanguage("dyn-lang-1", _lionWebVersion) { Name = "lang-name" })
+                new DynamicConcept("dyn-concept-1",
+                    new DynamicLanguage("dyn-lang-1", _lionWebVersion) { Name = "lang-name" })
                 {
                     Name = "concept-name"
                 })
             {
                 Name = "dynamic-reference",
-                Type = new DynamicConcept("dyn-concept-2", new DynamicLanguage("dyn-lang-2", _lionWebVersion) { Name = "lang-name" })
-                {
-                    Name = "concept-name"
-                }
+                Type = new DynamicConcept("dyn-concept-2",
+                    new DynamicLanguage("dyn-lang-2", _lionWebVersion) { Name = "lang-name" }) { Name = "concept-name" }
             },
             new Line("line")));
     }
@@ -153,10 +151,9 @@ public class DeserializerIgnoringHandlerTests
     [TestMethod]
     public void unknown_datatype()
     {
-        Assert.IsNull(new DeserializerIgnoringHandler().UnknownDatatype(
-            new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
-            "a",
-            new Line("line")));
+        var concept = new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion));
+        Assert.IsNull(new DeserializerIgnoringHandler().UnknownDatatype("a", concept,
+            new DynamicProperty("dyn-property", concept), new Line("line")));
     }
 
     [TestMethod]
@@ -164,7 +161,8 @@ public class DeserializerIgnoringHandlerTests
     {
         Assert.IsNull(new DeserializerIgnoringHandler().InvalidPropertyValue<int>(
             "a",
-            new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
+            new DynamicProperty("dyn-property",
+                new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
             CompressedId.Create("b", true)));
     }
 

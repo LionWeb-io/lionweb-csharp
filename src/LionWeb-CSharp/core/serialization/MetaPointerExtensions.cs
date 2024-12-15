@@ -39,6 +39,14 @@ public static class MetaPointerExtensions
         return metaPointer;
     }
 
+    /// Represents <paramref name="field"/> as MetaPointer.
+    public static MetaPointer ToMetaPointer(this Field field)
+    {
+        var language = field.GetStructuredDataType().GetLanguage();
+        var metaPointer = new MetaPointer(language.Key, language.Version, field.Key);
+        return metaPointer;
+    }
+
     /// Compares <paramref name="metaPointer"/> and <paramref name="classifier"/> in terms of <see cref="IKeyed.Key"/> and <see cref="M2Extensions.GetLanguage">Language</see>.
     public static bool Matches(this MetaPointer metaPointer, Classifier classifier)
         => metaPointer.Language == classifier.GetLanguage().Key

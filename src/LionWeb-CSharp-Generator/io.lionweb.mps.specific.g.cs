@@ -16,7 +16,7 @@ using System.Collections.Generic;
 public partial class SpecificLanguage : LanguageBase<ISpecificFactory>
 {
 	public static readonly SpecificLanguage Instance = new Lazy<SpecificLanguage>(() => new("io-lionweb-mps-specific")).Value;
-	public SpecificLanguage(string id) : base(id, LionWebVersions.v2023_1)
+	public SpecificLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_conceptDescription = new(() => new AnnotationBase<SpecificLanguage>("ConceptDescription", this) { Key = "ConceptDescription", Name = "ConceptDescription", AnnotatesLazy = new(() => M3Language.Instance.Classifier), FeaturesLazy = new(() => [ConceptDescription_conceptAlias, ConceptDescription_conceptShortDescription]) });
 		_conceptDescription_conceptAlias = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptAlias", ConceptDescription, this) { Key = "ConceptDescription-conceptAlias", Name = "conceptAlias", Optional = true, Type = BuiltInsLanguage.Instance.String });
@@ -115,7 +115,12 @@ public class SpecificFactory : AbstractBaseNodeFactory, ISpecificFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-	public virtual ConceptDescription NewConceptDescription(string id) => new(id);
+    /// <inheritdoc/>
+    public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues) =>
+        throw new UnsupportedStructuredDataTypeException(structuredDataType);
+
+    public virtual ConceptDescription NewConceptDescription(string id) => new(id);
 	public virtual ConceptDescription CreateConceptDescription() => NewConceptDescription(GetNewId());
 	public virtual Deprecated NewDeprecated(string id) => new(id);
 	public virtual Deprecated CreateDeprecated() => NewDeprecated(GetNewId());

@@ -157,7 +157,8 @@ public partial class Names : INames
         if (result != null)
             return result;
 
-        if (datatype is Enumeration && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
+        // TODO externalize
+        if (datatype is Enumeration or StructuredDataType && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
         {
             return
                 QualifiedName(
@@ -175,7 +176,7 @@ public partial class Names : INames
     }
     
     /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
-    protected IGeneratorVersionSpecifics VersionSpecifics =>
+    internal IGeneratorVersionSpecifics VersionSpecifics =>
         new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_language.LionWebVersion)).Value;
     
 
@@ -215,6 +216,10 @@ public partial class Names : INames
         IdentifierName($"{literal.GetEnumeration().Name}_{literal.Name}");
 
     /// <inheritdoc />
+    public IdentifierNameSyntax AsProperty(Field field) =>
+        IdentifierName($"{field.GetStructuredDataType().Name}_{field.Name}");
+
+    /// <inheritdoc />
     public NameSyntax MetaProperty(Language lang) =>
         QualifiedName(
             AsType(lang),
@@ -228,6 +233,14 @@ public partial class Names : INames
     /// <inheritdoc />
     public IdentifierNameSyntax FeatureProperty(Feature feature) =>
         IdentifierName(feature.Name.ToFirstUpper());
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax FieldField(Field field) =>
+        IdentifierName($"_{field.Name.ToFirstLower()}");
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax FieldProperty(Field field) =>
+        IdentifierName(field.Name.ToFirstUpper());
 
     [GeneratedRegex("`.*$")]
     private static partial Regex AfterIncludingBacktick();

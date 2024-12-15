@@ -44,6 +44,6 @@ public partial class Deserializer : DeserializerBase<IWritableNode>
     /// <inheritdoc />
     public Deserializer(IDeserializerVersionSpecifics versionSpecifics) : base(versionSpecifics)
     {
-        versionSpecifics.RegisterBuiltins(this);
+        versionSpecifics.RegisterBuiltins();
     }
 }

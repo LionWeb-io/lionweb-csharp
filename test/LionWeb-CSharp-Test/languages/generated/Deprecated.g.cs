@@ -9,7 +9,7 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2023_1;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 using DeprDatatype = string;
@@ -18,7 +18,7 @@ using DeprDatatype = string;
 public partial class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
 {
 	public static readonly DeprecatedLanguage Instance = new Lazy<DeprecatedLanguage>(() => new("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh")).Value;
-	public DeprecatedLanguage(string id) : base(id, LionWebVersions.v2023_1)
+	public DeprecatedLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_deprAnnotation = new(() => new AnnotationBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE", Name = "DeprAnnotation", AnnotatesLazy = new(() => _builtIns.Node) });
 		_deprConcept = new(() => new ConceptBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY", Name = "DeprConcept", Abstract = false, Partition = false, ExtendsLazy = new(() => _builtIns.Node), FeaturesLazy = new(() => [DeprConcept_deprChild, DeprConcept_deprProp, DeprConcept_deprRef]) });
@@ -136,6 +136,12 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 		if (_language.DeprEnum.EqualsIdentity(literal.GetEnumeration()))
 			return EnumValueFor<DeprEnum>(literal);
 		throw new UnsupportedEnumerationLiteralException(literal);
+	}
+
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
 	[Obsolete("deprAnnotation comment")]

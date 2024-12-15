@@ -30,6 +30,9 @@ public static class OrderedExtensions
     public static IEnumerable<EnumerationLiteral> Ordered(this IEnumerable<EnumerationLiteral> literals) =>
         literals.OrderBy(f => f.GetEnumeration().Name + _separator + f.Name);
 
+    public static IEnumerable<Field> Ordered(this IEnumerable<Field> fields) =>
+        fields.OrderBy(f => f.GetStructuredDataType().Name + _separator + f.Name);
+
     public static IEnumerable<Interface> Ordered(this IEnumerable<Interface> interfaces) =>
         interfaces.OrderBy(f => f.GetLanguage().Name + _separator + f.Name);
 

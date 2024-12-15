@@ -9,7 +9,7 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2023_1;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 using Time = string;
@@ -18,7 +18,7 @@ using Time = string;
 public partial class ShapesLanguage : LanguageBase<IShapesFactory>
 {
 	public static readonly ShapesLanguage Instance = new Lazy<ShapesLanguage>(() => new("id-Shapes")).Value;
-	public ShapesLanguage(string id) : base(id, LionWebVersions.v2023_1)
+	public ShapesLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_billOfMaterials = new(() => new AnnotationBase<ShapesLanguage>("id-BillOfMaterials", this) { Key = "key-BillOfMaterials", Name = "BillOfMaterials", AnnotatesLazy = new(() => _builtIns.Node), FeaturesLazy = new(() => [BillOfMaterials_altGroups, BillOfMaterials_defaultGroup, BillOfMaterials_groups, BillOfMaterials_materials]) });
 		_billOfMaterials_altGroups = new(() => new ContainmentBase<ShapesLanguage>("id-alt-groups", BillOfMaterials, this) { Key = "key-alt-groups", Name = "altGroups", Optional = true, Multiple = true, Type = MaterialGroup });
@@ -293,6 +293,12 @@ public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 		if (_language.MatterState.EqualsIdentity(literal.GetEnumeration()))
 			return EnumValueFor<MatterState>(literal);
 		throw new UnsupportedEnumerationLiteralException(literal);
+	}
+
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 
 	public virtual BillOfMaterials NewBillOfMaterials(string id) => new(id);
@@ -2002,7 +2008,7 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(LionWeb.Core.VersionSpecific.V2023_1.BuiltInsLanguage_2023_1), Key = "LionCore-builtins-INamed-name")]
+        [LionCoreMetaPointer(Language = typeof(LionWeb.Core.VersionSpecific.V2024_1.BuiltInsLanguage_2024_1), Key = "LionCore-builtins-INamed-name")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public string Name { get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name); set => SetName(value); }
 /// <remarks>Required Property</remarks>

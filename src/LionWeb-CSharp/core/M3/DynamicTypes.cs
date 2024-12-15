@@ -19,6 +19,7 @@ namespace LionWeb.Core.M3;
 
 using M2;
 using System.Collections;
+using VersionSpecific.V2024_1;
 
 // The types here implement the LionCore M3.
 
@@ -29,10 +30,12 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
     private string? _name;
 
     /// <inheritdoc />
-    protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.BuiltIns).Value;
+    protected override IBuiltInsLanguage _builtIns =>
+        new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.BuiltIns).Value;
 
     /// <inheritdoc />
-    protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguage _m3 =>
+        new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     public string Key
@@ -813,6 +816,166 @@ public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
 
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.EnumerationLiteral;
+}
+
+/// <inheritdoc cref="StructuredDataType"/>
+public class DynamicStructuredDataType(string id, DynamicLanguage? language)
+    : DynamicDatatype(id, language), StructuredDataType
+{
+    /// <inheritdoc />
+    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
+        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
+            (ILionCoreLanguageWithStructuredDataType)this.GetLanguage().LionWebVersion.LionCore).Value;
+
+    private readonly List<Field> _fields = [];
+
+    /// <inheritdoc />
+    public IReadOnlyList<Field> Fields => _fields.AsReadOnly();
+
+    /// <inheritdoc cref="Fields"/>
+    public void AddFields(IEnumerable<Field> fields) =>
+        _fields.AddRange(SetSelfParent(fields?.ToList(), _m3.StructuredDataType_fields));
+
+    /// <inheritdoc />
+    protected override bool DetachChild(INode child)
+    {
+        if (base.DetachChild(child))
+        {
+            return true;
+        }
+
+        var c = GetContainmentOf(child);
+        if (c == _m3.StructuredDataType_fields)
+            return _fields.Remove((Field)child);
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override Containment? GetContainmentOf(INode child)
+    {
+        var result = base.GetContainmentOf(child);
+        if (result != null)
+            return result;
+
+        if (child is Field s && _fields.Contains(s))
+            return _m3.StructuredDataType_fields;
+
+        return null;
+    }
+
+    /// <inheritdoc />
+    public override Classifier GetClassifier() => _m3.StructuredDataType;
+
+    /// <inheritdoc />
+    public override IEnumerable<Feature> CollectAllSetFeatures() =>
+        base.CollectAllSetFeatures().Concat([
+            _m3.StructuredDataType_fields
+        ]);
+
+    /// <inheritdoc />
+    protected override bool GetInternal(Feature? feature, out object? result)
+    {
+        if (base.GetInternal(feature, out result))
+            return true;
+
+        if (_m3.StructuredDataType_fields == feature)
+        {
+            result = Fields;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool SetInternal(Feature? feature, object? value)
+    {
+        var result = base.SetInternal(feature, value);
+        if (result)
+        {
+            return result;
+        }
+
+        if (_m3.StructuredDataType_fields == feature)
+        {
+            switch (value)
+            {
+                case IEnumerable e:
+                    RemoveSelfParent(_fields?.ToList(), _fields, _m3.StructuredDataType_fields);
+                    AddFields(e.OfType<Field>().ToArray());
+                    return true;
+                default:
+                    throw new InvalidValueException(feature, value);
+            }
+        }
+
+        return false;
+    }
+}
+
+/// <inheritdoc cref="Field"/>
+public class DynamicField(string id, DynamicStructuredDataType? structuredDataType) : DynamicIKeyed(id), Field
+{
+    /// <inheritdoc />
+    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
+        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
+            (ILionCoreLanguageWithStructuredDataType)this.GetLanguage().LionWebVersion.LionCore).Value;
+
+    private Datatype? _type;
+
+    /// <inheritdoc />
+    public Datatype Type
+    {
+        get => _type ?? throw new UnsetFeatureException(_m3.Field_type);
+        set => _type = value;
+    }
+
+    /// <inheritdoc />
+    public override Classifier GetClassifier() => _m3.Field;
+
+    /// <inheritdoc />
+    public override IEnumerable<Feature> CollectAllSetFeatures() =>
+        base.CollectAllSetFeatures().Concat([
+            _m3.Field_type
+        ]);
+
+    /// <inheritdoc />
+    protected override bool GetInternal(Feature? feature, out object? result)
+    {
+        if (base.GetInternal(feature, out result))
+            return true;
+
+        if (_m3.Field_type == feature)
+        {
+            result = Type;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool SetInternal(Feature? feature, object? value)
+    {
+        var result = base.SetInternal(feature, value);
+        if (result)
+        {
+            return result;
+        }
+
+        if (_m3.Field_type == feature)
+        {
+            Type = value switch
+            {
+                Datatype dt => dt,
+                _ => throw new InvalidValueException(feature, value)
+            };
+            return true;
+        }
+
+        return false;
+    }
 }
 
 /// <inheritdoc cref="Language"/>
