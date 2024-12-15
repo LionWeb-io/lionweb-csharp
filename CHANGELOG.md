@@ -16,6 +16,42 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Deprecated
 ### Security
 
+## [0.2.3] - unreleased
+
+### Added
+* Introduced `LionWeb.Core.LionWebVersions` to support multiple versions of LionWeb specification in a controlled manner.
+  Differences are implemented in specializations of `LionWeb.Core.IVersionSpecifics`:
+  * `LionWeb.Core.M1.IDeserializerVersionSpecifics` for Deserializer
+  * `LionWeb.Core.IDynamicNodeVersionSpecifics` for DynamicNode
+  * `LionWeb.CSharp.Generator.IGeneratorVersionSpecifics` for Generator
+* Introduced `LionWeb.Core.M1.IDeserializerHandler` to customize a deserializer's behaviour in non-regular situations.
+* Introduced `LionWeb.Core.M1.ISerializerHandler` to customize a serializer's behaviour in non-regular situations.
+* Introduced `DeserializerBuilder` to create M1 deserializers.
+* Deserializer can resolve references by name / _resolveInfo_ (see `ReferenceResolveInfoHandling`).
+* Deserializer supports selecting alternate language versions (see `DeserializerHandlerSelectOtherLanguageVersion`).
+* Introduced `Language.LionWebVersion` and `Language.SetFactory()`.
+* Introduced `LenientNode` to support migration scenarios.
+### Fixed
+### Changed
+* `LionWeb.Core.Serialization.JsonUtils`:
+  * Don't pretty-print serialized JSON anymore.
+  * Renamed `ReadNodesFromStreamAsync()` to adhere to C# conventions (added `Async` suffix). 
+* Both serializer and deserializer are streaming-enabled, i.e. they can process streams with minimal memory overhead. This changed their API considerably.
+* Merged Serializer and LanguageSerializer.
+* Generic variants of `Descendants()`, `Children()`, and `Ancestors()` are now public in `M1Extensions`.
+* `M2Extensions` methods use immutable collections instead of frozen ones (saves lots of memory).
+* `ReflectiveBaseNodeFactory` does not emit warning anymore when creating a node.
+* Generator orders all members by name, leading to more stable generation results.
+* Generated Factory interfaces, language classes, and classifier types are now `partial`.
+* Generated classifier types now _first_ contain all feature members, _then_ `INode` implementations.
+### Removed
+### Deprecated
+* `LionWeb.Core.M2.BuiltInsLanguage`: Use `LionWeb.Core.M2.IBuiltInsLanguage` instead.
+* `LionWeb.Core.M3.M3Language`: Use `LionWeb.Core.M3.ILionCoreLanguage` instead.
+* `LionWeb.Core.ReleaseVersion`: Use `LionWeb.Core.LionWebVersions` instead.
+
+### Security
+
 
 ## [0.2.2] - 2024-10-21
 
