@@ -22,20 +22,16 @@ namespace LionWeb.Core.VersionSpecific.V2024_1;
 using M2;
 using M3;
 using Utilities;
-using V2023_1;
 
-/// <see cref="DynamicNode"/> parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
-internal class DynamicNodeVersionSpecifics_2024_1_Compatible : IDynamicNodeVersionSpecifics
+/// <see cref="DynamicNode"/> parts specific to LionWeb <see cref="IVersion2024_1"/>.  
+internal class DynamicNodeVersionSpecifics_2024_1 : IDynamicNodeVersionSpecifics
 {
-    public LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
+    public LionWebVersions Version => LionWebVersions.v2024_1;
 
     public object PrepareSetProperty(Property property, object? value)
     {
         switch (value)
         {
-            case string when property.Type.EqualsIdentity(BuiltInsLanguage_2023_1.Instance.String):
-            case int when property.Type.EqualsIdentity(BuiltInsLanguage_2023_1.Instance.Integer):
-            case bool when property.Type.EqualsIdentity(BuiltInsLanguage_2023_1.Instance.Boolean):
             case string when property.Type.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.String):
             case int when property.Type.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.Integer):
             case bool when property.Type.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.Boolean):

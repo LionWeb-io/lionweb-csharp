@@ -42,7 +42,7 @@ internal class DeserializerVersionSpecifics_2023_1 : DeserializerVersionSpecific
         };
         return convertedValue;
     }
-    
+
     private object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype, string value)
     {
         CompressedId compressedId = _metaInfo.Compress(node.GetId());

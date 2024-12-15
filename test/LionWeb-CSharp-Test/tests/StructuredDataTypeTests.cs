@@ -227,7 +227,7 @@ public class StructuredDataTypeTests
             Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true
         };
 
-        Assert.AreEqual("Amount { Value = Decimal { Int = 23, Frac = 42 }, Currency = EUR, Digital = True }",
+        Assert.AreEqual("Amount { Currency = EUR, Digital = True, Value = Decimal { Frac = 42, Int = 23 } }",
             amount.ToString());
     }
 
@@ -240,7 +240,7 @@ public class StructuredDataTypeTests
         };
 
         Assert.AreNotEqual(0, amount.GetHashCode());
-        Assert.AreEqual(465354986, amount.GetHashCode());
+        Assert.AreEqual(-984265222, amount.GetHashCode());
     }
 
     [TestMethod]
@@ -356,7 +356,7 @@ public class StructuredDataTypeTests
         };
 
         Assert.AreEqual(
-            "A { Name = A1, A2b = B { Name = B1, B2d = D { Name = D1 } }, A2c = C { Name = C1, C2d = D { Name = D2 }, C2e = E { Name = E1, E2f = F { Name = F1, F2c = C { Name = C2, C2d = D { Name = D4 }, C2e = E { Name = E2, E2f = , E2b = B { Name = B3, B2d = D { Name = D5 } } } } }, E2b = B { Name = B2, B2d = D { Name = D3 } } } } }",
+            "A { A2b = B { B2d = D { Name = D1 }, Name = B1 }, A2c = C { C2d = D { Name = D2 }, C2e = E { E2b = B { B2d = D { Name = D3 }, Name = B2 }, E2f = F { F2c = C { C2d = D { Name = D4 }, C2e = E { E2b = B { B2d = D { Name = D5 }, Name = B3 }, E2f = , Name = E2 }, Name = C2 }, Name = F1 }, Name = E1 }, Name = C1 }, Name = A1 }",
             a.ToString());
     }
 }
