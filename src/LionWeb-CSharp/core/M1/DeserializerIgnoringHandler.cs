@@ -178,6 +178,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
 
     #endregion
 
-    protected virtual void LogMessage(string format) =>
-        Console.WriteLine(format);
+    /// Writes <paramref name="message"/> to the appropriate logging facility.
+    protected virtual void LogMessage(string message) =>
+        Console.WriteLine(message);
 }

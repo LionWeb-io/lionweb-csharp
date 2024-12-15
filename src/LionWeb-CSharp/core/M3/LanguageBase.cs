@@ -26,12 +26,16 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     : ReadableNodeBase<IReadableNode>(id, null), Language<TNodeFactory>
     where TNodeFactory : INodeFactory
 {
+    /// This language's current factory.
     protected TNodeFactory _factory;
 
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;
 
+    /// <inheritdoc />
     protected override IBuiltInsLanguage _builtIns=> new Lazy<IBuiltInsLanguage>(() => LionWebVersion.BuiltIns).Value;
+
+    /// <inheritdoc />
     protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
@@ -91,7 +95,10 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
 {
     private readonly TLanguage _language;
 
+    /// <inheritdoc />
     protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => _language.LionWebVersion.BuiltIns).Value;
+
+    /// <inheritdoc />
     protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => _language.LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />

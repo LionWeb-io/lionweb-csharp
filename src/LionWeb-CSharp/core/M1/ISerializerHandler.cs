@@ -19,20 +19,29 @@ namespace LionWeb.Core.M1;
 
 using M3;
 
+/// <summary>
+/// Callbacks to customize a <see cref="ISerializer"/>'s behaviour in non-regular situations.
+///
+/// <para>
+/// Each method of this interface is one callback. It should provide all relevant information as parameters.
+/// If the method returns non-null, the returned value is used to <i>heal</i> the issue; otherwise, the offender is skipped (if possible).
+/// </para>
+/// </summary>
 public interface ISerializerHandler
 {
     /// <summary>
-    /// 
+    /// Language <paramref name="a"/> is <see cref="LionWeb.Core.Utilities.LanguageIdentityComparer">semantically identical</see>
+    /// to language <paramref name="b"/>, but they are different C# objects. 
     /// </summary>
-    /// <param name="a"></param>
-    /// <param name="b"></param>
+    /// <param name="a">One semantically identical language.</param>
+    /// <param name="b">Other semantically identical language.</param>
     /// <returns>The language to use, if any.</returns>
     Language? DuplicateUsedLanguage(Language a, Language b);
 
     /// <summary>
-    /// 
+    /// Node with same <see cref="IReadableNode.GetId">node id</see> has already been serialized.
     /// </summary>
-    /// <param name="n"></param>
+    /// <param name="n">Node with duplicate id.</param>
     /// <remarks>
     /// It makes no sense to allow "healing" a duplicate id (e.g. by creating a new id).
     /// If we allowed this, we'd need to keep a map of all nodes to their (potentially "healed") id,
@@ -41,6 +50,15 @@ public interface ISerializerHandler
     /// </remarks>
     void DuplicateNodeId(IReadableNode n);
 
+    /// <summary>
+    /// <paramref name="node"/> contains <paramref name="value"/> in <paramref name="property"/>,
+    /// and we don't know how to serialize it.
+    /// </summary>
+    /// <param name="node">Node that contains unserializable <paramref name="value"/>.</param>
+    /// <param name="property">Property that contains unserializable <paramref name="value"/>.</param>
+    /// <param name="value">The value we don't know how to serialize.</param>
+    /// <returns><paramref name="value"/> as string, will be written verbatim to JSON;
+    /// or <c>null</c> to skip serializing this property.</returns>
     string? UnknownDatatype(IReadableNode node, Feature property, object? value);
 }
 

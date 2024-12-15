@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1;
 using M3;
 
 /// <summary>
-/// Callbacks to customize an <see cref="IDeserializer"/>'s behaviour in non-regular situations.
+/// Callbacks to customize a <see cref="IDeserializer"/>'s behaviour in non-regular situations.
 ///
 /// <para>
 /// Each method of this interface is one callback. It should provide all relevant information as parameters.

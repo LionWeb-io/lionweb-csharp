@@ -31,6 +31,7 @@ public class DeserializerBuilder
     private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
 
     /// Registers a custom handler.
+    /// Defaults to <see cref="DeserializerExceptionHandler"/>.
     public DeserializerBuilder WithHandler(IDeserializerHandler handler)
     {
         _handler = handler;

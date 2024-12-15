@@ -254,7 +254,10 @@ public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : I
     [GeneratedRegex("^[a-zA-Z0-9_-]+$")]
     private static partial Regex IdRegex();
 
+    /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
     protected virtual IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
+
+    /// The <see cref="ILionCoreLanguage"/> variant used for this node.
     protected virtual ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.LionCore).Value;
 
 
