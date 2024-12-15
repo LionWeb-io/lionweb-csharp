@@ -9,17 +9,19 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-mixedBasePropertyLang", Version = "1")]
-public class MixedBasePropertyLangLanguage : LanguageBase<IMixedBasePropertyLangFactory>
+public partial class MixedBasePropertyLangLanguage : LanguageBase<IMixedBasePropertyLangFactory>
 {
 	public static readonly MixedBasePropertyLangLanguage Instance = new Lazy<MixedBasePropertyLangLanguage>(() => new("id-mixedBasePropertyLang")).Value;
-	public MixedBasePropertyLangLanguage(string id) : base(id)
+	public MixedBasePropertyLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_basePropertyIface = new(() => new InterfaceBase<MixedBasePropertyLangLanguage>("id-basePropertyIface", this) { Key = "key-basePropertyIface", Name = "BasePropertyIface", FeaturesLazy = new(() => [BasePropertyIface_Prop]) });
-		_basePropertyIface_Prop = new(() => new PropertyBase<MixedBasePropertyLangLanguage>("id-basePropertyIface-prop", BasePropertyIface, this) { Key = "key-basePropertyIface-prop", Name = "Prop", Optional = false, Type = BuiltInsLanguage.Instance.String });
+		_basePropertyIface_Prop = new(() => new PropertyBase<MixedBasePropertyLangLanguage>("id-basePropertyIface-prop", BasePropertyIface, this) { Key = "key-basePropertyIface-prop", Name = "Prop", Optional = false, Type = _builtIns.String });
+		_factory = new MixedBasePropertyLangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -27,8 +29,6 @@ public class MixedBasePropertyLangLanguage : LanguageBase<IMixedBasePropertyLang
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override IMixedBasePropertyLangFactory GetFactory() => new MixedBasePropertyLangFactory(this);
 	private const string _key = "key-mixedBasePropertyLang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -48,7 +48,7 @@ public class MixedBasePropertyLangLanguage : LanguageBase<IMixedBasePropertyLang
 	public Property BasePropertyIface_Prop => _basePropertyIface_Prop.Value;
 }
 
-public interface IMixedBasePropertyLangFactory : INodeFactory
+public partial interface IMixedBasePropertyLangFactory : INodeFactory
 {
 }
 

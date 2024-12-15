@@ -265,7 +265,7 @@ public class SerializationTests
             }
         };
 
-        var serializer = new Serializer();
+        var serializer = new Serializer(_lionWebVersion);
         var serializedNodes = serializer.Serialize([node]).ToList();
         Assert.AreEqual(1, serializedNodes.Count);
         var serializedNode = serializedNodes.First();
@@ -310,7 +310,7 @@ public class SerializationTests
             }
         };
 
-        var serializer = new Serializer();
+        var serializer = new Serializer(_lionWebVersion);
         var serializedNodes = serializer.Serialize([node]).ToList();
         Assert.AreEqual(1, serializedNodes.Count);
         CollectionAssert.AreEquivalent(new List<SerializedLanguageReference>

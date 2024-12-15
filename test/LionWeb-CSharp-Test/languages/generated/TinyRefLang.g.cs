@@ -9,7 +9,7 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2023_1;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +17,7 @@ using System.Collections.Generic;
 public partial class TinyRefLangLanguage : LanguageBase<ITinyRefLangFactory>
 {
 	public static readonly TinyRefLangLanguage Instance = new Lazy<TinyRefLangLanguage>(() => new("id-TinyRefLang")).Value;
-	public TinyRefLangLanguage(string id) : base(id, LionWebVersions.v2023_1)
+	public TinyRefLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_myConcept = new(() => new ConceptBase<TinyRefLangLanguage>("id-Concept", this) { Key = "key-MyConcept", Name = "MyConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [MyConcept_multivaluedRef, MyConcept_singularRef]) });
 		_myConcept_multivaluedRef = new(() => new ReferenceBase<TinyRefLangLanguage>("id-Concept-multivaluedRef", MyConcept, this) { Key = "key-MyConcept-multivaluedRef", Name = "multivaluedRef", Optional = false, Multiple = true, Type = MyConcept });

@@ -9,7 +9,7 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2023_1;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +17,7 @@ using System.Collections.Generic;
 public partial class WithEnumLanguage : LanguageBase<IWithEnumFactory>
 {
 	public static readonly WithEnumLanguage Instance = new Lazy<WithEnumLanguage>(() => new("RkXMUe9zMRUQpw3bzQjSbBX6ju1a0UplEYsVa799WPQ")).Value;
-	public WithEnumLanguage(string id) : base(id, LionWebVersions.v2023_1)
+	public WithEnumLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_enumHolder = new(() => new ConceptBase<WithEnumLanguage>("PHrmcBTHnKIQD5HKKaWjhGp2U8Ndc99uZ0JftEqCjms", this) { Key = "EnumHolder", Name = "EnumHolder", Abstract = false, Partition = false, FeaturesLazy = new(() => [EnumHolder_enumValue]) });
 		_enumHolder_enumValue = new(() => new PropertyBase<WithEnumLanguage>("kzHwP_f-H6_UOSDM4Au_XDc-Jb-sIcxw3vu7XvqotgU", EnumHolder, this) { Key = "enumValue", Name = "enumValue", Optional = false, Type = MyEnum });

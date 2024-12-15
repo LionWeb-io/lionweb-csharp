@@ -9,17 +9,19 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-mixedBaseContainmentLang", Version = "1")]
-public class MixedBaseContainmentLangLanguage : LanguageBase<IMixedBaseContainmentLangFactory>
+public partial class MixedBaseContainmentLangLanguage : LanguageBase<IMixedBaseContainmentLangFactory>
 {
 	public static readonly MixedBaseContainmentLangLanguage Instance = new Lazy<MixedBaseContainmentLangLanguage>(() => new("id-mixedBaseContainmentLang")).Value;
-	public MixedBaseContainmentLangLanguage(string id) : base(id)
+	public MixedBaseContainmentLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_baseContainmentIface = new(() => new InterfaceBase<MixedBaseContainmentLangLanguage>("id-baseContainmentIface", this) { Key = "key-baseContainmentIface", Name = "BaseContainmentIface", FeaturesLazy = new(() => [BaseContainmentIface_Cont]) });
-		_baseContainmentIface_Cont = new(() => new ContainmentBase<MixedBaseContainmentLangLanguage>("id-baseContainemntIface-cont", BaseContainmentIface, this) { Key = "key-baseContainmentIface-cont", Name = "Cont", Optional = false, Multiple = false, Type = BuiltInsLanguage.Instance.Node });
+		_baseContainmentIface_Cont = new(() => new ContainmentBase<MixedBaseContainmentLangLanguage>("id-baseContainemntIface-cont", BaseContainmentIface, this) { Key = "key-baseContainmentIface-cont", Name = "Cont", Optional = false, Multiple = false, Type = _builtIns.Node });
+		_factory = new MixedBaseContainmentLangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -27,8 +29,6 @@ public class MixedBaseContainmentLangLanguage : LanguageBase<IMixedBaseContainme
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override IMixedBaseContainmentLangFactory GetFactory() => new MixedBaseContainmentLangFactory(this);
 	private const string _key = "key-mixedBaseContainmentLang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -48,7 +48,7 @@ public class MixedBaseContainmentLangLanguage : LanguageBase<IMixedBaseContainme
 	public Containment BaseContainmentIface_Cont => _baseContainmentIface_Cont.Value;
 }
 
-public interface IMixedBaseContainmentLangFactory : INodeFactory
+public partial interface IMixedBaseContainmentLangFactory : INodeFactory
 {
 }
 

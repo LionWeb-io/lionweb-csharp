@@ -84,7 +84,14 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"On node with id={node.GetId()}: unknown enumeration literal for enumeration {enumeration} with key {key}");
 
     /// <inheritdoc />
-    public virtual object? UnknownDatatype(Feature property, string? value, IReadableNode node) =>
+    public Field? UnknownField(string key, StructuredDataType structuredDataType, Feature property,
+        IReadableNode node) =>
+        throw new DeserializerException(
+            $"On node with id={node.GetId()}: unknown field for structured datatype {structuredDataType} with key {key}");
+
+    /// <inheritdoc />
+    public virtual object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property,
+        IReadableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: unknown property type {property /*.Type*/} with value {value}");
 

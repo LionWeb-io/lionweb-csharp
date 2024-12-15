@@ -9,17 +9,19 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-mixedNestedEnumLang", Version = "1")]
-public class MixedNestedEnumLangLanguage : LanguageBase<IMixedNestedEnumLangFactory>
+public partial class MixedNestedEnumLangLanguage : LanguageBase<IMixedNestedEnumLangFactory>
 {
 	public static readonly MixedNestedEnumLangLanguage Instance = new Lazy<MixedNestedEnumLangLanguage>(() => new("id-mixedNestedEnumLang")).Value;
-	public MixedNestedEnumLangLanguage(string id) : base(id)
+	public MixedNestedEnumLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_nestedEnum = new(() => new EnumerationBase<MixedNestedEnumLangLanguage>("id-nestedEnum", this) { Key = "key-nestedEnum", Name = "NestedEnum", LiteralsLazy = new(() => [NestedEnum_nestedLiteralA]) });
 		_nestedEnum_nestedLiteralA = new(() => new EnumerationLiteralBase<MixedNestedEnumLangLanguage>("id-nestedLiteralA", NestedEnum, this) { Key = "key-nestedLiteralA", Name = "nestedLiteralA" });
+		_factory = new MixedNestedEnumLangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -27,8 +29,6 @@ public class MixedNestedEnumLangLanguage : LanguageBase<IMixedNestedEnumLangFact
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override IMixedNestedEnumLangFactory GetFactory() => new MixedNestedEnumLangFactory(this);
 	private const string _key = "key-mixedNestedEnumLang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -48,7 +48,7 @@ public class MixedNestedEnumLangLanguage : LanguageBase<IMixedNestedEnumLangFact
 	public EnumerationLiteral NestedEnum_nestedLiteralA => _nestedEnum_nestedLiteralA.Value;
 }
 
-public interface IMixedNestedEnumLangFactory : INodeFactory
+public partial interface IMixedNestedEnumLangFactory : INodeFactory
 {
 }
 

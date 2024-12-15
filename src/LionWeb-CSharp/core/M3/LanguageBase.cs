@@ -20,6 +20,7 @@
 namespace LionWeb.Core.M3;
 
 using M2;
+using VersionSpecific.V2024_1;
 
 /// <inheritdoc cref="Language"/>
 public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lionWebVersion)
@@ -52,7 +53,7 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     public override Classifier GetClassifier() => _m3.Language;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         if (feature == _builtIns.INamed_name)
             return Name;
@@ -93,7 +94,7 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
 /// <inheritdoc cref="IKeyed"/>
 public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, IKeyed where TLanguage : Language
 {
-    private readonly TLanguage _language;
+    protected readonly TLanguage _language;
 
     /// <inheritdoc />
     protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => _language.LionWebVersion.BuiltIns).Value;
@@ -289,7 +290,7 @@ public class InterfaceBase<TLanguage>(string id, TLanguage parent) : ClassifierB
     public override Classifier GetClassifier() => _m3.Interface;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         var result = base.Get(feature);
         if (result != null)
@@ -384,7 +385,7 @@ public class ReferenceBase<TLanguage> : LinkBase<TLanguage>, Reference where TLa
     public override Classifier GetClassifier() => _m3.Reference;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         var result = base.Get(feature);
         if (result != null)
@@ -406,7 +407,7 @@ public class ContainmentBase<TLanguage> : LinkBase<TLanguage>, Containment where
     public override Classifier GetClassifier() => _m3.Containment;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         var result = base.Get(feature);
         if (result != null)
@@ -434,7 +435,7 @@ public class PropertyBase<TLanguage> : FeatureBase<TLanguage>, Property where TL
     public override Classifier GetClassifier() => _m3.Property;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         var result = base.Get(feature);
         if (result != null)
@@ -470,7 +471,7 @@ public class PrimitiveTypeBase<TLanguage> : DatatypeBase<TLanguage>, PrimitiveTy
     public override Classifier GetClassifier() => _m3.PrimitiveType;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         var result = base.Get(feature);
         if (result != null)
@@ -498,7 +499,7 @@ public class EnumerationBase<TLanguage> : DatatypeBase<TLanguage>, Enumeration w
     public override Classifier GetClassifier() => _m3.Enumeration;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         var result = base.Get(feature);
         if (result != null)
@@ -528,7 +529,7 @@ public class EnumerationLiteralBase<TLanguage> : IKeyedBase<TLanguage>, Enumerat
     public override Classifier GetClassifier() => _m3.EnumerationLiteral;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         var result = base.Get(feature);
         if (result != null)
@@ -542,6 +543,12 @@ public class EnumerationLiteralBase<TLanguage> : IKeyedBase<TLanguage>, Enumerat
 public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, StructuredDataType where TLanguage : Language
 {
     /// <inheritdoc />
+    protected override IBuiltInsLanguage_2024_1 _builtIns => new Lazy<IBuiltInsLanguage_2024_1>(() => (IBuiltInsLanguage_2024_1)_language.LionWebVersion.BuiltIns).Value;
+
+    /// <inheritdoc />
+    protected override ILionCoreLanguage_2024_1 _m3 => new Lazy<ILionCoreLanguage_2024_1>(() => (ILionCoreLanguage_2024_1)_language.LionWebVersion.LionCore).Value;
+
+    /// <inheritdoc />
     public StructuredDataTypeBase(string id, TLanguage parent) : base(id, parent)
     {
     }
@@ -549,19 +556,19 @@ public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, Struct
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.StructuredDataType_fields
+            _m3.StructuredDataType_fields
         ]);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.StructuredDataType;
+    public override Classifier GetClassifier() => _m3.StructuredDataType;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         var result = base.Get(feature);
         if (result != null)
             return result;
-        if (feature == M3Language.Instance.StructuredDataType_fields)
+        if (feature == _m3.StructuredDataType_fields)
             return Fields;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
@@ -578,6 +585,12 @@ public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, Struct
 public class FieldBase<TLanguage> : IKeyedBase<TLanguage>, Field where TLanguage : Language
 {
     /// <inheritdoc />
+    protected override IBuiltInsLanguage_2024_1 _builtIns => new Lazy<IBuiltInsLanguage_2024_1>(() => (IBuiltInsLanguage_2024_1)_language.LionWebVersion.BuiltIns).Value;
+
+    /// <inheritdoc />
+    protected override ILionCoreLanguage_2024_1 _m3 => new Lazy<ILionCoreLanguage_2024_1>(() => (ILionCoreLanguage_2024_1)_language.LionWebVersion.LionCore).Value;
+
+    /// <inheritdoc />
     public FieldBase(string id, StructuredDataType parent, TLanguage language) : base(id, parent, language)
     {
     }
@@ -585,19 +598,19 @@ public class FieldBase<TLanguage> : IKeyedBase<TLanguage>, Field where TLanguage
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Field_type
+            _m3.Field_type
         ]);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Field;
+    public override Classifier GetClassifier() => _m3.Field;
 
     /// <inheritdoc />
-    public override object? Get(Feature feature)
+    public override object Get(Feature feature)
     {
         var result = base.Get(feature);
         if (result != null)
             return result;
-        if (feature == M3Language.Instance.Field_type)
+        if (feature == _m3.Field_type)
             return Type;
 
         throw new UnknownFeatureException(GetClassifier(), feature);

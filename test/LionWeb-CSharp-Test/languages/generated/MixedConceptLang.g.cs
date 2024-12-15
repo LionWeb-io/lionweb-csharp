@@ -9,16 +9,18 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-mixedConceptLang", Version = "1")]
-public class MixedConceptLangLanguage : LanguageBase<IMixedConceptLangFactory>
+public partial class MixedConceptLangLanguage : LanguageBase<IMixedConceptLangFactory>
 {
 	public static readonly MixedConceptLangLanguage Instance = new Lazy<MixedConceptLangLanguage>(() => new("id-mixedConceptLang")).Value;
-	public MixedConceptLangLanguage(string id) : base(id)
+	public MixedConceptLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_mixedConcept = new(() => new ConceptBase<MixedConceptLangLanguage>("id-mixedConcept", this) { Key = "key-mixedConcept", Name = "MixedConcept", Abstract = false, Partition = false, ExtendsLazy = new(() => Examples.Mixed.MixedBaseConceptLang.MixedBaseConceptLangLanguage.Instance.BaseConcept) });
+		_factory = new MixedConceptLangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -26,8 +28,6 @@ public class MixedConceptLangLanguage : LanguageBase<IMixedConceptLangFactory>
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [Examples.Mixed.MixedBaseConceptLang.MixedBaseConceptLangLanguage.Instance];
 
-	/// <inheritdoc/>
-        public override IMixedConceptLangFactory GetFactory() => new MixedConceptLangFactory(this);
 	private const string _key = "key-mixedConceptLang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -44,7 +44,7 @@ public class MixedConceptLangLanguage : LanguageBase<IMixedConceptLangFactory>
 	public Concept MixedConcept => _mixedConcept.Value;
 }
 
-public interface IMixedConceptLangFactory : INodeFactory
+public partial interface IMixedConceptLangFactory : INodeFactory
 {
 	public MixedConcept NewMixedConcept(string id);
 	public MixedConcept CreateMixedConcept();

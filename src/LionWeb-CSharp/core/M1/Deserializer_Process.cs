@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
+using M2;
 using M3;
 using Serialization;
 using CompressedContainment = (CompressedMetaPointer, List<CompressedId>);

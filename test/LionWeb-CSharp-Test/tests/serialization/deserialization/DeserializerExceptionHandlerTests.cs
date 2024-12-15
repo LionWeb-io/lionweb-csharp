@@ -76,13 +76,15 @@ public class DeserializerExceptionHandlerTests
             new DeserializerExceptionHandler().InvalidLinkValue<Containment>(
                 [],
                 new DynamicReference("dyn-reference",
-                    new DynamicConcept("dyn-concept-1", new DynamicLanguage("dyn-lang-1", _lionWebVersion) { Name = "lang-name" })
+                    new DynamicConcept("dyn-concept-1",
+                        new DynamicLanguage("dyn-lang-1", _lionWebVersion) { Name = "lang-name" })
                     {
                         Name = "concept-name"
                     })
                 {
                     Name = "dynamic-reference",
-                    Type = new DynamicConcept("dyn-concept-2", new DynamicLanguage("dyn-lang-2", _lionWebVersion) { Name = "lang-name" })
+                    Type = new DynamicConcept("dyn-concept-2",
+                        new DynamicLanguage("dyn-lang-2", _lionWebVersion) { Name = "lang-name" })
                     {
                         Name = "concept-name"
                     }
@@ -186,10 +188,12 @@ public class DeserializerExceptionHandlerTests
     public void unknown_datatype()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().UnknownDatatype(
-                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
-                "a",
-                new Line("line")));
+        {
+            var concept = new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion));
+            return new DeserializerExceptionHandler().UnknownDatatype("a", concept,
+                new DynamicProperty("dyn-property", concept),
+                new Line("line"));
+        });
     }
 
     [TestMethod]
@@ -198,7 +202,8 @@ public class DeserializerExceptionHandlerTests
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().InvalidPropertyValue<int>(
                 "a",
-                new DynamicProperty("dyn-property", new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
+                new DynamicProperty("dyn-property",
+                    new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
                 CompressedId.Create("b", true)));
     }
 

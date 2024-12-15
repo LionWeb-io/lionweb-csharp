@@ -44,7 +44,7 @@ internal class DeserializerVersionSpecifics_2023_1 : IDeserializerVersionSpecifi
             // leave both a String and JSON value as a string:
             var s when s == BuiltInsLanguage_2023_1.Instance.String ||
                        s == BuiltInsLanguage_2023_1.Instance.Json => value,
-            _ => self.Handler.UnknownDatatype(property, value, node)
+            _ => self.Handler.UnknownDatatype(value, property.Type, property, node)
         };
     }
 

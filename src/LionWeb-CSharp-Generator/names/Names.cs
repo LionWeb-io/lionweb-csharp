@@ -157,7 +157,8 @@ public partial class Names : INames
         if (result != null)
             return result;
 
-        if (datatype is Enumeration && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
+        // TODO externalize
+        if (datatype is Enumeration or StructuredDataType && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
         {
             return
                 QualifiedName(

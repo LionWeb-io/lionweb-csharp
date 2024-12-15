@@ -115,7 +115,7 @@ public class SerializationLenientTests
         }
 
         public override object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property,
-            IWritableNode nodeId) => value;
+            IReadableNode nodeId) => value;
     }
 
     class LenientComparer : Comparer

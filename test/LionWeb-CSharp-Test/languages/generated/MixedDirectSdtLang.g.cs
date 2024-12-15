@@ -9,18 +9,20 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-mixedDirectSdtLang", Version = "1")]
-public class MixedDirectSdtLangLanguage : LanguageBase<IMixedDirectSdtLangFactory>
+public partial class MixedDirectSdtLangLanguage : LanguageBase<IMixedDirectSdtLangFactory>
 {
 	public static readonly MixedDirectSdtLangLanguage Instance = new Lazy<MixedDirectSdtLangLanguage>(() => new("id-mixedDirectSdtLang")).Value;
-	public MixedDirectSdtLangLanguage(string id) : base(id)
+	public MixedDirectSdtLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_directSdt = new(() => new StructuredDataTypeBase<MixedDirectSdtLangLanguage>("id-directSdt", this) { Key = "key-directSdt", Name = "DirectSdt", FieldsLazy = new(() => [DirectSdt_directSdtEnum, DirectSdt_directSdtSdt]) });
 		_directSdt_directSdtEnum = new(() => new FieldBase<MixedDirectSdtLangLanguage>("id-directSdtEnum", DirectSdt, this) { Key = "key-directSdtEnum", Name = "directSdtEnum", Type = Examples.Mixed.MixedNestedEnumLang.MixedNestedEnumLangLanguage.Instance.NestedEnum });
 		_directSdt_directSdtSdt = new(() => new FieldBase<MixedDirectSdtLangLanguage>("id-directSdtSdt", DirectSdt, this) { Key = "key-directSdtSdt", Name = "directSdtSdt", Type = Examples.Mixed.MixedNestedSdtLang.MixedNestedSdtLangLanguage.Instance.NestedSdt });
+		_factory = new MixedDirectSdtLangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -28,8 +30,6 @@ public class MixedDirectSdtLangLanguage : LanguageBase<IMixedDirectSdtLangFactor
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [Examples.Mixed.MixedNestedEnumLang.MixedNestedEnumLangLanguage.Instance, Examples.Mixed.MixedNestedSdtLang.MixedNestedSdtLangLanguage.Instance];
 
-	/// <inheritdoc/>
-        public override IMixedDirectSdtLangFactory GetFactory() => new MixedDirectSdtLangFactory(this);
 	private const string _key = "key-mixedDirectSdtLang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -52,7 +52,7 @@ public class MixedDirectSdtLangLanguage : LanguageBase<IMixedDirectSdtLangFactor
 	public Field DirectSdt_directSdtSdt => _directSdt_directSdtSdt.Value;
 }
 
-public interface IMixedDirectSdtLangFactory : INodeFactory
+public partial interface IMixedDirectSdtLangFactory : INodeFactory
 {
 }
 

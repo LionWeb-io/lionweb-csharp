@@ -9,7 +9,7 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2023_1;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +17,7 @@ using System.Collections.Generic;
 public partial class LibraryLanguage : LanguageBase<ILibraryFactory>
 {
 	public static readonly LibraryLanguage Instance = new Lazy<LibraryLanguage>(() => new("txjxNU9yRzEuyghtmgJK_l-nF93qWt7d1vErz5RbLow")).Value;
-	public LibraryLanguage(string id) : base(id, LionWebVersions.v2023_1)
+	public LibraryLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_book = new(() => new ConceptBase<LibraryLanguage>("uEoqgTU-BImmpne9vdcqM-o2JWS8yGAveLounJcncVU", this) { Key = "Book", Name = "Book", Abstract = false, Partition = false, FeaturesLazy = new(() => [Book_author, Book_pages, Book_title, Book_type]) });
 		_book_author = new(() => new ReferenceBase<LibraryLanguage>("LGawCEgHtaqYxRhVWTlQSf6NuCpW5MDpi7QWLbGG3DM", Book, this) { Key = "author", Name = "author", Optional = false, Multiple = false, Type = Writer });

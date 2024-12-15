@@ -9,17 +9,19 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-mixedDirectEnumLang", Version = "1")]
-public class MixedDirectEnumLangLanguage : LanguageBase<IMixedDirectEnumLangFactory>
+public partial class MixedDirectEnumLangLanguage : LanguageBase<IMixedDirectEnumLangFactory>
 {
 	public static readonly MixedDirectEnumLangLanguage Instance = new Lazy<MixedDirectEnumLangLanguage>(() => new("id-mixedDirectEnumLang")).Value;
-	public MixedDirectEnumLangLanguage(string id) : base(id)
+	public MixedDirectEnumLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_directEnum = new(() => new EnumerationBase<MixedDirectEnumLangLanguage>("id-directEnum", this) { Key = "key-directEnum", Name = "DirectEnum", LiteralsLazy = new(() => [DirectEnum_directEnumA]) });
 		_directEnum_directEnumA = new(() => new EnumerationLiteralBase<MixedDirectEnumLangLanguage>("id-directEnumA", DirectEnum, this) { Key = "key-directEnumA", Name = "directEnumA" });
+		_factory = new MixedDirectEnumLangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -27,8 +29,6 @@ public class MixedDirectEnumLangLanguage : LanguageBase<IMixedDirectEnumLangFact
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override IMixedDirectEnumLangFactory GetFactory() => new MixedDirectEnumLangFactory(this);
 	private const string _key = "key-mixedDirectEnumLang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -48,7 +48,7 @@ public class MixedDirectEnumLangLanguage : LanguageBase<IMixedDirectEnumLangFact
 	public EnumerationLiteral DirectEnum_directEnumA => _directEnum_directEnumA.Value;
 }
 
-public interface IMixedDirectEnumLangFactory : INodeFactory
+public partial interface IMixedDirectEnumLangFactory : INodeFactory
 {
 }
 

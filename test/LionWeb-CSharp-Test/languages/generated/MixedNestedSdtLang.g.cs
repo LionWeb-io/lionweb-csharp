@@ -9,17 +9,19 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-mixedNestedSdtLang", Version = "1")]
-public class MixedNestedSdtLangLanguage : LanguageBase<IMixedNestedSdtLangFactory>
+public partial class MixedNestedSdtLangLanguage : LanguageBase<IMixedNestedSdtLangFactory>
 {
 	public static readonly MixedNestedSdtLangLanguage Instance = new Lazy<MixedNestedSdtLangLanguage>(() => new("id-mixedNestedSdtLang")).Value;
-	public MixedNestedSdtLangLanguage(string id) : base(id)
+	public MixedNestedSdtLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_nestedSdt = new(() => new StructuredDataTypeBase<MixedNestedSdtLangLanguage>("id-nestedSdt", this) { Key = "key-nestedSdt", Name = "NestedSdt", FieldsLazy = new(() => [NestedSdt_nestedSdtField]) });
-		_nestedSdt_nestedSdtField = new(() => new FieldBase<MixedNestedSdtLangLanguage>("id-nestedSdtField", NestedSdt, this) { Key = "key-nestedSdtField", Name = "nestedSdtField", Type = BuiltInsLanguage.Instance.String });
+		_nestedSdt_nestedSdtField = new(() => new FieldBase<MixedNestedSdtLangLanguage>("id-nestedSdtField", NestedSdt, this) { Key = "key-nestedSdtField", Name = "nestedSdtField", Type = _builtIns.String });
+		_factory = new MixedNestedSdtLangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -27,8 +29,6 @@ public class MixedNestedSdtLangLanguage : LanguageBase<IMixedNestedSdtLangFactor
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override IMixedNestedSdtLangFactory GetFactory() => new MixedNestedSdtLangFactory(this);
 	private const string _key = "key-mixedNestedSdtLang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -48,7 +48,7 @@ public class MixedNestedSdtLangLanguage : LanguageBase<IMixedNestedSdtLangFactor
 	public Field NestedSdt_nestedSdtField => _nestedSdt_nestedSdtField.Value;
 }
 
-public interface IMixedNestedSdtLangFactory : INodeFactory
+public partial interface IMixedNestedSdtLangFactory : INodeFactory
 {
 }
 

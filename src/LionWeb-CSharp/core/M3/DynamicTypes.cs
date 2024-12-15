@@ -19,6 +19,7 @@ namespace LionWeb.Core.M3;
 
 using M2;
 using System.Collections;
+using VersionSpecific.V2024_1;
 
 // The types here implement the LionCore M3.
 
@@ -818,6 +819,12 @@ public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
 /// <inheritdoc cref="StructuredDataType"/>
 public class DynamicStructuredDataType(string id, DynamicLanguage? language) : DynamicDatatype(id, language), StructuredDataType
 {
+    /// <inheritdoc />
+    protected override IBuiltInsLanguage_2024_1 _builtIns => new Lazy<IBuiltInsLanguage_2024_1>(() => (IBuiltInsLanguage_2024_1)this.GetLanguage().LionWebVersion.BuiltIns).Value;
+
+    /// <inheritdoc />
+    protected override ILionCoreLanguage_2024_1 _m3 => new Lazy<ILionCoreLanguage_2024_1>(() => (ILionCoreLanguage_2024_1)this.GetLanguage().LionWebVersion.LionCore).Value;
+
     private readonly List<Field> _fields = [];
 
     /// <inheritdoc />
@@ -825,7 +832,7 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language) : D
 
     /// <inheritdoc cref="Fields"/>
     public void AddFields(IEnumerable<Field> fields) =>
-        _fields.AddRange(SetSelfParent(fields?.ToList(), M3Language.Instance.StructuredDataType_fields));
+        _fields.AddRange(SetSelfParent(fields?.ToList(), _m3.StructuredDataType_fields));
 
     /// <inheritdoc />
     protected override bool DetachChild(INode child)
@@ -836,7 +843,7 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language) : D
         }
 
         var c = GetContainmentOf(child);
-        if (c == M3Language.Instance.StructuredDataType_fields)
+        if (c == _m3.StructuredDataType_fields)
             return _fields.Remove((Field)child);
 
         return false;
@@ -850,18 +857,18 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language) : D
             return result;
 
         if (child is Field s && _fields.Contains(s))
-            return M3Language.Instance.StructuredDataType_fields;
+            return _m3.StructuredDataType_fields;
 
         return null;
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.StructuredDataType;
+    public override Classifier GetClassifier() => _m3.StructuredDataType;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.StructuredDataType_fields
+            _m3.StructuredDataType_fields
         ]);
 
     /// <inheritdoc />
@@ -870,7 +877,7 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language) : D
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.StructuredDataType_fields == feature)
+        if (_m3.StructuredDataType_fields == feature)
         {
             result = Fields;
             return true;
@@ -888,12 +895,12 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language) : D
             return result;
         }
 
-        if (M3Language.Instance.StructuredDataType_fields == feature)
+        if (_m3.StructuredDataType_fields == feature)
         {
             switch (value)
             {
                 case IEnumerable e:
-                    RemoveSelfParent(_fields?.ToList(), _fields, M3Language.Instance.StructuredDataType_fields);
+                    RemoveSelfParent(_fields?.ToList(), _fields, _m3.StructuredDataType_fields);
                     AddFields(e.OfType<Field>().ToArray());
                     return true;
                 default:
@@ -908,22 +915,28 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language) : D
 /// <inheritdoc cref="Field"/>
 public class DynamicField(string id, DynamicStructuredDataType? structuredDataType) : DynamicIKeyed(id), Field
 {
+    /// <inheritdoc />
+    protected override IBuiltInsLanguage_2024_1 _builtIns => new Lazy<IBuiltInsLanguage_2024_1>(() => (IBuiltInsLanguage_2024_1)this.GetLanguage().LionWebVersion.BuiltIns).Value;
+
+    /// <inheritdoc />
+    protected override ILionCoreLanguage_2024_1 _m3 => new Lazy<ILionCoreLanguage_2024_1>(() => (ILionCoreLanguage_2024_1)this.GetLanguage().LionWebVersion.LionCore).Value;
+
     private Datatype? _type;
 
     /// <inheritdoc />
     public Datatype Type
     {
-        get => _type ?? throw new UnsetFeatureException(M3Language.Instance.Field_type);
+        get => _type ?? throw new UnsetFeatureException(_m3.Field_type);
         set => _type = value;
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Field;
+    public override Classifier GetClassifier() => _m3.Field;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Field_type
+            _m3.Field_type
         ]);
 
     /// <inheritdoc />
@@ -932,7 +945,7 @@ public class DynamicField(string id, DynamicStructuredDataType? structuredDataTy
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Field_type == feature)
+        if (_m3.Field_type == feature)
         {
             result = Type;
             return true;
@@ -950,7 +963,7 @@ public class DynamicField(string id, DynamicStructuredDataType? structuredDataTy
             return result;
         }
 
-        if (M3Language.Instance.Field_type == feature)
+        if (_m3.Field_type == feature)
         {
             Type = value switch
             {

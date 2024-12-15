@@ -9,7 +9,7 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2023_1;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
@@ -17,7 +17,7 @@ using System.Collections.Generic;
 public partial class BLangLanguage : LanguageBase<IBLangFactory>
 {
 	public static readonly BLangLanguage Instance = new Lazy<BLangLanguage>(() => new("id-BLang")).Value;
-	public BLangLanguage(string id) : base(id, LionWebVersions.v2023_1)
+	public BLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_bConcept = new(() => new ConceptBase<BLangLanguage>("id-BConcept", this) { Key = "key-BConcept", Name = "BConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [BConcept_AEnumProp, BConcept_ARef]) });
 		_bConcept_AEnumProp = new(() => new PropertyBase<BLangLanguage>("id-BConcept-AEnumProp", BConcept, this) { Key = "key-AEnumProp", Name = "AEnumProp", Optional = false, Type = Examples.Circular.A.ALangLanguage.Instance.AEnum });

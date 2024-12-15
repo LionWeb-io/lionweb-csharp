@@ -138,10 +138,6 @@ public class DeserializerMetaInfo
     private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
         CompressedMetaPointer.Create(metaPointer, StoreUncompressedIds);
 
-    private CompressedId Compress(string id) =>
-        CompressedId.Create(id, StoreUncompressedIds);
-
-
     internal object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype, string? value)
     {
         var convertedValue = (datatype, value) switch

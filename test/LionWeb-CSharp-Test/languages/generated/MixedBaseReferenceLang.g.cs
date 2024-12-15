@@ -9,17 +9,19 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-mixedBaseReferenceLang", Version = "1")]
-public class MixedBaseReferenceLangLanguage : LanguageBase<IMixedBaseReferenceLangFactory>
+public partial class MixedBaseReferenceLangLanguage : LanguageBase<IMixedBaseReferenceLangFactory>
 {
 	public static readonly MixedBaseReferenceLangLanguage Instance = new Lazy<MixedBaseReferenceLangLanguage>(() => new("id-mixedBaseReferenceLang")).Value;
-	public MixedBaseReferenceLangLanguage(string id) : base(id)
+	public MixedBaseReferenceLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_baseReferenceIface = new(() => new InterfaceBase<MixedBaseReferenceLangLanguage>("id-baseReferenceIface", this) { Key = "key-baseReferenceIface", Name = "BaseReferenceIface", FeaturesLazy = new(() => [BaseReferenceIface_Ref]) });
-		_baseReferenceIface_Ref = new(() => new ReferenceBase<MixedBaseReferenceLangLanguage>("id-baseReferenceIface-ref", BaseReferenceIface, this) { Key = "key-baseReferenceIface-ref", Name = "Ref", Optional = false, Multiple = false, Type = BuiltInsLanguage.Instance.Node });
+		_baseReferenceIface_Ref = new(() => new ReferenceBase<MixedBaseReferenceLangLanguage>("id-baseReferenceIface-ref", BaseReferenceIface, this) { Key = "key-baseReferenceIface-ref", Name = "Ref", Optional = false, Multiple = false, Type = _builtIns.Node });
+		_factory = new MixedBaseReferenceLangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -27,8 +29,6 @@ public class MixedBaseReferenceLangLanguage : LanguageBase<IMixedBaseReferenceLa
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override IMixedBaseReferenceLangFactory GetFactory() => new MixedBaseReferenceLangFactory(this);
 	private const string _key = "key-mixedBaseReferenceLang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -48,7 +48,7 @@ public class MixedBaseReferenceLangLanguage : LanguageBase<IMixedBaseReferenceLa
 	public Reference BaseReferenceIface_Ref => _baseReferenceIface_Ref.Value;
 }
 
-public interface IMixedBaseReferenceLangFactory : INodeFactory
+public partial interface IMixedBaseReferenceLangFactory : INodeFactory
 {
 }
 
