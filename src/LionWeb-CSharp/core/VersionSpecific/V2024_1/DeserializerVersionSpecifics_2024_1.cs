@@ -22,7 +22,7 @@ namespace LionWeb.Core.VersionSpecific.V2024_1;
 using M1;
 using M3;
 
-/// Deserializer parts specific to LionWeb <see cref="IVersion2023_1"/>.  
+/// <see cref="IDeserializer"/> parts specific to LionWeb <see cref="IVersion2023_1"/>.  
 internal class DeserializerVersionSpecifics_2024_1 : IDeserializerVersionSpecifics
 {
     public virtual LionWebVersions Version => LionWebVersions.v2024_1;

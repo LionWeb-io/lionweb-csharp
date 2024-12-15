@@ -23,7 +23,7 @@ using M1;
 using M3;
 using V2023_1;
 
-/// Deserializer parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
+/// <see cref="IDeserializer"/> parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
 internal class DeserializerVersionSpecifics_2024_1_Compatible : DeserializerVersionSpecifics_2024_1
 {
     public override LionWebVersions Version => LionWebVersions.v2024_1_Compatible;

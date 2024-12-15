@@ -66,9 +66,20 @@ public interface LionWebVersions
 
     /// Finds the <i>pure</i> version of LionWeb standard defined by <paramref name="versionString"/>.
     /// <exception cref="UnsupportedVersionException">If LionWeb standard <paramref name="versionString"/> is not supported.</exception>
-    public static LionWebVersions GetByVersionString(string versionString) =>
+    public static LionWebVersions GetPureByVersionString(string versionString) =>
         AllPureVersions.FirstOrDefault(v => v.VersionString == versionString) ??
         throw new UnsupportedVersionException(versionString);
+
+    /// Finds the version of LionWeb standard defined by <paramref name="versionInterface"/>.
+    /// <param name="versionInterface">Interface defining the LionWeb version. Must be a specialization of <see cref="LionWebVersions"/>.</param>
+    /// <exception cref="UnsupportedVersionException">If LionWeb standard <paramref name="versionInterface"/> is not supported.</exception>
+    public static LionWebVersions GetByInterface(Type versionInterface) => versionInterface switch
+    {
+        _ when versionInterface == typeof(IVersion2023_1) => v2023_1,
+        _ when versionInterface == typeof(IVersion2024_1) => v2024_1,
+        _ when versionInterface == typeof(IVersion2024_1_Compatible) => v2024_1_Compatible,
+        _ => throw new UnsupportedVersionException(versionInterface.ToString())
+    };
 
     /// <inheritdoc cref="IVersion2023_1"/>
     public static IVersion2023_1 v2023_1 => Version2023_1.Instance;
@@ -95,7 +106,7 @@ public static class LionWebVersionsExtensions
     /// <exception cref="UnsupportedVersionException">If LionWeb standard <paramref name="otherVersionString"/> is not supported.</exception>
     /// <exception cref="VersionMismatchException">If <paramref name="self"/> and <paramref name="otherVersionString"/> are NOT compatible.</exception>
     public static void AssureCompatible(this LionWebVersions self, string otherVersionString, string? message = null) =>
-        AssureCompatible(self, LionWebVersions.GetByVersionString(otherVersionString), message);
+        AssureCompatible(self, LionWebVersions.GetPureByVersionString(otherVersionString), message);
 
     /// Assures <paramref name="self"/> and <paramref name="language"/>'s <see cref="Language.LionWebVersion"/> are compatible.
     /// <exception cref="VersionMismatchException">If <paramref name="self"/> and <paramref name="language"/>'s <see cref="Language.LionWebVersion"/> are NOT compatible.</exception>
