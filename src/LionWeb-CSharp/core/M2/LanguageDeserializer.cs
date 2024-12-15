@@ -35,7 +35,7 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     public LanguageDeserializer(IDeserializerVersionSpecifics versionSpecifics) :
         base(versionSpecifics)
     {
-        versionSpecifics.RegisterBuiltins(this);
+        versionSpecifics.RegisterBuiltins();
         RegisterDependentLanguage(_m3);
     }
 

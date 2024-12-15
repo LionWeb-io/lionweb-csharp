@@ -53,7 +53,7 @@ public partial class Deserializer
             if (property == null)
                 continue;
 
-            var convertedValue = _deserializerMetaInfo.ConvertDatatype(
+            var convertedValue = _versionSpecifics.ConvertDatatype(
                 node,
                 property,
                 property.GetFeatureType(),
@@ -66,9 +66,6 @@ public partial class Deserializer
             node.Set(property, convertedValue);
         }
     }
-
-    private object? ConvertPrimitiveType(IWritableNode node, Property property, string value) =>
-        _versionSpecifics.ConvertPrimitiveType(this, node, property, value);
 
     private void RegisterAnnotations(SerializedNode serializedNode, CompressedId compressedId)
     {

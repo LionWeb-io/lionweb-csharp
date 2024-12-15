@@ -51,6 +51,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
         _versionSpecifics = versionSpecifics;
         _m3 = versionSpecifics.Version.LionCore;
         _builtIns = versionSpecifics.Version.BuiltIns;
+        _versionSpecifics.Initialize(this, _deserializerMetaInfo, Handler);
     }
 
     /// <inheritdoc />
@@ -60,7 +61,11 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
     public IDeserializerHandler Handler
     {
         get => _deserializerMetaInfo.Handler;
-        init => _deserializerMetaInfo.Handler = value;
+        init
+        {
+            _deserializerMetaInfo.Handler = value;
+            _versionSpecifics.Initialize(this, _deserializerMetaInfo, value);
+        }
     }
 
     /// Whether we store uncompressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.

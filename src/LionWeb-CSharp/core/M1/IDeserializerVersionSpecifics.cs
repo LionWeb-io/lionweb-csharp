@@ -37,27 +37,61 @@ public interface IDeserializerVersionSpecifics : IVersionSpecifics
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 
-    /// Converts the low-level string representation <paramref name="value"/> of <paramref name="property"/> into the internal LionWeb-C# representation.
-    object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node, Property property, string value)
-        where T : class, IReadableNode;
+    void Initialize<T>(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler) where T : class, IReadableNode;
 
-    /// Registers all relevant builtins to <paramref name="self"/>. 
-    void RegisterBuiltins(IDeserializer self);
+    /// Registers all relevant builtins. 
+    void RegisterBuiltins();
+
+    /// Converts the low-level string representation <paramref name="value"/> of <paramref name="property"/> into the internal LionWeb-C# representation.
+    object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype, string? value);
 }
 
-internal static class IDeserializerVersionSpecificsExtensions
+internal abstract class DeserializerVersionSpecificsBase : IDeserializerVersionSpecifics
 {
-    public static void RegisterLanguage(this IDeserializerVersionSpecifics specifics, IDeserializer self,
-        Language language)
+    protected IDeserializer _deserializer;
+    protected DeserializerMetaInfo _metaInfo;
+    protected IDeserializerHandler _handler;
+
+    public abstract LionWebVersions Version { get; }
+
+    public virtual void Initialize<T>(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler) where T : class, IReadableNode
     {
-        switch (self)
+        _deserializer = deserializer;
+        _metaInfo = metaInfo;
+        _handler = handler;
+    }
+
+    public abstract void RegisterBuiltins();
+
+    public abstract object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype,
+        string? value);
+
+    protected void RegisterLanguage(Language language)
+    {
+        switch (_deserializer)
         {
             case ILanguageDeserializer l:
                 l.RegisterDependentLanguage(language);
                 break;
             default:
-                self.RegisterInstantiatedLanguage(language);
+                _deserializer.RegisterInstantiatedLanguage(language);
                 break;
         }
+    }
+
+    protected Enum? ConvertEnumeration(IWritableNode nodeId, Feature property, Enumeration enumeration, string value)
+    {
+        var literal = enumeration.Literals.FirstOrDefault(literal => literal.Key == value);
+
+        if (literal != null && _metaInfo.LookupFactory(enumeration.GetLanguage(), out var factory))
+        {
+            Enum? result = factory.GetEnumerationLiteral(literal);
+            if (result != null)
+            {
+                return result;
+            }
+        }
+
+        return _handler.UnknownEnumerationLiteral(value, enumeration, property, nodeId);
     }
 }
