@@ -103,7 +103,7 @@ public class DynamicNode : NodeBase
             Property => null,
             Link { Optional: false } => throw new UnsetFeatureException(feature),
             Link link => link.Multiple ? Enumerable.Empty<INode>().ToList().AsReadOnly() : null,
-            _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
+            _ => throw new UnknownFeatureException(this.GetClassifier(), feature)
         };
         return true;
     }
