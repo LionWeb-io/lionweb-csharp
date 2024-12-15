@@ -34,7 +34,7 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;
 
     /// <inheritdoc />
-    protected override IBuiltInsLanguage _builtIns=> new Lazy<IBuiltInsLanguage>(() => LionWebVersion.BuiltIns).Value;
+    protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => LionWebVersion.BuiltIns).Value;
 
     /// <inheritdoc />
     protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => LionWebVersion.LionCore).Value;
@@ -97,10 +97,12 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
     protected readonly TLanguage _language;
 
     /// <inheritdoc />
-    protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => _language.LionWebVersion.BuiltIns).Value;
+    protected override IBuiltInsLanguage _builtIns =>
+        new Lazy<IBuiltInsLanguage>(() => _language.LionWebVersion.BuiltIns).Value;
 
     /// <inheritdoc />
-    protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => _language.LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguage _m3 =>
+        new Lazy<ILionCoreLanguage>(() => _language.LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     protected IKeyedBase(string id, TLanguage language) : this(id, language, language) { }
@@ -543,10 +545,9 @@ public class EnumerationLiteralBase<TLanguage> : IKeyedBase<TLanguage>, Enumerat
 public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, StructuredDataType where TLanguage : Language
 {
     /// <inheritdoc />
-    protected override IBuiltInsLanguage_2024_1 _builtIns => new Lazy<IBuiltInsLanguage_2024_1>(() => (IBuiltInsLanguage_2024_1)_language.LionWebVersion.BuiltIns).Value;
-
-    /// <inheritdoc />
-    protected override ILionCoreLanguage_2024_1 _m3 => new Lazy<ILionCoreLanguage_2024_1>(() => (ILionCoreLanguage_2024_1)_language.LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
+        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
+            (ILionCoreLanguageWithStructuredDataType)_language.LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     public StructuredDataTypeBase(string id, TLanguage parent) : base(id, parent)
@@ -573,10 +574,10 @@ public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, Struct
 
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
-    
+
     /// <inheritdoc />
     public IReadOnlyList<Field> Fields => FieldsLazy.Value;
-    
+
     /// <inheritdoc cref="Fields"/>
     public required Lazy<IReadOnlyList<Field>> FieldsLazy { protected get; init; }
 }
@@ -585,10 +586,9 @@ public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, Struct
 public class FieldBase<TLanguage> : IKeyedBase<TLanguage>, Field where TLanguage : Language
 {
     /// <inheritdoc />
-    protected override IBuiltInsLanguage_2024_1 _builtIns => new Lazy<IBuiltInsLanguage_2024_1>(() => (IBuiltInsLanguage_2024_1)_language.LionWebVersion.BuiltIns).Value;
-
-    /// <inheritdoc />
-    protected override ILionCoreLanguage_2024_1 _m3 => new Lazy<ILionCoreLanguage_2024_1>(() => (ILionCoreLanguage_2024_1)_language.LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
+        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
+            (ILionCoreLanguageWithStructuredDataType)_language.LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     public FieldBase(string id, StructuredDataType parent, TLanguage language) : base(id, parent, language)

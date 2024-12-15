@@ -23,20 +23,7 @@ using M2;
 using M3;
 
 /// The self-definition of the LionCore <see cref="IVersion2024_1"/> M3.
-public interface ILionCoreLanguage_2024_1 : ILionCoreLanguage
-{
-    /// <inheritdoc cref="M3.Field"/>
-    public Concept Field { get; }
-
-    /// <inheritdoc cref="M3.Field.Type"/>
-    public Reference Field_type  { get; }
-    
-    /// <inheritdoc cref="M3.StructuredDataType"/>
-    public Concept StructuredDataType { get; }
-
-    /// <inheritdoc cref="M3.StructuredDataType"/>
-    public Containment StructuredDataType_fields { get; }
-}
+public interface ILionCoreLanguage_2024_1 : ILionCoreLanguageWithStructuredDataType;
 
 /// <inheritdoc cref="ILionCoreLanguage"/>
 public sealed class LionCoreLanguage_2024_1 : LanguageBase<LionCoreFactory_2024_1>, ILionCoreLanguage_2024_1

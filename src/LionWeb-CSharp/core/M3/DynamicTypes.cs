@@ -30,10 +30,12 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
     private string? _name;
 
     /// <inheritdoc />
-    protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.BuiltIns).Value;
+    protected override IBuiltInsLanguage _builtIns =>
+        new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.BuiltIns).Value;
 
     /// <inheritdoc />
-    protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguage _m3 =>
+        new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     public string Key
@@ -817,13 +819,13 @@ public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
 }
 
 /// <inheritdoc cref="StructuredDataType"/>
-public class DynamicStructuredDataType(string id, DynamicLanguage? language) : DynamicDatatype(id, language), StructuredDataType
+public class DynamicStructuredDataType(string id, DynamicLanguage? language)
+    : DynamicDatatype(id, language), StructuredDataType
 {
     /// <inheritdoc />
-    protected override IBuiltInsLanguage_2024_1 _builtIns => new Lazy<IBuiltInsLanguage_2024_1>(() => (IBuiltInsLanguage_2024_1)this.GetLanguage().LionWebVersion.BuiltIns).Value;
-
-    /// <inheritdoc />
-    protected override ILionCoreLanguage_2024_1 _m3 => new Lazy<ILionCoreLanguage_2024_1>(() => (ILionCoreLanguage_2024_1)this.GetLanguage().LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
+        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
+            (ILionCoreLanguageWithStructuredDataType)this.GetLanguage().LionWebVersion.LionCore).Value;
 
     private readonly List<Field> _fields = [];
 
@@ -916,10 +918,9 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language) : D
 public class DynamicField(string id, DynamicStructuredDataType? structuredDataType) : DynamicIKeyed(id), Field
 {
     /// <inheritdoc />
-    protected override IBuiltInsLanguage_2024_1 _builtIns => new Lazy<IBuiltInsLanguage_2024_1>(() => (IBuiltInsLanguage_2024_1)this.GetLanguage().LionWebVersion.BuiltIns).Value;
-
-    /// <inheritdoc />
-    protected override ILionCoreLanguage_2024_1 _m3 => new Lazy<ILionCoreLanguage_2024_1>(() => (ILionCoreLanguage_2024_1)this.GetLanguage().LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
+        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
+            (ILionCoreLanguageWithStructuredDataType)this.GetLanguage().LionWebVersion.LionCore).Value;
 
     private Datatype? _type;
 
