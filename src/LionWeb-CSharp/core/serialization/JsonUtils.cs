@@ -27,47 +27,53 @@ using System.Text.Json.Stream;
 /// </summary>
 public static class JsonUtils
 {
-    // TODO  write and read JSON as UTF-8
     private static readonly JsonSerializerOptions _readOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    /// <summary>
-    /// Parses the given string as JSON.
-    /// </summary>
+    /// Parses <paramref name="json"/> as JSON.
     public static T ReadJsonFromString<T>(string json) =>
         JsonSerializer.Deserialize<T>(json, _readOptions)!;
 
     private static readonly JsonSerializerOptions _writeOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase, WriteIndented = true
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
     };
 
-    /// <summary>
-    /// Returns the given data rendered as JSON.
-    /// </summary>
+    /// Returns <paramref name="data"/> rendered as JSON.
     public static string WriteJsonToString(object data) =>
         JsonSerializer.Serialize(data, _writeOptions);
 
-    /// <summary>
-    /// Writes the given data to a file with the given path.
-    /// </summary>
+    /// Writes <paramref name="data"/> to a file at <paramref name="path"/>.
     public static void WriteJsonToFile(string path, object data) =>
         File.WriteAllText(path, WriteJsonToString(data));
 
-    public static void WriteNodesToStream(Stream stream, ISerializer serializer, IEnumerable<INode> nodes)
+    /// <summary>
+    /// Uses <paramref name="serializer"/> to write <paramref name="nodes"/> to <paramref name="stream"/> efficiently.
+    /// </summary>
+    /// <param name="stream">Stream to serialize <paramref name="nodes"/> to.
+    /// <i>Only</i> includes these nodes, no descendants etc.</param>
+    /// <param name="serializer">Serializer to use.</param>
+    /// <param name="nodes">Nodes to serialize.</param>
+    public static void WriteNodesToStream(Stream stream, ISerializer serializer, IEnumerable<IReadableNode> nodes)
     {
         object data = new LazySerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = serializer.LionWebVersion.VersionString,
             Nodes = serializer.Serialize(nodes),
             Languages = serializer.UsedLanguages
         };
         JsonSerializer.Serialize(stream, data, _writeOptions);
     }
 
-    public static async Task<List<IReadableNode>> ReadNodesFromStream(Stream stream, IDeserializer deserializer)
+    /// <summary>
+    /// Uses <paramref name="deserializer"/> to read nodes from <paramref name="stream"/>.  
+    /// </summary>
+    /// <param name="stream">Stream to read from.</param>
+    /// <param name="deserializer">Deserializer to use.</param>
+    /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
+    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream stream, IDeserializer deserializer)
     {
         var streamReader = new Utf8JsonAsyncStreamReader(stream, leaveOpen: true);
 
@@ -79,9 +85,8 @@ public static class JsonUtils
                 case JsonTokenType.PropertyName when streamReader.GetString() == "serializationFormatVersion":
                     await Advance();
                     string? version = streamReader.GetString();
-                    if (version != ReleaseVersion.Current)
-                    {
-                    }
+                    if (version != null)
+                        deserializer.LionWebVersion.AssureCompatible(version);
 
                     break;
 
@@ -108,7 +113,8 @@ public static class JsonUtils
     }
 }
 
-/// <inheritdoc cref="SerializationChunk"/>
+/// Variant of <see cref="SerializationChunk"/> that moves <see cref="Languages"/> as last entry,
+/// so we can fill it _after_ we've processed all <see cref="Nodes"/>.
 internal class LazySerializationChunk
 {
     /// <inheritdoc cref="SerializationChunk.SerializationFormatVersion"/>

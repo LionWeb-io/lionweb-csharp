@@ -9,18 +9,20 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "key-BLang", Version = "2")]
-public class BLangLanguage : LanguageBase<IBLangFactory>
+public partial class BLangLanguage : LanguageBase<IBLangFactory>
 {
 	public static readonly BLangLanguage Instance = new Lazy<BLangLanguage>(() => new("id-BLang")).Value;
-	public BLangLanguage(string id) : base(id)
+	public BLangLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
-		_bConcept = new(() => new ConceptBase<BLangLanguage>("id-BConcept", this) { Key = "key-BConcept", Name = "BConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [BConcept_ARef, BConcept_AEnumProp]) });
-		_bConcept_ARef = new(() => new ReferenceBase<BLangLanguage>("id-BConcept-ARef", BConcept, this) { Key = "key-ARef", Name = "ARef", Optional = true, Multiple = false, Type = Examples.Circular.A.ALangLanguage.Instance.AConcept });
+		_bConcept = new(() => new ConceptBase<BLangLanguage>("id-BConcept", this) { Key = "key-BConcept", Name = "BConcept", Abstract = false, Partition = false, FeaturesLazy = new(() => [BConcept_AEnumProp, BConcept_ARef]) });
 		_bConcept_AEnumProp = new(() => new PropertyBase<BLangLanguage>("id-BConcept-AEnumProp", BConcept, this) { Key = "key-AEnumProp", Name = "AEnumProp", Optional = false, Type = Examples.Circular.A.ALangLanguage.Instance.AEnum });
+		_bConcept_ARef = new(() => new ReferenceBase<BLangLanguage>("id-BConcept-ARef", BConcept, this) { Key = "key-ARef", Name = "ARef", Optional = true, Multiple = false, Type = Examples.Circular.A.ALangLanguage.Instance.AConcept });
+		_factory = new BLangFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -28,8 +30,6 @@ public class BLangLanguage : LanguageBase<IBLangFactory>
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [Examples.Circular.A.ALangLanguage.Instance];
 
-	/// <inheritdoc/>
-        public override IBLangFactory GetFactory() => new BLangFactory(this);
 	private const string _key = "key-BLang";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -45,14 +45,14 @@ public class BLangLanguage : LanguageBase<IBLangFactory>
 	private readonly Lazy<Concept> _bConcept;
 	public Concept BConcept => _bConcept.Value;
 
-	private readonly Lazy<Reference> _bConcept_ARef;
-	public Reference BConcept_ARef => _bConcept_ARef.Value;
-
 	private readonly Lazy<Property> _bConcept_AEnumProp;
 	public Property BConcept_AEnumProp => _bConcept_AEnumProp.Value;
+
+	private readonly Lazy<Reference> _bConcept_ARef;
+	public Reference BConcept_ARef => _bConcept_ARef.Value;
 }
 
-public interface IBLangFactory : INodeFactory
+public partial interface IBLangFactory : INodeFactory
 {
 	public BConcept NewBConcept(string id);
 	public BConcept CreateBConcept();
@@ -94,19 +94,6 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-BConcept")]
 public partial class BConcept : NodeBase
 {
-	private Examples.Circular.A.AConcept? _aRef = null;
-	/// <remarks>Optional Single Reference</remarks>
-        [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public Examples.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
-
-	/// <remarks>Optional Single Reference</remarks>
-        public BConcept SetARef(Examples.Circular.A.AConcept? value)
-	{
-		_aRef = value;
-		return this;
-	}
-
 	private Examples.Circular.A.AEnum? _aEnumProp = null;
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If AEnumProp has not been set</exception>
@@ -124,6 +111,19 @@ public partial class BConcept : NodeBase
 		return this;
 	}
 
+	private Examples.Circular.A.AConcept? _aRef = null;
+	/// <remarks>Optional Single Reference</remarks>
+        [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	public Examples.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
+
+	/// <remarks>Optional Single Reference</remarks>
+        public BConcept SetARef(Examples.Circular.A.AConcept? value)
+	{
+		_aRef = value;
+		return this;
+	}
+
 	public BConcept(string id) : base(id)
 	{
 	}
@@ -135,15 +135,15 @@ public partial class BConcept : NodeBase
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
-		if (BLangLanguage.Instance.BConcept_ARef.EqualsIdentity(feature))
-		{
-			result = ARef;
-			return true;
-		}
-
 		if (BLangLanguage.Instance.BConcept_AEnumProp.EqualsIdentity(feature))
 		{
 			result = AEnumProp;
+			return true;
+		}
+
+		if (BLangLanguage.Instance.BConcept_ARef.EqualsIdentity(feature))
+		{
+			result = ARef;
 			return true;
 		}
 
@@ -155,22 +155,22 @@ public partial class BConcept : NodeBase
 	{
 		if (base.SetInternal(feature, value))
 			return true;
-		if (BLangLanguage.Instance.BConcept_ARef.EqualsIdentity(feature))
+		if (BLangLanguage.Instance.BConcept_AEnumProp.EqualsIdentity(feature))
 		{
-			if (value is null or Examples.Circular.A.AConcept)
+			if (value is Examples.Circular.A.AEnum v)
 			{
-				ARef = (Examples.Circular.A.AConcept?)value;
+				AEnumProp = v;
 				return true;
 			}
 
 			throw new InvalidValueException(feature, value);
 		}
 
-		if (BLangLanguage.Instance.BConcept_AEnumProp.EqualsIdentity(feature))
+		if (BLangLanguage.Instance.BConcept_ARef.EqualsIdentity(feature))
 		{
-			if (value is Examples.Circular.A.AEnum v)
+			if (value is null or Examples.Circular.A.AConcept)
 			{
-				AEnumProp = v;
+				ARef = (Examples.Circular.A.AConcept?)value;
 				return true;
 			}
 
@@ -184,10 +184,10 @@ public partial class BConcept : NodeBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		var result = base.CollectAllSetFeatures().ToList();
-		if (_aRef != default)
-			result.Add(BLangLanguage.Instance.BConcept_ARef);
 		if (_aEnumProp != default)
 			result.Add(BLangLanguage.Instance.BConcept_AEnumProp);
+		if (_aRef != default)
+			result.Add(BLangLanguage.Instance.BConcept_ARef);
 		return result;
 	}
 }

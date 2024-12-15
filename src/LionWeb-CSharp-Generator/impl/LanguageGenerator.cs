@@ -17,6 +17,7 @@
 
 namespace LionWeb.CSharp.Generator.Impl;
 
+using Core;
 using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
@@ -47,7 +48,7 @@ using Property = Core.M3.Property;
 /// - EnumerationLiteral properties
 /// </summary>
 /// <seealso cref="LanguageConstructorGenerator"/>
-public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
+public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : LanguageGeneratorBase(names, lionWebVersion)
 {
     private IdentifierNameSyntax FactoryInterfaceType => _names.FactoryInterfaceType;
 
@@ -60,20 +61,19 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
                     ("Version", names.Language.Version.AsLiteral())
                 ])
             ]))
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(AsType(typeof(LanguageBase<>), generics: FactoryInterfaceType)))
             .WithMembers(List(new List<MemberDeclarationSyntax>
                 {
                     GenLanguageInstance(),
-                    new LanguageConstructorGenerator(_names).GenConstructor(),
+                    new LanguageConstructorGenerator(_names, _lionWebVersion).GenConstructor(),
                     GenEntities(),
-                    GenDependsOn(),
-                    GenGetFactory()
+                    GenDependsOn()
                 }
                 .Concat(LanguageKeyMembers())
                 .Concat(LanguageNameMembers())
                 .Concat(LanguageVersionFieldMembers())
-                .Concat(Language.Entities.SelectMany(EntityLanguageMembers))));
+                .Concat(Language.Entities.Ordered().SelectMany(EntityLanguageMembers))));
 
     private FieldDeclarationSyntax GenLanguageInstance() =>
         Field("Instance", LanguageType,
@@ -86,7 +86,7 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
     private PropertyDeclarationSyntax GenEntities() =>
         ReadOnlyProperty("Entities", AsType(typeof(IReadOnlyList<LanguageEntity>)),
                 Collection(
-                    Language.Entities.Where(e => e is not PrimitiveType)
+                    Language.Entities.Where(e => e is not PrimitiveType).Ordered()
                         .Select(AsProperty)
                 )
             )
@@ -96,14 +96,9 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
     private PropertyDeclarationSyntax GenDependsOn() =>
         ReadOnlyProperty("DependsOn", AsType(typeof(IReadOnlyList<Language>)),
                 Collection(
-                    Language.DependsOn.Select(d => _names.MetaProperty(d))
+                    Language.DependsOn.Ordered().Select(d => _names.MetaProperty(d))
                 )
             )
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
-            .Xdoc(XdocInheritDoc());
-
-    private MethodDeclarationSyntax GenGetFactory() =>
-        Method("GetFactory", FactoryInterfaceType, exprBody: NewCall([ThisExpression()], _names.FactoryType))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc());
 
@@ -135,10 +130,10 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
         switch (entity)
         {
             case Classifier classifier:
-                result.AddRange(classifier.Features.SelectMany(FeatureLanguageMember));
+                result.AddRange(classifier.Features.Ordered().SelectMany(FeatureLanguageMember));
                 break;
             case Enumeration enumeration:
-                result.AddRange(enumeration.Literals.SelectMany(LiteralLanguageMember));
+                result.AddRange(enumeration.Literals.Ordered().SelectMany(LiteralLanguageMember));
                 break;
             case StructuredDataType structuredDataType:
                 result.AddRange(structuredDataType.Fields.SelectMany(FieldLanguageMember));

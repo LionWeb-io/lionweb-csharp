@@ -22,6 +22,7 @@ using Examples.Shapes.M2;
 using Examples.TinyRefLang;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
@@ -31,11 +32,13 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class InvalidLinkValueTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     private class DeserializerHealingHandler(
         Func<List<IReadableNode>, Feature, IWritableNode, List<IReadableNode>?> heal) : DeserializerExceptionHandler
     {
-        public override List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IWritableNode node) =>
-            heal([..value], link, node)?.Cast<T>().ToList();
+        public override List<T>? InvalidLinkValue<T>(List<T> value, Feature link, IReadableNode node) =>
+            heal([..value], link, (IWritableNode)node)?.Cast<T>().ToList();
     }
 
     [TestMethod]
@@ -43,7 +46,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
@@ -96,7 +99,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
@@ -151,7 +154,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
@@ -203,7 +206,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
@@ -269,7 +272,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
@@ -337,7 +340,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
@@ -405,7 +408,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "library", Version = "1" }
@@ -461,7 +464,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "library", Version = "1" }
@@ -519,7 +522,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-tinyRefLang", Version = "0" }
@@ -586,7 +589,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-tinyRefLang", Version = "0" }
@@ -655,7 +658,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-tinyRefLang", Version = "0" }
@@ -729,7 +732,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-tinyRefLang", Version = "0" },
@@ -820,7 +823,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },
@@ -902,7 +905,7 @@ public class InvalidLinkValueTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" },

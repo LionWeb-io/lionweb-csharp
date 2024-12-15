@@ -20,6 +20,7 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 using Examples.WithEnum.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
@@ -29,12 +30,14 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnknownEnumerationLiteralTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     private class DeserializerHealingHandler(Func<string, Enumeration, Feature, IWritableNode, Enum?> heal)
         : DeserializerExceptionHandler
     {
         public override Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
-            IWritableNode node) =>
-            heal(key, enumeration, property, node);
+            IReadableNode node) =>
+            heal(key, enumeration, property, (IWritableNode)node);
     }
 
     [TestMethod]
@@ -42,7 +45,7 @@ public class UnknownEnumerationLiteralTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "WithEnum", Version = "1" }
@@ -85,7 +88,7 @@ public class UnknownEnumerationLiteralTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "WithEnum", Version = "1" }
@@ -135,7 +138,7 @@ public class UnknownEnumerationLiteralTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "WithEnum", Version = "1" }

@@ -17,24 +17,31 @@
 
 using Examples.Shapes.Dynamic;
 using Io.Lionweb.Mps.Specific;
+using LionWeb.Core;
+using LionWeb.Core.M1;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using LionWeb.CSharp.Generator;
 using LionWeb.CSharp.Generator.Names;
 
+var lionWebVersion = LionWebVersions.Current;
+
 void SerializeLanguagesLocally(string name, params Language[] languages)
 {
-    JsonUtils.WriteJsonToFile($"chunks/localDefs/{name}.json", LanguageSerializer.Serialize(languages));
+    JsonUtils.WriteNodesToStream(new FileStream($"chunks/localDefs/{name}.json", FileMode.Create),
+        new Serializer(lionWebVersion),
+        languages.SelectMany(l => M1Extensions.Descendants<IReadableNode>(l, true, true)));
 }
 
-SerializeLanguagesLocally("lioncore", M3Language.Instance);
+SerializeLanguagesLocally("lioncore", lionWebVersion.LionCore);
 SerializeLanguagesLocally("shapes", ShapesDefinition.Language);
 
 
 DynamicLanguage[] DeserializeExternalLanguage(string name, params Language[] dependentLanguages) =>
-    LanguageDeserializer.Deserialize(
+    ILanguageDeserializerExtensions.Deserialize(
         JsonUtils.ReadJsonFromString<SerializationChunk>(File.ReadAllText($"chunks/externalDefs/{name}.json")),
+        lionWebVersion,
         dependentLanguages
     ).ToArray();
 
@@ -55,16 +62,23 @@ var sdtLang = testLanguagesDefinitions.SdtLang;
 
 List<Names> names =
 [
-    // TODO  get this working:
-    // new Names(M3Language.Instance, "LionWeb.Duplicate.M3"),
-    new(libraryLanguage, "Examples.Library.M2"),
-    new(multiLanguage, "Examples.Multi.M2") { NamespaceMappings = { [libraryLanguage] = "Examples.Library.M2" } },
-    new(withEnumLanguage, "Examples.WithEnum.M2"),
-    new(shapesLanguage, "Examples.Shapes.M2"),
-    new(aLang, "Examples.Circular.A") { NamespaceMappings = { [bLang] = "Examples.Circular.B" } },
-    new(bLang, "Examples.Circular.B") { NamespaceMappings = { [aLang] = "Examples.Circular.A" } },
-    new(tinyRefLang, "Examples.TinyRefLang"),
-    new(deprecatedLang, "Examples.DeprecatedLang"),
+    new (libraryLanguage, "Examples.Library.M2"),
+    new (multiLanguage, "Examples.Multi.M2")
+    {
+        NamespaceMappings = { [libraryLanguage] = "Examples.Library.M2" }
+    },
+    new (withEnumLanguage, "Examples.WithEnum.M2"),
+    new (shapesLanguage, "Examples.Shapes.M2"),
+    new (aLang, "Examples.Circular.A")
+    {
+        NamespaceMappings = { [bLang] = "Examples.Circular.B" }
+    },
+    new (bLang, "Examples.Circular.B")
+    {
+        NamespaceMappings = { [aLang] = "Examples.Circular.A" }
+    },
+    new (tinyRefLang, "Examples.TinyRefLang"),
+    new (deprecatedLang, "Examples.DeprecatedLang"),
     new(sdtLang, "Examples.SDTLang")
 ];
 

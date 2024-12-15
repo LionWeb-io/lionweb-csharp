@@ -29,7 +29,7 @@ using static AstExtensions;
 /// <summary>
 /// Generates Factory class.
 /// </summary>
-public class FactoryGenerator(INames names) : GeneratorBase(names)
+public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
 {
     private string FactoryName => _names.FactoryName;
     private string FactoryInterfaceName => _names.FactoryInterfaceName;
@@ -38,10 +38,11 @@ public class FactoryGenerator(INames names) : GeneratorBase(names)
         Language
             .Entities
             .OfType<Classifier>()
-            .Where(c => c is Concept { Abstract: false } or Annotation);
+            .Where(c => c is Concept { Abstract: false } or Annotation)
+            .Ordered();
 
-    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>();
-    private IEnumerable<StructuredDataType> StructuredDataTypes => Language.Entities.OfType<StructuredDataType>();
+    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
+    private IEnumerable<StructuredDataType> StructuredDataTypes => Language.Entities.OfType<StructuredDataType>().Ordered();
 
     /// <inheritdoc cref="FactoryGenerator"/>
     public IEnumerable<TypeDeclarationSyntax> FactoryTypes() =>
@@ -52,7 +53,7 @@ public class FactoryGenerator(INames names) : GeneratorBase(names)
 
     private InterfaceDeclarationSyntax FactoryInterface() =>
         InterfaceDeclaration(FactoryInterfaceName)
-            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(AsType(typeof(INodeFactory))))
             .WithMembers(List(new List<MemberDeclarationSyntax>(
                 ConcreteClassifiers

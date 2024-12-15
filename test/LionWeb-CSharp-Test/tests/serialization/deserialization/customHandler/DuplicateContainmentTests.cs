@@ -20,6 +20,7 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.Serialization;
 
 /// <summary>
@@ -28,12 +29,14 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class DuplicateContainmentTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     private class DeserializerHealingHandler(Func<IWritableNode, IWritableNode, IReadableNode, bool> heal)
         : DeserializerExceptionHandler
     {
-        public override bool DuplicateContainment(IWritableNode containedNode, IWritableNode newParent,
+        public override bool DuplicateContainment(IReadableNode containedNode, IReadableNode newParent,
             IReadableNode existingParent) =>
-            heal(containedNode, newParent, existingParent);
+            heal((IWritableNode)containedNode, (IWritableNode)newParent, existingParent);
     }
 
     [TestMethod]
@@ -41,7 +44,7 @@ public class DuplicateContainmentTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -122,7 +125,7 @@ public class DuplicateContainmentTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -203,7 +206,7 @@ public class DuplicateContainmentTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -278,7 +281,7 @@ public class DuplicateContainmentTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }

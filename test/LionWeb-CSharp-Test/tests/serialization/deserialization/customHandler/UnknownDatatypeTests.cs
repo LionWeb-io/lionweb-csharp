@@ -19,6 +19,7 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
@@ -28,6 +29,8 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnknownDatatypeTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     private class DeserializerHealingHandler(Func<Feature, string?, IWritableNode, object?> heal)
         : DeserializerExceptionHandler
     {
@@ -42,7 +45,7 @@ public class UnknownDatatypeTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-myLang", Version = "1" }
@@ -67,7 +70,8 @@ public class UnknownDatatypeTests
             ]
         };
 
-        var myLang = new DynamicLanguage("id-myLang") { Key = "key-myLang", Name = "myLang", Version = "1" };
+        var myLang =
+            new DynamicLanguage("id-myLang", _lionWebVersion) { Key = "key-myLang", Name = "myLang", Version = "1" };
         DynamicConcept clock = myLang.Concept("id-Clock", "key-Clock", "Clock");
         DynamicPrimitiveType time = myLang.PrimitiveType("id-Time", "key-Time", "Time");
         DynamicProperty wallClockTime =
@@ -93,7 +97,7 @@ public class UnknownDatatypeTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-myLang", Version = "1" }
@@ -118,7 +122,8 @@ public class UnknownDatatypeTests
             ]
         };
 
-        var myLang = new DynamicLanguage("id-myLang") { Key = "key-myLang", Name = "myLang", Version = "1" };
+        var myLang =
+            new DynamicLanguage("id-myLang", _lionWebVersion) { Key = "key-myLang", Name = "myLang", Version = "1" };
         DynamicConcept clock = myLang.Concept("id-Clock", "key-Clock", "Clock");
         DynamicPrimitiveType time = myLang.PrimitiveType("id-Time", "key-Time", "Time");
         DynamicProperty wallClockTime =

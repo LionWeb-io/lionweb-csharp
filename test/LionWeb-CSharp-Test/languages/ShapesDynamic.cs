@@ -17,9 +17,8 @@
 
 namespace Examples.Shapes.Dynamic;
 
-using LionWeb.Core.M2;
+using LionWeb.Core;
 using LionWeb.Core.M3;
-using M2;
 
 /// <summary>
 /// Entrypoint for working with the Shapes example language.
@@ -27,7 +26,6 @@ using M2;
 public static class ShapesDynamic
 {
     public static readonly DynamicLanguage Language = LanguagesUtils
-        .LoadLanguages("LionWeb-CSharp-Test", "LionWeb_CSharp_Test.languages.defChunks.shapes.json").First();
-
-    public static readonly INodeFactory Factory = Language.GetFactory();
+        .LoadLanguages("LionWeb-CSharp-Test", "LionWeb_CSharp_Test.languages.defChunks.shapes.json")
+        .First();
 }

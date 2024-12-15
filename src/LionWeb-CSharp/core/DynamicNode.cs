@@ -20,7 +20,6 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using System.Collections;
-using Utilities;
 
 /// <summary>
 /// A generic implementation of <see cref="INode"/> that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
@@ -104,7 +103,7 @@ public class DynamicNode : NodeBase
             Property => null,
             Link { Optional: false } => throw new UnsetFeatureException(feature),
             Link link => link.Multiple ? Enumerable.Empty<INode>().ToList().AsReadOnly() : null,
-            _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
+            _ => throw new UnknownFeatureException(this.GetClassifier(), feature)
         };
         return true;
     }
@@ -126,40 +125,18 @@ public class DynamicNode : NodeBase
 
     private bool SetProperty(Property property, object? value)
     {
-        switch (value)
+        if (value == null && property.Optional)
         {
-            case string when property.Type.EqualsIdentity(BuiltInsLanguage.Instance.String):
-            case int when property.Type.EqualsIdentity(BuiltInsLanguage.Instance.Integer):
-            case bool when property.Type.EqualsIdentity(BuiltInsLanguage.Instance.Boolean):
-                _settings[property] = value;
-                return true;
-
-            case Enum when property.Type is Enumeration e:
-                try
-                {
-                    var factory = e.GetLanguage().GetFactory();
-                    var enumerationLiteral = e.Literals[0];
-                    Enum literal = factory.GetEnumerationLiteral(enumerationLiteral);
-                    if (literal.GetType().IsEnumDefined(value))
-                    {
-                        _settings[property] = value;
-                        return true;
-                    }
-                } catch (ArgumentException)
-                {
-                    // fall-through
-                }
-
-                throw new InvalidValueException(property, value);
-
-            case null when property.Optional:
-                _settings.Remove(property);
-                return true;
-
-            default:
-                throw new InvalidValueException(property, value);
+            _settings.Remove(property);
+            return true;
         }
+
+        _settings[property] = VersionSpecifics.PrepareSetProperty(property, value);
+        return true;
     }
+
+    private IDynamicNodeVersionSpecifics VersionSpecifics => new Lazy<IDynamicNodeVersionSpecifics>(() =>
+        IDynamicNodeVersionSpecifics.Create(GetClassifier().GetLanguage().LionWebVersion)).Value;
 
     private bool SetReference(Reference reference, object? value)
     {

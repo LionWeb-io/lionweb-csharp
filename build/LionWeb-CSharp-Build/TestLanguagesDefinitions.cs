@@ -25,6 +25,8 @@ using LionWeb.Core.M3;
 
 public class TestLanguagesDefinitions
 {
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    
     public Language ALang { get; private set; }
     public Language BLang {get; private set;}
     public Language TinyRefLang {get; private set;}
@@ -58,7 +60,10 @@ public class TestLanguagesDefinitions
         ]);
         var aEnum = aLang.Enumeration("id-aEnum", "key-AEnum", "AEnum");
 
-        var bLang = new DynamicLanguage("id-BLang") { Key = "key-BLang", Name = "BLang", Version = "2" };
+        var bLang = new DynamicLanguage("id-BLang", _lionWebVersion)
+        {
+            Key = "key-BLang", Name = "BLang", Version = "2"
+        };
         var bConcept = bLang.Concept("id-BConcept", "key-BConcept", "BConcept");
         bConcept.AddAnnotations([new ConceptDescription("xxx") { ConceptShortDescription = "Some enum" }]);
 

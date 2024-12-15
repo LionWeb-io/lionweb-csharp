@@ -20,6 +20,7 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.Serialization;
 
 /// <summary>
@@ -28,11 +29,13 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnresolvableAnnotationTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     private class DeserializerHealingHandler(Func<CompressedId, IWritableNode, IWritableNode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IWritableNode node) =>
-            heal(annotationId, node);
+        public override IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IReadableNode node) =>
+            heal(annotationId, (IWritableNode)node);
     }
 
 
@@ -41,7 +44,7 @@ public class UnresolvableAnnotationTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -75,7 +78,7 @@ public class UnresolvableAnnotationTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -114,7 +117,7 @@ public class UnresolvableAnnotationTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }

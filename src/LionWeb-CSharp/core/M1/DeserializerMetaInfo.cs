@@ -21,12 +21,17 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
+/// Stores information required do deserialize meta-elements of nodes.
+/// <remarks>Should be internal, but the compiler doesn't like it in
+/// <see cref="DeserializerBase{T}._deserializerMetaInfo"/>.</remarks>
 public class DeserializerMetaInfo
 {
     private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
+    private readonly Dictionary<CompressedId, List<Language>> _languagesByKey = new();
     private readonly Dictionary<CompressedMetaPointer, Classifier> _classifiers = new();
     private readonly Dictionary<CompressedMetaPointer, Feature> _features = new();
 
@@ -36,6 +41,11 @@ public class DeserializerMetaInfo
     internal void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
     {
         _language2NodeFactory[language] = factory;
+        var compressedKey = Compress(language.Key);
+        if (!_languagesByKey.TryAdd(compressedKey, [language]))
+        {
+            _languagesByKey[compressedKey].Add(language);
+        }
 
         foreach (Classifier classifier in language.Entities.OfType<Classifier>())
         {
@@ -50,7 +60,7 @@ public class DeserializerMetaInfo
     internal INode? Instantiate(string id, MetaPointer metaPointer)
     {
         var compressedMetaPointer = Compress(metaPointer);
-        if (!_classifiers.TryGetValue(compressedMetaPointer, out var classifier))
+        if (!LookupClassifier(compressedMetaPointer, out var classifier))
         {
             classifier =
                 Handler.UnknownClassifier(compressedMetaPointer, CompressedId.Create(id, StoreUncompressedIds));
@@ -58,14 +68,19 @@ public class DeserializerMetaInfo
                 return null;
         }
 
-        return _language2NodeFactory[classifier.GetLanguage()].CreateNode(id, classifier);
+        if (!LookupFactory(classifier.GetLanguage(), out var factory))
+        {
+            return null;
+        }
+
+        return factory.CreateNode(id, classifier);
     }
 
     private Enum? ConvertEnumeration(IWritableNode nodeId, Feature property, Enumeration enumeration, string value)
     {
         var literal = enumeration.Literals.FirstOrDefault(literal => literal.Key == value);
 
-        if (literal != null && _language2NodeFactory.TryGetValue(enumeration.GetLanguage(), out var factory))
+        if (literal != null && LookupFactory(enumeration.GetLanguage(), out var factory))
         {
             Enum? result = factory.GetEnumerationLiteral(literal);
             if (result != null)
@@ -77,11 +92,11 @@ public class DeserializerMetaInfo
         return Handler.UnknownEnumerationLiteral(value, enumeration, property, nodeId);
     }
 
-    internal Feature? FindFeature<TFeature>(IWritableNode node, CompressedMetaPointer compressedMetaPointer)
+    internal Feature? FindFeature<TFeature>(IReadableNode node, CompressedMetaPointer compressedMetaPointer)
         where TFeature : class, Feature
     {
         Classifier classifier = node.GetClassifier();
-        if (!_features.TryGetValue(compressedMetaPointer, out var feature))
+        if (!LookupFeature(compressedMetaPointer, out var feature))
         {
             feature = Handler.UnknownFeature<TFeature>(compressedMetaPointer, classifier, node);
             if (feature == null)
@@ -90,6 +105,35 @@ public class DeserializerMetaInfo
 
         return feature as TFeature ?? Handler.InvalidFeature<TFeature>(compressedMetaPointer, classifier, node);
     }
+
+    private bool LookupClassifier(CompressedMetaPointer compressedMetaPointer,
+        [MaybeNullWhen(false)] out Classifier classifier) =>
+        _classifiers.TryGetValue(compressedMetaPointer, out classifier) ||
+        SelectVersion(compressedMetaPointer, out classifier);
+
+    private bool SelectVersion<T>(CompressedMetaPointer compressedMetaPointer, [MaybeNullWhen(false)] out T result)
+        where T : class, IKeyed
+    {
+        var languages = _languagesByKey[compressedMetaPointer.Language];
+        if (languages.Count == 0)
+        {
+            result = default;
+            return false;
+        }
+
+        result = Handler.SelectVersion<T>(compressedMetaPointer, languages);
+        return result != null;
+    }
+
+    private bool LookupFeature(CompressedMetaPointer compressedMetaPointer,
+        [MaybeNullWhen(false)] out Feature feature) =>
+        _features.TryGetValue(compressedMetaPointer, out feature) || SelectVersion(compressedMetaPointer, out feature);
+
+    private bool LookupFactory(Language language, [MaybeNullWhen(false)] out INodeFactory factory) =>
+        _language2NodeFactory.TryGetValue(language, out factory);
+
+    private CompressedId Compress(string id) =>
+        CompressedId.Create(id, StoreUncompressedIds);
 
     private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
         CompressedMetaPointer.Create(metaPointer, StoreUncompressedIds);

@@ -20,12 +20,15 @@ namespace LionWeb_CSharp_Test.tests.serialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using System.Collections.Concurrent;
 
 [TestClass]
 public class HandlerSerializationTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     class DuplicateNodeHandler(Action incrementer) : ISerializerHandler
     {
         Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) =>
@@ -44,7 +47,7 @@ public class HandlerSerializationTests
         int count = 0;
 
         var serializer =
-            new Serializer { Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count)) };
+            new Serializer(_lionWebVersion) { Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count)) };
 
         try
         {
@@ -68,7 +71,7 @@ public class HandlerSerializationTests
     [TestMethod]
     public void DuplicateLanguage_CustomHandler()
     {
-        var lang = new DynamicLanguage("abc")
+        var lang = new DynamicLanguage("abc",_lionWebVersion)
         {
             Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
         };
@@ -84,7 +87,7 @@ public class HandlerSerializationTests
         var dictionary = new ConcurrentDictionary<Language, byte>();
 
         var serializer =
-            new Serializer
+            new Serializer(_lionWebVersion)
             {
                 Handler = new DuplicateLanguageHandler((a, b) =>
                 {
@@ -107,7 +110,7 @@ public class HandlerSerializationTests
     [TestMethod]
     public void DuplicateLanguage_CustomHandler_Heal()
     {
-        var lang = new DynamicLanguage("abc")
+        var lang = new DynamicLanguage("abc",_lionWebVersion)
         {
             Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
         };
@@ -123,7 +126,7 @@ public class HandlerSerializationTests
         var dictionary = new ConcurrentDictionary<Language, byte>();
 
         var serializer =
-            new Serializer
+            new Serializer(_lionWebVersion)
             {
                 Handler = new DuplicateLanguageHandler((a, b) =>
                 {

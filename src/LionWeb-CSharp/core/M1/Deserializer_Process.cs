@@ -17,45 +17,27 @@
 
 namespace LionWeb.Core.M1;
 
-using M2;
 using M3;
 using Serialization;
+using CompressedContainment = (CompressedMetaPointer, List<CompressedId>);
 
 public partial class Deserializer
 {
     /// <inheritdoc />
     public override void Process(SerializedNode serializedNode)
     {
-        var id = serializedNode.Id;
-
-        CompressedId compressedId;
-
-        INode? node;
-        bool duplicateFound = false;
-
-        do
+        var processed = ProcessInternal(serializedNode, (id) =>
         {
-            compressedId = Compress(id);
-            if (IsInDependentNodes(compressedId) && Handler.SkipDeserializingDependentNode(compressedId))
-                return;
-
-            node = _deserializerMetaInfo.Instantiate(id, serializedNode.Classifier);
+            INode? node = _deserializerMetaInfo.Instantiate(id, serializedNode.Classifier);
             if (node == null)
-                return;
+                return null;
 
             DeserializeProperties(serializedNode, node);
-            duplicateFound = false;
+            return node;
+        });
 
-            if (_deserializedNodesById.TryGetValue(compressedId, out var existingNode))
-            {
-                id = Handler.DuplicateNodeId(compressedId, existingNode, node);
-                if (id == null)
-                    return;
-                duplicateFound = true;
-            }
-        } while (duplicateFound);
-
-        _deserializedNodesById[compressedId] = node;
+        if (processed is not { } compressedId)
+            return;
 
         RegisterContainments(serializedNode, compressedId);
         RegisterReferences(serializedNode, compressedId);
@@ -64,8 +46,6 @@ public partial class Deserializer
 
     private void DeserializeProperties(SerializedNode serializedNode, IWritableNode node)
     {
-        var id = serializedNode.Id;
-
         foreach (var serializedProperty in serializedNode.Properties)
         {
             var property = _deserializerMetaInfo.FindFeature<Property>(node, Compress(serializedProperty.Property));
@@ -86,6 +66,9 @@ public partial class Deserializer
         }
     }
 
+    private object? ConvertPrimitiveType(IWritableNode node, Property property, string value) =>
+        _versionSpecifics.ConvertPrimitiveType(this, node, property, value);
+
     private void RegisterAnnotations(SerializedNode serializedNode, CompressedId compressedId)
     {
         if (serializedNode.Annotations.Length == 0)
@@ -104,13 +87,7 @@ public partial class Deserializer
 
         _referencesByOwnerId[compressedId] = serializedNode
             .References
-            .Select(r => (
-                Compress(r.Reference),
-                r
-                    .Targets
-                    .Select(t => (t.Reference != null ? Compress(t.Reference) : (CompressedId?)null, t.ResolveInfo))
-                    .ToList()
-            ))
+            .Select(Compress)
             .ToList();
     }
 
@@ -121,13 +98,16 @@ public partial class Deserializer
 
         _containmentsByOwnerId[compressedId] = serializedNode
             .Containments
-            .Select(c => (
-                Compress(c.Containment),
-                c
-                    .Children
-                    .Select(Compress)
-                    .ToList()
-            ))
+            .Select(Compress)
             .ToList();
     }
+
+    private CompressedContainment Compress(SerializedContainment c) =>
+    (
+        Compress(c.Containment),
+        c
+            .Children
+            .Select(Compress)
+            .ToList()
+    );
 }

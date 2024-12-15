@@ -15,24 +15,26 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable ArrangeMethodOrOperatorBody
+
 namespace LionWeb.Core.M1;
 
 using Serialization;
 using System.Security.Cryptography;
 using System.Text;
 
+/// Checks for duplicate node ids in an efficient manner.
 public class DuplicateIdChecker
 {
     private readonly HashSet<CompressedId> _knownIds = new();
 
+    /// Whether <paramref name="compressedId"/> has been seen before by this instance.
     public bool IsIdDuplicate(CompressedId compressedId) =>
         !_knownIds.Add(compressedId);
 }
 
-/// <summary>
 /// Stores a LionWeb node id in a compact format, optionally preserving the original.
-/// </summary>
-public readonly struct CompressedId
+public readonly struct CompressedId : IEquatable<CompressedId>
 {
     private CompressedId(byte[] identifier, string? original)
     {
@@ -41,8 +43,16 @@ public readonly struct CompressedId
     }
 
     private byte[] Identifier { get; }
+
+    /// The original node id, if available.
     public string? Original { get; }
 
+    /// <summary>
+    /// Creates a new <see cref="CompressedId"/>.
+    /// </summary>
+    /// <param name="id">Node id to compress.</param>
+    /// <param name="keepOriginal">Whether to store the uncompressed original. Uses more memory, but eases debugging.</param>
+    /// <returns>The newly created compressed id.</returns>
     public static CompressedId Create(string id, bool keepOriginal)
     {
         var sha1 = SHA1.Create();
@@ -51,57 +61,97 @@ public readonly struct CompressedId
     }
 
     /// <inheritdoc />
+    public override string ToString() =>
+        Original ?? BitConverter.ToString(Identifier);
+
+    /// <inheritdoc />
     public override int GetHashCode() =>
         BitConverter.ToInt32(Identifier, 0);
 
-    /// <inheritdoc />
-    public override bool Equals(object? other) =>
-        other is CompressedId id && CompressedElement.Equals(Identifier, id.Identifier);
 
     /// <inheritdoc />
-    public override string ToString() =>
-        Original ?? BitConverter.ToString(Identifier);
+    public override bool Equals(object? obj) =>
+        obj is CompressedId other && Equals(other);
+
+    /// <inheritdoc />
+    public bool Equals(CompressedId other) =>
+        CompressedElement.Equals(Identifier, other.Identifier);
+
+    /// <inheritdoc cref="Equals(CompressedId)"/>
+    public static bool operator ==(CompressedId left, CompressedId right) =>
+        left.Equals(right);
+
+    /// <inheritdoc cref="Equals(CompressedId)"/>
+    public static bool operator !=(CompressedId left, CompressedId right) =>
+        !left.Equals(right);
 }
 
-/// <summary>
 /// Stores a LionWeb MetaPointer in a compact format, optionally preserving the original.
-/// </summary>
-public readonly struct CompressedMetaPointer
+public readonly struct CompressedMetaPointer : IEquatable<CompressedMetaPointer>
 {
-    private CompressedMetaPointer(byte[] identifier, MetaPointer? original)
+    private CompressedMetaPointer(CompressedId language, CompressedId version, CompressedId key, MetaPointer? original)
     {
-        Identifier = identifier;
+        Language = language;
+        Version = version;
+        Key = key;
         Original = original;
     }
 
-    private byte[] Identifier { get; }
+    /// The MetaPointer's language in compressed format.
+    public CompressedId Language { get; }
+
+    /// The MetaPointer's version in compressed format.
+    public CompressedId Version { get; }
+
+    /// The MetaPointer's key in compressed format.
+    public CompressedId Key { get; }
+
+    /// The original MetaPointer, if available.
     public MetaPointer? Original { get; }
 
-    public static CompressedMetaPointer Create(MetaPointer metaPointer, bool keepOriginal)
-    {
-        var sha1 = SHA1.Create();
-        var langBuf = CompressedElement.AsBytes(metaPointer.Language);
-        sha1.TransformBlock(langBuf, 0, langBuf.Length, null, 0);
-        var verBuf = CompressedElement.AsBytes(metaPointer.Version);
-        sha1.TransformBlock(verBuf, 0, verBuf.Length, null, 0);
-        var keyBuf = CompressedElement.AsBytes(metaPointer.Key);
-        sha1.TransformFinalBlock(keyBuf, 0, keyBuf.Length);
-        return new CompressedMetaPointer(sha1.Hash!, keepOriginal ? metaPointer : null);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode() =>
-        BitConverter.ToInt32(Identifier, 0);
-
-    /// <inheritdoc />
-    public override bool Equals(object? other) =>
-        other is CompressedMetaPointer id && CompressedElement.Equals(Identifier, id.Identifier);
+    /// <summary>
+    /// Creates a new <see cref="CompressedMetaPointer"/>.
+    /// </summary>
+    /// <param name="metaPointer">MetaPointer id to compress.</param>
+    /// <param name="keepOriginal">Whether to store the uncompressed original. Uses more memory, but eases debugging.</param>
+    /// <returns>The newly created compressed MetaPointer.</returns>
+    public static CompressedMetaPointer Create(MetaPointer metaPointer, bool keepOriginal) =>
+        new(
+            CompressedId.Create(metaPointer.Language, keepOriginal),
+            CompressedId.Create(metaPointer.Version, keepOriginal),
+            CompressedId.Create(metaPointer.Key, keepOriginal),
+            keepOriginal ? metaPointer : null
+        );
 
     /// <inheritdoc />
     public override string ToString() =>
-        Original?.ToString() ?? BitConverter.ToString(Identifier);
+        Original?.ToString() ??
+        $"{{Language={Language}, Version={Version}, Key={Key}}}";
+
+    /// <inheritdoc />
+    public override int GetHashCode() =>
+        HashCode.Combine(Key, Language, Version);
+
+    /// <inheritdoc />
+    public bool Equals(CompressedMetaPointer other) =>
+        Key.Equals(other.Key) &&
+        Language.Equals(other.Language) &&
+        Version.Equals(other.Version);
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) =>
+        obj is CompressedMetaPointer pointer && Equals(pointer);
+
+    /// <inheritdoc cref="Equals(LionWeb.Core.M1.CompressedMetaPointer)"/>
+    public static bool operator ==(CompressedMetaPointer left, CompressedMetaPointer right) =>
+        left.Equals(right);
+
+    /// <inheritdoc cref="Equals(LionWeb.Core.M1.CompressedMetaPointer)"/>
+    public static bool operator !=(CompressedMetaPointer left, CompressedMetaPointer right) =>
+        !(left == right);
 }
 
+/// Convenience methods to deal with byte arrays.
 internal static class CompressedElement
 {
     internal static byte[] AsBytes(string str) =>

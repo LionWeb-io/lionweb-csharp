@@ -13,10 +13,10 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "0")]
-public class SpecificLanguage : LanguageBase<ISpecificFactory>
+public partial class SpecificLanguage : LanguageBase<ISpecificFactory>
 {
 	public static readonly SpecificLanguage Instance = new Lazy<SpecificLanguage>(() => new("io-lionweb-mps-specific")).Value;
-	public SpecificLanguage(string id) : base(id)
+	public SpecificLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
 		_conceptDescription = new(() => new AnnotationBase<SpecificLanguage>("ConceptDescription", this) { Key = "ConceptDescription", Name = "ConceptDescription", AnnotatesLazy = new(() => M3Language.Instance.Classifier), FeaturesLazy = new(() => [ConceptDescription_conceptAlias, ConceptDescription_conceptShortDescription]) });
 		_conceptDescription_conceptAlias = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptAlias", ConceptDescription, this) { Key = "ConceptDescription-conceptAlias", Name = "conceptAlias", Optional = true, Type = BuiltInsLanguage.Instance.String });
@@ -27,6 +27,7 @@ public class SpecificLanguage : LanguageBase<ISpecificFactory>
 		_shortDescription = new(() => new AnnotationBase<SpecificLanguage>("ShortDescription", this) { Key = "ShortDescription", Name = "ShortDescription", AnnotatesLazy = new(() => BuiltInsLanguage.Instance.Node), FeaturesLazy = new(() => [ShortDescription_description]) });
 		_shortDescription_description = new(() => new PropertyBase<SpecificLanguage>("ShortDescription-description", ShortDescription, this) { Key = "ShortDescription-description", Name = "description", Optional = true, Type = BuiltInsLanguage.Instance.String });
 		_virtualPackage = new(() => new AnnotationBase<SpecificLanguage>("VirtualPackage", this) { Key = "VirtualPackage", Name = "VirtualPackage", AnnotatesLazy = new(() => BuiltInsLanguage.Instance.Node), ImplementsLazy = new(() => [BuiltInsLanguage.Instance.INamed]) });
+		_factory = new SpecificFactory(this);
 	}
 
 	/// <inheritdoc/>
@@ -34,8 +35,6 @@ public class SpecificLanguage : LanguageBase<ISpecificFactory>
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
-	/// <inheritdoc/>
-        public override ISpecificFactory GetFactory() => new SpecificFactory(this);
 	private const string _key = "io-lionweb-mps-specific";
 	/// <inheritdoc/>
         public override string Key => _key;
@@ -76,7 +75,7 @@ public class SpecificLanguage : LanguageBase<ISpecificFactory>
 	public Annotation VirtualPackage => _virtualPackage.Value;
 }
 
-public interface ISpecificFactory : INodeFactory
+public partial interface ISpecificFactory : INodeFactory
 {
 	public ConceptDescription NewConceptDescription(string id);
 	public ConceptDescription CreateConceptDescription();
@@ -132,7 +131,7 @@ public class SpecificFactory : AbstractBaseNodeFactory, ISpecificFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "ConceptDescription")]
-public class ConceptDescription : NodeBase
+public partial class ConceptDescription : NodeBase
 {
 	private string? _conceptAlias = null;
 	/// <remarks>Optional Property</remarks>
@@ -229,7 +228,7 @@ public class ConceptDescription : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "Deprecated")]
-public class Deprecated : NodeBase
+public partial class Deprecated : NodeBase
 {
 	private string? _build = null;
 	/// <remarks>Optional Property</remarks>
@@ -326,7 +325,7 @@ public class Deprecated : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "ShortDescription")]
-public class ShortDescription : NodeBase
+public partial class ShortDescription : NodeBase
 {
 	private string? _description = null;
 	/// <remarks>Optional Property</remarks>
@@ -391,7 +390,7 @@ public class ShortDescription : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "VirtualPackage")]
-public class VirtualPackage : NodeBase, INamedWritable
+public partial class VirtualPackage : NodeBase, INamedWritable
 {
 	private string? _name = null;
 	/// <remarks>Required Property</remarks>

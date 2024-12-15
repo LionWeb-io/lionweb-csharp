@@ -19,11 +19,20 @@ namespace LionWeb.Core.M1;
 
 using Serialization;
 
+/// <summary>
+/// Converts <see cref="IReadableNode">IReadableNodes</see> into <see cref="SerializedNode">SerializedNodes</see>.
+/// </summary>
+/// <seealso cref="ISerializerExtensions">Extensions</seealso>
 public interface ISerializer
 {
+    /// Optional handler to customize this serializer's behaviour in non-regular situations.
     ISerializerHandler Handler { get; init; }
 
+    /// <summary>
+    /// Converts <paramref name="allNodes"/> into <see cref="SerializedNode">SerializedNodes</see>.
+    /// </summary>
     /// <param name="allNodes">Collection of nodes to be serialized. Does not transform the collection, i.e. does not consider descendants.</param>
+    /// <exception cref="VersionMismatchException">If any of <paramref name="allNodes"/>s' languages' LionWeb version is not compatible with <see cref="LionWebVersion"/>.</exception>
     /// <remarks>
     /// We want to keep any transformation outside the serializer, as it might lead to duplicate nodes.
     /// Calling <c>Distinct()</c> implicitly creates a HashSet of the elements, violating the idea to stream nodes with minimal memory overhead. 
@@ -31,17 +40,26 @@ public interface ISerializer
     IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes);
 
     /// <summary>
-    /// 
+    /// All languages used during serialization.
     /// </summary>
     /// <remarks>
     /// Lazily populated while processing <i>allNodes</i> of <see cref="Serialize"/>.
     /// </remarks>
     IEnumerable<SerializedLanguageReference> UsedLanguages { get; }
+
+    /// Version of LionWeb standard to use.
+    LionWebVersions LionWebVersion { get; }
 }
 
+/// Extension methods for <see cref="ISerializer"/>.
 public static class ISerializerExtensions
 {
+    /// <summary>
+    /// Wraps <paramref name="serializer"/>'s result into a <see cref="SerializationChunk"/>.
+    /// </summary>
+    /// <param name="serializer">Serializer to use.</param>
     /// <param name="allNodes">Collection of nodes to be serialized. Does not transform the collection, i.e. does not consider descendants.</param>
+    /// <returns><paramref name="serializer"/>'s result wrapped into a <see cref="SerializationChunk"/>.</returns>
     /// <remarks>
     /// We want to keep any transformation outside the serializer, as it might lead to duplicate nodes.
     /// Calling <c>Distinct()</c> implicitly creates a HashSet of the elements, violating the idea to stream nodes with minimal memory overhead. 
@@ -51,12 +69,18 @@ public static class ISerializerExtensions
         SerializedNode[] serializedNodes = serializer.Serialize(allNodes).ToArray();
         return new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = serializer.LionWebVersion.VersionString,
             Languages = serializer.UsedLanguages.ToArray(),
             Nodes = serializedNodes
         };
     }
 
+    /// <summary>
+    /// Serializes all descendants of <paramref name="nodes"/>.
+    /// </summary>
+    /// <param name="serializer">Serializer to use.</param>
+    /// <param name="nodes">Node that should be serialized, including all their descendants and annotations.</param>
+    /// <returns><paramref name="serializer"/>'s result.</returns>
     public static IEnumerable<SerializedNode> SerializeDescendants(this ISerializer serializer,
         IEnumerable<IReadableNode> nodes) => serializer.Serialize(nodes.AllNodes());
 
@@ -64,11 +88,10 @@ public static class ISerializerExtensions
     /// Serializes a given <paramref name="nodes">iterable collection of nodes</paramref>, including all descendants and annotations.
     /// Disregards duplicate nodes, but fails on duplicate node ids.
     /// </summary>
-    /// 
     /// <returns>A data structure that can be directly serialized/unparsed to JSON.</returns>
     public static SerializationChunk SerializeToChunk(this ISerializer serializer, IEnumerable<IReadableNode> nodes) =>
         Serialize(serializer, nodes.AllNodes().Distinct());
 
     private static IEnumerable<IReadableNode> AllNodes(this IEnumerable<IReadableNode> nodes) =>
-        nodes.SelectMany(n => M1Extensions.Descendants(n, [], true, true));
+        nodes.SelectMany(n => M1Extensions.Descendants(n, true, true));
 }

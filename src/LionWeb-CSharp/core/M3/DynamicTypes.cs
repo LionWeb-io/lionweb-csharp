@@ -29,24 +29,30 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
     private string? _name;
 
     /// <inheritdoc />
+    protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.BuiltIns).Value;
+
+    /// <inheritdoc />
+    protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
+
+    /// <inheritdoc />
     public string Key
     {
-        get => _key ?? throw new UnsetFeatureException(M3Language.Instance.IKeyed_key);
+        get => _key ?? throw new UnsetFeatureException(_m3.IKeyed_key);
         set => _key = value;
     }
 
     /// <inheritdoc />
     public string Name
     {
-        get => _name ?? throw new UnsetFeatureException(BuiltInsLanguage.Instance.INamed_name);
+        get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name);
         set => _name = value;
     }
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
     [
-        BuiltInsLanguage.Instance.INamed_name,
-        M3Language.Instance.IKeyed_key
+        _builtIns.INamed_name,
+        _m3.IKeyed_key
     ];
 
     /// <inheritdoc />
@@ -55,13 +61,13 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (BuiltInsLanguage.Instance.INamed_name == feature)
+        if (_builtIns.INamed_name == feature)
         {
             result = Name;
             return true;
         }
 
-        if (M3Language.Instance.IKeyed_key == feature)
+        if (_m3.IKeyed_key == feature)
         {
             result = Key;
             return true;
@@ -74,7 +80,7 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
     /// <inheritdoc />
     protected override bool SetInternal(Feature? feature, object? value)
     {
-        if (BuiltInsLanguage.Instance.INamed_name == feature)
+        if (_builtIns.INamed_name == feature)
         {
             Name = value switch
             {
@@ -84,7 +90,7 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
             return true;
         }
 
-        if (M3Language.Instance.IKeyed_key == feature)
+        if (_m3.IKeyed_key == feature)
         {
             Key = value switch
             {
@@ -114,7 +120,7 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Feature_optional
+            _m3.Feature_optional
         ]);
 
     /// <inheritdoc />
@@ -123,7 +129,7 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Feature_optional == feature)
+        if (_m3.Feature_optional == feature)
         {
             result = Optional;
             return true;
@@ -141,7 +147,7 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
             return result;
         }
 
-        if (M3Language.Instance.Feature_optional == feature)
+        if (_m3.Feature_optional == feature)
         {
             Optional = value switch
             {
@@ -163,17 +169,17 @@ public class DynamicProperty(string id, DynamicClassifier? classifier) : Dynamic
     /// <inheritdoc />
     public Datatype Type
     {
-        get => _type ?? throw new UnsetFeatureException(M3Language.Instance.Property_type);
+        get => _type ?? throw new UnsetFeatureException(_m3.Property_type);
         set => _type = value;
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Property;
+    public override Classifier GetClassifier() => _m3.Property;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Property_type
+            _m3.Property_type
         ]);
 
     /// <inheritdoc />
@@ -182,7 +188,7 @@ public class DynamicProperty(string id, DynamicClassifier? classifier) : Dynamic
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Property_type == feature)
+        if (_m3.Property_type == feature)
         {
             result = Type;
             return true;
@@ -200,7 +206,7 @@ public class DynamicProperty(string id, DynamicClassifier? classifier) : Dynamic
             return result;
         }
 
-        if (M3Language.Instance.Property_type == feature)
+        if (_m3.Property_type == feature)
         {
             Type = value switch
             {
@@ -225,15 +231,15 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier) : Dy
     /// <inheritdoc />
     public Classifier Type
     {
-        get => _type ?? throw new UnsetFeatureException(M3Language.Instance.Link_type);
+        get => _type ?? throw new UnsetFeatureException(_m3.Link_type);
         set => _type = value;
     }
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Link_multiple,
-            M3Language.Instance.Link_type
+            _m3.Link_multiple,
+            _m3.Link_type
         ]);
 
     /// <inheritdoc />
@@ -242,13 +248,13 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier) : Dy
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Link_multiple == feature)
+        if (_m3.Link_multiple == feature)
         {
             result = Multiple;
             return true;
         }
 
-        if (M3Language.Instance.Link_type == feature)
+        if (_m3.Link_type == feature)
         {
             result = Type;
             return true;
@@ -266,7 +272,7 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier) : Dy
             return result;
         }
 
-        if (M3Language.Instance.Link_multiple == feature)
+        if (_m3.Link_multiple == feature)
         {
             Multiple = value switch
             {
@@ -276,7 +282,7 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier) : Dy
             return true;
         }
 
-        if (M3Language.Instance.Link_type == feature)
+        if (_m3.Link_type == feature)
         {
             Type = value switch
             {
@@ -294,14 +300,14 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier) : Dy
 public class DynamicContainment(string id, DynamicClassifier? classifier) : DynamicLink(id, classifier), Containment
 {
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Containment;
+    public override Classifier GetClassifier() => _m3.Containment;
 }
 
 /// <inheritdoc cref="Reference"/>
 public class DynamicReference(string id, DynamicClassifier? classifier) : DynamicLink(id, classifier), Reference
 {
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Reference;
+    public override Classifier GetClassifier() => _m3.Reference;
 }
 
 /// <inheritdoc cref="LanguageEntity"/>
@@ -326,7 +332,7 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
 
     /// <inheritdoc cref="Features"/>
     public void AddFeatures(IEnumerable<Feature> features) =>
-        _features.AddRange(SetSelfParent(features?.ToList(), M3Language.Instance.Classifier_features));
+        _features.AddRange(SetSelfParent(features?.ToList(), _m3.Classifier_features));
 
     /// <inheritdoc />
     protected override bool DetachChild(INode child)
@@ -337,7 +343,7 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
         }
 
         var c = GetContainmentOf(child);
-        if (c == M3Language.Instance.Classifier_features)
+        if (c == _m3.Classifier_features)
             return _features.Remove((Feature)child);
 
         return false;
@@ -351,7 +357,7 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
             return result;
 
         if (child is Feature s && _features.Contains(s))
-            return M3Language.Instance.Classifier_features;
+            return _m3.Classifier_features;
 
         return null;
     }
@@ -359,7 +365,7 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Classifier_features
+            _m3.Classifier_features
         ]);
 
     /// <inheritdoc />
@@ -368,7 +374,7 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Classifier_features == feature)
+        if (_m3.Classifier_features == feature)
         {
             result = Features;
             return true;
@@ -386,12 +392,12 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
             return result;
         }
 
-        if (M3Language.Instance.Classifier_features == feature)
+        if (_m3.Classifier_features == feature)
         {
             switch (value)
             {
                 case IEnumerable e:
-                    RemoveSelfParent(_features?.ToList(), _features, M3Language.Instance.Classifier_features);
+                    RemoveSelfParent(_features?.ToList(), _features, _m3.Classifier_features);
                     AddFeatures(e.OfType<Feature>().ToArray());
                     return true;
                 default:
@@ -424,15 +430,15 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
     public void AddImplements(IEnumerable<Interface> interfaces) => _implements.AddRange(interfaces);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Concept;
+    public override Classifier GetClassifier() => _m3.Concept;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Concept_abstract,
-            M3Language.Instance.Concept_partition,
-            M3Language.Instance.Concept_extends,
-            M3Language.Instance.Concept_implements
+            _m3.Concept_abstract,
+            _m3.Concept_partition,
+            _m3.Concept_extends,
+            _m3.Concept_implements
         ]);
 
     /// <inheritdoc />
@@ -441,25 +447,25 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Concept_abstract == feature)
+        if (_m3.Concept_abstract == feature)
         {
             result = Abstract;
             return true;
         }
 
-        if (M3Language.Instance.Concept_partition == feature)
+        if (_m3.Concept_partition == feature)
         {
             result = Partition;
             return true;
         }
 
-        if (M3Language.Instance.Concept_extends == feature)
+        if (_m3.Concept_extends == feature)
         {
             result = Extends;
             return true;
         }
 
-        if (M3Language.Instance.Concept_implements == feature)
+        if (_m3.Concept_implements == feature)
         {
             result = Implements;
             return true;
@@ -477,7 +483,7 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
             return result;
         }
 
-        if (M3Language.Instance.Concept_abstract == feature)
+        if (_m3.Concept_abstract == feature)
         {
             Abstract = value switch
             {
@@ -487,7 +493,7 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
             return true;
         }
 
-        if (M3Language.Instance.Concept_partition == feature)
+        if (_m3.Concept_partition == feature)
         {
             Partition = value switch
             {
@@ -497,7 +503,7 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
             return true;
         }
 
-        if (M3Language.Instance.Concept_extends == feature)
+        if (_m3.Concept_extends == feature)
         {
             Extends = value switch
             {
@@ -508,7 +514,7 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
             return true;
         }
 
-        if (M3Language.Instance.Concept_implements == feature)
+        if (_m3.Concept_implements == feature)
         {
             switch (value)
             {
@@ -531,7 +537,7 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
     /// <inheritdoc />
     public Classifier Annotates
     {
-        get => _annotates ?? BuiltInsLanguage.Instance.Node;
+        get => _annotates ?? _builtIns.Node;
         set => _annotates = value;
     }
 
@@ -548,14 +554,14 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
     public void AddImplements(IEnumerable<Interface> interfaces) => _implements.AddRange(interfaces);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Annotation;
+    public override Classifier GetClassifier() => _m3.Annotation;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Annotation_annotates,
-            M3Language.Instance.Annotation_extends,
-            M3Language.Instance.Annotation_implements
+            _m3.Annotation_annotates,
+            _m3.Annotation_extends,
+            _m3.Annotation_implements
         ]);
 
     /// <inheritdoc />
@@ -564,19 +570,19 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Annotation_annotates == feature)
+        if (_m3.Annotation_annotates == feature)
         {
             result = Annotates;
             return true;
         }
 
-        if (M3Language.Instance.Annotation_extends == feature)
+        if (_m3.Annotation_extends == feature)
         {
             result = Extends;
             return true;
         }
 
-        if (M3Language.Instance.Annotation_implements == feature)
+        if (_m3.Annotation_implements == feature)
         {
             result = Implements;
             return true;
@@ -594,7 +600,7 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
             return result;
         }
 
-        if (M3Language.Instance.Annotation_annotates == feature)
+        if (_m3.Annotation_annotates == feature)
         {
             Annotates = value switch
             {
@@ -604,7 +610,7 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
             return true;
         }
 
-        if (M3Language.Instance.Annotation_extends == feature)
+        if (_m3.Annotation_extends == feature)
         {
             Extends = value switch
             {
@@ -615,7 +621,7 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
             return true;
         }
 
-        if (M3Language.Instance.Annotation_implements == feature)
+        if (_m3.Annotation_implements == feature)
         {
             switch (value)
             {
@@ -644,12 +650,12 @@ public class DynamicInterface(string id, DynamicLanguage? language) : DynamicCla
     public void AddExtends(IEnumerable<Interface> extends) => _extends.AddRange(extends);
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Interface;
+    public override Classifier GetClassifier() => _m3.Interface;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Interface_extends
+            _m3.Interface_extends
         ]);
 
     /// <inheritdoc />
@@ -658,7 +664,7 @@ public class DynamicInterface(string id, DynamicLanguage? language) : DynamicCla
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Interface_extends == feature)
+        if (_m3.Interface_extends == feature)
         {
             result = Extends;
             return true;
@@ -676,7 +682,7 @@ public class DynamicInterface(string id, DynamicLanguage? language) : DynamicCla
             return result;
         }
 
-        if (M3Language.Instance.Interface_extends == feature)
+        if (_m3.Interface_extends == feature)
         {
             switch (value)
             {
@@ -701,7 +707,7 @@ public abstract class DynamicDatatype(string id, DynamicLanguage? language)
 public class DynamicPrimitiveType(string id, DynamicLanguage? language) : DynamicDatatype(id, language), PrimitiveType
 {
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.PrimitiveType;
+    public override Classifier GetClassifier() => _m3.PrimitiveType;
 }
 
 /// <inheritdoc cref="Enumeration"/>
@@ -714,7 +720,7 @@ public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicD
 
     /// <inheritdoc cref="Literals"/>
     public void AddLiterals(IEnumerable<EnumerationLiteral> literals) =>
-        _literals.AddRange(SetSelfParent(literals?.ToList(), M3Language.Instance.Enumeration_literals));
+        _literals.AddRange(SetSelfParent(literals?.ToList(), _m3.Enumeration_literals));
 
     /// <inheritdoc />
     protected override bool DetachChild(INode child)
@@ -725,7 +731,7 @@ public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicD
         }
 
         var c = GetContainmentOf(child);
-        if (c == M3Language.Instance.Enumeration_literals)
+        if (c == _m3.Enumeration_literals)
             return _literals.Remove((EnumerationLiteral)child);
 
         return false;
@@ -739,18 +745,18 @@ public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicD
             return result;
 
         if (child is EnumerationLiteral s && _literals.Contains(s))
-            return M3Language.Instance.Enumeration_literals;
+            return _m3.Enumeration_literals;
 
         return null;
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Enumeration;
+    public override Classifier GetClassifier() => _m3.Enumeration;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Enumeration_literals
+            _m3.Enumeration_literals
         ]);
 
     /// <inheritdoc />
@@ -759,7 +765,7 @@ public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicD
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Enumeration_literals == feature)
+        if (_m3.Enumeration_literals == feature)
         {
             result = Literals;
             return true;
@@ -777,12 +783,12 @@ public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicD
             return result;
         }
 
-        if (M3Language.Instance.Enumeration_literals == feature)
+        if (_m3.Enumeration_literals == feature)
         {
             switch (value)
             {
                 case IEnumerable e:
-                    RemoveSelfParent(_literals?.ToList(), _literals, M3Language.Instance.Enumeration_literals);
+                    RemoveSelfParent(_literals?.ToList(), _literals, _m3.Enumeration_literals);
                     AddLiterals(e.OfType<EnumerationLiteral>().ToArray());
                     return true;
                 default:
@@ -806,7 +812,7 @@ public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.EnumerationLiteral;
+    public override Classifier GetClassifier() => _m3.EnumerationLiteral;
 }
 
 /// <inheritdoc cref="StructuredDataType"/>
@@ -959,12 +965,15 @@ public class DynamicField(string id, DynamicStructuredDataType? structuredDataTy
 }
 
 /// <inheritdoc cref="Language"/>
-public class DynamicLanguage(string id) : DynamicIKeyed(id), Language
+public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : DynamicIKeyed(id), Language
 {
+    /// <inheritdoc />
+    public LionWebVersions LionWebVersion { get; } = lionWebVersion;
+
     /// <inheritdoc />
     public string Version
     {
-        get => _version ?? throw new UnsetFeatureException(M3Language.Instance.Language_version);
+        get => _version ?? throw new UnsetFeatureException(_m3.Language_version);
         set => _version = value;
     }
 
@@ -975,7 +984,7 @@ public class DynamicLanguage(string id) : DynamicIKeyed(id), Language
 
     /// <inheritdoc cref="Entities"/>
     public void AddEntities(IEnumerable<LanguageEntity> entities) =>
-        _entities.AddRange(SetSelfParent(entities?.ToList(), M3Language.Instance.Language_entities));
+        _entities.AddRange(SetSelfParent(entities?.ToList(), _m3.Language_entities));
 
     private readonly List<Language> _dependsOn = [];
     private string? _version;
@@ -986,21 +995,21 @@ public class DynamicLanguage(string id) : DynamicIKeyed(id), Language
     /// <inheritdoc cref="DependsOn"/>
     public void AddDependsOn(IEnumerable<Language> languages)
     {
-        AssureNotNull(languages, M3Language.Instance.Language_dependsOn);
+        AssureNotNull(languages, _m3.Language_dependsOn);
         var safeNodes = languages.ToList();
-        AssureNotNullMembers(safeNodes, M3Language.Instance.Language_dependsOn);
+        AssureNotNullMembers(safeNodes, _m3.Language_dependsOn);
         _dependsOn.AddRange(safeNodes);
     }
 
     /// <inheritdoc />
-    public override Classifier GetClassifier() => M3Language.Instance.Language;
+    public override Classifier GetClassifier() => _m3.Language;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
-            M3Language.Instance.Language_version,
-            M3Language.Instance.Language_entities,
-            M3Language.Instance.Language_dependsOn
+            _m3.Language_version,
+            _m3.Language_entities,
+            _m3.Language_dependsOn
         ]);
 
     /// <inheritdoc />
@@ -1009,19 +1018,19 @@ public class DynamicLanguage(string id) : DynamicIKeyed(id), Language
         if (base.GetInternal(feature, out result))
             return true;
 
-        if (M3Language.Instance.Language_version == feature)
+        if (_m3.Language_version == feature)
         {
             result = Version;
             return true;
         }
 
-        if (M3Language.Instance.Language_entities == feature)
+        if (_m3.Language_entities == feature)
         {
             result = Entities;
             return true;
         }
 
-        if (M3Language.Instance.Language_dependsOn == feature)
+        if (_m3.Language_dependsOn == feature)
         {
             result = DependsOn;
             return true;
@@ -1039,7 +1048,7 @@ public class DynamicLanguage(string id) : DynamicIKeyed(id), Language
             return result;
         }
 
-        if (M3Language.Instance.Language_version == feature)
+        if (_m3.Language_version == feature)
         {
             Version = value switch
             {
@@ -1049,12 +1058,12 @@ public class DynamicLanguage(string id) : DynamicIKeyed(id), Language
             return true;
         }
 
-        if (M3Language.Instance.Language_entities == feature)
+        if (_m3.Language_entities == feature)
         {
             switch (value)
             {
                 case IEnumerable e:
-                    RemoveSelfParent(_entities?.ToList(), _entities, M3Language.Instance.Language_entities);
+                    RemoveSelfParent(_entities?.ToList(), _entities, _m3.Language_entities);
                     AddEntities(e.OfType<LanguageEntity>().ToArray());
                     return true;
                 default:
@@ -1062,7 +1071,7 @@ public class DynamicLanguage(string id) : DynamicIKeyed(id), Language
             }
         }
 
-        if (M3Language.Instance.Language_dependsOn == feature)
+        if (_m3.Language_dependsOn == feature)
         {
             switch (value)
             {
@@ -1083,4 +1092,7 @@ public class DynamicLanguage(string id) : DynamicIKeyed(id), Language
 
     /// <inheritdoc />
     public INodeFactory GetFactory() => NodeFactory ??= new ReflectiveBaseNodeFactory(this);
+
+    /// <inheritdoc />
+    public void SetFactory(INodeFactory factory) => NodeFactory = factory;
 }

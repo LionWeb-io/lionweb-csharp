@@ -20,6 +20,7 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.Serialization;
 
 /// <summary>
@@ -31,8 +32,8 @@ public class DuplicateNodeIdTests
     private class DeserializerHealingHandler(Func<CompressedId, IWritableNode, INode, string?> heal)
         : DeserializerExceptionHandler
     {
-        public override string? DuplicateNodeId(CompressedId nodeId, IWritableNode existingNode, INode node) =>
-            heal(nodeId, existingNode, node);
+        public override string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
+            heal(nodeId, (IWritableNode)existingNode, (INode)node);
     }
 
     [TestMethod]
@@ -40,7 +41,7 @@ public class DuplicateNodeIdTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -194,7 +195,7 @@ public class DuplicateNodeIdTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -354,13 +355,14 @@ public class DuplicateNodeIdTests
     }
 
     private readonly Dictionary<CompressedId, int> _healingHandlerCallCount = new();
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     [TestMethod]
     public void duplicate_node_id_heals_after_second_attempt()
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }

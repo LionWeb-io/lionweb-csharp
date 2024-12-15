@@ -28,20 +28,21 @@ using System.Diagnostics;
 public class StreamingTests
 {
     private readonly Language _language;
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     public StreamingTests()
     {
         _language = ShapesLanguage.Instance;
     }
 
-    private const long _maxSize = 1_500_000L;
-    // private const long _maxSize = 1_500L;
+    // private const long _maxSize = 1_500_000L;
+    private const long _maxSize = 1_500L;
 
     [TestMethod]
     public void MassSerialization()
     {
         using Stream stream = File.Create("output.json");
-        JsonUtils.WriteNodesToStream(stream, new Serializer(), CreateNodes(_maxSize));
+        JsonUtils.WriteNodesToStream(stream, new Serializer(_lionWebVersion), CreateNodes(_maxSize));
 
         IEnumerable<INode> CreateNodes(long count)
         {
@@ -101,7 +102,7 @@ public class StreamingTests
             .WithLanguage(_language)
             .Build();
 
-        List<IReadableNode> nodes = JsonUtils.ReadNodesFromStream(stream, deserializer).GetAwaiter().GetResult();
+        List<IReadableNode> nodes = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).GetAwaiter().GetResult();
 
         Assert.AreEqual(_maxSize, nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count());
     }

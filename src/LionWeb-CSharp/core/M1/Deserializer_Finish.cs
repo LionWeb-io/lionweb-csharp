@@ -49,7 +49,7 @@ public partial class Deserializer
 
         IWritableNode node = _deserializedNodesById[compressedId];
 
-        foreach ((var compressedMetaPointer, var compressedChildrenIds) in containments)
+        foreach (var (compressedMetaPointer, compressedChildrenIds) in containments)
         {
             var containment = _deserializerMetaInfo.FindFeature<Containment>(node, compressedMetaPointer);
             if (containment == null)
@@ -67,52 +67,13 @@ public partial class Deserializer
     private IWritableNode? FindChild(IWritableNode node, Feature containment, CompressedId childId)
     {
         IWritableNode? result = _deserializedNodesById.TryGetValue(childId, out var existingChild)
-            ? existingChild
+            ? existingChild as IWritableNode
             : Handler.UnresolvableChild(childId, containment, node);
 
         return PreventCircularContainment(node, result);
     }
 
-    private IWritableNode? PreventCircularContainment(IWritableNode node, IWritableNode? result)
-    {
-        if (result == null)
-            return null;
-
-        while (result != null && ContainsAncestor(result, node))
-            result = Handler.CircularContainment(result, node);
-
-        if (result == null)
-            return null;
-
-        var existingParent = result.GetParent();
-        if (existingParent != null && existingParent != node &&
-            !Handler.DuplicateContainment(result, node, existingParent))
-            return null;
-
-        return result;
-    }
-
-    private bool ContainsAncestor(IWritableNode node, IReadableNode? parent) =>
-        ReferenceEquals(node, parent) || parent != null && ContainsAncestor(node, parent.GetParent());
-
     #endregion
-
-    private void SetLink<T>(List<T> children, IWritableNode node, Feature link) where T : class, IReadableNode
-    {
-        if (children.Count == 0)
-            return;
-
-        var single = link is Link { Multiple: false };
-        try
-        {
-            node.Set(link, single && children.Count == 1 ? children[0] : children);
-        } catch (InvalidValueException)
-        {
-            List<T>? replacement = Handler.InvalidLinkValue(children, link, node);
-            if (replacement != null)
-                node.Set(link, single ? replacement.FirstOrDefault() : replacement);
-        }
-    }
 
     #region References
 
@@ -121,36 +82,7 @@ public partial class Deserializer
         if (!_referencesByOwnerId.TryGetValue(compressedId, out var references))
             return;
 
-        IWritableNode node = _deserializedNodesById[compressedId];
-        foreach ((var compressedMetaPointer, var targetEntries) in references)
-        {
-            var reference = _deserializerMetaInfo.FindFeature<Reference>(node, compressedMetaPointer);
-            if (reference == null)
-                continue;
-
-            List<IReadableNode> targets = targetEntries
-                .Select(target => FindReferenceTarget(node, reference, target.Item1, target.Item2))
-                .Where(c => c != null)
-                .ToList()!;
-
-            SetLink(targets, node, reference);
-        }
-    }
-
-    private IReadableNode? FindReferenceTarget(IWritableNode node, Feature reference, CompressedId? targetId,
-        string? resolveInfo)
-    {
-        if (targetId is not null)
-        {
-            var tid = (CompressedId)targetId;
-            if (_deserializedNodesById.TryGetValue(tid, out var ownNode))
-                return ownNode;
-
-            if (_dependentNodesById.TryGetValue(tid, out var dependentNode))
-                return dependentNode;
-        }
-
-        return Handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
+        InstallReferences(compressedId, references);
     }
 
     #endregion

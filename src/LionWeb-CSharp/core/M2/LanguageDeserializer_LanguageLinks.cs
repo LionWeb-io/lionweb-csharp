@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M2;
 
-using M1;
 using M3;
 using Serialization;
 using Utilities;
@@ -28,19 +27,37 @@ public partial class LanguageDeserializer
     {
         foreach (var serializedNode in _serializedNodesById.Values.Where(IsLanguageNode))
         {
-            InstallContainments(serializedNode);
-            InstallReferences(serializedNode);
+            InstallLanguageContainments(serializedNode);
+            InstallLanguageReferences(serializedNode);
+        }
+
+        foreach (var language in _deserializedNodesById.Values.OfType<Language>())
+        {
+            _deserializerMetaInfo.RegisterInstantiatedLanguage(language, language.GetFactory());
         }
     }
 
-    private void InstallContainments(SerializedNode serializedNode)
+    private void InstallLanguageContainments(SerializedNode serializedNode)
     {
-        var node = _deserializedNodesById[Compress(serializedNode.Id)];
+        if (!_deserializedNodesById.TryGetValue(Compress(serializedNode.Id), out var node))
+            return;
 
-        ILookup<CompressedMetaPointer, IKeyed> serializedContainmentsLookup = serializedNode
+        ILookup<string, IKeyed> serializedContainmentsLookup = serializedNode
             .Containments
-            .SelectMany(containment => containment.Children.Select(child => (containment, child)))
-            .ToLookup(pair => Compress(pair.containment.Containment), pair => LookupNode<IKeyed>(pair.child));
+            .SelectMany(containment => containment
+                .Children
+                .Select(child => (containment.Containment, child))
+            )
+            .ToLookup(
+                pair => pair.Containment.Key,
+                pair =>
+                {
+                    var compressedId = Compress(pair.child);
+                    return (IKeyed)(_deserializedNodesById.TryGetValue(compressedId, out var deserialized)
+                        ? deserialized
+                        : _dependentNodesById[compressedId]);
+                }
+            );
 
         if (serializedContainmentsLookup.Count == 0)
             return;
@@ -58,18 +75,6 @@ public partial class LanguageDeserializer
                 return;
             case DynamicEnumerationLiteral or DynamicPrimitiveType or DynamicFeature:
                 return;
-            case IWritableNode writable:
-                foreach (var grouping in serializedContainmentsLookup)
-                {
-                    var feature = _deserializerMetaInfo.FindFeature<Containment>(writable, grouping.Key);
-                    if (feature == null)
-                        continue;
-
-                    writable.Set(feature, ToIEnumerable(grouping.GetEnumerator()));
-                }
-
-                return;
-
             default:
                 Handler.InvalidContainment(node);
                 return;
@@ -77,33 +82,30 @@ public partial class LanguageDeserializer
 
         IEnumerable<T> Lookup<T>(Containment containment) where T : class
         {
-            var compressedMetaPointer = Compress(containment.ToMetaPointer());
-            if (serializedContainmentsLookup.Contains(compressedMetaPointer))
-                return serializedContainmentsLookup[compressedMetaPointer].Cast<T>();
+            if (serializedContainmentsLookup.Contains(containment.Key))
+                return serializedContainmentsLookup[containment.Key].Cast<T>();
 
             var serializedContainment =
                 serializedNode.Containments.FirstOrDefault(c => c.Containment.Matches(containment));
             if (serializedContainment == null)
                 return [];
 
-            return serializedContainment.Children.Select(c =>
-            {
-                var targetNode = Handler.UnresolvableChild(Compress(c), containment, (IWritableNode)node);
-                if (targetNode is T result)
-                    return result;
-                return null;
-            }).Where(t => t != null)!;
+            return serializedContainment.Children
+                .Select(c => Handler.UnresolvableChild(Compress(c), containment, node) as T)
+                .Where(t => t != null)!;
         }
     }
 
-    private void InstallReferences(SerializedNode serializedNode)
+    private void InstallLanguageReferences(SerializedNode serializedNode)
     {
-        var node = _deserializedNodesById[Compress(serializedNode.Id)];
-        ILookup<CompressedMetaPointer, IKeyed?> serializedReferencesLookup = serializedNode
+        if (!_deserializedNodesById.TryGetValue(Compress(serializedNode.Id), out var node))
+            return;
+
+        ILookup<string, IKeyed?> serializedReferencesLookup = serializedNode
             .References
             .SelectMany(reference => reference.Targets.Select(target => (reference, target)))
-            .ToLookup(pair => Compress(pair.reference.Reference),
-                pair => pair.target.Reference != null ? LookupNode<IKeyed>(pair.target.Reference) : null);
+            .ToLookup(pair => pair.reference.Reference.Key,
+                pair => FindReferenceTarget(CompressOpt(pair.target.Reference), pair.target.ResolveInfo) as IKeyed);
 
         if (serializedReferencesLookup.Count == 0)
             return;
@@ -116,7 +118,7 @@ public partial class LanguageDeserializer
             case DynamicAnnotation annotation:
                 annotation.Extends = LookupSingle<Annotation>(_m3.Annotation_extends);
                 annotation.AddImplements(LookupFilteredInterfaces(_m3.Annotation_implements, annotation.Implements));
-                annotation.Annotates = LookupSingle<Classifier>(_m3.Annotation_annotates);
+                annotation.Annotates = LookupSingle<Classifier>(_m3.Annotation_annotates)!;
                 return;
             case DynamicConcept concept:
                 concept.Extends = LookupSingle<Concept>(_m3.Concept_extends);
@@ -126,23 +128,12 @@ public partial class LanguageDeserializer
                 @interface.AddExtends(LookupFilteredInterfaces(_m3.Interface_extends, @interface.Extends));
                 return;
             case DynamicLink link:
-                link.Type = LookupSingle<Classifier>(_m3.Link_type);
+                link.Type = LookupSingle<Classifier>(_m3.Link_type)!;
                 return;
             case DynamicProperty property:
-                property.Type = LookupSingle<Datatype>(_m3.Property_type);
+                property.Type = LookupSingle<Datatype>(_m3.Property_type)!;
                 return;
             case DynamicEnumeration or DynamicEnumerationLiteral or DynamicPrimitiveType:
-                return;
-            case IWritableNode writable:
-                foreach (var grouping in serializedReferencesLookup)
-                {
-                    var feature = _deserializerMetaInfo.FindFeature<Reference>(writable, grouping.Key);
-                    if (feature == null)
-                        continue;
-
-                    writable.Set(feature, ToIEnumerable(grouping.GetEnumerator()));
-                }
-
                 return;
 
             default:
@@ -152,10 +143,9 @@ public partial class LanguageDeserializer
 
         T? LookupSingle<T>(Reference reference) where T : class
         {
-            var compressedMetaPointer = Compress(reference.ToMetaPointer());
-            if (serializedReferencesLookup.Contains(compressedMetaPointer))
+            if (serializedReferencesLookup.Contains(reference.Key))
             {
-                var elements = serializedReferencesLookup[compressedMetaPointer].ToList();
+                var elements = serializedReferencesLookup[reference.Key].ToList();
                 if (elements.Count == 1)
                     return elements.Cast<T>().First();
             }
@@ -175,9 +165,8 @@ public partial class LanguageDeserializer
 
         IEnumerable<T> LookupMulti<T>(Reference reference) where T : class
         {
-            var compressedMetaPointer = Compress(reference.ToMetaPointer());
-            if (serializedReferencesLookup.Contains(compressedMetaPointer))
-                return serializedReferencesLookup[compressedMetaPointer].Cast<T>();
+            if (serializedReferencesLookup.Contains(reference.Key))
+                return serializedReferencesLookup[reference.Key].Cast<T>();
 
             var serializedReference = FindSerializedReference(reference);
             if (serializedReference == null)
@@ -187,34 +176,16 @@ public partial class LanguageDeserializer
         }
 
         IEnumerable<Interface> LookupFilteredInterfaces(Reference reference, IEnumerable<Interface> linkedInterfaces) =>
-            LookupMulti<Interface>(reference).Except(linkedInterfaces, new LanguageEntityIdentityComparer())
+            LookupMulti<Interface>(reference)
+                .Except(linkedInterfaces, new LanguageEntityIdentityComparer())
                 .OfType<Interface>();
 
         SerializedReference? FindSerializedReference(Reference reference) =>
-            serializedNode.References.FirstOrDefault(r => r.Reference.Matches(reference));
+            serializedNode.References
+                .FirstOrDefault(r => r.Reference.Matches(reference));
 
-        T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class
-        {
-            var targetNode =
-                Handler.UnresolvableReferenceTarget(target.Reference != null ? Compress(target.Reference) : null,
-                    target.ResolveInfo, reference, (IWritableNode)node);
-            if (targetNode is T result)
-                return result;
-            return null;
-        }
-    }
-
-    private IEnumerable<T> ToIEnumerable<T>(IEnumerator<T> enumerator)
-    {
-        using (enumerator)
-        {
-            while (enumerator.MoveNext())
-            {
-                var result = enumerator.Current;
-                if (result == null)
-                    continue;
-                yield return result;
-            }
-        }
+        T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class =>
+            Handler.UnresolvableReferenceTarget(CompressOpt(target.Reference), target.ResolveInfo, reference,
+                (IWritableNode)node) as T;
     }
 }

@@ -15,18 +15,19 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable SuggestVarOrType_Elsewhere
-
 namespace LionWeb_CSharp_Test.tests;
 
 using Examples.Shapes.Dynamic;
 using languages;
+using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 
 [TestClass]
 public class AllSpecializationsTests
 {
+    private static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
+
     [TestMethod]
     public void Interface()
     {
@@ -212,7 +213,7 @@ public class AllSpecializationsTests
     {
         Language lang = ShapesDynamic.Language;
 
-        var actual = BuiltInsLanguage.Instance.INamed.AllSpecializations([lang, InvalidLanguage.Language]);
+        var actual = _builtIns.INamed.AllSpecializations([lang, InvalidLanguage.Language]);
 
         CollectionAssert.AreEquivalent(new List<Classifier>
         {

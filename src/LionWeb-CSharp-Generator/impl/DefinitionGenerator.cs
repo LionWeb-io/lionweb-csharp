@@ -19,7 +19,7 @@
 
 namespace LionWeb.CSharp.Generator.Impl;
 
-using Core.M2;
+using Core;
 using Core.M3;
 using Core.Utilities;
 using Microsoft.CodeAnalysis;
@@ -30,25 +30,29 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 // use https://roslynquoter.azurewebsites.net/ to learn how to build C# ASTs
 
-public class DefinitionGenerator(INames names) : GeneratorBase(names)
+public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
 {
-    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>();
+    private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
 
-    private IEnumerable<Classifier> Classifiers => Language.Entities.OfType<Classifier>();
+    private IEnumerable<Classifier> Classifiers => Language.Entities.OfType<Classifier>().Ordered();
 
-    private IEnumerable<StructuredDataType> StructuredDataTypes => Language.Entities.OfType<StructuredDataType>();
+    private IEnumerable<StructuredDataType> StructuredDataTypes => Language.Entities.OfType<StructuredDataType>().Ordered();
     public CompilationUnitSyntax DefinitionFile() =>
         CompilationUnit()
             .WithMembers(List<MemberDeclarationSyntax>([
                     FileScopedNamespaceDeclaration(ParseName(_names.NamespaceName))
                         .WithNamespaceKeyword(Prelude())
                         .WithMembers(List(
-                            new List<MemberDeclarationSyntax> { new LanguageGenerator(_names).LanguageClass() }
-                                .Concat(new FactoryGenerator(_names).FactoryTypes())
+                            new List<MemberDeclarationSyntax>
+                                {
+                                    new LanguageGenerator(_names, _lionWebVersion).LanguageClass()
+                                }
+                                .Concat(new FactoryGenerator(_names, _lionWebVersion).FactoryTypes())
                                 .Concat(Classifiers.Select(
-                                    c => new ClassifierGenerator(c, _names).ClassifierType()))
-                                .Concat(Enumerations.Select(e => new EnumGenerator(e, _names).EnumType()))
-                                .Concat(StructuredDataTypes.Select(s => new StructuredDataTypeGenerator(s, _names).SdtType()))
+                                    c => new ClassifierGenerator(c, _names, _lionWebVersion).ClassifierType()))
+                                .Concat(Enumerations.Select(e =>
+                                    new EnumGenerator(e, _names, _lionWebVersion).EnumType()))
+                                .Concat(StructuredDataTypes.Select(s => new StructuredDataTypeGenerator(s, _names, _lionWebVersion).SdtType()))
                         ))
                         .WithUsings(List(CollectUsings()))
                 ])
@@ -77,7 +81,7 @@ public class DefinitionGenerator(INames names) : GeneratorBase(names)
             .Select(t => t.Namespace)
             .Where(n => n != null)
             .Prepend(typeof(EqualityExtensions).Namespace)
-            .Prepend(typeof(BuiltInsLanguage).Namespace)
+            .Prepend(_builtIns.GetType().Namespace)
             .Distinct()
             .Order()
             .Select(n => UsingDirective(ParseName(n)))
@@ -85,7 +89,7 @@ public class DefinitionGenerator(INames names) : GeneratorBase(names)
             .ToArray();
 
     private IEnumerable<UsingDirectiveSyntax> PrimitiveTypesAsUsings() =>
-        Language.Entities.OfType<PrimitiveType>().Select(p =>
+        Language.Entities.OfType<PrimitiveType>().Ordered().Select(p =>
             UsingDirective(
                 NameEquals(IdentifierName(p.Name)),
                 AsType(typeof(string))

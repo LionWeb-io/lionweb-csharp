@@ -227,7 +227,7 @@ public interface Language : IKeyed
     /// <summary>
     /// Other languages that define <see cref="LanguageEntity">LanguageEntities</see> that this language depends on.
     /// </summary>
-    IReadOnlyList<Language> DependsOn { get; }
+    public IReadOnlyList<Language> DependsOn { get; }
 
     /// <summary>
     /// Returns a node factory, capable of creating instances of this language's <see cref="Classifier">Classifiers</see>.
@@ -235,14 +235,24 @@ public interface Language : IKeyed
     /// </summary>
     /// <returns>A node factory, capable of creating instances of this language's <see cref="Classifier">Classifiers</see>.</returns>
     public INodeFactory GetFactory();
+    
+    public void SetFactory(INodeFactory factory);
+
+    public LionWebVersions LionWebVersion { get; }
 }
 
 /// <inheritdoc/>
-public interface Language<out T> : Language where T : INodeFactory
+public interface Language<T> : Language where T : INodeFactory
 {
     /// <inheritdoc/>
     INodeFactory Language.GetFactory() => GetFactory();
 
     /// <inheritdoc cref="Language.GetFactory"/>
     public new T GetFactory();
+
+    /// <inheritdoc />
+    void Language.SetFactory(INodeFactory factory) => SetFactory((T) factory);
+
+    /// <inheritdoc cref="Language.SetFactory"/>
+    public void SetFactory(T factory);
 }
