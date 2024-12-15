@@ -17,6 +17,7 @@
 
 namespace LionWeb.CSharp.Generator.Impl;
 
+using Core;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -27,16 +28,17 @@ using static AstExtensions;
 /// <summary>
 /// Generates Enumeration enums.
 /// </summary>
-public class EnumGenerator(Enumeration enumeration, INames names) : GeneratorBase(names)
+public class EnumGenerator(Enumeration enumeration, INames names, LionWebVersions lionWebVersion)
+    : GeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="EnumGenerator"/>
     public EnumDeclarationSyntax EnumType() =>
         EnumDeclaration(enumeration.Name)
             .WithAttributeLists(AsAttributes(
-                [
-                    MetaPointerAttribute(enumeration),
-                    ObsoleteAttribute(enumeration)
-                ]))
+            [
+                MetaPointerAttribute(enumeration),
+                ObsoleteAttribute(enumeration)
+            ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithMembers(SeparatedList(enumeration.Literals.Ordered().Select(Literal)));
 

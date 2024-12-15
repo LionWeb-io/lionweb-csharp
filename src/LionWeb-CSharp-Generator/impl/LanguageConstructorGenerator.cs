@@ -17,6 +17,7 @@
 
 namespace LionWeb.CSharp.Generator.Impl;
 
+using Core;
 using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -28,12 +29,16 @@ using Property = Core.M3.Property;
 /// <summary>
 /// Generates constructor of Language class.
 /// </summary>
-public class LanguageConstructorGenerator(INames names) : LanguageGeneratorBase(names)
+public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebVersion)
+    : LanguageGeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="LanguageConstructorGenerator"/>
     public ConstructorDeclarationSyntax GenConstructor() =>
         Constructor(LanguageName, Param("id", AsType(typeof(string))))
-            .WithInitializer(Initializer("id"))
+            .WithInitializer(Initializer(
+                "id",
+                $"{AsType(typeof(LionWebVersions))}.v{_lionWebVersion.VersionString.Replace('.', '_')}"
+            ))
             .WithBody(AsStatements(
                 Language.Entities.Ordered().SelectMany(EntityConstructorInitialization)
                     .Append(GenFactoryInitialization())
@@ -86,7 +91,7 @@ public class LanguageConstructorGenerator(INames names) : LanguageGeneratorBase(
     private (List<(string, ExpressionSyntax)>, TypeSyntax) EntityConstructorInitialization(Annotation annotation)
     {
         var result = KeyName(annotation);
-        result.Add(("AnnotatesLazy", NewLazy(AsProperty(annotation.Annotates ?? BuiltInsLanguage.Instance.Node))));
+        result.Add(("AnnotatesLazy", NewLazy(AsProperty(annotation.Annotates ?? _builtIns.Node))));
         result.AddRange(Extends(annotation.Extends));
         result.AddRange(Implements("ImplementsLazy", annotation.Implements));
         result.AddRange(Features(annotation));

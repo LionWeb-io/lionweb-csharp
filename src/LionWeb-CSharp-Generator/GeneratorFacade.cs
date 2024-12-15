@@ -17,6 +17,7 @@
 
 namespace LionWeb.CSharp.Generator;
 
+using Core;
 using Impl;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -46,7 +47,7 @@ public class GeneratorFacade
     {
         if (_compilationUnit == null)
         {
-            var generator = new DefinitionGenerator(Names);
+            var generator = new DefinitionGenerator(Names, LionWebVersion);
             _compilationUnit = generator.DefinitionFile();
         }
 
@@ -55,6 +56,9 @@ public class GeneratorFacade
 
     /// <inheritdoc cref="INames"/>
     public required INames Names { get; init; }
+
+    /// Version of LionWeb standard to use for generation.
+    public LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
 
     /// Stores the output of <see cref="Generate"/> to the file at <paramref name="path"/>.
     public void Persist(string path)

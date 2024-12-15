@@ -20,6 +20,7 @@ namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 using Examples.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 
@@ -29,11 +30,13 @@ using LionWeb.Core.Serialization;
 [TestClass]
 public class UnresolvableReferenceTargetTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     private class DeserializerHealingHandler(Func<CompressedId?, string?, Feature, IWritableNode, IReadableNode?> heal)
         : DeserializerExceptionHandler
     {
         public override IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo,
-            Feature reference, IWritableNode node) => heal(targetId, resolveInfo, reference, node);
+            Feature reference, IReadableNode node) => heal(targetId, resolveInfo, reference, (IWritableNode)node);
     }
 
     [TestMethod]
@@ -41,7 +44,7 @@ public class UnresolvableReferenceTargetTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -89,7 +92,7 @@ public class UnresolvableReferenceTargetTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -142,7 +145,7 @@ public class UnresolvableReferenceTargetTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }
@@ -195,7 +198,7 @@ public class UnresolvableReferenceTargetTests
     {
         var serializationChunk = new SerializationChunk
         {
-            SerializationFormatVersion = ReleaseVersion.Current,
+            SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
                 new SerializedLanguageReference { Key = "key-Shapes", Version = "1" }

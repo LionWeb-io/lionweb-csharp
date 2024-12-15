@@ -17,9 +17,9 @@
 
 namespace LionWeb.CSharp.Generator.Impl;
 
+using Core;
 using Core.M2;
 using Core.M3;
-using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -30,7 +30,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 public abstract class LanguageGeneratorBase : GeneratorBase
 {
     /// <inheritdoc cref="LanguageGeneratorBase"/>
-    protected LanguageGeneratorBase(INames names) : base(names) { }
+    protected LanguageGeneratorBase(INames names, LionWebVersions lionWebVersion) : base(names, lionWebVersion) { }
 
     /// <inheritdoc cref="INames.LanguageName"/>
     protected string LanguageName => _names.LanguageName(_names.Language);
@@ -51,28 +51,9 @@ public abstract class LanguageGeneratorBase : GeneratorBase
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.LanguageEntity)"/>
     protected ExpressionSyntax AsProperty(LanguageEntity entity)
     {
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.Node))
-            return ParseExpression("BuiltInsLanguage.Instance.Node");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.INamed))
-            return ParseExpression("BuiltInsLanguage.Instance.INamed");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.Boolean))
-            return ParseExpression("BuiltInsLanguage.Instance.Boolean");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.Integer))
-            return ParseExpression("BuiltInsLanguage.Instance.Integer");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.Json))
-            return ParseExpression("BuiltInsLanguage.Instance.Json");
-        if (entity.EqualsIdentity(BuiltInsLanguage.Instance.String))
-            return ParseExpression("BuiltInsLanguage.Instance.String");
-        if (entity.EqualsIdentity(M3Language.Instance.IKeyed))
-            return ParseExpression("M3Language.Instance.IKeyed");
-        if (entity.EqualsIdentity(M3Language.Instance.Classifier))
-            return ParseExpression("M3Language.Instance.Classifier");
-        if (entity.EqualsIdentity(M3Language.Instance.Concept))
-            return ParseExpression("M3Language.Instance.Concept");
-        if (entity.EqualsIdentity(M3Language.Instance.Annotation))
-            return ParseExpression("M3Language.Instance.Annotation");
-        if (entity.EqualsIdentity(M3Language.Instance.Interface))
-            return ParseExpression("M3Language.Instance.Interface");
+        var result = VersionSpecifics.AsProperty(entity);
+        if (result != null)
+            return result;
 
         if (_names.NamespaceMappings.ContainsKey(entity.GetLanguage()))
         {
@@ -85,6 +66,10 @@ public abstract class LanguageGeneratorBase : GeneratorBase
 
         return _names.AsProperty(entity);
     }
+
+    /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
+    protected IGeneratorVersionSpecifics VersionSpecifics =>
+        new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_lionWebVersion)).Value;
 
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.EnumerationLiteral)"/>
     protected IdentifierNameSyntax AsProperty(EnumerationLiteral literal) =>

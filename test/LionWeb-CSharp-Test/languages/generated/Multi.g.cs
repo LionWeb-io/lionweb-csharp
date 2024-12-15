@@ -9,6 +9,7 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
 
@@ -16,7 +17,7 @@ using System.Collections.Generic;
 public partial class MultiLanguage : LanguageBase<IMultiFactory>
 {
 	public static readonly MultiLanguage Instance = new Lazy<MultiLanguage>(() => new("S9d8_7DajL2oOe1cqvXUGPGa3cWUF3bocmHgANb5bpM")).Value;
-	public MultiLanguage(string id) : base(id)
+	public MultiLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
 		_container = new(() => new ConceptBase<MultiLanguage>("qc3OObx7WI52EBnUJrrzWtbH9d3mXI7V6gTag7FZx0o", this) { Key = "Container", Name = "Container", Abstract = false, Partition = false, FeaturesLazy = new(() => [Container_libraries]) });
 		_container_libraries = new(() => new ContainmentBase<MultiLanguage>("60eh9gc18v-vyPc8t3zNGWKgKPQ8Pmu85RmAoWlSV8U", Container, this) { Key = "libraries", Name = "libraries", Optional = false, Multiple = true, Type = Examples.Library.M2.LibraryLanguage.Instance.Library });
@@ -26,7 +27,7 @@ public partial class MultiLanguage : LanguageBase<IMultiFactory>
 	/// <inheritdoc/>
         public override IReadOnlyList<LanguageEntity> Entities => [Container];
 	/// <inheritdoc/>
-        public override IReadOnlyList<Language> DependsOn => [Examples.Library.M2.LibraryLanguage.Instance, Examples.Library.M2.LibraryLanguage.Instance];
+        public override IReadOnlyList<Language> DependsOn => [Examples.Library.M2.LibraryLanguage.Instance];
 
 	private const string _key = "multi";
 	/// <inheritdoc/>

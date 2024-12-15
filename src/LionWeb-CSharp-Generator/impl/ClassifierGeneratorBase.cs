@@ -17,6 +17,7 @@
 
 namespace LionWeb.CSharp.Generator.Impl;
 
+using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
@@ -25,7 +26,8 @@ using Names;
 /// <summary>
 /// Common base class for all generators for concept/annotation classes and interface interfaces.
 /// </summary>
-public abstract class ClassifierGeneratorBase(INames names) : GeneratorBase(names)
+public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lionWebVersion)
+    : GeneratorBase(names, lionWebVersion)
 {
     /// <summary>
     /// Required by <see cref="UniqueFeatureNames"/> to 

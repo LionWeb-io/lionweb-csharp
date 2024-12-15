@@ -17,12 +17,16 @@
 
 namespace LionWeb_CSharp_Test.languages;
 
+using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 
 public static class InvalidLanguage
 {
-    public static readonly DynamicLanguage Language = new("id-Invalid")
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.BuiltIns;
+
+    public static readonly DynamicLanguage Language = new("id-Invalid", _lionWebVersion)
     {
         Key = "key-Invalid", Name = "InvalidLanguage", Version = "a-_1"
     };
@@ -41,7 +45,7 @@ public static class InvalidLanguage
         var IJ = Language.Interface("id-IJ", "key-IJ", "IJ");
         var IK = Language.Interface("id-IK", "key-IK", "IK");
         var IL = Language.Interface("id-IL", "key-IL", "IL");
-        
+
         var ValidI0 = Language.Interface("id-ValidI0", "key-ValidI0", "ValidI0");
         var ValidI1 = Language.Interface("id-ValidI1", "key-ValidI1", "ValidI1");
         var ValidI2 = Language.Interface("id-ValidI2", "key-ValidI2", "ValidI2");
@@ -89,17 +93,17 @@ public static class InvalidLanguage
         ID.Extending(IE);
         IE.Extending(IC);
 
-        IC.Property("id-IC-propA", "key-IC-propA", "propA").OfType(BuiltInsLanguage.Instance.String);
-        ID.Property("id-ID-propA", "key-ID-propA", "propA").OfType(BuiltInsLanguage.Instance.String);
-        IE.Property("id-IE-propA", "key-IE-propA", "propA").OfType(BuiltInsLanguage.Instance.Boolean);
-        
+        IC.Property("id-IC-propA", "key-IC-propA", "propA").OfType(_builtIns.String);
+        ID.Property("id-ID-propA", "key-ID-propA", "propA").OfType(_builtIns.String);
+        IE.Property("id-IE-propA", "key-IE-propA", "propA").OfType(_builtIns.Boolean);
+
         // secondary direct interface circle:
         // F -> G
         // H -> G -> H
         IF.Extending(IG);
         IH.Extending(IG);
         IG.Extending(IH);
-        
+
         // diamond interface circle:
         // I -> J -> K -> I
         // I -> L -> K
@@ -108,7 +112,7 @@ public static class InvalidLanguage
         II.Extending(IL);
         IL.Extending(IK);
         IK.Extending(II);
-        
+
         // valid interface diamond:
         // 0 -> 1 -> 2
         // 0 -> 3 -> 2
@@ -116,7 +120,7 @@ public static class InvalidLanguage
         ValidI1.Extending(ValidI2);
         ValidI0.Extending(ValidI3);
         ValidI3.Extending(ValidI2);
-        
+
         // valid interface with two generalizations:
         // 7 -> 5
         // 7 -> 6
@@ -147,7 +151,7 @@ public static class InvalidLanguage
         // CF -> IL -> IK
         CF.Implementing(IJ);
         CF.Implementing(IL);
-        
+
         // valid concept line tapping into interface diamond:
         // C0 -> C1 -> C2 -> I0 -> I1 -> I2
         // C1 -> I3 -> I2
@@ -155,13 +159,13 @@ public static class InvalidLanguage
         ValidC1.Extending(ValidC2);
         ValidC2.Implementing(ValidI0);
         ValidC1.Implementing(ValidI3);
-        
+
         // Valid concept with multiple interfaces:
         // C4 -> I5
         // C4 -> I6
         ValidC4.Implementing(ValidI5);
         ValidC4.Implementing(ValidI6);
-        
+
         // Kind-of-valid concept with multiple interfaces, implementing the same interface twice:
         // C5 -> I5
         // C5 -> I6
@@ -169,7 +173,7 @@ public static class InvalidLanguage
         C5.Implementing(ValidI5);
         C5.Implementing(ValidI6);
         C5.Implementing(ValidI5);
-        
+
         // direct annotation circle:
         // A <-> B
         AA.Extending(AB);
@@ -204,7 +208,7 @@ public static class InvalidLanguage
         // A4 -> I6
         ValidA4.Implementing(ValidI5);
         ValidA4.Implementing(ValidI6);
-        
+
         // Kind-of-valid annotation with multiple interfaces, implementing the same interface twice:
         // A5 -> I5
         // A5 -> I6

@@ -15,10 +15,6 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable ReturnTypeCanBeEnumerable.Global
-// ReSharper disable MemberCanBePrivate.Global
-// ReSharper disable SuggestVarOrType_SimpleTypes
-
 namespace LionWeb.Core.Utilities;
 
 using M1;
@@ -567,7 +563,7 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     private bool ContainsDeep(IList<IReadableNode?> list, IReadableNode target)
     {
         var allNodes = list.OfType<IReadableNode>()
-            .SelectMany(n => M1Extensions.Descendants<IReadableNode>(n, [], true, true)).ToList();
+            .SelectMany(n => M1Extensions.Descendants(n, true, true)).ToList();
         return allNodes.Contains(target);
     }
 

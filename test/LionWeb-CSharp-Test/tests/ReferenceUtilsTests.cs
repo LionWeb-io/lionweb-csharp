@@ -15,8 +15,6 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable SuggestVarOrType_SimpleTypes
-// ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 
 namespace LionWeb_CSharp_Test.tests;

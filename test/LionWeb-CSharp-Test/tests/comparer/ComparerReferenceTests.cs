@@ -16,12 +16,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable InconsistentNaming
-// ReSharper disable SuggestVarOrType_SimpleTypes
 
 namespace LionWeb.Utils.Tests.Comparer;
 
-using Core.M2;
-using Core.M3;
 using Core.Utilities;
 
 [TestClass]
@@ -95,7 +92,7 @@ public class ComparerReferenceTests : ComparerTestsBase
         var parent = new NodeDifference(leftSource, rightSource);
         AreDifferent([left, leftSource], [right, rightSource],
             parent,
-            new PropertyValueDifference(leftSource, "hi", BuiltInsLanguage.Instance.INamed_name, rightSource, "bye")
+            new PropertyValueDifference(leftSource, "hi", _builtIns.INamed_name, rightSource, "bye")
             {
                 Parent = parent
             }
@@ -142,7 +139,7 @@ public class ComparerReferenceTests : ComparerTestsBase
         var parentB = new ReferenceDifference(leftA, leftOffsetDuplicateSource, rightA) { Parent = parentA };
         var parentC = new NodeDifference(leftSource, rightB);
         var parentD = new NodeDifference(leftB, rightSource);
-        var namedName = BuiltInsLanguage.Instance.INamed_name;
+        var namedName = _builtIns.INamed_name;
         AreDifferent([leftA, leftSource, leftB], [rightA, rightB, rightSource],
             parentA,
             parentB,

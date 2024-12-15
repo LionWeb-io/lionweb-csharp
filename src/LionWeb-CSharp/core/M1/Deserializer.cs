@@ -36,16 +36,14 @@ public partial class Deserializer : DeserializerBase<IWritableNode>
     /// 
     /// * Don't make any assumptions on feature validity. Rather, call <see cref="IWritableNode.Set"/>, let it decide, and react on exceptions.
     ///   Rationale: Different implementations might accept different levels of "broken" nodes. 
-    
     private readonly Dictionary<CompressedId, List<CompressedContainment>> _containmentsByOwnerId = new();
+
     private readonly Dictionary<CompressedId, List<CompressedReference>> _referencesByOwnerId = new();
     private readonly Dictionary<CompressedId, List<CompressedId>> _annotationsByOwnerId = new();
 
-    /// <summary>
-    /// TODO
-    /// </summary>
-    public Deserializer()
+    /// <inheritdoc />
+    public Deserializer(IDeserializerVersionSpecifics versionSpecifics) : base(versionSpecifics)
     {
-        RegisterInstantiatedLanguage(BuiltInsLanguage.Instance, BuiltInsLanguage.Instance.GetFactory());
+        versionSpecifics.RegisterBuiltins(this);
     }
 }

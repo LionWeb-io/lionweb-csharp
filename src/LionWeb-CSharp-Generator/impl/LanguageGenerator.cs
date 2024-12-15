@@ -17,6 +17,7 @@
 
 namespace LionWeb.CSharp.Generator.Impl;
 
+using Core;
 using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
@@ -47,7 +48,7 @@ using Property = Core.M3.Property;
 /// - EnumerationLiteral properties
 /// </summary>
 /// <seealso cref="LanguageConstructorGenerator"/>
-public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
+public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : LanguageGeneratorBase(names, lionWebVersion)
 {
     private IdentifierNameSyntax FactoryInterfaceType => _names.FactoryInterfaceType;
 
@@ -65,7 +66,7 @@ public class LanguageGenerator(INames names) : LanguageGeneratorBase(names)
             .WithMembers(List(new List<MemberDeclarationSyntax>
                 {
                     GenLanguageInstance(),
-                    new LanguageConstructorGenerator(_names).GenConstructor(),
+                    new LanguageConstructorGenerator(_names, _lionWebVersion).GenConstructor(),
                     GenEntities(),
                     GenDependsOn()
                 }

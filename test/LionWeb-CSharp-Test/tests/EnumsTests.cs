@@ -29,6 +29,7 @@ public class EnumsTests
 {
     private readonly Language _language;
     private readonly WithEnumFactory _factory;
+    private readonly LionWebVersions _lionWebVersions = LionWebVersions.Current;
 
     public EnumsTests()
     {
@@ -54,17 +55,17 @@ public class EnumsTests
     public void RoundtripSerializationOfModelWithEnum()
     {
         var nodes = new[] { Model() };
-        var chunk = Serializer.SerializeToChunk(nodes);
+        var chunk = new Serializer(_lionWebVersions).SerializeToChunk(nodes);
         Console.WriteLine(JsonUtils.WriteJsonToString(chunk));
         Assert.AreEqual("lit1", chunk.Nodes[0].Properties[0].Value);
 
         var deserialization = new DeserializerBuilder()
-                .WithLanguage(_language)
-                .Build()
+            .WithLanguage(_language)
+            .Build()
             .Deserialize(chunk);
         Assert.AreEqual(MyEnum.literal1, (deserialization[0] as EnumHolder).EnumValue);
 
-        var reserialization = Serializer.SerializeToChunk(deserialization);
+        var reserialization = new Serializer(_lionWebVersions).SerializeToChunk(deserialization);
         Assert.AreEqual(JsonUtils.WriteJsonToString(chunk), JsonUtils.WriteJsonToString(reserialization));
     }
 }

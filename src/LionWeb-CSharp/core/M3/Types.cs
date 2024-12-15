@@ -210,7 +210,7 @@ public interface Language : IKeyed
     /// <summary>
     /// Other languages that define <see cref="LanguageEntity">LanguageEntities</see> that this language depends on.
     /// </summary>
-    IReadOnlyList<Language> DependsOn { get; }
+    public IReadOnlyList<Language> DependsOn { get; }
 
     /// <summary>
     /// Returns a node factory, capable of creating instances of this language's <see cref="Classifier">Classifiers</see>.
@@ -220,6 +220,8 @@ public interface Language : IKeyed
     public INodeFactory GetFactory();
     
     public void SetFactory(INodeFactory factory);
+
+    public LionWebVersions LionWebVersion { get; }
 }
 
 /// <inheritdoc/>

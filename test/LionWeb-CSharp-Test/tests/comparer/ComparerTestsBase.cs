@@ -16,7 +16,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable InconsistentNaming
-// ReSharper disable SuggestVarOrType_SimpleTypes
 
 namespace LionWeb.Utils.Tests.Comparer;
 
@@ -24,7 +23,6 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
-using Examples.Shapes.Dynamic;
 using Examples.Shapes.M2;
 
 /// <summary>
@@ -35,6 +33,8 @@ using Examples.Shapes.M2;
 public abstract class ComparerTestsBase
 {
     private static readonly Language leftLanguage = ShapesLanguage.Instance;
+
+    protected static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
 
     protected static readonly ShapesFactory lF = leftLanguage.GetFactory() as ShapesFactory;
 
@@ -192,7 +192,7 @@ public static class ReflectiveShapesFactory
 static class ShapeNodeExtension
 {
     internal static void SetName(this INode node, string name) =>
-        node.Set(BuiltInsLanguage.Instance.INamed_name, name);
+        node.Set(LionWebVersions.Current.BuiltIns.INamed_name, name);
 
     internal static void SetX(this INode node, int x) =>
         node.Set(node.GetClassifier().FeatureByKey("key-x"), x);

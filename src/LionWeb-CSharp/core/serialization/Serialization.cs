@@ -28,7 +28,8 @@ public record SerializationChunk
     public required SerializedNode[] Nodes { get; init; }
 }
 
-public record SerializedLanguageReference {
+public record SerializedLanguageReference
+{
     public required string Key { get; set; }
     public required string Version { get; set; }
 }
@@ -58,12 +59,14 @@ public record SerializedContainment
     public required string[] Children { get; init; }
 }
 
-public record SerializedReferenceTarget {
+public record SerializedReferenceTarget
+{
     public string? ResolveInfo { get; init; }
     public string? Reference { get; init; }
 }
 
-public record SerializedReference {
+public record SerializedReference
+{
     public required MetaPointer Reference { get; init; }
     public required SerializedReferenceTarget[] Targets { get; init; }
 }

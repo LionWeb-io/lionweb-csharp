@@ -36,8 +36,8 @@ using static AstExtensions;
 /// <seealso cref="FeatureMethodsGenerator"/>
 /// <seealso cref="ContainmentMethodsGenerator"/>
 /// <seealso cref="FeatureGenerator"/>
-public class ClassifierGenerator(Classifier classifier, INames names)
-    : ClassifierGeneratorBase(new UniqueFeatureNames(names))
+public class ClassifierGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion)
+    : ClassifierGeneratorBase(new UniqueFeatureNames(names), lionWebVersion)
 {
     /// <inheritdoc cref="ClassifierGenerator"/>
     public TypeDeclarationSyntax ClassifierType() =>
@@ -66,10 +66,10 @@ public class ClassifierGenerator(Classifier classifier, INames names)
             .WithModifiers(AsModifiers(modifiers.ToArray()))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(
-                FeaturesToImplement(classifier).SelectMany(f => new FeatureGenerator(classifier, f, _names).Members())
+                FeaturesToImplement(classifier).SelectMany(f => new FeatureGenerator(classifier, f, _names,_lionWebVersion).Members())
                     .Concat(new List<MemberDeclarationSyntax> { GenConstructor(), GenGetClassifier() })
-                    .Concat(new FeatureMethodsGenerator(classifier, _names).FeatureMethods())
-                    .Concat(new ContainmentMethodsGenerator(classifier, _names).ContainmentMethods())
+                    .Concat(new FeatureMethodsGenerator(classifier, _names,_lionWebVersion).FeatureMethods())
+                    .Concat(new ContainmentMethodsGenerator(classifier, _names,_lionWebVersion).ContainmentMethods())
             ));
 
         return AttachConceptDescription(decl);
@@ -130,7 +130,7 @@ public class ClassifierGenerator(Classifier classifier, INames names)
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.Ordered().SelectMany(f =>
-                new FeatureGenerator(classifier, f, _names).AbstractMembers())));
+                new FeatureGenerator(classifier, f, _names, _lionWebVersion).AbstractMembers())));
         return AttachConceptDescription(decl);
     }
 

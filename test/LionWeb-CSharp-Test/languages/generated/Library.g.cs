@@ -9,6 +9,7 @@ using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
 
@@ -16,25 +17,25 @@ using System.Collections.Generic;
 public partial class LibraryLanguage : LanguageBase<ILibraryFactory>
 {
 	public static readonly LibraryLanguage Instance = new Lazy<LibraryLanguage>(() => new("txjxNU9yRzEuyghtmgJK_l-nF93qWt7d1vErz5RbLow")).Value;
-	public LibraryLanguage(string id) : base(id)
+	public LibraryLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
 		_book = new(() => new ConceptBase<LibraryLanguage>("uEoqgTU-BImmpne9vdcqM-o2JWS8yGAveLounJcncVU", this) { Key = "Book", Name = "Book", Abstract = false, Partition = false, FeaturesLazy = new(() => [Book_author, Book_pages, Book_title, Book_type]) });
 		_book_author = new(() => new ReferenceBase<LibraryLanguage>("LGawCEgHtaqYxRhVWTlQSf6NuCpW5MDpi7QWLbGG3DM", Book, this) { Key = "author", Name = "author", Optional = false, Multiple = false, Type = Writer });
-		_book_pages = new(() => new PropertyBase<LibraryLanguage>("kGSV8eFs5WIxjUKXyNoBIDW7pL4gyszY2LHKmmzvegU", Book, this) { Key = "pages", Name = "pages", Optional = false, Type = BuiltInsLanguage.Instance.Integer });
-		_book_title = new(() => new PropertyBase<LibraryLanguage>("ydTFbSaxS3-iPy4Z0BXupobIaWIpdtL9c_WfbzpBeOw", Book, this) { Key = "title", Name = "title", Optional = false, Type = BuiltInsLanguage.Instance.String });
+		_book_pages = new(() => new PropertyBase<LibraryLanguage>("kGSV8eFs5WIxjUKXyNoBIDW7pL4gyszY2LHKmmzvegU", Book, this) { Key = "pages", Name = "pages", Optional = false, Type = _builtIns.Integer });
+		_book_title = new(() => new PropertyBase<LibraryLanguage>("ydTFbSaxS3-iPy4Z0BXupobIaWIpdtL9c_WfbzpBeOw", Book, this) { Key = "title", Name = "title", Optional = false, Type = _builtIns.String });
 		_book_type = new(() => new PropertyBase<LibraryLanguage>("cOLUxl-SXt_fm3d3FEBhf6XSdeNKo3N9iW7oJpDfx3k", Book, this) { Key = "type", Name = "type", Optional = true, Type = BookType });
 		_bookType = new(() => new EnumerationBase<LibraryLanguage>("6S4CvZSArQGBLCO7FvP8hXw2gMpIzIjXGGz6pyTy-rA", this) { Key = "BookType", Name = "BookType", LiteralsLazy = new(() => [BookType_Normal, BookType_Special]) });
 		_bookType_Normal = new(() => new EnumerationLiteralBase<LibraryLanguage>("I5CCX1NbCOzV2c_vtCJKrp0iHdqwYgNPeiQfLL4Gejg", BookType, this) { Key = "Normal", Name = "Normal" });
 		_bookType_Special = new(() => new EnumerationLiteralBase<LibraryLanguage>("U5NXStjkSAQJfuMgoi5zUDKJVbckzm_97dtBgm-AVLI", BookType, this) { Key = "Special", Name = "Special" });
 		_guideBookWriter = new(() => new ConceptBase<LibraryLanguage>("z4c4dBOvVtSw9UN9T3k5v608cRvRmBgqFIo3nyHo_QA", this) { Key = "GuideBookWriter", Name = "GuideBookWriter", Abstract = false, Partition = false, ExtendsLazy = new(() => Writer), FeaturesLazy = new(() => [GuideBookWriter_countries]) });
-		_guideBookWriter_countries = new(() => new PropertyBase<LibraryLanguage>("ajxn2_nvTlZaETaH5NBSdjg-4ecBXAz0PLI9ZISNtfo", GuideBookWriter, this) { Key = "countries", Name = "countries", Optional = false, Type = BuiltInsLanguage.Instance.String });
+		_guideBookWriter_countries = new(() => new PropertyBase<LibraryLanguage>("ajxn2_nvTlZaETaH5NBSdjg-4ecBXAz0PLI9ZISNtfo", GuideBookWriter, this) { Key = "countries", Name = "countries", Optional = false, Type = _builtIns.String });
 		_library = new(() => new ConceptBase<LibraryLanguage>("J3-V1k6rqq4Ml8qX_SuUOFhhjXoxLkHrt4mShDRJH1g", this) { Key = "Library", Name = "Library", Abstract = false, Partition = false, FeaturesLazy = new(() => [Library_books, Library_name]) });
 		_library_books = new(() => new ContainmentBase<LibraryLanguage>("ZAYPfVsZ-nRe7ICpRe_3LzKufog84Unh9qT4jpT4Izc", Library, this) { Key = "books", Name = "books", Optional = false, Multiple = true, Type = Book });
-		_library_name = new(() => new PropertyBase<LibraryLanguage>("Rfy7VBCRh_jJSNcJTaqprdD1YcQS0OnoCMXnbmLCm8Y", Library, this) { Key = "library_Library_name", Name = "name", Optional = false, Type = BuiltInsLanguage.Instance.String });
+		_library_name = new(() => new PropertyBase<LibraryLanguage>("Rfy7VBCRh_jJSNcJTaqprdD1YcQS0OnoCMXnbmLCm8Y", Library, this) { Key = "library_Library_name", Name = "name", Optional = false, Type = _builtIns.String });
 		_specialistBookWriter = new(() => new ConceptBase<LibraryLanguage>("rs6OGi3yUdrLwpsDHxfQOFx6cb1GsMDT8XzJhcVK988", this) { Key = "SpecialistBookWriter", Name = "SpecialistBookWriter", Abstract = false, Partition = false, ExtendsLazy = new(() => Writer), FeaturesLazy = new(() => [SpecialistBookWriter_subject]) });
-		_specialistBookWriter_subject = new(() => new PropertyBase<LibraryLanguage>("JH7BxhpDr9L7f6UBOKtFQBr0TV6r2nAK_6NajM1ij2Q", SpecialistBookWriter, this) { Key = "subject", Name = "subject", Optional = false, Type = BuiltInsLanguage.Instance.String });
+		_specialistBookWriter_subject = new(() => new PropertyBase<LibraryLanguage>("JH7BxhpDr9L7f6UBOKtFQBr0TV6r2nAK_6NajM1ij2Q", SpecialistBookWriter, this) { Key = "subject", Name = "subject", Optional = false, Type = _builtIns.String });
 		_writer = new(() => new ConceptBase<LibraryLanguage>("7GwNCVubFACsj8FdlnwwIOaPbJ-mLJ5UvU5EnZRjLds", this) { Key = "Writer", Name = "Writer", Abstract = false, Partition = false, FeaturesLazy = new(() => [Writer_name]) });
-		_writer_name = new(() => new PropertyBase<LibraryLanguage>("6ephvryVAYXE1bm1LDlUBl0Ib9MOGcM23RDej6kyuqo", Writer, this) { Key = "library_Writer_name", Name = "name", Optional = false, Type = BuiltInsLanguage.Instance.String });
+		_writer_name = new(() => new PropertyBase<LibraryLanguage>("6ephvryVAYXE1bm1LDlUBl0Ib9MOGcM23RDej6kyuqo", Writer, this) { Key = "library_Writer_name", Name = "name", Optional = false, Type = _builtIns.String });
 		_factory = new LibraryFactory(this);
 	}
 

@@ -117,7 +117,7 @@ public class ReflectiveBaseNodeFactory(Language language) : AbstractBaseNodeFact
 {
     /// <inheritdoc />
     public override INode CreateNode(string id, Classifier classifier) =>
-        FallbackCreateNode(id, classifier);
+        new DynamicNode(id, classifier);
 
     private readonly Dictionary<Enumeration, Type> _enums = [];
 

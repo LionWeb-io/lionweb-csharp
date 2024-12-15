@@ -17,6 +17,7 @@
 
 namespace LionWeb.CSharp.Generator.Impl;
 
+using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
@@ -34,10 +35,18 @@ public abstract class GeneratorBase
     /// <inheritdoc cref="INames"/>
     protected readonly INames _names;
 
+    protected readonly LionWebVersions _lionWebVersion;
+    protected readonly ILionCoreLanguage _m3;
+    protected readonly IBuiltInsLanguage _builtIns;
+
     /// <inheritdoc cref="GeneratorBase"/>
-    protected GeneratorBase(INames names)
+    protected GeneratorBase(INames names, LionWebVersions lionWebVersion)
     {
+        lionWebVersion.AssureCompatible(names.Language.LionWebVersion);
         _names = names;
+        _lionWebVersion = lionWebVersion;
+        _m3 = lionWebVersion.LionCore;
+        _builtIns = lionWebVersion.BuiltIns;
     }
 
     /// <inheritdoc cref="INames.Language"/>
@@ -79,8 +88,8 @@ public abstract class GeneratorBase
     /// <returns><c>MyLang.Instance.MyClassifier_MyFeature</c></returns>
     protected MemberAccessExpressionSyntax MetaProperty(Feature feature)
     {
-        if (BuiltInsLanguage.Instance.INamed_name.EqualsIdentity(feature))
-            return (MemberAccessExpressionSyntax)ParseExpression("BuiltInsLanguage.Instance.INamed_name");
+        if (_builtIns.INamed_name.EqualsIdentity(feature))
+            return (MemberAccessExpressionSyntax)ParseExpression("_builtIns.INamed_name");
 
         return MemberAccess(_names.MetaProperty(feature.GetLanguage()), _names.AsProperty(feature));
     }
@@ -90,8 +99,8 @@ public abstract class GeneratorBase
     {
         var languageName = keyed.GetLanguage() switch
         {
-            var l when l.EqualsIdentity(BuiltInsLanguage.Instance) => nameof(BuiltInsLanguage),
-            var l when l.EqualsIdentity(M3Language.Instance) => nameof(M3Language),
+            var l when l.EqualsIdentity(_builtIns) => _builtIns.GetType().FullName,
+            var l when l.EqualsIdentity(_m3) => _m3.GetType().FullName,
             var l => _names.AsType(l).ToString()
         };
 
