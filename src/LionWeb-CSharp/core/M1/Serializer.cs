@@ -28,8 +28,8 @@ using Utilities;
 public class Serializer : ISerializer
 {
     private readonly DuplicateIdChecker _duplicateIdChecker = new();
-    private ILionCoreLanguage _m3;
-    private IBuiltInsLanguage _builtIns;
+    private readonly ILionCoreLanguage _m3;
+    private readonly IBuiltInsLanguage _builtIns;
     private readonly HashSet<Language> _usedLanguages = new();
 
     /// <inheritdoc cref="ISerializer"/>
@@ -68,69 +68,33 @@ public class Serializer : ISerializer
         }
     }
 
+    private void RegisterUsedLanguage(Language language)
+    {
+        if (language.EqualsIdentity(_builtIns))
+            return;
+
+        Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.EqualsIdentity(language));
+        if (existingLanguage == null)
+        {
+            LionWebVersion.AssureCompatible(language);
+            _usedLanguages.Add(language);
+            return;
+        }
+
+        Language? altLanguage = Handler.DuplicateUsedLanguage(existingLanguage, language);
+        if (altLanguage != null)
+            _usedLanguages.Add(altLanguage);
+    }
+
     private SerializedNode? SerializeNode(IReadableNode node)
     {
         var id = node.GetId();
-        if (_duplicateIdChecker.IsIdDuplicate(Compress(id)))
-        {
-            Handler.DuplicateNodeId(node);
-            return null;
-        }
+        if (!_duplicateIdChecker.IsIdDuplicate(Compress(id)))
+            return SerializeSimpleNode(node);
 
-        return SerializeSimpleNode(node);
+        Handler.DuplicateNodeId(node);
+        return null;
     }
-
-    private SerializedLanguageReference SerializeLanguageReference(Language language) =>
-        new() { Key = language.Key, Version = language.Version };
-
-    private SerializedReferenceTarget SerializeReferenceTarget(IReadableNode target)
-    {
-        if (target is not IKeyed k)
-            return new SerializedReferenceTarget { Reference = target.GetId(), ResolveInfo = target.GetNodeName() };
-
-        var hostingLanguage = M1Extensions
-            .Ancestors(k, [], true)
-            .OfType<Language>()
-            .FirstOrDefault();
-
-        return hostingLanguage?.Key switch
-        {
-            ILionCoreLanguage.LanguageKey => new SerializedReferenceTarget
-            {
-                Reference = null, ResolveInfo = ConcatResolveInfo(target, ILionCoreLanguage.ResolveInfoPrefix),
-            },
-            IBuiltInsLanguage.LanguageKey => new SerializedReferenceTarget
-            {
-                Reference = null, ResolveInfo = ConcatResolveInfo(target, IBuiltInsLanguage.ResolveInfoPrefix),
-            },
-            _ => new SerializedReferenceTarget { Reference = target.GetId(), ResolveInfo = target.GetNodeName() }
-        };
-    }
-
-    private static string ConcatResolveInfo(IReadableNode target, string prefix) =>
-        prefix + target switch
-        {
-            Feature f => f.GetFeatureClassifier().Name,
-            _ => ""
-        } + ((IKeyed)target).Name;
-
-    private CompressedId Compress(string id) =>
-        CompressedId.Create(id, StoreUncompressedIds);
-
-    /// <summary>
-    /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
-    /// conforming to the LionWeb JSON serialization format.
-    /// 
-    /// <em>Note!</em> No exception is thrown when the given runtime value doesn't correspond to a primitive type defined here.
-    /// Instead, the runtime value is simply coerced to a string using its <c>ToString</c> method.
-    /// </summary>
-    private string? ConvertPrimitiveType(object? value) => value switch
-    {
-        null => null,
-        bool boolean => boolean ? "true" : "false",
-        string @string => @string,
-        _ => value.ToString()
-    };
 
     /// <remarks>
     /// Features with `string` or _value type_ values are treated as property.
@@ -139,7 +103,7 @@ public class Serializer : ISerializer
     /// If any feature still remaining, throws exception.
     /// Only annotations are treated as annotations.
     /// </remarks>
-    protected SerializedNode SerializeSimpleNode(IReadableNode node)
+    private SerializedNode SerializeSimpleNode(IReadableNode node)
     {
         Classifier classifier = ExtractClassifier(node);
 
@@ -202,6 +166,8 @@ public class Serializer : ISerializer
         _ => node.GetClassifier()
     };
 
+    #region Properties
+
     private Dictionary<Feature, object?> CollectProperties(Dictionary<Feature, object?> featureValues) =>
         featureValues
             .Where(pair => pair.Value is string
@@ -209,68 +175,6 @@ public class Serializer : ISerializer
                            || pair is { Key: Property, Value: null }
             )
             .ToDictionary();
-
-    private Dictionary<Feature, object?> CollectContainments(IReadableNode node,
-        Dictionary<Feature, object?> featureValues)
-    {
-        var containments = featureValues
-            .Where(pair =>
-                pair.Key is Containment
-                || (pair.Value is IReadableNode n && ReferenceEquals(n.GetParent(), node))
-                || (pair.Value is IEnumerable<IReadableNode> en && en.All(c => ReferenceEquals(c.GetParent(), node)))
-                || (pair.Value is IEnumerable e &&
-                    e.Cast<IReadableNode>().All(c => ReferenceEquals(c.GetParent(), node)))
-            )
-            .ToDictionary();
-        return containments;
-    }
-
-    private Dictionary<Feature, object?> CollectReferences(Dictionary<Feature, object?> featureValues)
-    {
-        var references = featureValues
-            .Where(pair => pair.Key is Reference
-                           || pair.Value is IReadableNode
-                           || (pair.Value is IEnumerable e && M2Extensions.AreAll<IReadableNode>(e))
-            )
-            .ToDictionary();
-        return references;
-    }
-
-    private class FeatureComparer : IEqualityComparer<Feature>
-    {
-        public bool Equals(Feature? x, Feature? y) =>
-            EqualityExtensions.Equals(x, y) || (IsLionCore(x) && IsLionCore(y) && x?.Key == y?.Key);
-
-        public int GetHashCode(Feature obj) =>
-            IsLionCore(obj) ? obj.Key.GetHashCode() : obj.GetHashCodeIdentity();
-
-        private bool IsLionCore(Feature? feature) =>
-            feature?.GetLanguage().Key is ILionCoreLanguage.LanguageKey or IBuiltInsLanguage.LanguageKey;
-    }
-
-    private IEnumerable<SerializedProperty> CollectUnsetProperties(IReadableNode node, ISet<Feature> allFeatures,
-        Dictionary<Feature, object?> properties) =>
-        allFeatures
-            .OfType<Property>()
-            .Except(properties.Keys, new FeatureComparer())
-            .Select(p => SerializeProperty(node, p, null));
-
-    private IEnumerable<SerializedContainment> CollectUnsetContainments(ISet<Feature> allFeatures,
-        Dictionary<Feature, object?> containments) =>
-        allFeatures
-            .OfType<Containment>()
-            .Except(containments.Keys, new FeatureComparer())
-            .Select<Feature, SerializedContainment>(c => SerializeContainment([], c));
-
-    private IEnumerable<SerializedReference> CollectUnsetReferences(ISet<Feature> allFeatures,
-        Dictionary<Feature, object?> references) =>
-        allFeatures
-            .OfType<Reference>()
-            .Except(references.Keys, new FeatureComparer())
-            .Select<Feature, SerializedReference>(c => SerializeReference([], c));
-
-    private IEnumerable<IReadableNode> AsNodes(KeyValuePair<Feature, object?> pair) =>
-        pair.Value != null ? M2Extensions.AsNodes<IReadableNode>(pair.Value) : [];
 
     private SerializedProperty SerializeProperty(IReadableNode node, Feature feature, object? value)
     {
@@ -290,6 +194,47 @@ public class Serializer : ISerializer
         };
     }
 
+    /// <summary>
+    /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
+    /// conforming to the LionWeb JSON serialization format.
+    /// 
+    /// <em>Note!</em> No exception is thrown when the given runtime value doesn't correspond to a primitive type defined here.
+    /// Instead, the runtime value is simply coerced to a string using its <c>ToString</c> method.
+    /// </summary>
+    private string? ConvertPrimitiveType(object? value) => value switch
+    {
+        null => null,
+        bool boolean => boolean ? "true" : "false",
+        string @string => @string,
+        _ => value.ToString()
+    };
+
+    private IEnumerable<SerializedProperty> CollectUnsetProperties(IReadableNode node, ISet<Feature> allFeatures,
+        Dictionary<Feature, object?> properties) =>
+        allFeatures
+            .OfType<Property>()
+            .Except(properties.Keys, new FeatureComparer())
+            .Select(p => SerializeProperty(node, p, null));
+
+    #endregion
+
+    #region Containments
+
+    private Dictionary<Feature, object?> CollectContainments(IReadableNode node,
+        Dictionary<Feature, object?> featureValues)
+    {
+        var containments = featureValues
+            .Where(pair =>
+                pair.Key is Containment
+                || (pair.Value is IReadableNode n && ReferenceEquals(n.GetParent(), node))
+                || (pair.Value is IEnumerable<IReadableNode> en && en.All(c => ReferenceEquals(c.GetParent(), node)))
+                || (pair.Value is IEnumerable e &&
+                    e.Cast<IReadableNode>().All(c => ReferenceEquals(c.GetParent(), node)))
+            )
+            .ToDictionary();
+        return containments;
+    }
+
     private SerializedContainment SerializeContainment(KeyValuePair<Feature, object?> pair) =>
         SerializeContainment(AsNodes(pair), pair.Key);
 
@@ -298,6 +243,28 @@ public class Serializer : ISerializer
         {
             Containment = containment.ToMetaPointer(), Children = children.Select(child => child.GetId()).ToArray()
         };
+
+    private IEnumerable<SerializedContainment> CollectUnsetContainments(ISet<Feature> allFeatures,
+        Dictionary<Feature, object?> containments) =>
+        allFeatures
+            .OfType<Containment>()
+            .Except(containments.Keys, new FeatureComparer())
+            .Select<Feature, SerializedContainment>(c => SerializeContainment([], c));
+
+    #endregion
+
+    #region References
+
+    private Dictionary<Feature, object?> CollectReferences(Dictionary<Feature, object?> featureValues)
+    {
+        var references = featureValues
+            .Where(pair => pair.Key is Reference
+                           || pair.Value is IReadableNode
+                           || (pair.Value is IEnumerable e && M2Extensions.AreAll<IReadableNode>(e))
+            )
+            .ToDictionary();
+        return references;
+    }
 
     private SerializedReference SerializeReference(KeyValuePair<Feature, object?> pair) =>
         SerializeReference(AsNodes(pair), pair.Key);
@@ -308,25 +275,72 @@ public class Serializer : ISerializer
             Reference = reference.ToMetaPointer(),
             Targets = targets.Where(t => t != null).Select(SerializeReferenceTarget!).ToArray()
         };
+    private SerializedReferenceTarget SerializeReferenceTarget(IReadableNode target)
+    {
+        if (target is not IKeyed k)
+            return new SerializedReferenceTarget { Reference = target.GetId(), ResolveInfo = target.GetNodeName() };
+
+        var hostingLanguage = M1Extensions
+            .Ancestors(k, true)
+            .OfType<Language>()
+            .FirstOrDefault();
+
+        return hostingLanguage?.Key switch
+        {
+            ILionCoreLanguage.LanguageKey => new SerializedReferenceTarget
+            {
+                Reference = null, ResolveInfo = ConcatResolveInfo(target, ILionCoreLanguage.ResolveInfoPrefix),
+            },
+            IBuiltInsLanguage.LanguageKey => new SerializedReferenceTarget
+            {
+                Reference = null, ResolveInfo = ConcatResolveInfo(target, IBuiltInsLanguage.ResolveInfoPrefix),
+            },
+            _ => new SerializedReferenceTarget { Reference = target.GetId(), ResolveInfo = target.GetNodeName() }
+        };
+    }
+
+    private static string ConcatResolveInfo(IReadableNode target, string prefix) =>
+        prefix + target switch
+        {
+            Feature f => f.GetFeatureClassifier().Name,
+            _ => ""
+        } + ((IKeyed)target).Name;
+
+    private IEnumerable<SerializedReference> CollectUnsetReferences(ISet<Feature> allFeatures,
+        Dictionary<Feature, object?> references) =>
+        allFeatures
+            .OfType<Reference>()
+            .Except(references.Keys, new FeatureComparer())
+            .Select<Feature, SerializedReference>(c => SerializeReference([], c));
+
+    #endregion
 
     private string SerializeAnnotationTarget(IReadableNode annotation) =>
         annotation.GetId();
 
-    private void RegisterUsedLanguage(Language language)
+    private SerializedLanguageReference SerializeLanguageReference(Language language) =>
+        new() { Key = language.Key, Version = language.Version };
+
+    #region Helpers
+
+    private CompressedId Compress(string id) =>
+        CompressedId.Create(id, StoreUncompressedIds);
+
+    /// Compares features with special handling for LionCore features (only compared by key).
+    private class FeatureComparer : IEqualityComparer<Feature>
     {
-        if (language.EqualsIdentity(_builtIns))
-            return;
+        public bool Equals(Feature? x, Feature? y) =>
+            EqualityExtensions.Equals(x, y) || (IsLionCore(x) && IsLionCore(y) && x?.Key == y?.Key);
 
-        Language? existingLanguage = _usedLanguages.FirstOrDefault(l => l != language && l.EqualsIdentity(language));
-        if (existingLanguage == null)
-        {
-            LionWebVersion.AssureCompatible(language);
-            _usedLanguages.Add(language);
-            return;
-        }
+        public int GetHashCode(Feature obj) =>
+            IsLionCore(obj) ? obj.Key.GetHashCode() : obj.GetHashCodeIdentity();
 
-        Language? altLanguage = Handler.DuplicateUsedLanguage(existingLanguage, language);
-        if (altLanguage != null)
-            _usedLanguages.Add(altLanguage);
+        private bool IsLionCore(Feature? feature) =>
+            feature?.GetLanguage().Key is ILionCoreLanguage.LanguageKey or IBuiltInsLanguage.LanguageKey;
     }
+
+    private IEnumerable<IReadableNode> AsNodes(KeyValuePair<Feature, object?> pair) =>
+        pair.Value != null ? M2Extensions.AsNodes<IReadableNode>(pair.Value) : [];
+    
+    #endregion
 }

@@ -131,7 +131,7 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
 
-        Assert.ThrowsException<ArgumentException>(() =>
+        Assert.ThrowsException<SerializerException>(() =>
             new Serializer(_lionWebVersion).SerializeToChunk([materialGroup]));
     }
 
@@ -164,7 +164,7 @@ public class SerializationTests
         var b = new Circle("b");
         a.Set(defaultShape, b);
 
-        Assert.ThrowsException<ArgumentException>(() => new Serializer(_lionWebVersion).SerializeToChunk([a]));
+        Assert.ThrowsException<SerializerException>(() => new Serializer(_lionWebVersion).SerializeToChunk([a]));
     }
 
     [TestMethod]

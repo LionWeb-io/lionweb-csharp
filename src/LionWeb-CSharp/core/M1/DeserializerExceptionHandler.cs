@@ -141,5 +141,8 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     #endregion
 }
 
+/// Something went wrong during serialization.
+public class SerializerException(string? message) : LionWebExceptionBase(message);
+
 /// Something went wrong during deserialization.
 public class DeserializerException(string? message) : LionWebExceptionBase(message);
