@@ -190,8 +190,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }
@@ -242,8 +242,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Integer",
-              "reference": "LionCore-builtins-Integer"
+              "resolveInfo": "LionWeb.LionCore_builtins.Integer",
+              "reference": null
             }
           ]
         }
@@ -583,8 +583,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }
@@ -769,8 +769,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }
@@ -900,8 +900,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }
@@ -1031,8 +1031,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }

@@ -1,14 +1,8 @@
 {
   "serializationFormatVersion": "2024.1",
-  "languages": [
-    {
-      "key": "LionCore-M3",
-      "version": "2024.1"
-    }
-  ],
   "nodes": [
     {
-      "id": "-id-LionCore-M3",
+      "id": "-id-2024_1-LionCore-M3",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -48,23 +42,23 @@
             "key": "Language-entities"
           },
           "children": [
-            "-id-Annotation",
-            "-id-Classifier",
-            "-id-Concept",
-            "-id-Containment",
-            "-id-DataType",
-            "-id-Enumeration",
-            "-id-EnumerationLiteral",
-            "-id-Feature",
+            "-id-2024_1-Annotation",
+            "-id-2024_1-Classifier",
+            "-id-2024_1-Concept",
+            "-id-2024_1-Containment",
+            "-id-2024_1-DataType",
+            "-id-2024_1-Enumeration",
+            "-id-2024_1-EnumerationLiteral",
+            "-id-2024_1-Feature",
             "-id-Field",
-            "-id-IKeyed",
-            "-id-Interface",
-            "-id-Language",
-            "-id-LanguageEntity",
-            "-id-Link",
-            "-id-PrimitiveType",
-            "-id-Property",
-            "-id-Reference",
+            "-id-2024_1-IKeyed",
+            "-id-2024_1-Interface",
+            "-id-2024_1-Language",
+            "-id-2024_1-LanguageEntity",
+            "-id-2024_1-Link",
+            "-id-2024_1-PrimitiveType",
+            "-id-2024_1-Property",
+            "-id-2024_1-Reference",
             "-id-StructuredDataType"
           ]
         }
@@ -78,8 +72,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "LionCore_builtins",
-              "reference": "LionCore-builtins"
+              "resolveInfo": "LionWeb.LionCore_builtins.LionCore_builtins",
+              "reference": null
             }
           ]
         }
@@ -88,7 +82,7 @@
       "parent": null
     },
     {
-      "id": "-id-Annotation",
+      "id": "-id-2024_1-Annotation",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -136,9 +130,9 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-Annotation-annotates",
-            "-id-Annotation-extends",
-            "-id-Annotation-implements"
+            "-id-2024_1-Annotation-annotates",
+            "-id-2024_1-Annotation-extends",
+            "-id-2024_1-Annotation-implements"
           ]
         },
         {
@@ -159,8 +153,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Classifier",
-              "reference": "-id-Classifier"
+              "resolveInfo": "LionWeb.LionCore_M3.Classifier",
+              "reference": null
             }
           ]
         },
@@ -174,10 +168,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Annotation-annotates",
+      "id": "-id-2024_1-Annotation-annotates",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -227,17 +221,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Classifier",
-              "reference": "-id-Classifier"
+              "resolveInfo": "LionWeb.LionCore_M3.Classifier",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Annotation"
+      "parent": "-id-2024_1-Annotation"
     },
     {
-      "id": "-id-Annotation-extends",
+      "id": "-id-2024_1-Annotation-extends",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -287,17 +281,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Annotation",
-              "reference": "-id-Annotation"
+              "resolveInfo": "LionWeb.LionCore_M3.Annotation",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Annotation"
+      "parent": "-id-2024_1-Annotation"
     },
     {
-      "id": "-id-Annotation-implements",
+      "id": "-id-2024_1-Annotation-implements",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -347,17 +341,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Interface",
-              "reference": "-id-Interface"
+              "resolveInfo": "LionWeb.LionCore_M3.Interface",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Annotation"
+      "parent": "-id-2024_1-Annotation"
     },
     {
-      "id": "-id-Classifier",
+      "id": "-id-2024_1-Classifier",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -405,7 +399,7 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-Classifier-features"
+            "-id-2024_1-Classifier-features"
           ]
         },
         {
@@ -426,8 +420,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "LanguageEntity",
-              "reference": "-id-LanguageEntity"
+              "resolveInfo": "LionWeb.LionCore_M3.LanguageEntity",
+              "reference": null
             }
           ]
         },
@@ -441,10 +435,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Classifier-features",
+      "id": "-id-2024_1-Classifier-features",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -494,17 +488,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Feature",
-              "reference": "-id-Feature"
+              "resolveInfo": "LionWeb.LionCore_M3.Feature",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Classifier"
+      "parent": "-id-2024_1-Classifier"
     },
     {
-      "id": "-id-Concept",
+      "id": "-id-2024_1-Concept",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -552,10 +546,10 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-Concept-abstract",
-            "-id-Concept-partition",
-            "-id-Concept-extends",
-            "-id-Concept-implements"
+            "-id-2024_1-Concept-abstract",
+            "-id-2024_1-Concept-partition",
+            "-id-2024_1-Concept-extends",
+            "-id-2024_1-Concept-implements"
           ]
         },
         {
@@ -576,8 +570,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Classifier",
-              "reference": "-id-Classifier"
+              "resolveInfo": "LionWeb.LionCore_M3.Classifier",
+              "reference": null
             }
           ]
         },
@@ -591,10 +585,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Concept-abstract",
+      "id": "-id-2024_1-Concept-abstract",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -636,17 +630,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Boolean",
-              "reference": "LionCore-builtins-Boolean"
+              "resolveInfo": "LionWeb.LionCore_builtins.Boolean",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Concept"
+      "parent": "-id-2024_1-Concept"
     },
     {
-      "id": "-id-Concept-partition",
+      "id": "-id-2024_1-Concept-partition",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -688,17 +682,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Boolean",
-              "reference": "LionCore-builtins-Boolean"
+              "resolveInfo": "LionWeb.LionCore_builtins.Boolean",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Concept"
+      "parent": "-id-2024_1-Concept"
     },
     {
-      "id": "-id-Concept-extends",
+      "id": "-id-2024_1-Concept-extends",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -748,17 +742,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Concept",
-              "reference": "-id-Concept"
+              "resolveInfo": "LionWeb.LionCore_M3.Concept",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Concept"
+      "parent": "-id-2024_1-Concept"
     },
     {
-      "id": "-id-Concept-implements",
+      "id": "-id-2024_1-Concept-implements",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -808,17 +802,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Interface",
-              "reference": "-id-Interface"
+              "resolveInfo": "LionWeb.LionCore_M3.Interface",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Concept"
+      "parent": "-id-2024_1-Concept"
     },
     {
-      "id": "-id-Containment",
+      "id": "-id-2024_1-Containment",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -885,8 +879,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Link",
-              "reference": "-id-Link"
+              "resolveInfo": "LionWeb.LionCore_M3.Link",
+              "reference": null
             }
           ]
         },
@@ -900,10 +894,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-DataType",
+      "id": "-id-2024_1-DataType",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -970,8 +964,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "LanguageEntity",
-              "reference": "-id-LanguageEntity"
+              "resolveInfo": "LionWeb.LionCore_M3.LanguageEntity",
+              "reference": null
             }
           ]
         },
@@ -985,10 +979,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Enumeration",
+      "id": "-id-2024_1-Enumeration",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1036,7 +1030,7 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-Enumeration-literals"
+            "-id-2024_1-Enumeration-literals"
           ]
         },
         {
@@ -1057,8 +1051,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "DataType",
-              "reference": "-id-DataType"
+              "resolveInfo": "LionWeb.LionCore_M3.DataType",
+              "reference": null
             }
           ]
         },
@@ -1072,10 +1066,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Enumeration-literals",
+      "id": "-id-2024_1-Enumeration-literals",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1125,17 +1119,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "EnumerationLiteral",
-              "reference": "-id-EnumerationLiteral"
+              "resolveInfo": "LionWeb.LionCore_M3.EnumerationLiteral",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Enumeration"
+      "parent": "-id-2024_1-Enumeration"
     },
     {
-      "id": "-id-EnumerationLiteral",
+      "id": "-id-2024_1-EnumerationLiteral",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1202,17 +1196,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "IKeyed",
-              "reference": "-id-IKeyed"
+              "resolveInfo": "LionWeb.LionCore_M3.IKeyed",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Feature",
+      "id": "-id-2024_1-Feature",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1260,7 +1254,7 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-Feature-optional"
+            "-id-2024_1-Feature-optional"
           ]
         }
       ],
@@ -1281,17 +1275,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "IKeyed",
-              "reference": "-id-IKeyed"
+              "resolveInfo": "LionWeb.LionCore_M3.IKeyed",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Feature-optional",
+      "id": "-id-2024_1-Feature-optional",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1333,14 +1327,14 @@
           },
           "targets": [
             {
-              "resolveInfo": "Boolean",
-              "reference": "LionCore-builtins-Boolean"
+              "resolveInfo": "LionWeb.LionCore_builtins.Boolean",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Feature"
+      "parent": "-id-2024_1-Feature"
     },
     {
       "id": "-id-Field",
@@ -1412,14 +1406,14 @@
           },
           "targets": [
             {
-              "resolveInfo": "IKeyed",
-              "reference": "-id-IKeyed"
+              "resolveInfo": "LionWeb.LionCore_M3.IKeyed",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
       "id": "-id-Field-type",
@@ -1472,8 +1466,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "DataType",
-              "reference": "-id-DataType"
+              "resolveInfo": "LionWeb.LionCore_M3.DataType",
+              "reference": null
             }
           ]
         }
@@ -1482,7 +1476,7 @@
       "parent": "-id-Field"
     },
     {
-      "id": "-id-IKeyed",
+      "id": "-id-2024_1-IKeyed",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1514,7 +1508,7 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-IKeyed-key"
+            "-id-2024_1-IKeyed-key"
           ]
         }
       ],
@@ -1527,17 +1521,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "INamed",
-              "reference": "LionCore-builtins-INamed"
+              "resolveInfo": "LionWeb.LionCore_builtins.INamed",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-IKeyed-key",
+      "id": "-id-2024_1-IKeyed-key",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1579,17 +1573,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-IKeyed"
+      "parent": "-id-2024_1-IKeyed"
     },
     {
-      "id": "-id-Interface",
+      "id": "-id-2024_1-Interface",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1637,7 +1631,7 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-Interface-extends"
+            "-id-2024_1-Interface-extends"
           ]
         },
         {
@@ -1658,8 +1652,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Classifier",
-              "reference": "-id-Classifier"
+              "resolveInfo": "LionWeb.LionCore_M3.Classifier",
+              "reference": null
             }
           ]
         },
@@ -1673,10 +1667,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Interface-extends",
+      "id": "-id-2024_1-Interface-extends",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1726,17 +1720,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Interface",
-              "reference": "-id-Interface"
+              "resolveInfo": "LionWeb.LionCore_M3.Interface",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Interface"
+      "parent": "-id-2024_1-Interface"
     },
     {
-      "id": "-id-Language",
+      "id": "-id-2024_1-Language",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1784,9 +1778,9 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-Language-version",
-            "-id-Language-entities",
-            "-id-Language-dependsOn"
+            "-id-2024_1-Language-version",
+            "-id-2024_1-Language-entities",
+            "-id-2024_1-Language-dependsOn"
           ]
         }
       ],
@@ -1807,17 +1801,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "IKeyed",
-              "reference": "-id-IKeyed"
+              "resolveInfo": "LionWeb.LionCore_M3.IKeyed",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Language-version",
+      "id": "-id-2024_1-Language-version",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1859,17 +1853,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Language"
+      "parent": "-id-2024_1-Language"
     },
     {
-      "id": "-id-Language-entities",
+      "id": "-id-2024_1-Language-entities",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1919,17 +1913,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "LanguageEntity",
-              "reference": "-id-LanguageEntity"
+              "resolveInfo": "LionWeb.LionCore_M3.LanguageEntity",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Language"
+      "parent": "-id-2024_1-Language"
     },
     {
-      "id": "-id-Language-dependsOn",
+      "id": "-id-2024_1-Language-dependsOn",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -1979,17 +1973,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Language",
-              "reference": "-id-Language"
+              "resolveInfo": "LionWeb.LionCore_M3.Language",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Language"
+      "parent": "-id-2024_1-Language"
     },
     {
-      "id": "-id-LanguageEntity",
+      "id": "-id-2024_1-LanguageEntity",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -2056,17 +2050,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "IKeyed",
-              "reference": "-id-IKeyed"
+              "resolveInfo": "LionWeb.LionCore_M3.IKeyed",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Link",
+      "id": "-id-2024_1-Link",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -2114,8 +2108,8 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-Link-multiple",
-            "-id-Link-type"
+            "-id-2024_1-Link-multiple",
+            "-id-2024_1-Link-type"
           ]
         },
         {
@@ -2136,8 +2130,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Feature",
-              "reference": "-id-Feature"
+              "resolveInfo": "LionWeb.LionCore_M3.Feature",
+              "reference": null
             }
           ]
         },
@@ -2151,10 +2145,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Link-multiple",
+      "id": "-id-2024_1-Link-multiple",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -2196,17 +2190,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Boolean",
-              "reference": "LionCore-builtins-Boolean"
+              "resolveInfo": "LionWeb.LionCore_builtins.Boolean",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Link"
+      "parent": "-id-2024_1-Link"
     },
     {
-      "id": "-id-Link-type",
+      "id": "-id-2024_1-Link-type",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -2256,17 +2250,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "Classifier",
-              "reference": "-id-Classifier"
+              "resolveInfo": "LionWeb.LionCore_M3.Classifier",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Link"
+      "parent": "-id-2024_1-Link"
     },
     {
-      "id": "-id-PrimitiveType",
+      "id": "-id-2024_1-PrimitiveType",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -2333,8 +2327,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "DataType",
-              "reference": "-id-DataType"
+              "resolveInfo": "LionWeb.LionCore_M3.DataType",
+              "reference": null
             }
           ]
         },
@@ -2348,10 +2342,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Property",
+      "id": "-id-2024_1-Property",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -2399,7 +2393,7 @@
             "key": "Classifier-features"
           },
           "children": [
-            "-id-Property-type"
+            "-id-2024_1-Property-type"
           ]
         },
         {
@@ -2420,8 +2414,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Feature",
-              "reference": "-id-Feature"
+              "resolveInfo": "LionWeb.LionCore_M3.Feature",
+              "reference": null
             }
           ]
         },
@@ -2435,10 +2429,10 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
-      "id": "-id-Property-type",
+      "id": "-id-2024_1-Property-type",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -2488,17 +2482,17 @@
           },
           "targets": [
             {
-              "resolveInfo": "DataType",
-              "reference": "-id-DataType"
+              "resolveInfo": "LionWeb.LionCore_M3.DataType",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Property"
+      "parent": "-id-2024_1-Property"
     },
     {
-      "id": "-id-Reference",
+      "id": "-id-2024_1-Reference",
       "classifier": {
         "language": "LionCore-M3",
         "version": "2024.1",
@@ -2565,8 +2559,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Link",
-              "reference": "-id-Link"
+              "resolveInfo": "LionWeb.LionCore_M3.Link",
+              "reference": null
             }
           ]
         },
@@ -2580,7 +2574,7 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
       "id": "-id-StructuredDataType",
@@ -2652,8 +2646,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "DataType",
-              "reference": "-id-DataType"
+              "resolveInfo": "LionWeb.LionCore_M3.DataType",
+              "reference": null
             }
           ]
         },
@@ -2667,7 +2661,7 @@
         }
       ],
       "annotations": [],
-      "parent": "-id-LionCore-M3"
+      "parent": "-id-2024_1-LionCore-M3"
     },
     {
       "id": "-id-StructuredDataType-fields",
@@ -2720,14 +2714,20 @@
           },
           "targets": [
             {
-              "resolveInfo": "Field",
-              "reference": "-id-Field"
+              "resolveInfo": "LionWeb.LionCore_M3.Field",
+              "reference": null
             }
           ]
         }
       ],
       "annotations": [],
-      "parent": "-id-Enumeration"
+      "parent": "-id-2024_1-Enumeration"
+    }
+  ],
+  "languages": [
+    {
+      "key": "LionCore-M3",
+      "version": "2024.1"
     }
   ]
 }

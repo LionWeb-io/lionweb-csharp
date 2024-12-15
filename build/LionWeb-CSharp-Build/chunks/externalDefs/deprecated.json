@@ -412,8 +412,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Node",
-              "reference": "LionCore-builtins-Node"
+              "resolveInfo": "LionWeb.LionCore_builtins.Node",
+              "reference": null
             }
           ]
         },
@@ -474,8 +474,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }
@@ -703,8 +703,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Node",
-              "reference": "LionCore-builtins-Node"
+              "resolveInfo": "LionWeb.LionCore_builtins.Node",
+              "reference": null
             }
           ]
         },
@@ -926,8 +926,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Node",
-              "reference": "LionCore-builtins-Node"
+              "resolveInfo": "LionWeb.LionCore_builtins.Node",
+              "reference": null
             }
           ]
         },
