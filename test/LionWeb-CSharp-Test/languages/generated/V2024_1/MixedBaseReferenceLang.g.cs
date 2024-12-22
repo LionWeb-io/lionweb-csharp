@@ -4,7 +4,7 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Examples.Mixed.MixedBaseReferenceLang;
+namespace Examples.V2024_1.Mixed.MixedBaseReferenceLang;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;

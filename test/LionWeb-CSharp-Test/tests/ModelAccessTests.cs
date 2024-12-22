@@ -18,17 +18,19 @@
 namespace LionWeb.Core.Test;
 
 using Examples.Shapes.Dynamic;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 using M1;
 using Utilities;
 
 [TestClass]
 public class ModelAccessTests
 {
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    
     [TestMethod]
     public void test_multi_valued_containment_access()
     {
-        var geometry = ExampleModels.ExampleModel(ShapesLanguage.Instance) as Geometry;
+        var geometry = new ExampleModels(_lionWebVersion).ExampleModel(ShapesLanguage.Instance) as Geometry;
         Assert.AreEqual(1, geometry.Shapes.Count);
         var shape = geometry.Shapes[0];
         Assert.IsInstanceOfType<Line>(shape);
@@ -76,7 +78,7 @@ public class ModelAccessTests
     [TestMethod]
     public void test_AllChildren()
     {
-        var geometry = ExampleModels.ExampleModel(ShapesLanguage.Instance) as Geometry;
+        var geometry = new ExampleModels(_lionWebVersion).ExampleModel(ShapesLanguage.Instance) as Geometry;
         var allChildren = geometry.Children(false, true);
         Assert.AreEqual(1, allChildren.Count());
         Assert.AreEqual(geometry.Shapes[0], allChildren.ElementAt(0));
@@ -85,7 +87,7 @@ public class ModelAccessTests
     [TestMethod]
     public void test_GetThisAndAllChildren()
     {
-        var geometry = ExampleModels.ExampleModel(ShapesLanguage.Instance) as Geometry;
+        var geometry = new ExampleModels(_lionWebVersion).ExampleModel(ShapesLanguage.Instance) as Geometry;
         var thisAndAllChildren = geometry.Children(true, true);
         Assert.AreEqual(2, thisAndAllChildren.Count());
         Assert.AreEqual(geometry, thisAndAllChildren.ElementAt(0));
@@ -95,7 +97,7 @@ public class ModelAccessTests
     [TestMethod]
     public void test_AllDescendants()
     {
-        var geometry = ExampleModels.ExampleModel(ShapesLanguage.Instance) as Geometry;
+        var geometry = new ExampleModels(_lionWebVersion).ExampleModel(ShapesLanguage.Instance) as Geometry;
         var allDescendants = geometry.Descendants(false, true);
         Assert.AreEqual(3, allDescendants.Count());
         Assert.IsFalse(allDescendants.Contains(geometry));
@@ -108,7 +110,7 @@ public class ModelAccessTests
     [TestMethod]
     public void test_AllNodes()
     {
-        var geometry = ExampleModels.ExampleModel(ShapesLanguage.Instance) as Geometry;
+        var geometry = new ExampleModels(_lionWebVersion).ExampleModel(ShapesLanguage.Instance) as Geometry;
         var allNodes = geometry.Descendants(true, true);
         Assert.AreEqual(4, allNodes.Count());
         Assert.AreEqual(geometry, allNodes.ElementAt(0));

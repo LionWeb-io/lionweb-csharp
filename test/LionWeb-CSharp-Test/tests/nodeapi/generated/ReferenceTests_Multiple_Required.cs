@@ -18,7 +18,7 @@
 namespace LionWeb.Core.M2.Generated.Test;
 
 using Core;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 using System.Collections;
 
 [TestClass]

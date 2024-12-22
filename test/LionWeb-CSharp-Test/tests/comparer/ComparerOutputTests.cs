@@ -21,7 +21,7 @@ namespace LionWeb.Utils.Tests.Comparer;
 
 using Core;
 using Core.Utilities;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 
 [TestClass]
 public class ComparerOutputTests : ComparerTestsBase

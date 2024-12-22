@@ -17,7 +17,7 @@
 
 namespace LionWeb_CSharp_Test.tests;
 
-using Examples.SDTLang;
+using Examples.V2024_1.SDTLang;
 using LionWeb.Core;
 using LionWeb.Core.M3;
 

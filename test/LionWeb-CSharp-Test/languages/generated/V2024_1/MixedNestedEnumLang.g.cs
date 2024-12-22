@@ -4,7 +4,7 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Examples.Mixed.MixedNestedEnumLang;
+namespace Examples.V2024_1.Mixed.MixedNestedEnumLang;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;

@@ -4,7 +4,7 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Examples.Mixed.MixedDirectSdtLang;
+namespace Examples.V2024_1.Mixed.MixedDirectSdtLang;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -20,15 +20,15 @@ public partial class MixedDirectSdtLangLanguage : LanguageBase<IMixedDirectSdtLa
 	public MixedDirectSdtLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_directSdt = new(() => new StructuredDataTypeBase<MixedDirectSdtLangLanguage>("id-directSdt", this) { Key = "key-directSdt", Name = "DirectSdt", FieldsLazy = new(() => [DirectSdt_directSdtEnum, DirectSdt_directSdtSdt]) });
-		_directSdt_directSdtEnum = new(() => new FieldBase<MixedDirectSdtLangLanguage>("id-directSdtEnum", DirectSdt, this) { Key = "key-directSdtEnum", Name = "directSdtEnum", Type = Examples.Mixed.MixedNestedEnumLang.MixedNestedEnumLangLanguage.Instance.NestedEnum });
-		_directSdt_directSdtSdt = new(() => new FieldBase<MixedDirectSdtLangLanguage>("id-directSdtSdt", DirectSdt, this) { Key = "key-directSdtSdt", Name = "directSdtSdt", Type = Examples.Mixed.MixedNestedSdtLang.MixedNestedSdtLangLanguage.Instance.NestedSdt });
+		_directSdt_directSdtEnum = new(() => new FieldBase<MixedDirectSdtLangLanguage>("id-directSdtEnum", DirectSdt, this) { Key = "key-directSdtEnum", Name = "directSdtEnum", Type = Examples.V2024_1.Mixed.MixedNestedEnumLang.MixedNestedEnumLangLanguage.Instance.NestedEnum });
+		_directSdt_directSdtSdt = new(() => new FieldBase<MixedDirectSdtLangLanguage>("id-directSdtSdt", DirectSdt, this) { Key = "key-directSdtSdt", Name = "directSdtSdt", Type = Examples.V2024_1.Mixed.MixedNestedSdtLang.MixedNestedSdtLangLanguage.Instance.NestedSdt });
 		_factory = new MixedDirectSdtLangFactory(this);
 	}
 
 	/// <inheritdoc/>
         public override IReadOnlyList<LanguageEntity> Entities => [DirectSdt];
 	/// <inheritdoc/>
-        public override IReadOnlyList<Language> DependsOn => [Examples.Mixed.MixedNestedEnumLang.MixedNestedEnumLangLanguage.Instance, Examples.Mixed.MixedNestedSdtLang.MixedNestedSdtLangLanguage.Instance];
+        public override IReadOnlyList<Language> DependsOn => [Examples.V2024_1.Mixed.MixedNestedEnumLang.MixedNestedEnumLangLanguage.Instance, Examples.V2024_1.Mixed.MixedNestedSdtLang.MixedNestedSdtLangLanguage.Instance];
 
 	private const string _key = "key-mixedDirectSdtLang";
 	/// <inheritdoc/>
@@ -80,7 +80,7 @@ public class MixedDirectSdtLangFactory : AbstractBaseNodeFactory, IMixedDirectSd
         public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
 	{
 		if (_language.DirectSdt.EqualsIdentity(structuredDataType))
-			return new DirectSdt((Examples.Mixed.MixedNestedEnumLang.NestedEnum?)fieldValues.Get(_language.DirectSdt_directSdtEnum), (Examples.Mixed.MixedNestedSdtLang.NestedSdt?)fieldValues.Get(_language.DirectSdt_directSdtSdt));
+			return new DirectSdt((Examples.V2024_1.Mixed.MixedNestedEnumLang.NestedEnum?)fieldValues.Get(_language.DirectSdt_directSdtEnum), (Examples.V2024_1.Mixed.MixedNestedSdtLang.NestedSdt?)fieldValues.Get(_language.DirectSdt_directSdtSdt));
 		throw new UnsupportedStructuredDataTypeException(structuredDataType);
 	}
 }
@@ -88,13 +88,13 @@ public class MixedDirectSdtLangFactory : AbstractBaseNodeFactory, IMixedDirectSd
 [LionCoreMetaPointer(Language = typeof(MixedDirectSdtLangLanguage), Key = "key-directSdt")]
 public readonly record struct DirectSdt : IStructuredDataTypeInstance
 {
-	private readonly Examples.Mixed.MixedNestedEnumLang.NestedEnum? _directSdtEnum;
+	private readonly Examples.V2024_1.Mixed.MixedNestedEnumLang.NestedEnum? _directSdtEnum;
 	[LionCoreMetaPointer(Language = typeof(MixedDirectSdtLangLanguage), Key = "key-directSdtEnum")]
-	public Examples.Mixed.MixedNestedEnumLang.NestedEnum DirectSdtEnum { get => _directSdtEnum ?? throw new UnsetFieldException(MixedDirectSdtLangLanguage.Instance.DirectSdt_directSdtEnum); init => _directSdtEnum = value; }
+	public Examples.V2024_1.Mixed.MixedNestedEnumLang.NestedEnum DirectSdtEnum { get => _directSdtEnum ?? throw new UnsetFieldException(MixedDirectSdtLangLanguage.Instance.DirectSdt_directSdtEnum); init => _directSdtEnum = value; }
 
-	private readonly Examples.Mixed.MixedNestedSdtLang.NestedSdt? _directSdtSdt;
+	private readonly Examples.V2024_1.Mixed.MixedNestedSdtLang.NestedSdt? _directSdtSdt;
 	[LionCoreMetaPointer(Language = typeof(MixedDirectSdtLangLanguage), Key = "key-directSdtSdt")]
-	public Examples.Mixed.MixedNestedSdtLang.NestedSdt DirectSdtSdt { get => _directSdtSdt ?? throw new UnsetFieldException(MixedDirectSdtLangLanguage.Instance.DirectSdt_directSdtSdt); init => _directSdtSdt = value; }
+	public Examples.V2024_1.Mixed.MixedNestedSdtLang.NestedSdt DirectSdtSdt { get => _directSdtSdt ?? throw new UnsetFieldException(MixedDirectSdtLangLanguage.Instance.DirectSdt_directSdtSdt); init => _directSdtSdt = value; }
 
 	public DirectSdt()
 	{
@@ -102,7 +102,7 @@ public readonly record struct DirectSdt : IStructuredDataTypeInstance
 		_directSdtSdt = null;
 	}
 
-	internal DirectSdt(Examples.Mixed.MixedNestedEnumLang.NestedEnum? directSdtEnum_, Examples.Mixed.MixedNestedSdtLang.NestedSdt? directSdtSdt_)
+	internal DirectSdt(Examples.V2024_1.Mixed.MixedNestedEnumLang.NestedEnum? directSdtEnum_, Examples.V2024_1.Mixed.MixedNestedSdtLang.NestedSdt? directSdtSdt_)
 	{
 		_directSdtEnum = directSdtEnum_;
 		_directSdtSdt = directSdtSdt_;

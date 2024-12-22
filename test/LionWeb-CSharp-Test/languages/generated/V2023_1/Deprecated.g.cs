@@ -4,12 +4,12 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Examples.DeprecatedLang;
+namespace Examples.V2023_1.DeprecatedLang;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2024_1;
+using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
 using DeprDatatype = string;
@@ -18,7 +18,7 @@ using DeprDatatype = string;
 public partial class DeprecatedLanguage : LanguageBase<IDeprecatedFactory>
 {
 	public static readonly DeprecatedLanguage Instance = new Lazy<DeprecatedLanguage>(() => new("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh")).Value;
-	public DeprecatedLanguage(string id) : base(id, LionWebVersions.v2024_1)
+	public DeprecatedLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
 		_deprAnnotation = new(() => new AnnotationBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE", Name = "DeprAnnotation", AnnotatesLazy = new(() => _builtIns.Node) });
 		_deprConcept = new(() => new ConceptBase<DeprecatedLanguage>("MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY", this) { Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY", Name = "DeprConcept", Abstract = false, Partition = false, ExtendsLazy = new(() => _builtIns.Node), FeaturesLazy = new(() => [DeprConcept_deprChild, DeprConcept_deprProp, DeprConcept_deprRef]) });
@@ -282,7 +282,7 @@ public partial class DeprConcept : NodeBase
 			return true;
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
 		{
-			var enumerable = DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<Examples.DeprecatedLang.DeprIface>(value);
+			var enumerable = DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<Examples.V2023_1.DeprecatedLang.DeprIface>(value);
 			RemoveSelfParent(_deprChild.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 			AddDeprChild(enumerable);
 			return true;
@@ -301,7 +301,7 @@ public partial class DeprConcept : NodeBase
 
 		if (DeprecatedLanguage.Instance.DeprConcept_deprRef.EqualsIdentity(feature))
 		{
-			if (value is Examples.DeprecatedLang.DeprAnnotation v)
+			if (value is Examples.V2023_1.DeprecatedLang.DeprAnnotation v)
 			{
 				DeprRef = v;
 				return true;

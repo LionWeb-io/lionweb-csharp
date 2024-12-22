@@ -23,7 +23,7 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 
 /// <summary>
 /// We want to get all left-side nodes from a different language and factory than all the right-side nodes.
@@ -32,9 +32,11 @@ using Examples.Shapes.M2;
 /// </summary>
 public abstract class ComparerTestsBase
 {
+    private static LionWebVersions _lionWebVersion = LionWebVersions.Current;
+
     private static readonly Language leftLanguage = ShapesLanguage.Instance;
 
-    protected static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
+    protected static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.BuiltIns;
 
     protected static readonly ShapesFactory lF = leftLanguage.GetFactory() as ShapesFactory;
 
@@ -76,7 +78,8 @@ public abstract class ComparerTestsBase
 
     protected static readonly Language rightLanguage =
         LanguagesUtils
-            .LoadLanguages("LionWeb-CSharp-Test", "LionWeb_CSharp_Test.languages.defChunks.shapes.json")
+            .LoadLanguages("LionWeb-CSharp-Test",
+                $"LionWeb_CSharp_Test.languages.defChunks.shapes_{_lionWebVersion.VersionString.Replace('.', '_')}.json")
             .First();
 
     protected static readonly AbstractBaseNodeFactory rF = rightLanguage.GetFactory() as AbstractBaseNodeFactory;

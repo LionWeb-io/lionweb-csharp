@@ -4,7 +4,7 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Examples.Mixed.MixedConceptLang;
+namespace Examples.V2024_1.Mixed.MixedConceptLang;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -19,14 +19,14 @@ public partial class MixedConceptLangLanguage : LanguageBase<IMixedConceptLangFa
 	public static readonly MixedConceptLangLanguage Instance = new Lazy<MixedConceptLangLanguage>(() => new("id-mixedConceptLang")).Value;
 	public MixedConceptLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
-		_mixedConcept = new(() => new ConceptBase<MixedConceptLangLanguage>("id-mixedConcept", this) { Key = "key-mixedConcept", Name = "MixedConcept", Abstract = false, Partition = false, ExtendsLazy = new(() => Examples.Mixed.MixedBaseConceptLang.MixedBaseConceptLangLanguage.Instance.BaseConcept) });
+		_mixedConcept = new(() => new ConceptBase<MixedConceptLangLanguage>("id-mixedConcept", this) { Key = "key-mixedConcept", Name = "MixedConcept", Abstract = false, Partition = false, ExtendsLazy = new(() => Examples.V2024_1.Mixed.MixedBaseConceptLang.MixedBaseConceptLangLanguage.Instance.BaseConcept) });
 		_factory = new MixedConceptLangFactory(this);
 	}
 
 	/// <inheritdoc/>
         public override IReadOnlyList<LanguageEntity> Entities => [MixedConcept];
 	/// <inheritdoc/>
-        public override IReadOnlyList<Language> DependsOn => [Examples.Mixed.MixedBaseConceptLang.MixedBaseConceptLangLanguage.Instance];
+        public override IReadOnlyList<Language> DependsOn => [Examples.V2024_1.Mixed.MixedBaseConceptLang.MixedBaseConceptLangLanguage.Instance];
 
 	private const string _key = "key-mixedConceptLang";
 	/// <inheritdoc/>
@@ -83,7 +83,7 @@ public class MixedConceptLangFactory : AbstractBaseNodeFactory, IMixedConceptLan
 }
 
 [LionCoreMetaPointer(Language = typeof(MixedConceptLangLanguage), Key = "key-mixedConcept")]
-public partial class MixedConcept : Examples.Mixed.MixedBaseConceptLang.BaseConcept
+public partial class MixedConcept : Examples.V2024_1.Mixed.MixedBaseConceptLang.BaseConcept
 {
 	public MixedConcept(string id) : base(id)
 	{

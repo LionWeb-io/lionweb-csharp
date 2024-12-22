@@ -17,11 +17,10 @@
 
 namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 
-using Examples.Shapes.M2;
-using Examples.TinyRefLang;
+using Examples.V2024_1.Shapes.M2;
+using Examples.V2024_1.TinyRefLang;
 using LionWeb.Core;
 using LionWeb.Core.M1;
-using LionWeb.Core.M2;
 using LionWeb.Core.Serialization;
 
 /// <summary>

@@ -4,7 +4,7 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Examples.SDTLang;
+namespace Examples.V2024_1.SDTLang;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -407,7 +407,7 @@ public partial class SDTConcept : NodeBase
 			return true;
 		if (SDTLangLanguage.Instance.SDTConcept_A.EqualsIdentity(feature))
 		{
-			if (value is Examples.SDTLang.A v)
+			if (value is Examples.V2024_1.SDTLang.A v)
 			{
 				A = v;
 				return true;
@@ -418,7 +418,7 @@ public partial class SDTConcept : NodeBase
 
 		if (SDTLangLanguage.Instance.SDTConcept_amount.EqualsIdentity(feature))
 		{
-			if (value is Examples.SDTLang.Amount v)
+			if (value is Examples.V2024_1.SDTLang.Amount v)
 			{
 				Amount = v;
 				return true;
@@ -429,7 +429,7 @@ public partial class SDTConcept : NodeBase
 
 		if (SDTLangLanguage.Instance.SDTConcept_complex.EqualsIdentity(feature))
 		{
-			if (value is Examples.SDTLang.ComplexNumber v)
+			if (value is Examples.V2024_1.SDTLang.ComplexNumber v)
 			{
 				Complex = v;
 				return true;
@@ -440,7 +440,7 @@ public partial class SDTConcept : NodeBase
 
 		if (SDTLangLanguage.Instance.SDTConcept_decimal.EqualsIdentity(feature))
 		{
-			if (value is Examples.SDTLang.Decimal v)
+			if (value is Examples.V2024_1.SDTLang.Decimal v)
 			{
 				Decimal = v;
 				return true;
@@ -451,7 +451,7 @@ public partial class SDTConcept : NodeBase
 
 		if (SDTLangLanguage.Instance.SDTConcept_fqn.EqualsIdentity(feature))
 		{
-			if (value is Examples.SDTLang.FullyQualifiedName v)
+			if (value is Examples.V2024_1.SDTLang.FullyQualifiedName v)
 			{
 				Fqn = v;
 				return true;

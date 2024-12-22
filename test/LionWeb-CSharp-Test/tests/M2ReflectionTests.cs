@@ -25,8 +25,10 @@ using VersionSpecific.V2023_1;
 [TestClass]
 public class M2ReflectionTests
 {
-    private static readonly ILionCoreLanguage _m3 = LionWebVersions.Current.LionCore;
-    private static readonly IBuiltInsLanguage _builtIns = LionWebVersions.Current.BuiltIns;
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.v2024_1;
+    
+    private static readonly ILionCoreLanguage _m3 = _lionWebVersion.LionCore;
+    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.BuiltIns;
 
     private static Classifier Concept = _m3.Concept;
 
@@ -67,7 +69,6 @@ public class M2ReflectionTests
 
     DynamicLanguage shapesLang;
     DynamicLanguage enumLang;
-    private readonly LionWebVersions _lionWebVersion = LionWebVersions.v2023_1;
 
     DynamicLanguage lang { get => shapesLang; }
     DynamicAnnotation ann { get => shapesLang.ClassifierByKey("key-Documentation") as DynamicAnnotation; }
@@ -93,7 +94,7 @@ public class M2ReflectionTests
     public void InitLanguages()
     {
         shapesLang = LanguagesUtils
-            .LoadLanguages("LionWeb-CSharp-Test", "LionWeb_CSharp_Test.languages.defChunks.shapes.json").First();
+            .LoadLanguages("LionWeb-CSharp-Test", $"LionWeb_CSharp_Test.languages.defChunks.shapes_{_lionWebVersion.VersionString.Replace('.', '_')}.json").First();
         enumLang = LanguagesUtils
             .LoadLanguages("LionWeb-CSharp-Test", "LionWeb_CSharp_Test.languages.defChunks.with-enum.json").First();
     }

@@ -11,7 +11,7 @@
     },
     {
       "key": "io-lionweb-mps-specific",
-      "version": "0"
+      "version": "2024.1"
     }
   ],
   "nodes": [
@@ -19,14 +19,14 @@
       "id": "7815243479487993447",
       "classifier": {
         "language": "io-lionweb-mps-specific",
-        "version": "0",
+        "version": "2024.1",
         "key": "Deprecated"
       },
       "properties": [
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-build"
           },
           "value": "deprConcept build"
@@ -34,7 +34,7 @@
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-comment"
           },
           "value": "deprConcept comment"
@@ -49,14 +49,14 @@
       "id": "7815243479487993451",
       "classifier": {
         "language": "io-lionweb-mps-specific",
-        "version": "0",
+        "version": "2024.1",
         "key": "Deprecated"
       },
       "properties": [
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-build"
           },
           "value": "deprProp build"
@@ -64,7 +64,7 @@
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-comment"
           },
           "value": "deprProp comment"
@@ -79,14 +79,14 @@
       "id": "7815243479487993456",
       "classifier": {
         "language": "io-lionweb-mps-specific",
-        "version": "0",
+        "version": "2024.1",
         "key": "Deprecated"
       },
       "properties": [
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-build"
           },
           "value": "deprIface build"
@@ -94,7 +94,7 @@
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-comment"
           },
           "value": "deprIface comment"
@@ -109,14 +109,14 @@
       "id": "7815243479487993464",
       "classifier": {
         "language": "io-lionweb-mps-specific",
-        "version": "0",
+        "version": "2024.1",
         "key": "Deprecated"
       },
       "properties": [
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-build"
           },
           "value": "deprAnnotation build"
@@ -124,7 +124,7 @@
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-comment"
           },
           "value": "deprAnnotation comment"
@@ -139,14 +139,14 @@
       "id": "7815243479487993467",
       "classifier": {
         "language": "io-lionweb-mps-specific",
-        "version": "0",
+        "version": "2024.1",
         "key": "Deprecated"
       },
       "properties": [
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-build"
           },
           "value": "deprChild build"
@@ -154,7 +154,7 @@
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-comment"
           },
           "value": "deprChild comment"
@@ -169,14 +169,14 @@
       "id": "7815243479487993469",
       "classifier": {
         "language": "io-lionweb-mps-specific",
-        "version": "0",
+        "version": "2024.1",
         "key": "Deprecated"
       },
       "properties": [
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-build"
           },
           "value": "deprRef build"
@@ -184,7 +184,7 @@
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-comment"
           },
           "value": "deprRef comment"
@@ -199,14 +199,14 @@
       "id": "7815243479487993473",
       "classifier": {
         "language": "io-lionweb-mps-specific",
-        "version": "0",
+        "version": "2024.1",
         "key": "Deprecated"
       },
       "properties": [
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-build"
           },
           "value": "deprEnum build"
@@ -214,7 +214,7 @@
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-comment"
           },
           "value": "deprEnum comment"
@@ -229,14 +229,14 @@
       "id": "7815243479487993485",
       "classifier": {
         "language": "io-lionweb-mps-specific",
-        "version": "0",
+        "version": "2024.1",
         "key": "Deprecated"
       },
       "properties": [
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-build"
           },
           "value": "deprDatatype build"
@@ -244,7 +244,7 @@
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-comment"
           },
           "value": "deprDatatype comment"
@@ -259,14 +259,14 @@
       "id": "7815243479507587642",
       "classifier": {
         "language": "io-lionweb-mps-specific",
-        "version": "0",
+        "version": "2024.1",
         "key": "Deprecated"
       },
       "properties": [
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-build"
           },
           "value": null
@@ -274,7 +274,7 @@
         {
           "property": {
             "language": "io-lionweb-mps-specific",
-            "version": "0",
+            "version": "2024.1",
             "key": "Deprecated-comment"
           },
           "value": null

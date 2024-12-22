@@ -20,6 +20,7 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using System.Collections;
+using Utilities;
 
 /// <summary>
 /// A generic implementation of <see cref="INode"/> that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
@@ -80,7 +81,7 @@ public class DynamicNode : NodeBase
     /// <summary>
     /// Contains all settings of features.
     /// </summary>
-    private readonly Dictionary<Feature, object> _settings = new();
+    private readonly Dictionary<Feature, object> _settings = new(new FeatureIdentityComparer());
 
     /// <inheritdoc />
     protected override bool GetInternal(Feature? feature, out object? result)

@@ -20,11 +20,11 @@ namespace Examples.Shapes.Dynamic;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
-using M2;
+using V2023_1.Shapes.M2;
 
-public static class ExampleModels
+public class ExampleModels(LionWebVersions lionWebVersion)
 {
-    public static INode ExampleLine(Language lang)
+    public INode ExampleLine(Language lang)
     {
         Classifier lineClassifier = lang.ClassifierByKey("key-Line");
         var lineName = lineClassifier.FeatureByKey("LionCore-builtins-INamed-name");
@@ -54,9 +54,15 @@ public static class ExampleModels
         return line;
     }
 
-    public static INode ExampleModel(Language lang)
+    public INode ExampleModel(Language lang)
     {
-        var language = ShapesLanguage.Instance;
+        Language language = lionWebVersion switch
+        {
+            IVersion2023_1 => ShapesLanguage.Instance,
+            IVersion2024_1 => V2024_1.Shapes.M2.ShapesLanguage.Instance,
+            IVersion2024_1_Compatible => V2024_1.Shapes.M2.ShapesLanguage.Instance,
+            _ => throw new UnsupportedVersionException(lionWebVersion)
+        };
         var geometry = language.GetFactory().CreateNode("geo", language.ClassifierByKey("key-Geometry"));
         geometry.Set(language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes"), new List<INode>{ExampleLine(language)});
 

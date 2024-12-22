@@ -25,87 +25,90 @@ using LionWeb.Core.Serialization;
 using LionWeb.CSharp.Generator;
 using LionWeb.CSharp.Generator.Names;
 
-var lionWebVersion = LionWebVersions.Current;
-
-void SerializeLanguagesLocally(string name, params Language[] languages)
+foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 {
-    JsonUtils.WriteNodesToStream(new FileStream($"chunks/localDefs/{name}.json", FileMode.Create),
+    ShapesDefinition._lionWebVersion = lionWebVersion;
+    
+    Console.WriteLine($"\n### LionWeb specification version: {lionWebVersion}\n");
+    
+    SerializeLanguagesLocally(lionWebVersion, "lioncore", lionWebVersion.LionCore);
+    SerializeLanguagesLocally(lionWebVersion, "shapes", ShapesDefinition.Language);
+
+    var libraryLanguage = DeserializeExternalLanguage(lionWebVersion, "library").First();
+    var multiLanguage = DeserializeExternalLanguage(lionWebVersion, "multi", libraryLanguage).First();
+    var withEnumLanguage = DeserializeExternalLanguage(lionWebVersion, "with-enum").First();
+    withEnumLanguage.Name = "WithEnum";
+    var specificLanguage = ISpecificLanguage.Get(lionWebVersion);
+    var deprecatedLang = DeserializeExternalLanguage(lionWebVersion, "deprecated", specificLanguage).First();
+    deprecatedLang.Name = "Deprecated";
+    var shapesLanguage = ShapesDefinition.Language;
+    shapesLanguage.Name = "Shapes";
+    var testLanguagesDefinitions = new TestLanguagesDefinitions(lionWebVersion);
+    var aLang = testLanguagesDefinitions.ALang;
+    var bLang = testLanguagesDefinitions.BLang;
+    var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
+    var sdtLang = testLanguagesDefinitions.SdtLang;
+
+    string prefix = $"Examples.V{lionWebVersion.VersionString.Replace('.', '_')}";
+    List<Names> names =
+    [
+        new(libraryLanguage, $"{prefix}.Library.M2"),
+        new(multiLanguage, $"{prefix}.Multi.M2") { NamespaceMappings = { [libraryLanguage] = $"{prefix}.Library.M2" } },
+        new(withEnumLanguage, $"{prefix}.WithEnum.M2"),
+        new(shapesLanguage, $"{prefix}.Shapes.M2"),
+        new(aLang, $"{prefix}.Circular.A") { NamespaceMappings = { [bLang] = $"{prefix}.Circular.B" } },
+        new(bLang, $"{prefix}.Circular.B") { NamespaceMappings = { [aLang] = $"{prefix}.Circular.A" } },
+        new(tinyRefLang, $"{prefix}.TinyRefLang"),
+        new(deprecatedLang, $"{prefix}.DeprecatedLang"),
+    ];
+    
+    if(sdtLang != null)
+        names.Add(new(sdtLang, $"{prefix}.SDTLang"));
+
+    names.AddRange(testLanguagesDefinitions
+        .MixedLangs
+        .Select(l =>
+            new Names(l, $"{prefix}.Mixed.{l.Name}")
+            {
+                NamespaceMappings = testLanguagesDefinitions
+                    .MixedLangs
+                    .Except([l])
+                    .Select(n => (n, $"{prefix}.Mixed.{n.Name}"))
+                    .ToDictionary()
+            }
+        )
+    );
+
+    var generationPath = "../../test/LionWeb-CSharp-Test/languages/generated";
+    Directory.CreateDirectory(generationPath);
+
+    foreach (var name in names)
+    {
+        var generator = new GeneratorFacade { Names = name, LionWebVersion = lionWebVersion};
+        generator.Generate();
+        Console.WriteLine($"generated code for: {name.Language.Name}");
+
+        var path = @$"{generationPath}/V{lionWebVersion.VersionString.Replace('.', '_')}/{name.Language.Name}.g.cs";
+        generator.Persist(path);
+        Console.WriteLine($"persisted to: {path}");
+    }
+}
+
+return;
+
+void SerializeLanguagesLocally(LionWebVersions lionWebVersion, string name, params Language[] languages)
+{
+    JsonUtils.WriteNodesToStream(
+        new FileStream($"chunks/localDefs/{lionWebVersion.VersionString}/{name}.json", FileMode.Create),
         new Serializer(lionWebVersion),
         languages.SelectMany(l => M1Extensions.Descendants<IReadableNode>(l, true, true)));
 }
 
-SerializeLanguagesLocally("lioncore", lionWebVersion.LionCore);
-SerializeLanguagesLocally("shapes", ShapesDefinition.Language);
-
-
-DynamicLanguage[] DeserializeExternalLanguage(string name, params Language[] dependentLanguages) =>
-    ILanguageDeserializerExtensions.Deserialize(
-        JsonUtils.ReadJsonFromString<SerializationChunk>(File.ReadAllText($"chunks/externalDefs/{name}.json")),
-        lionWebVersion,
-        dependentLanguages
-    ).ToArray();
-
-
-var libraryLanguage = DeserializeExternalLanguage("library").First();
-var multiLanguage = DeserializeExternalLanguage("multi", libraryLanguage).First();
-var withEnumLanguage = DeserializeExternalLanguage("with-enum").First();
-withEnumLanguage.Name = "WithEnum";
-var deprecatedLang = DeserializeExternalLanguage("deprecated", SpecificLanguage.Instance).First();
-deprecatedLang.Name = "Deprecated";
-var shapesLanguage = ShapesDefinition.Language;
-shapesLanguage.Name = "Shapes";
-var testLanguagesDefinitions = new TestLanguagesDefinitions();
-var aLang = testLanguagesDefinitions.ALang;
-var bLang = testLanguagesDefinitions.BLang;
-var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
-var sdtLang = testLanguagesDefinitions.SdtLang;
-
-List<Names> names =
-[
-    new (libraryLanguage, "Examples.Library.M2"),
-    new (multiLanguage, "Examples.Multi.M2")
-    {
-        NamespaceMappings = { [libraryLanguage] = "Examples.Library.M2" }
-    },
-    new (withEnumLanguage, "Examples.WithEnum.M2"),
-    new (shapesLanguage, "Examples.Shapes.M2"),
-    new (aLang, "Examples.Circular.A")
-    {
-        NamespaceMappings = { [bLang] = "Examples.Circular.B" }
-    },
-    new (bLang, "Examples.Circular.B")
-    {
-        NamespaceMappings = { [aLang] = "Examples.Circular.A" }
-    },
-    new (tinyRefLang, "Examples.TinyRefLang"),
-    new (deprecatedLang, "Examples.DeprecatedLang"),
-    new(sdtLang, "Examples.SDTLang")
-];
-
-names.AddRange(testLanguagesDefinitions
-    .MixedLangs
-    .Select(l =>
-        new Names(l, $"Examples.Mixed.{l.Name}")
-        {
-            NamespaceMappings = testLanguagesDefinitions
-                .MixedLangs
-                .Except([l])
-                .Select(n => (n, $"Examples.Mixed.{n.Name}"))
-                .ToDictionary()
-        }
-    )
-);
-
-var generationPath = "../../test/LionWeb-CSharp-Test/languages/generated";
-Directory.CreateDirectory(generationPath);
-
-foreach (var name in names)
+DynamicLanguage[] DeserializeExternalLanguage(LionWebVersions lionWebVersion, string name, params Language[] dependentLanguages)
 {
-    var generator = new GeneratorFacade { Names = name };
-    generator.Generate();
-    Console.WriteLine($"generated code for: {name.Language.Name}");
-
-    var path = @$"{generationPath}/{name.Language.Name}.g.cs";
-    generator.Persist(path);
-    Console.WriteLine($"persisted to: {path}");
+    SerializationChunk serializationChunk = JsonUtils.ReadJsonFromString<SerializationChunk>(File.ReadAllText($"chunks/externalDefs/{lionWebVersion.VersionString}/{name}.json"));
+    return new LanguageDeserializer(lionWebVersion)
+    {
+        StoreUncompressedIds = true
+    }.Deserialize(serializationChunk, dependentLanguages).ToArray();
 }

@@ -17,14 +17,14 @@
 
 namespace LionWeb_CSharp_Test.tests.serialization;
 
-using Examples.Mixed.MixedConceptLang;
-using Examples.Mixed.MixedDirectEnumLang;
-using Examples.Mixed.MixedDirectSdtLang;
-using Examples.Mixed.MixedNestedEnumLang;
-using Examples.Mixed.MixedNestedSdtLang;
-using Examples.SDTLang;
 using Examples.Shapes.Dynamic;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Mixed.MixedConceptLang;
+using Examples.V2024_1.Mixed.MixedDirectEnumLang;
+using Examples.V2024_1.Mixed.MixedDirectSdtLang;
+using Examples.V2024_1.Mixed.MixedNestedEnumLang;
+using Examples.V2024_1.Mixed.MixedNestedSdtLang;
+using Examples.V2024_1.SDTLang;
+using Examples.V2024_1.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
@@ -33,7 +33,6 @@ using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using LionWeb.Core.Utilities;
 using System.Collections;
-using System.Text;
 using Comparer = LionWeb.Core.Utilities.Comparer;
 
 [TestClass]
@@ -50,7 +49,7 @@ public class SerializationTests
     [TestMethod]
     public void test_serialization_shapes_model()
     {
-        INode rootNode = ExampleModels.ExampleModel(_language);
+        INode rootNode = new ExampleModels(_lionWebVersion).ExampleModel(_language);
 
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([rootNode]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
@@ -65,7 +64,7 @@ public class SerializationTests
     [TestMethod]
     public void test_no_double_serialization()
     {
-        var geometry = ExampleModels.ExampleModel(_language);
+        var geometry = new ExampleModels(_lionWebVersion).ExampleModel(_language);
         var shape0 = (geometry.Get(_language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes")) as IEnumerable)
             .Cast<INode>().First();
 

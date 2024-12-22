@@ -4,7 +4,7 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Examples.Mixed.MixedBaseConceptLang;
+namespace Examples.V2024_1.Mixed.MixedBaseConceptLang;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -19,16 +19,16 @@ public partial class MixedBaseConceptLangLanguage : LanguageBase<IMixedBaseConce
 	public static readonly MixedBaseConceptLangLanguage Instance = new Lazy<MixedBaseConceptLangLanguage>(() => new("id-mixedBaseConceptLang")).Value;
 	public MixedBaseConceptLangLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
-		_baseConcept = new(() => new ConceptBase<MixedBaseConceptLangLanguage>("id-baseConcept", this) { Key = "key-baseConcept", Name = "BaseConcept", Abstract = true, Partition = false, ImplementsLazy = new(() => [Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface, Examples.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface, Examples.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface]), FeaturesLazy = new(() => [BaseConcept_enumProp, BaseConcept_sdtProp]) });
-		_baseConcept_enumProp = new(() => new PropertyBase<MixedBaseConceptLangLanguage>("id-enumProp", BaseConcept, this) { Key = "key-enumProp", Name = "enumProp", Optional = false, Type = Examples.Mixed.MixedDirectEnumLang.MixedDirectEnumLangLanguage.Instance.DirectEnum });
-		_baseConcept_sdtProp = new(() => new PropertyBase<MixedBaseConceptLangLanguage>("id-sdtProp", BaseConcept, this) { Key = "key-sdtProp", Name = "sdtProp", Optional = false, Type = Examples.Mixed.MixedDirectSdtLang.MixedDirectSdtLangLanguage.Instance.DirectSdt });
+		_baseConcept = new(() => new ConceptBase<MixedBaseConceptLangLanguage>("id-baseConcept", this) { Key = "key-baseConcept", Name = "BaseConcept", Abstract = true, Partition = false, ImplementsLazy = new(() => [Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface, Examples.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface, Examples.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface]), FeaturesLazy = new(() => [BaseConcept_enumProp, BaseConcept_sdtProp]) });
+		_baseConcept_enumProp = new(() => new PropertyBase<MixedBaseConceptLangLanguage>("id-enumProp", BaseConcept, this) { Key = "key-enumProp", Name = "enumProp", Optional = false, Type = Examples.V2024_1.Mixed.MixedDirectEnumLang.MixedDirectEnumLangLanguage.Instance.DirectEnum });
+		_baseConcept_sdtProp = new(() => new PropertyBase<MixedBaseConceptLangLanguage>("id-sdtProp", BaseConcept, this) { Key = "key-sdtProp", Name = "sdtProp", Optional = false, Type = Examples.V2024_1.Mixed.MixedDirectSdtLang.MixedDirectSdtLangLanguage.Instance.DirectSdt });
 		_factory = new MixedBaseConceptLangFactory(this);
 	}
 
 	/// <inheritdoc/>
         public override IReadOnlyList<LanguageEntity> Entities => [BaseConcept];
 	/// <inheritdoc/>
-        public override IReadOnlyList<Language> DependsOn => [Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance, Examples.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance, Examples.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance, Examples.Mixed.MixedDirectEnumLang.MixedDirectEnumLangLanguage.Instance, Examples.Mixed.MixedDirectSdtLang.MixedDirectSdtLangLanguage.Instance];
+        public override IReadOnlyList<Language> DependsOn => [Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance, Examples.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance, Examples.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance, Examples.V2024_1.Mixed.MixedDirectEnumLang.MixedDirectEnumLangLanguage.Instance, Examples.V2024_1.Mixed.MixedDirectSdtLang.MixedDirectSdtLangLanguage.Instance];
 
 	private const string _key = "key-mixedBaseConceptLang";
 	/// <inheritdoc/>
@@ -84,36 +84,36 @@ public class MixedBaseConceptLangFactory : AbstractBaseNodeFactory, IMixedBaseCo
 }
 
 [LionCoreMetaPointer(Language = typeof(MixedBaseConceptLangLanguage), Key = "key-baseConcept")]
-public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseContainmentLang.BaseContainmentIface, Examples.Mixed.MixedBasePropertyLang.BasePropertyIface, Examples.Mixed.MixedBaseReferenceLang.BaseReferenceIface
+public abstract partial class BaseConcept : NodeBase, Examples.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface, Examples.V2024_1.Mixed.MixedBasePropertyLang.BasePropertyIface, Examples.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface
 {
-	private Examples.Mixed.MixedDirectEnumLang.DirectEnum? _enumProp = null;
+	private Examples.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum? _enumProp = null;
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If EnumProp has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(MixedBaseConceptLangLanguage), Key = "key-enumProp")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public Examples.Mixed.MixedDirectEnumLang.DirectEnum EnumProp { get => _enumProp ?? throw new UnsetFeatureException(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp); set => SetEnumProp(value); }
+	public Examples.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum EnumProp { get => _enumProp ?? throw new UnsetFeatureException(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp); set => SetEnumProp(value); }
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BaseConcept SetEnumProp(Examples.Mixed.MixedDirectEnumLang.DirectEnum value)
+        public BaseConcept SetEnumProp(Examples.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum value)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp);
 		_enumProp = value;
 		return this;
 	}
 
-	private Examples.Mixed.MixedDirectSdtLang.DirectSdt? _sdtProp = null;
+	private Examples.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt? _sdtProp = null;
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If SdtProp has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(MixedBaseConceptLangLanguage), Key = "key-sdtProp")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public Examples.Mixed.MixedDirectSdtLang.DirectSdt SdtProp { get => _sdtProp ?? throw new UnsetFeatureException(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp); set => SetSdtProp(value); }
+	public Examples.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt SdtProp { get => _sdtProp ?? throw new UnsetFeatureException(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp); set => SetSdtProp(value); }
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BaseConcept SetSdtProp(Examples.Mixed.MixedDirectSdtLang.DirectSdt value)
+        public BaseConcept SetSdtProp(Examples.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt value)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp);
 		_sdtProp = value;
@@ -124,17 +124,17 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Cont has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage), Key = "key-baseContainmentIface-cont")]
+        [LionCoreMetaPointer(Language = typeof(Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage), Key = "key-baseContainmentIface-cont")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public NodeBase Cont { get => _cont ?? throw new UnsetFeatureException(Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont); set => SetCont(value); }
+	public NodeBase Cont { get => _cont ?? throw new UnsetFeatureException(Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont); set => SetCont(value); }
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- Examples.Mixed.MixedBaseContainmentLang.BaseContainmentIface Examples.Mixed.MixedBaseContainmentLang.BaseContainmentIface.SetCont(NodeBase value) => SetCont(value);
+ Examples.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface Examples.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface.SetCont(NodeBase value) => SetCont(value);
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public BaseConcept SetCont(NodeBase value)
 	{
-		AssureNotNull(value, Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
+		AssureNotNull(value, Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
 		SetParentNull(_cont);
 		AttachChild(value);
 		_cont = value;
@@ -145,17 +145,17 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Prop has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(Examples.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage), Key = "key-basePropertyIface-prop")]
+        [LionCoreMetaPointer(Language = typeof(Examples.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage), Key = "key-basePropertyIface-prop")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Prop { get => _prop ?? throw new UnsetFeatureException(Examples.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop); set => SetProp(value); }
+	public string Prop { get => _prop ?? throw new UnsetFeatureException(Examples.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop); set => SetProp(value); }
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- Examples.Mixed.MixedBasePropertyLang.BasePropertyIface Examples.Mixed.MixedBasePropertyLang.BasePropertyIface.SetProp(string value) => SetProp(value);
+ Examples.V2024_1.Mixed.MixedBasePropertyLang.BasePropertyIface Examples.V2024_1.Mixed.MixedBasePropertyLang.BasePropertyIface.SetProp(string value) => SetProp(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public BaseConcept SetProp(string value)
 	{
-		AssureNotNull(value, Examples.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop);
+		AssureNotNull(value, Examples.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop);
 		_prop = value;
 		return this;
 	}
@@ -164,17 +164,17 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Ref has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(Examples.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage), Key = "key-baseReferenceIface-ref")]
+        [LionCoreMetaPointer(Language = typeof(Examples.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage), Key = "key-baseReferenceIface-ref")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public NodeBase Ref { get => _ref ?? throw new UnsetFeatureException(Examples.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref); set => SetRef(value); }
+	public NodeBase Ref { get => _ref ?? throw new UnsetFeatureException(Examples.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref); set => SetRef(value); }
 /// <remarks>Required Single Reference</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- Examples.Mixed.MixedBaseReferenceLang.BaseReferenceIface Examples.Mixed.MixedBaseReferenceLang.BaseReferenceIface.SetRef(NodeBase value) => SetRef(value);
+ Examples.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface Examples.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface.SetRef(NodeBase value) => SetRef(value);
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public BaseConcept SetRef(NodeBase value)
 	{
-		AssureNotNull(value, Examples.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
+		AssureNotNull(value, Examples.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
 		_ref = value;
 		return this;
 	}
@@ -202,19 +202,19 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 			return true;
 		}
 
-		if (Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont.EqualsIdentity(feature))
+		if (Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont.EqualsIdentity(feature))
 		{
 			result = Cont;
 			return true;
 		}
 
-		if (Examples.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop.EqualsIdentity(feature))
+		if (Examples.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop.EqualsIdentity(feature))
 		{
 			result = Prop;
 			return true;
 		}
 
-		if (Examples.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref.EqualsIdentity(feature))
+		if (Examples.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref.EqualsIdentity(feature))
 		{
 			result = Ref;
 			return true;
@@ -230,7 +230,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 			return true;
 		if (MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp.EqualsIdentity(feature))
 		{
-			if (value is Examples.Mixed.MixedDirectEnumLang.DirectEnum v)
+			if (value is Examples.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum v)
 			{
 				EnumProp = v;
 				return true;
@@ -241,7 +241,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 
 		if (MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp.EqualsIdentity(feature))
 		{
-			if (value is Examples.Mixed.MixedDirectSdtLang.DirectSdt v)
+			if (value is Examples.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt v)
 			{
 				SdtProp = v;
 				return true;
@@ -250,7 +250,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 			throw new InvalidValueException(feature, value);
 		}
 
-		if (Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont.EqualsIdentity(feature))
+		if (Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont.EqualsIdentity(feature))
 		{
 			if (value is NodeBase v)
 			{
@@ -261,7 +261,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 			throw new InvalidValueException(feature, value);
 		}
 
-		if (Examples.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop.EqualsIdentity(feature))
+		if (Examples.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop.EqualsIdentity(feature))
 		{
 			if (value is string v)
 			{
@@ -272,7 +272,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 			throw new InvalidValueException(feature, value);
 		}
 
-		if (Examples.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref.EqualsIdentity(feature))
+		if (Examples.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref.EqualsIdentity(feature))
 		{
 			if (value is NodeBase v)
 			{
@@ -295,11 +295,11 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 		if (_sdtProp != default)
 			result.Add(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp);
 		if (_cont != default)
-			result.Add(Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
+			result.Add(Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
 		if (_prop != default)
-			result.Add(Examples.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop);
+			result.Add(Examples.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop);
 		if (_ref != default)
-			result.Add(Examples.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
+			result.Add(Examples.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
 		return result;
 	}
 
@@ -309,7 +309,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 		if (base.DetachChild(child))
 			return true;
 		var c = GetContainmentOf(child);
-		if (Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont.EqualsIdentity(c))
+		if (Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont.EqualsIdentity(c))
 		{
 			_cont = null;
 			return true;
@@ -325,7 +325,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.Mixed.MixedBaseCo
 		if (result != null)
 			return result;
 		if (ReferenceEquals(_cont, child))
-			return Examples.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont;
+			return Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont;
 		return null;
 	}
 }
