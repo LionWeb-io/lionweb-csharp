@@ -25,7 +25,7 @@ public partial class SDTLangLanguage : LanguageBase<ISDTLangFactory>
 		_a_a2c = new(() => new FieldBase<SDTLangLanguage>("id-SDTa2c", A, this) { Key = "key-SDTa2c", Name = "a2c", Type = C });
 		_amount = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDTAmount", this) { Key = "key-SDTAmount", Name = "Amount", FieldsLazy = new(() => [Amount_value, Amount_currency, Amount_digital]) });
 		_amount_value = new(() => new FieldBase<SDTLangLanguage>("id-SDTValue", Amount, this) { Key = "key-SDTValue", Name = "value", Type = Decimal });
-		_amount_currency = new(() => new FieldBase<SDTLangLanguage>("id-SDTCurrency", Amount, this) { Key = "key-SDTCurrency", Name = "currency", Type = Currency });
+		_amount_currency = new(() => new FieldBase<SDTLangLanguage>("id-SDTCurr", Amount, this) { Key = "key-SDTCurr", Name = "currency", Type = Currency });
 		_amount_digital = new(() => new FieldBase<SDTLangLanguage>("id-SDTDigital", Amount, this) { Key = "key-SDTDigital", Name = "digital", Type = _builtIns.Boolean });
 		_b = new(() => new StructuredDataTypeBase<SDTLangLanguage>("id-SDTB", this) { Key = "key-SDTB", Name = "B", FieldsLazy = new(() => [B_name, B_b2d]) });
 		_b_name = new(() => new FieldBase<SDTLangLanguage>("id-SDTbName", B, this) { Key = "key-SDTbName", Name = "name", Type = _builtIns.String });
@@ -59,7 +59,7 @@ public partial class SDTLangLanguage : LanguageBase<ISDTLangFactory>
 		_sDTConcept_A = new(() => new PropertyBase<SDTLangLanguage>("id-SDTAField", SDTConcept, this) { Key = "key-SDTAField", Name = "A", Optional = false, Type = A });
 		_sDTConcept_amount = new(() => new PropertyBase<SDTLangLanguage>("id-SDTamountField", SDTConcept, this) { Key = "key-SDTamountField", Name = "amount", Optional = false, Type = Amount });
 		_sDTConcept_complex = new(() => new PropertyBase<SDTLangLanguage>("id-SDTComplexField", SDTConcept, this) { Key = "key-SDTComplexField", Name = "complex", Optional = false, Type = ComplexNumber });
-		_sDTConcept_decimal = new(() => new PropertyBase<SDTLangLanguage>("id-SDTDecimalField", SDTConcept, this) { Key = "key-SDTDecimalField", Name = "decimal", Optional = false, Type = Decimal });
+		_sDTConcept_decimal = new(() => new PropertyBase<SDTLangLanguage>("id-SDTDecimalField", SDTConcept, this) { Key = "key-SDTDecimalField", Name = "decimal", Optional = true, Type = Decimal });
 		_sDTConcept_fqn = new(() => new PropertyBase<SDTLangLanguage>("id-SDTFqnField", SDTConcept, this) { Key = "key-SDTFqnField", Name = "fqn", Optional = false, Type = FullyQualifiedName });
 		_factory = new SDTLangFactory(this);
 	}
@@ -323,18 +323,14 @@ public partial class SDTConcept : NodeBase
 	}
 
 	private Decimal? _decimal = null;
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "UnsetFeatureException">If Decimal has not been set</exception>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
+	/// <remarks>Optional Property</remarks>
         [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTDecimalField")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public Decimal Decimal { get => _decimal ?? throw new UnsetFeatureException(SDTLangLanguage.Instance.SDTConcept_decimal); set => SetDecimal(value); }
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
+	public Decimal? Decimal { get => _decimal; set => SetDecimal(value); }
 
-	/// <remarks>Required Property</remarks>
-    	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetDecimal(Decimal value)
+	/// <remarks>Optional Property</remarks>
+        public SDTConcept SetDecimal(Decimal? value)
 	{
-		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_decimal);
 		_decimal = value;
 		return this;
 	}
@@ -440,9 +436,9 @@ public partial class SDTConcept : NodeBase
 
 		if (SDTLangLanguage.Instance.SDTConcept_decimal.EqualsIdentity(feature))
 		{
-			if (value is Examples.V2024_1.SDTLang.Decimal v)
+			if (value is null or Examples.V2024_1.SDTLang.Decimal)
 			{
-				Decimal = v;
+				Decimal = (Examples.V2024_1.SDTLang.Decimal?)value;
 				return true;
 			}
 
@@ -551,7 +547,7 @@ public readonly record struct A : IStructuredDataTypeInstance
 public readonly record struct Amount : IStructuredDataTypeInstance
 {
 	private readonly Currency? _currency;
-	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTCurrency")]
+	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTCurr")]
 	public Currency Currency { get => _currency ?? throw new UnsetFieldException(SDTLangLanguage.Instance.Amount_currency); init => _currency = value; }
 
 	private readonly bool? _digital;

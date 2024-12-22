@@ -136,7 +136,7 @@ public class TestLanguagesDefinitions
             "FullyQualifiedName");
 
         sdtConcept.Property("id-SDTamountField", "key-SDTamountField", "amount").OfType(amount);
-        sdtConcept.Property("id-SDTDecimalField", "key-SDTDecimalField", "decimal").OfType(dec);
+        sdtConcept.Property("id-SDTDecimalField", "key-SDTDecimalField", "decimal").OfType(dec).IsOptional();
         sdtConcept.Property("id-SDTComplexField", "key-SDTComplexField", "complex").OfType(complex);
         sdtConcept.Property("id-SDTFqnField", "key-SDTFqnField", "fqn").OfType(fqn);
 
@@ -144,7 +144,7 @@ public class TestLanguagesDefinitions
         currency.EnumerationLiteral("id-SDT-gbp", "key-SDTGbp", "GBP");
 
         amount.Field("id-SDTValue", "key-SDTValue", "value").OfType(dec);
-        amount.Field("id-SDTCurrency", "key-SDTCurrency", "currency").OfType(currency);
+        amount.Field("id-SDTCurr", "key-SDTCurr", "currency").OfType(currency);
         amount.Field("id-SDTDigital", "key-SDTDigital", "digital").OfType(_lionWebVersion.BuiltIns.Boolean);
 
         dec.Field("id-SDTInt", "key-SDTInt", "int").OfType(_lionWebVersion.BuiltIns.Integer);
