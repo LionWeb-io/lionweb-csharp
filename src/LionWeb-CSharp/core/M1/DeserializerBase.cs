@@ -308,7 +308,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
         CompressedId.Create(id, StoreUncompressedIds);
 
     /// Compresses <paramref name="id"/> if not <c>null</c>.
-    protected CompressedId? CompressOpt(string? id) =>
+    protected internal CompressedId? CompressOpt(string? id) =>
         id != null ? CompressedId.Create(id, StoreUncompressedIds) : null;
 
     /// Compresses <paramref name="metaPointer"/>.

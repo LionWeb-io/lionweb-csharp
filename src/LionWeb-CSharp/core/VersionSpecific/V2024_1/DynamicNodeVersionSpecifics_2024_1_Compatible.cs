@@ -47,6 +47,12 @@ internal class DynamicNodeVersionSpecifics_2024_1_Compatible : DynamicNodeVersio
                     return result;
 
                 break;
+
+            case IStructuredDataTypeInstance i when property.Type is StructuredDataType s:
+                if (i.GetStructuredDataType().EqualsIdentity(s))
+                    return value;
+                
+                break;
         }
 
         throw new InvalidValueException(property, value);

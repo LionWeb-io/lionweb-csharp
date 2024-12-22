@@ -62,38 +62,7 @@ public partial class LanguageDeserializer
         if (serializedContainmentsLookup.Count == 0)
             return;
 
-        switch (node)
-        {
-            case DynamicClassifier classifier:
-                classifier.AddFeatures(Lookup<Feature>(_m3.Classifier_features));
-                return;
-            case DynamicEnumeration enumeration:
-                enumeration.AddLiterals(Lookup<EnumerationLiteral>(_m3.Enumeration_literals));
-                return;
-            case DynamicLanguage language:
-                language.AddEntities(Lookup<LanguageEntity>(_m3.Language_entities));
-                return;
-            case DynamicEnumerationLiteral or DynamicPrimitiveType or DynamicFeature:
-                return;
-            default:
-                _handler.InvalidContainment(node);
-                return;
-        }
-
-        IEnumerable<T> Lookup<T>(Containment containment) where T : class
-        {
-            if (serializedContainmentsLookup.Contains(containment.Key))
-                return serializedContainmentsLookup[containment.Key].Cast<T>();
-
-            var serializedContainment =
-                serializedNode.Containments.FirstOrDefault(c => c.Containment.Matches(containment));
-            if (serializedContainment == null)
-                return [];
-
-            return serializedContainment.Children
-                .Select(c => _handler.UnresolvableChild(Compress(c), containment, node) as T)
-                .Where(t => t != null)!;
-        }
+        _languageVersionSpecifics.InstallLanguageContainments(serializedNode, node, serializedContainmentsLookup);
     }
 
     private void InstallLanguageReferences(SerializedNode serializedNode)
@@ -110,82 +79,6 @@ public partial class LanguageDeserializer
         if (serializedReferencesLookup.Count == 0)
             return;
 
-        switch (node)
-        {
-            case DynamicLanguage language:
-                language.AddDependsOn(LookupMulti<Language>(_m3.Language_dependsOn));
-                return;
-            case DynamicAnnotation annotation:
-                annotation.Extends = LookupSingle<Annotation>(_m3.Annotation_extends);
-                annotation.AddImplements(LookupFilteredInterfaces(_m3.Annotation_implements, annotation.Implements));
-                annotation.Annotates = LookupSingle<Classifier>(_m3.Annotation_annotates)!;
-                return;
-            case DynamicConcept concept:
-                concept.Extends = LookupSingle<Concept>(_m3.Concept_extends);
-                concept.AddImplements(LookupFilteredInterfaces(_m3.Concept_implements, concept.Implements));
-                return;
-            case DynamicInterface @interface:
-                @interface.AddExtends(LookupFilteredInterfaces(_m3.Interface_extends, @interface.Extends));
-                return;
-            case DynamicLink link:
-                link.Type = LookupSingle<Classifier>(_m3.Link_type)!;
-                return;
-            case DynamicProperty property:
-                property.Type = LookupSingle<Datatype>(_m3.Property_type)!;
-                return;
-            case DynamicEnumeration or DynamicEnumerationLiteral or DynamicPrimitiveType:
-                return;
-
-            default:
-                _handler.InvalidReference(node);
-                return;
-        }
-
-        T? LookupSingle<T>(Reference reference) where T : class
-        {
-            if (serializedReferencesLookup.Contains(reference.Key))
-            {
-                var elements = serializedReferencesLookup[reference.Key].ToList();
-                if (elements.Count == 1)
-                    return elements.Cast<T>().First();
-            }
-
-            var serializedReference = FindSerializedReference(reference);
-            if (serializedReference == null)
-                return null;
-
-            if (serializedReference.Targets.Length == 1)
-            {
-                var target = serializedReference.Targets.First();
-                return UnknownReference<T>(reference, target);
-            }
-
-            return null;
-        }
-
-        IEnumerable<T> LookupMulti<T>(Reference reference) where T : class
-        {
-            if (serializedReferencesLookup.Contains(reference.Key))
-                return serializedReferencesLookup[reference.Key].Cast<T>();
-
-            var serializedReference = FindSerializedReference(reference);
-            if (serializedReference == null)
-                return [];
-
-            return serializedReference.Targets.Select(t => UnknownReference<T>(reference, t)).Where(t => t != null)!;
-        }
-
-        IEnumerable<Interface> LookupFilteredInterfaces(Reference reference, IEnumerable<Interface> linkedInterfaces) =>
-            LookupMulti<Interface>(reference)
-                .Except(linkedInterfaces, new LanguageEntityIdentityComparer())
-                .OfType<Interface>();
-
-        SerializedReference? FindSerializedReference(Reference reference) =>
-            serializedNode.References
-                .FirstOrDefault(r => r.Reference.Matches(reference));
-
-        T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class =>
-            _handler.UnresolvableReferenceTarget(CompressOpt(target.Reference), target.ResolveInfo, reference,
-                (IWritableNode)node) as T;
+_languageVersionSpecifics.InstallLanguageReferences(serializedNode, node, serializedReferencesLookup);
     }
 }

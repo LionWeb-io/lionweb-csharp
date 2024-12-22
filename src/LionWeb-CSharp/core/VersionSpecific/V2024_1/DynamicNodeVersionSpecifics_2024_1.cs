@@ -43,13 +43,11 @@ internal class DynamicNodeVersionSpecifics_2024_1 : DynamicNodeVersionSpecificsB
 
                 break;
 
-            // TODO
-            // implement
-            // case IStructuredDataTypeInstance i when property.Type is StructuredDataType s:
-            //     if (i.GetStructuredDataType().EqualsIdentity(s))
-            //         return value;
-            //     
-            //     break;
+            case IStructuredDataTypeInstance i when property.Type is StructuredDataType s:
+                if (i.GetStructuredDataType().EqualsIdentity(s))
+                    return value;
+                
+                break;
         }
 
         throw new InvalidValueException(property, value);
