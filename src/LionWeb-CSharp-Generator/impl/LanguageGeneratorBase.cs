@@ -71,10 +71,6 @@ public abstract class LanguageGeneratorBase : GeneratorBase
         return _names.AsProperty(entity);
     }
 
-    /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
-    internal IGeneratorVersionSpecifics VersionSpecifics =>
-        new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_lionWebVersion)).Value;
-
     /// <inheritdoc cref="INames.AsProperty(LionWeb.Core.M3.EnumerationLiteral)"/>
     protected IdentifierNameSyntax AsProperty(EnumerationLiteral literal) =>
         _names.AsProperty(literal);

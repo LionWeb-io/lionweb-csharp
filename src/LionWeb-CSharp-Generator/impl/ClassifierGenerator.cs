@@ -77,14 +77,8 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
 
     private T AttachConceptDescription<T>(T decl) where T : TypeDeclarationSyntax
     {
-        var conceptDescriptions = classifier.GetAnnotations().OfType<ConceptDescription>()
-            .Where(cd => cd.ConceptShortDescription != null);
-        if (conceptDescriptions.Any())
-        {
-            return decl.Xdoc(XdocLine(conceptDescriptions.First().ConceptShortDescription, "summary"));
-        }
-
-        return decl;
+        var conceptShortDescription = VersionSpecifics.GetConceptShortDescription(classifier);
+        return conceptShortDescription != null ? decl.Xdoc(XdocLine(conceptShortDescription, "summary")) : decl;
     }
 
     private TypeSyntax GetSuperclass() =>

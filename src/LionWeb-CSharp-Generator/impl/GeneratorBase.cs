@@ -21,7 +21,6 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
-using Io.Lionweb.Mps.Specific;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -54,6 +53,10 @@ public abstract class GeneratorBase
 
     /// <inheritdoc cref="INames.LanguageType"/>
     protected NameSyntax LanguageType => _names.LanguageType;
+
+    /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
+    internal IGeneratorVersionSpecifics VersionSpecifics =>
+        new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_lionWebVersion)).Value;
 
     /// <inheritdoc cref="INames.AsType(System.Type,Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax?[])"/>
     protected TypeSyntax AsType(Type type, params TypeSyntax?[] generics) =>
@@ -130,16 +133,13 @@ public abstract class GeneratorBase
     {
         var deprecatedAnnotation = keyed
             .GetAnnotations()
-            .FirstOrDefault(a => a
-                .GetClassifier()
-                .EqualsIdentity(SpecificLanguage.Instance.Deprecated)
-            );
+            .FirstOrDefault(a => VersionSpecifics.IsDeprecated(a.GetClassifier()));
         if (deprecatedAnnotation == null)
             return null;
 
         var result = Attribute(IdentifierName("Obsolete"));
 
-        var comment = deprecatedAnnotation.Get(SpecificLanguage.Instance.Deprecated_comment);
+        var comment = VersionSpecifics.GetDeprecatedComment(deprecatedAnnotation);
         if (comment is not string s)
             return result;
 
