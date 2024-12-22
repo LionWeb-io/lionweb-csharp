@@ -4,7 +4,10 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace Io.Lionweb.Mps.Specific;
+namespace LionWeb.CSharp.Generator.VersionSpecific.V2023_1;
+
+using Core.VersionSpecific.V2023_1;
+using Io.Lionweb.Mps.Specific;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -13,20 +16,20 @@ using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "0")]
-public partial class SpecificLanguage : LanguageBase<ISpecificFactory>
+public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecificLanguage
 {
 	public static readonly SpecificLanguage Instance = new Lazy<SpecificLanguage>(() => new("io-lionweb-mps-specific")).Value;
-	public SpecificLanguage(string id) : base(id, LionWebVersions.v2024_1)
+	public SpecificLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
-		_conceptDescription = new(() => new AnnotationBase<SpecificLanguage>("ConceptDescription", this) { Key = "ConceptDescription", Name = "ConceptDescription", AnnotatesLazy = new(() => M3Language.Instance.Classifier), FeaturesLazy = new(() => [ConceptDescription_conceptAlias, ConceptDescription_conceptShortDescription]) });
-		_conceptDescription_conceptAlias = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptAlias", ConceptDescription, this) { Key = "ConceptDescription-conceptAlias", Name = "conceptAlias", Optional = true, Type = BuiltInsLanguage.Instance.String });
-		_conceptDescription_conceptShortDescription = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptShortDescription", ConceptDescription, this) { Key = "ConceptDescription-conceptShortDescription", Name = "conceptShortDescription", Optional = true, Type = BuiltInsLanguage.Instance.String });
-		_deprecated = new(() => new AnnotationBase<SpecificLanguage>("Deprecated", this) { Key = "Deprecated", Name = "Deprecated", AnnotatesLazy = new(() => M3Language.Instance.IKeyed), FeaturesLazy = new(() => [Deprecated_build, Deprecated_comment]) });
-		_deprecated_build = new(() => new PropertyBase<SpecificLanguage>("Deprecated-build", Deprecated, this) { Key = "Deprecated-build", Name = "build", Optional = true, Type = BuiltInsLanguage.Instance.String });
-		_deprecated_comment = new(() => new PropertyBase<SpecificLanguage>("Deprecated-comment", Deprecated, this) { Key = "Deprecated-comment", Name = "comment", Optional = true, Type = BuiltInsLanguage.Instance.String });
-		_shortDescription = new(() => new AnnotationBase<SpecificLanguage>("ShortDescription", this) { Key = "ShortDescription", Name = "ShortDescription", AnnotatesLazy = new(() => BuiltInsLanguage.Instance.Node), FeaturesLazy = new(() => [ShortDescription_description]) });
-		_shortDescription_description = new(() => new PropertyBase<SpecificLanguage>("ShortDescription-description", ShortDescription, this) { Key = "ShortDescription-description", Name = "description", Optional = true, Type = BuiltInsLanguage.Instance.String });
-		_virtualPackage = new(() => new AnnotationBase<SpecificLanguage>("VirtualPackage", this) { Key = "VirtualPackage", Name = "VirtualPackage", AnnotatesLazy = new(() => BuiltInsLanguage.Instance.Node), ImplementsLazy = new(() => [BuiltInsLanguage.Instance.INamed]) });
+		_conceptDescription = new(() => new AnnotationBase<SpecificLanguage>("ConceptDescription", this) { Key = "ConceptDescription", Name = "ConceptDescription", AnnotatesLazy = new(() => LionCoreLanguage_2023_1.Instance.Classifier), FeaturesLazy = new(() => [ConceptDescription_conceptAlias, ConceptDescription_conceptShortDescription]) });
+		_conceptDescription_conceptAlias = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptAlias", ConceptDescription, this) { Key = "ConceptDescription-conceptAlias", Name = "conceptAlias", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
+		_conceptDescription_conceptShortDescription = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptShortDescription", ConceptDescription, this) { Key = "ConceptDescription-conceptShortDescription", Name = "conceptShortDescription", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
+		_deprecated = new(() => new AnnotationBase<SpecificLanguage>("Deprecated", this) { Key = "Deprecated", Name = "Deprecated", AnnotatesLazy = new(() => LionCoreLanguage_2023_1.Instance.IKeyed), FeaturesLazy = new(() => [Deprecated_build, Deprecated_comment]) });
+		_deprecated_build = new(() => new PropertyBase<SpecificLanguage>("Deprecated-build", Deprecated, this) { Key = "Deprecated-build", Name = "build", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
+		_deprecated_comment = new(() => new PropertyBase<SpecificLanguage>("Deprecated-comment", Deprecated, this) { Key = "Deprecated-comment", Name = "comment", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
+		_shortDescription = new(() => new AnnotationBase<SpecificLanguage>("ShortDescription", this) { Key = "ShortDescription", Name = "ShortDescription", AnnotatesLazy = new(() => BuiltInsLanguage_2023_1.Instance.Node), FeaturesLazy = new(() => [ShortDescription_description]) });
+		_shortDescription_description = new(() => new PropertyBase<SpecificLanguage>("ShortDescription-description", ShortDescription, this) { Key = "ShortDescription-description", Name = "description", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
+		_virtualPackage = new(() => new AnnotationBase<SpecificLanguage>("VirtualPackage", this) { Key = "VirtualPackage", Name = "VirtualPackage", AnnotatesLazy = new(() => BuiltInsLanguage_2023_1.Instance.Node), ImplementsLazy = new(() => [BuiltInsLanguage_2023_1.Instance.INamed]) });
 		_factory = new SpecificFactory(this);
 	}
 
@@ -396,9 +399,9 @@ public partial class VirtualPackage : NodeBase, INamedWritable
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(BuiltInsLanguage), Key = "LionCore-builtins-INamed-name")]
+        [LionCoreMetaPointer(Language = typeof(BuiltInsLanguage_2023_1), Key = "LionCore-builtins-INamed-name")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Name { get => _name ?? throw new UnsetFeatureException(BuiltInsLanguage.Instance.INamed_name); set => SetName(value); }
+	public string Name { get => _name ?? throw new UnsetFeatureException(BuiltInsLanguage_2023_1.Instance.INamed_name); set => SetName(value); }
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  INamedWritable INamedWritable.SetName(string value) => SetName(value);
@@ -406,7 +409,7 @@ public partial class VirtualPackage : NodeBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public VirtualPackage SetName(string value)
 	{
-		AssureNotNull(value, BuiltInsLanguage.Instance.INamed_name);
+		AssureNotNull(value, BuiltInsLanguage_2023_1.Instance.INamed_name);
 		_name = value;
 		return this;
 	}
@@ -422,7 +425,7 @@ public partial class VirtualPackage : NodeBase, INamedWritable
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
-		if (BuiltInsLanguage.Instance.INamed_name.EqualsIdentity(feature))
+		if (BuiltInsLanguage_2023_1.Instance.INamed_name.EqualsIdentity(feature))
 		{
 			result = Name;
 			return true;
@@ -436,7 +439,7 @@ public partial class VirtualPackage : NodeBase, INamedWritable
 	{
 		if (base.SetInternal(feature, value))
 			return true;
-		if (BuiltInsLanguage.Instance.INamed_name.EqualsIdentity(feature))
+		if (BuiltInsLanguage_2023_1.Instance.INamed_name.EqualsIdentity(feature))
 		{
 			if (value is string v)
 			{
@@ -455,7 +458,7 @@ public partial class VirtualPackage : NodeBase, INamedWritable
 	{
 		var result = base.CollectAllSetFeatures().ToList();
 		if (_name != default)
-			result.Add(BuiltInsLanguage.Instance.INamed_name);
+			result.Add(BuiltInsLanguage_2023_1.Instance.INamed_name);
 		return result;
 	}
 }

@@ -29,11 +29,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 /// <see cref="GeneratorFacade"/> parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
-internal class GeneratorVersionSpecifics_2024_1_Compatible : IGeneratorVersionSpecifics
+internal class GeneratorVersionSpecifics_2024_1_Compatible : GeneratorVersionSpecifics_2024_1
 {
-    public LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
+    public override LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
 
-    public ExpressionSyntax? AsProperty(LanguageEntity entity) => entity switch
+    public override ExpressionSyntax? AsProperty(LanguageEntity entity) => entity switch
     {
         _ when entity.EqualsIdentity(BuiltInsLanguage_2023_1.Instance.Node) => ParseExpression("_builtIns.Node"),
         _ when entity.EqualsIdentity(BuiltInsLanguage_2023_1.Instance.INamed) => ParseExpression("_builtIns.INamed"),
@@ -58,7 +58,7 @@ internal class GeneratorVersionSpecifics_2024_1_Compatible : IGeneratorVersionSp
         _ => null
     };
 
-    public TypeSyntax? AsType(Datatype datatype) => datatype switch
+    public override TypeSyntax? AsType(Datatype datatype) => datatype switch
     {
         _ when datatype.EqualsIdentity(BuiltInsLanguage_2023_1.Instance.Boolean) => PredefinedType(Token(SyntaxKind.BoolKeyword)),
         _ when datatype.EqualsIdentity(BuiltInsLanguage_2023_1.Instance.Integer) => PredefinedType(Token(SyntaxKind.IntKeyword)),

@@ -44,4 +44,8 @@ internal interface IGeneratorVersionSpecifics : IVersionSpecifics
 
     /// <inheritdoc cref="INames.AsType(System.Type,Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax?[])"/>
     TypeSyntax? AsType(Datatype datatype);
+    
+    string? GetConceptShortDescription(Classifier classifier);
+    bool IsDeprecated(Classifier classifier);
+    string? GetDeprecatedComment(IReadableNode annotation);
 }
