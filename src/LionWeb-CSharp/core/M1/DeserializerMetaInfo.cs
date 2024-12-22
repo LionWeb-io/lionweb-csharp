@@ -27,14 +27,13 @@ using System.Diagnostics.CodeAnalysis;
 /// Stores information required do deserialize meta-elements of nodes.
 /// <remarks>Should be internal, but the compiler doesn't like it in
 /// <see cref="DeserializerBase{T}._deserializerMetaInfo"/>.</remarks>
-public class DeserializerMetaInfo
+public class DeserializerMetaInfo(IDeserializerHandler handler)
 {
     private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
     private readonly Dictionary<CompressedId, List<Language>> _languagesByKey = new();
     private readonly Dictionary<CompressedMetaPointer, Classifier> _classifiers = new();
     private readonly Dictionary<CompressedMetaPointer, Feature> _features = new();
-
-    internal IDeserializerHandler Handler { get; set; } = new DeserializerExceptionHandler();
+    
     internal bool StoreUncompressedIds { get; set; } = false;
 
     internal void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
@@ -62,7 +61,7 @@ public class DeserializerMetaInfo
         if (!LookupClassifier(compressedMetaPointer, out var classifier))
         {
             classifier =
-                Handler.UnknownClassifier(compressedMetaPointer, CompressedId.Create(id, StoreUncompressedIds));
+                handler.UnknownClassifier(compressedMetaPointer, CompressedId.Create(id, StoreUncompressedIds));
             if (classifier == null)
                 return null;
         }
@@ -81,12 +80,12 @@ public class DeserializerMetaInfo
         Classifier classifier = node.GetClassifier();
         if (!LookupFeature(compressedMetaPointer, out var feature))
         {
-            feature = Handler.UnknownFeature<TFeature>(compressedMetaPointer, classifier, node);
+            feature = handler.UnknownFeature<TFeature>(compressedMetaPointer, classifier, node);
             if (feature == null)
                 return null;
         }
 
-        return feature as TFeature ?? Handler.InvalidFeature<TFeature>(compressedMetaPointer, classifier, node);
+        return feature as TFeature ?? handler.InvalidFeature<TFeature>(compressedMetaPointer, classifier, node);
     }
 
     private bool LookupClassifier(CompressedMetaPointer compressedMetaPointer,
@@ -104,7 +103,7 @@ public class DeserializerMetaInfo
             return false;
         }
 
-        result = Handler.SelectVersion<T>(compressedMetaPointer, languages);
+        result = handler.SelectVersion<T>(compressedMetaPointer, languages);
         return result != null;
     }
 

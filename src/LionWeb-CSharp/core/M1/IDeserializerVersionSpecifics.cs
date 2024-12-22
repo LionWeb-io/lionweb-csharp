@@ -23,22 +23,19 @@ using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1;
 
 /// Externalized logic of <see cref="IDeserializer"/>, specific to one version of LionWeb standard.
-public interface IDeserializerVersionSpecifics : IVersionSpecifics
+internal interface IDeserializerVersionSpecifics : IVersionSpecifics
 {
     /// <summary>
     /// Creates an instance of <see cref="IDeserializerVersionSpecifics"/> that implements <paramref name="lionWebVersion"/>.
     /// </summary>
     /// <exception cref="UnsupportedVersionException"></exception>
-    public static IDeserializerVersionSpecifics Create(LionWebVersions lionWebVersion) => lionWebVersion switch
+    public static IDeserializerVersionSpecifics Create<T>(LionWebVersions lionWebVersion, DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler) where T : class, IReadableNode => lionWebVersion switch
     {
-        IVersion2023_1 => new DeserializerVersionSpecifics_2023_1(),
-        IVersion2024_1 => new DeserializerVersionSpecifics_2024_1(),
-        IVersion2024_1_Compatible => new DeserializerVersionSpecifics_2024_1_Compatible(),
+        IVersion2023_1 => new DeserializerVersionSpecifics_2023_1<T>(deserializer,metaInfo,handler),
+        IVersion2024_1 => new DeserializerVersionSpecifics_2024_1<T>(deserializer,metaInfo,handler),
+        IVersion2024_1_Compatible => new DeserializerVersionSpecifics_2024_1_Compatible<T>(deserializer,metaInfo,handler),
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
-
-    void Initialize<T>(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler)
-        where T : class, IReadableNode;
 
     /// Registers all relevant builtins. 
     void RegisterBuiltins();
@@ -47,7 +44,7 @@ public interface IDeserializerVersionSpecifics : IVersionSpecifics
     object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype, string? value);
 }
 
-internal abstract class DeserializerVersionSpecificsBase : IDeserializerVersionSpecifics
+internal abstract class DeserializerVersionSpecificsBase<T> : IDeserializerVersionSpecifics where T : class, IReadableNode
 {
     protected IDeserializer _deserializer;
     protected DeserializerMetaInfo _metaInfo;
@@ -55,8 +52,7 @@ internal abstract class DeserializerVersionSpecificsBase : IDeserializerVersionS
 
     public abstract LionWebVersions Version { get; }
 
-    public virtual void Initialize<T>(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo,
-        IDeserializerHandler handler) where T : class, IReadableNode
+    protected DeserializerVersionSpecificsBase(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler)
     {
         _deserializer = deserializer;
         _metaInfo = metaInfo;

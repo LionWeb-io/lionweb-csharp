@@ -68,7 +68,7 @@ public partial class Deserializer
     {
         IWritableNode? result = _deserializedNodesById.TryGetValue(childId, out var existingChild)
             ? existingChild as IWritableNode
-            : Handler.UnresolvableChild(childId, containment, node);
+            : _handler.UnresolvableChild(childId, containment, node);
 
         return PreventCircularContainment(node, result);
     }
@@ -107,13 +107,13 @@ public partial class Deserializer
     private IWritableNode? FindAnnotation(IWritableNode node, CompressedId annotationId)
     {
         if (!_deserializedNodesById.TryGetValue(annotationId, out var result))
-            result = Handler.UnresolvableAnnotation(annotationId, node);
+            result = _handler.UnresolvableAnnotation(annotationId, node);
 
         if (result == null)
             return null;
 
         if (result.GetClassifier() is not Annotation ann || !ann.CanAnnotate(node.GetClassifier()))
-            result = Handler.InvalidAnnotation(result, node);
+            result = _handler.InvalidAnnotation(result, node);
 
         return PreventCircularContainment(node, result);
     }

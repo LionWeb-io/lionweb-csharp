@@ -29,13 +29,12 @@ public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILa
     private readonly DeserializerBuilder _deserializerBuilder = new();
 
     /// <summary>
-    /// Deserializes languages based on LionWeb version encoded in <paramref name="versionSpecifics"/>.
+    /// Deserializes languages based on LionWeb version <paramref name="lionWebVersion"/>.
     /// </summary>
-    /// <param name="versionSpecifics">Version of LionWeb standard to use for deserializing.</param>
-    public LanguageDeserializer(IDeserializerVersionSpecifics versionSpecifics) :
-        base(versionSpecifics)
+    /// <inheritdoc />
+    public LanguageDeserializer(LionWebVersions lionWebVersion, IDeserializerHandler? handler = null) :
+        base(lionWebVersion, handler)
     {
-        versionSpecifics.RegisterBuiltins();
         RegisterDependentLanguage(_m3);
     }
 

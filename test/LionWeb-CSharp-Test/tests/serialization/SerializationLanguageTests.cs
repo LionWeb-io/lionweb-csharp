@@ -75,7 +75,7 @@ public class LanguageSerializationTests
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
 
         var redeserialized =
-            new LanguageDeserializer(IDeserializerVersionSpecifics.Create(_lionWebVersion))
+            new LanguageDeserializer(_lionWebVersion)
             {
                 StoreUncompressedIds = true
             }.Deserialize(serializationChunk);
@@ -108,7 +108,7 @@ public class LanguageSerializationTests
         var serializationChunk2 = new Serializer(_lionWebVersion).SerializeToChunk([redeserializedShapes, language]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
         var redeserialized2 =
-            new LanguageDeserializer(IDeserializerVersionSpecifics.Create(_lionWebVersion))
+            new LanguageDeserializer(_lionWebVersion)
             {
                 StoreUncompressedIds = true
             }.Deserialize(serializationChunk2);
@@ -129,10 +129,7 @@ public class LanguageSerializationTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        var deserializer = new LanguageDeserializer(IDeserializerVersionSpecifics.Create(_lionWebVersion))
-        {
-            Handler = new SkipDeserializationHandler()
-        };
+        var deserializer = new LanguageDeserializer(_lionWebVersion, new SkipDeserializationHandler());
         foreach (var serializedNode in serializationChunk.Nodes)
         {
             deserializer.Process(serializedNode);
@@ -160,10 +157,7 @@ public class LanguageSerializationTests
             new Serializer(LionWebVersions.v2024_1_Compatible) { StoreUncompressedIds = true }.SerializeToChunk(input);
 
         var deserializer =
-            new LanguageDeserializer(IDeserializerVersionSpecifics.Create(LionWebVersions.v2024_1_Compatible))
-            {
-                StoreUncompressedIds = true, Handler = new SkipDeserializationHandler()
-            };
+            new LanguageDeserializer(LionWebVersions.v2024_1_Compatible, new SkipDeserializationHandler());
 
         var actual = deserializer.Deserialize(chunk).Cast<Language>().ToList();
 

@@ -26,7 +26,12 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 
 /// <see cref="IDeserializer"/> parts specific to LionWeb <see cref="IVersion2023_1"/>.  
-internal class DeserializerVersionSpecifics_2024_1 : DeserializerVersionSpecificsBase
+internal class DeserializerVersionSpecifics_2024_1<T>(
+    DeserializerBase<T> deserializer,
+    DeserializerMetaInfo metaInfo,
+    IDeserializerHandler handler)
+    : DeserializerVersionSpecificsBase<T>(deserializer, metaInfo, handler)
+    where T : class, IReadableNode
 {
     public override LionWebVersions Version => LionWebVersions.v2024_1;
 

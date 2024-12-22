@@ -107,7 +107,10 @@ public class DeserializerBuilder
     /// </exception>
     public IDeserializer Build()
     {
-        IDeserializer result = CreateDeserializer(_lionWebVersion);
+        IDeserializer result = new Deserializer(_lionWebVersion, _handler)
+        {
+            StoreUncompressedIds = _storeUncompressedIds, ResolveInfoHandling = _referenceResolveInfoHandling
+        };
         foreach ((Language language, INodeFactory factory) in _languages)
         {
             result.RegisterInstantiatedLanguage(language, factory);
@@ -116,24 +119,5 @@ public class DeserializerBuilder
         result.RegisterDependentNodes(_dependentNodes);
 
         return result;
-    }
-
-    private Deserializer CreateDeserializer(LionWebVersions lionWebVersion)
-    {
-        var versionSpecifics =
-            IDeserializerVersionSpecifics.Create(lionWebVersion);
-
-        return _handler == null
-            ? new Deserializer(versionSpecifics)
-            {
-                StoreUncompressedIds = _storeUncompressedIds,
-                ResolveInfoHandling = _referenceResolveInfoHandling
-            }
-            : new Deserializer(versionSpecifics)
-            {
-                StoreUncompressedIds = _storeUncompressedIds, 
-                ResolveInfoHandling = _referenceResolveInfoHandling,
-                Handler = _handler
-            };
     }
 }

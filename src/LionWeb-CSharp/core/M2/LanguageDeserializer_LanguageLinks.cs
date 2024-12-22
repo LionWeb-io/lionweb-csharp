@@ -76,7 +76,7 @@ public partial class LanguageDeserializer
             case DynamicEnumerationLiteral or DynamicPrimitiveType or DynamicFeature:
                 return;
             default:
-                Handler.InvalidContainment(node);
+                _handler.InvalidContainment(node);
                 return;
         }
 
@@ -91,7 +91,7 @@ public partial class LanguageDeserializer
                 return [];
 
             return serializedContainment.Children
-                .Select(c => Handler.UnresolvableChild(Compress(c), containment, node) as T)
+                .Select(c => _handler.UnresolvableChild(Compress(c), containment, node) as T)
                 .Where(t => t != null)!;
         }
     }
@@ -137,7 +137,7 @@ public partial class LanguageDeserializer
                 return;
 
             default:
-                Handler.InvalidReference(node);
+                _handler.InvalidReference(node);
                 return;
         }
 
@@ -185,7 +185,7 @@ public partial class LanguageDeserializer
                 .FirstOrDefault(r => r.Reference.Matches(reference));
 
         T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class =>
-            Handler.UnresolvableReferenceTarget(CompressOpt(target.Reference), target.ResolveInfo, reference,
+            _handler.UnresolvableReferenceTarget(CompressOpt(target.Reference), target.ResolveInfo, reference,
                 (IWritableNode)node) as T;
     }
 }

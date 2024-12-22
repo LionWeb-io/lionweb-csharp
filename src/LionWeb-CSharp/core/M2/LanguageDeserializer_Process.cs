@@ -88,7 +88,7 @@ public partial class LanguageDeserializer
             if (serializedPropertiesByKey.TryGetValue(property.Key, out var value))
                 return value == "true";
 
-            var result = Handler.InvalidPropertyValue<bool>(null, property, Compress(id));
+            var result = _handler.InvalidPropertyValue<bool>(null, property, Compress(id));
             return result as bool? ?? throw new InvalidValueException(property, result);
         }
 
@@ -97,7 +97,7 @@ public partial class LanguageDeserializer
             if (serializedPropertiesByKey.TryGetValue(property.Key, out var s) && s != null)
                 return s;
 
-            var result = Handler.InvalidPropertyValue<string>(null, property, Compress(id));
+            var result = _handler.InvalidPropertyValue<string>(null, property, Compress(id));
             return result as string ?? throw new InvalidValueException(property, result);
         }
     }

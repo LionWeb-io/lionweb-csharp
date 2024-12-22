@@ -38,9 +38,6 @@ using Serialization;
 /// <seealso cref="IDeserializerExtensions">Extensions</seealso>
 public interface IDeserializer
 {
-    /// Optional handler to customize this deserializer's behaviour in non-regular situations.
-    IDeserializerHandler Handler { get; init; }
-
     /// <summary>
     /// Enables this deserializer to create instances of <paramref name="language"/>'s entities.
     /// </summary>

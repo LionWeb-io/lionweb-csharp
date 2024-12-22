@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M3;
 
-using M1;
 using M2;
 using Serialization;
 
@@ -39,7 +38,10 @@ public static class LanguagesUtils
     {
         Stream stream = ResourcesUtils.GetAssemblyByName(assemblyName).GetManifestResourceStream(resourceName) ??
                         throw new ArgumentException($"Cannot read resource: {resourceName}", nameof(resourceName));
-        return JsonUtils.ReadNodesFromStreamAsync(stream, new LanguageDeserializer(IDeserializerVersionSpecifics.Create(lionWebVersion))).GetAwaiter().GetResult()
+        return JsonUtils
+            .ReadNodesFromStreamAsync(stream, new LanguageDeserializer(lionWebVersion))
+            .GetAwaiter()
+            .GetResult()
             .Cast<DynamicLanguage>();
     }
 }

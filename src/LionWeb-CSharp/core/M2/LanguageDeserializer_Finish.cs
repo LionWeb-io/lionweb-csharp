@@ -38,7 +38,7 @@ public partial class LanguageDeserializer
     private List<IWritableNode> DeserializeAnnotations()
     {
         _deserializerBuilder
-            .WithHandler(Handler)
+            .WithHandler(_handler)
             .WithUncompressedIds(StoreUncompressedIds)
             .WithLanguages(_deserializedNodesById.Values.OfType<Language>())
             .WithDependentNodes(_deserializedNodesById.Values)
@@ -56,7 +56,7 @@ public partial class LanguageDeserializer
             .Select(deserializedAnnotation =>
             {
                 IWritableNode? node = deserializedAnnotation as IWritableNode ??
-                                      Handler.InvalidAnnotation(deserializedAnnotation, null);
+                                      _handler.InvalidAnnotation(deserializedAnnotation, null);
 
                 if (node != null)
                     _deserializedNodesById[Compress(node.GetId())] = node;
@@ -90,7 +90,7 @@ public partial class LanguageDeserializer
 
             if (writableParent == null)
             {
-                Handler.InvalidAnnotationParent(deserializedAnnotation, readableParent);
+                _handler.InvalidAnnotationParent(deserializedAnnotation, readableParent);
                 continue;
             }
 
@@ -98,7 +98,7 @@ public partial class LanguageDeserializer
             if (deserializedAnnotation.GetClassifier() is not Annotation ann ||
                 !ann.CanAnnotate(writableParent.GetClassifier()))
             {
-                annotation = Handler.InvalidAnnotation(deserializedAnnotation, writableParent);
+                annotation = _handler.InvalidAnnotation(deserializedAnnotation, writableParent);
                 if (annotation == null)
                     continue;
             }
