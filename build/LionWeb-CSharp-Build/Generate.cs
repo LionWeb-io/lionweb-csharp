@@ -34,6 +34,11 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     SerializeLanguagesLocally(lionWebVersion, "lioncore", lionWebVersion.LionCore);
     SerializeLanguagesLocally(lionWebVersion, "shapes", ShapesDefinition.Language);
 
+    var testLanguagesDefinitions = new TestLanguagesDefinitions(lionWebVersion);
+    var sdtLang = testLanguagesDefinitions.SdtLang;
+    if (sdtLang != null)
+        SerializeLanguagesLocally(lionWebVersion, "sdtLang", sdtLang);
+
     var libraryLanguage = DeserializeExternalLanguage(lionWebVersion, "library").First();
     var multiLanguage = DeserializeExternalLanguage(lionWebVersion, "multi", libraryLanguage).First();
     var withEnumLanguage = DeserializeExternalLanguage(lionWebVersion, "with-enum").First();
@@ -43,11 +48,9 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     deprecatedLang.Name = "Deprecated";
     var shapesLanguage = ShapesDefinition.Language;
     shapesLanguage.Name = "Shapes";
-    var testLanguagesDefinitions = new TestLanguagesDefinitions(lionWebVersion);
     var aLang = testLanguagesDefinitions.ALang;
     var bLang = testLanguagesDefinitions.BLang;
     var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
-    var sdtLang = testLanguagesDefinitions.SdtLang;
 
     string prefix = $"Examples.V{lionWebVersion.VersionString.Replace('.', '_')}";
     List<Names> names =
