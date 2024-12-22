@@ -31,36 +31,35 @@ internal interface ILanguageDeserializerVersionSpecifics : IVersionSpecifics
     /// </summary>
     /// <exception cref="UnsupportedVersionException"></exception>
     public static ILanguageDeserializerVersionSpecifics Create(LionWebVersions lionWebVersion,
-        LanguageDeserializer deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler)
+        LanguageDeserializer deserializer, IDeserializerHandler handler)
         => lionWebVersion switch
         {
-            IVersion2023_1 => new LanguageDeserializerVersionSpecifics_2023_1(deserializer, metaInfo, handler),
-            IVersion2024_1 => new LanguageDeserializerVersionSpecifics_2024_1(deserializer, metaInfo, handler),
-            IVersion2024_1_Compatible => new LanguageDeserializerVersionSpecifics_2024_1_Compatible(deserializer,
-                metaInfo,
-                handler),
+            IVersion2023_1 => new LanguageDeserializerVersionSpecifics_2023_1(deserializer, handler),
+            IVersion2024_1 => new LanguageDeserializerVersionSpecifics_2024_1(deserializer, handler),
+            IVersion2024_1_Compatible =>
+                new LanguageDeserializerVersionSpecifics_2024_1_Compatible(deserializer, handler),
             _ => throw new UnsupportedVersionException(lionWebVersion)
         };
 
+    /// <seealso cref="LanguageDeserializer.CreateNodeWithProperties"/>
     public DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, string id);
 
+    /// <seealso cref="LanguageDeserializer.InstallLanguageContainments"/>
     public void InstallLanguageContainments(SerializedNode serializedNode, IReadableNode node,
         ILookup<string, IKeyed> serializedContainmentsLookup);
 
+    /// <seealso cref="LanguageDeserializer.InstallLanguageReferences"/>
     public void InstallLanguageReferences(SerializedNode serializedNode, IReadableNode node,
         ILookup<string, IKeyed?> serializedReferencesLookup);
 }
 
-internal abstract class LanguageDeserializerVersionSpecificsBase : ILanguageDeserializerVersionSpecifics
+internal abstract class LanguageDeserializerVersionSpecificsBase(
+    LanguageDeserializer deserializer,
+    IDeserializerHandler handler)
+    : ILanguageDeserializerVersionSpecifics
 {
-    internal readonly LanguageDeserializer _deserializer;
-    internal readonly IDeserializerHandler _handler;
-
-    protected LanguageDeserializerVersionSpecificsBase(LanguageDeserializer deserializer, IDeserializerHandler handler)
-    {
-        _deserializer = deserializer;
-        _handler = handler;
-    }
+    internal readonly LanguageDeserializer _deserializer = deserializer;
+    internal readonly IDeserializerHandler _handler = handler;
 
     public abstract LionWebVersions Version { get; }
 
@@ -75,14 +74,14 @@ internal abstract class LanguageDeserializerVersionSpecificsBase : ILanguageDese
 
 internal abstract class NodeCreatorBase
 {
-    internal readonly LanguageDeserializerVersionSpecificsBase _versionSpecifics;
+    private readonly LanguageDeserializerVersionSpecificsBase _versionSpecifics;
     internal readonly SerializedNode _serializedNode;
-    internal readonly Dictionary<string, string?> _serializedPropertiesByKey;
+    private readonly Dictionary<string, string?> _serializedPropertiesByKey;
     internal readonly string _key;
     internal readonly string _name;
     internal readonly string _id;
 
-    public NodeCreatorBase(LanguageDeserializerVersionSpecificsBase versionSpecifics, SerializedNode serializedNode,
+    internal NodeCreatorBase(LanguageDeserializerVersionSpecificsBase versionSpecifics, SerializedNode serializedNode,
         string id)
     {
         _versionSpecifics = versionSpecifics;
@@ -143,10 +142,9 @@ internal abstract class NodeCreatorBase
 
     protected abstract LionWebVersions Version { get; }
     protected virtual ILionCoreLanguage LionCore => Version.LionCore;
-    protected virtual IBuiltInsLanguage BuiltIns => Version.BuiltIns;
+    private IBuiltInsLanguage BuiltIns => Version.BuiltIns;
 
-
-    protected bool LookupBool(Property property)
+    private bool LookupBool(Property property)
     {
         if (_serializedPropertiesByKey.TryGetValue(property.Key, out var value))
             return value == "true";
@@ -157,7 +155,7 @@ internal abstract class NodeCreatorBase
         return result as bool? ?? throw new InvalidValueException(property, result);
     }
 
-    protected string LookupString(Property property)
+    private string LookupString(Property property)
     {
         if (_serializedPropertiesByKey.TryGetValue(property.Key, out var s) && s != null)
             return s;
@@ -169,23 +167,13 @@ internal abstract class NodeCreatorBase
     }
 }
 
-internal abstract class ContainmentsInstallerBase
+internal abstract class ContainmentsInstallerBase(
+    LanguageDeserializerVersionSpecificsBase versionSpecifics,
+    SerializedNode serializedNode,
+    IReadableNode node,
+    ILookup<string, IKeyed> serializedContainmentsLookup)
 {
-    internal readonly LanguageDeserializerVersionSpecificsBase _versionSpecifics;
-    internal readonly SerializedNode _serializedNode;
-    internal readonly IReadableNode _node;
-    internal readonly ILookup<string, IKeyed> _serializedContainmentsLookup;
-
-    protected ContainmentsInstallerBase(LanguageDeserializerVersionSpecificsBase versionSpecifics,
-        SerializedNode serializedNode,
-        IReadableNode node,
-        ILookup<string, IKeyed> serializedContainmentsLookup)
-    {
-        _versionSpecifics = versionSpecifics;
-        _serializedNode = serializedNode;
-        _node = node;
-        _serializedContainmentsLookup = serializedContainmentsLookup;
-    }
+    internal readonly IReadableNode _node = node;
 
     public virtual void Install()
     {
@@ -203,7 +191,7 @@ internal abstract class ContainmentsInstallerBase
             case DynamicEnumerationLiteral or DynamicPrimitiveType or DynamicFeature:
                 return;
             default:
-                _versionSpecifics._handler.InvalidContainment(_node);
+                versionSpecifics._handler.InvalidContainment(_node);
                 return;
         }
     }
@@ -213,39 +201,29 @@ internal abstract class ContainmentsInstallerBase
 
     internal IEnumerable<T> Lookup<T>(Containment containment) where T : class
     {
-        if (_serializedContainmentsLookup.Contains(containment.Key))
-            return _serializedContainmentsLookup[containment.Key].Cast<T>();
+        if (serializedContainmentsLookup.Contains(containment.Key))
+            return serializedContainmentsLookup[containment.Key].Cast<T>();
 
         var serializedContainment =
-            _serializedNode.Containments.FirstOrDefault(c => c.Containment.Matches(containment));
+            serializedNode.Containments.FirstOrDefault(c => c.Containment.Matches(containment));
         if (serializedContainment == null)
             return [];
 
         return serializedContainment.Children
             .Select(c =>
-                _versionSpecifics._handler.UnresolvableChild(_versionSpecifics._deserializer.Compress(c), containment,
+                versionSpecifics._handler.UnresolvableChild(versionSpecifics._deserializer.Compress(c), containment,
                     _node) as T)
             .Where(t => t != null)!;
     }
 }
 
-internal abstract class ReferencesInstallerBase
+internal abstract class ReferencesInstallerBase(
+    LanguageDeserializerVersionSpecificsBase versionSpecifics,
+    SerializedNode serializedNode,
+    IReadableNode node,
+    ILookup<string, IKeyed?> serializedReferencesLookup)
 {
-    internal readonly LanguageDeserializerVersionSpecificsBase _versionSpecifics;
-    internal readonly SerializedNode _serializedNode;
-    internal readonly IReadableNode _node;
-    internal readonly ILookup<string, IKeyed?> _serializedReferencesLookup;
-
-    protected ReferencesInstallerBase(LanguageDeserializerVersionSpecificsBase versionSpecifics,
-        SerializedNode serializedNode,
-        IReadableNode node,
-        ILookup<string, IKeyed?> serializedReferencesLookup)
-    {
-        _versionSpecifics = versionSpecifics;
-        _serializedNode = serializedNode;
-        _node = node;
-        _serializedReferencesLookup = serializedReferencesLookup;
-    }
+    internal readonly IReadableNode _node = node;
 
     public virtual void Install()
     {
@@ -277,7 +255,7 @@ internal abstract class ReferencesInstallerBase
                 return;
 
             default:
-                _versionSpecifics._handler.InvalidReference(_node);
+                versionSpecifics._handler.InvalidReference(_node);
                 return;
         }
     }
@@ -287,9 +265,9 @@ internal abstract class ReferencesInstallerBase
 
     internal T? LookupSingle<T>(Reference reference) where T : class
     {
-        if (_serializedReferencesLookup.Contains(reference.Key))
+        if (serializedReferencesLookup.Contains(reference.Key))
         {
-            var elements = _serializedReferencesLookup[reference.Key].ToList();
+            var elements = serializedReferencesLookup[reference.Key].ToList();
             if (elements.Count == 1)
                 return elements.Cast<T>().First();
         }
@@ -307,10 +285,10 @@ internal abstract class ReferencesInstallerBase
         return null;
     }
 
-    IEnumerable<T> LookupMulti<T>(Reference reference) where T : class
+    private IEnumerable<T> LookupMulti<T>(Reference reference) where T : class
     {
-        if (_serializedReferencesLookup.Contains(reference.Key))
-            return _serializedReferencesLookup[reference.Key].Cast<T>();
+        if (serializedReferencesLookup.Contains(reference.Key))
+            return serializedReferencesLookup[reference.Key].Cast<T>();
 
         var serializedReference = FindSerializedReference(reference);
         if (serializedReference == null)
@@ -319,17 +297,18 @@ internal abstract class ReferencesInstallerBase
         return serializedReference.Targets.Select(t => UnknownReference<T>(reference, t)).Where(t => t != null)!;
     }
 
-    IEnumerable<Interface> LookupFilteredInterfaces(Reference reference, IEnumerable<Interface> linkedInterfaces) =>
+    private IEnumerable<Interface> LookupFilteredInterfaces(Reference reference,
+        IEnumerable<Interface> linkedInterfaces) =>
         LookupMulti<Interface>(reference)
             .Except(linkedInterfaces, new LanguageEntityIdentityComparer())
             .OfType<Interface>();
 
-    SerializedReference? FindSerializedReference(Reference reference) =>
-        _serializedNode.References
+    private SerializedReference? FindSerializedReference(Reference reference) =>
+        serializedNode.References
             .FirstOrDefault(r => r.Reference.Matches(reference));
 
-    T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class =>
-        _versionSpecifics._handler.UnresolvableReferenceTarget(
-            _versionSpecifics._deserializer.CompressOpt(target.Reference), target.ResolveInfo, reference,
+    private T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class =>
+        versionSpecifics._handler.UnresolvableReferenceTarget(
+            versionSpecifics._deserializer.CompressOpt(target.Reference), target.ResolveInfo, reference,
             (IWritableNode)_node) as T;
 }

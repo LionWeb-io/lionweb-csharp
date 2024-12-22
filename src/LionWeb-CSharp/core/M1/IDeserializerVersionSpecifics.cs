@@ -41,23 +41,22 @@ internal interface IDeserializerVersionSpecifics : IVersionSpecifics
     void RegisterBuiltins();
 
     /// Converts the low-level string representation <paramref name="value"/> of <paramref name="property"/> into the internal LionWeb-C# representation.
+    /// <seealso cref="Deserializer.DeserializeProperties"/>
     object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype, string? value);
 }
 
-internal abstract class DeserializerVersionSpecificsBase<T> : IDeserializerVersionSpecifics where T : class, IReadableNode
+internal abstract class DeserializerVersionSpecificsBase<T>(
+    DeserializerBase<T> deserializer,
+    DeserializerMetaInfo metaInfo,
+    IDeserializerHandler handler)
+    : IDeserializerVersionSpecifics
+    where T : class, IReadableNode
 {
-    protected IDeserializer _deserializer;
-    protected DeserializerMetaInfo _metaInfo;
-    protected IDeserializerHandler _handler;
+    private readonly IDeserializer _deserializer = deserializer;
+    internal readonly DeserializerMetaInfo _metaInfo = metaInfo;
+    internal readonly IDeserializerHandler _handler = handler;
 
     public abstract LionWebVersions Version { get; }
-
-    protected DeserializerVersionSpecificsBase(DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler)
-    {
-        _deserializer = deserializer;
-        _metaInfo = metaInfo;
-        _handler = handler;
-    }
 
     public abstract void RegisterBuiltins();
 

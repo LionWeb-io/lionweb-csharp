@@ -19,7 +19,6 @@ namespace LionWeb.Core.M2;
 
 using M3;
 using Serialization;
-using Utilities;
 
 public partial class LanguageDeserializer
 {
@@ -79,6 +78,6 @@ public partial class LanguageDeserializer
         if (serializedReferencesLookup.Count == 0)
             return;
 
-_languageVersionSpecifics.InstallLanguageReferences(serializedNode, node, serializedReferencesLookup);
+        _languageVersionSpecifics.InstallLanguageReferences(serializedNode, node, serializedReferencesLookup);
     }
 }

@@ -25,13 +25,11 @@ using M3;
 using Serialization;
 
 /// <see cref="LanguageDeserializer"/> parts specific to LionWeb <see cref="IVersion2024_1"/>.  
-internal class LanguageDeserializerVersionSpecifics_2024_1 : LanguageDeserializerVersionSpecificsBase
+internal class LanguageDeserializerVersionSpecifics_2024_1(
+    LanguageDeserializer deserializer,
+    IDeserializerHandler handler)
+    : LanguageDeserializerVersionSpecificsBase(deserializer, handler)
 {
-    public LanguageDeserializerVersionSpecifics_2024_1(LanguageDeserializer deserializer, DeserializerMetaInfo metaInfo,
-        IDeserializerHandler handler) : base(deserializer, handler)
-    {
-    }
-
     public override LionWebVersions Version => LionWebVersions.v2024_1;
 
     public override DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, string id) =>
@@ -54,7 +52,6 @@ internal class NodeCreator_2024_1(
 {
     protected override LionWebVersions Version => LionWebVersions.v2024_1;
     protected override ILionCoreLanguageWithStructuredDataType LionCore => (ILionCoreLanguage_2024_1)Version.LionCore;
-    protected override IBuiltInsLanguage_2024_1 BuiltIns => (IBuiltInsLanguage_2024_1)Version.BuiltIns;
 
     public override DynamicIKeyed Create() => _serializedNode.Classifier switch
     {
