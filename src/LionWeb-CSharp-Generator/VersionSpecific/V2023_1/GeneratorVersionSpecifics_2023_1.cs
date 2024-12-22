@@ -20,6 +20,7 @@
 namespace LionWeb.CSharp.Generator.VersionSpecific.V2023_1;
 
 using Core;
+using Core.M2;
 using Core.M3;
 using Core.Utilities;
 using Core.VersionSpecific.V2023_1;
@@ -48,7 +49,7 @@ internal class GeneratorVersionSpecifics_2023_1 : IGeneratorVersionSpecifics
         _ => null
     };
 
-    public TypeSyntax? AsType(Datatype datatype) => datatype switch
+    public TypeSyntax? AsType(Datatype datatype, Dictionary<Language, string> namespaceMappings) => datatype switch
     {
         _ when datatype.EqualsIdentity(BuiltInsLanguage_2023_1.Instance.Boolean) =>
             PredefinedType(Token(SyntaxKind.BoolKeyword)),
@@ -58,6 +59,8 @@ internal class GeneratorVersionSpecifics_2023_1 : IGeneratorVersionSpecifics
             PredefinedType(Token(SyntaxKind.StringKeyword)),
         _ when datatype.EqualsIdentity(BuiltInsLanguage_2023_1.Instance.Json) =>
             PredefinedType(Token(SyntaxKind.StringKeyword)),
+        Enumeration when namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns) =>
+            QualifiedName(ParseName(ns), IdentifierName(datatype.Name)),
         _ => null
     };
 

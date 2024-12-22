@@ -43,7 +43,7 @@ internal interface IGeneratorVersionSpecifics : IVersionSpecifics
     ExpressionSyntax? AsProperty(LanguageEntity entity);
 
     /// <inheritdoc cref="INames.AsType(System.Type,Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax?[])"/>
-    TypeSyntax? AsType(Datatype datatype);
+    TypeSyntax? AsType(Datatype datatype, Dictionary<Language, string> namespaceMappings);
     
     string? GetConceptShortDescription(Classifier classifier);
     bool IsDeprecated(Classifier classifier);
