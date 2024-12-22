@@ -270,7 +270,7 @@ public class SerializationTests
         var serializedNode = serializedNodes.First();
 
         Assert.AreEqual(
-            """{"key-SDTValue":{"key-SDTInt":"23","key-SDTFrac":"42"},"key-SDTCurrency":"key-SDTEur","key-SDTDigital":"true"}""",
+            """{"key-SDTValue":{"key-SDTInt":"23","key-SDTFrac":"42"},"key-SDTCurr":"key-SDTEur","key-SDTDigital":"true"}""",
             serializedNode.Properties.First(p => p.Property.Key == "key-SDTamountField").Value);
 
         Assert.AreEqual(

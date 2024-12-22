@@ -67,6 +67,23 @@ public class PropertyTests_VersionSpecifics
     }
 
     [TestMethod]
+    [DataRow(typeof(IVersion2024_1))]
+    [DataRow(typeof(IVersion2024_1_Compatible))]
+    public void StructuredDataType(Type versionIface)
+    {
+        INode node = CreateNode(versionIface, out Classifier classifier);
+
+        var feature = classifier.FeatureByKey("key-sdt");
+        var language = classifier.GetLanguage();
+        var sdt = language.Entities.OfType<StructuredDataType>().First();
+        var sdtInstance = language.GetFactory().CreateStructuredDataTypeInstance(sdt, new FieldValues([(sdt.Fields.First(), "hello")]));
+        node.Set(feature, sdtInstance);
+
+        var expected = language.GetFactory().CreateStructuredDataTypeInstance(sdt, new FieldValues([(sdt.Fields.First(), "hello")]));
+        Assert.AreEqual(expected, node.Get(feature));
+    }
+
+    [TestMethod]
     [DataRow(typeof(IVersion2023_1))]
     public void Json(Type versionIface)
     {
@@ -103,6 +120,17 @@ public class PropertyTests_VersionSpecifics
             myConcept
                 .Property($"id-{primitiveType.Name}", $"key-{primitiveType.Name}", $"prop{primitiveType.Name}")
                 .OfType(primitiveType)
+                .IsOptional(true);
+        }
+
+        if (lionWebVersion.LionCore is ILionCoreLanguageWithStructuredDataType)
+        {
+            var sdt = language.StructuredDataType(NextId(idBase), "key-mySdt", "mySdt");
+            var field = sdt.Field(NextId(idBase), "key-myField", "myField")
+                .OfType(lionWebVersion.BuiltIns.String);
+            myConcept
+                .Property("id-sdt", "key-sdt", "propSdt")
+                .OfType(sdt)
                 .IsOptional(true);
         }
 

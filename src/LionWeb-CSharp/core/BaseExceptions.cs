@@ -146,13 +146,35 @@ public class UnsupportedClassifierException : LionWebExceptionBase
 public class UnsupportedEnumerationLiteralException(EnumerationLiteral literal)
     : LionWebExceptionBase($"EnumerationLiteral {literal.Name} not supported");
 
-/// <summary>
-/// Trying to operate on an <see cref="StructuredDataType"/>.
-/// Might happen if a NodeFactory cannot <see cref="INodeFactory.CreateStructuredDataTypeInstance">create</see> an instance of <paramref name="sdt"/>.
-/// </summary>
-/// <param name="sdt">Unsupported Structured Datatype.</param>
-public class UnsupportedStructuredDataTypeException(StructuredDataType sdt)
-    : LionWebExceptionBase($"StructuredDataType {sdt.Name} not supported");
+/// Trying to operate on an unsupported <see cref="StructuredDataType"/>.
+public class UnsupportedStructuredDataTypeException : LionWebExceptionBase
+{
+    /// <summary>
+    /// Trying to operate on an unsupported <see cref="StructuredDataType"/>.
+    /// Might happen if a NodeFactory cannot <see cref="INodeFactory.CreateStructuredDataTypeInstance">create</see> an instance of <paramref name="structuredDataType"/>.
+    /// </summary>
+    /// <param name="structuredDataType">Unsupported Structured Datatype.</param>
+    /// <param name="message">Optional additional message.</param>
+    public UnsupportedStructuredDataTypeException(StructuredDataType structuredDataType, string? message = null) : base(
+        $"StructuredDataType {structuredDataType.Name} not supported" +
+        (message != null ? $": {message}" : "")
+    )
+    {
+    }
+
+    /// <summary>
+    /// Trying to operate on an unsupported <see cref="StructuredDataType"/>.
+    /// Might happen if a NodeFactory cannot <see cref="INodeFactory.CreateStructuredDataTypeInstance">create</see> an instance of <paramref name="structuredDataType"/>.
+    /// </summary>
+    /// <param name="structuredDataType">Unsupported Structured Datatype.</param>
+    /// <param name="message">Optional additional message.</param>
+    public UnsupportedStructuredDataTypeException(Type structuredDataType, string? message = null) : base(
+        $"StructuredDataType {structuredDataType.Name} not supported" +
+        (message != null ? $": {message}" : "")
+    )
+    {
+    }
+}
 
 /// <summary>
 /// Trying to operate on an object that's not an <see cref="INode"/>.

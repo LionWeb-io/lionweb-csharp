@@ -19,7 +19,7 @@ namespace LionWeb.Core.M3;
 
 using M2;
 using System.Collections;
-using VersionSpecific.V2024_1;
+using Utilities;
 
 // The types here implement the LionCore M3.
 
@@ -911,6 +911,47 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language)
         }
 
         return false;
+    }
+}
+
+/// <inheritdoc cref="IStructuredDataTypeInstance" />
+public readonly record struct DynamicStructuredDataTypeInstance : IStructuredDataTypeInstance
+{
+    private readonly StructuredDataType _structuredDataType;
+    private readonly (Field field, object? value)[] _fields;
+
+    /// <inheritdoc cref="DynamicStructuredDataTypeInstance"/>
+    public DynamicStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+    {
+        _structuredDataType = structuredDataType;
+        _fields = fieldValues.ToArray();
+    }
+
+    /// <inheritdoc />
+    public StructuredDataType GetStructuredDataType() =>
+        _structuredDataType;
+
+    /// <inheritdoc />
+    public IEnumerable<Field> CollectAllSetFields() =>
+        _fields.Select(v => v.field);
+
+    /// <inheritdoc />
+    public object? Get(Field field) =>
+        _fields.FirstOrDefault(v => v.field == field);
+
+    /// <inheritdoc />
+    public bool Equals(DynamicStructuredDataTypeInstance other) =>
+        _structuredDataType.EqualsIdentity(other._structuredDataType) &&
+        _fields.SequenceEqual(other._fields);
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(_structuredDataType);
+        foreach (var field in _fields)
+            hashCode.Add(field);
+        return hashCode.ToHashCode();
     }
 }
 

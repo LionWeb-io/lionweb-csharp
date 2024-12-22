@@ -136,11 +136,16 @@ public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
     /// <returns>New instance of <paramref name="sdtType"/>, initialized with <paramref name="fieldValues"/>.</returns>
     protected IStructuredDataTypeInstance StructuredDataTypeInstanceFor(Type sdtType, IFieldValues fieldValues)
     {
+        if (!sdtType.IsSubclassOf(typeof(IStructuredDataTypeInstance)) || sdtType.TypeInitializer is null)
+            throw new UnsupportedStructuredDataTypeException(sdtType);
+
         var result = sdtType.TypeInitializer.Invoke([]);
 
         foreach ((Field field, var value) in fieldValues)
         {
-            var propertyInfo = sdtType.GetProperties().FirstOrDefault(p => p.LionCoreKey() == field.Key);
+            var propertyInfo = sdtType.GetProperties().FirstOrDefault(p => p.LionCoreKey() == field.Key)
+                               ?? throw new UnsupportedStructuredDataTypeException(sdtType,
+                                   $"Cannot find property for key '{field.Key}'");
             propertyInfo.SetValue(result, value);
         }
 
@@ -229,5 +234,5 @@ public class ReflectiveBaseNodeFactory(Language language) : AbstractBaseNodeFact
     /// <inheritdoc />
     public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
         IFieldValues fieldValues) =>
-        StructuredDataTypeInstanceFor(structuredDataType.GetType(), fieldValues);
+        new DynamicStructuredDataTypeInstance(structuredDataType, fieldValues);
 }
