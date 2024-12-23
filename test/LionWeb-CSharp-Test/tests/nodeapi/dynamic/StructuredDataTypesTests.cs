@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M2.Dynamic.Test;
 
+using M1;
 using M3;
 
 [TestClass]
@@ -148,6 +149,32 @@ public class StructuredDataTypesTests
     {
         var parent = newSdtConcept("od");
         Assert.AreEqual(null, parent.Get(SdtConcept_decimal));
+    }
+
+    #endregion
+
+    #region Loop
+
+    [TestMethod]
+    public void Loop_Reflective()
+    {
+        LionWebVersions lionWebVersion = LionWebVersions.v2024_1;
+        var language =
+            new DynamicLanguage("lang", lionWebVersion) { Key = "key-myLanguage", Version = "1", Name = "myLanguage" };
+        var myConcept = language.Concept("conc", "key-myConcept", "myConcept");
+        var sdt = language.StructuredDataType("sdt", "key-mySdt", "mySdt");
+        var field = sdt.Field("field", "key-myField", "myField")
+            .OfType(lionWebVersion.BuiltIns.String);
+        sdt.Field("field2", "key-field2", "myField2")
+            .OfType(sdt);
+        var prop = myConcept
+            .Property("id-sdt", "key-sdt", "propSdt")
+            .OfType(sdt)
+            .IsOptional(true);
+
+        var chunk = new Serializer(lionWebVersion).SerializeToChunk([language]);
+        Assert.ThrowsException<UnsupportedStructuredDataTypeException>(() =>
+            new LanguageDeserializer(lionWebVersion).Deserialize(chunk));
     }
 
     #endregion

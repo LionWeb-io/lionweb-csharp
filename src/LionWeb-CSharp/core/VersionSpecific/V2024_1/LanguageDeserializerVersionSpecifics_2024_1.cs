@@ -42,6 +42,20 @@ internal class LanguageDeserializerVersionSpecifics_2024_1(
     public override void InstallLanguageReferences(SerializedNode serializedNode, IReadableNode node,
         ILookup<string, IKeyed?> serializedReferencesLookup) =>
         new ReferencesInstaller_2024_1(this, serializedNode, node, serializedReferencesLookup).Install();
+
+    internal static bool ContainsSelf(Datatype datatype, HashSet<StructuredDataType> owners)
+    {
+        if (datatype is not StructuredDataType structuredDataType)
+            return false;
+
+        if (!owners.Add(structuredDataType))
+            return true;
+
+        if (structuredDataType.Fields.Any(f => !f.TryGetType(out _)))
+            return false;
+
+        return structuredDataType.Fields.Any(f => ContainsSelf(f.Type, [..owners]));
+    }
 }
 
 internal class NodeCreator_2024_1(
@@ -80,6 +94,9 @@ internal class ContainmentsInstaller_2024_1(
         {
             case DynamicStructuredDataType sdt:
                 sdt.AddFields(Lookup<Field>(LionCore.StructuredDataType_fields));
+                HashSet<StructuredDataType> owners = [];
+                if (LanguageDeserializerVersionSpecifics_2024_1.ContainsSelf(sdt, owners))
+                    _versionSpecifics._handler.CircularStructuredDataType(sdt, owners);
                 return;
             case DynamicField:
                 return;
@@ -106,6 +123,10 @@ internal class ReferencesInstaller_2024_1(
         {
             case DynamicField field:
                 field.Type = LookupSingle<Datatype>(LionCore.Field_type)!;
+                var fSdt = field.GetStructuredDataType();
+                HashSet<StructuredDataType> fOwners = [];
+                if (LanguageDeserializerVersionSpecifics_2024_1.ContainsSelf(fSdt, fOwners))
+                    _versionSpecifics._handler.CircularStructuredDataType(fSdt, fOwners);
                 return;
 
             case StructuredDataType:

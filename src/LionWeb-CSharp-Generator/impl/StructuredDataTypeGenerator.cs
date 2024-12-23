@@ -226,15 +226,4 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
             FieldField(field),
             IdentifierName("Value")
         );
-
-    private bool ContainsSelf(Datatype datatype, HashSet<StructuredDataType> owners)
-    {
-        if (datatype is not StructuredDataType structuredDataType)
-            return false;
-
-        if (!owners.Add(structuredDataType))
-            return true;
-
-        return structuredDataType.Fields.Any(f => ContainsSelf(f.Type, [..owners]));
-    }
 }
