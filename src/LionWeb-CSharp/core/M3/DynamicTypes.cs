@@ -45,10 +45,24 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
     }
 
     /// <inheritdoc />
+    public bool TryGetKey(out string? key)
+    {
+        key = _key;
+        return key != null;
+    }
+
+    /// <inheritdoc />
     public string Name
     {
         get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name);
         set => _name = value;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetName(out string? name)
+    {
+        name = _name;
+        return name != null;
     }
 
     /// <inheritdoc />
@@ -177,6 +191,13 @@ public class DynamicProperty(string id, DynamicClassifier? classifier) : Dynamic
     }
 
     /// <inheritdoc />
+    public bool TryGetType(out Datatype? type)
+    {
+        type = _type;
+        return _type != null;
+    }
+
+    /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.Property;
 
     /// <inheritdoc />
@@ -236,6 +257,13 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier) : Dy
     {
         get => _type ?? throw new UnsetFeatureException(_m3.Link_type);
         set => _type = value;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetType(out Classifier? type)
+    {
+        type = _type;
+        return _type != null;
     }
 
     /// <inheritdoc />
@@ -537,6 +565,8 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
 /// <inheritdoc cref="Annotation"/>
 public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicClassifier(id, language), Annotation
 {
+    private Classifier? _annotates;
+    
     /// <inheritdoc />
     public Classifier Annotates
     {
@@ -544,12 +574,12 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
         set => _annotates = value;
     }
 
+    
     /// <inheritdoc />
     public Annotation? Extends { get; set; }
 
     private readonly List<Interface> _implements = [];
-    private Classifier? _annotates;
-
+    
     /// <inheritdoc />
     public IReadOnlyList<Interface> Implements => _implements.AsReadOnly();
 
@@ -956,7 +986,7 @@ public readonly record struct DynamicStructuredDataTypeInstance : IStructuredDat
 }
 
 /// <inheritdoc cref="Field"/>
-public class DynamicField(string id, DynamicStructuredDataType? structuredDataType) : DynamicIKeyed(id), Field
+public class DynamicField : DynamicIKeyed, Field
 {
     /// <inheritdoc />
     protected override ILionCoreLanguageWithStructuredDataType _m3 =>
@@ -965,11 +995,25 @@ public class DynamicField(string id, DynamicStructuredDataType? structuredDataTy
 
     private Datatype? _type;
 
+    /// <inheritdoc cref="Field"/>
+    public DynamicField(string id, DynamicStructuredDataType? structuredDataType) : base(id)
+    {
+        structuredDataType?.AddFields([this]);
+        _parent = structuredDataType;
+    }
+
     /// <inheritdoc />
     public Datatype Type
     {
         get => _type ?? throw new UnsetFeatureException(_m3.Field_type);
         set => _type = value;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetType(out Datatype? type)
+    {
+        type = _type;
+        return type != null;
     }
 
     /// <inheritdoc />
@@ -1025,11 +1069,20 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;
 
+    private string? _version;
+    
     /// <inheritdoc />
     public string Version
     {
         get => _version ?? throw new UnsetFeatureException(_m3.Language_version);
         set => _version = value;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetVersion(out string? version)
+    {
+        version = _version;
+        return version != null;
     }
 
     private readonly List<LanguageEntity> _entities = [];
@@ -1042,7 +1095,6 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
         _entities.AddRange(SetSelfParent(entities?.ToList(), _m3.Language_entities));
 
     private readonly List<Language> _dependsOn = [];
-    private string? _version;
 
     /// <inheritdoc />
     public IReadOnlyList<Language> DependsOn => _dependsOn.AsReadOnly();

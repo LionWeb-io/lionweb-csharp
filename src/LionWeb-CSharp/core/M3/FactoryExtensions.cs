@@ -67,9 +67,9 @@ public static class FactoryExtensions
     public static DynamicField Field(this DynamicStructuredDataType structuredDataType, string id,
         string key, string name)
     {
-        var enumerationLiteral = new DynamicField(id, structuredDataType) { Key = key, Name = name };
-        structuredDataType.AddFields([enumerationLiteral]);
-        return enumerationLiteral;
+        var field = new DynamicField(id, structuredDataType) { Key = key, Name = name };
+        structuredDataType.AddFields([field]);
+        return field;
     }
 
     /// <inheritdoc cref="Field.Type"/>

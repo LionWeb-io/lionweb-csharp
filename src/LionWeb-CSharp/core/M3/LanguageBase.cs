@@ -20,7 +20,6 @@
 namespace LionWeb.Core.M3;
 
 using M2;
-using VersionSpecific.V2024_1;
 
 /// <inheritdoc cref="Language"/>
 public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lionWebVersion)
@@ -73,10 +72,31 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     public abstract string Name { get; }
 
     /// <inheritdoc />
+    public bool TryGetName(out string? name)
+    {
+        name = Name;
+        return name != null;
+    }
+
+    /// <inheritdoc />
     public abstract string Key { get; }
 
     /// <inheritdoc />
+    public bool TryGetKey(out string? key)
+    {
+        key = Key;
+        return key != null;
+    }
+
+    /// <inheritdoc />
     public abstract string Version { get; }
+
+    /// <inheritdoc />
+    public bool TryGetVersion(out string? version)
+    {
+        version = Version;
+        return version != null;
+    }
 
     /// <inheritdoc />
     public abstract IReadOnlyList<LanguageEntity> Entities { get; }
@@ -135,7 +155,21 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
     public required string Name { get; init; }
 
     /// <inheritdoc />
+    public bool TryGetName(out string? name)
+    {
+        name = Name;
+        return name != null;
+    }
+
+    /// <inheritdoc />
     public required string Key { get; init; }
+
+    /// <inheritdoc />
+    public bool TryGetKey(out string? key)
+    {
+        key = Key;
+        return key != null;
+    }
 
     /// <inheritdoc cref="M2Extensions.GetLanguage"/>
     protected TLanguage GetLanguage() => _language;
@@ -373,6 +407,13 @@ public abstract class LinkBase<TLanguage> : FeatureBase<TLanguage>, Link where T
 
     /// <inheritdoc />
     public required Classifier Type { get; init; }
+
+    /// <inheritdoc />
+    public bool TryGetType(out Classifier? type)
+    {
+        type = Type;
+        return type != null;
+    }
 }
 
 /// <inheritdoc cref="Reference"/>
@@ -450,6 +491,13 @@ public class PropertyBase<TLanguage> : FeatureBase<TLanguage>, Property where TL
 
     /// <inheritdoc />
     public required Datatype Type { get; init; }
+
+    /// <inheritdoc />
+    public bool TryGetType(out Datatype? type)
+    {
+        type = Type;
+        return type != null;
+    }
 }
 
 /// <inheritdoc cref="Datatype"/>
@@ -618,4 +666,11 @@ public class FieldBase<TLanguage> : IKeyedBase<TLanguage>, Field where TLanguage
 
     /// <inheritdoc />
     public required Datatype Type { get; init; }
+
+    /// <inheritdoc />
+    public bool TryGetType(out Datatype? type)
+    {
+        type = Type;
+        return type != null;
+    }
 }
