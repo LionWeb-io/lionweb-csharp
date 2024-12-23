@@ -17,11 +17,11 @@
 
 namespace LionWeb.Core.M2;
 
-using M1;
 using M3;
 using Serialization;
 using Utilities;
 using VersionSpecific.V2023_1;
+using VersionSpecific.V2024_1_Compatible;
 using VersionSpecific.V2024_1;
 
 internal interface ILanguageDeserializerVersionSpecifics : IVersionSpecifics

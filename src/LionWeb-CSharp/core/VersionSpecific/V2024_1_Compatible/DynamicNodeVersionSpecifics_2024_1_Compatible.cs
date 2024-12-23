@@ -17,12 +17,12 @@
 
 // ReSharper disable InconsistentNaming
 
-namespace LionWeb.Core.VersionSpecific.V2024_1;
+namespace LionWeb.Core.VersionSpecific.V2024_1_Compatible;
 
-using M2;
 using M3;
 using Utilities;
 using V2023_1;
+using V2024_1;
 
 /// <see cref="DynamicNode"/> parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
 internal class DynamicNodeVersionSpecifics_2024_1_Compatible : DynamicNodeVersionSpecificsBase

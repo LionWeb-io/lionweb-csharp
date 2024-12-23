@@ -15,7 +15,9 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.VersionSpecific.V2024_1;
+namespace LionWeb.Core.VersionSpecific.V2024_1_Compatible;
+
+using V2024_1;
 
 internal class SerializerVersionSpecifics_2024_1_Compatible : SerializerVersionSpecifics_2024_1
 {

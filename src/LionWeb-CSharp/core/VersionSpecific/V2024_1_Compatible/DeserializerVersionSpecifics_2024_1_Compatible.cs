@@ -17,11 +17,12 @@
 
 // ReSharper disable InconsistentNaming
 
-namespace LionWeb.Core.VersionSpecific.V2024_1;
+namespace LionWeb.Core.VersionSpecific.V2024_1_Compatible;
 
 using M1;
 using M3;
 using V2023_1;
+using V2024_1;
 
 /// <see cref="IDeserializer"/> parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
 internal class DeserializerVersionSpecifics_2024_1_Compatible<T, H>(
