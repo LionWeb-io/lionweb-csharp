@@ -128,10 +128,10 @@ public interface Classifier : LanguageEntity
     /// </summary>
     /// <param name="features">Value of <see cref="Features"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Features"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetFeatures([MaybeNullWhen(false)] out IReadOnlyList<Feature>? features)
+    bool TryGetFeatures(out IReadOnlyList<Feature>? features)
     {
         features = Features;
-        return features != null;
+        return true;
     }
 }
 
@@ -177,10 +177,10 @@ public interface Concept : Classifier
     /// </summary>
     /// <param name="extends">Value of <see cref="Extends"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Extends"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetExtends([MaybeNullWhen(false)] out Concept? extends)
+    bool TryGetExtends(out Concept? extends)
     {
         extends = Extends;
-        return Extends != null;
+        return true;
     }
 
     /// A concept can implement zero or more <see cref="Interface">LionWeb interfaces</see>,
@@ -224,10 +224,10 @@ public interface Annotation : Classifier
     /// </summary>
     /// <param name="extends">Value of <see cref="Extends"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Extends"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetExtends([MaybeNullWhen(false)] out Annotation? extends)
+    bool TryGetExtends(out Annotation? extends)
     {
         extends = Extends;
-        return extends != null;
+        return true;
     }
 
     /// An annotation can implement zero or more <see cref="Interface">LionWeb interfaces</see>,
