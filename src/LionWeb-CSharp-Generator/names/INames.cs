@@ -115,4 +115,7 @@ public interface INames
 
     /// <returns><c>MyField</c></returns>
     IdentifierNameSyntax FieldProperty(Field field);
+    
+    /// <returns><c>myField</c></returns>
+    string ParamField(Field field);
 }

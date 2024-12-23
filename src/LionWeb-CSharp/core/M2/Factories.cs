@@ -49,7 +49,7 @@ public interface IFieldValues : IEnumerable<(Field field, object? value)>
     /// Gets the value associated with <paramref name="field"/>.
     /// </summary>
     /// <param name="field">Field to get the value associated with.</param>
-    /// <returns>The value associated with <paramref name="field"/>.</returns>
+    /// <returns>The value associated with <paramref name="field"/>, or <c>null</c> if <paramref name="field"/> is not set.</returns>
     object? Get(Field field);
 }
 

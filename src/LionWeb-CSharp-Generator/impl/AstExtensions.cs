@@ -73,9 +73,8 @@ public static class AstExtensions
         Block(List(statements));
 
     /// <returns><c>public type name => expression;</c></returns>
-    public static PropertyDeclarationSyntax
-        ReadOnlyProperty(string name, TypeSyntax? type, ExpressionSyntax expression) =>
-        PropertyDeclaration(type, Identifier(name))
+    public static PropertyDeclarationSyntax ReadOnlyProperty(string name, TypeSyntax? type, ExpressionSyntax expression)
+        => PropertyDeclaration(type, Identifier(name))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithExpressionBody(ArrowExpressionClause(expression))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
@@ -455,4 +454,18 @@ public static class AstExtensions
     /// <returns><c>this</c></returns>
     public static ThisExpressionSyntax This() =>
         ThisExpression();
+    
+    /// Adds <paramref name="element"/> between any two elements of <paramref name="source"/>.
+    public static IEnumerable<T> Intersperse<T>(this IEnumerable<T> source, T element)
+    {
+        bool first = true;
+        foreach (T value in source)
+        {
+            if (!first)
+                yield return element;
+            yield return value;
+            first = false;
+        }
+    }
+
 }

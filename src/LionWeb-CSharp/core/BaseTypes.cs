@@ -23,17 +23,13 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
-/// <summary>
 /// An interface that LionWeb AST nodes implement to provide <em>read</em> access.
-/// </summary>
 public interface IReadableNode
 {
-    /// <summary>
     /// The <em>unique within the repository</em> ID of the node.
     /// A node id has no "meaning". 
     /// An id must be a valid <i>identifier</i>, i.e. a non-empty string of arbitrary length
     /// comprised of uppercase or lowercase A to Z, 1 to 9, - (dash) and _ (underscore).
-    /// </summary>
     public string GetId();
 
     /// <summary>
@@ -51,14 +47,10 @@ public interface IReadableNode
     /// <seealso cref="IWritableNode.RemoveAnnotations"/>
     public IReadOnlyList<IReadableNode> GetAnnotations();
 
-    /// <summary>
     /// The <see cref="Classifier"/> that <c>this</c> node is an instance of.
-    /// </summary>
     public Classifier GetClassifier();
 
-    /// <summary>
     /// Returns all features for which a value has been set on <c>this</c> node.
-    /// </summary>
     public IEnumerable<Feature> CollectAllSetFeatures();
 
     /// <summary>
@@ -70,9 +62,7 @@ public interface IReadableNode
     public object? Get(Feature feature);
 }
 
-/// <summary>
 /// The type-parametrized twin of the non-generic <see cref="IReadableNode"/> interface.
-/// </summary>
 public interface IReadableNode<out T> : IReadableNode where T : IReadableNode
 {
     /// <inheritdoc/>
@@ -88,9 +78,7 @@ public interface IReadableNode<out T> : IReadableNode where T : IReadableNode
     public new IReadOnlyList<T> GetAnnotations();
 }
 
-/// <summary>
 /// An interface that LionWeb AST nodes implement to provide <em>write</em> access.
-/// </summary>
 public interface IWritableNode : IReadableNode
 {
     /// <inheritdoc cref="IReadableNode.GetParent"/>
@@ -103,10 +91,8 @@ public interface IWritableNode : IReadableNode
     /// <returns><c>true</c> if <paramref name="child"/> was contained in any of <c>this</c> node's containment, <c>false</c> otherwise.</returns>
     protected internal bool DetachChild(IWritableNode child);
 
-    /// <summary>
     /// Removes <c>this</c> node from its <see cref="IReadableNode.GetParent">parents'</see> containments.
     /// After completion, <c>this</c> node does not have a parent, and the former parent does not contain <c>this</c> node anymore.
-    /// </summary>
     public void DetachFromParent();
 
     /// <summary>
@@ -167,9 +153,7 @@ public interface IWritableNode : IReadableNode
     public void Set(Feature feature, object? value);
 }
 
-/// <summary>
 /// The type-parametrized twin of the non-generic <see cref="IWritableNode"/> interface.
-/// </summary>
 public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : class, IWritableNode
 {
     /// <inheritdoc/>
@@ -241,19 +225,13 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
     public bool RemoveAnnotations(IEnumerable<T> annotations);
 }
 
-/// <summary>
 /// An interface that instances of LionWeb <see cref="StructuredDataType">StructuredDataTypes</see> implement.
-/// </summary>
 public interface IStructuredDataTypeInstance
 {
-    /// <summary>
     /// The <see cref="StructuredDataType"/> that <c>this</c> is an instance of.
-    /// </summary>
     public StructuredDataType GetStructuredDataType();
 
-    /// <summary>
     /// Returns all fields for which a value has been set on <c>this</c>.
-    /// </summary>
     public IEnumerable<Field> CollectAllSetFields();
 
     /// <summary>
@@ -264,50 +242,10 @@ public interface IStructuredDataTypeInstance
     public object? Get(Field field);
 }
 
-/// <summary>
-/// A variant of <see cref="Lazy{T}"/> that applies only to <c>struct</c>s and considers itself equal to <c>null</c>
-/// if <see cref="Lazy{T}.Value"/> is <c>null</c>.
-/// </summary>
-/// <inheritdoc />
-public class NullableStructMember<T>(T? value) : Lazy<T?>(value) where T : struct
-{
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        if (ReferenceEquals(this, obj))
-        {
-            return true;
-        }
-
-        if (obj is null)
-        {
-            if (Value is null)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        if (this.GetType() != obj.GetType())
-        {
-            return false;
-        }
-
-        return EqualityComparer<T?>.Default.Equals(this.Value, ((NullableStructMember<T>)obj).Value);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode() => Value?.GetHashCode() ?? 0;
-}
-
-/// <summary>
 /// Every model node is an instance of <see cref="INode"/>.
-/// </summary>
 public interface INode : IWritableNode<INode>;
 
-/// <summary>
 /// Base implementation of <see cref="IReadableNode{T}"/>.
-/// </summary>
 public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
 {
     [GeneratedRegex("^[a-zA-Z0-9_-]+$")]
@@ -365,9 +303,7 @@ public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : I
     public abstract object? Get(Feature feature);
 }
 
-/// <summary>
 /// Base implementation of <see cref="INode"/>.
-/// </summary>
 public abstract class NodeBase : ReadableNodeBase<INode>, INode
 {
     /// <summary>

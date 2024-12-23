@@ -132,13 +132,10 @@ public class TestLanguagesDefinitions
         var amount = sdtLang.StructuredDataType("id-SDTAmount", "key-SDTAmount", "Amount");
         var dec = sdtLang.StructuredDataType("id-SDTDecimal", "key-SDTDecimal", "Decimal");
         var complex = sdtLang.StructuredDataType("id-SDTComplexNumber", "key-SDTComplexNumber", "ComplexNumber");
-        var fqn = sdtLang.StructuredDataType("id-SDTFullyQualifiedName", "key-SDTFullyQualifiedName",
-            "FullyQualifiedName");
 
         sdtConcept.Property("id-SDTamountField", "key-SDTamountField", "amount").OfType(amount);
         sdtConcept.Property("id-SDTDecimalField", "key-SDTDecimalField", "decimal").OfType(dec).IsOptional();
         sdtConcept.Property("id-SDTComplexField", "key-SDTComplexField", "complex").OfType(complex);
-        sdtConcept.Property("id-SDTFqnField", "key-SDTFqnField", "fqn").OfType(fqn);
 
         currency.EnumerationLiteral("id-SDT-eur", "key-SDTEur", "EUR");
         currency.EnumerationLiteral("id-SDT-gbp", "key-SDTGbp", "GBP");
@@ -153,17 +150,14 @@ public class TestLanguagesDefinitions
         complex.Field("id-SDTReal", "key-SDTReal", "real").OfType(dec);
         complex.Field("id-SDTImaginary", "key-SDTImaginary", "imaginary").OfType(dec);
 
-        fqn.Field("id-SDT-FQN-name", "key-SDTFqnName", "name").OfType(_lionWebVersion.BuiltIns.String);
-        fqn.Field("id-SDT-FQN-nested", "key-SDTFqnNested", "nested").OfType(fqn);
-
         // Shape:
         //     A
         //    / \
         //   B   C
         //    \ / \
-        //     D   E -- B
+        //     D   E
         //          \
-        //           F -- C
+        //           F
 
         var a = sdtLang.StructuredDataType("id-SDTA", "key-SDTA", "A");
         var b = sdtLang.StructuredDataType("id-SDTB", "key-SDTB", "B");
@@ -187,8 +181,6 @@ public class TestLanguagesDefinitions
         c.Field("id-SDTc2d", "key-SDTc2d", "c2d").OfType(d);
         c.Field("id-SDTc2e", "key-SDTc2e", "c2e").OfType(e);
         e.Field("id-SDTe2f", "key-SDTf", "e2f").OfType(f);
-        e.Field("id-SDTe2b", "key-SDTb", "e2b").OfType(b);
-        f.Field("id-SDTf2c", "key-SDTf2c", "f2c").OfType(c);
 
         SdtLang = sdtLang;
     }

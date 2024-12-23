@@ -161,7 +161,8 @@ public class StructuredDataTypesTests
 
     private IStructuredDataTypeInstance newAmount(int dec, int frac, string currency, bool digital)
         => new Amount(
-            new Decimal(dec, frac),
             Enum.TryParse<Currency>(currency, out var result) ? result : null,
-            digital);
+            digital,
+            new Decimal(dec, frac)
+        );
 }

@@ -180,7 +180,7 @@ public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : Ge
                 AsArguments([IdentifierName("structuredDataType")])
             ),
             ReturnStatement(NewCall(
-                sdt.Fields.Select(f =>
+                sdt.Fields.Ordered().Select(f =>
                 {
                     var invocationExpressionSyntax = InvocationExpression(
                         MemberAccess(IdentifierName("fieldValues"), IdentifierName("Get")),

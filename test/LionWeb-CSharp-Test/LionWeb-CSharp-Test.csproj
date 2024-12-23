@@ -29,8 +29,4 @@
       <ProjectReference Include="..\..\src\LionWeb-CSharp\LionWeb-CSharp.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="languages\generated\V2023_1\" />
-    </ItemGroup>
-
 </Project>

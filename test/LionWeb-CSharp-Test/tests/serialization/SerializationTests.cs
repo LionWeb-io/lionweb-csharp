@@ -256,12 +256,7 @@ public class SerializationTests
             Amount =
                 new Amount { Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true },
             Decimal = new Decimal { Int = 19 },
-            Complex = new ComplexNumber { Real = new Decimal { Int = 1, Frac = 0 }, Imaginary = new Decimal() },
-            Fqn = new FullyQualifiedName
-            {
-                Name = "A",
-                Nested = new FullyQualifiedName { Name = "B", Nested = new FullyQualifiedName { Name = "C" } }
-            }
+            Complex = new ComplexNumber { Real = new Decimal { Int = 1, Frac = 0 }, Imaginary = new Decimal() }
         };
 
         var serializer = new Serializer(_lionWebVersion);
@@ -270,7 +265,7 @@ public class SerializationTests
         var serializedNode = serializedNodes.First();
 
         Assert.AreEqual(
-            """{"key-SDTValue":{"key-SDTInt":"23","key-SDTFrac":"42"},"key-SDTCurr":"key-SDTEur","key-SDTDigital":"true"}""",
+            """{"key-SDTCurr":"key-SDTEur","key-SDTDigital":"true","key-SDTValue":{"key-SDTFrac":"42","key-SDTInt":"23"}}""",
             serializedNode.Properties.First(p => p.Property.Key == "key-SDTamountField").Value);
 
         Assert.AreEqual(
@@ -278,12 +273,8 @@ public class SerializationTests
             serializedNode.Properties.First(p => p.Property.Key == "key-SDTDecimalField").Value);
 
         Assert.AreEqual(
-            """{"key-SDTReal":{"key-SDTInt":"1","key-SDTFrac":"0"},"key-SDTImaginary":{}}""",
+            """{"key-SDTImaginary":{},"key-SDTReal":{"key-SDTFrac":"0","key-SDTInt":"1"}}""",
             serializedNode.Properties.First(p => p.Property.Key == "key-SDTComplexField").Value);
-
-        Assert.AreEqual(
-            """{"key-SDTFqnName":"A","key-SDTFqnNested":{"key-SDTFqnName":"B","key-SDTFqnNested":{"key-SDTFqnName":"C"}}}""",
-            serializedNode.Properties.First(p => p.Property.Key == "key-SDTFqnField").Value);
 
 
         var nodes = new DeserializerBuilder()

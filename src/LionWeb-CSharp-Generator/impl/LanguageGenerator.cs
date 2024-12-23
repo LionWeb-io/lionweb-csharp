@@ -136,7 +136,7 @@ public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : L
                 result.AddRange(enumeration.Literals.Ordered().SelectMany(LiteralLanguageMember));
                 break;
             case StructuredDataType structuredDataType:
-                result.AddRange(structuredDataType.Fields.SelectMany(FieldLanguageMember));
+                result.AddRange(structuredDataType.Fields.Ordered().SelectMany(FieldLanguageMember));
                 break;
             case PrimitiveType:
                 // fall-through

@@ -27,182 +27,182 @@ public class StructuredDataTypeTests
     [TestMethod]
     public void Empty()
     {
-        var fqn = new FullyQualifiedName();
+        var dec = new Decimal();
 
-        Assert.ThrowsException<UnsetFieldException>(() => fqn.Name);
+        Assert.ThrowsException<UnsetFieldException>(() => dec.Int);
     }
 
     [TestMethod]
     public void Empty_ToString()
     {
-        var fqn = new FullyQualifiedName();
+        var dec = new Decimal();
 
-        Assert.ThrowsException<UnsetFieldException>(() => fqn.ToString());
+        Assert.AreEqual("Decimal { Frac = , Int =  }", dec.ToString());
     }
 
     [TestMethod]
     public void Empty_GetHashCode()
     {
-        var fqn = new FullyQualifiedName();
+        var dec = new Decimal();
 
-        Assert.AreEqual(0, fqn.GetHashCode());
+        Assert.AreEqual(0, dec.GetHashCode());
     }
 
     [TestMethod]
     public void Empty_Equals()
     {
-        var fqn = new FullyQualifiedName();
+        var dec = new Decimal();
 
-        Assert.IsTrue(fqn.Equals(new FullyQualifiedName{}));
+        Assert.IsTrue(dec.Equals(new Decimal{}));
     }
 
     [TestMethod]
     public void Empty_CollectAllSetFields()
     {
-        var fqn = new FullyQualifiedName();
+        var dec = new Decimal();
 
-        CollectionAssert.AreEqual(new List<Field>(), fqn.CollectAllSetFields().ToList());
+        CollectionAssert.AreEqual(new List<Field>(), dec.CollectAllSetFields().ToList());
     }
 
     [TestMethod]
     public void Empty_Get()
     {
-        var fqn = new FullyQualifiedName();
+        var dec = new Decimal();
 
-        Assert.ThrowsException<UnsetFieldException>(() => fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_name));
-        Assert.ThrowsException<UnsetFieldException>(() => fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_nested));
+        Assert.ThrowsException<UnsetFieldException>(() => dec.Get(SDTLangLanguage.Instance.Decimal_int));
+        Assert.ThrowsException<UnsetFieldException>(() => dec.Get(SDTLangLanguage.Instance.Decimal_frac));
     }
 
     [TestMethod]
     public void Partial()
     {
-        var fqn = new FullyQualifiedName { Name = "test" };
+        var e = new E { E2f = new F("test") };
 
-        Assert.AreEqual("test", fqn.Name);
+        Assert.AreEqual(new F("test"), e.E2f);
     }
 
     [TestMethod]
     public void Partial_ToString()
     {
-        var fqn = new FullyQualifiedName { Name = "test" };
+        var e = new E { E2f = new F("test") };
 
-        Assert.AreEqual("FullyQualifiedName { Name = test, Nested =  }", fqn.ToString());
+        Assert.AreEqual("E { E2f = F { Name = test }, Name =  }", e.ToString());
     }
 
     [TestMethod]
     public void Partial_GetHashCode()
     {
-        var fqn = new FullyQualifiedName { Name = "test" };
+        var e = new E { E2f = new F("test") };
 
-        Assert.AreNotEqual(0, fqn.GetHashCode());
+        Assert.AreNotEqual(0, e.GetHashCode());
     }
 
     [TestMethod]
     public void Partial_Equals()
     {
-        var fqn = new FullyQualifiedName { Name = "test" };
+        var e = new E { E2f = new F("test") };
 
-        Assert.IsTrue(fqn.Equals(new FullyQualifiedName { Name = "test" }));
+        Assert.IsTrue(e.Equals(new E { E2f = new F("test") }));
 
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName{}));
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName{} }));
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Name = "Test" }));
+        Assert.IsFalse(e.Equals(new E{}));
+        Assert.IsFalse(e.Equals(new E { E2f = new F("hello") }));
+        Assert.IsFalse(e.Equals(new E { Name = "test" }));
     }
 
     [TestMethod]
     public void Partial_CollectAllSetFields()
     {
-        var fqn = new FullyQualifiedName { Name = "test" };
+        var e = new E { E2f = new F("test") };
 
-        CollectionAssert.AreEqual(new List<Field> { SDTLangLanguage.Instance.FullyQualifiedName_name },
-            fqn.CollectAllSetFields().ToList());
+        CollectionAssert.AreEqual(new List<Field> { SDTLangLanguage.Instance.E_e2f },
+            e.CollectAllSetFields().ToList());
     }
 
     [TestMethod]
     public void Partial_Get()
     {
-        var fqn = new FullyQualifiedName { Name = "test" };
+        var e = new E { E2f = new F("test") };
 
-        Assert.AreEqual("test", fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_name));
-        Assert.ThrowsException<UnsetFieldException>(() => fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_nested));
+        Assert.AreEqual(new F("test"), e.Get(SDTLangLanguage.Instance.E_e2f));
+        Assert.ThrowsException<UnsetFieldException>(() => e.Get(SDTLangLanguage.Instance.E_name));
     }
 
     [TestMethod]
     public void Partial_Null()
     {
-        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+        var e = new E { E2f = new F("test"), Name = null };
 
-        Assert.AreEqual("test", fqn.Name);
+        Assert.AreEqual("test", e.E2f.Name);
     }
 
     [TestMethod]
     public void Partial_Null_ToString()
     {
-        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+        var e = new E { E2f = new F("test"), Name = null };
 
-        Assert.AreEqual("FullyQualifiedName { Name = test, Nested =  }", fqn.ToString());
+        Assert.AreEqual("E { E2f = F { Name = test }, Name =  }", e.ToString());
     }
 
     [TestMethod]
     public void Partial_Null_GetHashCode()
     {
-        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+        var e = new E { E2f = new F("test"), Name = null };
 
-        Assert.AreNotEqual(0, fqn.GetHashCode());
+        Assert.AreNotEqual(0, e.GetHashCode());
     }
 
     [TestMethod]
     public void Partial_Null_Equals()
     {
-        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+        var e = new E { E2f = new F("test"), Name = null };
 
-        Assert.IsTrue(fqn.Equals(new FullyQualifiedName { Name = "test" }));
+        Assert.IsTrue(e.Equals(new E { E2f = new F("test") }));
 
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName{}));
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName{} }));
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Name = "Test" }));
+        Assert.IsFalse(e.Equals(new E{}));
+        Assert.IsFalse(e.Equals(new E { E2f = new F("hello") }));
+        Assert.IsFalse(e.Equals(new E { Name = "Test" }));
     }
 
     [TestMethod]
     public void Partial_Null_Equals_Null()
     {
-        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+        var e = new E { E2f = new F("test"), Name = null };
 
-        Assert.IsTrue(fqn.Equals(new FullyQualifiedName { Name = "test", Nested = null }));
+        Assert.IsTrue(e.Equals(new E { E2f = new F("test"), Name = null }));
 
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName{}));
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName{} }));
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Name = "Test" }));
+        Assert.IsFalse(e.Equals(new E{}));
+        Assert.IsFalse(e.Equals(new E { E2f = new F("hello") }));
+        Assert.IsFalse(e.Equals(new E { Name = "Test" }));
     }
 
     [TestMethod]
     public void Partial_Equals_Null()
     {
-        var fqn = new FullyQualifiedName { Name = "test" };
+        var e = new E { E2f = new F("test") };
 
-        Assert.IsTrue(fqn.Equals(new FullyQualifiedName { Name = "test", Nested = null }));
+        Assert.IsTrue(e.Equals(new E { E2f = new F("test"), Name = null }));
 
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName{}));
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Nested = new FullyQualifiedName{} }));
-        Assert.IsFalse(fqn.Equals(new FullyQualifiedName { Name = "Test" }));
+        Assert.IsFalse(e.Equals(new E{}));
+        Assert.IsFalse(e.Equals(new E { E2f = new F("hello") }));
+        Assert.IsFalse(e.Equals(new E { Name = "Test" }));
     }
 
     [TestMethod]
     public void Partial_Null_CollectAllSetFields()
     {
-        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+        var e = new E { E2f = new F("test"), Name = null };
 
-        CollectionAssert.AreEqual(new List<Field> { SDTLangLanguage.Instance.FullyQualifiedName_name },
-            fqn.CollectAllSetFields().ToList());
+        CollectionAssert.AreEqual(new List<Field> { SDTLangLanguage.Instance.E_e2f },
+            e.CollectAllSetFields().ToList());
     }
 
     [TestMethod]
     public void Partial_Null_Get()
     {
-        var fqn = new FullyQualifiedName { Name = "test", Nested = null };
+        var e = new E { E2f = new F("test"), Name = null };
 
-        Assert.AreEqual("test", fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_name));
-        Assert.ThrowsException<UnsetFieldException>(() => fqn.Get(SDTLangLanguage.Instance.FullyQualifiedName_nested));
+        Assert.AreEqual(new F("test"), e.Get(SDTLangLanguage.Instance.E_e2f));
+        Assert.ThrowsException<UnsetFieldException>(() => e.Get(SDTLangLanguage.Instance.E_name));
     }
 
     [TestMethod]
@@ -272,9 +272,9 @@ public class StructuredDataTypeTests
         CollectionAssert.AreEqual(
             new List<Field>
             {
-                SDTLangLanguage.Instance.Amount_value,
                 SDTLangLanguage.Instance.Amount_currency,
                 SDTLangLanguage.Instance.Amount_digital,
+                SDTLangLanguage.Instance.Amount_value,
             }, amount.CollectAllSetFields().ToList());
     }
 
@@ -292,37 +292,6 @@ public class StructuredDataTypeTests
     }
 
     [TestMethod]
-    public void Nested()
-    {
-        var fqn = new FullyQualifiedName
-        {
-            Name = "a",
-            Nested = new FullyQualifiedName { Name = "b", Nested = new FullyQualifiedName { Name = "c" } }
-        };
-
-        Assert.AreEqual(
-            "FullyQualifiedName { Name = a, Nested = FullyQualifiedName { Name = b, Nested = FullyQualifiedName { Name = c, Nested =  } } }",
-            fqn.ToString());
-    }
-
-    [TestMethod]
-    public void Nested_Null()
-    {
-        var fqn = new FullyQualifiedName
-        {
-            Name = "a",
-            Nested = new FullyQualifiedName
-            {
-                Name = "b", Nested = new FullyQualifiedName { Name = "c", Nested = null }
-            }
-        };
-
-        Assert.AreEqual(
-            "FullyQualifiedName { Name = a, Nested = FullyQualifiedName { Name = b, Nested = FullyQualifiedName { Name = c, Nested =  } } }",
-            fqn.ToString());
-    }
-
-    [TestMethod]
     public void ComplexStructure()
     {
         var a = new A
@@ -336,27 +305,16 @@ public class StructuredDataTypeTests
                 C2e = new E
                 {
                     Name = "E1",
-                    E2b = new B { Name = "B2", B2d = new D { Name = "D3" } },
                     E2f = new F
                     {
-                        Name = "F1",
-                        F2c = new C
-                        {
-                            Name = "C2",
-                            C2d = new D { Name = "D4" },
-                            C2e = new E
-                            {
-                                Name = "E2",
-                                E2b = new B { Name = "B3", B2d = new D { Name = "D5" } }
-                            }
-                        }
+                        Name = "F1"
                     }
                 }
             }
         };
 
         Assert.AreEqual(
-            "A { A2b = B { B2d = D { Name = D1 }, Name = B1 }, A2c = C { C2d = D { Name = D2 }, C2e = E { E2b = B { B2d = D { Name = D3 }, Name = B2 }, E2f = F { F2c = C { C2d = D { Name = D4 }, C2e = E { E2b = B { B2d = D { Name = D5 }, Name = B3 }, E2f = , Name = E2 }, Name = C2 }, Name = F1 }, Name = E1 }, Name = C1 }, Name = A1 }",
+            "A { A2b = B { B2d = D { Name = D1 }, Name = B1 }, A2c = C { C2d = D { Name = D2 }, C2e = E { E2f = F { Name = F1 }, Name = E1 }, Name = C1 }, Name = A1 }",
             a.ToString());
     }
 }

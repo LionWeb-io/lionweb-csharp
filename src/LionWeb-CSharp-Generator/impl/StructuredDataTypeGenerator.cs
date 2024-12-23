@@ -28,23 +28,28 @@ using static AstExtensions;
 /// <summary>
 /// Generates StructuredDataType readonly record structs.
 /// </summary>
-public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
+public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, LionWebVersions lionWebVersion)
+    : GeneratorBase(names, lionWebVersion)
 {
+    private string SdtName => sdt.Name.PrefixKeyword();
+    private IEnumerable<Field> Fields => sdt.Fields.Ordered();
+
     /// <inheritdoc cref="StructuredDataTypeGenerator"/>
     public RecordDeclarationSyntax SdtType()
     {
-        var members = sdt.Fields.Ordered().SelectMany(Field);
+        var members = Fields.SelectMany(Field);
 
         members = members.Concat([
             GenDefaultConstructor(),
             GenInternalConstructor(),
             GenGetStructuredDataType(),
             GenCollectAllSetFields(),
-            GenGet()
+            GenGet(),
+            GenToString()
         ]);
 
         return RecordDeclaration(SyntaxKind.RecordStructDeclaration,
-                Token(SyntaxKind.RecordKeyword), sdt.Name)
+                Token(SyntaxKind.RecordKeyword), SdtName)
             .WithAttributeLists(AsAttributes(
             [
                 MetaPointerAttribute(sdt),
@@ -61,44 +66,31 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
     #region DefaultConstructor
 
     private ConstructorDeclarationSyntax GenDefaultConstructor() =>
-        Constructor(sdt.Name)
-            .WithBody(AsStatements(sdt.Fields.Select(DefaultFieldInitializer)));
+        Constructor(SdtName)
+            .WithBody(AsStatements(Fields.Select(DefaultFieldInitializer)));
 
-    private StatementSyntax DefaultFieldInitializer(Field field)
-    {
-        ExpressionSyntax initializer = IsLazyField(field)
-            ? NewCall([Null()])
-            : Null();
-
-        return Assignment(FieldField(field).ToString(), initializer);
-    }
+    private StatementSyntax DefaultFieldInitializer(Field field) =>
+        Assignment(FieldField(field).ToString(), Null());
 
     #endregion
-    
+
     #region InternalConstructor
-    
+
     private ConstructorDeclarationSyntax GenInternalConstructor() =>
         Constructor(
-            sdt.Name, 
-            sdt.Fields.Select(f => Param(ParamField(f), NullableType(AsType(f.Type)))).ToArray()
-        )
+                SdtName,
+                Fields
+                    .Select(f => Param(_names.ParamField(f), NullableType(AsType(f.Type))))
+                    .ToArray()
+            )
             .WithModifiers(AsModifiers(SyntaxKind.InternalKeyword))
-            .WithBody(AsStatements(sdt.Fields.Select(InternalFieldInitializer)));
+            .WithBody(AsStatements(Fields.Select(InternalFieldInitializer)));
 
-    private StatementSyntax InternalFieldInitializer(Field field)
-    {
-        var paramName = IdentifierName(ParamField(field));
-        ExpressionSyntax initializer = IsLazyField(field)
-            ? NewCall([paramName])
-            : paramName;
-
-        return Assignment(FieldField(field).ToString(), initializer);
-    }
-
-    private string ParamField(Field field) => FieldProperty(field).ToString().ToFirstLower() + "_";
+    private StatementSyntax InternalFieldInitializer(Field field) =>
+        Assignment(FieldField(field).ToString(), IdentifierName(_names.ParamField(field)));
 
     #endregion
-    
+
     private MemberDeclarationSyntax GenGetStructuredDataType()
     {
         return Method("GetStructuredDataType", AsType(typeof(StructuredDataType)), exprBody: MetaProperty())
@@ -117,28 +109,19 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(
                 new List<StatementSyntax> { ParseStatement("List<Field> result = [];") }
-                    .Concat(sdt.Fields.Select(GenCollectAllSetFields))
+                    .Concat(Fields.Select(GenCollectAllSetFields))
                     .Append(ReturnStatement(IdentifierName("result")))
             ));
 
-    private StatementSyntax GenCollectAllSetFields(Field field)
-    {
-        ExpressionSyntax condition = BinaryExpression(
+    private StatementSyntax GenCollectAllSetFields(Field field) =>
+        IfStatement(BinaryExpression(
             SyntaxKind.NotEqualsExpression,
             FieldField(field),
             Null()
-        );
-
-        if (IsLazyField(field))
-        {
-            condition = LazyFieldNotNull(field, condition);
-        }
-
-        return IfStatement(condition, ExpressionStatement(InvocationExpression(
+        ), ExpressionStatement(InvocationExpression(
             MemberAccess(IdentifierName("result"), IdentifierName("Add")),
             AsArguments([MetaProperty(field)])
         )));
-    }
 
     #endregion
 
@@ -151,23 +134,42 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(
-                sdt.Fields.Select(GenGetInternal)
+                Fields.Select(GenGetInternal)
                     .Append(ThrowStatement(NewCall([IdentifierName("field")], AsType(typeof(UnsetFieldException)))))
             ));
 
-    private StatementSyntax GenGetInternal(Field field)
-    {
-        ExpressionSyntax condition = GenEqualsIdentityField(field);
-
-        if (IsLazyField(field))
-        {
-            condition = LazyFieldNotNull(field, condition);
-        }
-
-        return IfStatement(condition,
+    private StatementSyntax GenGetInternal(Field field) =>
+        IfStatement(GenEqualsIdentityField(field),
             ReturnStatement(FieldProperty(field))
         );
-    }
+
+    private MemberDeclarationSyntax GenToString() =>
+        Method(
+                "ToString",
+                AsType(typeof(string)),
+                exprBody: InterpolatedStringExpression(Token(SyntaxKind.InterpolatedStringStartToken))
+                    .WithContents(List(
+                        Fields
+                            .Select(f => new List<InterpolatedStringContentSyntax>
+                            {
+                                AsInterpolatedString(FieldProperty(f) + " = "), Interpolation(FieldField(f))
+                            })
+                            .Intersperse([AsInterpolatedString(",")])
+                            .SelectMany(l => l)
+                            .Prepend(AsInterpolatedString(SdtName + " " + "{{"))
+                            .Append(AsInterpolatedString(" }}"))))
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword));
+
+    private InterpolatedStringTextSyntax AsInterpolatedString(string text) =>
+        InterpolatedStringText()
+            .WithTextToken(Token(
+                TriviaList(),
+                SyntaxKind.InterpolatedStringTextToken,
+                text,
+                text,
+                TriviaList()
+            ));
 
     private BinaryExpressionSyntax LazyFieldNotNull(Field field, ExpressionSyntax condition) =>
         BinaryExpression(
@@ -189,55 +191,26 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
 
     private List<MemberDeclarationSyntax> Field(Field field)
     {
-        var propertyType = AsType(field.Type);
-        TypeSyntax memberFieldType = NullableType(propertyType);
-
-        bool circumventSelfContainment = IsLazyField(field);
-
-        if (circumventSelfContainment)
-        {
-            memberFieldType = AsType(typeof(NullableStructMember<>), propertyType);
-            propertyType = NullableType(propertyType);
-        }
-
-        var memberField = AstExtensions.Field(FieldField(field).ToString(), memberFieldType)
+        var memberField = AstExtensions.Field(FieldField(field).ToString(), NullableType(AsType(field.Type)))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
-        ExpressionSyntax getter;
-        ExpressionSyntax setter;
-
-        if (circumventSelfContainment)
-        {
-            getter = LazyFieldValue(field);
-            setter = AssignmentExpression(
-                SyntaxKind.SimpleAssignmentExpression,
-                FieldField(field),
-                NewCall([Value()])
-            );
-        } else
-        {
-            getter = BinaryExpression(
-                SyntaxKind.CoalesceExpression,
-                FieldField(field),
-                ThrowExpression(NewCall([MetaProperty(field)],
-                    AsType(typeof(UnsetFieldException))))
-            );
-            setter = AssignmentExpression(
-                    SyntaxKind.SimpleAssignmentExpression,
-                    FieldField(field),
-                    Value())
-                ;
-        }
-
-        var property = PropertyDeclaration(propertyType, Identifier(FieldProperty(field).ToString()))
+        var property = PropertyDeclaration(AsType(field.Type), Identifier(FieldProperty(field).ToString()))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([MetaPointerAttribute(field)]))
             .WithAccessorList(AccessorList(List([
                             AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                                .WithExpressionBody(ArrowExpressionClause(getter))
+                                .WithExpressionBody(ArrowExpressionClause(BinaryExpression(
+                                    SyntaxKind.CoalesceExpression,
+                                    FieldField(field),
+                                    ThrowExpression(NewCall([MetaProperty(field)],
+                                        AsType(typeof(UnsetFieldException))))
+                                )))
                                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
                             AccessorDeclaration(SyntaxKind.InitAccessorDeclaration)
-                                .WithExpressionBody(ArrowExpressionClause(setter))
+                                .WithExpressionBody(ArrowExpressionClause(AssignmentExpression(
+                                    SyntaxKind.SimpleAssignmentExpression,
+                                    FieldField(field),
+                                    Value())))
                                 .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
                         ]
                     )
@@ -253,9 +226,6 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
             FieldField(field),
             IdentifierName("Value")
         );
-
-    private bool IsLazyField(Field field) =>
-        field.Type is StructuredDataType s && ContainsSelf(s, []);
 
     private bool ContainsSelf(Datatype datatype, HashSet<StructuredDataType> owners)
     {

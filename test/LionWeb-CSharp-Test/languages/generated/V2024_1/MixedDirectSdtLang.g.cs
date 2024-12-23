@@ -102,10 +102,10 @@ public readonly record struct DirectSdt : IStructuredDataTypeInstance
 		_directSdtSdt = null;
 	}
 
-	internal DirectSdt(Examples.V2024_1.Mixed.MixedNestedEnumLang.NestedEnum? directSdtEnum_, Examples.V2024_1.Mixed.MixedNestedSdtLang.NestedSdt? directSdtSdt_)
+	internal DirectSdt(Examples.V2024_1.Mixed.MixedNestedEnumLang.NestedEnum? directSdtEnum, Examples.V2024_1.Mixed.MixedNestedSdtLang.NestedSdt? directSdtSdt)
 	{
-		_directSdtEnum = directSdtEnum_;
-		_directSdtSdt = directSdtSdt_;
+		_directSdtEnum = directSdtEnum;
+		_directSdtSdt = directSdtSdt;
 	}
 
 	/// <inheritdoc/>
@@ -130,4 +130,6 @@ public readonly record struct DirectSdt : IStructuredDataTypeInstance
 			return DirectSdtSdt;
 		throw new UnsetFieldException(field);
 	}
+
+	public override string ToString() => $"DirectSdt {{ DirectSdtEnum = {_directSdtEnum}, DirectSdtSdt = {_directSdtSdt} }}";
 }

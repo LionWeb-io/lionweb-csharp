@@ -93,9 +93,9 @@ public readonly record struct NestedSdt : IStructuredDataTypeInstance
 		_nestedSdtField = null;
 	}
 
-	internal NestedSdt(string? nestedSdtField_)
+	internal NestedSdt(string? nestedSdtField)
 	{
-		_nestedSdtField = nestedSdtField_;
+		_nestedSdtField = nestedSdtField;
 	}
 
 	/// <inheritdoc/>
@@ -116,4 +116,6 @@ public readonly record struct NestedSdt : IStructuredDataTypeInstance
 			return NestedSdtField;
 		throw new UnsetFieldException(field);
 	}
+
+	public override string ToString() => $"NestedSdt {{ NestedSdtField = {_nestedSdtField} }}";
 }

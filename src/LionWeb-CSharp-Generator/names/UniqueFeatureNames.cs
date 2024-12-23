@@ -104,17 +104,20 @@ public class UniqueFeatureNames(INames parent) : INames
     public IdentifierNameSyntax FieldProperty(Field field) => parent.FieldProperty(field);
 
     /// <inheritdoc />
+    public string ParamField(Field field) => parent.ParamField(field);
+
+    /// <inheritdoc />
     public IdentifierNameSyntax FeatureField(Feature feature)
     {
         RegisterFeatureName(feature);
-        return IdentifierName($"_{_featureNames[feature].ToFirstLower()}");
+        return IdentifierName($"_{_featureNames[feature].ToFirstLower()}".PrefixKeyword());
     }
 
     /// <inheritdoc />
     public IdentifierNameSyntax FeatureProperty(Feature feature)
     {
         RegisterFeatureName(feature);
-        return IdentifierName(_featureNames[feature].ToFirstUpper());
+        return IdentifierName(_featureNames[feature].ToFirstUpper().PrefixKeyword());
     }
 
     private void RegisterFeatureName(Feature feature)

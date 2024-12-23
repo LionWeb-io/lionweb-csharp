@@ -80,7 +80,7 @@ public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebV
                 result.AddRange(enumeration.Literals.Ordered().Select(LiteralConstructorInitialization));
                 break;
             case StructuredDataType structuredDataType:
-                result.AddRange(structuredDataType.Fields.Select(FieldConstructorInitialization));
+                result.AddRange(structuredDataType.Fields.Ordered().Select(FieldConstructorInitialization));
                 break;
             case PrimitiveType:
                 // fall-through
@@ -141,7 +141,7 @@ public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebV
         StructuredDataType structuredDataType)
     {
         var result = KeyName(structuredDataType);
-        result.Add(("FieldsLazy", NewLazy(Collection(structuredDataType.Fields.Select(AsProperty)))));
+        result.Add(("FieldsLazy", NewLazy(Collection(structuredDataType.Fields.Ordered().Select(AsProperty)))));
 
         return (result, AsType(typeof(StructuredDataTypeBase<>), generics: LanguageType));
     }
