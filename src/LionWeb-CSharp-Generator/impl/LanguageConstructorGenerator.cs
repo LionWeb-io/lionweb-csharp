@@ -86,7 +86,7 @@ public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebV
                 // fall-through
                 break;
             default:
-                throw new ArgumentException($"unsupported entity: {entity}", nameof(entity));
+                throw new ArgumentException($"unsupported entity type: {entity}", nameof(entity));
         }
 
         return result;
