@@ -23,12 +23,12 @@ using M1;
 using M3;
 
 /// <see cref="IDeserializer"/> parts specific to LionWeb <see cref="IVersion2023_1"/>.  
-internal class DeserializerVersionSpecifics_2023_1<T>(
-    DeserializerBase<T> deserializer,
+internal class DeserializerVersionSpecifics_2023_1<T, H>(
+    DeserializerBase<T, H> deserializer,
     DeserializerMetaInfo metaInfo,
     IDeserializerHandler handler)
-    : DeserializerVersionSpecificsBase<T>(deserializer, metaInfo, handler)
-    where T : class, IReadableNode
+    : DeserializerVersionSpecificsBase<T, H>(deserializer, metaInfo, handler)
+    where T : class, IReadableNode where H : class, IDeserializerHandler
 {
     public override LionWebVersions Version => LionWebVersions.v2023_1;
 

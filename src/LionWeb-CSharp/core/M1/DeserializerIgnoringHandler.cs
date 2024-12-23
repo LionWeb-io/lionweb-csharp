@@ -161,20 +161,9 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
 
     #endregion
 
-    #region language deserializer
-
-    /// <inheritdoc />
-    public void InvalidContainment(IReadableNode node) =>
-        LogMessage($"installing containments in node of meta-concept {node.GetType().Name} not implemented");
-
     /// <inheritdoc />
     public void InvalidReference(IReadableNode node) =>
         LogMessage($"installing references in node of meta-concept {node.GetType().Name} not implemented");
-
-
-    /// <inheritdoc />
-    public void InvalidAnnotationParent(IReadableNode annotation, IReadableNode? parent) =>
-        LogMessage($"Cannot attach annotation {annotation} to its parent with id={parent?.GetId()}.");
 
 
     /// <inheritdoc />
@@ -183,8 +172,6 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
         LogMessage($"Skip deserializing {id} because dependent nodes contains node with same id");
         return true;
     }
-
-    #endregion
 
     /// Writes <paramref name="message"/> to the appropriate logging facility.
     protected virtual void LogMessage(string message) =>

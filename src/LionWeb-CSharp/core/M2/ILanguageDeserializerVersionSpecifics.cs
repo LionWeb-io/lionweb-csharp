@@ -31,7 +31,7 @@ internal interface ILanguageDeserializerVersionSpecifics : IVersionSpecifics
     /// </summary>
     /// <exception cref="UnsupportedVersionException"></exception>
     public static ILanguageDeserializerVersionSpecifics Create(LionWebVersions lionWebVersion,
-        LanguageDeserializer deserializer, IDeserializerHandler handler)
+        LanguageDeserializer deserializer, ILanguageDeserializerHandler handler)
         => lionWebVersion switch
         {
             IVersion2023_1 => new LanguageDeserializerVersionSpecifics_2023_1(deserializer, handler),
@@ -55,11 +55,11 @@ internal interface ILanguageDeserializerVersionSpecifics : IVersionSpecifics
 
 internal abstract class LanguageDeserializerVersionSpecificsBase(
     LanguageDeserializer deserializer,
-    IDeserializerHandler handler)
+    ILanguageDeserializerHandler handler)
     : ILanguageDeserializerVersionSpecifics
 {
     internal readonly LanguageDeserializer _deserializer = deserializer;
-    internal readonly IDeserializerHandler _handler = handler;
+    internal readonly ILanguageDeserializerHandler _handler = handler;
 
     public abstract LionWebVersions Version { get; }
 
@@ -173,6 +173,7 @@ internal abstract class ContainmentsInstallerBase(
     IReadableNode node,
     ILookup<string, IKeyed> serializedContainmentsLookup)
 {
+    internal readonly LanguageDeserializerVersionSpecificsBase _versionSpecifics = versionSpecifics;
     internal readonly IReadableNode _node = node;
 
     public virtual void Install()
@@ -191,7 +192,7 @@ internal abstract class ContainmentsInstallerBase(
             case DynamicEnumerationLiteral or DynamicPrimitiveType or DynamicFeature:
                 return;
             default:
-                versionSpecifics._handler.InvalidContainment(_node);
+                _versionSpecifics._handler.InvalidContainment(_node);
                 return;
         }
     }
@@ -211,7 +212,7 @@ internal abstract class ContainmentsInstallerBase(
 
         return serializedContainment.Children
             .Select(c =>
-                versionSpecifics._handler.UnresolvableChild(versionSpecifics._deserializer.Compress(c), containment,
+                _versionSpecifics._handler.UnresolvableChild(_versionSpecifics._deserializer.Compress(c), containment,
                     _node) as T)
             .Where(t => t != null)!;
     }
@@ -224,6 +225,7 @@ internal abstract class ReferencesInstallerBase(
     ILookup<string, IKeyed?> serializedReferencesLookup)
 {
     internal readonly IReadableNode _node = node;
+    internal readonly LanguageDeserializerVersionSpecificsBase _versionSpecifics = versionSpecifics;
 
     public virtual void Install()
     {
@@ -255,7 +257,7 @@ internal abstract class ReferencesInstallerBase(
                 return;
 
             default:
-                versionSpecifics._handler.InvalidReference(_node);
+                _versionSpecifics._handler.InvalidReference(_node);
                 return;
         }
     }
@@ -308,7 +310,7 @@ internal abstract class ReferencesInstallerBase(
             .FirstOrDefault(r => r.Reference.Matches(reference));
 
     private T? UnknownReference<T>(Feature reference, SerializedReferenceTarget target) where T : class =>
-        versionSpecifics._handler.UnresolvableReferenceTarget(
-            versionSpecifics._deserializer.CompressOpt(target.Reference), target.ResolveInfo, reference,
+        _versionSpecifics._handler.UnresolvableReferenceTarget(
+            _versionSpecifics._deserializer.CompressOpt(target.Reference), target.ResolveInfo, reference,
             (IWritableNode)_node) as T;
 }

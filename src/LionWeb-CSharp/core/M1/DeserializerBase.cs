@@ -25,7 +25,10 @@ using Serialization;
 using CompressedReference = (CompressedMetaPointer, List<(CompressedId?, string?)>);
 
 /// <inheritdoc />
-public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IReadableNode
+/// <typeparam name="T">Type of node to return</typeparam>
+/// <typeparam name="H">Type of <see cref="IDeserializerHandler"/> to use.</typeparam>
+public abstract class DeserializerBase<T, H> : IDeserializer<T>
+    where T : class, IReadableNode where H : class, IDeserializerHandler
 {
     /// Version of LionWeb standard to use.
     internal readonly IDeserializerVersionSpecifics _versionSpecifics;
@@ -37,7 +40,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
     protected readonly IBuiltInsLanguage _builtIns;
 
     ///Handler to customize this deserializer's behaviour in non-regular situations.
-    protected readonly IDeserializerHandler _handler;
+    protected readonly H _handler;
 
     /// <inheritdoc cref="DeserializerMetaInfo"/>
     protected readonly DeserializerMetaInfo _deserializerMetaInfo;
@@ -50,11 +53,11 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
 
     /// <param name="lionWebVersion">Version of LionWeb standard to use.</param>
     /// <param name="handler">Optional handler to customize this deserializer's behaviour in non-regular situations.</param>
-    protected DeserializerBase(LionWebVersions lionWebVersion, IDeserializerHandler? handler = null)
+    protected DeserializerBase(LionWebVersions lionWebVersion, H handler)
     {
         _m3 = lionWebVersion.LionCore;
         _builtIns = lionWebVersion.BuiltIns;
-        _handler = handler ?? new DeserializerExceptionHandler();
+        _handler = handler;
         _deserializerMetaInfo = new DeserializerMetaInfo(_handler);
         _versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion, this, _deserializerMetaInfo, _handler);
         _versionSpecifics.RegisterBuiltins();
@@ -70,7 +73,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
         get => _deserializerMetaInfo.StoreUncompressedIds;
         init => _deserializerMetaInfo.StoreUncompressedIds = value;
     }
-    
+
     /// Whether we try to resolve references by <see cref="LionWeb.Core.Serialization.SerializedReferenceTarget.ResolveInfo"/>.
     public ReferenceResolveInfoHandling ResolveInfoHandling { get; init; }
 
@@ -202,7 +205,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
             .Concat(_deserializedNodesById.Values)
             .OfType<INamed>()
             .Where(n => n.CollectAllSetFeatures().Contains(_builtIns.INamed_name));
-            
+
         return ResolveInfoHandling switch
         {
             ReferenceResolveInfoHandling.None => null,
@@ -210,7 +213,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
             ReferenceResolveInfoHandling.NameIfUnique => GetSingle(namedNodes, n => n.Name == s)
         };
     }
-    
+
     private static TSource? GetSingle<TSource>(IEnumerable<TSource> source, Func<TSource, bool> predicate)
     {
         using IEnumerator<TSource> e = source.GetEnumerator();
@@ -226,6 +229,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
                         return default;
                     }
                 }
+
                 return result;
             }
         }

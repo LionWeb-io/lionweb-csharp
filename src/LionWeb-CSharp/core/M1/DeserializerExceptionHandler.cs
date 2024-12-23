@@ -123,29 +123,15 @@ public class DeserializerExceptionHandler : IDeserializerHandler
 
     #endregion
 
-    #region language deserializer
-
-    /// <inheritdoc />
-    public virtual void InvalidContainment(IReadableNode node) =>
-        throw new UnsupportedClassifierException(node.GetClassifier().ToMetaPointer(),
-            $"On node with id={node.GetId()}:");
-
     /// <inheritdoc />
     public virtual void InvalidReference(IReadableNode node) =>
         throw new UnsupportedClassifierException(node.GetClassifier().ToMetaPointer(),
             $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public virtual void InvalidAnnotationParent(IReadableNode annotation, IReadableNode? parent) =>
-        throw new DeserializerException(
-            $"Cannot attach annotation {annotation} to its parent with id={parent?.GetId()}.");
-
-    /// <inheritdoc />
     public virtual bool SkipDeserializingDependentNode(CompressedId id) =>
         throw new DeserializerException(
             $"Skip deserializing {id} because dependentLanguages contains node with same id");
-
-    #endregion
 }
 
 /// Something went wrong during serialization.

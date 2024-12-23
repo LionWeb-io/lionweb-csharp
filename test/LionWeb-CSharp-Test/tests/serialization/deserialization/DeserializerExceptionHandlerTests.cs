@@ -96,7 +96,7 @@ public class DeserializerExceptionHandlerTests
     public void invalid_containment()
     {
         Assert.ThrowsException<UnsupportedClassifierException>(() =>
-            new DeserializerExceptionHandler().InvalidContainment(new Line("line")));
+            new LanguageDeserializerExceptionHandler().InvalidContainment(new Line("line")));
     }
 
     [TestMethod]
@@ -168,7 +168,7 @@ public class DeserializerExceptionHandlerTests
     public void invalid_annotation_parent()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().InvalidAnnotationParent(new Documentation("doc"), new Line("line")));
+            new LanguageDeserializerExceptionHandler().InvalidAnnotationParent(new Documentation("doc"), new Line("line")));
     }
 
     [TestMethod]

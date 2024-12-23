@@ -138,7 +138,7 @@ public class LanguageSerializationTests
         deserializer.Finish();
     }
 
-    private class SkipDeserializationHandler : DeserializerExceptionHandler
+    private class SkipDeserializationHandler : LanguageDeserializerExceptionHandler
     {
         public override bool SkipDeserializingDependentNode(CompressedId id) => false;
     }

@@ -27,7 +27,7 @@ using Serialization;
 /// <see cref="LanguageDeserializer"/> parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
 internal class LanguageDeserializerVersionSpecifics_2024_1_Compatible(
     LanguageDeserializer deserializer,
-    IDeserializerHandler handler)
+    ILanguageDeserializerHandler handler)
     : LanguageDeserializerVersionSpecifics_2024_1(deserializer, handler)
 {
     public override DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, string id) =>

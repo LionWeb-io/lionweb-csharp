@@ -27,7 +27,7 @@ using Serialization;
 /// <see cref="LanguageDeserializer"/> parts specific to LionWeb <see cref="IVersion2023_1"/>.  
 internal class LanguageDeserializerVersionSpecifics_2023_1(
     LanguageDeserializer deserializer,
-    IDeserializerHandler handler)
+    ILanguageDeserializerHandler handler)
     : LanguageDeserializerVersionSpecificsBase(deserializer, handler)
 {
     public override LionWebVersions Version => LionWebVersions.v2023_1;

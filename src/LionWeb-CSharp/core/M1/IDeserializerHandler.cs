@@ -205,8 +205,6 @@ public interface IDeserializerHandler
 
     #endregion
 
-    #region language deserializer
-
     /// <summary>
     /// Whether to skip node with id <paramref name="id"/> that appears both in deserialized nodes and <see cref="IDeserializer.RegisterDependentNodes">dependent nodes</see>.
     /// </summary>
@@ -216,23 +214,8 @@ public interface IDeserializerHandler
     bool SkipDeserializingDependentNode(CompressedId id);
 
     /// <summary>
-    /// Cannot install containments into <paramref name="node"/>. 
-    /// </summary>
-    /// <param name="node">Node that cannot receive new containments.</param>
-    void InvalidContainment(IReadableNode node);
-
-    /// <summary>
     /// Cannot install references into <paramref name="node"/>. 
     /// </summary>
     /// <param name="node">Node that cannot receive new references.</param>
     void InvalidReference(IReadableNode node);
-
-    /// <summary>
-    /// Cannot install annotations into <paramref name="parent"/>.
-    /// </summary>
-    /// <param name="annotation">Annotation we want to add to <paramref name="parent"/>.</param>
-    /// <param name="parent">Node that cannot receive new annotations.</param>
-    void InvalidAnnotationParent(IReadableNode annotation, IReadableNode? parent);
-
-    #endregion
 }

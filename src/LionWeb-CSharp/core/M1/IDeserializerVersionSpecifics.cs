@@ -29,11 +29,11 @@ internal interface IDeserializerVersionSpecifics : IVersionSpecifics
     /// Creates an instance of <see cref="IDeserializerVersionSpecifics"/> that implements <paramref name="lionWebVersion"/>.
     /// </summary>
     /// <exception cref="UnsupportedVersionException"></exception>
-    public static IDeserializerVersionSpecifics Create<T>(LionWebVersions lionWebVersion, DeserializerBase<T> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler) where T : class, IReadableNode => lionWebVersion switch
+    public static IDeserializerVersionSpecifics Create<T, H>(LionWebVersions lionWebVersion, DeserializerBase<T, H> deserializer, DeserializerMetaInfo metaInfo, IDeserializerHandler handler) where T : class, IReadableNode where H : class, IDeserializerHandler => lionWebVersion switch
     {
-        IVersion2023_1 => new DeserializerVersionSpecifics_2023_1<T>(deserializer,metaInfo,handler),
-        IVersion2024_1 => new DeserializerVersionSpecifics_2024_1<T>(deserializer,metaInfo,handler),
-        IVersion2024_1_Compatible => new DeserializerVersionSpecifics_2024_1_Compatible<T>(deserializer,metaInfo,handler),
+        IVersion2023_1 => new DeserializerVersionSpecifics_2023_1<T, H>(deserializer,metaInfo,handler),
+        IVersion2024_1 => new DeserializerVersionSpecifics_2024_1<T, H>(deserializer,metaInfo,handler),
+        IVersion2024_1_Compatible => new DeserializerVersionSpecifics_2024_1_Compatible<T, H>(deserializer,metaInfo,handler),
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 
@@ -45,12 +45,12 @@ internal interface IDeserializerVersionSpecifics : IVersionSpecifics
     object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype, string? value);
 }
 
-internal abstract class DeserializerVersionSpecificsBase<T>(
-    DeserializerBase<T> deserializer,
+internal abstract class DeserializerVersionSpecificsBase<T, H>(
+    DeserializerBase<T, H> deserializer,
     DeserializerMetaInfo metaInfo,
     IDeserializerHandler handler)
     : IDeserializerVersionSpecifics
-    where T : class, IReadableNode
+    where T : class, IReadableNode where H : class, IDeserializerHandler
 {
     private readonly IDeserializer _deserializer = deserializer;
     internal readonly DeserializerMetaInfo _metaInfo = metaInfo;
