@@ -91,7 +91,7 @@ public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) :
     private IEnumerable<UsingDirectiveSyntax> PrimitiveTypesAsUsings() =>
         Language.Entities.OfType<PrimitiveType>().Ordered().Select(p =>
             UsingDirective(
-                NameEquals(IdentifierName(p.Name)),
+                NameEquals(IdentifierName(p.Name.PrefixKeyword())),
                 AsType(typeof(string))
             )
         );

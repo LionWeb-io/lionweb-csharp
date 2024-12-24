@@ -263,9 +263,9 @@ public static class AstExtensions
     public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax expression, SimpleNameSyntax name) =>
         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, expression, name);
 
-    /// <returns><c>@name</c></returns>
+    /// <returns><c>name</c></returns>
     public static EnumMemberDeclarationSyntax EnumMember(string name) =>
-        EnumMemberDeclaration(Identifier($"@{name}"));
+        EnumMemberDeclaration(Identifier(name.PrefixKeyword()));
 
     /// Prepends <paramref name="xdocs"/> before <paramref name="member"/>.
     public static T Xdoc<T>(this T member, IEnumerable<XmlNodeSyntax> xdocs) where T : MemberDeclarationSyntax

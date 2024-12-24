@@ -210,7 +210,7 @@ public partial class MyConcept : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_multivaluedRef.Count != 0)
 			result.Add(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		if (_singularRef != default)

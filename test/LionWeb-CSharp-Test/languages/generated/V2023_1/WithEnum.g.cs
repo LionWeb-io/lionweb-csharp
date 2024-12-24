@@ -162,7 +162,7 @@ public partial class EnumHolder : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_enumValue != default)
 			result.Add(WithEnumLanguage.Instance.EnumHolder_enumValue);
 		return result;
@@ -173,7 +173,7 @@ public partial class EnumHolder : NodeBase
 public enum MyEnum
 {
 	[LionCoreMetaPointer(Language = typeof(WithEnumLanguage), Key = "lit1")]
-	@literal1,
+	literal1,
 	[LionCoreMetaPointer(Language = typeof(WithEnumLanguage), Key = "lit2")]
-	@literal2
+	literal2
 }

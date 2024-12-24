@@ -85,5 +85,5 @@ public class MixedDirectEnumLangFactory : AbstractBaseNodeFactory, IMixedDirectE
 public enum DirectEnum
 {
 	[LionCoreMetaPointer(Language = typeof(MixedDirectEnumLangLanguage), Key = "key-directEnumA")]
-	@directEnumA
+	directEnumA
 }

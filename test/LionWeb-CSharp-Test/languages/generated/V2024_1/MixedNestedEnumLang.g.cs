@@ -85,5 +85,5 @@ public class MixedNestedEnumLangFactory : AbstractBaseNodeFactory, IMixedNestedE
 public enum NestedEnum
 {
 	[LionCoreMetaPointer(Language = typeof(MixedNestedEnumLangLanguage), Key = "key-nestedLiteralA")]
-	@nestedLiteralA
+	nestedLiteralA
 }

@@ -270,7 +270,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(
-                new List<StatementSyntax> { ParseStatement("var result = base.CollectAllSetFeatures().ToList();") }
+                new List<StatementSyntax> { ParseStatement("List<Feature> result = base.CollectAllSetFeatures().ToList();") }
                     .Concat(FeaturesToImplement(classifier).Select(GenCollectAllSetFeatures))
                     .Append(ReturnStatement(IdentifierName("result")))
             ));

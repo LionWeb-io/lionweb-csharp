@@ -329,7 +329,7 @@ public partial class Book : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_author != default)
 			result.Add(LibraryLanguage.Instance.Book_author);
 		if (_pages != default)
@@ -404,7 +404,7 @@ public partial class GuideBookWriter : Writer
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_countries != default)
 			result.Add(LibraryLanguage.Instance.GuideBookWriter_countries);
 		return result;
@@ -529,7 +529,7 @@ public partial class Library : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_books.Count != 0)
 			result.Add(LibraryLanguage.Instance.Library_books);
 		if (_name != default)
@@ -542,7 +542,7 @@ public partial class Library : NodeBase
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(c))
 		{
 			RemoveSelfParent(child, _books, LibraryLanguage.Instance.Library_books);
@@ -555,7 +555,7 @@ public partial class Library : NodeBase
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (child is Book child0 && _books.Contains(child0))
@@ -626,7 +626,7 @@ public partial class SpecialistBookWriter : Writer
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_subject != default)
 			result.Add(LibraryLanguage.Instance.SpecialistBookWriter_subject);
 		return result;
@@ -695,7 +695,7 @@ public partial class Writer : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_name != default)
 			result.Add(LibraryLanguage.Instance.Writer_name);
 		return result;
@@ -706,7 +706,7 @@ public partial class Writer : NodeBase
 public enum BookType
 {
 	[LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Normal")]
-	@Normal,
+	Normal,
 	[LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Special")]
-	@Special
+	Special
 }

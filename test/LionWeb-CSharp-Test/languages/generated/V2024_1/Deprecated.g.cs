@@ -316,7 +316,7 @@ public partial class DeprConcept : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_deprChild.Count != 0)
 			result.Add(DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		if (_deprProp != default)
@@ -331,7 +331,7 @@ public partial class DeprConcept : NodeBase
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(c))
 		{
 			RemoveSelfParent(child, _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
@@ -344,7 +344,7 @@ public partial class DeprConcept : NodeBase
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (child is DeprIface child0 && _deprChild.Contains(child0))
@@ -376,7 +376,7 @@ public partial class DeprNoComment : NodeBase
 public enum DeprEnum
 {
 	[LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3Mg")]
-	@A,
+	A,
 	[LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzEvNzgxNTI0MzQ3OTQ4Nzk5MzQ3NQ")]
-	@B
+	B
 }

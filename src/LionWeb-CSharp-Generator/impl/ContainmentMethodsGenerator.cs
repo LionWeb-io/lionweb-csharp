@@ -60,7 +60,7 @@ public class ContainmentMethodsGenerator(Classifier classifier, INames names, Li
                 {
                     IfStatement(ParseExpression("base.DetachChild(child)"),
                         ReturnTrue()),
-                    ParseStatement("var c = GetContainmentOf(child);")
+                    ParseStatement("Containment? c = GetContainmentOf(child);")
                 }.Concat(ContainmentsToImplement.Select(GenDetachChild))
                 .Append(ReturnStatement(false.AsLiteral()))
             ));
@@ -103,7 +103,7 @@ public class ContainmentMethodsGenerator(Classifier classifier, INames names, Li
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    ParseStatement("var result = base.GetContainmentOf(child);"),
+                    ParseStatement("Containment? result = base.GetContainmentOf(child);"),
                     IfStatement(NotEquals(IdentifierName("result"), Null()),
                         ReturnStatement(IdentifierName("result")))
                 }.Concat(ContainmentsToImplement.Select(GenGetContainmentOf))

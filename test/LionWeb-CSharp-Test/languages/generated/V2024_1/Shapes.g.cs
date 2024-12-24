@@ -524,7 +524,7 @@ public partial class BillOfMaterials : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_altGroups.Count != 0)
 			result.Add(ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		if (_defaultGroup != default)
@@ -541,7 +541,7 @@ public partial class BillOfMaterials : NodeBase
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(c))
 		{
 			RemoveSelfParent(child, _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
@@ -566,7 +566,7 @@ public partial class BillOfMaterials : NodeBase
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (child is MaterialGroup child0 && _altGroups.Contains(child0))
@@ -674,7 +674,7 @@ public partial class Circle : Shape
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_center != default)
 			result.Add(ShapesLanguage.Instance.Circle_center);
 		if (_r != default)
@@ -687,7 +687,7 @@ public partial class Circle : Shape
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.Circle_center.EqualsIdentity(c))
 		{
 			_center = null;
@@ -700,7 +700,7 @@ public partial class Circle : Shape
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (ReferenceEquals(_center, child))
@@ -885,7 +885,7 @@ public partial class CompositeShape : Shape
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_disabledParts.Count != 0)
 			result.Add(ShapesLanguage.Instance.CompositeShape_disabledParts);
 		if (_evilPart != default)
@@ -900,7 +900,7 @@ public partial class CompositeShape : Shape
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(c))
 		{
 			RemoveSelfParent(child, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
@@ -925,7 +925,7 @@ public partial class CompositeShape : Shape
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (child is IShape child0 && _disabledParts.Contains(child0))
@@ -1059,7 +1059,7 @@ public partial class Coord : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_x != default)
 			result.Add(ShapesLanguage.Instance.Coord_x);
 		if (_y != default)
@@ -1158,7 +1158,7 @@ public partial class Documentation : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_technical != default)
 			result.Add(ShapesLanguage.Instance.Documentation_technical);
 		if (_text != default)
@@ -1272,7 +1272,7 @@ public partial class Geometry : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_documentation != default)
 			result.Add(ShapesLanguage.Instance.Geometry_documentation);
 		if (_shapes.Count != 0)
@@ -1285,7 +1285,7 @@ public partial class Geometry : NodeBase
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.Geometry_documentation.EqualsIdentity(c))
 		{
 			_documentation = null;
@@ -1304,7 +1304,7 @@ public partial class Geometry : NodeBase
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (ReferenceEquals(_documentation, child))
@@ -1438,7 +1438,7 @@ public partial class Line : Shape, INamedWritable
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_end != default)
 			result.Add(ShapesLanguage.Instance.Line_end);
 		if (_start != default)
@@ -1451,7 +1451,7 @@ public partial class Line : Shape, INamedWritable
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.Line_end.EqualsIdentity(c))
 		{
 			_end = null;
@@ -1470,7 +1470,7 @@ public partial class Line : Shape, INamedWritable
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (ReferenceEquals(_end, child))
@@ -1629,7 +1629,7 @@ public partial class MaterialGroup : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_defaultShape != default)
 			result.Add(ShapesLanguage.Instance.MaterialGroup_defaultShape);
 		if (_materials.Count != 0)
@@ -1644,7 +1644,7 @@ public partial class MaterialGroup : NodeBase
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.MaterialGroup_defaultShape.EqualsIdentity(c))
 		{
 			_defaultShape = null;
@@ -1657,7 +1657,7 @@ public partial class MaterialGroup : NodeBase
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (ReferenceEquals(_defaultShape, child))
@@ -1858,7 +1858,7 @@ public partial class OffsetDuplicate : Shape
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_altSource != default)
 			result.Add(ShapesLanguage.Instance.OffsetDuplicate_altSource);
 		if (_docs != default)
@@ -1877,7 +1877,7 @@ public partial class OffsetDuplicate : Shape
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.OffsetDuplicate_docs.EqualsIdentity(c))
 		{
 			_docs = null;
@@ -1902,7 +1902,7 @@ public partial class OffsetDuplicate : Shape
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (ReferenceEquals(_docs, child))
@@ -1994,7 +1994,7 @@ public partial class ReferenceGeometry : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_shapes.Count != 0)
 			result.Add(ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		return result;
@@ -2181,7 +2181,7 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_name != default)
 			result.Add(_builtIns.INamed_name);
 		if (_fixpoints.Count != 0)
@@ -2198,7 +2198,7 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(c))
 		{
 			RemoveSelfParent(child, _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
@@ -2217,7 +2217,7 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (child is Coord child0 && _fixpoints.Contains(child0))
@@ -2232,9 +2232,9 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 public enum MatterState
 {
 	[LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-gas")]
-	@gas,
+	gas,
 	[LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-liquid")]
-	@liquid,
+	liquid,
 	[LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-solid")]
-	@solid
+	solid
 }

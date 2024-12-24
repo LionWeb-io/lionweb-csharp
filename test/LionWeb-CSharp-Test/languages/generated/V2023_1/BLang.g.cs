@@ -183,7 +183,7 @@ public partial class BConcept : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_aEnumProp != default)
 			result.Add(BLangLanguage.Instance.BConcept_AEnumProp);
 		if (_aRef != default)

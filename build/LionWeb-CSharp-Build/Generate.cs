@@ -51,6 +51,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var aLang = testLanguagesDefinitions.ALang;
     var bLang = testLanguagesDefinitions.BLang;
     var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
+    var keywordLang = testLanguagesDefinitions.KeywordLang;
 
     string prefix = $"Examples.V{lionWebVersion.VersionString.Replace('.', '_')}";
     List<Names> names =
@@ -67,6 +68,9 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     
     if(sdtLang != null)
         names.Add(new(sdtLang, $"{prefix}.SDTLang"));
+    
+    if(keywordLang != null)
+        names.Add(new(keywordLang, $"@namespace.@int.@public"));
 
     names.AddRange(testLanguagesDefinitions
         .MixedLangs

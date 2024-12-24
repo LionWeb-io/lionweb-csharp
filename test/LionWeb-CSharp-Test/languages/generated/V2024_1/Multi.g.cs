@@ -170,7 +170,7 @@ public partial class Container : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_libraries.Count != 0)
 			result.Add(MultiLanguage.Instance.Container_libraries);
 		return result;
@@ -181,7 +181,7 @@ public partial class Container : NodeBase
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(c))
 		{
 			RemoveSelfParent(child, _libraries, MultiLanguage.Instance.Container_libraries);
@@ -194,7 +194,7 @@ public partial class Container : NodeBase
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (child is Examples.V2024_1.Library.M2.Library child0 && _libraries.Contains(child0))

@@ -162,7 +162,7 @@ public partial class AConcept : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_bRef != default)
 			result.Add(ALangLanguage.Instance.AConcept_BRef);
 		return result;
@@ -173,7 +173,7 @@ public partial class AConcept : NodeBase
 public enum AEnum
 {
 	[LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-left")]
-	@left,
+	left,
 	[LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-right")]
-	@right
+	right
 }

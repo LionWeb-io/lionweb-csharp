@@ -402,7 +402,7 @@ public partial class SDTConcept : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_a != default)
 			result.Add(SDTLangLanguage.Instance.SDTConcept_A);
 		if (_amount != default)
@@ -419,9 +419,9 @@ public partial class SDTConcept : NodeBase
 public enum Currency
 {
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTEur")]
-	@EUR,
+	EUR,
 	[LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTGbp")]
-	@GBP
+	GBP
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTA")]

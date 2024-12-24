@@ -289,7 +289,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.V2024_1.Mixed.Mix
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_enumProp != default)
 			result.Add(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp);
 		if (_sdtProp != default)
@@ -308,7 +308,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.V2024_1.Mixed.Mix
 	{
 		if (base.DetachChild(child))
 			return true;
-		var c = GetContainmentOf(child);
+		Containment? c = GetContainmentOf(child);
 		if (Examples.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont.EqualsIdentity(c))
 		{
 			_cont = null;
@@ -321,7 +321,7 @@ public abstract partial class BaseConcept : NodeBase, Examples.V2024_1.Mixed.Mix
 	/// <inheritdoc/>
         public override Containment? GetContainmentOf(INode child)
 	{
-		var result = base.GetContainmentOf(child);
+		Containment? result = base.GetContainmentOf(child);
 		if (result != null)
 			return result;
 		if (ReferenceEquals(_cont, child))
