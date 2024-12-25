@@ -80,7 +80,7 @@ public interface IReadableNode<out T> : IReadableNode where T : IReadableNode
 
 /// Instance of an <see cref="Annotation"/>.
 /// <inheritdoc />
-public interface IAnnotationInstance<out T> : IReadableNode<T> where T : IReadableNode
+public interface IAnnotationInstance : IReadableNode
 {
     Classifier IReadableNode.GetClassifier() => GetClassifier();
 
@@ -88,9 +88,19 @@ public interface IAnnotationInstance<out T> : IReadableNode<T> where T : IReadab
     public new Annotation GetClassifier();
 }
 
+/// <inheritdoc cref="IAnnotationInstance" />
+public interface IAnnotationInstance<out T> : IReadableNode<T>, IAnnotationInstance where T : IReadableNode
+{
+}
+
 /// Instance of an <see cref="Concept.Partition"/>.
 /// <inheritdoc />
-public interface IPartitionInstance<out T> : IReadableNode<T> where T : IReadableNode
+public interface IPartitionInstance : IReadableNode
+{
+}
+
+/// <inheritdoc cref="IPartitionInstance" />
+public interface IPartitionInstance<out T> : IReadableNode<T>, IPartitionInstance where T : IReadableNode
 {
 }
 
