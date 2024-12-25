@@ -32,7 +32,7 @@ jobs:
         run: dotnet build
 
       - name: Test all projects
-        run: dotnet test
+        run: dotnet test --logger:nunit
 
       - name: Pack NuGet packages
         run: |
