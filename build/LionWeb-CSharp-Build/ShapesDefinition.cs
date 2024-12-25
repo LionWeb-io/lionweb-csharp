@@ -15,8 +15,6 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace Examples.Shapes.Dynamic;
-
 using LionWeb.Core;
 using LionWeb.Core.M3;
 

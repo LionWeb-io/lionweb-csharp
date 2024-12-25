@@ -6,8 +6,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\LionWeb-CSharp-Generator\LionWeb-CSharp-Generator.csproj" />
-      <ProjectReference Include="..\..\src\LionWeb-CSharp\LionWeb-CSharp.csproj" />
+      <ProjectReference Include="..\..\src\LionWeb.Generator\LionWeb.Generator.csproj" />
+      <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>

@@ -10,7 +10,7 @@ SPDX-License-Identifier: Apache-2.0
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>LionWeb-CSharp</RootNamespace>
+    <RootNamespace>LionWeb.Core</RootNamespace>
 
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Version>$(MinVerVersion)</Version>

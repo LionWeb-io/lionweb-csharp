@@ -5,9 +5,9 @@ VisualStudioVersion = 17.8.34330.188
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LionWeb-CSharp-Build", "build\LionWeb-CSharp-Build\LionWeb-CSharp-Build.csproj", "{9387B682-36E8-4385-80AB-45020B346A4B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LionWeb-CSharp", "src\LionWeb-CSharp\LionWeb-CSharp.csproj", "{4066676D-48BA-4AEA-AB85-5D23A2E39B54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LionWeb.Core", "src\LionWeb.Core\LionWeb.Core.csproj", "{4066676D-48BA-4AEA-AB85-5D23A2E39B54}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LionWeb-CSharp-Test", "test\LionWeb-CSharp-Test\LionWeb-CSharp-Test.csproj", "{ED47B25A-37D3-4383-8712-8CA30C897DDC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LionWeb.Core.Test", "test\LionWeb.Core.Test\LionWeb.Core.Test.csproj", "{ED47B25A-37D3-4383-8712-8CA30C897DDC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E37C3E8F-70A4-416B-9E4D-ACA0D373677F}"
 	ProjectSection(SolutionItems) = preProject
@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{49B2FB80-3
 		docs\LionWeb-intro-CSharp.pdf = docs\LionWeb-intro-CSharp.pdf
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb-CSharp-Generator", "src\LionWeb-CSharp-Generator\LionWeb-CSharp-Generator.csproj", "{D654BC85-5FF7-4186-BEF4-389472FB167D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Generator", "src\LionWeb.Generator\LionWeb.Generator.csproj", "{D654BC85-5FF7-4186-BEF4-389472FB167D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
