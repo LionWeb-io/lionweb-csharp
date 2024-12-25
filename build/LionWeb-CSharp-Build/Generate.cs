@@ -21,8 +21,8 @@ using LionWeb.Core.M1;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
-using LionWeb.Core.Generator;
-using LionWeb.Core.Generator.Names;
+using LionWeb.Generator;
+using LionWeb.Generator.Names;
 
 foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 {

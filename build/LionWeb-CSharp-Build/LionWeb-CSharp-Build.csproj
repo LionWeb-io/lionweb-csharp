@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\LionWeb.Core.Generator\LionWeb.Core.Generator.csproj" />
+      <ProjectReference Include="..\..\src\LionWeb.Generator\LionWeb.Generator.csproj" />
       <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
     </ItemGroup>
 

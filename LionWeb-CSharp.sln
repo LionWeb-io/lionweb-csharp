@@ -37,7 +37,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{49B2FB80-3
 		docs\LionWeb-intro-CSharp.pdf = docs\LionWeb-intro-CSharp.pdf
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Core.Generator", "src\LionWeb.Core.Generator\LionWeb.Core.Generator.csproj", "{D654BC85-5FF7-4186-BEF4-389472FB167D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Generator", "src\LionWeb.Generator\LionWeb.Generator.csproj", "{D654BC85-5FF7-4186-BEF4-389472FB167D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
