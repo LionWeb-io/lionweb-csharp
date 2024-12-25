@@ -20,6 +20,7 @@ namespace LionWeb.Generator.Impl;
 using Core;
 using Core.M2;
 using Core.M3;
+using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -51,7 +52,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
     private ClassDeclarationSyntax ClassifierAnnotation(Annotation annotation)
     {
         List<TypeSyntax> bases = [];
-        if (annotation.Extends is not null)
+        if (annotation.Extends is not null && !annotation.Extends.EqualsIdentity(_builtIns.Node))
         {
             bases.Add(AsType(annotation.Extends));
         } else
@@ -61,19 +62,19 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
 
         bases.AddRange(Interfaces.Select(i => AsType(i)));
 
-        return ClassifierClass(bases, GenGetClassifier(typeof(Annotation)));
+        return ClassifierClass(bases, GenGetClassifier("GetAnnotation", typeof(Annotation)));
     }
 
     private ClassDeclarationSyntax ClassifierConcept(Concept concept)
     {
         List<TypeSyntax> bases = [];
 
-        if (concept.Extends is not null)
+        if (concept.Extends is not null && !concept.Extends.EqualsIdentity(_builtIns.Node))
         {
             bases.Add(AsType(concept.Extends));
         } else
         {
-            bases.Add(AsType(typeof(NodeBase)));
+            bases.Add(AsType(typeof(ConceptInstanceBase)));
         }
 
         bases.AddRange(Interfaces.Select(i => AsType(i)));
@@ -81,7 +82,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
         if (concept.Partition)
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
-        return ClassifierClass(bases, GenGetClassifier(typeof(Classifier)));
+        return ClassifierClass(bases, GenGetClassifier("GetConcept", typeof(Concept)));
     }
 
     private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases, MethodDeclarationSyntax genGetClassifier)
@@ -115,14 +116,6 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
         return conceptShortDescription != null ? decl.Xdoc(XdocLine(conceptShortDescription, "summary")) : decl;
     }
 
-    private TypeSyntax GetSuperclass() =>
-        classifier switch
-        {
-            Annotation { Extends: not null } a => AsType(a.Extends),
-            Concept { Extends: not null } c => AsType(c.Extends),
-            _ => null
-        } ?? AsType(typeof(NodeBase));
-
     private IEnumerable<Interface> Interfaces =>
         classifier
             .DirectGeneralizations()
@@ -135,8 +128,8 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithInitializer(Initializer("id"))
             .WithBody(AsStatements([]));
 
-    private MethodDeclarationSyntax GenGetClassifier(Type returnType) =>
-        Method("GetClassifier", AsType(returnType), exprBody: MetaProperty())
+    private MethodDeclarationSyntax GenGetClassifier(string methodName, Type returnType) =>
+        Method(methodName, AsType(returnType), exprBody: MetaProperty())
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc());
 

@@ -91,7 +91,7 @@ public class TinyRefLangFactory : AbstractBaseNodeFactory, ITinyRefLangFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept")]
-public partial class MyConcept : NodeBase
+public partial class MyConcept : ConceptInstanceBase
 {
 	private readonly List<MyConcept> _multivaluedRef = [];
 	/// <remarks>Required Multiple Reference</remarks>
@@ -158,7 +158,7 @@ public partial class MyConcept : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => TinyRefLangLanguage.Instance.MyConcept;
+        public override Concept GetConcept() => TinyRefLangLanguage.Instance.MyConcept;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{

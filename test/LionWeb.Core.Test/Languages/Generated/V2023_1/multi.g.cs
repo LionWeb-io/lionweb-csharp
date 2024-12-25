@@ -87,7 +87,7 @@ public class MultiFactory : AbstractBaseNodeFactory, IMultiFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "Container")]
-public partial class Container : NodeBase
+public partial class Container : ConceptInstanceBase
 {
 	private readonly List<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library> _libraries = [];
 	/// <remarks>Required Multiple Containment</remarks>
@@ -135,7 +135,7 @@ public partial class Container : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => MultiLanguage.Instance.Container;
+        public override Concept GetConcept() => MultiLanguage.Instance.Container;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{

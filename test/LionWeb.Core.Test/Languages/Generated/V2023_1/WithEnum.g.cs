@@ -101,7 +101,7 @@ public class WithEnumFactory : AbstractBaseNodeFactory, IWithEnumFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(WithEnumLanguage), Key = "EnumHolder")]
-public partial class EnumHolder : NodeBase
+public partial class EnumHolder : ConceptInstanceBase
 {
 	private MyEnum? _enumValue = null;
 	/// <remarks>Required Property</remarks>
@@ -125,7 +125,7 @@ public partial class EnumHolder : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => WithEnumLanguage.Instance.EnumHolder;
+        public override Concept GetConcept() => WithEnumLanguage.Instance.EnumHolder;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{

@@ -82,10 +82,10 @@ public interface IReadableNode<out T> : IReadableNode where T : IReadableNode
 /// <inheritdoc />
 public interface IAnnotationInstance : IReadableNode
 {
-    Classifier IReadableNode.GetClassifier() => GetClassifier();
+    Classifier IReadableNode.GetClassifier() => GetAnnotation();
 
     /// <inheritdoc cref="IReadableNode.GetClassifier()"/>
-    public new Annotation GetClassifier();
+    public Annotation GetAnnotation();
 }
 
 /// <inheritdoc cref="IAnnotationInstance" />
@@ -93,14 +93,30 @@ public interface IAnnotationInstance<out T> : IReadableNode<T>, IAnnotationInsta
 {
 }
 
+/// Instance of an <see cref="Concept"/>.
+/// <inheritdoc />
+public interface IConceptInstance : IReadableNode
+{
+    Classifier IReadableNode.GetClassifier() => GetClassifier();
+
+    /// <inheritdoc cref="IReadableNode.GetClassifier()"/>
+    public Concept GetConcept();
+}
+
+/// <inheritdoc cref="IConceptInstance" />
+public interface IConceptInstance<out T> : IReadableNode<T>, IConceptInstance where T : IReadableNode
+{
+}
+
+
 /// Instance of an <see cref="Concept.Partition"/>.
 /// <inheritdoc />
-public interface IPartitionInstance : IReadableNode
+public interface IPartitionInstance : IConceptInstance
 {
 }
 
 /// <inheritdoc cref="IPartitionInstance" />
-public interface IPartitionInstance<out T> : IReadableNode<T>, IPartitionInstance where T : IReadableNode
+public interface IPartitionInstance<out T> : IConceptInstance<T>, IPartitionInstance where T : IReadableNode
 {
 }
 
@@ -741,7 +757,30 @@ public abstract class AnnotationInstanceBase : NodeBase, IAnnotationInstance<INo
 {
     /// <inheritdoc />
     protected AnnotationInstanceBase(string id) : base(id) {}
-    
-    /// <inheritdoc cref="GetClassifier"/>
-    public abstract override Annotation GetClassifier();
+
+    /// <inheritdoc cref="IAnnotationInstance.GetClassifier()" />
+    public override Classifier GetClassifier() => GetAnnotation();
+
+    /// <inheritdoc />
+    public abstract Annotation GetAnnotation();
+}
+
+/// Base implementation of <see cref="IConceptInstance{T}"/>.
+public abstract class ConceptInstanceBase : NodeBase, IConceptInstance<INode>
+{
+    /// <inheritdoc />
+    protected ConceptInstanceBase(string id) : base(id) {}
+
+    /// <inheritdoc cref="IConceptInstance.GetClassifier()" />
+    public override Classifier GetClassifier() => GetConcept();
+
+    /// <inheritdoc />
+    public abstract Concept GetConcept();
+}
+
+/// Base implementation of <see cref="IPartitionInstance{T}"/>.
+public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionInstance<INode>
+{
+    /// <inheritdoc />
+    protected PartitionInstanceBase(string id) : base(id) {}
 }

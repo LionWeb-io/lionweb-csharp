@@ -1108,8 +1108,11 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
         _dependsOn.AddRange(safeNodes);
     }
 
+    /// <inheritdoc cref="IConceptInstance.GetClassifier()" />
+    public override Classifier GetClassifier() => GetConcept();
+
     /// <inheritdoc />
-    public override Classifier GetClassifier() => _m3.Language;
+    public Concept GetConcept() => _m3.Language;
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>

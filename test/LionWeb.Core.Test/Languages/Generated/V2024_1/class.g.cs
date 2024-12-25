@@ -198,7 +198,7 @@ public partial class @out : @struct
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ClassLanguage.Instance.@out;
+        public override Concept GetConcept() => ClassLanguage.Instance.@out;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -293,7 +293,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        public override Annotation GetClassifier() => ClassLanguage.Instance.@record;
+        public override Annotation GetAnnotation() => ClassLanguage.Instance.@record;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -383,7 +383,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 }
 
 [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-concept")]
-public partial class @struct : NodeBase, @interface
+public partial class @struct : ConceptInstanceBase, @interface
 {
 	private @enum? _string = null;
 	/// <remarks>Required Property</remarks>
@@ -426,7 +426,7 @@ public partial class @struct : NodeBase, @interface
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ClassLanguage.Instance.@struct;
+        public override Concept GetConcept() => ClassLanguage.Instance.@struct;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -497,7 +497,7 @@ public partial class @var : @record
 	}
 
 	/// <inheritdoc/>
-        public override Annotation GetClassifier() => ClassLanguage.Instance.@var;
+        public override Annotation GetAnnotation() => ClassLanguage.Instance.@var;
 }
 
 [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-enm")]

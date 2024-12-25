@@ -84,7 +84,7 @@ public class MixedBaseConceptLangFactory : AbstractBaseNodeFactory, IMixedBaseCo
 }
 
 [LionCoreMetaPointer(Language = typeof(MixedBaseConceptLangLanguage), Key = "key-baseConcept")]
-public abstract partial class BaseConcept : NodeBase, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.BasePropertyIface, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface
+public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.BasePropertyIface, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface
 {
 	private LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum? _enumProp = null;
 	/// <remarks>Required Property</remarks>
@@ -184,7 +184,7 @@ public abstract partial class BaseConcept : NodeBase, LionWeb.Core.Test.Language
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => MixedBaseConceptLangLanguage.Instance.BaseConcept;
+        public override Concept GetConcept() => MixedBaseConceptLangLanguage.Instance.BaseConcept;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{

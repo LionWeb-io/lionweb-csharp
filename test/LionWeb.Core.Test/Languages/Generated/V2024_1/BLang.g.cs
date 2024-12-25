@@ -92,7 +92,7 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 
 /// <summary>Some enum</summary>
 [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-BConcept")]
-public partial class BConcept : NodeBase
+public partial class BConcept : ConceptInstanceBase
 {
 	private LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum? _aEnumProp = null;
 	/// <remarks>Required Property</remarks>
@@ -129,7 +129,7 @@ public partial class BConcept : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => BLangLanguage.Instance.BConcept;
+        public override Concept GetConcept() => BLangLanguage.Instance.BConcept;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{

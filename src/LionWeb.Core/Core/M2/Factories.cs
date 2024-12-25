@@ -116,7 +116,8 @@ public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
     protected DynamicNode CreateDynamicNode(string id, Classifier classifier) => classifier switch
     {
         Annotation a => new DynamicAnnotationInstance(id, a),
-        Concept { Partition: true } => new DynamicPartitionInstance(id, classifier),
+        Concept { Partition: true } c => new DynamicPartitionInstance(id, c),
+        Concept c => new DynamicConceptInstance(id, c),
         _ => new DynamicNode(id, classifier)
     };
 

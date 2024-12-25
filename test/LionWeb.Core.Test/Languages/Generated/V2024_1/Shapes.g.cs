@@ -445,7 +445,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        public override Annotation GetClassifier() => ShapesLanguage.Instance.BillOfMaterials;
+        public override Annotation GetAnnotation() => ShapesLanguage.Instance.BillOfMaterials;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -620,7 +620,7 @@ public partial class Circle : Shape
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.Circle;
+        public override Concept GetConcept() => ShapesLanguage.Instance.Circle;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -818,7 +818,7 @@ public partial class CompositeShape : Shape
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.CompositeShape;
+        public override Concept GetConcept() => ShapesLanguage.Instance.CompositeShape;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -939,7 +939,7 @@ public partial class CompositeShape : Shape
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Coord")]
-public partial class Coord : NodeBase
+public partial class Coord : ConceptInstanceBase
 {
 	private int? _x = null;
 	/// <remarks>Required Property</remarks>
@@ -988,7 +988,7 @@ public partial class Coord : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.Coord;
+        public override Concept GetConcept() => ShapesLanguage.Instance.Coord;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1104,7 +1104,7 @@ public partial class Documentation : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        public override Annotation GetClassifier() => ShapesLanguage.Instance.Documentation;
+        public override Annotation GetAnnotation() => ShapesLanguage.Instance.Documentation;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1168,7 +1168,7 @@ public partial class Documentation : AnnotationInstanceBase
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Geometry")]
-public partial class Geometry : NodeBase, IPartitionInstance<INode>
+public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 {
 	private Documentation? _documentation = null;
 	/// <remarks>Optional Single Containment</remarks>
@@ -1221,7 +1221,7 @@ public partial class Geometry : NodeBase, IPartitionInstance<INode>
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.Geometry;
+        public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1384,7 +1384,7 @@ public partial class Line : Shape, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.Line;
+        public override Concept GetConcept() => ShapesLanguage.Instance.Line;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1482,7 +1482,7 @@ public partial class Line : Shape, INamedWritable
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-MaterialGroup")]
-public partial class MaterialGroup : NodeBase
+public partial class MaterialGroup : ConceptInstanceBase
 {
 	private IShape? _defaultShape = null;
 	/// <remarks>Optional Single Containment</remarks>
@@ -1560,7 +1560,7 @@ public partial class MaterialGroup : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.MaterialGroup;
+        public override Concept GetConcept() => ShapesLanguage.Instance.MaterialGroup;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1753,7 +1753,7 @@ public partial class OffsetDuplicate : Shape
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.OffsetDuplicate;
+        public override Concept GetConcept() => ShapesLanguage.Instance.OffsetDuplicate;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1916,7 +1916,7 @@ public partial class OffsetDuplicate : Shape
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-ReferenceGeometry")]
-public partial class ReferenceGeometry : NodeBase, IPartitionInstance<INode>
+public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance<INode>
 {
 	private readonly List<IShape> _shapes = [];
 	/// <remarks>Optional Multiple Reference</remarks>
@@ -1960,7 +1960,7 @@ public partial class ReferenceGeometry : NodeBase, IPartitionInstance<INode>
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.ReferenceGeometry;
+        public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -2002,7 +2002,7 @@ public partial class ReferenceGeometry : NodeBase, IPartitionInstance<INode>
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Shape")]
-public abstract partial class Shape : NodeBase, INamedWritable, IShape
+public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShape
 {
 	private string? _name = null;
 	/// <remarks>Required Property</remarks>
@@ -2096,7 +2096,7 @@ public abstract partial class Shape : NodeBase, INamedWritable, IShape
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.Shape;
+        public override Concept GetConcept() => ShapesLanguage.Instance.Shape;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{

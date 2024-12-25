@@ -167,12 +167,12 @@ public partial class DeprAnnotation : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        public override Annotation GetClassifier() => DeprecatedLanguage.Instance.DeprAnnotation;
+        public override Annotation GetAnnotation() => DeprecatedLanguage.Instance.DeprAnnotation;
 }
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY")]
 [Obsolete("deprConcept comment")]
-public partial class DeprConcept : NodeBase
+public partial class DeprConcept : ConceptInstanceBase
 {
 	private readonly List<DeprIface> _deprChild = [];
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -248,7 +248,7 @@ public partial class DeprConcept : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => DeprecatedLanguage.Instance.DeprConcept;
+        public override Concept GetConcept() => DeprecatedLanguage.Instance.DeprConcept;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -361,14 +361,14 @@ public partial interface DeprIface : INode
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk1MDc1ODcyODk")]
 [Obsolete]
-public partial class DeprNoComment : NodeBase
+public partial class DeprNoComment : ConceptInstanceBase
 {
 	public DeprNoComment(string id) : base(id)
 	{
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => DeprecatedLanguage.Instance.DeprNoComment;
+        public override Concept GetConcept() => DeprecatedLanguage.Instance.DeprNoComment;
 }
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NzE")]

@@ -105,7 +105,7 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 /// crip
 ///    tion</summary>
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
-public partial class AConcept : NodeBase
+public partial class AConcept : ConceptInstanceBase
 {
 	private LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? _bRef = null;
 	/// <remarks>Optional Single Reference</remarks>
@@ -125,7 +125,7 @@ public partial class AConcept : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ALangLanguage.Instance.AConcept;
+        public override Concept GetConcept() => ALangLanguage.Instance.AConcept;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{

@@ -243,7 +243,7 @@ public class SDTLangFactory : AbstractBaseNodeFactory, ISDTLangFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTConcept")]
-public partial class SDTConcept : NodeBase
+public partial class SDTConcept : ConceptInstanceBase
 {
 	private A? _a = null;
 	/// <remarks>Required Property</remarks>
@@ -314,7 +314,7 @@ public partial class SDTConcept : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => SDTLangLanguage.Instance.SDTConcept;
+        public override Concept GetConcept() => SDTLangLanguage.Instance.SDTConcept;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{

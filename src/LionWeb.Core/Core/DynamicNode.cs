@@ -227,21 +227,32 @@ public class DynamicNode : NodeBase
         _settings.Keys;
 }
 
-/// A generic implementation of <see cref="IAnnotationInstance{T}"/>
+/// A generic implementation of <see cref="IAnnotationInstance"/>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
 public class DynamicAnnotationInstance : DynamicNode, IAnnotationInstance<INode>
 {
-    /// <inheritdoc cref="IAnnotationInstance{T}.GetClassifier()" />
-    public override Annotation GetClassifier() => (Annotation)base.GetClassifier();
-
     /// <inheritdoc />
     public DynamicAnnotationInstance(string id, Annotation annotation) : base(id, annotation) { }
+
+    /// <inheritdoc cref="IAnnotationInstance.GetAnnotation" />
+    public Annotation GetAnnotation() => (Annotation)base.GetClassifier();
 }
 
-/// A generic implementation of <see cref="IPartitionInstance{T}"/>
+/// A generic implementation of <see cref="IConceptInstance"/>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
-public class DynamicPartitionInstance : DynamicNode, IPartitionInstance<INode>
+public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 {
-    /// <inheritdoc cref="IPartitionInstance{T}.GetClassifier()" />
-    public DynamicPartitionInstance(string id, Classifier classifier) : base(id, classifier) { }
+    /// <inheritdoc />
+    public DynamicConceptInstance(string id, Concept concept) : base(id, concept) { }
+
+    /// <inheritdoc cref="IConceptInstance.GetConcept()" />
+    public Concept GetConcept() => (Concept)base.GetClassifier();
+}
+
+/// A generic implementation of <see cref="IPartitionInstance"/>
+/// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
+public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
+{
+    /// <inheritdoc />
+    public DynamicPartitionInstance(string id, Concept concept) : base(id, concept) { }
 }

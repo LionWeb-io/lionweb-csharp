@@ -173,7 +173,7 @@ public class LibraryFactory : AbstractBaseNodeFactory, ILibraryFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Book")]
-public partial class Book : NodeBase
+public partial class Book : ConceptInstanceBase
 {
 	private Writer? _author = null;
 	/// <remarks>Required Single Reference</remarks>
@@ -241,7 +241,7 @@ public partial class Book : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => LibraryLanguage.Instance.Book;
+        public override Concept GetConcept() => LibraryLanguage.Instance.Book;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -367,7 +367,7 @@ public partial class GuideBookWriter : Writer
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => LibraryLanguage.Instance.GuideBookWriter;
+        public override Concept GetConcept() => LibraryLanguage.Instance.GuideBookWriter;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -412,7 +412,7 @@ public partial class GuideBookWriter : Writer
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Library")]
-public partial class Library : NodeBase
+public partial class Library : ConceptInstanceBase
 {
 	private readonly List<Book> _books = [];
 	/// <remarks>Required Multiple Containment</remarks>
@@ -477,7 +477,7 @@ public partial class Library : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => LibraryLanguage.Instance.Library;
+        public override Concept GetConcept() => LibraryLanguage.Instance.Library;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -589,7 +589,7 @@ public partial class SpecialistBookWriter : Writer
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => LibraryLanguage.Instance.SpecialistBookWriter;
+        public override Concept GetConcept() => LibraryLanguage.Instance.SpecialistBookWriter;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -634,7 +634,7 @@ public partial class SpecialistBookWriter : Writer
 }
 
 [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "Writer")]
-public partial class Writer : NodeBase
+public partial class Writer : ConceptInstanceBase
 {
 	private string? _name = null;
 	/// <remarks>Required Property</remarks>
@@ -658,7 +658,7 @@ public partial class Writer : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => LibraryLanguage.Instance.Writer;
+        public override Concept GetConcept() => LibraryLanguage.Instance.Writer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
