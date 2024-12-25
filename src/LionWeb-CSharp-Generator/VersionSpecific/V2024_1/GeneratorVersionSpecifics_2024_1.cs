@@ -20,6 +20,7 @@
 namespace LionWeb.CSharp.Generator.VersionSpecific.V2024_1;
 
 using Core;
+using Core.M2;
 using Core.M3;
 using Core.Utilities;
 using Core.VersionSpecific.V2024_1;
@@ -30,9 +31,9 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 /// <see cref="GeneratorFacade"/> parts specific to LionWeb <see cref="IVersion2024_1"/>.  
 internal class GeneratorVersionSpecifics_2024_1 : IGeneratorVersionSpecifics
 {
-    public LionWebVersions Version => LionWebVersions.v2024_1;
+    public virtual LionWebVersions Version => LionWebVersions.v2024_1;
 
-    public ExpressionSyntax? AsProperty(LanguageEntity entity) => entity switch
+    public virtual ExpressionSyntax? AsProperty(LanguageEntity entity) => entity switch
     {
         _ when entity.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.Node) => ParseExpression("_builtIns.Node"),
         _ when entity.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.INamed) => ParseExpression("_builtIns.INamed"),
@@ -47,11 +48,29 @@ internal class GeneratorVersionSpecifics_2024_1 : IGeneratorVersionSpecifics
         _ => null
     };
 
-    public TypeSyntax? AsType(Datatype datatype) => datatype switch
+    public virtual TypeSyntax? AsType(Datatype datatype, Dictionary<Language, string> namespaceMappings) => datatype switch
     {
-        _ when datatype.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.Boolean) => PredefinedType(Token(SyntaxKind.BoolKeyword)),
-        _ when datatype.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.Integer) => PredefinedType(Token(SyntaxKind.IntKeyword)),
-        _ when datatype.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.String) => PredefinedType(Token(SyntaxKind.StringKeyword)),
+        _ when datatype.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.Boolean) =>
+            PredefinedType(Token(SyntaxKind.BoolKeyword)),
+        _ when datatype.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.Integer) =>
+            PredefinedType(Token(SyntaxKind.IntKeyword)),
+        _ when datatype.EqualsIdentity(BuiltInsLanguage_2024_1.Instance.String) =>
+            PredefinedType(Token(SyntaxKind.StringKeyword)),
+        Enumeration or StructuredDataType when namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns) =>
+            QualifiedName(ParseName(ns), IdentifierName(datatype.Name)),
         _ => null
     };
+    
+
+    public string? GetConceptShortDescription(Classifier classifier) => classifier
+        .GetAnnotations()
+        .OfType<ConceptDescription>()
+        .FirstOrDefault(cd => cd.ConceptShortDescription != null)
+        ?.ConceptShortDescription;
+
+    public bool IsDeprecated(Classifier classifier) =>
+        classifier.EqualsIdentity(SpecificLanguage.Instance.Deprecated);
+
+    public string? GetDeprecatedComment(IReadableNode annotation) =>
+        annotation.Get(SpecificLanguage.Instance.Deprecated_comment) as string;
 }

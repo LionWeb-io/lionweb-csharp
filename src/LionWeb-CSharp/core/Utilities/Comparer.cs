@@ -401,6 +401,15 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
 
                 return result;
 
+            case (IStructuredDataTypeInstance leftSdt, IStructuredDataTypeInstance rightSdt):
+                if (!leftSdt.Equals(rightSdt))
+                {
+                    result.Add(new PropertyValueDifference(left, leftSdt, leftProp, right, rightSdt));
+                }
+
+                return result;
+
+
             default:
                 result.Add(new PropertyValueTypeDifference(left, leftValue, leftProp, right, rightValue));
                 return result;

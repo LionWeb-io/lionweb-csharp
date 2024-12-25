@@ -141,13 +141,24 @@ public interface IDeserializerHandler
     Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property, IReadableNode node);
 
     /// <summary>
-    /// Cannot process <see cref="Datatype"/> in <paramref name="property"/>.
+    /// Cannot find field with <see cref="IKeyed.Key"/> <paramref name="key"/> in <paramref name="structuredDataType"/>.
     /// </summary>
-    /// <param name="property">Property with unknown Datatype.</param>
+    /// <param name="key">Unknown field key.</param>
+    /// <param name="structuredDataType">LionWeb structured datatype that should contain a field with key <paramref name="key"/>.</param>
+    /// <param name="property">Property in <paramref name="node"/> that contains <paramref name="key"/>.</param>
+    /// <param name="node">Node that has <paramref name="property"/> with value <paramref name="key"/>.</param>
+    /// <returns>Replacement field to use, or <c>null</c> to skip field <paramref name="key"/>.</returns>
+    Field? UnknownField(string key, StructuredDataType structuredDataType, Feature property, IReadableNode node);
+
+    /// <summary>
+    /// Cannot process <paramref name="datatype"/> in <paramref name="property"/>.
+    /// </summary>
     /// <param name="value">Value of <paramref name="property"/> in <paramref name="node"/>.</param>
+    /// <param name="datatype">Unknown Datatype.</param>
+    /// <param name="property">Property with unknown Datatype.</param>
     /// <param name="node">Node that has property <paramref name="property"/>.</param>
     /// <returns>Replacement value to use, or <c>null</c> to skip property <paramref name="property"/>.</returns>
-    object? UnknownDatatype(Feature property, string? value, IReadableNode node);
+    object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property, IReadableNode node);
 
     /// <summary>
     /// Cannot put <paramref name="value"/> into <paramref name="property"/>.
@@ -194,8 +205,6 @@ public interface IDeserializerHandler
 
     #endregion
 
-    #region language deserializer
-
     /// <summary>
     /// Whether to skip node with id <paramref name="id"/> that appears both in deserialized nodes and <see cref="IDeserializer.RegisterDependentNodes">dependent nodes</see>.
     /// </summary>
@@ -205,23 +214,8 @@ public interface IDeserializerHandler
     bool SkipDeserializingDependentNode(CompressedId id);
 
     /// <summary>
-    /// Cannot install containments into <paramref name="node"/>. 
-    /// </summary>
-    /// <param name="node">Node that cannot receive new containments.</param>
-    void InvalidContainment(IReadableNode node);
-
-    /// <summary>
     /// Cannot install references into <paramref name="node"/>. 
     /// </summary>
     /// <param name="node">Node that cannot receive new references.</param>
     void InvalidReference(IReadableNode node);
-
-    /// <summary>
-    /// Cannot install annotations into <paramref name="parent"/>.
-    /// </summary>
-    /// <param name="annotation">Annotation we want to add to <paramref name="parent"/>.</param>
-    /// <param name="parent">Node that cannot receive new annotations.</param>
-    void InvalidAnnotationParent(IReadableNode annotation, IReadableNode? parent);
-
-    #endregion
 }

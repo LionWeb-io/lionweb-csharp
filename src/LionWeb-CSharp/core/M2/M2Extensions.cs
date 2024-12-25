@@ -280,6 +280,40 @@ public static class M2Extensions
         (Enumeration)literal.GetParent()!;
 
     /// <summary>
+    /// Returns the structured datatype with <paramref name="key"/> contained in <paramref name="language"/>.
+    /// Does <i>not</i> find structured datatypes from dependent languages.
+    /// </summary>
+    /// <param name="language">Language to search through.</param>
+    /// <param name="key">Key of the requested structured datatype.</param>
+    /// <returns>Structured DataType with <paramref name="key"/> contained in <paramref name="language"/>.</returns>
+    /// <exception cref="KeyNotFoundException">If <paramref name="language"/> does not contain a structured datatype with <paramref name="key"/>.</exception>
+    public static StructuredDataType StructuredDataTypeByKey(this Language language, string key)
+        => language
+            .Entities
+            .OfType<StructuredDataType>()
+            .FindByKey(key);
+
+    /// <summary>
+    /// Returns the field with <paramref name="key"/> contained in <paramref name="structuredDataType"/>.
+    /// </summary>
+    /// <param name="structuredDataType">Structured DataType to search through.</param>
+    /// <param name="key">Key of requested field.</param>
+    /// <returns>Field with <paramref name="key"/> contained in <paramref name="structuredDataType"/>.</returns>
+    /// <exception cref="InvalidOperationException">If <paramref name="structuredDataType"/> does not contain a field with <paramref name="key"/>.</exception>
+    public static Field FieldByKey(this StructuredDataType structuredDataType, string key)
+        => structuredDataType
+            .Fields
+            .FindByKey(key);
+    
+    /// <summary>
+    /// Returns the StructuredDataType that contains <paramref name="field"/>. 
+    /// </summary>
+    /// <param name="field">Field to find StructuredDataType of.</param>
+    /// <returns>StructuredDataType that contains <paramref name="field"/>.</returns>
+    public static StructuredDataType GetStructuredDataType(this Field field) =>
+        (StructuredDataType)field.GetParent()!;
+
+    /// <summary>
     /// Returns the type of <paramref name="feature"/>,
     /// i.e. a Datatype if <paramref name="feature"/> is a Property, a Classifier if <paramref name="feature"/> is a Link.
     /// </summary>

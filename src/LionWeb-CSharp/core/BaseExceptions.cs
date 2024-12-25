@@ -75,6 +75,13 @@ public class UnsetFeatureException(Feature feature)
     : LionWebExceptionBase($"Required {feature.GetClassifier().Name} {feature.Name} is not set");
 
 /// <summary>
+/// Trying to retrieve a <see cref="Field"/> that hasn't been set.
+/// </summary>
+/// <param name="field">Field trying to retrieve.</param>
+public class UnsetFieldException(Field field)
+    : LionWebExceptionBase($"Required Field {field.Name} is not set");
+
+/// <summary>
 /// Trying to operate on a <see cref="Feature"/> unknown to a <see cref="Classifier"/>.
 /// </summary>
 public class UnknownFeatureException : LionWebExceptionBase
@@ -138,6 +145,36 @@ public class UnsupportedClassifierException : LionWebExceptionBase
 /// <param name="literal">Unsupported enumeration literal.</param>
 public class UnsupportedEnumerationLiteralException(EnumerationLiteral literal)
     : LionWebExceptionBase($"EnumerationLiteral {literal.Name} not supported");
+
+/// Trying to operate on an unsupported <see cref="StructuredDataType"/>.
+public class UnsupportedStructuredDataTypeException : LionWebExceptionBase
+{
+    /// <summary>
+    /// Trying to operate on an unsupported <see cref="StructuredDataType"/>.
+    /// Might happen if a NodeFactory cannot <see cref="INodeFactory.CreateStructuredDataTypeInstance">create</see> an instance of <paramref name="structuredDataType"/>.
+    /// </summary>
+    /// <param name="structuredDataType">Unsupported Structured Datatype.</param>
+    /// <param name="message">Optional additional message.</param>
+    public UnsupportedStructuredDataTypeException(StructuredDataType structuredDataType, string? message = null) : base(
+        $"StructuredDataType {structuredDataType.Name} not supported" +
+        (message != null ? $": {message}" : "")
+    )
+    {
+    }
+
+    /// <summary>
+    /// Trying to operate on an unsupported <see cref="StructuredDataType"/>.
+    /// Might happen if a NodeFactory cannot <see cref="INodeFactory.CreateStructuredDataTypeInstance">create</see> an instance of <paramref name="structuredDataType"/>.
+    /// </summary>
+    /// <param name="structuredDataType">Unsupported Structured Datatype.</param>
+    /// <param name="message">Optional additional message.</param>
+    public UnsupportedStructuredDataTypeException(Type structuredDataType, string? message = null) : base(
+        $"StructuredDataType {structuredDataType.Name} not supported" +
+        (message != null ? $": {message}" : "")
+    )
+    {
+    }
+}
 
 /// <summary>
 /// Trying to operate on an object that's not an <see cref="INode"/>.

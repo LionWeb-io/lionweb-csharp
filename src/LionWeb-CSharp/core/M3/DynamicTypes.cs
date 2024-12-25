@@ -19,6 +19,7 @@ namespace LionWeb.Core.M3;
 
 using M2;
 using System.Collections;
+using Utilities;
 
 // The types here implement the LionCore M3.
 
@@ -29,10 +30,12 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
     private string? _name;
 
     /// <inheritdoc />
-    protected override IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.BuiltIns).Value;
+    protected override IBuiltInsLanguage _builtIns =>
+        new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.BuiltIns).Value;
 
     /// <inheritdoc />
-    protected override ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguage _m3 =>
+        new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     public string Key
@@ -42,10 +45,24 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
     }
 
     /// <inheritdoc />
+    public bool TryGetKey(out string? key)
+    {
+        key = _key;
+        return key != null;
+    }
+
+    /// <inheritdoc />
     public string Name
     {
         get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name);
         set => _name = value;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetName(out string? name)
+    {
+        name = _name;
+        return name != null;
     }
 
     /// <inheritdoc />
@@ -174,6 +191,13 @@ public class DynamicProperty(string id, DynamicClassifier? classifier) : Dynamic
     }
 
     /// <inheritdoc />
+    public bool TryGetType(out Datatype? type)
+    {
+        type = _type;
+        return _type != null;
+    }
+
+    /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.Property;
 
     /// <inheritdoc />
@@ -233,6 +257,13 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier) : Dy
     {
         get => _type ?? throw new UnsetFeatureException(_m3.Link_type);
         set => _type = value;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetType(out Classifier? type)
+    {
+        type = _type;
+        return _type != null;
     }
 
     /// <inheritdoc />
@@ -534,6 +565,8 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
 /// <inheritdoc cref="Annotation"/>
 public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicClassifier(id, language), Annotation
 {
+    private Classifier? _annotates;
+    
     /// <inheritdoc />
     public Classifier Annotates
     {
@@ -541,12 +574,12 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
         set => _annotates = value;
     }
 
+    
     /// <inheritdoc />
     public Annotation? Extends { get; set; }
 
     private readonly List<Interface> _implements = [];
-    private Classifier? _annotates;
-
+    
     /// <inheritdoc />
     public IReadOnlyList<Interface> Implements => _implements.AsReadOnly();
 
@@ -815,17 +848,241 @@ public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
     public override Classifier GetClassifier() => _m3.EnumerationLiteral;
 }
 
+/// <inheritdoc cref="StructuredDataType"/>
+public class DynamicStructuredDataType(string id, DynamicLanguage? language)
+    : DynamicDatatype(id, language), StructuredDataType
+{
+    /// <inheritdoc />
+    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
+        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
+            (ILionCoreLanguageWithStructuredDataType)this.GetLanguage().LionWebVersion.LionCore).Value;
+
+    private readonly List<Field> _fields = [];
+
+    /// <inheritdoc />
+    public IReadOnlyList<Field> Fields => _fields.AsReadOnly();
+
+    /// <inheritdoc cref="Fields"/>
+    public void AddFields(IEnumerable<Field> fields) =>
+        _fields.AddRange(SetSelfParent(fields?.ToList(), _m3.StructuredDataType_fields));
+
+    /// <inheritdoc />
+    protected override bool DetachChild(INode child)
+    {
+        if (base.DetachChild(child))
+        {
+            return true;
+        }
+
+        var c = GetContainmentOf(child);
+        if (c == _m3.StructuredDataType_fields)
+            return _fields.Remove((Field)child);
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override Containment? GetContainmentOf(INode child)
+    {
+        var result = base.GetContainmentOf(child);
+        if (result != null)
+            return result;
+
+        if (child is Field s && _fields.Contains(s))
+            return _m3.StructuredDataType_fields;
+
+        return null;
+    }
+
+    /// <inheritdoc />
+    public override Classifier GetClassifier() => _m3.StructuredDataType;
+
+    /// <inheritdoc />
+    public override IEnumerable<Feature> CollectAllSetFeatures() =>
+        base.CollectAllSetFeatures().Concat([
+            _m3.StructuredDataType_fields
+        ]);
+
+    /// <inheritdoc />
+    protected override bool GetInternal(Feature? feature, out object? result)
+    {
+        if (base.GetInternal(feature, out result))
+            return true;
+
+        if (_m3.StructuredDataType_fields == feature)
+        {
+            result = Fields;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool SetInternal(Feature? feature, object? value)
+    {
+        var result = base.SetInternal(feature, value);
+        if (result)
+        {
+            return result;
+        }
+
+        if (_m3.StructuredDataType_fields == feature)
+        {
+            switch (value)
+            {
+                case IEnumerable e:
+                    RemoveSelfParent(_fields?.ToList(), _fields, _m3.StructuredDataType_fields);
+                    AddFields(e.OfType<Field>().ToArray());
+                    return true;
+                default:
+                    throw new InvalidValueException(feature, value);
+            }
+        }
+
+        return false;
+    }
+}
+
+/// <inheritdoc cref="IStructuredDataTypeInstance" />
+public readonly record struct DynamicStructuredDataTypeInstance : IStructuredDataTypeInstance
+{
+    private readonly StructuredDataType _structuredDataType;
+    private readonly (Field field, object? value)[] _fields;
+
+    /// <inheritdoc cref="DynamicStructuredDataTypeInstance"/>
+    public DynamicStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+    {
+        _structuredDataType = structuredDataType;
+        _fields = fieldValues.ToArray();
+    }
+
+    /// <inheritdoc />
+    public StructuredDataType GetStructuredDataType() =>
+        _structuredDataType;
+
+    /// <inheritdoc />
+    public IEnumerable<Field> CollectAllSetFields() =>
+        _fields.Select(v => v.field);
+
+    /// <inheritdoc />
+    public object? Get(Field field) =>
+        _fields.FirstOrDefault(v => v.field == field);
+
+    /// <inheritdoc />
+    public bool Equals(DynamicStructuredDataTypeInstance other) =>
+        _structuredDataType.EqualsIdentity(other._structuredDataType) &&
+        _fields.SequenceEqual(other._fields);
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(_structuredDataType);
+        foreach (var field in _fields)
+            hashCode.Add(field);
+        return hashCode.ToHashCode();
+    }
+}
+
+/// <inheritdoc cref="Field"/>
+public class DynamicField : DynamicIKeyed, Field
+{
+    /// <inheritdoc />
+    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
+        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
+            (ILionCoreLanguageWithStructuredDataType)this.GetLanguage().LionWebVersion.LionCore).Value;
+
+    private Datatype? _type;
+
+    /// <inheritdoc cref="Field"/>
+    public DynamicField(string id, DynamicStructuredDataType? structuredDataType) : base(id)
+    {
+        structuredDataType?.AddFields([this]);
+        _parent = structuredDataType;
+    }
+
+    /// <inheritdoc />
+    public Datatype Type
+    {
+        get => _type ?? throw new UnsetFeatureException(_m3.Field_type);
+        set => _type = value;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetType(out Datatype? type)
+    {
+        type = _type;
+        return type != null;
+    }
+
+    /// <inheritdoc />
+    public override Classifier GetClassifier() => _m3.Field;
+
+    /// <inheritdoc />
+    public override IEnumerable<Feature> CollectAllSetFeatures() =>
+        base.CollectAllSetFeatures().Concat([
+            _m3.Field_type
+        ]);
+
+    /// <inheritdoc />
+    protected override bool GetInternal(Feature? feature, out object? result)
+    {
+        if (base.GetInternal(feature, out result))
+            return true;
+
+        if (_m3.Field_type == feature)
+        {
+            result = Type;
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    protected override bool SetInternal(Feature? feature, object? value)
+    {
+        var result = base.SetInternal(feature, value);
+        if (result)
+        {
+            return result;
+        }
+
+        if (_m3.Field_type == feature)
+        {
+            Type = value switch
+            {
+                Datatype dt => dt,
+                _ => throw new InvalidValueException(feature, value)
+            };
+            return true;
+        }
+
+        return false;
+    }
+}
+
 /// <inheritdoc cref="Language"/>
 public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : DynamicIKeyed(id), Language
 {
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;
 
+    private string? _version;
+    
     /// <inheritdoc />
     public string Version
     {
         get => _version ?? throw new UnsetFeatureException(_m3.Language_version);
         set => _version = value;
+    }
+
+    /// <inheritdoc />
+    public bool TryGetVersion(out string? version)
+    {
+        version = _version;
+        return version != null;
     }
 
     private readonly List<LanguageEntity> _entities = [];
@@ -838,7 +1095,6 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
         _entities.AddRange(SetSelfParent(entities?.ToList(), _m3.Language_entities));
 
     private readonly List<Language> _dependsOn = [];
-    private string? _version;
 
     /// <inheritdoc />
     public IReadOnlyList<Language> DependsOn => _dependsOn.AsReadOnly();

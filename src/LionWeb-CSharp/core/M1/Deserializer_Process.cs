@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
+using M2;
 using M3;
 using Serialization;
 using CompressedContainment = (CompressedMetaPointer, List<CompressedId>);
@@ -52,14 +53,12 @@ public partial class Deserializer
             if (property == null)
                 continue;
 
-            var convertedValue = (property, value: serializedProperty.Value) switch
-            {
-                (_, null) => null,
-                (Property { Type: PrimitiveType } p, { } v) => ConvertPrimitiveType(node, p, v),
-                (Property { Type: Enumeration enumeration }, { } v) =>
-                    _deserializerMetaInfo.ConvertEnumeration(node, property, enumeration, v),
-                var (_, v) => Handler.UnknownDatatype(property, v, node)
-            };
+            var convertedValue = _versionSpecifics.ConvertDatatype(
+                node,
+                property,
+                property.GetFeatureType(),
+                serializedProperty.Value
+            );
 
             if (convertedValue == null)
                 continue;
@@ -67,9 +66,6 @@ public partial class Deserializer
             node.Set(property, convertedValue);
         }
     }
-
-    private object? ConvertPrimitiveType(IWritableNode node, Property property, string value) =>
-        _versionSpecifics.ConvertPrimitiveType(this, node, property, value);
 
     private void RegisterAnnotations(SerializedNode serializedNode, CompressedId compressedId)
     {

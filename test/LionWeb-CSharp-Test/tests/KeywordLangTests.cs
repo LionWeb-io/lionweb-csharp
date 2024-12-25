@@ -1,0 +1,75 @@
+﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License")
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// 
+// SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
+// SPDX-License-Identifier: Apache-2.0
+
+namespace LionWeb_CSharp_Test.tests;
+
+using LionWeb.Core;
+using LionWeb.Core.M1;
+using LionWeb.Core.M2;
+using LionWeb.Core.Serialization;
+using LionWeb.Core.Utilities;
+using @namespace.@int.@public;
+
+[TestClass]
+public class KeywordLangTests
+{
+    [TestMethod]
+    public void Language()
+    {
+        LionWebVersions lionWebVersion = LionWebVersions.v2024_1;
+
+        List<IReadableNode?> input = [ClassLanguage.Instance];
+        SerializationChunk chunk = new Serializer(lionWebVersion).SerializeToChunk(input);
+
+        List<IReadableNode?> deserialized =
+            new LanguageDeserializer(lionWebVersion).Deserialize(chunk).Cast<IReadableNode?>().ToList();
+
+        List<IDifference> differences = new Comparer(input, deserialized).Compare().ToList();
+        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+    }
+
+    [TestMethod]
+    public void Instance()
+    {
+        LionWebVersions lionWebVersion = LionWebVersions.v2024_1;
+
+        @out root = new @out("out")
+        {
+            Ref = new record("record")
+            {
+                String = @enum.@internal, Double = new @struct("struct") { Ref = new @var("var") }
+            },
+            Default = new @if(@namespace: "hello")
+        };
+
+        List<IReadableNode?> input = [root, root.Ref, ((@struct)root.Ref.Double).Ref];
+        SerializationChunk chunk = new Serializer(lionWebVersion).SerializeToChunk(input);
+
+        IDeserializer deserializer = new DeserializerBuilder()
+            .WithUncompressedIds()
+            .WithLanguage(ClassLanguage.Instance)
+            .Build();
+
+        List<IReadableNode?> deserialized = deserializer
+            .Deserialize(chunk)
+            .Cast<IReadableNode?>()
+            .ToList();
+
+        List<IDifference> differences = new Comparer(input, deserialized).Compare().ToList();
+        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+    }
+}

@@ -25,7 +25,15 @@ using LionWeb.Core.M3;
 /// </summary>
 public static class ShapesDynamic
 {
-    public static readonly DynamicLanguage Language = LanguagesUtils
-        .LoadLanguages("LionWeb-CSharp-Test", "LionWeb_CSharp_Test.languages.defChunks.shapes.json")
-        .First();
+    public static readonly DynamicLanguage Language = GetLanguage(LionWebVersions.Current);
+
+    public static DynamicLanguage GetLanguage(LionWebVersions lionWebVersion) =>
+        LanguagesUtils.LoadLanguages("LionWeb-CSharp-Test", lionWebVersion switch
+            {
+                IVersion2023_1 => "LionWeb_CSharp_Test.languages.defChunks.shapes_2023_1.json",
+                IVersion2024_1 => "LionWeb_CSharp_Test.languages.defChunks.shapes_2024_1.json",
+                IVersion2024_1_Compatible => "LionWeb_CSharp_Test.languages.defChunks.shapes_2024_1.json",
+                _ => throw new UnsupportedVersionException(lionWebVersion)
+            }, lionWebVersion)
+            .First();
 }

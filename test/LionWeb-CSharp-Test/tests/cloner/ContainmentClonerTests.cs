@@ -21,7 +21,7 @@ using Core;
 using Core.M2;
 using Core.Utilities;
 using Examples.Shapes.Dynamic;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 
 [TestClass]
 public class ContainmentClonerTests : ClonerTestsBase

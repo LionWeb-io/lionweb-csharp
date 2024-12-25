@@ -17,6 +17,7 @@
 
 namespace LionWeb.CSharp.Generator.Impl;
 
+using Microsoft.CodeAnalysis.CSharp;
 using System.Diagnostics.CodeAnalysis;
 
 /// String mangling helpers.
@@ -53,4 +54,12 @@ public static class StringExtensions
         a[0] = char.ToLower(a[0]);
         return new string(a);
     }
+    
+    /// Prefixes <paramref name="candidate"/> with <c>@</c> iff <paramref name="candidate"/> is a C# keyword.
+    public static string PrefixKeyword(this string candidate) =>
+        SyntaxFacts.GetKeywordKind(candidate) == SyntaxKind.None &&
+        SyntaxFacts.GetContextualKeywordKind(candidate) == SyntaxKind.None
+            ? candidate
+            : $"@{candidate}";
+
 }

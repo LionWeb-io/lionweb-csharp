@@ -17,7 +17,7 @@
 
 namespace LionWeb_CSharp_Test.tests.serialization;
 
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
@@ -75,7 +75,7 @@ public class LanguageSerializationTests
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
 
         var redeserialized =
-            new LanguageDeserializer(IDeserializerVersionSpecifics.Create(_lionWebVersion))
+            new LanguageDeserializer(_lionWebVersion)
             {
                 StoreUncompressedIds = true
             }.Deserialize(serializationChunk);
@@ -108,7 +108,7 @@ public class LanguageSerializationTests
         var serializationChunk2 = new Serializer(_lionWebVersion).SerializeToChunk([redeserializedShapes, language]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
         var redeserialized2 =
-            new LanguageDeserializer(IDeserializerVersionSpecifics.Create(_lionWebVersion))
+            new LanguageDeserializer(_lionWebVersion)
             {
                 StoreUncompressedIds = true
             }.Deserialize(serializationChunk2);
@@ -129,10 +129,7 @@ public class LanguageSerializationTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        var deserializer = new LanguageDeserializer(IDeserializerVersionSpecifics.Create(_lionWebVersion))
-        {
-            Handler = new SkipDeserializationHandler()
-        };
+        var deserializer = new LanguageDeserializer(_lionWebVersion, new SkipDeserializationHandler());
         foreach (var serializedNode in serializationChunk.Nodes)
         {
             deserializer.Process(serializedNode);
@@ -141,7 +138,7 @@ public class LanguageSerializationTests
         deserializer.Finish();
     }
 
-    private class SkipDeserializationHandler : DeserializerExceptionHandler
+    private class SkipDeserializationHandler : LanguageDeserializerExceptionHandler
     {
         public override bool SkipDeserializingDependentNode(CompressedId id) => false;
     }
@@ -160,10 +157,7 @@ public class LanguageSerializationTests
             new Serializer(LionWebVersions.v2024_1_Compatible) { StoreUncompressedIds = true }.SerializeToChunk(input);
 
         var deserializer =
-            new LanguageDeserializer(IDeserializerVersionSpecifics.Create(LionWebVersions.v2024_1_Compatible))
-            {
-                StoreUncompressedIds = true, Handler = new SkipDeserializationHandler()
-            };
+            new LanguageDeserializer(LionWebVersions.v2024_1_Compatible, new SkipDeserializationHandler());
 
         var actual = deserializer.Deserialize(chunk).Cast<Language>().ToList();
 
@@ -209,37 +203,37 @@ public class LanguageSerializationTests
 
         var chunk = new SerializationChunk()
         {
-            SerializationFormatVersion = "2023.1",
+            SerializationFormatVersion = "2024.1",
             Languages = [new SerializedLanguageReference { Key = "key-myLanguage", Version = "1" }],
             Nodes =
             [
                 new SerializedNode
                 {
                     Id = "testDuplicateNodeId",
-                    Classifier = new MetaPointer("LionCore-M3", "2023.1", "Language"),
+                    Classifier = new MetaPointer("LionCore-M3", "2024.1", "Language"),
                     Properties =
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "myLanguage"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "IKeyed-key"),
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "IKeyed-key"),
                             Value = "key-myLanguage"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "Language-version"), Value = "1"
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "Language-version"), Value = "1"
                         }
                     ],
                     Containments =
                     [
                         new SerializedContainment
                         {
-                            Containment = new MetaPointer("LionCore-M3", "2023.1", "Language-entities"),
+                            Containment = new MetaPointer("LionCore-M3", "2024.1", "Language-entities"),
                             Children = ["testDuplicateNodeId", "otherNodeId"]
                         }
                     ],
@@ -249,27 +243,27 @@ public class LanguageSerializationTests
                 new SerializedNode
                 {
                     Id = "otherNodeId",
-                    Classifier = new MetaPointer("LionCore-M3", "2023.1", "Concept"),
+                    Classifier = new MetaPointer("LionCore-M3", "2024.1", "Concept"),
                     Properties =
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "myConcept"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "IKeyed-key"),
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "IKeyed-key"),
                             Value = "key-myConcept"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "Concept-abstract"), Value = "false"
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "Concept-abstract"), Value = "false"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "Concept-partition"),
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "Concept-partition"),
                             Value = "false"
                         }
                     ],
@@ -281,18 +275,18 @@ public class LanguageSerializationTests
                 new SerializedNode
                 {
                     Id = "testDuplicateNodeId",
-                    Classifier = new MetaPointer("LionCore-M3", "2023.1", "Annotation"),
+                    Classifier = new MetaPointer("LionCore-M3", "2024.1", "Annotation"),
                     Properties =
                     [
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-builtins", "2023.1",
+                            Property = new MetaPointer("LionCore-builtins", "2024.1",
                                 "LionCore-builtins-INamed-name"),
                             Value = "myAnnotation"
                         },
                         new SerializedProperty
                         {
-                            Property = new MetaPointer("LionCore-M3", "2023.1", "IKeyed-key"),
+                            Property = new MetaPointer("LionCore-M3", "2024.1", "IKeyed-key"),
                             Value = "key-myAnnotation"
                         }
                     ],

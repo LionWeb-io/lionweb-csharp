@@ -15,6 +15,8 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable SuggestVarOrType_SimpleTypes
+
 namespace LionWeb.Core.M1;
 
 using M2;
@@ -25,14 +27,13 @@ using System.Diagnostics.CodeAnalysis;
 /// Stores information required do deserialize meta-elements of nodes.
 /// <remarks>Should be internal, but the compiler doesn't like it in
 /// <see cref="DeserializerBase{T}._deserializerMetaInfo"/>.</remarks>
-public class DeserializerMetaInfo
+public class DeserializerMetaInfo(IDeserializerHandler handler)
 {
     private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
     private readonly Dictionary<CompressedId, List<Language>> _languagesByKey = new();
     private readonly Dictionary<CompressedMetaPointer, Classifier> _classifiers = new();
     private readonly Dictionary<CompressedMetaPointer, Feature> _features = new();
-
-    internal IDeserializerHandler Handler { get; set; } = new DeserializerExceptionHandler();
+    
     internal bool StoreUncompressedIds { get; set; } = false;
 
     internal void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
@@ -60,7 +61,7 @@ public class DeserializerMetaInfo
         if (!LookupClassifier(compressedMetaPointer, out var classifier))
         {
             classifier =
-                Handler.UnknownClassifier(compressedMetaPointer, CompressedId.Create(id, StoreUncompressedIds));
+                handler.UnknownClassifier(compressedMetaPointer, CompressedId.Create(id, StoreUncompressedIds));
             if (classifier == null)
                 return null;
         }
@@ -73,34 +74,18 @@ public class DeserializerMetaInfo
         return factory.CreateNode(id, classifier);
     }
 
-    internal Enum? ConvertEnumeration(IWritableNode nodeId, Feature property, Enumeration enumeration, string value)
-    {
-        var literal = enumeration.Literals.FirstOrDefault(literal => literal.Key == value);
-
-        if (literal != null && LookupFactory(enumeration.GetLanguage(), out var factory))
-        {
-            Enum? result = factory.GetEnumerationLiteral(literal);
-            if (result != null)
-            {
-                return result;
-            }
-        }
-
-        return Handler.UnknownEnumerationLiteral(value, enumeration, property, nodeId);
-    }
-
     internal Feature? FindFeature<TFeature>(IReadableNode node, CompressedMetaPointer compressedMetaPointer)
         where TFeature : class, Feature
     {
         Classifier classifier = node.GetClassifier();
         if (!LookupFeature(compressedMetaPointer, out var feature))
         {
-            feature = Handler.UnknownFeature<TFeature>(compressedMetaPointer, classifier, node);
+            feature = handler.UnknownFeature<TFeature>(compressedMetaPointer, classifier, node);
             if (feature == null)
                 return null;
         }
 
-        return feature as TFeature ?? Handler.InvalidFeature<TFeature>(compressedMetaPointer, classifier, node);
+        return feature as TFeature ?? handler.InvalidFeature<TFeature>(compressedMetaPointer, classifier, node);
     }
 
     private bool LookupClassifier(CompressedMetaPointer compressedMetaPointer,
@@ -118,7 +103,7 @@ public class DeserializerMetaInfo
             return false;
         }
 
-        result = Handler.SelectVersion<T>(compressedMetaPointer, languages);
+        result = handler.SelectVersion<T>(compressedMetaPointer, languages);
         return result != null;
     }
 
@@ -126,10 +111,10 @@ public class DeserializerMetaInfo
         [MaybeNullWhen(false)] out Feature feature) =>
         _features.TryGetValue(compressedMetaPointer, out feature) || SelectVersion(compressedMetaPointer, out feature);
 
-    private bool LookupFactory(Language language, [MaybeNullWhen(false)] out INodeFactory factory) =>
+    internal bool LookupFactory(Language language, [MaybeNullWhen(false)] out INodeFactory factory) =>
         _language2NodeFactory.TryGetValue(language, out factory);
 
-    private CompressedId Compress(string id) =>
+    internal CompressedId Compress(string id) =>
         CompressedId.Create(id, StoreUncompressedIds);
 
     private CompressedMetaPointer Compress(MetaPointer metaPointer) =>

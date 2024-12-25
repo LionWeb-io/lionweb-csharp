@@ -34,7 +34,8 @@ public class UnknownDatatypeTests
     private class DeserializerHealingHandler(Func<Feature, string?, IWritableNode, object?> heal)
         : DeserializerExceptionHandler
     {
-        public override object? UnknownDatatype(Feature property, string? value, IReadableNode node) =>
+        public override object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property,
+            IReadableNode node) =>
             heal(property, value, (IWritableNode)node);
     }
 

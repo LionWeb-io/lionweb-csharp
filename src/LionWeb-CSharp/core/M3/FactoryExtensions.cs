@@ -63,6 +63,22 @@ public static class FactoryExtensions
         return enumerationLiteral;
     }
 
+    /// <inheritdoc cref="Field"/>
+    public static DynamicField Field(this DynamicStructuredDataType structuredDataType, string id,
+        string key, string name)
+    {
+        var field = new DynamicField(id, structuredDataType) { Key = key, Name = name };
+        structuredDataType.AddFields([field]);
+        return field;
+    }
+
+    /// <inheritdoc cref="Field.Type"/>
+    public static DynamicField OfType(this DynamicField field, Datatype type)
+    {
+        field.Type = type;
+        return field;
+    }
+
     /// <inheritdoc cref="Interface"/>
     public static DynamicInterface Interface(this DynamicLanguage language, string id, string key, string name)
     {
@@ -93,5 +109,14 @@ public static class FactoryExtensions
         var reference = new DynamicReference(id, classifier) { Key = key, Name = name };
         classifier.AddFeatures([reference]);
         return reference;
+    }
+
+    /// <inheritdoc cref="StructuredDataType"/>
+    public static DynamicStructuredDataType StructuredDataType(this DynamicLanguage language, string id, string key,
+        string name)
+    {
+        var structuredDataType = new DynamicStructuredDataType(id, language) { Key = key, Name = name };
+        language.AddEntities([structuredDataType]);
+        return structuredDataType;
     }
 }

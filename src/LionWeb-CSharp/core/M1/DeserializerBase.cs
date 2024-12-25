@@ -25,10 +25,13 @@ using Serialization;
 using CompressedReference = (CompressedMetaPointer, List<(CompressedId?, string?)>);
 
 /// <inheritdoc />
-public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IReadableNode
+/// <typeparam name="T">Type of node to return</typeparam>
+/// <typeparam name="H">Type of <see cref="IDeserializerHandler"/> to use.</typeparam>
+public abstract class DeserializerBase<T, H> : IDeserializer<T>
+    where T : class, IReadableNode where H : class, IDeserializerHandler
 {
     /// Version of LionWeb standard to use.
-    protected readonly IDeserializerVersionSpecifics _versionSpecifics;
+    internal readonly IDeserializerVersionSpecifics _versionSpecifics;
 
     /// LionCore M3 according to <see cref="_versionSpecifics"/>.
     protected readonly ILionCoreLanguage _m3;
@@ -36,8 +39,11 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
     /// LionCore builtins according to <see cref="_versionSpecifics"/>.
     protected readonly IBuiltInsLanguage _builtIns;
 
+    ///Handler to customize this deserializer's behaviour in non-regular situations.
+    protected readonly H _handler;
+
     /// <inheritdoc cref="DeserializerMetaInfo"/>
-    protected readonly DeserializerMetaInfo _deserializerMetaInfo = new();
+    protected readonly DeserializerMetaInfo _deserializerMetaInfo;
 
     /// <inheritdoc cref="IDeserializer.RegisterDependentNodes"/>
     protected readonly Dictionary<CompressedId, IReadableNode> _dependentNodesById = new();
@@ -45,23 +51,20 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
     /// Already deserialized nodes.
     protected readonly Dictionary<CompressedId, T> _deserializedNodesById = new();
 
-    /// <param name="versionSpecifics">Version of LionWeb standard to use.</param>
-    protected DeserializerBase(IDeserializerVersionSpecifics versionSpecifics)
+    /// <param name="lionWebVersion">Version of LionWeb standard to use.</param>
+    /// <param name="handler">Optional handler to customize this deserializer's behaviour in non-regular situations.</param>
+    protected DeserializerBase(LionWebVersions lionWebVersion, H handler)
     {
-        _versionSpecifics = versionSpecifics;
-        _m3 = versionSpecifics.Version.LionCore;
-        _builtIns = versionSpecifics.Version.BuiltIns;
+        _m3 = lionWebVersion.LionCore;
+        _builtIns = lionWebVersion.BuiltIns;
+        _handler = handler;
+        _deserializerMetaInfo = new DeserializerMetaInfo(_handler);
+        _versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion, this, _deserializerMetaInfo, _handler);
+        _versionSpecifics.RegisterBuiltins();
     }
 
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get => _versionSpecifics.Version; }
-
-    /// <inheritdoc />
-    public IDeserializerHandler Handler
-    {
-        get => _deserializerMetaInfo.Handler;
-        init => _deserializerMetaInfo.Handler = value;
-    }
 
     /// Whether we store uncompressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
     /// Uses more memory, but very helpful for debugging. 
@@ -70,7 +73,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
         get => _deserializerMetaInfo.StoreUncompressedIds;
         init => _deserializerMetaInfo.StoreUncompressedIds = value;
     }
-    
+
     /// Whether we try to resolve references by <see cref="LionWeb.Core.Serialization.SerializedReferenceTarget.ResolveInfo"/>.
     public ReferenceResolveInfoHandling ResolveInfoHandling { get; init; }
 
@@ -110,7 +113,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
         do
         {
             compressedId = Compress(id);
-            if (IsInDependentNodes(compressedId) && Handler.SkipDeserializingDependentNode(compressedId))
+            if (IsInDependentNodes(compressedId) && _handler.SkipDeserializingDependentNode(compressedId))
                 return null;
 
             node = instantiator(id);
@@ -121,7 +124,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
 
             if (_deserializedNodesById.TryGetValue(compressedId, out var existingNode))
             {
-                id = Handler.DuplicateNodeId(compressedId, existingNode, node);
+                id = _handler.DuplicateNodeId(compressedId, existingNode, node);
                 if (id == null)
                     return null;
                 duplicateFound = true;
@@ -142,14 +145,14 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
             return null;
 
         while (result != null && ContainsAncestor(result, node))
-            result = Handler.CircularContainment(result, node);
+            result = _handler.CircularContainment(result, node);
 
         if (result == null)
             return null;
 
         var existingParent = result.GetParent();
         if (existingParent != null && existingParent != node &&
-            !Handler.DuplicateContainment(result, node, existingParent))
+            !_handler.DuplicateContainment(result, node, existingParent))
             return null;
 
         return result;
@@ -202,7 +205,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
             .Concat(_deserializedNodesById.Values)
             .OfType<INamed>()
             .Where(n => n.CollectAllSetFeatures().Contains(_builtIns.INamed_name));
-            
+
         return ResolveInfoHandling switch
         {
             ReferenceResolveInfoHandling.None => null,
@@ -210,7 +213,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
             ReferenceResolveInfoHandling.NameIfUnique => GetSingle(namedNodes, n => n.Name == s)
         };
     }
-    
+
     private static TSource? GetSingle<TSource>(IEnumerable<TSource> source, Func<TSource, bool> predicate)
     {
         using IEnumerator<TSource> e = source.GetEnumerator();
@@ -226,6 +229,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
                         return default;
                     }
                 }
+
                 return result;
             }
         }
@@ -243,7 +247,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
 
         if (node is not IWritableNode writable)
         {
-            Handler.InvalidReference(node);
+            _handler.InvalidReference(node);
             return;
         }
 
@@ -265,7 +269,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
     private IReadableNode? FindReferenceTarget(IReadableNode node, Feature reference, CompressedId? targetId,
         string? resolveInfo) =>
         FindReferenceTarget(targetId, resolveInfo) ??
-        Handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
+        _handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
 
     /// Compresses <paramref name="r"/>.
     protected CompressedReference Compress(SerializedReference r) =>
@@ -297,7 +301,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
             node.Set(link, single && children.Count == 1 ? children[0] : children);
         } catch (InvalidValueException)
         {
-            List<TChild>? replacement = Handler.InvalidLinkValue(children, link, node);
+            List<TChild>? replacement = _handler.InvalidLinkValue(children, link, node);
             if (replacement != null)
                 node.Set(link, single ? replacement.FirstOrDefault() : replacement);
         }
@@ -308,7 +312,7 @@ public abstract class DeserializerBase<T> : IDeserializer<T> where T : class, IR
         CompressedId.Create(id, StoreUncompressedIds);
 
     /// Compresses <paramref name="id"/> if not <c>null</c>.
-    protected CompressedId? CompressOpt(string? id) =>
+    protected internal CompressedId? CompressOpt(string? id) =>
         id != null ? CompressedId.Create(id, StoreUncompressedIds) : null;
 
     /// Compresses <paramref name="metaPointer"/>.

@@ -21,7 +21,7 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 
 /// Example of a node that implements <see cref="IReadableNode"/>,
 /// but neither <see cref="IWritableNode"/> nor <see cref="INode"/>.

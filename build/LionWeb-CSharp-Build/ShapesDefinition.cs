@@ -25,34 +25,36 @@ using LionWeb.Core.M3;
 /// </summary>
 public static class ShapesDefinition
 {
-    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    internal static LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     /// <summary>
     /// Definition of the Shapes language.
     /// </summary>
-    public static readonly DynamicLanguage Language = new("id-Shapes", _lionWebVersion)
-    {
-        Key = "key-Shapes", Name = "Shapes", Version = "1"
-    };
+    public static DynamicLanguage Language => new Lazy<DynamicLanguage>(() => Init(_lionWebVersion)).Value;
 
-    static ShapesDefinition()
+    internal static DynamicLanguage Init(LionWebVersions lionWebVersion)
     {
-        var builtIns = _lionWebVersion.BuiltIns;
+        var language = new DynamicLanguage("id-Shapes", lionWebVersion)
+        {
+            Key = "key-Shapes", Name = "Shapes", Version = "1"
+        };
+        
+        var builtIns = lionWebVersion.BuiltIns;
 
-        var Circle = Language.Concept("id-Circle", "key-Circle", "Circle");
-        var Coord = Language.Concept("id-Coord", "key-Coord", "Coord");
-        var Geometry = Language.Concept("id-Geometry", "key-Geometry", "Geometry");
-        var IShape = Language.Interface("id-IShape", "key-IShape", "IShape");
-        var Line = Language.Concept("id-Line", "key-Line", "Line");
-        var OffsetDuplicate = Language.Concept("id-OffsetDuplicate", "key-OffsetDuplicate", "OffsetDuplicate");
-        var Shape = Language.Concept("id-Shape", "key-Shape", "Shape");
-        var CompositeShape = Language.Concept("id-CompositeShape", "key-CompositeShape", "CompositeShape");
-        var ReferenceGeometry = Language.Concept("id-ReferenceGeometry", "key-ReferenceGeometry", "ReferenceGeometry");
-        var Documentation = Language.Annotation("id-Documentation", "key-Documentation", "Documentation");
-        var BillOfMaterials = Language.Annotation("id-BillOfMaterials", "key-BillOfMaterials", "BillOfMaterials");
-        var MaterialGroup = Language.Concept("id-MaterialGroup", "key-MaterialGroup", "MaterialGroup");
-        var MatterState = Language.Enumeration("id-MatterState", "key-MatterState", "MatterState");
-        var Time = Language.PrimitiveType("id-Time", "key-Time", "Time");
+        var Circle = language.Concept("id-Circle", "key-Circle", "Circle");
+        var Coord = language.Concept("id-Coord", "key-Coord", "Coord");
+        var Geometry = language.Concept("id-Geometry", "key-Geometry", "Geometry");
+        var IShape = language.Interface("id-IShape", "key-IShape", "IShape");
+        var Line = language.Concept("id-Line", "key-Line", "Line");
+        var OffsetDuplicate = language.Concept("id-OffsetDuplicate", "key-OffsetDuplicate", "OffsetDuplicate");
+        var Shape = language.Concept("id-Shape", "key-Shape", "Shape");
+        var CompositeShape = language.Concept("id-CompositeShape", "key-CompositeShape", "CompositeShape");
+        var ReferenceGeometry = language.Concept("id-ReferenceGeometry", "key-ReferenceGeometry", "ReferenceGeometry");
+        var Documentation = language.Annotation("id-Documentation", "key-Documentation", "Documentation");
+        var BillOfMaterials = language.Annotation("id-BillOfMaterials", "key-BillOfMaterials", "BillOfMaterials");
+        var MaterialGroup = language.Concept("id-MaterialGroup", "key-MaterialGroup", "MaterialGroup");
+        var MatterState = language.Enumeration("id-MatterState", "key-MatterState", "MatterState");
+        var Time = language.PrimitiveType("id-Time", "key-Time", "Time");
 
         Circle.Extending(Shape);
         Circle.Property("id-r", "key-r", "r").OfType(builtIns.Integer);
@@ -117,5 +119,7 @@ public static class ShapesDefinition
         MatterState.EnumerationLiteral("id-solid", "key-solid", "solid");
         MatterState.EnumerationLiteral("id-liquid", "key-liquid", "liquid");
         MatterState.EnumerationLiteral("id-gas", "key-gas", "gas");
+
+        return language;
     }
 }

@@ -141,6 +141,21 @@ public sealed class M3Language
     public static readonly ILionCoreLanguage Instance = LionWebVersions.Current.LionCore;
 }
 
+public interface ILionCoreLanguageWithStructuredDataType : ILionCoreLanguage
+{
+    /// <inheritdoc cref="M3.Field"/>
+    public Concept Field { get; }
+
+    /// <inheritdoc cref="M3.Field.Type"/>
+    public Reference Field_type  { get; }
+    
+    /// <inheritdoc cref="M3.StructuredDataType"/>
+    public Concept StructuredDataType { get; }
+
+    /// <inheritdoc cref="M3.StructuredDataType"/>
+    public Containment StructuredDataType_fields { get; }
+}
+
 /// <inheritdoc />
 public sealed class M3Concept : ConceptBase<ILionCoreLanguage>
 {

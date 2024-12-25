@@ -17,10 +17,10 @@
 
 namespace LionWeb_CSharp_Test.tests.serialization;
 
-using Examples.Circular.B;
-using Examples.Library.M2;
-using Examples.Shapes.M2;
-using Examples.WithEnum.M2;
+using Examples.V2024_1.Circular.B;
+using Examples.V2024_1.Library.M2;
+using Examples.V2024_1.Shapes.M2;
+using Examples.V2024_1.WithEnum.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
@@ -85,6 +85,11 @@ public class SerializationLenientTests
 
         public override Enum GetEnumerationLiteral(EnumerationLiteral literal) =>
             EnumValueFor<Enum>(literal);
+
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(
+            StructuredDataType structuredDataType,
+            IFieldValues fieldValues) =>
+            StructuredDataTypeInstanceFor(structuredDataType.GetType(), fieldValues);
     }
 
     class LenientHandler : DeserializerExceptionHandler
@@ -109,7 +114,8 @@ public class SerializationLenientTests
             return replacementFeature;
         }
 
-        public override object? UnknownDatatype(Feature property, string? value, IReadableNode nodeId) => value;
+        public override object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property,
+            IReadableNode nodeId) => value;
     }
 
     class LenientComparer : Comparer

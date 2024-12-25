@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.M2.Generated.Test;
 
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 
 [TestClass]
 public class ParentHandlingTests

@@ -18,6 +18,7 @@
 namespace LionWeb.Core.M2;
 
 using M3;
+using System.Reflection;
 
 /// <summary>
 /// Common supertype of all LionCore attributes.
@@ -38,7 +39,7 @@ public abstract class LionCoreKeyAttribute : LionCoreAttribute
 /// </summary>
 /// <seealso cref="LionCoreLanguage">For "metapointer" of a Language.</seealso>
 [AttributeUsage(AttributeTargets.Field | AttributeTargets.Enum | AttributeTargets.Class | AttributeTargets.Interface |
-                AttributeTargets.Property)]
+                AttributeTargets.Property | AttributeTargets.Struct)]
 public class LionCoreMetaPointer : LionCoreKeyAttribute
 {
     /// <summary>
@@ -108,7 +109,7 @@ public static class AttributeExtensions
     /// <typeparam name="T">The type of the attribute you want to retrieve</typeparam>
     /// <param name="enumValue">The enumeration value</param>
     /// <returns>The attribute of type T that exists on the given object</returns>
-    private static T? GetAttributeOfType<T>(this Enum enumValue) where T : Attribute
+    public static T? GetAttributeOfType<T>(Enum enumValue) where T : Attribute
     {
         if (enumValue == null)
             return null;
@@ -125,5 +126,13 @@ public static class AttributeExtensions
     /// <param name="enumValue">The enumeration value</param>
     /// <returns>The key declared on the given enumeration value</returns>
     public static string? LionCoreKey(this Enum enumValue)
-        => enumValue.GetAttributeOfType<LionCoreMetaPointer>()?.Key;
+        => GetAttributeOfType<LionCoreMetaPointer>(enumValue)?.Key;
+
+    /// <summary>
+    /// Gets the LionCore key from the given C# property.
+    /// </summary>
+    /// <param name="propertyInfo">The C# property</param>
+    /// <returns>The key declared on the given C# property</returns>
+    public static string? LionCoreKey(this PropertyInfo propertyInfo)
+        => propertyInfo.GetCustomAttributes<LionCoreMetaPointer>().FirstOrDefault()?.Key;
 }

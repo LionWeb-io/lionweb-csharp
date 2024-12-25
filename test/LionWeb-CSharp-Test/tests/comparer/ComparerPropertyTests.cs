@@ -20,7 +20,7 @@
 namespace LionWeb.Utils.Tests.Comparer;
 
 using Core.Utilities;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 
 [TestClass]
 public class ComparerPropertyTests : ComparerTestsBase

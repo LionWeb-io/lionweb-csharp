@@ -30,7 +30,9 @@ public class Serializer : ISerializer
     private readonly DuplicateIdChecker _duplicateIdChecker = new();
     private readonly ILionCoreLanguage _m3;
     private readonly IBuiltInsLanguage _builtIns;
+    private readonly ISerializerVersionSpecifics _versionSpecifics;
     private readonly HashSet<Language> _usedLanguages = new();
+    private readonly ISerializerHandler _handler = new SerializerExceptionHandler();
 
     /// <inheritdoc cref="ISerializer"/>
     public Serializer(LionWebVersions lionWebVersion)
@@ -38,10 +40,20 @@ public class Serializer : ISerializer
         LionWebVersion = lionWebVersion;
         _m3 = lionWebVersion.LionCore;
         _builtIns = lionWebVersion.BuiltIns;
+        _versionSpecifics = ISerializerVersionSpecifics.Create(lionWebVersion);
+        _versionSpecifics.Initialize(this, _handler);
     }
 
     /// <inheritdoc />
-    public ISerializerHandler Handler { get; init; } = new SerializerExceptionHandler();
+    public ISerializerHandler Handler
+    {
+        get => _handler;
+        init
+        {
+            _handler = value;
+            _versionSpecifics.Initialize(this, value);
+        }
+    }
 
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; }
@@ -72,7 +84,7 @@ public class Serializer : ISerializer
         }
     }
 
-    private void RegisterUsedLanguage(Language language)
+    internal void RegisterUsedLanguage(Language language)
     {
         if (language.EqualsIdentity(_builtIns))
             return;
@@ -180,38 +192,11 @@ public class Serializer : ISerializer
             )
             .ToDictionary();
 
-    private SerializedProperty SerializeProperty(IReadableNode node, Feature feature, object? value)
+    private SerializedProperty SerializeProperty(IReadableNode node, Feature property, object? value)
     {
-        if (value is not null && feature is Property { Type: Enumeration enumeration })
-            RegisterUsedLanguage(enumeration.GetLanguage());
-
-        return new SerializedProperty
-        {
-            Property = feature.ToMetaPointer(),
-            Value = value switch
-            {
-                null => null,
-                Enum e => e.LionCoreKey(),
-                int or bool or string => ConvertPrimitiveType(value),
-                _ => Handler.UnknownDatatype(node, feature, value)
-            }
-        };
+        RegisterUsedLanguage(property.GetLanguage());
+        return _versionSpecifics.SerializeProperty(node, property, value);
     }
-
-    /// <summary>
-    /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
-    /// conforming to the LionWeb JSON serialization format.
-    /// 
-    /// <em>Note!</em> No exception is thrown when the given runtime value doesn't correspond to a primitive type defined here.
-    /// Instead, the runtime value is simply coerced to a string using its <c>ToString</c> method.
-    /// </summary>
-    private string? ConvertPrimitiveType(object? value) => value switch
-    {
-        null => null,
-        bool boolean => boolean ? "true" : "false",
-        string @string => @string,
-        _ => value.ToString()
-    };
 
     private IEnumerable<SerializedProperty> CollectUnsetProperties(IReadableNode node, ISet<Feature> allFeatures,
         Dictionary<Feature, object?> properties) =>
@@ -242,11 +227,14 @@ public class Serializer : ISerializer
     private SerializedContainment SerializeContainment(KeyValuePair<Feature, object?> pair) =>
         SerializeContainment(AsNodes(pair), pair.Key);
 
-    private SerializedContainment SerializeContainment(IEnumerable<IReadableNode> children, Feature containment) =>
-        new()
+    private SerializedContainment SerializeContainment(IEnumerable<IReadableNode> children, Feature containment)
+    {
+        RegisterUsedLanguage(containment.GetLanguage());
+        return new SerializedContainment
         {
             Containment = containment.ToMetaPointer(), Children = children.Select(child => child.GetId()).ToArray()
         };
+    }
 
     private IEnumerable<SerializedContainment> CollectUnsetContainments(ISet<Feature> allFeatures,
         Dictionary<Feature, object?> containments) =>
@@ -273,12 +261,16 @@ public class Serializer : ISerializer
     private SerializedReference SerializeReference(KeyValuePair<Feature, object?> pair) =>
         SerializeReference(AsNodes(pair), pair.Key);
 
-    private SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Feature reference) =>
-        new()
+    private SerializedReference SerializeReference(IEnumerable<IReadableNode?> targets, Feature reference)
+    {
+        RegisterUsedLanguage(reference.GetLanguage());
+        return new SerializedReference
         {
             Reference = reference.ToMetaPointer(),
             Targets = targets.Where(t => t != null).Select(SerializeReferenceTarget!).ToArray()
         };
+    }
+
     private SerializedReferenceTarget SerializeReferenceTarget(IReadableNode target)
     {
         if (target is not IKeyed k)

@@ -421,8 +421,7 @@ public class LionWebVersionsTests
             Assert.IsNotNull(target.ResolveInfo);
         }
 
-        var versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion);
-        var deserialized = new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }
+        var deserialized = new LanguageDeserializer(lionWebVersion) { StoreUncompressedIds = true }
             .Deserialize(chunk).Cast<IReadableNode>()
             .ToList();
 
@@ -455,8 +454,7 @@ public class LionWebVersionsTests
             Assert.IsNotNull(target.ResolveInfo);
         }
 
-        var versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion);
-        var deserialized = new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }
+        var deserialized = new LanguageDeserializer(lionWebVersion) { StoreUncompressedIds = true }
             .Deserialize(chunk).Cast<IReadableNode>()
             .ToList();
 
@@ -473,9 +471,8 @@ public class LionWebVersionsTests
             new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk(
                 language.Descendants(true, true));
 
-        var versionSpecifics = IDeserializerVersionSpecifics.Create(LionWebVersions.v2024_1);
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }.Deserialize(chunk)
+            new LanguageDeserializer(LionWebVersions.v2024_1) { StoreUncompressedIds = true }.Deserialize(chunk)
         );
     }
 
@@ -487,8 +484,7 @@ public class LionWebVersionsTests
             new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk(
                 language.Descendants(true, true));
 
-        var versionSpecifics = IDeserializerVersionSpecifics.Create(LionWebVersions.v2024_1_Compatible);
-        var deserialized = new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }
+        var deserialized = new LanguageDeserializer(LionWebVersions.v2024_1_Compatible) { StoreUncompressedIds = true }
             .Deserialize(chunk)
             .Cast<IReadableNode>()
             .ToList();
@@ -508,9 +504,8 @@ public class LionWebVersionsTests
             new Serializer(LionWebVersions.v2024_1) { StoreUncompressedIds = true }.SerializeToChunk(
                 language.Descendants(true, true));
 
-        var versionSpecifics = IDeserializerVersionSpecifics.Create(LionWebVersions.v2023_1);
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new LanguageDeserializer(versionSpecifics) { StoreUncompressedIds = true }.Deserialize(chunk)
+            new LanguageDeserializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.Deserialize(chunk)
         );
     }
 

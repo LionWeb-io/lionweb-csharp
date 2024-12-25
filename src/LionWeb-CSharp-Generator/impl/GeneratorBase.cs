@@ -21,7 +21,6 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
-using Io.Lionweb.Mps.Specific;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -55,6 +54,10 @@ public abstract class GeneratorBase
     /// <inheritdoc cref="INames.LanguageType"/>
     protected NameSyntax LanguageType => _names.LanguageType;
 
+    /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
+    internal IGeneratorVersionSpecifics VersionSpecifics =>
+        new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_lionWebVersion)).Value;
+
     /// <inheritdoc cref="INames.AsType(System.Type,Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax?[])"/>
     protected TypeSyntax AsType(Type type, params TypeSyntax?[] generics) =>
         _names.AsType(type, generics);
@@ -85,6 +88,14 @@ public abstract class GeneratorBase
     protected ExpressionSyntax FeatureProperty(Feature feature) =>
         _names.FeatureProperty(feature);
 
+    /// <inheritdoc cref="INames.FieldField"/>
+    protected ExpressionSyntax FieldField(Field field) =>
+        _names.FieldField(field);
+
+    /// <inheritdoc cref="INames.FieldProperty"/>
+    protected ExpressionSyntax FieldProperty(Field field) =>
+        _names.FieldProperty(field);
+
     /// <returns><c>MyLang.Instance.MyClassifier_MyFeature</c></returns>
     protected MemberAccessExpressionSyntax MetaProperty(Feature feature)
     {
@@ -93,6 +104,10 @@ public abstract class GeneratorBase
 
         return MemberAccess(_names.MetaProperty(feature.GetLanguage()), _names.AsProperty(feature));
     }
+
+    /// <returns><c>MyLang.Instance.MyStructuredDataType_MyField</c></returns>
+    protected MemberAccessExpressionSyntax MetaProperty(Field field) =>
+        MemberAccess(_names.MetaProperty(field.GetLanguage()), _names.AsProperty(field));
 
     /// <returns><c>[LionCoreMetaPointer(Language = typeof(MyLangNameLanguage), Key = "keyedKey")]</c></returns>
     protected AttributeSyntax MetaPointerAttribute(IKeyed keyed)
@@ -118,16 +133,13 @@ public abstract class GeneratorBase
     {
         var deprecatedAnnotation = keyed
             .GetAnnotations()
-            .FirstOrDefault(a => a
-                .GetClassifier()
-                .EqualsIdentity(SpecificLanguage.Instance.Deprecated)
-            );
+            .FirstOrDefault(a => VersionSpecifics.IsDeprecated(a.GetClassifier()));
         if (deprecatedAnnotation == null)
             return null;
 
         var result = Attribute(IdentifierName("Obsolete"));
 
-        var comment = deprecatedAnnotation.Get(SpecificLanguage.Instance.Deprecated_comment);
+        var comment = VersionSpecifics.GetDeprecatedComment(deprecatedAnnotation);
         if (comment is not string s)
             return result;
 

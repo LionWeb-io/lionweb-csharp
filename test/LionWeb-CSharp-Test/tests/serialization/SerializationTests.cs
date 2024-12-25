@@ -18,7 +18,13 @@
 namespace LionWeb_CSharp_Test.tests.serialization;
 
 using Examples.Shapes.Dynamic;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Mixed.MixedConceptLang;
+using Examples.V2024_1.Mixed.MixedDirectEnumLang;
+using Examples.V2024_1.Mixed.MixedDirectSdtLang;
+using Examples.V2024_1.Mixed.MixedNestedEnumLang;
+using Examples.V2024_1.Mixed.MixedNestedSdtLang;
+using Examples.V2024_1.SDTLang;
+using Examples.V2024_1.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
@@ -27,7 +33,6 @@ using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
 using LionWeb.Core.Utilities;
 using System.Collections;
-using System.Text;
 using Comparer = LionWeb.Core.Utilities.Comparer;
 
 [TestClass]
@@ -44,7 +49,7 @@ public class SerializationTests
     [TestMethod]
     public void test_serialization_shapes_model()
     {
-        INode rootNode = ExampleModels.ExampleModel(_language);
+        INode rootNode = new ExampleModels(_lionWebVersion).ExampleModel(_language);
 
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([rootNode]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
@@ -59,7 +64,7 @@ public class SerializationTests
     [TestMethod]
     public void test_no_double_serialization()
     {
-        var geometry = ExampleModels.ExampleModel(_language);
+        var geometry = new ExampleModels(_lionWebVersion).ExampleModel(_language);
         var shape0 = (geometry.Get(_language.ClassifierByKey("key-Geometry").FeatureByKey("key-shapes")) as IEnumerable)
             .Cast<INode>().First();
 
@@ -241,6 +246,75 @@ public class SerializationTests
 
         Assert.AreEqual(text,
             readableNodes.OfType<INode>().SelectMany(n => n.Descendants(true)).OfType<Circle>().First().Name);
+    }
+
+    [TestMethod]
+    public void SerializeStructuredDataType()
+    {
+        var node = new SDTConcept("nodeId")
+        {
+            Amount =
+                new Amount { Value = new Decimal { Int = 23, Frac = 42 }, Currency = Currency.EUR, Digital = true },
+            Decimal = new Decimal { Int = 19 },
+            Complex = new ComplexNumber { Real = new Decimal { Int = 1, Frac = 0 }, Imaginary = new Decimal() }
+        };
+
+        var serializer = new Serializer(_lionWebVersion);
+        var serializedNodes = serializer.Serialize([node]).ToList();
+        Assert.AreEqual(1, serializedNodes.Count);
+        var serializedNode = serializedNodes.First();
+
+        Assert.AreEqual(
+            """{"key-SDTCurr":"key-SDTEur","key-SDTDigital":"true","key-SDTValue":{"key-SDTFrac":"42","key-SDTInt":"23"}}""",
+            serializedNode.Properties.First(p => p.Property.Key == "key-SDTamountField").Value);
+
+        Assert.AreEqual(
+            """{"key-SDTInt":"19"}""",
+            serializedNode.Properties.First(p => p.Property.Key == "key-SDTDecimalField").Value);
+
+        Assert.AreEqual(
+            """{"key-SDTImaginary":{},"key-SDTReal":{"key-SDTFrac":"0","key-SDTInt":"1"}}""",
+            serializedNode.Properties.First(p => p.Property.Key == "key-SDTComplexField").Value);
+
+
+        var nodes = new DeserializerBuilder()
+            .WithLanguage(SDTLangLanguage.Instance)
+            .WithLanguage(SDTLangLanguage.Instance)
+            .Build()
+            .Deserialize(serializedNodes);
+
+        var comparer = new Comparer([node], nodes);
+        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
+    }
+
+    [TestMethod]
+    public void SerializePropertyUsedLanguages()
+    {
+        var node = new MixedConcept("mixedId")
+        {
+            EnumProp = DirectEnum.directEnumA,
+            SdtProp = new DirectSdt
+            {
+                DirectSdtEnum = NestedEnum.nestedLiteralA,
+                DirectSdtSdt = new NestedSdt { NestedSdtField = "hello" }
+            }
+        };
+
+        var serializer = new Serializer(_lionWebVersion);
+        var serializedNodes = serializer.Serialize([node]).ToList();
+        Assert.AreEqual(1, serializedNodes.Count);
+        CollectionAssert.AreEquivalent(new List<SerializedLanguageReference>
+        {
+            new() { Key = "key-mixedBasePropertyLang", Version = "1" },
+            new() { Key = "key-mixedBaseContainmentLang", Version = "1" },
+            new() { Key = "key-mixedBaseReferenceLang", Version = "1" },
+            new() { Key = "key-mixedBaseConceptLang", Version = "1" },
+            new() { Key = "key-mixedConceptLang", Version = "1" },
+            new() { Key = "key-mixedDirectEnumLang", Version = "1" },
+            new() { Key = "key-mixedNestedEnumLang", Version = "1" },
+            new() { Key = "key-mixedDirectSdtLang", Version = "1" },
+            new() { Key = "key-mixedNestedSdtLang", Version = "1" },
+        }, serializer.UsedLanguages.ToList());
     }
 
     private TestContext testContextInstance;

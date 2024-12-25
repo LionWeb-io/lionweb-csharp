@@ -28,6 +28,7 @@ public static class EqualityExtensions
     private static readonly LanguageIdentityComparer _languageComparer = new();
     private static readonly LanguageEntityIdentityComparer _entityComparer = new();
     private static readonly FeatureIdentityComparer _featureComparer = new();
+    private static readonly FieldIdentityComparer _fieldComparer = new();
 
     /// <inheritdoc cref="LanguageIdentityComparer"/>
     /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/> and <see cref="Language.Version"/>; <c>false</c> otherwise.</returns>
@@ -53,16 +54,28 @@ public static class EqualityExtensions
         _entityComparer.GetHashCode(obj);
 
     /// <inheritdoc cref="FeatureIdentityComparer"/>
-    /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/> and <see cref="M2Extensions.GetLanguage">Language</see>; <c>false</c> otherwise.</returns>
-    /// <seealso cref="EqualsIdentity(LionWeb.Core.M3.Language,LionWeb.Core.M3.Language?)"/>
+    /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/> and <see cref="M2Extensions.GetFeatureClassifier">hosting Classifier</see>; <c>false</c> otherwise.</returns>
+    /// <seealso cref="EqualsIdentity(LionWeb.Core.M3.LanguageEntity,LionWeb.Core.M3.LanguageEntity?)"/>
     public static bool EqualsIdentity(this Feature left, Feature? right) =>
         _featureComparer.Equals(left, right);
 
     /// <summary>
-    /// Calculates <see cref="Feature"/> hash code by its <see cref="IKeyed.Key"/> and its <see cref="M2Extensions.GetLanguage"/>.
+    /// Calculates <see cref="Feature"/> hash code by its <see cref="IKeyed.Key"/> and its <see cref="M2Extensions.GetFeatureClassifier">hosting Classifier</see>.
     /// </summary>
     public static int GetHashCodeIdentity(this Feature obj) =>
         _featureComparer.GetHashCode(obj);
+    
+    /// <inheritdoc cref="FieldIdentityComparer"/>
+    /// <returns><c>true</c> if <paramref name="left"/> and <paramref name="right"/> have the same <see cref="IKeyed.Key"/> and <see cref="M2Extensions.GetStructuredDataType">hosting StructuredDataType</see>; <c>false</c> otherwise.</returns>
+    /// <seealso cref="EqualsIdentity(LionWeb.Core.M3.LanguageEntity,LionWeb.Core.M3.LanguageEntity?)"/>
+    public static bool EqualsIdentity(this Field left, Field? right) =>
+        _fieldComparer.Equals(left, right);
+
+    /// <summary>
+    /// Calculates <see cref="Field"/> hash code by its <see cref="IKeyed.Key"/> and its <see cref="M2Extensions.GetStructuredDataType">hosting StructuredDataType</see>.
+    /// </summary>
+    public static int GetHashCodeIdentity(this Field obj) =>
+        _fieldComparer.GetHashCode(obj);
 }
 
 /// <summary>
@@ -93,7 +106,7 @@ public class LanguageIdentityComparer : IEqualityComparer<Language>
 }
 
 /// <summary>
-/// Compares <see cref="Feature">Features</see> by their <see cref="IKeyed.Key"/>, and their <see cref="M2Extensions.GetLanguage">Languages</see>.
+/// Compares <see cref="Feature">Features</see> by their <see cref="IKeyed.Key"/>, and their <see cref="M2Extensions.GetFeatureClassifier">hosting Classifier</see>.
 /// </summary>
 /// <seealso cref="LanguageEntityIdentityComparer"/>
 /// <seealso cref="LanguageIdentityComparer"/>
@@ -119,6 +132,35 @@ public class FeatureIdentityComparer : IEqualityComparer<Feature>
     /// <inheritdoc />
     public int GetHashCode(Feature obj) =>
         HashCode.Combine(obj.Key, obj.GetFeatureClassifier().GetHashCodeIdentity());
+}
+
+/// <summary>
+/// Compares <see cref="Field">Fields</see> by their <see cref="IKeyed.Key"/>, and their <see cref="M2Extensions.GetStructuredDataType">hosting StructuredDataType</see>.
+/// </summary>
+/// <seealso cref="LanguageEntityIdentityComparer"/>
+/// <seealso cref="LanguageIdentityComparer"/>
+public class FieldIdentityComparer : IEqualityComparer<Field>
+{
+    /// <inheritdoc />
+    public bool Equals(Field? x, Field? y)
+    {
+        if (ReferenceEquals(x, y))
+        {
+            return true;
+        }
+
+        if (x == null || y == null)
+        {
+            return false;
+        }
+
+        return x.Key == y.Key &&
+               x.GetStructuredDataType().EqualsIdentity(y.GetStructuredDataType());
+    }
+
+    /// <inheritdoc />
+    public int GetHashCode(Field obj) =>
+        HashCode.Combine(obj.Key, obj.GetStructuredDataType().GetHashCodeIdentity());
 }
 
 /// <summary>

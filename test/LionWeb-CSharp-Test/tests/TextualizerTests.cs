@@ -22,7 +22,7 @@ using Core.M2;
 using Core.M3;
 using Core.Utilities;
 using Examples.Shapes.Dynamic;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 
 [TestClass]
 public class TextualizerTests
@@ -33,7 +33,7 @@ public class TextualizerTests
     [TestMethod]
     public void smoke_test_textualizer()
     {
-        var model = ExampleModels.ExampleModel(ShapesDynamic.Language);
+        var model = new ExampleModels(_lionWebVersion).ExampleModel(ShapesDynamic.Language);
         Console.WriteLine(model.AsString());
     }
 
@@ -70,20 +70,20 @@ public class TextualizerTests
     [TestMethod]
     public void does_not_crash_on_features_with_unset_names()
     {
-        var language = new DynamicLanguage("lang", _lionWebVersion);
+        var language = new DynamicLanguage("lang", _lionWebVersion) { Key = "key-lang", Version = "0" };
 
-        var concept = new DynamicConcept("concept", language);
+        var concept = new DynamicConcept("concept", language) { Key = "key-concept" };
         language.AddEntities([concept]);
 
         // shows that INamed_name is declared as a set feature, but its getter still throws:
         Assert.IsTrue(concept.CollectAllSetFeatures().Contains(_builtIns.INamed_name));
         Assert.ThrowsException<UnsetFeatureException>(() => concept.Name);
 
-        var property = new DynamicProperty("prop", concept);
+        var property = new DynamicProperty("prop", concept) { Key = "key-prop" };
         property.Type = _builtIns.String;
-        var containment = new DynamicContainment("cont", concept);
+        var containment = new DynamicContainment("cont", concept) { Key = "key-cont" };
         containment.Type = concept;
-        var reference = new DynamicReference("ref", concept);
+        var reference = new DynamicReference("ref", concept) { Key = "key-ref" };
         reference.Type = concept;
         concept.AddFeatures([property, containment, reference]);
 

@@ -22,20 +22,24 @@ using M3;
 using Serialization;
 
 /// <inheritdoc cref="ILanguageDeserializer"/>
-public partial class LanguageDeserializer : DeserializerBase<IReadableNode>, ILanguageDeserializer
+public partial class LanguageDeserializer : DeserializerBase<IReadableNode, ILanguageDeserializerHandler>,
+    ILanguageDeserializer
 {
     private readonly Dictionary<CompressedId, SerializedNode> _serializedNodesById = new();
 
     private readonly DeserializerBuilder _deserializerBuilder = new();
 
+    private readonly ILanguageDeserializerVersionSpecifics _languageVersionSpecifics;
+
+
     /// <summary>
-    /// Deserializes languages based on LionWeb version encoded in <paramref name="versionSpecifics"/>.
+    /// Deserializes languages based on LionWeb version <paramref name="lionWebVersion"/>.
     /// </summary>
-    /// <param name="versionSpecifics">Version of LionWeb standard to use for deserializing.</param>
-    public LanguageDeserializer(IDeserializerVersionSpecifics versionSpecifics) :
-        base(versionSpecifics)
+    /// <inheritdoc />
+    public LanguageDeserializer(LionWebVersions lionWebVersion, ILanguageDeserializerHandler? handler = null) :
+        base(lionWebVersion, handler ?? new LanguageDeserializerExceptionHandler())
     {
-        versionSpecifics.RegisterBuiltins(this);
+        _languageVersionSpecifics = ILanguageDeserializerVersionSpecifics.Create(lionWebVersion, this, _handler);
         RegisterDependentLanguage(_m3);
     }
 

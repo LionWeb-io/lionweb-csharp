@@ -98,6 +98,9 @@ public interface INames
     /// <returns><c>MyEnum_MyLiteral</c></returns>
     IdentifierNameSyntax AsProperty(EnumerationLiteral literal);
 
+    /// <returns><c>MyStructuredDataType_MyField</c></returns>
+    IdentifierNameSyntax AsProperty(Field field);
+
     /// <returns><c>MyLanguage.Instance</c></returns>
     NameSyntax MetaProperty(Language lang);
 
@@ -106,4 +109,13 @@ public interface INames
 
     /// <returns><c>MyFeature</c></returns>
     IdentifierNameSyntax FeatureProperty(Feature feature);
+
+    /// <returns><c>_myField</c></returns>
+    IdentifierNameSyntax FieldField(Field field);
+
+    /// <returns><c>MyField</c></returns>
+    IdentifierNameSyntax FieldProperty(Field field);
+    
+    /// <returns><c>myField</c></returns>
+    string ParamField(Field field);
 }

@@ -23,31 +23,48 @@ using M1;
 using M3;
 
 /// <see cref="IDeserializer"/> parts specific to LionWeb <see cref="IVersion2023_1"/>.  
-internal class DeserializerVersionSpecifics_2023_1 : IDeserializerVersionSpecifics
+internal class DeserializerVersionSpecifics_2023_1<T, H>(
+    DeserializerBase<T, H> deserializer,
+    DeserializerMetaInfo metaInfo,
+    IDeserializerHandler handler)
+    : DeserializerVersionSpecificsBase<T, H>(deserializer, metaInfo, handler)
+    where T : class, IReadableNode where H : class, IDeserializerHandler
 {
-    public LionWebVersions Version => LionWebVersions.v2023_1;
+    public override LionWebVersions Version => LionWebVersions.v2023_1;
 
-    public object? ConvertPrimitiveType<T>(DeserializerBase<T> self, T node,
-        Property property, string value) where T : class, IReadableNode
+    public override void RegisterBuiltins() =>
+        RegisterLanguage(BuiltInsLanguage_2023_1.Instance);
+
+    public override object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype,
+        string? value)
     {
-        CompressedId compressedId = self.Compress(node.GetId());
-        return property.Type switch
+        var convertedValue = (datatype, value) switch
+        {
+            (_, null) => null,
+            (PrimitiveType p, { } v) => ConvertPrimitiveType(node, property, p, v),
+            (Enumeration enumeration, { } v) => ConvertEnumeration(node, property, enumeration, v),
+            var (_, v) => _handler.UnknownDatatype(v, datatype, property, node)
+        };
+        return convertedValue;
+    }
+
+    private object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype, string value)
+    {
+        CompressedId compressedId = _metaInfo.Compress(node.GetId());
+        return datatype switch
         {
             var b when b == BuiltInsLanguage_2023_1.Instance.Boolean =>
                 bool.TryParse(value, out var result)
                     ? result
-                    : self.Handler.InvalidPropertyValue<bool>(value, property, compressedId),
+                    : _handler.InvalidPropertyValue<bool>(value, property, compressedId),
             var i when i == BuiltInsLanguage_2023_1.Instance.Integer =>
                 int.TryParse(value, out var result)
                     ? result
-                    : self.Handler.InvalidPropertyValue<int>(value, property, compressedId),
+                    : _handler.InvalidPropertyValue<int>(value, property, compressedId),
             // leave both a String and JSON value as a string:
             var s when s == BuiltInsLanguage_2023_1.Instance.String ||
                        s == BuiltInsLanguage_2023_1.Instance.Json => value,
-            _ => self.Handler.UnknownDatatype(property, value, node)
+            _ => _handler.UnknownDatatype(value, datatype, property, node)
         };
     }
-
-    public void RegisterBuiltins(IDeserializer self) =>
-        this.RegisterLanguage(self, BuiltInsLanguage_2023_1.Instance);
 }

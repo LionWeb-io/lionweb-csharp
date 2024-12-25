@@ -33,7 +33,7 @@ public class EnumGenerator(Enumeration enumeration, INames names, LionWebVersion
 {
     /// <inheritdoc cref="EnumGenerator"/>
     public EnumDeclarationSyntax EnumType() =>
-        EnumDeclaration(enumeration.Name)
+        EnumDeclaration(enumeration.Name.PrefixKeyword())
             .WithAttributeLists(AsAttributes(
             [
                 MetaPointerAttribute(enumeration),

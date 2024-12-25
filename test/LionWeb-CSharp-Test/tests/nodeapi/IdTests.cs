@@ -18,7 +18,7 @@
 namespace LionWeb.Utils.Tests;
 
 using Core;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 
 [TestClass]
 public class IdTests

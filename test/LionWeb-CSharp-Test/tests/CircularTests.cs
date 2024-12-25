@@ -17,8 +17,8 @@
 
 namespace LionWeb_CSharp_Test.tests;
 
-using Examples.Circular.A;
-using Examples.Circular.B;
+using Examples.V2024_1.Circular.A;
+using Examples.V2024_1.Circular.B;
 
 [TestClass]
 public class CircularTests

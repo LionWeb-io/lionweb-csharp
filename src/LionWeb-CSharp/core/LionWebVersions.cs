@@ -20,6 +20,7 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using VersionSpecific.V2023_1;
+using VersionSpecific.V2024_1_Compatible;
 using VersionSpecific.V2024_1;
 
 /// <summary>
@@ -56,7 +57,7 @@ public interface LionWebVersions
     public bool IsCompatibleWith(LionWebVersions other);
 
     /// The current default version.
-    public static LionWebVersions Current => v2023_1;
+    public static LionWebVersions Current => v2024_1;
 
     /// All supported <i>pure</i> versions of LionWeb standard.
     public static IReadOnlyList<LionWebVersions> AllPureVersions { get => [v2023_1, v2024_1]; }

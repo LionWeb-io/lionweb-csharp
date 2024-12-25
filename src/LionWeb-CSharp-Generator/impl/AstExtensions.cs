@@ -73,9 +73,8 @@ public static class AstExtensions
         Block(List(statements));
 
     /// <returns><c>public type name => expression;</c></returns>
-    public static PropertyDeclarationSyntax
-        ReadOnlyProperty(string name, TypeSyntax? type, ExpressionSyntax expression) =>
-        PropertyDeclaration(type, Identifier(name))
+    public static PropertyDeclarationSyntax ReadOnlyProperty(string name, TypeSyntax? type, ExpressionSyntax expression)
+        => PropertyDeclaration(type, Identifier(name))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithExpressionBody(ArrowExpressionClause(expression))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
@@ -84,18 +83,14 @@ public static class AstExtensions
     public static PropertyDeclarationSyntax Property(string name, TypeSyntax type, ExpressionSyntax getter,
         ExpressionSyntax setter) =>
         PropertyDeclaration(type, Identifier(name))
-            .WithAccessorList(
-                AccessorList(
-                    List([
-                        AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
-                            .WithExpressionBody(ArrowExpressionClause(getter))
-                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                        AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
-                            .WithExpressionBody(ArrowExpressionClause(setter))
-                            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-                    ])
-                )
-            );
+            .WithAccessorList(AccessorList(List([
+                AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
+                    .WithExpressionBody(ArrowExpressionClause(getter))
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+                AccessorDeclaration(SyntaxKind.SetAccessorDeclaration)
+                    .WithExpressionBody(ArrowExpressionClause(setter))
+                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+            ])));
 
     /// <returns><c>type name = init;</c></returns>
     public static FieldDeclarationSyntax Field(string name, TypeSyntax? type, ExpressionSyntax? init = null)
@@ -268,9 +263,9 @@ public static class AstExtensions
     public static MemberAccessExpressionSyntax MemberAccess(ExpressionSyntax expression, SimpleNameSyntax name) =>
         MemberAccessExpression(SyntaxKind.SimpleMemberAccessExpression, expression, name);
 
-    /// <returns><c>@name</c></returns>
+    /// <returns><c>name</c></returns>
     public static EnumMemberDeclarationSyntax EnumMember(string name) =>
-        EnumMemberDeclaration(Identifier($"@{name}"));
+        EnumMemberDeclaration(Identifier(name.PrefixKeyword()));
 
     /// Prepends <paramref name="xdocs"/> before <paramref name="member"/>.
     public static T Xdoc<T>(this T member, IEnumerable<XmlNodeSyntax> xdocs) where T : MemberDeclarationSyntax
@@ -452,7 +447,25 @@ public static class AstExtensions
     public static LiteralExpressionSyntax Default() =>
         LiteralExpression(SyntaxKind.DefaultLiteralExpression, Token(SyntaxKind.DefaultKeyword));
 
+    /// <returns><c>value</c></returns>
+    public static IdentifierNameSyntax Value() =>
+        IdentifierName("value");
+
     /// <returns><c>this</c></returns>
     public static ThisExpressionSyntax This() =>
         ThisExpression();
+    
+    /// Adds <paramref name="element"/> between any two elements of <paramref name="source"/>.
+    public static IEnumerable<T> Intersperse<T>(this IEnumerable<T> source, T element)
+    {
+        bool first = true;
+        foreach (T value in source)
+        {
+            if (!first)
+                yield return element;
+            yield return value;
+            first = false;
+        }
+    }
+
 }

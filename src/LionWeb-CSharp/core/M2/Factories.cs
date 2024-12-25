@@ -19,41 +19,91 @@ namespace LionWeb.Core.M2;
 
 using M3;
 using Serialization;
+using System.Collections;
 using System.Reflection;
 using System.Reflection.Emit;
 using Utilities;
 
-/// <summary>
 /// An <see cref="INodeFactory"/> instance creates nodes, given an ID and a Concept.
 /// For concepts that the instance is not familiar with, a "placeholder" node (such as an instance of <see cref="DynamicNode"/>) should be returned.
-/// </summary>
 public interface INodeFactory
 {
     /// <returns>A node created given the <paramref name="id">ID</paramref> and <paramref name="classifier">Classifier</paramref>.</returns>
+    /// <exception cref="UnsupportedClassifierException">If <paramref name="classifier"/> cannot be instantiated.</exception>
     public INode CreateNode(string id, Classifier classifier);
 
     /// <returns>The C# (runtime) enumeration literal corresponding to the given <paramref name="literal">LionCore M3 enumeration literal</paramref>.</returns>
+    /// <exception cref="UnsupportedEnumerationLiteralException">If <paramref name="literal"/> cannot be found.</exception>
     public Enum GetEnumerationLiteral(EnumerationLiteral literal);
+
+    /// <returns>An instance of <paramref name="structuredDataType"/>, initialized with <paramref name="fieldValues"/>.</returns>
+    /// <exception cref="UnsupportedStructuredDataTypeException">If <paramref name="structuredDataType"/> cannot be created.</exception>
+    public IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues);
 }
 
-/// <summary>
-/// An abstract base implementation of <see cref="INodeFactory"/>
-/// that holds a reference to the (single) <see cref="Language"/> it's a node factory for.
-/// </summary>
-public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
+/// Intermediate data structure to initialize an <see cref="IStructuredDataTypeInstance"/>.
+public interface IFieldValues : IEnumerable<(Field field, object? value)>
 {
     /// <summary>
-    /// The <see cref="Language"/> this <see cref="AbstractBaseNodeFactory"/> is a node factory for.
+    /// Gets the value associated with <paramref name="field"/>.
     /// </summary>
+    /// <param name="field">Field to get the value associated with.</param>
+    /// <returns>The value associated with <paramref name="field"/>, or <c>null</c> if <paramref name="field"/> is not set.</returns>
+    object? Get(Field field);
+}
+
+/// <inheritdoc />
+public class FieldValues : IFieldValues
+{
+    private readonly Dictionary<Field, object?> _fieldValues;
+
+    /// <inheritdoc cref="FieldValues"/>
+    public FieldValues()
+    {
+        _fieldValues = new Dictionary<Field, object?>(new FieldIdentityComparer());
+    }
+
+    /// <inheritdoc cref="FieldValues"/>
+    /// <param name="fieldValues">Field/value pairs to initialize with.</param>
+    public FieldValues(IEnumerable<(Field, object?)> fieldValues)
+    {
+        _fieldValues = fieldValues.ToDictionary(new FieldIdentityComparer());
+    }
+
+    /// <summary>
+    /// Adds a new Field/value pair.
+    /// </summary>
+    /// <param name="field">Field to add.</param>
+    /// <param name="value">Value to add.</param>
+    public void Add(Field field, object? value) =>
+        _fieldValues.Add(field, value);
+
+    /// <inheritdoc />
+    public object? Get(Field field) =>
+        _fieldValues.GetValueOrDefault(field);
+
+    /// <inheritdoc />
+    public IEnumerator<(Field, object?)> GetEnumerator() =>
+        _fieldValues.Select(p => (p.Key, p.Value)).GetEnumerator();
+
+    /// <inheritdoc />
+    IEnumerator IEnumerable.GetEnumerator() =>
+        GetEnumerator();
+}
+
+/// An abstract base implementation of <see cref="INodeFactory"/>
+/// that holds a reference to the (single) <see cref="Language"/> it's a node factory for.
+public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
+{
+    /// The <see cref="Language"/> this <see cref="AbstractBaseNodeFactory"/> is a node factory for.
     public readonly Language Language = language;
 
     /// <inheritdoc />
     public abstract INode CreateNode(string id, Classifier classifier);
 
-    /// <summary>
-    /// Fallback implementation of <see cref="CreateNode"/> that prints a warning to the console,
+    /// Fallback implementation of <see cref="CreateNode"/> that <see cref="LogWarning">logs</see> a warning,
     /// and instantiates an instance of the generic <see cref="DynamicNode"/> that's not backed by a specific class.
-    /// </summary>
     protected INode FallbackCreateNode(string id, Classifier classifier)
     {
         LogWarning(
@@ -71,26 +121,49 @@ public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
     /// <inheritdoc />
     public abstract Enum GetEnumerationLiteral(EnumerationLiteral literal);
 
-    /// <summary>
     /// A typed implementation of <see cref="GetEnumerationLiteral"/> that's used by generated code.
-    /// </summary>
     protected T EnumValueFor<T>(EnumerationLiteral literal) where T : Enum
         => Enum.GetValues(typeof(T))
                .OfType<T>()
                .FirstOrDefault(enumValue => enumValue.LionCoreKey() == literal.Key)
            ?? throw new UnsupportedEnumerationLiteralException(literal);
+
+    /// <summary>
+    /// Implementation of <see cref="CreateStructuredDataTypeInstance"/> that dynamically instantiates <paramref name="sdtType"/>.
+    /// </summary>
+    /// <param name="sdtType">C# type to instantiate. MUST implement <see cref="IStructuredDataTypeInstance"/> with the same pattern as a <c>struct record</c>.</param>
+    /// <param name="fieldValues">Values to initialize with.</param>
+    /// <returns>New instance of <paramref name="sdtType"/>, initialized with <paramref name="fieldValues"/>.</returns>
+    protected IStructuredDataTypeInstance StructuredDataTypeInstanceFor(Type sdtType, IFieldValues fieldValues)
+    {
+        if (!sdtType.IsSubclassOf(typeof(IStructuredDataTypeInstance)) || sdtType.TypeInitializer is null)
+            throw new UnsupportedStructuredDataTypeException(sdtType);
+
+        var result = sdtType.TypeInitializer.Invoke([]);
+
+        foreach ((Field field, var value) in fieldValues)
+        {
+            var propertyInfo = sdtType.GetProperties().FirstOrDefault(p => p.LionCoreKey() == field.Key)
+                               ?? throw new UnsupportedStructuredDataTypeException(sdtType,
+                                   $"Cannot find property for key '{field.Key}'");
+            propertyInfo.SetValue(result, value);
+        }
+
+        return (IStructuredDataTypeInstance)result;
+    }
+
+    /// <inheritdoc />
+    public abstract IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues);
 }
 
-/// <summary>
 /// An <see cref="INodeFactory"/> that's a node factory for multiple languages.
-/// </summary>
+[Obsolete("Not needed anymore, all usage sites can handle multiple languages and factories.")]
 public class MultiLanguageNodeFactory : INodeFactory
 {
     private readonly IDictionary<Language, AbstractBaseNodeFactory> _map;
 
-    /// <summary>
     /// Can be passed as the params argument to the Deserializer.Deserialize method.
-    /// </summary>
     public readonly (Language language, INodeFactory nodeFactory)[] Tuples;
 
     /// Creates a combined factory for all <paramref name="factories"/>.
@@ -110,6 +183,11 @@ public class MultiLanguageNodeFactory : INodeFactory
     /// <inheritdoc />
     public Enum GetEnumerationLiteral(EnumerationLiteral literal)
         => _map[literal.GetEnumeration().GetLanguage()].GetEnumerationLiteral(literal);
+
+    /// <inheritdoc />
+    public IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues)
+        => _map[structuredDataType.GetLanguage()].CreateStructuredDataTypeInstance(structuredDataType, fieldValues);
 }
 
 /// Creates all requested node instances and enumerations dynamically.
@@ -152,4 +230,9 @@ public class ReflectiveBaseNodeFactory(Language language) : AbstractBaseNodeFact
         _enums[literal.GetEnumeration()] = type;
         return Enum.Parse(type, literal.Name) as Enum;
     }
+
+    /// <inheritdoc />
+    public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
+        IFieldValues fieldValues) =>
+        new DynamicStructuredDataTypeInstance(structuredDataType, fieldValues);
 }

@@ -42,6 +42,7 @@ public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : Ge
             .Ordered();
 
     private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
+    private IEnumerable<StructuredDataType> StructuredDataTypes => Language.Entities.OfType<StructuredDataType>().Ordered();
 
     /// <inheritdoc cref="FactoryGenerator"/>
     public IEnumerable<TypeDeclarationSyntax> FactoryTypes() =>
@@ -66,7 +67,11 @@ public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : Ge
             .WithBaseList(AsBase(AsType(typeof(AbstractBaseNodeFactory)), _names.FactoryInterfaceType))
             .WithMembers(List(new List<MemberDeclarationSyntax>
             {
-                GenLanguageField(), GenConstructor(), GenCreateNode(), GenGetEnumerationLiteral()
+                GenLanguageField(),
+                GenConstructor(),
+                GenCreateNode(),
+                GenGetEnumerationLiteral(),
+                GenCreateStructuredDataTypeInstance()
             }.Concat(ConcreteClassifiers
                 .SelectMany(GenNewMethods)
                 .Select(m => m.WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.VirtualKeyword)))
@@ -139,6 +144,57 @@ public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : Ge
             ReturnStatement(InvocationExpression(Generic("EnumValueFor", _names.AsType(enumeration, false)),
                 AsArguments([IdentifierName("literal")]))
             )
+        );
+
+    #endregion
+
+    #region CreateStructuredDataTypeInstance
+
+    private MethodDeclarationSyntax GenCreateStructuredDataTypeInstance() =>
+        Method(
+                "CreateStructuredDataTypeInstance",
+                AsType(typeof(IStructuredDataTypeInstance)),
+                [
+                    Param("structuredDataType", AsType(typeof(StructuredDataType))),
+                    Param("fieldValues", AsType(typeof(IFieldValues)))
+                ]
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
+            .Xdoc(XdocInheritDoc())
+            .WithBody(AsStatements(
+                StructuredDataTypes
+                    .Select(GenCreateStructuredDataTypeInstance)
+                    .Append(
+                        ThrowStatement(NewCall([IdentifierName("structuredDataType")],
+                            AsType(typeof(UnsupportedStructuredDataTypeException))
+                        ))
+                    )
+            ));
+
+    private StatementSyntax GenCreateStructuredDataTypeInstance(StructuredDataType sdt) =>
+        IfStatement(
+            InvocationExpression(
+                MemberAccess(MemberAccess(IdentifierName("_language"), _names.AsProperty(sdt)),
+                    IdentifierName("EqualsIdentity")
+                ),
+                AsArguments([IdentifierName("structuredDataType")])
+            ),
+            ReturnStatement(NewCall(
+                sdt.Fields.Ordered().Select(f =>
+                {
+                    var invocationExpressionSyntax = InvocationExpression(
+                        MemberAccess(IdentifierName("fieldValues"), IdentifierName("Get")),
+                        AsArguments([
+                            MemberAccess(IdentifierName("_language"), _names.AsProperty(f)),
+                        ])
+                    );
+                    return (ExpressionSyntax)CastExpression(
+                        NullableType(AsType(f.Type)),
+                        invocationExpressionSyntax
+                    );
+                }).ToList(),
+                AsType(sdt)
+            ))
         );
 
     #endregion

@@ -18,7 +18,7 @@
 namespace LionWeb.Core.M2.Lenient.Test;
 
 using Examples.Shapes.Dynamic;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 using M3;
 using System.Collections;
 using Utils.Tests;

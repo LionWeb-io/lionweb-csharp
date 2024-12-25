@@ -17,7 +17,7 @@
 
 namespace LionWeb_CSharp_Test.tests.serialization.deserialization;
 
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
@@ -73,6 +73,7 @@ public class InvalidPropertyValueTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
+            .WithUncompressedIds()
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);

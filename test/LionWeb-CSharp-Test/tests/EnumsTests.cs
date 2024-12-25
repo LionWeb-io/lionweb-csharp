@@ -22,7 +22,7 @@ using Core.M1;
 using Core.M2;
 using Core.M3;
 using Core.Serialization;
-using Examples.WithEnum.M2;
+using Examples.V2024_1.WithEnum.M2;
 
 [TestClass]
 public class EnumsTests

@@ -56,7 +56,7 @@ public partial class Names : INames
     public Names(Language language, string namespaceName)
     {
         _language = language;
-        _namespaceName = namespaceName;
+        _namespaceName = namespaceName.PrefixKeyword();
         
         _m3 = language.LionWebVersion.LionCore;
         _builtIns = language.LionWebVersion.BuiltIns;
@@ -82,16 +82,16 @@ public partial class Names : INames
     /// <inheritdoc />
     public string LanguageName(Language lang) => LanguageBaseName(lang) + "Language";
 
-    private string LanguageBaseName(Language lang) => lang.Name.Split('.').Last().ToFirstUpper();
+    private string LanguageBaseName(Language lang) => lang.Name.Split('.').Last().ToFirstUpper().PrefixKeyword();
 
     /// <inheritdoc />
     public NameSyntax LanguageType => AsType(_language);
 
     /// <inheritdoc />
-    public string FactoryInterfaceName => $"I{FactoryName}";
+    public string FactoryInterfaceName => $"I{FactoryName}".PrefixKeyword();
 
     /// <inheritdoc />
-    public string FactoryName => $"{LanguageBaseName(_language)}Factory";
+    public string FactoryName => $"{LanguageBaseName(_language)}Factory".PrefixKeyword();
     /// <inheritdoc />
     public IdentifierNameSyntax FactoryInterfaceType => IdentifierName(FactoryInterfaceName);
     /// <inheritdoc />
@@ -141,10 +141,10 @@ public partial class Names : INames
 
         if (_namespaceMappings.TryGetValue(classifier.GetLanguage(), out var ns))
         {
-            return QualifiedName(ParseName(ns), IdentifierName(classifier.Name));
+            return QualifiedName(ParseName(ns), IdentifierName(classifier.Name.PrefixKeyword()));
         }
 
-        var type = IdentifierName(classifier.Name);
+        var type = IdentifierName(classifier.Name.PrefixKeyword());
         if (!disambiguate)
             return type;
         return QualifiedName(ParseName(NamespaceName), type);
@@ -153,20 +153,11 @@ public partial class Names : INames
     /// <inheritdoc />
     public TypeSyntax AsType(Datatype datatype, bool disambiguate = false)
     {
-        var result = VersionSpecifics.AsType(datatype);
+        var result = VersionSpecifics.AsType(datatype, _namespaceMappings);
         if (result != null)
             return result;
 
-        if (datatype is Enumeration && _namespaceMappings.TryGetValue(datatype.GetLanguage(), out var ns))
-        {
-            return
-                QualifiedName(
-                    ParseName(ns),
-                    IdentifierName(datatype.Name)
-                );
-        }
-
-        var type = IdentifierName(datatype.Name);
+        var type = IdentifierName(datatype.Name.PrefixKeyword());
 
         if (!disambiguate || datatype is PrimitiveType)
             return type;
@@ -175,7 +166,7 @@ public partial class Names : INames
     }
     
     /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
-    protected IGeneratorVersionSpecifics VersionSpecifics =>
+    internal IGeneratorVersionSpecifics VersionSpecifics =>
         new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_language.LionWebVersion)).Value;
     
 
@@ -199,20 +190,24 @@ public partial class Names : INames
     public string Use(Type type)
     {
         _usedTypes.Add(type);
-        return AfterIncludingBacktick().Replace(type.Name, "");
+        return AfterIncludingBacktick().Replace(type.Name, "").PrefixKeyword();
     }
 
     /// <inheritdoc />
     public IdentifierNameSyntax AsProperty(LanguageEntity classifier) =>
-        IdentifierName(classifier.Name);
+        IdentifierName(classifier.Name.PrefixKeyword());
 
     /// <inheritdoc />
     public IdentifierNameSyntax AsProperty(Feature feature) =>
-        IdentifierName($"{feature.GetFeatureClassifier().Name}_{feature.Name}");
+        IdentifierName($"{feature.GetFeatureClassifier().Name}_{feature.Name}".PrefixKeyword());
 
     /// <inheritdoc />
     public IdentifierNameSyntax AsProperty(EnumerationLiteral literal) =>
-        IdentifierName($"{literal.GetEnumeration().Name}_{literal.Name}");
+        IdentifierName($"{literal.GetEnumeration().Name}_{literal.Name}".PrefixKeyword());
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax AsProperty(Field field) =>
+        IdentifierName($"{field.GetStructuredDataType().Name}_{field.Name}".PrefixKeyword());
 
     /// <inheritdoc />
     public NameSyntax MetaProperty(Language lang) =>
@@ -223,11 +218,23 @@ public partial class Names : INames
 
     /// <inheritdoc />
     public IdentifierNameSyntax FeatureField(Feature feature) =>
-        IdentifierName($"_{feature.Name.ToFirstLower()}");
+        IdentifierName($"_{feature.Name.ToFirstLower()}".PrefixKeyword());
 
     /// <inheritdoc />
     public IdentifierNameSyntax FeatureProperty(Feature feature) =>
-        IdentifierName(feature.Name.ToFirstUpper());
+        IdentifierName(feature.Name.ToFirstUpper().PrefixKeyword());
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax FieldField(Field field) =>
+        IdentifierName($"_{field.Name.ToFirstLower()}".PrefixKeyword());
+
+    /// <inheritdoc />
+    public IdentifierNameSyntax FieldProperty(Field field) =>
+        IdentifierName(field.Name.ToFirstUpper().PrefixKeyword());
+
+    /// <inheritdoc />
+    public string ParamField(Field field) =>
+        FieldProperty(field).ToString().ToFirstLower().PrefixKeyword();
 
     [GeneratedRegex("`.*$")]
     private static partial Regex AfterIncludingBacktick();

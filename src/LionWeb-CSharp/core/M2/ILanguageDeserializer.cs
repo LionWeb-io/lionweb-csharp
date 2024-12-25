@@ -89,9 +89,6 @@ public static class ILanguageDeserializerExtensions
     /// </exception>
     /// <exception cref="DeserializerException"/>
     public static IEnumerable<DynamicLanguage> Deserialize(SerializationChunk serializationChunk,
-        LionWebVersions lionWebVersion, IEnumerable<Language>? dependentLanguages = null)
-    {
-        var versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion);
-        return new LanguageDeserializer(versionSpecifics).Deserialize(serializationChunk, dependentLanguages);
-    }
+        LionWebVersions lionWebVersion, IEnumerable<Language>? dependentLanguages = null) =>
+        new LanguageDeserializer(lionWebVersion).Deserialize(serializationChunk, dependentLanguages);
 }

@@ -109,7 +109,15 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public object? UnknownDatatype(Feature property, string? value, IReadableNode node)
+    public Field? UnknownField(string key, StructuredDataType structuredDataType, Feature property, IReadableNode node)
+    {
+        LogMessage(
+            $"On node with id={node.GetId()}: unknown field for structured datatype {structuredDataType} with key {key} = skipping");
+        return null;
+    }
+
+    /// <inheritdoc />
+    public object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property, IReadableNode node)
     {
         LogMessage(
             $"On node with id={node.GetId()}: unknown datatype {property /*.Type*/} with value {value} - skipping");
@@ -153,20 +161,9 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
 
     #endregion
 
-    #region language deserializer
-
-    /// <inheritdoc />
-    public void InvalidContainment(IReadableNode node) =>
-        LogMessage($"installing containments in node of meta-concept {node.GetType().Name} not implemented");
-
     /// <inheritdoc />
     public void InvalidReference(IReadableNode node) =>
         LogMessage($"installing references in node of meta-concept {node.GetType().Name} not implemented");
-
-
-    /// <inheritdoc />
-    public void InvalidAnnotationParent(IReadableNode annotation, IReadableNode? parent) =>
-        LogMessage($"Cannot attach annotation {annotation} to its parent with id={parent?.GetId()}.");
 
 
     /// <inheritdoc />
@@ -175,8 +172,6 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
         LogMessage($"Skip deserializing {id} because dependent nodes contains node with same id");
         return true;
     }
-
-    #endregion
 
     /// Writes <paramref name="message"/> to the appropriate logging facility.
     protected virtual void LogMessage(string message) =>

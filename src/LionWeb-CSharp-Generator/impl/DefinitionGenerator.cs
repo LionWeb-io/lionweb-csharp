@@ -36,6 +36,7 @@ public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) :
 
     private IEnumerable<Classifier> Classifiers => Language.Entities.OfType<Classifier>().Ordered();
 
+    private IEnumerable<StructuredDataType> StructuredDataTypes => Language.Entities.OfType<StructuredDataType>().Ordered();
     public CompilationUnitSyntax DefinitionFile() =>
         CompilationUnit()
             .WithMembers(List<MemberDeclarationSyntax>([
@@ -51,6 +52,7 @@ public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) :
                                     c => new ClassifierGenerator(c, _names, _lionWebVersion).ClassifierType()))
                                 .Concat(Enumerations.Select(e =>
                                     new EnumGenerator(e, _names, _lionWebVersion).EnumType()))
+                                .Concat(StructuredDataTypes.Select(s => new StructuredDataTypeGenerator(s, _names, _lionWebVersion).SdtType()))
                         ))
                         .WithUsings(List(CollectUsings()))
                 ])
@@ -89,7 +91,7 @@ public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) :
     private IEnumerable<UsingDirectiveSyntax> PrimitiveTypesAsUsings() =>
         Language.Entities.OfType<PrimitiveType>().Ordered().Select(p =>
             UsingDirective(
-                NameEquals(IdentifierName(p.Name)),
+                NameEquals(IdentifierName(p.Name.PrefixKeyword())),
                 AsType(typeof(string))
             )
         );

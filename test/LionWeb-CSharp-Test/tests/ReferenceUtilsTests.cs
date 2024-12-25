@@ -20,8 +20,8 @@
 namespace LionWeb_CSharp_Test.tests;
 
 using Examples.Shapes.Dynamic;
-using Examples.Shapes.M2;
-using Examples.TinyRefLang;
+using Examples.V2024_1.Shapes.M2;
+using Examples.V2024_1.TinyRefLang;
 using LionWeb.Core;
 using LionWeb.Core.Utilities;
 
@@ -32,6 +32,8 @@ using LionWeb.Core.Utilities;
 [TestClass]
 public class ReferenceUtilsTests
 {
+    private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    
     [TestMethod]
     public void finds_a_reference_from_a_feature_of_a_concept()
     {
@@ -39,7 +41,7 @@ public class ReferenceUtilsTests
         var factory = language.GetFactory();
         var referenceGeometry = factory.CreateReferenceGeometry();
 
-        var geometry = (ExampleModels.ExampleModel(language) as Geometry)!;
+        var geometry = (new ExampleModels(_lionWebVersion).ExampleModel(language) as Geometry)!;
         referenceGeometry.AddShapes(geometry.Shapes);
 
         List<INode> scope = [geometry, referenceGeometry];
@@ -60,7 +62,7 @@ public class ReferenceUtilsTests
 
         var circle = factory.CreateCircle();
 
-        var line = (ExampleModels.ExampleLine(language) as Line)!;
+        var line = (new ExampleModels(_lionWebVersion).ExampleLine(language) as Line)!;
         var bom = factory.CreateBillOfMaterials();
         bom.AddMaterials([circle]);
         line.AddAnnotations([bom]);
@@ -166,7 +168,7 @@ public class ReferenceUtilsTests
         var factory = language.GetFactory();
         var referenceGeometry = factory.CreateReferenceGeometry();
 
-        var geometry = (ExampleModels.ExampleModel(language) as Geometry)!;
+        var geometry = (new ExampleModels(_lionWebVersion).ExampleModel(language) as Geometry)!;
         referenceGeometry.AddShapes(geometry.Shapes);
 
         List<INode> scope = [geometry, referenceGeometry];
@@ -188,7 +190,7 @@ public class ReferenceUtilsTests
         var factory = language.GetFactory();
         var referenceGeometry = factory.CreateReferenceGeometry();
 
-        var geometry = (ExampleModels.ExampleModel(language) as Geometry)!;
+        var geometry = (new ExampleModels(_lionWebVersion).ExampleModel(language) as Geometry)!;
         referenceGeometry.AddShapes(geometry.Shapes);
 
         List<INode> scope = [geometry, referenceGeometry];
@@ -209,7 +211,7 @@ public class ReferenceUtilsTests
         var factory = language.GetFactory();
         var referenceGeometry = factory.CreateReferenceGeometry();
 
-        var geometry = (ExampleModels.ExampleModel(language) as Geometry)!;
+        var geometry = (new ExampleModels(_lionWebVersion).ExampleModel(language) as Geometry)!;
         referenceGeometry.AddShapes(geometry.Shapes);
 
         Assert.AreEqual(1, referenceGeometry.Shapes.Count);

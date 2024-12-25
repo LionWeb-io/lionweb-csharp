@@ -20,13 +20,18 @@
 namespace LionWeb.Core.M3.Test;
 
 using M2;
-using VersionSpecific.V2023_1;
 
 [TestClass]
 public class M2ReflectionTests
 {
-    private static readonly ILionCoreLanguage _m3 = LionCoreLanguage_2023_1.Instance;
-    private static readonly IBuiltInsLanguage_2023_1 _builtIns = BuiltInsLanguage_2023_1.Instance;
+    #region Helpers
+
+    private static readonly LionWebVersions _lionWebVersion = LionWebVersions.v2024_1;
+
+    private static readonly ILionCoreLanguageWithStructuredDataType _m3 =
+        (ILionCoreLanguageWithStructuredDataType)_lionWebVersion.LionCore;
+
+    private static readonly IBuiltInsLanguage _builtIns = _lionWebVersion.BuiltIns;
 
     private static Classifier Concept = _m3.Concept;
 
@@ -65,9 +70,13 @@ public class M2ReflectionTests
 
     private static Feature InterfaceExtends = _m3.Interface_extends;
 
+    private static Feature Fields = _m3.StructuredDataType_fields;
+
+    private static Feature FieldType = _m3.Field_type;
+
     DynamicLanguage shapesLang;
     DynamicLanguage enumLang;
-    private readonly LionWebVersions _lionWebVersion = LionWebVersions.v2023_1;
+    DynamicLanguage sdtLang;
 
     DynamicLanguage lang { get => shapesLang; }
     DynamicAnnotation ann { get => shapesLang.ClassifierByKey("key-Documentation") as DynamicAnnotation; }
@@ -89,14 +98,30 @@ public class M2ReflectionTests
 
     DynamicInterface iface { get => shapesLang.ClassifierByKey("key-IShape") as DynamicInterface; }
 
+    DynamicStructuredDataType sdt
+    {
+        get => enumLang.Entities.OfType<StructuredDataType>().First() as DynamicStructuredDataType;
+    }
+
+    DynamicField fld { get => sdt.Fields.First() as DynamicField; }
+
+
     [TestInitialize]
     public void InitLanguages()
     {
         shapesLang = LanguagesUtils
-            .LoadLanguages("LionWeb-CSharp-Test", "LionWeb_CSharp_Test.languages.defChunks.shapes.json").First();
+            .LoadLanguages("LionWeb-CSharp-Test",
+                $"LionWeb_CSharp_Test.languages.defChunks.shapes_{_lionWebVersion.VersionString.Replace('.', '_')}.json")
+            .First();
         enumLang = LanguagesUtils
             .LoadLanguages("LionWeb-CSharp-Test", "LionWeb_CSharp_Test.languages.defChunks.with-enum.json").First();
+        enumLang = LanguagesUtils
+            .LoadLanguages("LionWeb-CSharp-Test", "LionWeb_CSharp_Test.languages.defChunks.sdtLang.json").First();
     }
+
+    #endregion
+
+    #region Language
 
     [TestMethod]
     public void Language_Meta()
@@ -138,6 +163,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Language_TryGet_Name()
+    {
+        var node = new DynamicLanguage("a", _lionWebVersion);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void Language_Set_Key()
     {
         var language = lang;
@@ -146,6 +182,17 @@ public class M2ReflectionTests
         Assert.ThrowsException<InvalidValueException>(() => language.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", language.Key);
         Assert.ThrowsException<InvalidValueException>(() => language.Set(IKeyedKey, 123));
+    }
+
+    [TestMethod]
+    public void Language_TryGet_Key()
+    {
+        var node = new DynamicLanguage("a", _lionWebVersion);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
     }
 
     [TestMethod]
@@ -159,6 +206,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Language_TryGet_Version()
+    {
+        var node = new DynamicLanguage("a", _lionWebVersion);
+        Assert.IsFalse(node.TryGetVersion(out _));
+
+        node.Version = "Hello";
+        Assert.IsTrue(node.TryGetVersion(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void Language_Set_Entities()
     {
         Concept conceptA = new DynamicConcept("my-id", lang) { Key = "my-key", Name = "SomeName" };
@@ -168,6 +226,18 @@ public class M2ReflectionTests
         lang.Set(LanguageEntities, Enumerable.Empty<LanguageEntity>());
         CollectionAssert.AreEqual(Enumerable.Empty<LanguageEntity>().ToList(), lang.Entities.ToList());
         Assert.ThrowsException<InvalidValueException>(() => lang.Set(LanguageEntities, null));
+    }
+
+    [TestMethod]
+    public void Language_TryGet_Entities()
+    {
+        var node = new DynamicLanguage("a", _lionWebVersion);
+        Assert.IsTrue(((Language)node).TryGetEntities(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddEntities([new DynamicConcept("b", null)]);
+        Assert.IsTrue(((Language)node).TryGetEntities(out var value));
+        Assert.IsFalse(value.Count == 0);
     }
 
     [TestMethod]
@@ -185,10 +255,26 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Language_TryGet_DependsOn()
+    {
+        var node = new DynamicLanguage("a", _lionWebVersion);
+        Assert.IsTrue(((Language)node).TryGetDependsOn(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddDependsOn([node]);
+        Assert.IsTrue(((Language)node).TryGetDependsOn(out var value));
+        Assert.IsFalse(value.Count == 0);
+    }
+
+    [TestMethod]
     public void Language_Set_Invalid()
     {
         Assert.ThrowsException<UnknownFeatureException>(() => lang.Set(AnnotationExtends, null));
     }
+
+    #endregion
+
+    #region Annotation
 
     [TestMethod]
     public void Annotation_Meta()
@@ -233,6 +319,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Annotation_TryGet_Name()
+    {
+        var node = new DynamicAnnotation("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void Annotation_Set_Key()
     {
         var annotation = ann;
@@ -242,6 +339,17 @@ public class M2ReflectionTests
         Assert.AreEqual("asdf", annotation.Key);
         Assert.ThrowsException<InvalidValueException>(() => annotation.Set(IKeyedKey, 123));
         Assert.AreEqual("asdf", annotation.Key);
+    }
+
+    [TestMethod]
+    public void Annotation_TryGet_Key()
+    {
+        var node = new DynamicAnnotation("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
     }
 
     [TestMethod]
@@ -257,6 +365,18 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Annotation_TryGet_Features()
+    {
+        var node = new DynamicAnnotation("a", lang);
+        Assert.IsTrue(((Annotation)node).TryGetFeatures(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddFeatures([new DynamicProperty("b", null)]);
+        Assert.IsTrue(((Annotation)node).TryGetFeatures(out var value));
+        Assert.IsFalse(value.Count == 0);
+    }
+
+    [TestMethod]
     public void Annotation_Set_Annotates()
     {
         Annotation tgt = new DynamicAnnotation("my-id", lang) { Key = "my-key", Name = "SomeName" };
@@ -264,6 +384,18 @@ public class M2ReflectionTests
         Assert.AreEqual(tgt, ann.Annotates);
         Assert.ThrowsException<InvalidValueException>(() => ann.Set(AnnotationAnnotates, null));
         Assert.AreEqual(tgt, ann.Annotates);
+    }
+
+    [TestMethod]
+    public void Annotation_TryGet_Annotates()
+    {
+        var node = new DynamicAnnotation("a", lang);
+        Assert.IsTrue(((Annotation)node).TryGetAnnotates(out var empty));
+        Assert.AreEqual(_builtIns.Node, empty);
+
+        node.Annotates = _builtIns.INamed;
+        Assert.IsTrue(((Annotation)node).TryGetAnnotates(out var value));
+        Assert.AreEqual(_builtIns.INamed, value);
     }
 
     [TestMethod]
@@ -275,6 +407,18 @@ public class M2ReflectionTests
         ann.Set(AnnotationExtends, null);
         Assert.AreEqual(null, ann.Extends);
         Assert.ThrowsException<InvalidValueException>(() => ann.Set(AnnotationExtends, lang));
+    }
+
+    [TestMethod]
+    public void Annotation_TryGet_Extends()
+    {
+        var node = new DynamicAnnotation("a", lang);
+        Assert.IsTrue(((Annotation)node).TryGetExtends(out var empty));
+        Assert.IsNull(empty);
+
+        node.Extends = node;
+        Assert.IsTrue(((Annotation)node).TryGetExtends(out var value));
+        Assert.AreEqual(node, value);
     }
 
     [TestMethod]
@@ -290,10 +434,26 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Annotation_TryGet_Implements()
+    {
+        var node = new DynamicAnnotation("a", lang);
+        Assert.IsTrue(((Annotation)node).TryGetImplements(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddImplements([new DynamicInterface("b", null)]);
+        Assert.IsTrue(((Annotation)node).TryGetImplements(out var value));
+        Assert.IsFalse(value.Count == 0);
+    }
+
+    [TestMethod]
     public void Annotation_Set_Invalid()
     {
         Assert.ThrowsException<UnknownFeatureException>(() => ann.Set(LanguageVersion, "asdf"));
     }
+
+    #endregion
+
+    #region Concept
 
     [TestMethod]
     public void Concept_Meta()
@@ -339,6 +499,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Concept_TryGet_Name()
+    {
+        var node = new DynamicConcept("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void Concept_Set_Key()
     {
         var concept = conc;
@@ -347,6 +518,17 @@ public class M2ReflectionTests
         concept.Set(IKeyedKey, "otherKey");
         Assert.AreEqual("otherKey", concept.Key);
         Assert.ThrowsException<InvalidValueException>(() => concept.Set(IKeyedKey, null));
+    }
+
+    [TestMethod]
+    public void Concept_TryGet_Key()
+    {
+        var node = new DynamicConcept("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
     }
 
     [TestMethod]
@@ -362,6 +544,18 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Concept_TryGet_Features()
+    {
+        var node = new DynamicConcept("a", lang);
+        Assert.IsTrue(((Concept)node).TryGetFeatures(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddFeatures([new DynamicProperty("b", null)]);
+        Assert.IsTrue(((Concept)node).TryGetFeatures(out var value));
+        Assert.IsFalse(value.Count == 0);
+    }
+
+    [TestMethod]
     public void Concept_Set_Abstract()
     {
         conc.Set(ConceptAbstract, true);
@@ -369,6 +563,18 @@ public class M2ReflectionTests
         conc.Set(ConceptAbstract, false);
         Assert.AreEqual(false, conc.Abstract);
         Assert.ThrowsException<InvalidValueException>(() => conc.Set(ConceptAbstract, null));
+    }
+
+    [TestMethod]
+    public void Concept_TryGet_Abstract()
+    {
+        var node = new DynamicConcept("a", null);
+        Assert.IsTrue(((Concept)node).TryGetAbstract(out var empty));
+        Assert.AreEqual(false, empty);
+
+        node.Abstract = true;
+        Assert.IsTrue(((Concept)node).TryGetAbstract(out var value));
+        Assert.AreEqual(true, value);
     }
 
     [TestMethod]
@@ -382,6 +588,18 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Concept_TryGet_Partition()
+    {
+        var node = new DynamicConcept("a", null);
+        Assert.IsTrue(((Concept)node).TryGetPartition(out var empty));
+        Assert.AreEqual(false, empty);
+
+        node.Partition = true;
+        Assert.IsTrue(((Concept)node).TryGetPartition(out var value));
+        Assert.AreEqual(true, value);
+    }
+
+    [TestMethod]
     public void Concept_Set_Extends()
     {
         Concept sup = new DynamicConcept("my-id", lang) { Key = "my-key", Name = "SomeName" };
@@ -390,6 +608,18 @@ public class M2ReflectionTests
         conc.Set(ConceptExtends, null);
         Assert.AreEqual(null, conc.Extends);
         Assert.ThrowsException<InvalidValueException>(() => conc.Set(ConceptExtends, lang));
+    }
+
+    [TestMethod]
+    public void Concept_TryGet_Extends()
+    {
+        var node = new DynamicConcept("a", null);
+        Assert.IsTrue(((Concept)node).TryGetExtends(out var empty));
+        Assert.AreEqual(null, empty);
+
+        node.Extends = node;
+        Assert.IsTrue(((Concept)node).TryGetExtends(out var value));
+        Assert.AreEqual(node, value);
     }
 
     [TestMethod]
@@ -405,10 +635,26 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Concept_TryGet_Implements()
+    {
+        var node = new DynamicConcept("a", lang);
+        Assert.IsTrue(((Concept)node).TryGetImplements(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddImplements([new DynamicInterface("b", null)]);
+        Assert.IsTrue(((Concept)node).TryGetImplements(out var value));
+        Assert.IsFalse(value.Count == 0);
+    }
+
+    [TestMethod]
     public void Concept_Set_Invalid()
     {
         Assert.ThrowsException<UnknownFeatureException>(() => conc.Set(LanguageVersion, "asdf"));
     }
+
+    #endregion
+
+    #region Containment
 
     [TestMethod]
     public void Containment_Meta()
@@ -448,6 +694,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Containment_TryGet_Name()
+    {
+        var node = new DynamicContainment("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void Containment_Set_Key()
     {
         var containment = cont;
@@ -456,6 +713,17 @@ public class M2ReflectionTests
         Assert.ThrowsException<InvalidValueException>(() => containment.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", containment.Key);
         Assert.ThrowsException<InvalidValueException>(() => containment.Set(IKeyedKey, 123));
+    }
+
+    [TestMethod]
+    public void Containment_TryGet_Key()
+    {
+        var node = new DynamicContainment("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
     }
 
     [TestMethod]
@@ -469,6 +737,18 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Containment_TryGet_Optional()
+    {
+        var node = new DynamicContainment("a", null);
+        Assert.IsTrue(((Containment)node).TryGetOptional(out var empty));
+        Assert.AreEqual(false, empty);
+
+        node.Optional = true;
+        Assert.IsTrue(((Containment)node).TryGetOptional(out var value));
+        Assert.AreEqual(true, value);
+    }
+
+    [TestMethod]
     public void Containment_Set_Multiple()
     {
         cont.Set(LinkMultiple, true);
@@ -476,6 +756,18 @@ public class M2ReflectionTests
         cont.Set(LinkMultiple, false);
         Assert.AreEqual(false, cont.Multiple);
         Assert.ThrowsException<InvalidValueException>(() => cont.Set(LinkMultiple, null));
+    }
+
+    [TestMethod]
+    public void Containment_TryGet_Multiple()
+    {
+        var node = new DynamicContainment("a", null);
+        Assert.IsTrue(((Containment)node).TryGetMultiple(out var empty));
+        Assert.AreEqual(false, empty);
+
+        node.Multiple = true;
+        Assert.IsTrue(((Containment)node).TryGetMultiple(out var value));
+        Assert.AreEqual(true, value);
     }
 
     [TestMethod]
@@ -488,10 +780,26 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Containment_TryGet_Type()
+    {
+        var node = new DynamicContainment("a", null);
+        Assert.IsFalse(node.TryGetType(out _));
+
+        var type = new DynamicConcept("b", null);
+        node.Type = type;
+        Assert.IsTrue(node.TryGetType(out var value));
+        Assert.AreEqual(type, value);
+    }
+
+    [TestMethod]
     public void Containment_Set_Invalid()
     {
         Assert.ThrowsException<UnknownFeatureException>(() => cont.Set(LanguageVersion, "asdf"));
     }
+
+    #endregion
+
+    #region Reference
 
     [TestMethod]
     public void Reference_Meta()
@@ -532,6 +840,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Reference_TryGet_Name()
+    {
+        var node = new DynamicReference("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void Reference_Set_Key()
     {
         var reference = refe;
@@ -540,6 +859,17 @@ public class M2ReflectionTests
         Assert.ThrowsException<InvalidValueException>(() => reference.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", reference.Key);
         Assert.ThrowsException<InvalidValueException>(() => reference.Set(IKeyedKey, 123));
+    }
+
+    [TestMethod]
+    public void Reference_TryGet_Key()
+    {
+        var node = new DynamicReference("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
     }
 
     [TestMethod]
@@ -553,6 +883,18 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Reference_TryGet_Optional()
+    {
+        var node = new DynamicReference("a", null);
+        Assert.IsTrue(((Reference)node).TryGetOptional(out var empty));
+        Assert.AreEqual(false, empty);
+
+        node.Optional = true;
+        Assert.IsTrue(((Reference)node).TryGetOptional(out var value));
+        Assert.AreEqual(true, value);
+    }
+
+    [TestMethod]
     public void Reference_Set_Multiple()
     {
         refe.Set(LinkMultiple, true);
@@ -560,6 +902,18 @@ public class M2ReflectionTests
         refe.Set(LinkMultiple, false);
         Assert.AreEqual(false, refe.Multiple);
         Assert.ThrowsException<InvalidValueException>(() => refe.Set(LinkMultiple, null));
+    }
+
+    [TestMethod]
+    public void Reference_TryGet_Multiple()
+    {
+        var node = new DynamicReference("a", null);
+        Assert.IsTrue(((Reference)node).TryGetMultiple(out var empty));
+        Assert.AreEqual(false, empty);
+
+        node.Multiple = true;
+        Assert.IsTrue(((Reference)node).TryGetMultiple(out var value));
+        Assert.AreEqual(true, value);
     }
 
     [TestMethod]
@@ -572,10 +926,26 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Reference_TryGet_Type()
+    {
+        var node = new DynamicReference("a", null);
+        Assert.IsFalse(node.TryGetType(out _));
+
+        var type = new DynamicConcept("b", null);
+        node.Type = type;
+        Assert.IsTrue(node.TryGetType(out var value));
+        Assert.AreEqual(type, value);
+    }
+
+    [TestMethod]
     public void Reference_Set_Invalid()
     {
         Assert.ThrowsException<UnknownFeatureException>(() => refe.Set(LanguageVersion, "asdf"));
     }
+
+    #endregion
+
+    #region Enumeration
 
     [TestMethod]
     public void Enumeration_Meta()
@@ -607,6 +977,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Enumeration_TryGet_Name()
+    {
+        var node = new DynamicEnumeration("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void Enumeration_Set_Key()
     {
         var enumeration = enm;
@@ -615,6 +996,17 @@ public class M2ReflectionTests
         Assert.ThrowsException<InvalidValueException>(() => enumeration.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", enumeration.Key);
         Assert.ThrowsException<InvalidValueException>(() => enumeration.Set(IKeyedKey, 123));
+    }
+
+    [TestMethod]
+    public void Enumeration_TryGet_Key()
+    {
+        var node = new DynamicEnumeration("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
     }
 
     [TestMethod]
@@ -630,10 +1022,26 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Enumeration_TryGet_Literals()
+    {
+        var node = new DynamicEnumeration("a", lang);
+        Assert.IsTrue(((Enumeration)node).TryGetLiterals(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddLiterals([new DynamicEnumerationLiteral("b", null)]);
+        Assert.IsTrue(((Enumeration)node).TryGetLiterals(out var value));
+        Assert.IsFalse(value.Count == 0);
+    }
+
+    [TestMethod]
     public void Enumeration_Set_Invalid()
     {
         Assert.ThrowsException<UnknownFeatureException>(() => enm.Set(LanguageVersion, "asdf"));
     }
+
+    #endregion
+
+    #region EnumerationLiteral
 
     [TestMethod]
     public void EnumerationLiteral_Meta()
@@ -663,6 +1071,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void EnumerationLiteral_TryGet_Name()
+    {
+        var node = new DynamicEnumerationLiteral("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void EnumerationLiteral_Set_Key()
     {
         var literal = enLit;
@@ -674,10 +1093,25 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void EnumerationLiteral_TryGet_Key()
+    {
+        var node = new DynamicEnumerationLiteral("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void EnumerationLiteral_Set_Invalid()
     {
         Assert.ThrowsException<UnknownFeatureException>(() => enLit.Set(LanguageVersion, "asdf"));
     }
+
+    #endregion
+
+    #region PrimitiveType
 
     [TestMethod]
     public void PrimitiveType_Meta()
@@ -707,6 +1141,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void PrimitiveType_TryGet_Name()
+    {
+        var node = new DynamicPrimitiveType("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void PrimitiveType_Set_Key()
     {
         var primitive = prim;
@@ -718,10 +1163,25 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void PrimitiveType_TryGet_Key()
+    {
+        var node = new DynamicPrimitiveType("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void PrimitiveType_Set_Invalid()
     {
         Assert.ThrowsException<UnknownFeatureException>(() => prim.Set(LanguageVersion, "asdf"));
     }
+
+    #endregion
+
+    #region Interface
 
     [TestMethod]
     public void Interface_Meta()
@@ -755,6 +1215,17 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Interface_TryGet_Name()
+    {
+        var node = new DynamicInterface("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
     public void Interface_Set_Key()
     {
         var ifac = iface;
@@ -763,6 +1234,17 @@ public class M2ReflectionTests
         Assert.ThrowsException<InvalidValueException>(() => ifac.Set(IKeyedKey, null));
         Assert.AreEqual("Hello", ifac.Key);
         Assert.ThrowsException<InvalidValueException>(() => ifac.Set(IKeyedKey, 123));
+    }
+
+    [TestMethod]
+    public void Interface_TryGet_Key()
+    {
+        var node = new DynamicInterface("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
     }
 
     [TestMethod]
@@ -778,6 +1260,18 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Interface_TryGet_Features()
+    {
+        var node = new DynamicInterface("a", lang);
+        Assert.IsTrue(((Interface)node).TryGetFeatures(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddFeatures([new DynamicProperty("b", null)]);
+        Assert.IsTrue(((Interface)node).TryGetFeatures(out var value));
+        Assert.IsFalse(value.Count == 0);
+    }
+
+    [TestMethod]
     public void Interface_Set_Extends()
     {
         Interface ifaceA = new DynamicInterface("my-id", lang) { Key = "my-key", Name = "SomeName" };
@@ -790,8 +1284,207 @@ public class M2ReflectionTests
     }
 
     [TestMethod]
+    public void Interface_TryGet_Extends()
+    {
+        var node = new DynamicInterface("a", lang);
+        Assert.IsTrue(((Interface)node).TryGetExtends(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddExtends([new DynamicInterface("b", null)]);
+        Assert.IsTrue(((Interface)node).TryGetExtends(out var value));
+        Assert.IsFalse(value.Count == 0);
+    }
+
+    [TestMethod]
     public void Interface_Set_Invalid()
     {
         Assert.ThrowsException<UnknownFeatureException>(() => iface.Set(LanguageVersion, "asdf"));
     }
+
+    #endregion
+
+    #region StructuredDataType
+
+    [TestMethod]
+    public void StructuredDataType_Meta()
+    {
+        Assert.AreEqual(_m3.StructuredDataType, sdt.GetClassifier());
+
+        CollectionAssert.AreEqual(new List<Feature> { INamedName, IKeyedKey, Fields },
+            sdt.CollectAllSetFeatures().ToList());
+    }
+
+    [TestMethod]
+    public void StructuredDataType_Get()
+    {
+        Assert.AreEqual(sdt.Name, sdt.Get(INamedName));
+        Assert.AreEqual(sdt.Key, sdt.Get(IKeyedKey));
+        CollectionAssert.AreEqual(sdt.Fields.ToList(),
+            (sdt.Get(Fields) as IReadOnlyList<Field>).ToList());
+        Assert.ThrowsException<UnknownFeatureException>(() => sdt.Get(LanguageVersion));
+    }
+
+    [TestMethod]
+    public void StructuredDataType_Set_Name()
+    {
+        sdt.Set(INamedName, "Hello");
+        Assert.AreEqual("Hello", sdt.Name);
+        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(INamedName, null));
+        Assert.AreEqual("Hello", sdt.Name);
+        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(INamedName, 123));
+    }
+
+    [TestMethod]
+    public void StructuredDataType_TryGet_Name()
+    {
+        var node = new DynamicStructuredDataType("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
+    public void StructuredDataType_Set_Key()
+    {
+        sdt.Set(IKeyedKey, "Hello");
+        Assert.AreEqual("Hello", sdt.Key);
+        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(IKeyedKey, null));
+        Assert.AreEqual("Hello", sdt.Key);
+        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(IKeyedKey, 123));
+    }
+
+    [TestMethod]
+    public void StructuredDataType_TryGet_Key()
+    {
+        var node = new DynamicStructuredDataType("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
+    public void StructuredDataType_Set_Fields()
+    {
+        Field litA = new DynamicField("my-id", sdt) { Key = "my-key", Name = "SomeName" };
+        Field litB = new DynamicField("ref-id", sdt) { Key = "ref-key", Name = "SomeRef" };
+        sdt.Set(Fields, new List<Field> { litA, litB });
+        CollectionAssert.AreEqual(new List<object> { litA, litB }, sdt.Fields.ToList());
+        sdt.Set(Fields, Enumerable.Empty<Field>());
+        CollectionAssert.AreEqual(Enumerable.Empty<Feature>().ToList(), sdt.Fields.ToList());
+        Assert.ThrowsException<InvalidValueException>(() => sdt.Set(Fields, null));
+    }
+
+    [TestMethod]
+    public void StructuredDataType_TryGet_Fields()
+    {
+        var node = new DynamicStructuredDataType("a", lang);
+        Assert.IsFalse(((StructuredDataType)node).TryGetFields(out var empty));
+        Assert.IsTrue(empty.Count == 0);
+
+        node.AddFields([new DynamicField("b", null)]);
+        Assert.IsTrue(((StructuredDataType)node).TryGetFields(out var value));
+        Assert.IsFalse(value.Count == 0);
+    }
+
+    [TestMethod]
+    public void StructuredDataType_Set_Invalid()
+    {
+        Assert.ThrowsException<UnknownFeatureException>(() => sdt.Set(LanguageVersion, "asdf"));
+    }
+
+    #endregion
+
+    #region Field
+
+    [TestMethod]
+    public void Field_Meta()
+    {
+        Assert.AreEqual(_m3.Field, fld.GetClassifier());
+
+        CollectionAssert.AreEqual(new List<Feature> { INamedName, IKeyedKey, FieldType },
+            fld.CollectAllSetFeatures().ToList());
+    }
+
+    [TestMethod]
+    public void Field_Get()
+    {
+        Assert.AreEqual(fld.Name, fld.Get(INamedName));
+        Assert.AreEqual(fld.Key, fld.Get(IKeyedKey));
+        Assert.ThrowsException<UnknownFeatureException>(() => fld.Get(LanguageVersion));
+    }
+
+    [TestMethod]
+    public void Field_Set_Name()
+    {
+        fld.Set(INamedName, "Hello");
+        Assert.AreEqual("Hello", fld.Name);
+        Assert.ThrowsException<InvalidValueException>(() => fld.Set(INamedName, null));
+        Assert.AreEqual("Hello", fld.Name);
+        Assert.ThrowsException<InvalidValueException>(() => fld.Set(INamedName, 123));
+    }
+
+    [TestMethod]
+    public void Field_TryGet_Name()
+    {
+        var node = new DynamicField("a", null);
+        Assert.IsFalse(node.TryGetName(out _));
+
+        node.Name = "Hello";
+        Assert.IsTrue(node.TryGetName(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
+    public void Field_Set_Key()
+    {
+        fld.Set(IKeyedKey, "Hello");
+        Assert.AreEqual("Hello", fld.Key);
+        Assert.ThrowsException<InvalidValueException>(() => fld.Set(IKeyedKey, null));
+        Assert.AreEqual("Hello", fld.Key);
+        Assert.ThrowsException<InvalidValueException>(() => fld.Set(IKeyedKey, 123));
+    }
+
+    [TestMethod]
+    public void Field_TryGet_Key()
+    {
+        var node = new DynamicField("a", null);
+        Assert.IsFalse(node.TryGetKey(out _));
+
+        node.Key = "Hello";
+        Assert.IsTrue(node.TryGetKey(out var value));
+        Assert.AreEqual("Hello", value);
+    }
+
+    [TestMethod]
+    public void Field_Set_Invalid()
+    {
+        Assert.ThrowsException<UnknownFeatureException>(() => fld.Set(LanguageVersion, "asdf"));
+    }
+
+    [TestMethod]
+    public void Field_Set_Type()
+    {
+        fld.Set(FieldType, prim);
+        Assert.AreEqual(prim, fld.Type);
+        Assert.ThrowsException<InvalidValueException>(() => fld.Set(FieldType, lang));
+        Assert.AreEqual(prim, fld.Type);
+    }
+
+    [TestMethod]
+    public void Field_TryGet_Type()
+    {
+        var node = new DynamicField("a", null);
+        Assert.IsFalse(node.TryGetType(out _));
+
+        var type = new DynamicPrimitiveType("b", null);
+        node.Type = type;
+        Assert.IsTrue(node.TryGetType(out var value));
+        Assert.AreEqual(type, value);
+    }
+
+    #endregion
 }

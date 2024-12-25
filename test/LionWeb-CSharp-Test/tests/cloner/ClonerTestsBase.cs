@@ -18,7 +18,7 @@
 namespace LionWeb.Utils.Tests.Cloner;
 
 using Core.M3;
-using Examples.Shapes.M2;
+using Examples.V2024_1.Shapes.M2;
 
 public abstract class ClonerTestsBase
 {
@@ -86,7 +86,7 @@ public abstract class ClonerTestsBase
         geometry.AddShapes([line, duplicate]);
         return geometry;
     }
-    
+
     protected static void AssertExampleGeometry(Geometry geometry)
     {
         Assert.AreEqual(2, geometry.Shapes.Count);
