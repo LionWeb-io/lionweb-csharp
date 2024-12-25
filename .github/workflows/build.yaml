@@ -32,7 +32,7 @@ jobs:
         run: dotnet build
 
       - name: Test all projects
-        run: dotnet test /logger:trx
+        run: dotnet test -l trx
 
       - name: Pack NuGet packages
         run: |
@@ -52,7 +52,7 @@ jobs:
         if: always()
         with:
           files: |
-            TEST-*.xml
+            *.trx
           large_files: "true"
           report_individual_runs: "true"
           report_suite_logs: "any"
