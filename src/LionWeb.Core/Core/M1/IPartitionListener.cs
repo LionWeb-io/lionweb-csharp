@@ -46,6 +46,8 @@ public interface IReferenceTarget
     TargetNode? Reference { get; }
 }
 
+public readonly record struct ReferenceTarget(ResolveInfo? ResolveInfo, TargetNode? Reference) : IReferenceTarget;
+
 public interface IPartitionListener
 {
     #region Nodes

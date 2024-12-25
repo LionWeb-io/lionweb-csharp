@@ -239,7 +239,9 @@ public partial class DeprConcept : ConceptInstanceBase
 	public DeprConcept SetDeprRef(DeprAnnotation value)
 	{
 		AssureNotNull(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
+		DeprAnnotation? oldValue = _deprRef;
 		_deprRef = value;
+		RaiseSingleReferenceEvent(DeprecatedLanguage.Instance.DeprConcept_deprRef, oldValue, value);
 		return this;
 	}
 

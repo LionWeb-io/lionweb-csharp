@@ -794,6 +794,31 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
+    protected void RaiseSingleReferenceEvent(Reference reference, IReadableNode? oldTarget, IReadableNode? newTarget)
+    {
+        var partitionCommander = GetPartitionCommander();
+        if (partitionCommander == null)
+            return;
+
+        switch ((oldTarget, newTarget))
+        {
+            case (null, { } v):
+                partitionCommander.AddReference(this, reference, 0, new ReferenceTarget(null, v));
+                break;
+            case ({ } o, null):
+                partitionCommander.DeleteReference(this, reference, 0, new ReferenceTarget(null, o));
+                break;
+            case ({ } o, { } n):
+                partitionCommander.ChangeReference(this,
+                    reference,
+                    0,
+                    new ReferenceTarget(null, n),
+                    new ReferenceTarget(null, o)
+                );
+                break;
+        }
+    }
+
     #endregion
 }
 
