@@ -160,14 +160,14 @@ public class DeprecatedFactory : AbstractBaseNodeFactory, IDeprecatedFactory
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NjE")]
 [Obsolete("deprAnnotation comment")]
-public partial class DeprAnnotation : NodeBase
+public partial class DeprAnnotation : AnnotationInstanceBase
 {
 	public DeprAnnotation(string id) : base(id)
 	{
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => DeprecatedLanguage.Instance.DeprAnnotation;
+        public override Annotation GetClassifier() => DeprecatedLanguage.Instance.DeprAnnotation;
 }
 
 [LionCoreMetaPointer(Language = typeof(DeprecatedLanguage), Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBhLzc4MTUyNDM0Nzk0ODc5OTM0NDY")]

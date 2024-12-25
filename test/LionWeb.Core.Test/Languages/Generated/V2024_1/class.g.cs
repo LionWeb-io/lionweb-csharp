@@ -248,7 +248,7 @@ public partial interface @partial : @interface
 }
 
 [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-ann")]
-public partial class @record : NodeBase, @interface
+public partial class @record : AnnotationInstanceBase, @interface
 {
 	private @enum? _string = null;
 	/// <remarks>Required Property</remarks>
@@ -293,7 +293,7 @@ public partial class @record : NodeBase, @interface
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ClassLanguage.Instance.@record;
+        public override Annotation GetClassifier() => ClassLanguage.Instance.@record;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -497,7 +497,7 @@ public partial class @var : @record
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ClassLanguage.Instance.@var;
+        public override Annotation GetClassifier() => ClassLanguage.Instance.@var;
 }
 
 [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-enm")]

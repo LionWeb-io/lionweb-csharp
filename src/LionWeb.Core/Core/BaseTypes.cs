@@ -78,6 +78,22 @@ public interface IReadableNode<out T> : IReadableNode where T : IReadableNode
     public new IReadOnlyList<T> GetAnnotations();
 }
 
+/// Instance of an <see cref="Annotation"/>.
+/// <inheritdoc />
+public interface IAnnotationInstance<out T> : IReadableNode<T> where T : IReadableNode
+{
+    Classifier IReadableNode.GetClassifier() => GetClassifier();
+
+    /// <inheritdoc cref="IReadableNode.GetClassifier()"/>
+    public new Annotation GetClassifier();
+}
+
+/// Instance of an <see cref="Concept.Partition"/>.
+/// <inheritdoc />
+public interface IPartitionInstance<out T> : IReadableNode<T> where T : IReadableNode
+{
+}
+
 /// An interface that LionWeb AST nodes implement to provide <em>write</em> access.
 public interface IWritableNode : IReadableNode
 {
@@ -708,4 +724,14 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     #endregion
+}
+
+/// Base implementation of <see cref="IAnnotationInstance{T}"/>.
+public abstract class AnnotationInstanceBase : NodeBase, IAnnotationInstance<INode>
+{
+    /// <inheritdoc />
+    protected AnnotationInstanceBase(string id) : base(id) {}
+    
+    /// <inheritdoc cref="GetClassifier"/>
+    public abstract override Annotation GetClassifier();
 }

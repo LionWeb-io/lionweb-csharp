@@ -39,7 +39,7 @@ public partial class ShapesLanguage : LanguageBase<IShapesFactory>
 		_documentation = new(() => new AnnotationBase<ShapesLanguage>("id-Documentation", this) { Key = "key-Documentation", Name = "Documentation", AnnotatesLazy = new(() => Shape), FeaturesLazy = new(() => [Documentation_technical, Documentation_text]) });
 		_documentation_technical = new(() => new PropertyBase<ShapesLanguage>("id-technical", Documentation, this) { Key = "key-technical", Name = "technical", Optional = true, Type = _builtIns.Boolean });
 		_documentation_text = new(() => new PropertyBase<ShapesLanguage>("id-text", Documentation, this) { Key = "key-text", Name = "text", Optional = true, Type = _builtIns.String });
-		_geometry = new(() => new ConceptBase<ShapesLanguage>("id-Geometry", this) { Key = "key-Geometry", Name = "Geometry", Abstract = false, Partition = false, FeaturesLazy = new(() => [Geometry_documentation, Geometry_shapes]) });
+		_geometry = new(() => new ConceptBase<ShapesLanguage>("id-Geometry", this) { Key = "key-Geometry", Name = "Geometry", Abstract = false, Partition = true, FeaturesLazy = new(() => [Geometry_documentation, Geometry_shapes]) });
 		_geometry_documentation = new(() => new ContainmentBase<ShapesLanguage>("id-documentation", Geometry, this) { Key = "key-documentation", Name = "documentation", Optional = true, Multiple = false, Type = Documentation });
 		_geometry_shapes = new(() => new ContainmentBase<ShapesLanguage>("id-shapes", Geometry, this) { Key = "key-shapes", Name = "shapes", Optional = true, Multiple = true, Type = IShape });
 		_iShape = new(() => new InterfaceBase<ShapesLanguage>("id-IShape", this) { Key = "key-IShape", Name = "IShape", FeaturesLazy = new(() => [IShape_fixpoints, IShape_uuid]) });
@@ -62,7 +62,7 @@ public partial class ShapesLanguage : LanguageBase<IShapesFactory>
 		_offsetDuplicate_offset = new(() => new ContainmentBase<ShapesLanguage>("id-offset", OffsetDuplicate, this) { Key = "key-offset", Name = "offset", Optional = false, Multiple = false, Type = Coord });
 		_offsetDuplicate_secretDocs = new(() => new ContainmentBase<ShapesLanguage>("id-secret-docs", OffsetDuplicate, this) { Key = "key-secret-docs", Name = "secretDocs", Optional = true, Multiple = false, Type = Documentation });
 		_offsetDuplicate_source = new(() => new ReferenceBase<ShapesLanguage>("id-source", OffsetDuplicate, this) { Key = "key-source", Name = "source", Optional = false, Multiple = false, Type = Shape });
-		_referenceGeometry = new(() => new ConceptBase<ShapesLanguage>("id-ReferenceGeometry", this) { Key = "key-ReferenceGeometry", Name = "ReferenceGeometry", Abstract = false, Partition = false, FeaturesLazy = new(() => [ReferenceGeometry_shapes]) });
+		_referenceGeometry = new(() => new ConceptBase<ShapesLanguage>("id-ReferenceGeometry", this) { Key = "key-ReferenceGeometry", Name = "ReferenceGeometry", Abstract = false, Partition = true, FeaturesLazy = new(() => [ReferenceGeometry_shapes]) });
 		_referenceGeometry_shapes = new(() => new ReferenceBase<ShapesLanguage>("id-shape-references", ReferenceGeometry, this) { Key = "key-shapes-references", Name = "shapes", Optional = true, Multiple = true, Type = IShape });
 		_shape = new(() => new ConceptBase<ShapesLanguage>("id-Shape", this) { Key = "key-Shape", Name = "Shape", Abstract = true, Partition = false, ImplementsLazy = new(() => [_builtIns.INamed, IShape]), FeaturesLazy = new(() => [Shape_shapeDocs]) });
 		_shape_shapeDocs = new(() => new ContainmentBase<ShapesLanguage>("id-shape-docs", Shape, this) { Key = "key-shape-docs", Name = "shapeDocs", Optional = true, Multiple = false, Type = Documentation });
@@ -324,7 +324,7 @@ public class ShapesFactory : AbstractBaseNodeFactory, IShapesFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-BillOfMaterials")]
-public partial class BillOfMaterials : NodeBase
+public partial class BillOfMaterials : AnnotationInstanceBase
 {
 	private readonly List<MaterialGroup> _altGroups = [];
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -445,7 +445,7 @@ public partial class BillOfMaterials : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.BillOfMaterials;
+        public override Annotation GetClassifier() => ShapesLanguage.Instance.BillOfMaterials;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1071,7 +1071,7 @@ public partial class Coord : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Documentation")]
-public partial class Documentation : NodeBase
+public partial class Documentation : AnnotationInstanceBase
 {
 	private bool? _technical = null;
 	/// <remarks>Optional Property</remarks>
@@ -1104,7 +1104,7 @@ public partial class Documentation : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => ShapesLanguage.Instance.Documentation;
+        public override Annotation GetClassifier() => ShapesLanguage.Instance.Documentation;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1168,7 +1168,7 @@ public partial class Documentation : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Geometry")]
-public partial class Geometry : NodeBase
+public partial class Geometry : NodeBase, IPartitionInstance<INode>
 {
 	private Documentation? _documentation = null;
 	/// <remarks>Optional Single Containment</remarks>
@@ -1916,7 +1916,7 @@ public partial class OffsetDuplicate : Shape
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-ReferenceGeometry")]
-public partial class ReferenceGeometry : NodeBase
+public partial class ReferenceGeometry : NodeBase, IPartitionInstance<INode>
 {
 	private readonly List<IShape> _shapes = [];
 	/// <remarks>Optional Multiple Reference</remarks>

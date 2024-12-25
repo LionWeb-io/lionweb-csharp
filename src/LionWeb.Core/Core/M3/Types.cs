@@ -224,7 +224,7 @@ public interface Annotation : Classifier
     /// </summary>
     /// <param name="extends">Value of <see cref="Extends"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Extends"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetExtends(out Annotation? extends)
+    bool TryGetExtends([MaybeNullWhen(false)] out Annotation? extends)
     {
         extends = Extends;
         return true;
