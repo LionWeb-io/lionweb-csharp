@@ -47,3 +47,14 @@ jobs:
               dotnet nuget push $packageFile --api-key "${{secrets.NUGET_APIKEY}}" --source https://api.nuget.org/v3/index.json --skip-duplicate
           }
 
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            TEST-*.xml
+          large_files: "true"
+          report_individual_runs: "true"
+          report_suite_logs: "any"
+          check_run_annotations: all tests, skipped tests
+          action_fail: "true"
