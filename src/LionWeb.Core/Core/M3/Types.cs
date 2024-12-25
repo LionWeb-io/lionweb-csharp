@@ -333,7 +333,7 @@ public interface Field : IKeyed
 
 /// A Language will provide the Concepts necessary to describe ideas
 /// in a particular domain together with supporting elements necessary for the definition of those Concepts.
-public interface Language : IKeyed
+public interface Language : IKeyed, IPartitionInstance
 {
     /// The version of this language. Can be any non-empty string.
     public string Version { get; }
