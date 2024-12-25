@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1;
 using M2;
 using M3;
 using System.Collections;
@@ -122,13 +123,28 @@ public class DynamicNode : NodeBase
 
     private bool SetProperty(Property property, object? value)
     {
+        _settings.TryGetValue(property, out var oldValue);
         if (value == null && property.Optional)
         {
             _settings.Remove(property);
+            if (oldValue != null)
+            {
+                GetPartitionCommander()?.DeleteProperty(this, property, oldValue);
+            }
+
             return true;
         }
 
-        _settings[property] = VersionSpecifics.PrepareSetProperty(property, value);
+        var newValue = VersionSpecifics.PrepareSetProperty(property, value);
+        if (oldValue != null)
+        {
+            GetPartitionCommander()?.ChangeProperty(this, property, newValue, oldValue);
+        } else
+        {
+            GetPartitionCommander()?.AddProperty(this, property, newValue);
+        }
+
+        _settings[property] = newValue;
         return true;
     }
 
@@ -253,6 +269,14 @@ public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
 public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
 {
+    private readonly PartitionEventHandler _eventHandler = new();
+    
     /// <inheritdoc />
     public DynamicPartitionInstance(string id, Concept concept) : base(id, concept) { }
+
+    /// <inheritdoc />
+    public IPartitionListener Listener { get => _eventHandler; }
+
+    /// <inheritdoc />
+    public IPartitionCommander Commander { get => _eventHandler; }
 }

@@ -1,11 +1,5 @@
 {
   "serializationFormatVersion": "2023.1",
-  "languages": [
-    {
-      "key": "LionCore-M3",
-      "version": "2023.1"
-    }
-  ],
   "nodes": [
     {
       "id": "id-Shapes",
@@ -217,8 +211,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Integer",
-              "reference": "LionCore-builtins-Integer"
+              "resolveInfo": "LionWeb.LionCore_builtins.Integer",
+              "reference": null
             }
           ]
         }
@@ -413,8 +407,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Integer",
-              "reference": "LionCore-builtins-Integer"
+              "resolveInfo": "LionWeb.LionCore_builtins.Integer",
+              "reference": null
             }
           ]
         }
@@ -465,8 +459,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Integer",
-              "reference": "LionCore-builtins-Integer"
+              "resolveInfo": "LionWeb.LionCore_builtins.Integer",
+              "reference": null
             }
           ]
         }
@@ -517,8 +511,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Integer",
-              "reference": "LionCore-builtins-Integer"
+              "resolveInfo": "LionWeb.LionCore_builtins.Integer",
+              "reference": null
             }
           ]
         }
@@ -564,7 +558,7 @@
             "version": "2023.1",
             "key": "Concept-partition"
           },
-          "value": "false"
+          "value": "true"
         }
       ],
       "containments": [
@@ -831,8 +825,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }
@@ -976,8 +970,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "INamed",
-              "reference": "LionCore-builtins-INamed"
+              "resolveInfo": "LionWeb.LionCore_builtins.INamed",
+              "reference": null
             }
           ]
         }
@@ -1566,8 +1560,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "INamed",
-              "reference": "LionCore-builtins-INamed"
+              "resolveInfo": "LionWeb.LionCore_builtins.INamed",
+              "reference": null
             },
             {
               "resolveInfo": "IShape",
@@ -1946,7 +1940,7 @@
             "version": "2023.1",
             "key": "Concept-partition"
           },
-          "value": "false"
+          "value": "true"
         }
       ],
       "containments": [
@@ -2173,8 +2167,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "String",
-              "reference": "LionCore-builtins-String"
+              "resolveInfo": "LionWeb.LionCore_builtins.String",
+              "reference": null
             }
           ]
         }
@@ -2225,8 +2219,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Boolean",
-              "reference": "LionCore-builtins-Boolean"
+              "resolveInfo": "LionWeb.LionCore_builtins.Boolean",
+              "reference": null
             }
           ]
         }
@@ -2291,8 +2285,8 @@
           },
           "targets": [
             {
-              "resolveInfo": "Node",
-              "reference": "LionCore-builtins-Node"
+              "resolveInfo": "LionWeb.LionCore_builtins.Node",
+              "reference": null
             }
           ]
         },
@@ -2974,6 +2968,12 @@
       "references": [],
       "annotations": [],
       "parent": "id-Shapes"
+    }
+  ],
+  "languages": [
+    {
+      "key": "LionCore-M3",
+      "version": "2023.1"
     }
   ]
 }
