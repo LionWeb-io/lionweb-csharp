@@ -22,9 +22,7 @@ using M3;
 using System.Collections;
 using Utilities;
 
-/// <summary>
 /// A generic implementation of <see cref="INode"/> that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
-/// </summary>
 public class DynamicNode : NodeBase
 {
     /// <inheritdoc cref="IReadableNode.GetClassifier()"/>
@@ -78,9 +76,7 @@ public class DynamicNode : NodeBase
     /// <inheritdoc/>
     public override Classifier GetClassifier() => _classifier;
 
-    /// <summary>
     /// Contains all settings of features.
-    /// </summary>
     private readonly Dictionary<Feature, object> _settings = new(new FeatureIdentityComparer());
 
     /// <inheritdoc />
@@ -229,4 +225,23 @@ public class DynamicNode : NodeBase
     /// <inheritdoc/>
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         _settings.Keys;
+}
+
+/// A generic implementation of <see cref="IAnnotationInstance{T}"/>
+/// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
+public class DynamicAnnotationInstance : DynamicNode, IAnnotationInstance<INode>
+{
+    /// <inheritdoc cref="IAnnotationInstance{T}.GetClassifier()" />
+    public override Annotation GetClassifier() => (Annotation)base.GetClassifier();
+
+    /// <inheritdoc />
+    public DynamicAnnotationInstance(string id, Annotation annotation) : base(id, annotation) { }
+}
+
+/// A generic implementation of <see cref="IPartitionInstance{T}"/>
+/// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
+public class DynamicPartitionInstance : DynamicNode, IPartitionInstance<INode>
+{
+    /// <inheritdoc cref="IPartitionInstance{T}.GetClassifier()" />
+    public DynamicPartitionInstance(string id, Classifier classifier) : base(id, classifier) { }
 }
