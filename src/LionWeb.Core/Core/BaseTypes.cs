@@ -459,12 +459,12 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     protected virtual IPartitionCommander? GetPartitionCommander()
     {
-        var parent = _parent;
+        INode current = this;
         INode? root = null;
-        while (parent != null)
+        while (current != null)
         {
-            root = parent;
-            parent = parent.GetParent();
+            root = current;
+            current = current.GetParent();
         }
 
         if (root == null)
@@ -817,6 +817,22 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 );
                 break;
         }
+    }
+
+    protected void RaiseReferenceAddEvent<T>(Reference reference, List<T> safeNodes, int previousCount) where T : IReadableNode
+    {
+        var partitionCommander = GetPartitionCommander();
+        if (partitionCommander == null)
+            return;
+
+        int index = previousCount;
+        foreach (var node in safeNodes)
+        {
+            partitionCommander.AddReference(this, reference, index++, new ReferenceTarget(null, node)
+            );
+        }
+
+
     }
 
     #endregion

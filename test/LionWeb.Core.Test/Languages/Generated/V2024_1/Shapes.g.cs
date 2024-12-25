@@ -415,7 +415,9 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		int previousCount = _materials.Count;
 		_materials.AddRange(safeNodes);
+		RaiseReferenceAddEvent(ShapesLanguage.Instance.BillOfMaterials_materials, safeNodes, previousCount);
 		return this;
 	}
 
@@ -1942,7 +1944,9 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		int previousCount = _shapes.Count;
 		_shapes.AddRange(safeNodes);
+		RaiseReferenceAddEvent(ShapesLanguage.Instance.ReferenceGeometry_shapes, safeNodes, previousCount);
 		return this;
 	}
 

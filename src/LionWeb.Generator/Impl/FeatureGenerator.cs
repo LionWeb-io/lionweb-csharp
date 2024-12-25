@@ -121,7 +121,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ])
             );
 
-    private LocalDeclarationStatementSyntax OldValueVariable() => Variable("oldValue", NullableType(AsType(feature.GetFeatureType())), FeatureField(feature));
+    private LocalDeclarationStatementSyntax OldValueVariable() => Variable("oldValue",
+        NullableType(AsType(feature.GetFeatureType())), FeatureField(feature));
 
     private ExpressionStatementSyntax RaisePropertyEventCall() =>
         ExpressionStatement(
@@ -184,7 +185,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private ExpressionStatementSyntax RaiseSingleReferenceEventCall() =>
         ExpressionStatement(
-            Call("RaiseSingleReferenceEvent", MetaProperty(feature), IdentifierName("oldValue"), IdentifierName("value"))
+            Call("RaiseSingleReferenceEvent", MetaProperty(feature), IdentifierName("oldValue"),
+                IdentifierName("value"))
         );
 
     private IEnumerable<MemberDeclarationSyntax> RequiredMultiContainment(Containment containment) =>
@@ -315,7 +317,13 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
+                Variable("previousCount", AsType(typeof(int)),
+                    MemberAccess(FeatureField(reference), IdentifierName("Count"))
+                ),
                 SimpleAddRangeCall(reference),
+                ExpressionStatement(Call("RaiseReferenceAddEvent",
+                    [MetaProperty(feature), IdentifierName("safeNodes"), IdentifierName("previousCount")])
+                ),
                 ReturnStatement(This())
             ])
         ).Concat(
