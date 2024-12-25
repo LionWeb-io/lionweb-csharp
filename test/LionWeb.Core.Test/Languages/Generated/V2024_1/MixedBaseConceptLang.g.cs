@@ -99,7 +99,9 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetEnumProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum value)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp);
+		LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum? oldValue = _enumProp;
 		_enumProp = value;
+		RaisePropertyEvent(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp, oldValue, value);
 		return this;
 	}
 
@@ -116,7 +118,9 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetSdtProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt value)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp);
+		LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt? oldValue = _sdtProp;
 		_sdtProp = value;
+		RaisePropertyEvent(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp, oldValue, value);
 		return this;
 	}
 
@@ -156,7 +160,9 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetProp(string value)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop);
+		string? oldValue = _prop;
 		_prop = value;
+		RaisePropertyEvent(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop, oldValue, value);
 		return this;
 	}
 

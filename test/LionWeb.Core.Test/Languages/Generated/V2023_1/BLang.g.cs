@@ -107,7 +107,9 @@ public partial class BConcept : ConceptInstanceBase
         public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum value)
 	{
 		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
+		LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum? oldValue = _aEnumProp;
 		_aEnumProp = value;
+		RaisePropertyEvent(BLangLanguage.Instance.BConcept_AEnumProp, oldValue, value);
 		return this;
 	}
 

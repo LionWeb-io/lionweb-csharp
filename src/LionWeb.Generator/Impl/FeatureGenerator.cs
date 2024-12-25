@@ -92,7 +92,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     {
         List<StatementSyntax> setterBody =
         [
+            OldValueVariable(),
             AssignFeatureField(),
+            RaisePropertyEventCall(),
             ReturnStatement(This())
         ];
         if (IsReferenceType(property))
@@ -112,14 +114,19 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
             .Concat(
                 OptionalFeatureSetter([
-                    Variable("oldValue", NullableType(AsType(property.GetFeatureType())), FeatureField(property)),
+                    OldValueVariable(),
                     AssignFeatureField(),
-                    ExpressionStatement(
-                        Call("RaisePropertyEvent", MetaProperty(property), IdentifierName("oldValue"), IdentifierName("value"))
-                    ),
+                    RaisePropertyEventCall(),
                     ReturnStatement(This())
                 ])
             );
+
+    private ExpressionStatementSyntax RaisePropertyEventCall() =>
+        ExpressionStatement(
+            Call("RaisePropertyEvent", MetaProperty(feature), IdentifierName("oldValue"), IdentifierName("value"))
+        );
+
+    private LocalDeclarationStatementSyntax OldValueVariable() => Variable("oldValue", NullableType(AsType(feature.GetFeatureType())), FeatureField(feature));
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>

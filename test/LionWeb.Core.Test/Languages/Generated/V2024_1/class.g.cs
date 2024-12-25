@@ -189,7 +189,9 @@ public partial class @out : @struct
         public @out SetDefault(@if value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.out_default);
+		@if? oldValue = _default;
 		_default = value;
+		RaisePropertyEvent(ClassLanguage.Instance.out_default, oldValue, value);
 		return this;
 	}
 
@@ -265,7 +267,9 @@ public partial class @record : AnnotationInstanceBase, @interface
         public @record SetString(@enum value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
+		@enum? oldValue = _string;
 		_string = value;
+		RaisePropertyEvent(ClassLanguage.Instance.interface_string, oldValue, value);
 		return this;
 	}
 
@@ -400,7 +404,9 @@ public partial class @struct : ConceptInstanceBase, @interface
         public @struct SetString(@enum value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
+		@enum? oldValue = _string;
 		_string = value;
+		RaisePropertyEvent(ClassLanguage.Instance.interface_string, oldValue, value);
 		return this;
 	}
 

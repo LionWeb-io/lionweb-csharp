@@ -258,7 +258,9 @@ public partial class SDTConcept : ConceptInstanceBase
         public SDTConcept SetA(A value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_A);
+		A? oldValue = _a;
 		_a = value;
+		RaisePropertyEvent(SDTLangLanguage.Instance.SDTConcept_A, oldValue, value);
 		return this;
 	}
 
@@ -275,7 +277,9 @@ public partial class SDTConcept : ConceptInstanceBase
         public SDTConcept SetAmount(Amount value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_amount);
+		Amount? oldValue = _amount;
 		_amount = value;
+		RaisePropertyEvent(SDTLangLanguage.Instance.SDTConcept_amount, oldValue, value);
 		return this;
 	}
 
@@ -292,7 +296,9 @@ public partial class SDTConcept : ConceptInstanceBase
         public SDTConcept SetComplex(ComplexNumber value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_complex);
+		ComplexNumber? oldValue = _complex;
 		_complex = value;
+		RaisePropertyEvent(SDTLangLanguage.Instance.SDTConcept_complex, oldValue, value);
 		return this;
 	}
 

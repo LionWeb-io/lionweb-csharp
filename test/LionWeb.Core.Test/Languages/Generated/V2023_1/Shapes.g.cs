@@ -611,7 +611,9 @@ public partial class Circle : Shape
 	/// <remarks>Required Property</remarks>
         public Circle SetR(int value)
 	{
+		int? oldValue = _r;
 		_r = value;
+		RaisePropertyEvent(ShapesLanguage.Instance.Circle_r, oldValue, value);
 		return this;
 	}
 
@@ -951,7 +953,9 @@ public partial class Coord : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Coord SetX(int value)
 	{
+		int? oldValue = _x;
 		_x = value;
+		RaisePropertyEvent(ShapesLanguage.Instance.Coord_x, oldValue, value);
 		return this;
 	}
 
@@ -965,7 +969,9 @@ public partial class Coord : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Coord SetY(int value)
 	{
+		int? oldValue = _y;
 		_y = value;
+		RaisePropertyEvent(ShapesLanguage.Instance.Coord_y, oldValue, value);
 		return this;
 	}
 
@@ -979,7 +985,9 @@ public partial class Coord : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Coord SetZ(int value)
 	{
+		int? oldValue = _z;
 		_z = value;
+		RaisePropertyEvent(ShapesLanguage.Instance.Coord_z, oldValue, value);
 		return this;
 	}
 
@@ -2019,7 +2027,9 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public Shape SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
+		string? oldValue = _name;
 		_name = value;
+		RaisePropertyEvent(_builtIns.INamed_name, oldValue, value);
 		return this;
 	}
 
@@ -2072,7 +2082,9 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public Shape SetUuid(string value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.IShape_uuid);
+		string? oldValue = _uuid;
 		_uuid = value;
+		RaisePropertyEvent(ShapesLanguage.Instance.IShape_uuid, oldValue, value);
 		return this;
 	}
 

@@ -23,7 +23,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 public class PropertyTests_Listener
 {
     [TestMethod]
-    public void PropertyAdded()
+    public void PropertyAdded_Optional()
     {
         var parent = new Geometry("g");
         var doc = new Documentation("d");
@@ -44,7 +44,7 @@ public class PropertyTests_Listener
     }
 
     [TestMethod]
-    public void PropertyDeleted()
+    public void PropertyDeleted_Optional()
     {
         var parent = new Geometry("g");
         var doc = new Documentation("d");
@@ -66,7 +66,7 @@ public class PropertyTests_Listener
     }
 
     [TestMethod]
-    public void PropertyChanged()
+    public void PropertyChanged_Optional()
     {
         var parent = new Geometry("g");
         var doc = new Documentation("d");
@@ -88,6 +88,76 @@ public class PropertyTests_Listener
         ((IPartitionInstance)parent).Listener.PropertyDeleted += (sender, args) => badEvents++;
 
         doc.Text = "bye";
+
+        Assert.AreEqual(1, events);
+        Assert.AreEqual(0, badEvents);
+    }
+    
+    [TestMethod]
+    public void PropertyAdded_Required()
+    {
+        var parent = new Geometry("g");
+        var circle = new Circle("d");
+        parent.AddShapes([circle]);
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.PropertyAdded += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(circle, args.node);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.property);
+            Assert.AreEqual("hello", args.newValue);
+        };
+
+        circle.Uuid = "hello";
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void PropertyDeleted_Required()
+    {
+        var parent = new Geometry("g");
+        var circle = new Circle("d");
+        parent.AddShapes([circle]);
+        circle.Uuid = "hello";
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.PropertyDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(circle, args.node);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.property);
+            Assert.AreEqual("hello", args.oldValue);
+        };
+        Assert.ThrowsException<InvalidValueException>(() => circle.Uuid = null);
+
+        Assert.AreEqual(0, events);
+    }
+
+    [TestMethod]
+    public void PropertyChanged_Required()
+    {
+        var parent = new Geometry("g");
+        var circle = new Circle("d");
+        parent.AddShapes([circle]);
+        circle.Uuid = "hello";
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.PropertyChanged += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(circle, args.node);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.property);
+            Assert.AreEqual("hello", args.oldValue);
+            Assert.AreEqual("bye", args.newValue);
+        };
+
+        int badEvents = 0;
+        ((IPartitionInstance)parent).Listener.PropertyAdded += (sender, args) => badEvents++;
+        ((IPartitionInstance)parent).Listener.PropertyDeleted += (sender, args) => badEvents++;
+
+        circle.Uuid = "bye";
 
         Assert.AreEqual(1, events);
         Assert.AreEqual(0, badEvents);

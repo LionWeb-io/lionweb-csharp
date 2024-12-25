@@ -202,7 +202,9 @@ public partial class Book : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Book SetPages(int value)
 	{
+		int? oldValue = _pages;
 		_pages = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Book_pages, oldValue, value);
 		return this;
 	}
 
@@ -219,7 +221,9 @@ public partial class Book : ConceptInstanceBase
         public Book SetTitle(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
+		string? oldValue = _title;
 		_title = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Book_title, oldValue, value);
 		return this;
 	}
 
@@ -358,7 +362,9 @@ public partial class GuideBookWriter : Writer
         public GuideBookWriter SetCountries(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.GuideBookWriter_countries);
+		string? oldValue = _countries;
 		_countries = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.GuideBookWriter_countries, oldValue, value);
 		return this;
 	}
 
@@ -468,7 +474,9 @@ public partial class Library : ConceptInstanceBase
         public Library SetName(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Library_name);
+		string? oldValue = _name;
 		_name = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Library_name, oldValue, value);
 		return this;
 	}
 
@@ -580,7 +588,9 @@ public partial class SpecialistBookWriter : Writer
         public SpecialistBookWriter SetSubject(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.SpecialistBookWriter_subject);
+		string? oldValue = _subject;
 		_subject = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.SpecialistBookWriter_subject, oldValue, value);
 		return this;
 	}
 
@@ -649,7 +659,9 @@ public partial class Writer : ConceptInstanceBase
         public Writer SetName(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Writer_name);
+		string? oldValue = _name;
 		_name = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Writer_name, oldValue, value);
 		return this;
 	}
 
