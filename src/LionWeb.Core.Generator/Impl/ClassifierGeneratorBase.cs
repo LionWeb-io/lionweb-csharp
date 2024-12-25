@@ -1,0 +1,54 @@
+﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// 
+// SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
+// SPDX-License-Identifier: Apache-2.0
+
+namespace LionWeb.Core.Generator.Impl;
+
+using M2;
+using M3;
+using Names;
+using Utilities;
+
+/// <summary>
+/// Common base class for all generators for concept/annotation classes and interface interfaces.
+/// </summary>
+public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lionWebVersion)
+    : GeneratorBase(names, lionWebVersion)
+{
+    /// <summary>
+    /// Required by <see cref="UniqueFeatureNames"/> to 
+    /// sort implemented interface features before local features. 
+    /// </summary>
+    protected IEnumerable<Feature> FeaturesToImplement(Classifier classifier) =>
+        InterfaceFeatures(classifier)
+            .Concat(classifier.Features)
+            .Ordered();
+
+    /// Returns features directly inherited from an interface,
+    /// and not yet implemented by <paramref name="classifier">classifier's</paramref> super-classifier.
+    private IEnumerable<Feature> InterfaceFeatures(Classifier classifier) =>
+        classifier
+            .DirectGeneralizations()
+            .OfType<Interface>()
+            .SelectMany(i => i.AllGeneralizations(true))
+            .SelectMany(i => i.Features)
+            .Distinct(new FeatureIdentityComparer())
+            .Except(classifier
+                .DirectGeneralizations()
+                .Where(c => c is Concept or Annotation)
+                .SelectMany(InterfaceFeatures)
+            );
+}
