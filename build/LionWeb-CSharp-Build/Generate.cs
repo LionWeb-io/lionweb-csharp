@@ -15,15 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-using Examples.Shapes.Dynamic;
 using Io.Lionweb.Mps.Specific;
 using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Serialization;
-using LionWeb.CSharp.Generator;
-using LionWeb.CSharp.Generator.Names;
+using LionWeb.Generator;
+using LionWeb.Generator.Names;
 
 foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 {
@@ -53,7 +52,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
     var keywordLang = testLanguagesDefinitions.KeywordLang;
 
-    string prefix = $"Examples.V{lionWebVersion.VersionString.Replace('.', '_')}";
+    string prefix = $"LionWeb.Core.Test.Languages.Generated.V{lionWebVersion.VersionString.Replace('.', '_')}";
     List<Names> names =
     [
         new(libraryLanguage, $"{prefix}.Library.M2"),
@@ -86,7 +85,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         )
     );
 
-    var generationPath = "../../test/LionWeb-CSharp-Test/languages/generated";
+    var generationPath = "../../test/LionWeb.Core.Test/Languages/Generated";
     Directory.CreateDirectory(generationPath);
 
     foreach (var name in names)

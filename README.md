@@ -9,10 +9,10 @@ This repository contains an implementation of (select parts of) the [LionWeb](ht
 
 .NET projects:
 
-* [`src/LionWeb-CSharp`]: implementation of LionWeb for/in C#
-* [`src/LionWeb-CSharp-Generator`]: implementation of a C# code generator for LionWeb
+* [`src/LionWeb.Core`]: implementation of LionWeb for/in C#
+* [`src/LionWeb.Generator`]: implementation of a C# code generator for LionWeb
 * [`build/LionWeb-CSharp-Build`]: a .NET console application that generates various source files in the `-Test` project
-* [`test/LionWeb-CSharp-Test`]: unit tests for `LionWeb-CSharp`
+* [`test/LionWeb.Core.Test`]: unit tests for `LionWeb.Core`
 
 See these projects' respective `README`s for more information.
 
@@ -27,7 +27,7 @@ It's triggered:
 * On every event for a Pull Request, including opening one.
 * When a commit (on any branch) is tagged.
     Provided that restoring, building, packaging, and running all tests are all successful,
-    then NuGet packages (for) `LionWeb-CSharp` and `LionWeb-CSharp-Generator` are published with the tag as version identification.
+    then NuGet packages (for) `LionWeb.Core` and `LionWeb.Generator` are published with the tag as version identification.
 
 
 ## Development
