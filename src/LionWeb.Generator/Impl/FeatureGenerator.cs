@@ -39,7 +39,8 @@ using Property = Core.M3.Property;
 /// - InsertFeature()
 /// - RemoveFeature()
 /// </summary>
-public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
+public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion)
+    : GeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="FeatureGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> Members() =>
@@ -111,7 +112,11 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
             .Concat(
                 OptionalFeatureSetter([
+                    Variable("oldValue", NullableType(AsType(property.GetFeatureType())), FeatureField(property)),
                     AssignFeatureField(),
+                    ExpressionStatement(
+                        Call("RaisePropertyEvent", MetaProperty(property), IdentifierName("oldValue"), IdentifierName("value"))
+                    ),
                     ReturnStatement(This())
                 ])
             );
@@ -136,15 +141,13 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
-        new List<MemberDeclarationSyntax>
-        {
-            SingleFeatureField(), SingleOptionalFeatureProperty()
-        }.Concat(OptionalFeatureSetter([
-            SetParentNullCall(containment),
-            AttachChildCall(),
-            AssignFeatureField(),
-            ReturnStatement(This())
-        ]));
+        new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }.Concat(
+            OptionalFeatureSetter([
+                SetParentNullCall(containment),
+                AttachChildCall(),
+                AssignFeatureField(),
+                ReturnStatement(This())
+            ]));
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax>

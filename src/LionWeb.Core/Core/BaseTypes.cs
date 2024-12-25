@@ -456,7 +456,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
         return false;
     }
-    
+
     protected virtual IPartitionCommander? GetPartitionCommander()
     {
         var parent = _parent;
@@ -768,6 +768,30 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     {
         foreach (var node in safeNodes)
             storage.Remove(node);
+    }
+
+    #endregion
+
+    #region Listener Helpers
+
+    protected void RaisePropertyEvent(Property property, object? oldValue, object? newValue)
+    {
+        var partitionCommander = GetPartitionCommander();
+        if (partitionCommander == null)
+            return;
+
+        switch ((oldValue, newValue))
+        {
+            case (null, { } v):
+                partitionCommander.AddProperty(this, property, v);
+                break;
+            case ({ } o, null):
+                partitionCommander.DeleteProperty(this, property, o);
+                break;
+            case ({ } o, { } n):
+                partitionCommander.ChangeProperty(this, property, n, o);
+                break;
+        }
     }
 
     #endregion

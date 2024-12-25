@@ -18,6 +18,7 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
+using Core.M1;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
@@ -62,7 +63,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
 
         bases.AddRange(Interfaces.Select(i => AsType(i)));
 
-        return ClassifierClass(bases, GenGetClassifier("GetAnnotation", typeof(Annotation)));
+        return ClassifierClass(bases, [GenGetClassifier("GetAnnotation", typeof(Annotation))]);
     }
 
     private ClassDeclarationSyntax ClassifierConcept(Concept concept)
@@ -82,10 +83,19 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
         if (concept.Partition)
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
-        return ClassifierClass(bases, GenGetClassifier("GetConcept", typeof(Concept)));
+        return ClassifierClass(bases, [
+            GenGetClassifier("GetConcept", typeof(Concept)),
+            Field("_eventHandler", AsType(typeof(PartitionEventHandler)), NewCall([]))
+                .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
+            ReadOnlyProperty("Listener", AsType(typeof(IPartitionListener)), IdentifierName("_eventHandler"))
+                .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword)),
+            ReadOnlyProperty("Commander", AsType(typeof(IPartitionCommander)), IdentifierName("_eventHandler"))
+                .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+        ]);
     }
 
-    private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases, MethodDeclarationSyntax genGetClassifier)
+    private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases,
+        List<MemberDeclarationSyntax> additionalMembers)
     {
         List<SyntaxKind> modifiers = [SyntaxKind.PublicKeyword];
         if (classifier is Concept { Abstract: true })
@@ -102,7 +112,8 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithMembers(List(
                 FeaturesToImplement(classifier)
                     .SelectMany(f => new FeatureGenerator(classifier, f, _names, _lionWebVersion).Members())
-                    .Concat(new List<MemberDeclarationSyntax> { GenConstructor(), genGetClassifier })
+                    .Append(GenConstructor())
+                    .Concat(additionalMembers)
                     .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion).FeatureMethods())
                     .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion).ContainmentMethods())
             ));
