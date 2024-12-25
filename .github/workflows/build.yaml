@@ -52,7 +52,7 @@ jobs:
         if: always()
         with:
           files: |
-            *.trx
+            test-results/**/*.trx
           large_files: "true"
           report_individual_runs: "true"
           report_suite_logs: "any"
