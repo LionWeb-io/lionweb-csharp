@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1;
 using M2;
 using M3;
 using System.Collections;
@@ -113,6 +114,8 @@ public interface IConceptInstance<out T> : IReadableNode<T>, IConceptInstance wh
 /// <inheritdoc />
 public interface IPartitionInstance : IConceptInstance
 {
+    IPartitionListener? Listener { get => null; }
+    IPartitionCommander? Commander { get => null; }
 }
 
 /// <inheritdoc cref="IPartitionInstance" />
@@ -294,10 +297,12 @@ public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : I
     private static partial Regex IdRegex();
 
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
-    protected virtual IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
+    protected virtual IBuiltInsLanguage _builtIns =>
+        new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
 
     /// The <see cref="ILionCoreLanguage"/> variant used for this node.
-    protected virtual ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.LionCore).Value;
+    protected virtual ILionCoreLanguage _m3 =>
+        new Lazy<ILionCoreLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.LionCore).Value;
 
 
     /// <summary>
@@ -450,6 +455,22 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
 
         return false;
+    }
+    
+    protected virtual IPartitionCommander? GetPartitionCommander()
+    {
+        var parent = _parent;
+        INode? root = null;
+        while (parent != null)
+        {
+            root = parent;
+            parent = parent.GetParent();
+        }
+
+        if (root == null)
+            return null;
+
+        return (root as IPartitionInstance)?.Commander;
     }
 
     #region Helpers
