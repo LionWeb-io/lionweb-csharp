@@ -220,7 +220,9 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete("deprProp comment")]
 	public DeprConcept SetDeprProp(string? value)
 	{
+		string? oldValue = _deprProp;
 		_deprProp = value;
+		RaisePropertyEvent(DeprecatedLanguage.Instance.DeprConcept_deprProp, oldValue, value);
 		return this;
 	}
 

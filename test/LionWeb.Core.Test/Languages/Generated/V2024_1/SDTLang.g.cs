@@ -311,7 +311,9 @@ public partial class SDTConcept : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         public SDTConcept SetDecimal(Decimal? value)
 	{
+		Decimal? oldValue = _decimal;
 		_decimal = value;
+		RaisePropertyEvent(SDTLangLanguage.Instance.SDTConcept_decimal, oldValue, value);
 		return this;
 	}
 

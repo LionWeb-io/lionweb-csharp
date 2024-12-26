@@ -238,7 +238,9 @@ public partial class Book : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Book SetType(BookType? value)
 	{
+		BookType? oldValue = _type;
 		_type = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Book_type, oldValue, value);
 		return this;
 	}
 

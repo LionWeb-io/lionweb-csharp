@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using LionWeb.Core;
+using LionWeb.Core.M1;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -1092,7 +1093,9 @@ public partial class Documentation : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Documentation SetTechnical(bool? value)
 	{
+		bool? oldValue = _technical;
 		_technical = value;
+		RaisePropertyEvent(ShapesLanguage.Instance.Documentation_technical, oldValue, value);
 		return this;
 	}
 
@@ -1105,7 +1108,9 @@ public partial class Documentation : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Documentation SetText(string? value)
 	{
+		string? oldValue = _text;
 		_text = value;
+		RaisePropertyEvent(ShapesLanguage.Instance.Documentation_text, oldValue, value);
 		return this;
 	}
 
@@ -1232,6 +1237,10 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
+	private readonly PartitionEventHandler _eventHandler = new();
+	public IPartitionListener Listener => _eventHandler;
+	public IPartitionCommander Commander => _eventHandler;
+
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1561,7 +1570,9 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         public MaterialGroup SetMatterState(MatterState? value)
 	{
+		MatterState? oldValue = _matterState;
 		_matterState = value;
+		RaisePropertyEvent(ShapesLanguage.Instance.MaterialGroup_matterState, oldValue, value);
 		return this;
 	}
 
@@ -1977,6 +1988,10 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
+	private readonly PartitionEventHandler _eventHandler = new();
+	public IPartitionListener Listener => _eventHandler;
+	public IPartitionCommander Commander => _eventHandler;
+
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
