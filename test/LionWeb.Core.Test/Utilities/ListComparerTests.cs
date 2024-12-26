@@ -33,7 +33,7 @@ public class ListComparerTests
     [TestMethod]
     public void LeftEmptyOne()
     {
-        var changes = new ListComparer<string>([], ["a"]).Compare();
+        var changes = new ListComparer<string>([], ["a"]).Run();
 
         CollectionAssert.AreEqual(
             new List<ListComparer<string>.ListChange> { new ListComparer<string>.ListAdded("a", 0) },
@@ -83,10 +83,10 @@ public class ListComparerTests
     [TestMethod]
     public void SwappedTwo()
     {
-        var changes = new ListComparer<string>(["a", "b"], ["b", "a"]).Compare();
+        var changes = new ListComparer<string>(["a", "b"], ["b", "a"]).Run();
 
         CollectionAssert.AreEqual(
-            new List<ListComparer<string>.ListChange> { new ListComparer<string>.ListMoved("a", 0, "a", 1) },
+            new List<ListComparer<char>.ListChange> { new ListComparer<char>.ListMoved('a', 0, 'a', 1) },
             changes
         );
     }
@@ -98,6 +98,23 @@ public class ListComparerTests
         const string right = "bcda";
         var hirschberg = new Hirschberg(left, right, new int[left.Length + 1, right.Length + 1]);
         hirschberg.run();
-        Console.WriteLine(string.Join("\n",  hirschberg.actions));
+        Console.WriteLine(string.Join("\n", hirschberg.actions));
+    }
+
+    [TestMethod]
+    public void Hirschberg2()
+    {
+        const string left = "abcdef";
+        const string right = "bcda";
+        var comparer = new ListComparer<char>(left.ToList(), right.ToList());
+        var changes = comparer.Run();
+        CollectionAssert.AreEquivalent(
+            new List<ListComparer<char>.ListChange>
+            {
+                new ListComparer<char>.ListMoved('a', 0, 'a', 5),
+                new ListComparer<char>.ListRemoved('e', 4),
+            },
+            changes
+        );
     }
 }
