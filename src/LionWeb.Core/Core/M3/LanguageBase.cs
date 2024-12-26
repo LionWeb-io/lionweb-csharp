@@ -48,8 +48,11 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
         _m3.Language_dependsOn
     ];
 
+    /// <inheritdoc cref="IConceptInstance.GetClassifier()" />
+    public override Classifier GetClassifier() => GetConcept();
+
     /// <inheritdoc />
-    public override Classifier GetClassifier() => _m3.Language;
+    public Concept GetConcept() => _m3.Language;
 
     /// <inheritdoc />
     public override object Get(Feature feature)

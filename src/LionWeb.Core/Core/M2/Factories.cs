@@ -108,8 +108,18 @@ public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
     {
         LogWarning(
             $"No class was generated for classifier with meta-pointer {classifier.ToMetaPointer()} - returning direct instance of Node.");
-        return new DynamicNode(id, classifier);
+        return CreateDynamicNode(id, classifier);
     }
+
+    /// Default implementation of <see cref="CreateNode"/> that instantiates
+    /// an instance of the generic <see cref="DynamicNode"/> that's not backed by a specific class.
+    protected DynamicNode CreateDynamicNode(string id, Classifier classifier) => classifier switch
+    {
+        Annotation a => new DynamicAnnotationInstance(id, a),
+        Concept { Partition: true } c => new DynamicPartitionInstance(id, c),
+        Concept c => new DynamicConceptInstance(id, c),
+        _ => new DynamicNode(id, classifier)
+    };
 
     /// Logs <paramref name="message"/> as warning.
     protected virtual void LogWarning(string message) =>
@@ -195,7 +205,7 @@ public class ReflectiveBaseNodeFactory(Language language) : AbstractBaseNodeFact
 {
     /// <inheritdoc />
     public override INode CreateNode(string id, Classifier classifier) =>
-        new DynamicNode(id, classifier);
+        CreateDynamicNode(id, classifier);
 
     private readonly Dictionary<Enumeration, Type> _enums = [];
 

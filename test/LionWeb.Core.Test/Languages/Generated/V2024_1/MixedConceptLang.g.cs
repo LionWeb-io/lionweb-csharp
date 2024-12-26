@@ -90,5 +90,5 @@ public partial class MixedConcept : LionWeb.Core.Test.Languages.Generated.V2024_
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => MixedConceptLangLanguage.Instance.MixedConcept;
+        public override Concept GetConcept() => MixedConceptLangLanguage.Instance.MixedConcept;
 }

@@ -62,6 +62,7 @@ public static class ShapesDefinition
         Coord.Property("id-y", "key-y", "y").OfType(builtIns.Integer);
         Coord.Property("id-z", "key-z", "z").OfType(builtIns.Integer);
 
+        Geometry.IsPartition();
         Geometry.Containment("id-shapes", "key-shapes", "shapes").OfType(IShape).IsMultiple().IsOptional();
         Geometry.Containment("id-documentation", "key-documentation", "documentation").OfType(Documentation)
             .IsOptional();
@@ -97,6 +98,7 @@ public static class ShapesDefinition
         Documentation.Property("id-technical", "key-technical", "technical").OfType(builtIns.Boolean)
             .IsOptional();
 
+        ReferenceGeometry.IsPartition();
         ReferenceGeometry.Reference("id-shape-references", "key-shapes-references", "shapes").OfType(IShape)
             .IsMultiple().IsOptional();
 

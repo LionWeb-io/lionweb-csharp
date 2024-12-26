@@ -22,9 +22,7 @@ using M3;
 using System.Collections;
 using Utilities;
 
-/// <summary>
 /// A generic implementation of <see cref="INode"/> that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
-/// </summary>
 public class DynamicNode : NodeBase
 {
     /// <inheritdoc cref="IReadableNode.GetClassifier()"/>
@@ -78,9 +76,7 @@ public class DynamicNode : NodeBase
     /// <inheritdoc/>
     public override Classifier GetClassifier() => _classifier;
 
-    /// <summary>
     /// Contains all settings of features.
-    /// </summary>
     private readonly Dictionary<Feature, object> _settings = new(new FeatureIdentityComparer());
 
     /// <inheritdoc />
@@ -229,4 +225,34 @@ public class DynamicNode : NodeBase
     /// <inheritdoc/>
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         _settings.Keys;
+}
+
+/// A generic implementation of <see cref="IAnnotationInstance"/>
+/// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
+public class DynamicAnnotationInstance : DynamicNode, IAnnotationInstance<INode>
+{
+    /// <inheritdoc />
+    public DynamicAnnotationInstance(string id, Annotation annotation) : base(id, annotation) { }
+
+    /// <inheritdoc cref="IAnnotationInstance.GetAnnotation" />
+    public Annotation GetAnnotation() => (Annotation)base.GetClassifier();
+}
+
+/// A generic implementation of <see cref="IConceptInstance"/>
+/// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
+public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
+{
+    /// <inheritdoc />
+    public DynamicConceptInstance(string id, Concept concept) : base(id, concept) { }
+
+    /// <inheritdoc cref="IConceptInstance.GetConcept()" />
+    public Concept GetConcept() => (Concept)base.GetClassifier();
+}
+
+/// A generic implementation of <see cref="IPartitionInstance"/>
+/// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
+public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
+{
+    /// <inheritdoc />
+    public DynamicPartitionInstance(string id, Concept concept) : base(id, concept) { }
 }

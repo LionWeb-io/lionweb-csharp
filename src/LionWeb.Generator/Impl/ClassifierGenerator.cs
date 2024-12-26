@@ -20,6 +20,7 @@ namespace LionWeb.Generator.Impl;
 using Core;
 using Core.M2;
 using Core.M3;
+using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -42,16 +43,50 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
     public TypeDeclarationSyntax ClassifierType() =>
         classifier switch
         {
-            Concept or Annotation => ClassifierClass(),
+            Annotation a => ClassifierAnnotation(a),
+            Concept c => ClassifierConcept(c),
             Interface i => ClassifierInterface(i),
             _ => throw new ArgumentException($"Unsupported classifier: {classifier}", nameof(classifier))
         };
 
-    private ClassDeclarationSyntax ClassifierClass()
+    private ClassDeclarationSyntax ClassifierAnnotation(Annotation annotation)
     {
-        List<TypeSyntax> bases = [GetSuperclass()];
+        List<TypeSyntax> bases = [];
+        if (annotation.Extends is not null && !annotation.Extends.EqualsIdentity(_builtIns.Node))
+        {
+            bases.Add(AsType(annotation.Extends));
+        } else
+        {
+            bases.Add(AsType(typeof(AnnotationInstanceBase)));
+        }
+
         bases.AddRange(Interfaces.Select(i => AsType(i)));
 
+        return ClassifierClass(bases, GenGetClassifier("GetAnnotation", typeof(Annotation)));
+    }
+
+    private ClassDeclarationSyntax ClassifierConcept(Concept concept)
+    {
+        List<TypeSyntax> bases = [];
+
+        if (concept.Extends is not null && !concept.Extends.EqualsIdentity(_builtIns.Node))
+        {
+            bases.Add(AsType(concept.Extends));
+        } else
+        {
+            bases.Add(AsType(typeof(ConceptInstanceBase)));
+        }
+
+        bases.AddRange(Interfaces.Select(i => AsType(i)));
+
+        if (concept.Partition)
+            bases.Add(AsType(typeof(IPartitionInstance<INode>)));
+
+        return ClassifierClass(bases, GenGetClassifier("GetConcept", typeof(Concept)));
+    }
+
+    private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases, MethodDeclarationSyntax genGetClassifier)
+    {
         List<SyntaxKind> modifiers = [SyntaxKind.PublicKeyword];
         if (classifier is Concept { Abstract: true })
             modifiers.Add(SyntaxKind.AbstractKeyword);
@@ -65,10 +100,11 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithModifiers(AsModifiers(modifiers.ToArray()))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(
-                FeaturesToImplement(classifier).SelectMany(f => new FeatureGenerator(classifier, f, _names,_lionWebVersion).Members())
-                    .Concat(new List<MemberDeclarationSyntax> { GenConstructor(), GenGetClassifier() })
-                    .Concat(new FeatureMethodsGenerator(classifier, _names,_lionWebVersion).FeatureMethods())
-                    .Concat(new ContainmentMethodsGenerator(classifier, _names,_lionWebVersion).ContainmentMethods())
+                FeaturesToImplement(classifier)
+                    .SelectMany(f => new FeatureGenerator(classifier, f, _names, _lionWebVersion).Members())
+                    .Concat(new List<MemberDeclarationSyntax> { GenConstructor(), genGetClassifier })
+                    .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion).FeatureMethods())
+                    .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion).ContainmentMethods())
             ));
 
         return AttachConceptDescription(decl);
@@ -79,14 +115,6 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
         var conceptShortDescription = VersionSpecifics.GetConceptShortDescription(classifier);
         return conceptShortDescription != null ? decl.Xdoc(XdocLine(conceptShortDescription, "summary")) : decl;
     }
-
-    private TypeSyntax GetSuperclass() =>
-        classifier switch
-        {
-            Annotation { Extends: not null } a => AsType(a.Extends),
-            Concept { Extends: not null } c => AsType(c.Extends),
-            _ => null
-        } ?? AsType(typeof(NodeBase));
 
     private IEnumerable<Interface> Interfaces =>
         classifier
@@ -100,8 +128,8 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithInitializer(Initializer("id"))
             .WithBody(AsStatements([]));
 
-    private MethodDeclarationSyntax GenGetClassifier() =>
-        Method("GetClassifier", AsType(typeof(Classifier)), exprBody: MetaProperty())
+    private MethodDeclarationSyntax GenGetClassifier(string methodName, Type returnType) =>
+        Method(methodName, AsType(returnType), exprBody: MetaProperty())
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc());
 
