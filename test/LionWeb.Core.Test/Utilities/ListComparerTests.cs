@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.Utilities;
 
 using Core.Utilities;
+using Languages.Generated.V2023_1.Shapes.M2;
 using LeftIndex = int;
 using RightIndex = int;
 
@@ -75,12 +76,109 @@ public class ListComparerTests
         );
 
     [TestMethod]
-    public void SwappedTwo() =>
+    public void MoveOneFarRight() =>
+        AssertCompare(
+            "aBcdefghijkl",
+            "acdefghiBjkl",
+            [
+                new(Move, 'B', 1, 8),
+            ]
+        );
+
+    [TestMethod]
+    public void MoveOneFarLeft() =>
+        AssertCompare(
+            "acdefghiBjkl",
+            "aBcdefghijkl",
+            [
+                new(Move, 'B', 8, 1),
+            ]
+        );
+
+    [TestMethod]
+    public void MoveTwoFarRight() =>
+        AssertCompare(
+            "aBCdefghijkl",
+            "adefghiBCjkl",
+            [
+                new(Move, 'B', 1, 7),
+                new(Move, 'C', 2, 8),
+            ]
+        );
+
+    [TestMethod]
+    public void MoveTwoFarLeft() =>
+        AssertCompare(
+            "adefghiBCjkl",
+            "aBCdefghijkl",
+            [
+                new(Move, 'B', 7, 1),
+                new(Move, 'C', 8, 2),
+            ]
+        );
+
+    [TestMethod]
+    public void MoveTwoSeparatedFarRight() =>
+        AssertCompare(
+            "aBcDefghijkl",
+            "acefghiBDjkl",
+            [
+                new(Move, 'B', 1, 7),
+                new(Move, 'D', 3, 8),
+            ]
+        );
+
+    [TestMethod]
+    public void MoveTwoSeparatedFarLeft() =>
+        AssertCompare(
+            "acefghiBDjkl",
+            "aBcDefghijkl",
+            [
+                new(Move, 'B', 7, 1),
+                new(Move, 'D', 8, 3),
+            ]
+        );
+
+    [TestMethod]
+    public void MoveOneFarRightRemoveAfter() =>
+        AssertCompare(
+            "aBcdefghijKl",
+            "acdefghiBjl",
+            [
+                new(Move, 'B', 1, 8),
+                new(Remove, 'K', 10)
+            ]
+        );
+
+    [TestMethod]
+    public void MoveOneFarLeftRemoveAfter() =>
+        AssertCompare(
+            "acdEfghiBjkl",
+            "aBcdfghijkl",
+            [
+                new(Move, 'B', 8, 1),
+                new (Remove, 'E', 3)
+            ]
+        );
+
+    [TestMethod]
+    public void SwapTwo() =>
         AssertCompare(
             "ab",
             "ba",
             [
                 new(Move, 'a', 0, 1)
+            ]
+        );
+
+    [TestMethod]
+    public void SwapTwoFar() =>
+        AssertCompare(
+            "abCdefgHijkl",
+            "abHdefgCijkl",
+            [
+                new(Move, 'H', 7, 2),
+                new(Move, 'C', 2, 7)
             ]
         );
 
@@ -100,16 +198,87 @@ public class ListComparerTests
             "abcdef",
             "bcda",
             [
-                new(Move, 'a', 0, 5),
-                new(Remove, 'e', 4)
+                new(Move, 'a', 0, 3),
+                new(Remove, 'e', 4),
+                new(Remove, 'f', 5),
             ]
         );
+
+    [TestMethod]
+    public void LongListMove() =>
+        AssertCompare(
+            "a" + new string('x', 2000),
+            new string('x', 2000) + "a",
+            [
+                new(Move, 'a', 0, 2000)
+            ]
+        );
+
+    [TestMethod]
+    public void LongListSame() =>
+        AssertCompare(
+            new string('x', 2000),
+            new string('x', 2000),
+            []
+        );
+
+    [TestMethod]
+    public void SwapTwoNodes()
+    {
+        var a = new Line("a");
+        var b = new Line("b");
+
+        var comparer = new ListComparer<INode>([a, b], [b, a]);
+        var changes = comparer.Run();
+        CollectionAssert.AreEquivalent(
+            new List<ListComparer<INode>.ListChange> { new ListComparer<INode>.ListMoved(a, 0, a, 1) },
+            changes
+        );
+    }
+
+    [TestMethod]
+    public void SwapTwoNodes_SameId()
+    {
+        var a = new Line("x");
+        var b = new Line("x");
+
+        var comparer = new ListComparer<INode>([a, b], [b, a]);
+        var changes = comparer.Run();
+        CollectionAssert.AreEquivalent(
+            new List<ListComparer<INode>.ListChange> { new ListComparer<INode>.ListMoved(a, 0, a, 1) },
+            changes
+        );
+    }
+
+    private class NodeIdComparer : IEqualityComparer<INode>
+    {
+        public bool Equals(INode? x, INode? y) =>
+            x.GetId() == y.GetId();
+
+        public int GetHashCode(INode obj) =>
+            obj.GetId().GetHashCode();
+    }
+
+    [TestMethod]
+    public void SwapTwoNodes_SameId_CustomComparer()
+    {
+        var a = new Line("x");
+        var b = new Line("x");
+
+
+        var comparer = new ListComparer<INode>([a, b], [b, a], new NodeIdComparer());
+        var changes = comparer.Run();
+        CollectionAssert.AreEquivalent(
+            new List<ListComparer<INode>.ListChange> { },
+            changes
+        );
+    }
 
     private const int Add = 0;
     private const int Remove = 1;
     private const int Move = 2;
 
-    private void AssertCompare(string left, string right, R[] results)
+    private void AssertCompare(string left, string right, EasyToEnterResult[] results)
     {
         var comparer = new ListComparer<char>(left.ToList(), right.ToList());
         var changes = comparer.Run();
@@ -124,10 +293,10 @@ public class ListComparerTests
             changes
         );
     }
-}
 
-internal record struct R(
-    int changeKind,
-    char left,
-    LeftIndex leftIndex,
-    RightIndex? rightIndex = null);
+    private record struct EasyToEnterResult(
+        int changeKind,
+        char left,
+        LeftIndex leftIndex,
+        RightIndex? rightIndex = null);
+}

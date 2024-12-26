@@ -17,19 +17,19 @@
 
 namespace LionWeb.Core.Utilities;
 
-using CostBase = sbyte;
+using CostBase = short;
 using LeftIndex = int;
 using RightIndex = int;
 
 /// <remarks>
-/// Implement the Hirschberg O(n) space algorithm for finding an alignment.
+/// Implements the Hirschberg O(n) space algorithm for finding an alignment.
 /// Inspired by David Powell's Java implementation at https://github.com/drpowell/AlignDemo/blob/master/Hirschberg.java
 /// </remarks>
 public class ListComparer<T>
 {
     private readonly List<T> _left;
     private readonly List<T> _right;
-    private readonly IComparer<T> _comparer;
+    private readonly IEqualityComparer<T> _comparer;
 
     private readonly Cost[,] _matrix;
     private readonly Cost[,] _forwardMatrix;
@@ -46,11 +46,11 @@ public class ListComparer<T>
     /// Compares two lists, and returns the minimum number of <see cref="ListChange">changes</see>
     /// to convert <paramref name="left"/> into <paramref name="right"/>. 
     /// </summary>
-    public ListComparer(List<T> left, List<T> right, IComparer<T>? comparer = null)
+    public ListComparer(List<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
     {
         _left = left;
         _right = right;
-        _comparer = comparer ?? Comparer<T>.Default;
+        _comparer = comparer ?? EqualityComparer<T>.Default;
 
         LeftIndex leftSize = left.Count + 1;
         RightIndex rightSize = right.Count + 1;
@@ -103,7 +103,13 @@ public class ListComparer<T>
             if (!removedEntry.Equals(default))
             {
                 LeftIndex indexOfValue = _removed.IndexOfValue(removedEntry);
-                result.Add(new ListMoved(removedEntry.Item1, removedEntry.Item2, addedEntry.Item1, addedEntry.Item2));
+                T leftElement = removedEntry.Item1;
+                LeftIndex leftIndex = removedEntry.Item2;
+                T rightElement = addedEntry.Item1;
+                RightIndex rightIndex = addedEntry.Item2;
+
+                if (leftIndex != rightIndex || !Equals(leftElement, rightElement))
+                    result.Add(new ListMoved(leftElement, leftIndex, rightElement, rightIndex));
                 _added.RemoveAt(_added.IndexOfValue(addedEntry));
                 _removed.RemoveAt(indexOfValue);
             }
@@ -117,7 +123,9 @@ public class ListComparer<T>
 
     private void CompareInternal()
     {
-        // mat.clearAlignment();
+        if (_left.SequenceEqual(_right, _comparer))
+            return;
+
         _matrix[0, 0] = Cost.Align;
         _matrix[_left.Count, _right.Count] = Cost.Align;
         Align(0, _left.Count, 0, _right.Count);
@@ -128,14 +136,11 @@ public class ListComparer<T>
     private void Align(LeftIndex lowerBoundLeft, LeftIndex upperBoundLeft, RightIndex lowerBoundRight,
         RightIndex upperBoundRight)
     {
-        // Align s1[p1..p2) with p2[q1..q2)
-        //System.out.println("s1["+p1+".."+(p2-1)+"] : s2["+q1+".."+(q2-1)+"]");
-
         // First the base cases...
 
         if (upperBoundLeft <= lowerBoundLeft)
         {
-            // s1 is empty
+            // left is empty
             for (RightIndex rightIndex = lowerBoundRight; rightIndex < upperBoundRight; rightIndex++)
             {
                 _alignLeft.Add(CreateEmpty());
@@ -143,7 +148,6 @@ public class ListComparer<T>
                 _alignRight.Add(rightElement);
                 Add(rightElement, rightIndex);
                 _matrix[lowerBoundLeft, rightIndex + 1] = Cost.Align;
-                // mat.addAlignment(p1,j,p1,j+1);
             }
 
             return;
@@ -151,7 +155,7 @@ public class ListComparer<T>
 
         if (upperBoundRight <= lowerBoundRight)
         {
-            // s2 is empty
+            // right is empty
             for (LeftIndex leftIndex = lowerBoundLeft; leftIndex < upperBoundLeft; leftIndex++)
             {
                 T leftElement = _left[leftIndex];
@@ -159,7 +163,6 @@ public class ListComparer<T>
                 _alignRight.Add(CreateEmpty());
                 Remove(leftElement, leftIndex);
                 _matrix[leftIndex + 1, upperBoundRight] = Cost.Align;
-                // mat.addAlignment(i,q2,i+1,q2);
             }
 
             return;
@@ -167,7 +170,7 @@ public class ListComparer<T>
 
         if (lowerBoundLeft + 1 == upperBoundLeft)
         {
-            // s1 is exactly one character
+            // left is exactly one entry
             T leftElement = _left[lowerBoundLeft];
             RightIndex memo = lowerBoundRight;
             for (RightIndex rightIndex = lowerBoundRight + 1; rightIndex < upperBoundRight; rightIndex++)
@@ -181,12 +184,17 @@ public class ListComparer<T>
                 {
                     _alignLeft.Add(leftElement);
                     if (!Equals(leftElement, rightElement))
-                        Add(rightElement, lowerBoundLeft);
+                    {
+                        Remove(leftElement, lowerBoundLeft);
+                    }
                 } else
                 {
                     _alignLeft.Add(CreateEmpty());
-                    if (!Equals(leftElement, rightElement))
-                        Remove(leftElement, lowerBoundLeft);
+                }
+
+                if (!Equals(leftElement, rightElement))
+                {
+                    Add(rightElement, rightIndex);
                 }
 
                 _alignRight.Add(rightElement);
@@ -195,9 +203,6 @@ public class ListComparer<T>
                     _matrix[lowerBoundLeft, rightIndex + 1] = Cost.Align;
                 else
                     _matrix[lowerBoundLeft + 1, rightIndex + 1] = Cost.Align;
-
-                // mat.addAlignment((j<=memo ? p1 : p1+1),j,
-                // 		 (j<memo? p1 : p1+1),j+1);
             }
 
             return;
@@ -235,7 +240,6 @@ public class ListComparer<T>
         }
 
         _matrix[midBoundLeft, midBoundRight] = Cost.Align;
-        //mat.addAlignment(mid,s2mid, mid+1, s2mid+1);
 
         // Recurse on the two halves...
         Align(lowerBoundLeft, midBoundLeft, lowerBoundRight, midBoundRight);
@@ -348,7 +352,6 @@ public class ListComparer<T>
         Cost col = Cost.Store;
         if (c == Cost.Align)
             col = Cost.Align;
-        // c.setVal(v,col);
         _matrix[leftIndex, rightIndex] = col;
     }
 
@@ -357,7 +360,7 @@ public class ListComparer<T>
         string.Join(",", _alignLeft) + "\n" + string.Join(",", _alignRight);
 
     private bool Equals(T left, T right) =>
-        _comparer.Compare(left, right) == 0;
+        _comparer.Equals(left, right);
 
     private Cost OneIfMismatch(LeftIndex leftIndex, RightIndex rightIndex) =>
         Equals(_left[leftIndex], _right[rightIndex]) ? Cost.Zero : Cost.One;
