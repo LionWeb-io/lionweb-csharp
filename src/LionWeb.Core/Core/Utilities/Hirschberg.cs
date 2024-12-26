@@ -22,11 +22,12 @@ using System.Text;
 // Hirschberg - implement the Hirschberg O(n) space algorithm
 // for finding an alignment.  Code translated from Lloyd's javascript
 // version: http://www.csse.monash.edu.au/~lloyd/tildeAlgDS/Dynamic/Hirsch.html
-public class Hirschberg : AlignAlgorithm
+public class Hirschberg
 {
     static int unusedCol = 0;
     static int storeCol = 2;
     static int alignCol = 4;
+    const int infinity = int.MaxValue;
 
     int[][] fwdMat, revMat;
     StringBuilder align1;
@@ -36,18 +37,26 @@ public class Hirschberg : AlignAlgorithm
 
     public SortedList<int, (char, int)> added = [];
     public SortedList<int, (char, int)> removed = [];
+    protected int[,] mat;
+    protected string s1;
+    protected string s2;
+    protected int _editCost;
+    protected int cellsComputed;
 
-    public Hirschberg(string str1, string str2, int[,] m) : base(str1, str2, m)
+    public Hirschberg(string str1, string str2, int[,] m)
     {
+        mat = m;
+        s1 = str1;
+        s2 = str2;
+        _editCost = -1;
+        cellsComputed = 0;
         fwdMat = new int[][] { new int[s2.Length + 1], new int[s2.Length + 1] };
         revMat = new int[][] { new int[s2.Length + 1], new int[s2.Length + 1] };
         align1 = new StringBuilder();
         align2 = new StringBuilder();
     }
 
-    public override string algName() { return "Hirschberg"; }
-
-    public override void go()
+    public void go()
     {
         // mat.clearAlignment();
         mat[0, 0] = alignCol;
@@ -195,19 +204,6 @@ public class Hirschberg : AlignAlgorithm
     private void Remove(char s1char, int index) => removed
         .Add(index, (s1char, index));
 
-    // private void DetectMove(char s1Char, int index)
-    // {
-    //     var lastIndex = removed.FindLastIndex(p => p.Item1 == s1Char);
-    //     if (lastIndex != -1)
-    //     {
-    //         removed.RemoveAt(lastIndex);
-    //         actions.Add($"moved: {s1Char} from {lastIndex} to {index}");
-    //     } else
-    //     {
-    //         Add(s1Char, index);
-    //     }
-    // }
-
     private void Add(char s1Char, int index) =>
         added.Add(index, (s1Char, index));
 
@@ -299,8 +295,19 @@ public class Hirschberg : AlignAlgorithm
     }
 
 
-    public override string traceBack()
+    public string traceBack()
     {
         return align1.ToString() + "\n" + align2.ToString();
     }
+
+    public void run() {
+        Console.WriteLine("Hirschberg" + " running.");
+        go();
+
+        Console.WriteLine("Hirschberg" + " done. Cost="+_editCost+"\n");
+        Console.WriteLine(traceBack());
+        Console.WriteLine("\n"+"Cells computed = "+cellsComputed);
+    }
+
+    protected int min3(int a, int b, int c) { return (a<b ? (a<c ? a : c) : (b<c ? b : c)); }
 }
