@@ -317,13 +317,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
-                Variable("previousCount", AsType(typeof(int)),
-                    MemberAccess(FeatureField(reference), IdentifierName("Count"))
-                ),
+                PreviousCountVariable(reference),
                 SimpleAddRangeCall(reference),
-                ExpressionStatement(Call("RaiseReferenceAddEvent",
-                    [MetaProperty(feature), IdentifierName("safeNodes"), IdentifierName("previousCount")])
-                ),
+                RaiseReferenceAddEventCall("previousCount"),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -333,6 +329,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
                 SimpleInsertRangeCall(reference),
+                RaiseReferenceAddEventCall("index"),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -343,6 +340,16 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SimpleRemoveAllCall(reference),
                 ReturnStatement(This())
             ])
+        );
+
+    private ExpressionStatementSyntax RaiseReferenceAddEventCall(string index) =>
+        ExpressionStatement(Call("RaiseReferenceAddEvent",
+            [MetaProperty(feature), IdentifierName("safeNodes"), IdentifierName(index)])
+        );
+
+    private LocalDeclarationStatementSyntax PreviousCountVariable(Reference reference) =>
+        Variable("previousCount", AsType(typeof(int)),
+            MemberAccess(FeatureField(reference), IdentifierName("Count"))
         );
 
     private bool IsReferenceType(Property property) =>

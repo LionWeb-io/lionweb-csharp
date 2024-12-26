@@ -831,8 +831,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             partitionCommander.AddReference(this, reference, index++, new ReferenceTarget(null, node)
             );
         }
-
-
     }
 
     #endregion
