@@ -109,7 +109,6 @@ public interface IConceptInstance<out T> : IReadableNode<T>, IConceptInstance wh
 {
 }
 
-
 /// Instance of an <see cref="Concept.Partition"/>.
 /// <inheritdoc />
 public interface IPartitionInstance : IConceptInstance
@@ -573,7 +572,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <summary>
-    /// Assures <paramref name="storage"/> would contain at leas one member after removing all of <paramref name="safeNodes"/>.
+    /// Assures <paramref name="storage"/> would contain at least one member after removing all of <paramref name="safeNodes"/>.
     /// Does <i>not</i> modify <paramref name="storage"/>.
     /// </summary>
     /// <param name="safeNodes">Candidates to be removed.</param>
@@ -581,10 +580,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="link">Link of <paramref name="storage"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="storage"/> were empty after removing all of <paramref name="safeNodes"/>.</exception>
-    protected void AssureNotClearing<T>(List<T> safeNodes, List<T> storage, Link link)
+    protected void AssureNotClearing<T>(List<T> safeNodes, List<T> storage, Link link) where T : IReadableNode
     {
         var copy = new List<T>(storage);
-        RemoveAll(safeNodes, copy);
+        RemoveAll(safeNodes, copy, (_, _, _) => { });
         if (copy.Count == 0)
             throw new InvalidValueException(link, safeNodes);
     }
@@ -764,11 +763,28 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="safeNodes">Nodes to remove.</param>
     /// <param name="storage">Storage of nodes.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
-    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage)
+    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, int, T> remover)
+        where T : IReadableNode
     {
+        var partitionCommander = GetPartitionCommander();
+
         foreach (var node in safeNodes)
-            storage.Remove(node);
+        {
+            var index = storage.IndexOf(node);
+            if (index >= 0)
+            {
+                storage.RemoveAt(index);
+                if (partitionCommander != null)
+                {
+                    remover(partitionCommander, index, node);
+                }
+            }
+        }
     }
+
+    protected Action<IPartitionCommander, int, T> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
+        (commander, index, node) =>
+            commander.DeleteReference(this, reference, index, new ReferenceTarget(null, node));
 
     #endregion
 
@@ -819,7 +835,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
-    protected void RaiseReferenceAddEvent<T>(Reference reference, List<T> safeNodes, int previousCount) where T : IReadableNode
+    protected void RaiseReferenceAddEvent<T>(Reference reference, List<T> safeNodes, int previousCount)
+        where T : IReadableNode
     {
         var partitionCommander = GetPartitionCommander();
         if (partitionCommander == null)
@@ -840,7 +857,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 public abstract class AnnotationInstanceBase : NodeBase, IAnnotationInstance<INode>
 {
     /// <inheritdoc />
-    protected AnnotationInstanceBase(string id) : base(id) {}
+    protected AnnotationInstanceBase(string id) : base(id) { }
 
     /// <inheritdoc cref="IAnnotationInstance.GetClassifier()" />
     public override Classifier GetClassifier() => GetAnnotation();
@@ -853,7 +870,7 @@ public abstract class AnnotationInstanceBase : NodeBase, IAnnotationInstance<INo
 public abstract class ConceptInstanceBase : NodeBase, IConceptInstance<INode>
 {
     /// <inheritdoc />
-    protected ConceptInstanceBase(string id) : base(id) {}
+    protected ConceptInstanceBase(string id) : base(id) { }
 
     /// <inheritdoc cref="IConceptInstance.GetClassifier()" />
     public override Classifier GetClassifier() => GetConcept();
@@ -866,5 +883,5 @@ public abstract class ConceptInstanceBase : NodeBase, IConceptInstance<INode>
 public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionInstance<INode>
 {
     /// <inheritdoc />
-    protected PartitionInstanceBase(string id) : base(id) {}
+    protected PartitionInstanceBase(string id) : base(id) { }
 }

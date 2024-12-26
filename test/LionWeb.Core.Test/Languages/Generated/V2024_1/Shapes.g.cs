@@ -440,7 +440,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		RemoveAll(safeNodes, _materials);
+		RemoveAll(safeNodes, _materials, ReferenceRemover<IShape>(ShapesLanguage.Instance.BillOfMaterials_materials));
 		return this;
 	}
 
@@ -1558,7 +1558,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNotClearing(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		RemoveAll(safeNodes, _materials);
+		RemoveAll(safeNodes, _materials, ReferenceRemover<IShape>(ShapesLanguage.Instance.MaterialGroup_materials));
 		return this;
 	}
 
@@ -1980,7 +1980,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		RemoveAll(safeNodes, _shapes);
+		RemoveAll(safeNodes, _shapes, ReferenceRemover<IShape>(ShapesLanguage.Instance.ReferenceGeometry_shapes));
 		return this;
 	}
 

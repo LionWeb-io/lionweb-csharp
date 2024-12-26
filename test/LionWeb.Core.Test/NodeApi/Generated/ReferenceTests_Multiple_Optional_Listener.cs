@@ -19,10 +19,9 @@ namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using System.Collections;
 
 [TestClass]
-public class ReferenceTests_Multiple_Listener
+public class ReferenceTests_Multiple_Optional_Listener
 {
     #region Single
 
@@ -43,7 +42,7 @@ public class ReferenceTests_Multiple_Listener
         };
 
         parent.AddShapes([line]);
-        
+
         Assert.AreEqual(1, events);
     }
 
@@ -67,7 +66,7 @@ public class ReferenceTests_Multiple_Listener
         };
 
         parent.InsertShapes(0, [line]);
-        
+
         Assert.AreEqual(1, events);
     }
 
@@ -89,7 +88,7 @@ public class ReferenceTests_Multiple_Listener
         };
 
         parent.InsertShapes(1, [line]);
-        
+
         Assert.AreEqual(1, events);
     }
 
@@ -112,7 +111,7 @@ public class ReferenceTests_Multiple_Listener
         };
 
         parent.InsertShapes(0, [line]);
-        
+
         Assert.AreEqual(1, events);
     }
 
@@ -135,7 +134,7 @@ public class ReferenceTests_Multiple_Listener
         };
 
         parent.InsertShapes(1, [line]);
-        
+
         Assert.AreEqual(1, events);
     }
 
@@ -158,7 +157,7 @@ public class ReferenceTests_Multiple_Listener
         };
 
         parent.InsertShapes(2, [line]);
-        
+
         Assert.AreEqual(1, events);
     }
 
@@ -171,9 +170,16 @@ public class ReferenceTests_Multiple_Listener
     {
         var parent = new ReferenceGeometry("g");
         var line = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+        };
+
         parent.RemoveShapes([line]);
-        Assert.IsNull(line.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(line));
+
+        Assert.AreEqual(0, events);
     }
 
     [TestMethod]
@@ -182,10 +188,16 @@ public class ReferenceTests_Multiple_Listener
         var circle = new Circle("myC");
         var parent = new ReferenceGeometry("cs") { Shapes = [circle] };
         var line = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+        };
+
         parent.RemoveShapes([line]);
-        Assert.IsNull(circle.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+
+        Assert.AreEqual(0, events);
     }
 
     [TestMethod]
@@ -193,9 +205,20 @@ public class ReferenceTests_Multiple_Listener
     {
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [line] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.deletedTarget);
+        };
+
         parent.RemoveShapes([line]);
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { }, parent.Shapes.ToList());
+
+        Assert.AreEqual(1, events);
     }
 
     [TestMethod]
@@ -204,10 +227,20 @@ public class ReferenceTests_Multiple_Listener
         var circle = new Circle("cId");
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [line, circle] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.deletedTarget);
+        };
+
         parent.RemoveShapes([line]);
-        Assert.IsNull(circle.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+
+        Assert.AreEqual(1, events);
     }
 
     [TestMethod]
@@ -216,10 +249,20 @@ public class ReferenceTests_Multiple_Listener
         var circle = new Circle("cId");
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [circle, line] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(1, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.deletedTarget);
+        };
+
         parent.RemoveShapes([line]);
-        Assert.IsNull(circle.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+
+        Assert.AreEqual(1, events);
     }
 
     [TestMethod]
@@ -229,17 +272,26 @@ public class ReferenceTests_Multiple_Listener
         var circleB = new Circle("cIdB");
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, line, circleB] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(1, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.deletedTarget);
+        };
+
         parent.RemoveShapes([line]);
-        Assert.IsNull(circleA.GetParent());
-        Assert.IsNull(circleB.GetParent());
-        Assert.IsNull(line.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Shapes.ToList());
+
+        Assert.AreEqual(1, events);
     }
 
     #endregion
 
     #endregion
-    
+
     #region EmptyCollection
 
     [TestMethod]
@@ -253,9 +305,9 @@ public class ReferenceTests_Multiple_Listener
         {
             events++;
         };
-        
+
         parent.AddShapes(values);
-        
+
         Assert.AreEqual(0, events);
     }
 
@@ -270,9 +322,13 @@ public class ReferenceTests_Multiple_Listener
         {
             events++;
         };
-        
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+        };
+
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        
+
         Assert.AreEqual(0, events);
     }
 
@@ -287,9 +343,9 @@ public class ReferenceTests_Multiple_Listener
         {
             events++;
         };
-        
+
         parent.InsertShapes(0, values);
-        
+
         Assert.AreEqual(0, events);
     }
 
@@ -298,18 +354,41 @@ public class ReferenceTests_Multiple_Listener
     {
         var parent = new ReferenceGeometry("g");
         var values = new IShape[0];
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+        };
+
         parent.RemoveShapes(values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+
+        Assert.AreEqual(0, events);
     }
 
     [TestMethod]
+    [Ignore("Reflective removal not implemented yet")]
+    // TODO
     public void EmptyList_Reset_Reflective()
     {
         var parent = new ReferenceGeometry("g");
-        parent.AddShapes([new Circle("myId")]);
+        var circle = new Circle("myId");
+        parent.AddShapes([circle]);
         var values = new List<IShape>();
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, circle), args.deletedTarget);
+            events++;
+        };
+
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        Assert.IsTrue(parent.Shapes.Count == 0);
+
+        Assert.AreEqual(1, events);
     }
 
     #endregion
@@ -335,7 +414,7 @@ public class ReferenceTests_Multiple_Listener
         };
 
         parent.AddShapes(values);
-        
+
         Assert.AreEqual(2, events);
     }
 
@@ -346,17 +425,26 @@ public class ReferenceTests_Multiple_Listener
         var valueA = new Line("sA");
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceAdded += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(events, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.newTarget);
+            events++;
+        };
+
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
+
+        Assert.AreEqual(2, events);
     }
 
     #region Insert
 
     [TestMethod]
-    public void Multiple_Insert_ListMatchingType()
+    public void Multiple_Insert_Empty()
     {
         var parent = new ReferenceGeometry("g");
         var valueA = new Line("sA");
@@ -374,7 +462,7 @@ public class ReferenceTests_Multiple_Listener
         };
 
         parent.InsertShapes(0, values);
-        
+
         Assert.AreEqual(2, events);
     }
 
@@ -399,7 +487,7 @@ public class ReferenceTests_Multiple_Listener
         };
 
         parent.InsertShapes(1, values);
-        
+
         Assert.AreEqual(2, events);
     }
 
@@ -414,67 +502,21 @@ public class ReferenceTests_Multiple_Listener
         var valueA = new Line("sA");
         var valueB = new Line("sB");
         var values = new List<IShape> { valueA, valueB };
-        parent.RemoveShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(valueA));
-        Assert.IsFalse(parent.Shapes.Contains(valueB));
-    }
+        parent.AddShapes(values);
 
-    [TestMethod]
-    public void Multiple_Remove_ListSubtype()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<Shape> { valueA, valueB };
-        parent.RemoveShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(valueA));
-        Assert.IsFalse(parent.Shapes.Contains(valueB));
-    }
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.deletedTarget);
+            events++;
+        };
 
-    [TestMethod]
-    public void Multiple_Remove_Set()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new HashSet<IShape> { valueA, valueB };
         parent.RemoveShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(valueA));
-        Assert.IsFalse(parent.Shapes.Contains(valueB));
-    }
 
-    [TestMethod]
-    public void Multiple_Remove_SingleEnumerable()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new SingleEnumerable<IShape> { valueA, valueB };
-        parent.RemoveShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(valueA));
-        Assert.IsFalse(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void Multiple_Remove_Empty()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.RemoveShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsFalse(parent.Shapes.Contains(valueA));
-        Assert.IsFalse(parent.Shapes.Contains(valueB));
+        Assert.AreEqual(2, events);
     }
 
     [TestMethod]
@@ -486,12 +528,16 @@ public class ReferenceTests_Multiple_Listener
         var valueA = new Line("sA");
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+        };
+
         parent.RemoveShapes(values);
-        Assert.IsNull(circleA.GetParent());
-        Assert.IsNull(circleB.GetParent());
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Shapes.ToList());
+
+        Assert.AreEqual(0, events);
     }
 
     [TestMethod]
@@ -502,11 +548,20 @@ public class ReferenceTests_Multiple_Listener
         var parent = new ReferenceGeometry("cs") { Shapes = [circleA, circleB] };
         var valueA = new Line("sA");
         var values = new IShape[] { valueA, circleA };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, circleA), args.deletedTarget);
+            events++;
+        };
+
         parent.RemoveShapes(values);
-        Assert.IsNull(circleB.GetParent());
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(circleA.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleB }, parent.Shapes.ToList());
+
+        Assert.AreEqual(1, events);
     }
 
     [TestMethod]
@@ -516,25 +571,20 @@ public class ReferenceTests_Multiple_Listener
         var valueB = new Line("sB");
         var parent = new ReferenceGeometry("g") { Shapes = [valueA, valueB] };
         var values = new IShape[] { valueA, valueB };
-        parent.RemoveShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { }, parent.Shapes.ToList());
-    }
 
-    [TestMethod]
-    public void Multiple_Remove_First()
-    {
-        var circle = new Circle("cId");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var parent = new ReferenceGeometry("g") { Shapes = [valueA, valueB, circle] };
-        var values = new IShape[] { valueA, valueB };
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.deletedTarget);
+            events++;
+        };
+
         parent.RemoveShapes(values);
-        Assert.IsNull(circle.GetParent());
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+
+        Assert.AreEqual(2, events);
     }
 
     [TestMethod]
@@ -545,11 +595,20 @@ public class ReferenceTests_Multiple_Listener
         var valueB = new Line("sB");
         var parent = new ReferenceGeometry("g") { Shapes = [circle, valueA, valueB] };
         var values = new IShape[] { valueA, valueB };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(1, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.deletedTarget);
+            events++;
+        };
+
         parent.RemoveShapes(values);
-        Assert.IsNull(circle.GetParent());
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circle }, parent.Shapes.ToList());
+
+        Assert.AreEqual(2, events);
     }
 
     [TestMethod]
@@ -561,12 +620,20 @@ public class ReferenceTests_Multiple_Listener
         var valueB = new Line("sB");
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, valueA, valueB, circleB] };
         var values = new IShape[] { valueA, valueB };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(1, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.deletedTarget);
+            events++;
+        };
+
         parent.RemoveShapes(values);
-        Assert.IsNull(circleA.GetParent());
-        Assert.IsNull(circleB.GetParent());
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Shapes.ToList());
+
+        Assert.AreEqual(2, events);
     }
 
     [TestMethod]
@@ -578,223 +645,24 @@ public class ReferenceTests_Multiple_Listener
         var valueB = new Line("sB");
         var parent = new ReferenceGeometry("g") { Shapes = [valueA, circleA, valueB, circleB] };
         var values = new IShape[] { valueA, valueB };
+
+        int events = 0;
+        int[] indexes = { 0, 1 };
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(indexes[events], args.index);
+            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.deletedTarget);
+            events++;
+        };
+
         parent.RemoveShapes(values);
-        Assert.IsNull(circleA.GetParent());
-        Assert.IsNull(circleB.GetParent());
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsNull(valueB.GetParent());
-        CollectionAssert.AreEqual(new List<IShape> { circleA, circleB }, parent.Shapes.ToList());
+
+        Assert.AreEqual(2, events);
     }
 
     #endregion
-
-    [TestMethod]
-    public void MultipleUntypedArray_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new object[] { valueA, valueB };
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleUntypedList_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new ArrayList() { valueA, valueB };
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleListMatchingType()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape>() { valueA, valueB };
-        parent.AddShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleListMatchingType_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<IShape>() { valueA, valueB };
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleListSubtype()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<Shape>() { valueA, valueB };
-        parent.AddShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleListSubtype_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new List<Shape>() { valueA, valueB };
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleSet()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new HashSet<IShape>() { valueA, valueB };
-        parent.AddShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleSet_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new HashSet<IShape>() { valueA, valueB };
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleSingleEnumerable()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new SingleEnumerable<IShape>() { valueA, valueB };
-        parent.AddShapes(values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleSingleEnumerable_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new SingleEnumerable<IShape>() { valueA, valueB };
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        Assert.IsNull(valueA.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueA));
-        Assert.IsNull(valueB.GetParent());
-        Assert.IsTrue(parent.Shapes.Contains(valueB));
-    }
-
-    [TestMethod]
-    public void MultipleListNonMatchingType_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Coord("cA");
-        var valueB = new Coord("cB");
-        var values = new List<Coord>() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
-    }
-
-    [TestMethod]
-    public void MultipleUntypedListNonMatchingType_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Coord("cA");
-        var valueB = new Coord("cB");
-        var values = new ArrayList() { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
-    }
-
-    [TestMethod]
-    public void MultipleUntypedArrayNonMatchingType_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Coord("cA");
-        var valueB = new Coord("cB");
-        var values = new object[] { valueA, valueB };
-        Assert.ThrowsException<InvalidValueException>(
-            () => parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values));
-        Assert.IsTrue(parent.Shapes.Count == 0);
-    }
-
-    [TestMethod]
-    public void ResultUnmodifiable_Set()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        var result = parent.Get(ShapesLanguage.Instance.ReferenceGeometry_shapes);
-        Assert.IsInstanceOfType<IReadOnlyList<INode>>(result);
-    }
-
-    [TestMethod]
-    public void Result_Reflective()
-    {
-        var parent = new ReferenceGeometry("g");
-        var valueA = new Line("sA");
-        var valueB = new Line("sB");
-        var values = new IShape[] { valueA, valueB };
-        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
-        var result = parent.Get(ShapesLanguage.Instance.ReferenceGeometry_shapes);
-        CollectionAssert.AreEqual(new List<INode>() { valueA, valueB }, (result as IEnumerable<INode>).ToList());
-    }
-
-    [TestMethod]
-    public void ResultUnmodifiable_Unset()
-    {
-        var parent = new ReferenceGeometry("g");
-        var result = parent.Get(ShapesLanguage.Instance.ReferenceGeometry_shapes);
-        Assert.IsInstanceOfType<IReadOnlyList<INode>>(result);
-    }
 
     #endregion
 }

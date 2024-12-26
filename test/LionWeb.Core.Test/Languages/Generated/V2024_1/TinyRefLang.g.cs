@@ -132,7 +132,7 @@ public partial class MyConcept : ConceptInstanceBase
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNotClearing(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		RemoveAll(safeNodes, _multivaluedRef);
+		RemoveAll(safeNodes, _multivaluedRef, ReferenceRemover<MyConcept>(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef));
 		return this;
 	}
 

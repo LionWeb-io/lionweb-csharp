@@ -302,7 +302,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
                     AssureNotClearingCall(reference),
-                    SimpleRemoveAllCall(reference),
+                    RemoveAllCall(reference),
                     ReturnStatement(This())
                 ])
                 .Select(r => XdocRequiredRemover(r, reference))
@@ -337,7 +337,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
-                SimpleRemoveAllCall(reference),
+                RemoveAllCall(reference),
                 ReturnStatement(This())
             ])
         );
@@ -467,8 +467,13 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             AsArguments([IdentifierName("safeNodes")])
         ));
 
-    private ExpressionStatementSyntax SimpleRemoveAllCall(Reference reference) =>
-        ExpressionStatement(Call("RemoveAll", IdentifierName("safeNodes"), FeatureField(reference)));
+    private ExpressionStatementSyntax RemoveAllCall(Reference reference) =>
+        ExpressionStatement(Call(
+            "RemoveAll",
+            IdentifierName("safeNodes"),
+            FeatureField(reference),
+            CallGeneric("ReferenceRemover", AsType(reference.Type), MetaProperty(reference))
+        ));
 
     private ExpressionStatementSyntax SimpleInsertRangeCall(Reference reference) =>
         ExpressionStatement(InvocationExpression(

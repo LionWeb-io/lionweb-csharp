@@ -233,6 +233,23 @@ public static class AstExtensions
         return result;
     }
 
+    /// <returns><c>name&lt;type&gt;(parameters)</c></returns>
+    public static InvocationExpressionSyntax CallGeneric(string name, TypeSyntax type, params ExpressionSyntax[] arguments)
+    {
+        var result = InvocationExpression(
+            GenericName(Identifier(name))
+                .WithTypeArgumentList(TypeArgumentList(SingletonSeparatedList<TypeSyntax>(type)))
+            );
+
+        if (arguments.Length != 0)
+        {
+            result = result
+                .WithArgumentList(AsArguments(arguments));
+        }
+
+        return result;
+    }
+
     /// <returns><c>returnType name(parameters) => exprBody;</c></returns>
     public static MethodDeclarationSyntax Method(string name, TypeSyntax? returnType = null,
         IEnumerable<ParameterSyntax>? parameters = null, ExpressionSyntax? exprBody = null)
