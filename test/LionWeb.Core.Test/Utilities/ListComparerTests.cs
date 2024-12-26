@@ -18,78 +18,71 @@
 namespace LionWeb.Core.Test.Utilities;
 
 using Core.Utilities;
+using LeftIndex = int;
+using RightIndex = int;
 
 [TestClass]
 public class ListComparerTests
 {
     [TestMethod]
-    public void Empty()
-    {
-        var changes = new ListComparer<string>([], []).Compare();
-
-        Assert.AreEqual(0, changes.Count);
-    }
+    public void Empty() =>
+        AssertCompare(
+            "",
+            "",
+            []
+        );
 
     [TestMethod]
-    public void LeftEmptyOne()
-    {
-        var changes = new ListComparer<string>([], ["a"]).Run();
-
-        CollectionAssert.AreEqual(
-            new List<ListComparer<string>.ListChange> { new ListComparer<string>.ListAdded("a", 0) },
-            changes
+    public void LeftEmptyOne() =>
+        AssertCompare(
+            "",
+            "a",
+            [
+                new(Add, 'a', 0),
+            ]
         );
-    }
 
     [TestMethod]
-    public void LeftEmptyTwo()
-    {
-        var changes = new ListComparer<string>([], ["a", "b"]).Compare();
-
-        CollectionAssert.AreEqual(
-            new List<ListComparer<string>.ListChange>
-            {
-                new ListComparer<string>.ListAdded("a", 0), new ListComparer<string>.ListAdded("b", 1)
-            },
-            changes
+    public void LeftEmptyTwo() =>
+        AssertCompare(
+            "",
+            "ab",
+            [
+                new(Add, 'a', 0),
+                new(Add, 'b', 1),
+            ]
         );
-    }
 
     [TestMethod]
-    public void RightEmptyOne()
-    {
-        var changes = new ListComparer<string>(["a"], []).Compare();
-
-        CollectionAssert.AreEqual(
-            new List<ListComparer<string>.ListChange> { new ListComparer<string>.ListRemoved("a", 0) },
-            changes
+    public void RightEmptyOne() =>
+        AssertCompare(
+            "a",
+            "",
+            [
+                new(Remove, 'a', 0),
+            ]
         );
-    }
 
     [TestMethod]
-    public void RightEmptyTwo()
-    {
-        var changes = new ListComparer<string>(["a", "b"], []).Compare();
-
-        CollectionAssert.AreEqual(
-            new List<ListComparer<string>.ListChange>
-            {
-                new ListComparer<string>.ListRemoved("a", 0), new ListComparer<string>.ListRemoved("b", 1)
-            },
-            changes
+    public void RightEmptyTwo() =>
+        AssertCompare(
+            "ab",
+            "",
+            [
+                new(Remove, 'a', 0),
+                new(Remove, 'b', 1),
+            ]
         );
-    }
 
     [TestMethod]
-    public void SwappedTwo()
-    {
-        var changes = new ListComparer<string>(["a", "b"], ["b", "a"]).Run();
-
-        CollectionAssert.AreEqual(
-            new List<ListComparer<char>.ListChange> { new ListComparer<char>.ListMoved('a', 0, 'a', 1) },
-            changes
+    public void SwappedTwo() =>
+        AssertCompare(
+            "ab",
+            "ba",
+            [
+                new(Move, 'a', 0, 1)
+            ]
         );
-    }
 
     [TestMethod]
     public void Hirschberg()
@@ -102,19 +95,39 @@ public class ListComparerTests
     }
 
     [TestMethod]
-    public void Hirschberg2()
+    public void Hirschberg2() =>
+        AssertCompare(
+            "abcdef",
+            "bcda",
+            [
+                new(Move, 'a', 0, 5),
+                new(Remove, 'e', 4)
+            ]
+        );
+
+    private const int Add = 0;
+    private const int Remove = 1;
+    private const int Move = 2;
+
+    private void AssertCompare(string left, string right, R[] results)
     {
-        const string left = "abcdef";
-        const string right = "bcda";
         var comparer = new ListComparer<char>(left.ToList(), right.ToList());
         var changes = comparer.Run();
         CollectionAssert.AreEquivalent(
-            new List<ListComparer<char>.ListChange>
+            results.Select(r => (ListComparer<char>.ListChange)(r.changeKind switch
             {
-                new ListComparer<char>.ListMoved('a', 0, 'a', 5),
-                new ListComparer<char>.ListRemoved('e', 4),
-            },
+                Add => new ListComparer<char>.ListAdded(r.left, r.leftIndex),
+                Remove => new ListComparer<char>.ListRemoved(r.left, r.leftIndex),
+                Move => new ListComparer<char>.ListMoved(r.left, r.leftIndex, (char)r.left, (RightIndex)r.rightIndex),
+                _ => throw new InvalidOperationException()
+            })).ToList(),
             changes
         );
     }
 }
+
+internal record struct R(
+    int changeKind,
+    char left,
+    LeftIndex leftIndex,
+    RightIndex? rightIndex = null);
