@@ -69,7 +69,6 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
     private ClassDeclarationSyntax ClassifierConcept(Concept concept)
     {
         List<TypeSyntax> bases = [];
-
         if (concept.Extends is not null && !concept.Extends.EqualsIdentity(_builtIns.Node))
         {
             bases.Add(AsType(concept.Extends));
@@ -80,18 +79,23 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
 
         bases.AddRange(Interfaces.Select(i => AsType(i)));
 
+        List<MemberDeclarationSyntax> additionalMembers = [GenGetClassifier("GetConcept", typeof(Concept))];
+
         if (concept.Partition)
+        {
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
-        return ClassifierClass(bases, [
-            GenGetClassifier("GetConcept", typeof(Concept)),
-            Field("_eventHandler", AsType(typeof(PartitionEventHandler)), NewCall([]))
-                .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
-            ReadOnlyProperty("Listener", AsType(typeof(IPartitionListener)), IdentifierName("_eventHandler"))
-                .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword)),
-            ReadOnlyProperty("Commander", AsType(typeof(IPartitionCommander)), IdentifierName("_eventHandler"))
-                .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-        ]);
+            additionalMembers.AddRange([
+                Field("_eventHandler", AsType(typeof(PartitionEventHandler)), NewCall([]))
+                    .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
+                ReadOnlyProperty("Listener", AsType(typeof(IPartitionListener)), IdentifierName("_eventHandler"))
+                    .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword)),
+                ReadOnlyProperty("Commander", AsType(typeof(IPartitionCommander)), IdentifierName("_eventHandler"))
+                    .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            ]);
+        }
+
+        return ClassifierClass(bases, additionalMembers);
     }
 
     private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases,
