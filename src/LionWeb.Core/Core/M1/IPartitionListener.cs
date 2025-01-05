@@ -38,7 +38,7 @@ public interface IForestCommander
 {
     void AddPartition(IReadableNode newPartition);
     // bool CanRaiseAddPartition();
-    
+
     void DeletePartition(IReadableNode deletedPartition);
     // bool CanRaiseDeletePartition();
 }
@@ -286,10 +286,10 @@ public interface IPartitionCommander
 
     void AddProperty(IWritableNode node, Property property, PropertyValue newValue);
     // bool CanRaiseAddProperty();
-    
+
     void DeleteProperty(IWritableNode node, Property property, PropertyValue oldValue);
     // bool CanRaiseDeleteProperty();
-    
+
     void ChangeProperty(IWritableNode node, Property property, PropertyValue newValue, PropertyValue oldValue);
     // bool CanRaiseChangeProperty();
 
@@ -298,26 +298,30 @@ public interface IPartitionCommander
     #region Children
 
     void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index);
-    // bool CanRaiseAddChild();
-    
+    bool CanRaiseAddChild();
+
     void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index);
-    // bool CanRaiseDeleteChild();
+    bool CanRaiseDeleteChild();
 
     void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
         Containment containment, Index index);
-    // bool CanRaiseReplaceChild();
+
+    bool CanRaiseReplaceChild();
 
     void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
         IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex);
-    // bool CanRaiseMoveChildFromOtherContainment();
+
+    bool CanRaiseMoveChildFromOtherContainment();
 
     void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex, IWritableNode movedChild,
         IWritableNode parent, Containment oldContainment, Index oldIndex);
-    // bool CanRaiseMoveChildFromOtherContainmentInSameParent();
+
+    bool CanRaiseMoveChildFromOtherContainmentInSameParent();
 
     void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
         Containment containment, Index oldIndex);
-    // bool CanRaiseMoveChildInSameContainment();
+
+    bool CanRaiseMoveChildInSameContainment();
 
     #endregion
 
@@ -325,7 +329,7 @@ public interface IPartitionCommander
 
     void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index);
     // bool CanRaiseAddAnnotation();
-    
+
     void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index);
     // bool CanRaiseDeleteAnnotation();
 
@@ -347,24 +351,26 @@ public interface IPartitionCommander
 
     void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget);
     bool CanRaiseAddReference();
-    
+
     void DeleteReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget deletedTarget);
     bool CanRaiseDeleteReference();
 
     void ChangeReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
         IReferenceTarget replacedTarget);
+
     bool CanRaiseChangeReference();
 
     void MoveEntryFromOtherReference(IWritableNode newParent, Reference newReference, Index newIndex,
         IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target);
     // bool CanRaiseMoveEntryFromOtherReference();
-    
+
     void MoveEntryFromOtherReferenceInSameParent(IWritableNode parent, Reference newReference, Index newIndex,
         Reference oldReference, Index oldIndex, IReferenceTarget target);
     // bool CanRaiseMoveEntryFromOtherReferenceInSameParent();
 
     void MoveEntryInSameReference(IWritableNode parent, Reference reference, Index oldIndex, Index newIndex,
         IReferenceTarget target);
+
     bool CanRaiseMoveEntryInSameReference();
 
     void AddReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, ResolveInfo newResolveInfo,

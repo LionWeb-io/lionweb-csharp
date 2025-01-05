@@ -894,6 +894,117 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
+    protected class SingleContainmentEvent<T> where T : INode
+    {
+        private readonly Containment _containment;
+        private readonly INode _newParent;
+        private readonly T? _newValue;
+        private readonly T? _oldValue;
+        private readonly IPartitionCommander? _partitionCommander;
+
+        private INode? _oldParent;
+        private Containment? _oldContainment;
+        private int _oldIndex;
+        private readonly T? _newValue1;
+
+        public SingleContainmentEvent(Containment containment, NodeBase newParent, T? newValue, T? oldValue)
+        {
+            _containment = containment;
+            _newParent = newParent;
+            _oldValue = oldValue;
+            _newValue = newValue;
+
+            _partitionCommander = newParent.GetPartitionCommander();
+        }
+
+        public void CollectOldData()
+        {
+            if (!IsActive())
+                return;
+
+            if (_newValue == null)
+                return;
+
+            _oldParent = _newValue.GetParent();
+            if (_oldParent == null)
+                return;
+
+            _oldContainment = _oldParent.GetContainmentOf(_newValue);
+            if (_oldContainment == null)
+                return;
+
+            _oldIndex = _oldContainment.Multiple
+                ? M2Extensions.AsNodes<INode>(_oldParent.Get(_oldContainment)).ToList().IndexOf(_newValue1)
+                : 0;
+        }
+
+        public void RaiseEvent()
+        {
+            if (!IsActive())
+                return;
+
+            switch (_oldValue, _newValue, _oldParent)
+            {
+                case (null, null, _):
+                case ({ }, { }, _) when Equals(_oldValue, _newValue):
+                    // fall-through
+                    break;
+
+                case ({ }, null, _):
+                    _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
+                    break;
+
+                case (null, { }, { })
+                    when _oldParent == _newParent && _oldContainment != _containment:
+                    _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, 0, _newValue,
+                        _newParent, _oldContainment, _oldIndex);
+                    break;
+
+                case ({ }, { }, { })
+                    when _oldParent == _newParent && _oldContainment != _containment:
+                    _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
+                    _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, 0, _newValue,
+                        _newParent, _oldContainment, _oldIndex);
+                    break;
+
+                case ({ }, { }, { })
+                    when _oldParent != _newParent:
+                    _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
+                    _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, 0, _newValue,
+                        _oldParent, _oldContainment, _oldIndex);
+                    break;
+
+                case (null, { }, { })
+                    when _oldParent != _newParent:
+                    _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, 0, _newValue,
+                        _oldParent, _oldContainment, _oldIndex);
+                    break;
+
+                case (null, { }, null):
+                    _partitionCommander.AddChild(_newParent, _newValue, _containment, 0);
+                    break;
+
+                case ({ }, { }, null):
+                    _partitionCommander.ReplaceChild(_newValue, _oldValue, _newParent, _containment, 0);
+                    break;
+
+                default:
+                    throw new ArgumentException("Unknown state");
+            }
+        }
+
+        private bool IsActive() =>
+            _partitionCommander != null && (_partitionCommander.CanRaiseAddChild() ||
+                                            _partitionCommander.CanRaiseDeleteChild() ||
+                                            _partitionCommander.CanRaiseReplaceChild() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildFromOtherContainment() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildInSameContainment());
+    }
+
     #endregion
 }
 

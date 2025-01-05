@@ -85,56 +85,114 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         PropertyChanged?.Invoke(_sender, new(node, property, newValue, oldValue));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildAddedArgs>? ChildAdded;
+    public event EventHandler<IPartitionListener.ChildAddedArgs> ChildAdded
+    {
+        add => _childAdded.Add(value);
+        remove => _childAdded.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ChildAddedArgs> _childAdded = new();
 
     /// <inheritdoc />
     public void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index) =>
-        ChildAdded?.Invoke(_sender, new(parent, newChild, containment, index));
+        _childAdded.Invoke(_sender, new(parent, newChild, containment, index));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildDeletedArgs>? ChildDeleted;
+    public bool CanRaiseAddChild() => _childAdded.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ChildDeletedArgs> ChildDeleted
+    {
+        add => _childDeleted.Add(value);
+        remove => _childDeleted.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ChildDeletedArgs> _childDeleted = new();
 
     /// <inheritdoc />
     public void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index) =>
-        ChildDeleted?.Invoke(_sender, new(deletedChild, parent, containment, index));
+        _childDeleted.Invoke(_sender, new(deletedChild, parent, containment, index));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildReplacedArgs>? ChildReplaced;
+    public bool CanRaiseDeleteChild() => _childDeleted.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ChildReplacedArgs> ChildReplaced
+    {
+        add => _childReplaced.Add(value);
+        remove => _childReplaced.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ChildReplacedArgs> _childReplaced = new();
 
     /// <inheritdoc />
     public void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
         Containment containment,
         Index index) =>
-        ChildReplaced?.Invoke(_sender, new(newChild, replacedChild, parent, containment, index));
+        _childReplaced.Invoke(_sender, new(newChild, replacedChild, parent, containment, index));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildMovedFromOtherContainmentArgs>? ChildMovedFromOtherContainment;
+    public bool CanRaiseReplaceChild() => _childReplaced.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ChildMovedFromOtherContainmentArgs> ChildMovedFromOtherContainment
+    {
+        add => _childMovedFromOtherContainment.Add(value);
+        remove => _childMovedFromOtherContainment.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ChildMovedFromOtherContainmentArgs>
+        _childMovedFromOtherContainment = new();
 
     /// <inheritdoc />
     public void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
         IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex) =>
-        ChildMovedFromOtherContainment?.Invoke(_sender,
+        _childMovedFromOtherContainment.Invoke(_sender,
             new(newParent, newContainment, newIndex, movedChild, oldParent, oldContainment, oldIndex));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildMovedFromOtherContainmentInSameParentArgs>?
-        ChildMovedFromOtherContainmentInSameParent;
+    public bool CanRaiseMoveChildFromOtherContainment() => _childMovedFromOtherContainment.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ChildMovedFromOtherContainmentInSameParentArgs>
+        ChildMovedFromOtherContainmentInSameParent
+        {
+            add => _childMovedFromOtherContainmentInSameParent.Add(value);
+            remove => _childMovedFromOtherContainmentInSameParent.Remove(value);
+        }
+
+    private readonly CountingEventHandler<IPartitionListener.ChildMovedFromOtherContainmentInSameParentArgs>
+        _childMovedFromOtherContainmentInSameParent = new();
 
     /// <inheritdoc />
     public void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex,
         IWritableNode movedChild,
         IWritableNode parent, Containment oldContainment, Index oldIndex) =>
-        ChildMovedFromOtherContainmentInSameParent?.Invoke(_sender,
+        _childMovedFromOtherContainmentInSameParent.Invoke(_sender,
             new(newContainment, newIndex, movedChild, parent, oldContainment, oldIndex));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildMovedInSameContainmentArgs>? ChildMovedInSameContainment;
+    public bool CanRaiseMoveChildFromOtherContainmentInSameParent() =>
+        _childMovedFromOtherContainmentInSameParent.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ChildMovedInSameContainmentArgs> ChildMovedInSameContainment
+    {
+        add => _childMovedInSameContainment.Add(value);
+        remove => _childMovedInSameContainment.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ChildMovedInSameContainmentArgs>
+        _childMovedInSameContainment = new();
 
     /// <inheritdoc />
     public void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
         Containment containment,
         Index oldIndex) =>
-        ChildMovedInSameContainment?.Invoke(_sender, new(newIndex, movedChild, parent, containment, oldIndex));
+        _childMovedInSameContainment.Invoke(_sender, new(newIndex, movedChild, parent, containment, oldIndex));
+
+    /// <inheritdoc />
+    public bool CanRaiseMoveChildInSameContainment() => _childMovedInSameContainment.HasSubscribers;
 
     /// <inheritdoc />
     public event EventHandler<IPartitionListener.AnnotationAddedArgs>? AnnotationAdded;

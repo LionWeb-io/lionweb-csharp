@@ -1193,13 +1193,16 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
 	public Documentation? Documentation { get => _documentation; set => SetDocumentation(value); }
 
-	/// <remarks>Optional Single Containment</remarks>
-        public Geometry SetDocumentation(Documentation? value)
-	{
-		SetParentNull(_documentation);
+    /// <remarks>Optional Single Containment</remarks>
+    public Geometry SetDocumentation(Documentation? value)
+    {
+        var evt = new SingleContainmentEvent<Documentation>(ShapesLanguage.Instance.Geometry_documentation, this, value, _documentation);
+        evt.CollectOldData();
+        SetParentNull(_documentation);
 		AttachChild(value);
 		_documentation = value;
-		return this;
+        evt.RaiseEvent();
+        return this;
 	}
 
 	private readonly List<IShape> _shapes = [];
@@ -1718,9 +1721,12 @@ public partial class OffsetDuplicate : Shape
 	/// <remarks>Optional Single Containment</remarks>
         public OffsetDuplicate SetDocs(Documentation? value)
 	{
+        var evt = new SingleContainmentEvent<Documentation>(ShapesLanguage.Instance.OffsetDuplicate_docs, this, value, _docs);
+        evt.CollectOldData();
 		SetParentNull(_docs);
 		AttachChild(value);
 		_docs = value;
+        evt.RaiseEvent();
 		return this;
 	}
 
