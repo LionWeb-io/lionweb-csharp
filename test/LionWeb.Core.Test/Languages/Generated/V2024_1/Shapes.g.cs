@@ -2016,8 +2016,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
 			var enumerable = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value);
-			_shapes.Clear();
-			AddShapes(enumerable);
+            SetReferenceWithEvents(ShapesLanguage.Instance.ReferenceGeometry_shapes, enumerable.ToList(), _shapes);
 			return true;
 		}
 

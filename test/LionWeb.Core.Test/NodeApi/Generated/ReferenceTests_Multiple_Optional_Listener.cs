@@ -46,6 +46,27 @@ public class ReferenceTests_Multiple_Optional_Listener
         Assert.AreEqual(1, events);
     }
 
+    [TestMethod]
+    public void Single_Add_Reflective()
+    {
+        var parent = new ReferenceGeometry("g");
+        var line = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceAdded += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.newTarget);
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line });
+
+        Assert.AreEqual(1, events);
+    }
+
     #region Insert
 
     [TestMethod]
@@ -71,6 +92,28 @@ public class ReferenceTests_Multiple_Optional_Listener
     }
 
     [TestMethod]
+    public void Single_Insert_One_Before_Reflective()
+    {
+        var circle = new Circle("cId");
+        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
+        var line = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceAdded += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.newTarget);
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line, circle });
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
     public void Single_Insert_One_After()
     {
         var circle = new Circle("cId");
@@ -88,6 +131,28 @@ public class ReferenceTests_Multiple_Optional_Listener
         };
 
         parent.InsertShapes(1, [line]);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void Single_Insert_One_After_Reflective()
+    {
+        var circle = new Circle("cId");
+        var parent = new ReferenceGeometry("g") { Shapes = [circle] };
+        var line = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceAdded += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(1, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.newTarget);
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle, line });
 
         Assert.AreEqual(1, events);
     }
@@ -116,6 +181,29 @@ public class ReferenceTests_Multiple_Optional_Listener
     }
 
     [TestMethod]
+    public void Single_Insert_Two_Before_Reflective()
+    {
+        var circleA = new Circle("cIdA");
+        var circleB = new Circle("cIdB");
+        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
+        var line = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceAdded += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.newTarget);
+            events++;
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line, circleA, circleB });
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
     public void Single_Insert_Two_Between()
     {
         var circleA = new Circle("cIdA");
@@ -134,6 +222,29 @@ public class ReferenceTests_Multiple_Optional_Listener
         };
 
         parent.InsertShapes(1, [line]);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void Single_Insert_Two_Between_Reflective()
+    {
+        var circleA = new Circle("cIdA");
+        var circleB = new Circle("cIdB");
+        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
+        var line = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceAdded += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(1, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.newTarget);
+            events++;
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, line, circleB });
 
         Assert.AreEqual(1, events);
     }
@@ -161,6 +272,29 @@ public class ReferenceTests_Multiple_Optional_Listener
         Assert.AreEqual(1, events);
     }
 
+    [TestMethod]
+    public void Single_Insert_Two_After_Reflective()
+    {
+        var circleA = new Circle("cIdA");
+        var circleB = new Circle("cIdB");
+        var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
+        var line = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceAdded += (sender, args) =>
+        {
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(2, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.newTarget);
+            events++;
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, circleB, line });
+
+        Assert.AreEqual(1, events);
+    }
+
     #endregion
 
     #region Remove
@@ -178,6 +312,23 @@ public class ReferenceTests_Multiple_Optional_Listener
         };
 
         parent.RemoveShapes([line]);
+
+        Assert.AreEqual(0, events);
+    }
+
+    [TestMethod]
+    public void Single_Remove_Empty_Reflective()
+    {
+        var parent = new ReferenceGeometry("g");
+        var line = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
 
         Assert.AreEqual(0, events);
     }
@@ -222,6 +373,27 @@ public class ReferenceTests_Multiple_Optional_Listener
     }
 
     [TestMethod]
+    public void Single_Remove_Only_Reflective()
+    {
+        var line = new Line("myId");
+        var parent = new ReferenceGeometry("g") { Shapes = [line] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.deletedTarget);
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
     public void Single_Remove_First()
     {
         var circle = new Circle("cId");
@@ -239,6 +411,28 @@ public class ReferenceTests_Multiple_Optional_Listener
         };
 
         parent.RemoveShapes([line]);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void Single_Remove_First_Reflective()
+    {
+        var circle = new Circle("cId");
+        var line = new Line("myId");
+        var parent = new ReferenceGeometry("g") { Shapes = [line, circle] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.deletedTarget);
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
 
         Assert.AreEqual(1, events);
     }
@@ -266,6 +460,28 @@ public class ReferenceTests_Multiple_Optional_Listener
     }
 
     [TestMethod]
+    public void Single_Remove_Last_Reflective()
+    {
+        var circle = new Circle("cId");
+        var line = new Line("myId");
+        var parent = new ReferenceGeometry("g") { Shapes = [circle, line] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(1, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.deletedTarget);
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
     public void Single_Remove_Between()
     {
         var circleA = new Circle("cIdA");
@@ -284,6 +500,29 @@ public class ReferenceTests_Multiple_Optional_Listener
         };
 
         parent.RemoveShapes([line]);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void Single_Remove_Between_Reflective()
+    {
+        var circleA = new Circle("cIdA");
+        var circleB = new Circle("cIdB");
+        var line = new Line("myId");
+        var parent = new ReferenceGeometry("g") { Shapes = [circleA, line, circleB] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.reference);
+            Assert.AreEqual(1, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, line), args.deletedTarget);
+        };
+
+        parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, circleB });
 
         Assert.AreEqual(1, events);
     }
@@ -367,8 +606,6 @@ public class ReferenceTests_Multiple_Optional_Listener
     }
 
     [TestMethod]
-    [Ignore("Reflective removal not implemented yet")]
-    // TODO
     public void EmptyList_Reset_Reflective()
     {
         var parent = new ReferenceGeometry("g");
