@@ -367,9 +367,12 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	/// <remarks>Optional Single Containment</remarks>
         public BillOfMaterials SetDefaultGroup(MaterialGroup? value)
 	{
+		SingleContainmentEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_defaultGroup, this, value, _defaultGroup);
+		evt.CollectOldData();
 		SetParentNull(_defaultGroup);
 		AttachChild(value);
 		_defaultGroup = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1196,9 +1199,12 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	/// <remarks>Optional Single Containment</remarks>
         public Geometry SetDocumentation(Documentation? value)
 	{
+		SingleContainmentEvent<Documentation> evt = new(ShapesLanguage.Instance.Geometry_documentation, this, value, _documentation);
+		evt.CollectOldData();
 		SetParentNull(_documentation);
 		AttachChild(value);
 		_documentation = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1514,9 +1520,12 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <remarks>Optional Single Containment</remarks>
         public MaterialGroup SetDefaultShape(IShape? value)
 	{
+		SingleContainmentEvent<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_defaultShape, this, value, _defaultShape);
+		evt.CollectOldData();
 		SetParentNull(_defaultShape);
 		AttachChild(value);
 		_defaultShape = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1718,9 +1727,12 @@ public partial class OffsetDuplicate : Shape
 	/// <remarks>Optional Single Containment</remarks>
         public OffsetDuplicate SetDocs(Documentation? value)
 	{
+		SingleContainmentEvent<Documentation> evt = new(ShapesLanguage.Instance.OffsetDuplicate_docs, this, value, _docs);
+		evt.CollectOldData();
 		SetParentNull(_docs);
 		AttachChild(value);
 		_docs = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1752,9 +1764,12 @@ public partial class OffsetDuplicate : Shape
 	/// <remarks>Optional Single Containment</remarks>
         public OffsetDuplicate SetSecretDocs(Documentation? value)
 	{
+		SingleContainmentEvent<Documentation> evt = new(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, this, value, _secretDocs);
+		evt.CollectOldData();
 		SetParentNull(_secretDocs);
 		AttachChild(value);
 		_secretDocs = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2126,9 +2141,12 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <remarks>Optional Single Containment</remarks>
         public Shape SetShapeDocs(Documentation? value)
 	{
+		SingleContainmentEvent<Documentation> evt = new(ShapesLanguage.Instance.Shape_shapeDocs, this, value, _shapeDocs);
+		evt.CollectOldData();
 		SetParentNull(_shapeDocs);
 		AttachChild(value);
 		_shapeDocs = value;
+		evt.RaiseEvent();
 		return this;
 	}
 

@@ -121,8 +121,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ])
             );
 
-    private LocalDeclarationStatementSyntax OldValueVariable() => Variable("oldValue",
-        NullableType(AsType(feature.GetFeatureType())), FeatureField(feature));
+    private LocalDeclarationStatementSyntax OldValueVariable() =>
+        Variable("oldValue", NullableType(AsType(feature.GetFeatureType())), FeatureField(feature));
 
     private ExpressionStatementSyntax RaisePropertyEventCall() =>
         ExpressionStatement(
@@ -151,9 +151,16 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }.Concat(
             OptionalFeatureSetter([
+                Variable(
+                    "evt",
+                    AsType(typeof(NodeBase.SingleContainmentEvent<>), AsType(feature.GetFeatureType())),
+                    NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
+                ),
+                ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("CollectOldData")))),
                 SetParentNullCall(containment),
                 AttachChildCall(),
                 AssignFeatureField(),
+                ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("RaiseEvent")))),
                 ReturnStatement(This())
             ]));
 
@@ -373,7 +380,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             FeatureField(link),
             MetaProperty(link)
         ));
-    
+
     private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
         ExpressionStatement(Call("AssureNonEmpty",
             IdentifierName("safeNodes"),

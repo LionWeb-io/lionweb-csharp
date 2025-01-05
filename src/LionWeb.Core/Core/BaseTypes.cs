@@ -894,7 +894,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
-    protected class SingleContainmentEvent<T> where T : INode
+    public class SingleContainmentEvent<T> where T : INode
     {
         private readonly Containment _containment;
         private readonly INode _newParent;
