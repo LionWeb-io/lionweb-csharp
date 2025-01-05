@@ -18,10 +18,9 @@
 namespace LionWeb.Core.Test.Utilities;
 
 using Core.Utilities;
-using Languages.Generated.V2023_1.Shapes.M2;
 
 [TestClass]
-public class ListComparerTests : ListComparerTestsBase
+public class StepwiseListComparerTests : ListComparerTestsBase
 {
     [TestMethod]
     public void Empty() =>
@@ -69,7 +68,7 @@ public class ListComparerTests : ListComparerTestsBase
             "",
             [
                 new(Delete, 'a', 0),
-                new(Delete, 'b', 1),
+                new(Delete, 'b', 0),
             ]
         );
 
@@ -176,7 +175,7 @@ public class ListComparerTests : ListComparerTestsBase
             "abHdefgCijkl",
             [
                 new(Move, 'H', 7, 2),
-                new(Move, 'C', 2, 7)
+                new(Move, 'C', 3, 7)
             ]
         );
 
@@ -193,12 +192,12 @@ public class ListComparerTests : ListComparerTestsBase
     [TestMethod]
     public void Hirschberg2() =>
         AssertCompare(
-            "abcdef",
-            "bcda",
+            "AbcdEF",
+            "bcdA",
             [
-                new(Move, 'a', 0, 3),
-                new(Delete, 'e', 4),
-                new(Delete, 'f', 5),
+                new(Move, 'A', 0, 3),
+                new(Delete, 'E', 4),
+                new(Delete, 'F', 4),
             ]
         );
 
@@ -221,69 +220,17 @@ public class ListComparerTests : ListComparerTestsBase
         );
 
     [TestMethod]
-    public void SwapTwoNodes()
-    {
-        var a = new Line("a");
-        var b = new Line("b");
-
-        var comparer = new ListComparer<INode>([a, b], [b, a]);
-        var changes = comparer.Compare();
-        CollectionAssert.AreEquivalent(
-            new List<IListComparer<INode>.Change> { new IListComparer<INode>.Moved(a, 0, a, 1) },
-            changes
-        );
-    }
-
-    [TestMethod]
-    public void SwapTwoNodes_SameId()
-    {
-        var a = new Line("x");
-        var b = new Line("x");
-
-        var comparer = new ListComparer<INode>([a, b], [b, a]);
-        var changes = comparer.Compare();
-        CollectionAssert.AreEquivalent(
-            new List<IListComparer<INode>.Change> { new IListComparer<INode>.Moved(a, 0, a, 1) },
-            changes
-        );
-    }
-
-    private class NodeIdComparer : IEqualityComparer<INode>
-    {
-        public bool Equals(INode? x, INode? y) =>
-            x.GetId() == y.GetId();
-
-        public int GetHashCode(INode obj) =>
-            obj.GetId().GetHashCode();
-    }
-
-    [TestMethod]
-    public void SwapTwoNodes_SameId_CustomComparer()
-    {
-        var a = new Line("x");
-        var b = new Line("x");
-
-
-        var comparer = new ListComparer<INode>([a, b], [b, a], new NodeIdComparer());
-        var changes = comparer.Compare();
-        CollectionAssert.AreEquivalent(
-            new List<IListComparer<INode>.Change> { },
-            changes
-        );
-    }
-
-    [TestMethod]
     public void AddDeleteMove() =>
         AssertCompare(
             "aBcD",
             "aEcB",
             [
                 new(Add, 'E', 1),
-                new(Delete, 'D', 3),
-                new(Move, 'B', 1, 3),
+                new(Move, 'B', 2, 3),
+                new(Delete, 'D', 4),
             ]
         );
 
     protected internal override IListComparer<char> CreateComparer(string left, string right)
-        => new ListComparer<char>(left.ToList(), right.ToList());
+        => new StepwiseListComparer<char>(left.ToList(), right.ToList());
 }

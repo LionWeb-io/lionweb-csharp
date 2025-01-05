@@ -25,7 +25,7 @@ using RightIndex = int;
 /// Implements the Hirschberg O(n) space algorithm for finding an alignment.
 /// Inspired by David Powell's Java implementation at https://github.com/drpowell/AlignDemo/blob/master/Hirschberg.java
 /// </remarks>
-public class ListComparer<T>
+public class ListComparer<T> : IListComparer<T>
 {
     private readonly List<T> _left;
     private readonly List<T> _right;
@@ -40,10 +40,10 @@ public class ListComparer<T>
     private readonly List<T> _alignLeft;
     private readonly List<T> _alignRight;
     private readonly SortedList<RightIndex, (T, RightIndex)> _added = [];
-    private readonly SortedList<LeftIndex, (T, LeftIndex)> _removed = [];
+    private readonly SortedList<LeftIndex, (T, LeftIndex)> _deleted = [];
 
     /// <summary>
-    /// Compares two lists, and returns the minimum number of <see cref="ListChange">changes</see>
+    /// Compares two lists, and returns the minimum number of <see cref="IListComparer{T}.Change">changes</see>
     /// to convert <paramref name="left"/> into <paramref name="right"/>. 
     /// </summary>
     public ListComparer(List<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
@@ -64,23 +64,17 @@ public class ListComparer<T>
         _alignRight = [];
     }
 
-    public List<ListChange> Compare()
-    {
-        CompareInternal();
-        return CollectChanges();
-    }
-
-    public List<ListChange> Run()
+    /// <inheritdoc />
+    public List<IListComparer<T>.Change> Compare()
     {
         Console.WriteLine("Hirschberg" + " running.");
         CompareInternal();
-
         Console.WriteLine("Hirschberg" + " done. Cost=" + _editCost + "\n");
         Console.WriteLine(TraceBack());
         Console.WriteLine("\n" + "Cells computed = " + _cellsComputed);
 
         Console.WriteLine($"added:\n  {Join(_added)}");
-        Console.WriteLine($"removed:\n  {Join(_removed)}");
+        Console.WriteLine($"deleted:\n  {Join(_deleted)}");
 
         var result = CollectChanges();
 
@@ -94,29 +88,29 @@ public class ListComparer<T>
         }
     }
 
-    private List<ListChange> CollectChanges()
+    private List<IListComparer<T>.Change> CollectChanges()
     {
-        List<ListChange> result = [];
+        List<IListComparer<T>.Change> result = [];
         foreach ((T, RightIndex) addedEntry in _added.Values.ToList())
         {
-            (T, LeftIndex) removedEntry = _removed.Values.FirstOrDefault(p => Equals(p.Item1, addedEntry.Item1));
-            if (!removedEntry.Equals(default))
+            (T, LeftIndex) deletedEntry = _deleted.Values.FirstOrDefault(p => Equals(p.Item1, addedEntry.Item1));
+            if (!deletedEntry.Equals(default))
             {
-                LeftIndex indexOfValue = _removed.IndexOfValue(removedEntry);
-                T leftElement = removedEntry.Item1;
-                LeftIndex leftIndex = removedEntry.Item2;
+                LeftIndex indexOfValue = _deleted.IndexOfValue(deletedEntry);
+                T leftElement = deletedEntry.Item1;
+                LeftIndex leftIndex = deletedEntry.Item2;
                 T rightElement = addedEntry.Item1;
                 RightIndex rightIndex = addedEntry.Item2;
 
                 if (leftIndex != rightIndex || !Equals(leftElement, rightElement))
-                    result.Add(new ListMoved(leftElement, leftIndex, rightElement, rightIndex));
+                    result.Add(new IListComparer<T>.Moved(leftElement, leftIndex, rightElement, rightIndex));
                 _added.RemoveAt(_added.IndexOfValue(addedEntry));
-                _removed.RemoveAt(indexOfValue);
+                _deleted.RemoveAt(indexOfValue);
             }
         }
 
-        result.AddRange(_added.Values.Select(c => new ListAdded(c.Item1, c.Item2)).Cast<ListChange>());
-        result.AddRange(_removed.Values.Select(c => new ListRemoved(c.Item1, c.Item2)).Cast<ListChange>());
+        result.AddRange(_added.Values.Select(c => new IListComparer<T>.Added(c.Item1, c.Item2)).Cast<IListComparer<T>.Change>());
+        result.AddRange(_deleted.Values.Select(c => new IListComparer<T>.Deleted(c.Item1, c.Item2)).Cast<IListComparer<T>.Change>());
 
         return result;
     }
@@ -161,7 +155,7 @@ public class ListComparer<T>
                 T leftElement = _left[leftIndex];
                 _alignLeft.Add(leftElement);
                 _alignRight.Add(CreateEmpty());
-                Remove(leftElement, leftIndex);
+                Delete(leftElement, leftIndex);
                 _matrix[leftIndex + 1, upperBoundRight] = Cost.Align;
             }
 
@@ -185,7 +179,7 @@ public class ListComparer<T>
                     _alignLeft.Add(leftElement);
                     if (!Equals(leftElement, rightElement))
                     {
-                        Remove(leftElement, lowerBoundLeft);
+                        Delete(leftElement, lowerBoundLeft);
                     }
                 } else
                 {
@@ -246,8 +240,8 @@ public class ListComparer<T>
         Align(midBoundLeft, upperBoundLeft, midBoundRight, upperBoundRight);
     }
 
-    private void Remove(T leftElement, LeftIndex leftIndex) =>
-        _removed.Add(leftIndex, (leftElement, leftIndex));
+    private void Delete(T leftElement, LeftIndex leftIndex) =>
+        _deleted.Add(leftIndex, (leftElement, leftIndex));
 
     private void Add(T rightElement, RightIndex rightIndex) =>
         _added.Add(rightIndex, (rightElement, rightIndex));
@@ -367,15 +361,6 @@ public class ListComparer<T>
 
     private Cost Min(Cost a, Cost b, Cost c) =>
         new[] { a, b, c }.Min();
-
-    public interface ListChange;
-
-    public record struct ListAdded(T Element, RightIndex RightIndex) : ListChange;
-
-    public record struct ListRemoved(T Element, LeftIndex LeftIndex) : ListChange;
-
-    public record struct ListMoved(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
-        : ListChange;
 }
 
 internal enum Cost : CostBase
