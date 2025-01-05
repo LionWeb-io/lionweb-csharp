@@ -157,10 +157,10 @@ public partial class Container : ConceptInstanceBase
 			return true;
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature))
 		{
-			var enumerable = MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library>(value).ToList();
-			AssureNonEmpty(enumerable, MultiLanguage.Instance.Container_libraries);
+			var safeNodes = MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Library.M2.Library>(value).ToList();
+			AssureNonEmpty(safeNodes, MultiLanguage.Instance.Container_libraries);
 			RemoveSelfParent(_libraries.ToList(), _libraries, MultiLanguage.Instance.Container_libraries);
-			AddLibraries(enumerable);
+			AddLibraries(safeNodes);
 			return true;
 		}
 

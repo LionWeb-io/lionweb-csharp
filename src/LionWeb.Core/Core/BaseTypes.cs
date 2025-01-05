@@ -857,9 +857,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     protected void SetReferenceWithEvents<T>(Reference reference, List<T> safeNodes, List<T> storage)
         where T : IReadableNode
     {
-        AssureNotNull(safeNodes, reference);
-        AssureNotNullMembers(safeNodes, reference);
-
         var partitionCommander = GetPartitionCommander();
         List<IListComparer<T>.Change> changes = [];
         if (partitionCommander != null && (partitionCommander.CanRaiseAddReference() ||

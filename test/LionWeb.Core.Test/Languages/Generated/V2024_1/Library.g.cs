@@ -517,10 +517,10 @@ public partial class Library : ConceptInstanceBase
 			return true;
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
 		{
-			var enumerable = LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value).ToList();
-			AssureNonEmpty(enumerable, LibraryLanguage.Instance.Library_books);
+			var safeNodes = LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value).ToList();
+			AssureNonEmpty(safeNodes, LibraryLanguage.Instance.Library_books);
 			RemoveSelfParent(_books.ToList(), _books, LibraryLanguage.Instance.Library_books);
-			AddBooks(enumerable);
+			AddBooks(safeNodes);
 			return true;
 		}
 

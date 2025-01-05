@@ -40,7 +40,7 @@ using Property = Core.M3.Property;
 /// - RemoveFeature()
 /// </summary>
 public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion)
-    : GeneratorBase(names, lionWebVersion)
+    : ClassifierGeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="FeatureGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> Members() =>
@@ -282,7 +282,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
+                    PreviousCountVariable(reference),
                     SimpleAddRangeCall(reference),
+                    RaiseReferenceAddEventCall("previousCount"),
                     ReturnStatement(This())
                 ])
                 .Select(a => XdocRequiredAdder(a, reference))
@@ -293,6 +295,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
                     SimpleInsertRangeCall(reference),
+                    RaiseReferenceAddEventCall("index"),
                     ReturnStatement(This())
                 ])
                 .Select(i => XdocRequiredInserter(i, reference))
@@ -370,13 +373,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             FeatureField(link),
             MetaProperty(link)
         ));
-
-    private ExpressionStatementSyntax AssureNotNullCall(Link link) =>
-        ExpressionStatement(Call("AssureNotNull",
-            IdentifierName("safeNodes"),
-            MetaProperty(link)
-        ));
-
+    
     private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
         ExpressionStatement(Call("AssureNonEmpty",
             IdentifierName("safeNodes"),
@@ -390,12 +387,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             FeatureField(link)
         ));
 
-    private ExpressionStatementSyntax AssureNotNullMembersCall(Reference reference) =>
-        ExpressionStatement(Call("AssureNotNullMembers",
-            IdentifierName("safeNodes"),
-            MetaProperty(reference)
-        ));
-
     private ExpressionStatementSyntax AsureNotNullCall() =>
         ExpressionStatement(Call("AssureNotNull",
             IdentifierName("value"),
@@ -404,11 +395,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private static LocalDeclarationStatementSyntax SafeNodesVariable() =>
         Variable("safeNodes", Var(), OptionalNodesToList());
-
-    private static LocalDeclarationStatementSyntax NotNullSafeNodesVariable() =>
-        Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(IdentifierName("nodes"), IdentifierName("ToList")))
-        );
 
     private static ConditionalAccessExpressionSyntax OptionalNodesToList() =>
         ConditionalAccessExpression(IdentifierName("nodes"),

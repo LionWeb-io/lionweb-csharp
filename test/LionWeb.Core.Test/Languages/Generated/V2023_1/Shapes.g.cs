@@ -489,9 +489,9 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup>(value);
+			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup>(value).ToList();
 			RemoveSelfParent(_altGroups.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-			AddAltGroups(enumerable);
+			AddAltGroups(safeNodes);
 			return true;
 		}
 
@@ -508,16 +508,18 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup>(value);
+			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup>(value).ToList();
 			RemoveSelfParent(_groups.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
-			AddGroups(enumerable);
+			AddGroups(safeNodes);
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value);
-			SetReferenceWithEvents(ShapesLanguage.Instance.BillOfMaterials_materials, enumerable.ToList(), _materials);
+			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
+			AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+			SetReferenceWithEvents(ShapesLanguage.Instance.BillOfMaterials_materials, safeNodes, _materials);
 			return true;
 		}
 
@@ -857,10 +859,10 @@ public partial class CompositeShape : Shape
 			return true;
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
-			AssureNonEmpty(enumerable, ShapesLanguage.Instance.CompositeShape_disabledParts);
+			var safeNodes = ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
+			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
 			RemoveSelfParent(_disabledParts.ToList(), _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-			AddDisabledParts(enumerable);
+			AddDisabledParts(safeNodes);
 			return true;
 		}
 
@@ -877,10 +879,10 @@ public partial class CompositeShape : Shape
 
 		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
-			AssureNonEmpty(enumerable, ShapesLanguage.Instance.CompositeShape_parts);
+			var safeNodes = ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
+			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
 			RemoveSelfParent(_parts.ToList(), _parts, ShapesLanguage.Instance.CompositeShape_parts);
-			AddParts(enumerable);
+			AddParts(safeNodes);
 			return true;
 		}
 
@@ -1279,9 +1281,9 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value);
+			var safeNodes = ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			RemoveSelfParent(_shapes.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes);
-			AddShapes(enumerable);
+			AddShapes(safeNodes);
 			return true;
 		}
 
@@ -1532,7 +1534,9 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
+		int previousCount = _materials.Count;
 		_materials.AddRange(safeNodes);
+		RaiseReferenceAddEvent(ShapesLanguage.Instance.MaterialGroup_materials, safeNodes, previousCount);
 		return this;
 	}
 
@@ -1546,6 +1550,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
 		_materials.InsertRange(index, safeNodes);
+		RaiseReferenceAddEvent(ShapesLanguage.Instance.MaterialGroup_materials, safeNodes, index);
 		return this;
 	}
 
@@ -1626,10 +1631,9 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
-			AssureNonEmpty(enumerable, ShapesLanguage.Instance.MaterialGroup_materials);
-			_materials.Clear();
-			AddMaterials(enumerable);
+			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
+			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
+			SetReferenceWithEvents(ShapesLanguage.Instance.MaterialGroup_materials, safeNodes, _materials);
 			return true;
 		}
 
@@ -2014,8 +2018,10 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value);
-			SetReferenceWithEvents(ShapesLanguage.Instance.ReferenceGeometry_shapes, enumerable.ToList(), _shapes);
+			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
+			AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+			SetReferenceWithEvents(ShapesLanguage.Instance.ReferenceGeometry_shapes, safeNodes, _shapes);
 			return true;
 		}
 
@@ -2182,9 +2188,9 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord>(value);
+			var safeNodes = ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord>(value).ToList();
 			RemoveSelfParent(_fixpoints.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
-			AddFixpoints(enumerable);
+			AddFixpoints(safeNodes);
 			return true;
 		}
 

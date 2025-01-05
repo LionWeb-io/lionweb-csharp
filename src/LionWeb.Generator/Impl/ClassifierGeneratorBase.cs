@@ -21,7 +21,10 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static AstExtensions;
 
 /// <summary>
 /// Common base class for all generators for concept/annotation classes and interface interfaces.
@@ -52,4 +55,16 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
                 .Where(c => c is Concept or Annotation)
                 .SelectMany(InterfaceFeatures)
             );
+
+    protected ExpressionStatementSyntax AssureNotNullCall(Link link) =>
+        ExpressionStatement(Call("AssureNotNull",
+            IdentifierName("safeNodes"),
+            MetaProperty(link)
+        ));
+
+    protected ExpressionStatementSyntax AssureNotNullMembersCall(Reference reference) =>
+        ExpressionStatement(Call("AssureNotNullMembers",
+            IdentifierName("safeNodes"),
+            MetaProperty(reference)
+        ));
 }
