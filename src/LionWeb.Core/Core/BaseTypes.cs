@@ -813,10 +813,13 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     protected void RaiseSingleReferenceEvent(Reference reference, IReadableNode? oldTarget, IReadableNode? newTarget)
     {
         var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null)
+        if (partitionCommander == null || !(partitionCommander.CanRaiseAddReference() ||
+                                            partitionCommander.CanRaiseDeleteReference() ||
+                                            partitionCommander.CanRaiseChangeReference())
+           )
             return;
 
-        switch ((oldTarget, newTarget))
+        switch (oldTarget, newTarget)
         {
             case (null, { } v):
                 partitionCommander.AddReference(this, reference, 0, new ReferenceTarget(null, v));
@@ -839,7 +842,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         where T : IReadableNode
     {
         var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null)
+        if (partitionCommander == null || !partitionCommander.CanRaiseAddReference())
             return;
 
         int index = previousCount;

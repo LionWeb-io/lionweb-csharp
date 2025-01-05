@@ -175,27 +175,54 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         AnnotationMovedInSameParent?.Invoke(_sender, new(newIndex, movedAnnotation, parent, oldIndex));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceAddedArgs>? ReferenceAdded;
+    public event EventHandler<IPartitionListener.ReferenceAddedArgs> ReferenceAdded
+    {
+        add => _referenceAdded.Add(value);
+        remove => _referenceAdded.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ReferenceAddedArgs> _referenceAdded = new();
 
     /// <inheritdoc />
     public void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget) =>
-        ReferenceAdded?.Invoke(_sender, new(parent, reference, index, newTarget));
+        _referenceAdded.Invoke(_sender, new(parent, reference, index, newTarget));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceDeletedArgs>? ReferenceDeleted;
+    public bool CanRaiseAddReference() => _referenceAdded.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ReferenceDeletedArgs> ReferenceDeleted
+    {
+        add => _referenceDeleted.Add(value);
+        remove => _referenceDeleted.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ReferenceDeletedArgs> _referenceDeleted = new();
 
     /// <inheritdoc />
     public void DeleteReference(IWritableNode parent, Reference reference, Index index,
         IReferenceTarget deletedTarget) =>
-        ReferenceDeleted?.Invoke(_sender, new(parent, reference, index, deletedTarget));
+        _referenceDeleted.Invoke(_sender, new(parent, reference, index, deletedTarget));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceChangedArgs>? ReferenceChanged;
+    public bool CanRaiseDeleteReference() => _referenceDeleted.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ReferenceChangedArgs> ReferenceChanged
+    {
+        add => _referenceChanged.Add(value);
+        remove => _referenceChanged.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ReferenceChangedArgs> _referenceChanged = new();
 
     /// <inheritdoc />
     public void ChangeReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
         IReferenceTarget replacedTarget) =>
-        ReferenceChanged?.Invoke(_sender, new(parent, reference, index, newTarget, replacedTarget));
+        _referenceChanged.Invoke(_sender, new(parent, reference, index, newTarget, replacedTarget));
+
+    /// <inheritdoc />
+    public bool CanRaiseChangeReference() => _referenceChanged.HasSubscribers;
 
     /// <inheritdoc />
     public event EventHandler<IPartitionListener.EntryMovedFromOtherReferenceArgs>? EntryMovedFromOtherReference;
@@ -217,12 +244,22 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
             new(parent, newReference, newIndex, oldReference, oldIndex, target));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.EntryMovedInSameReferenceArgs>? EntryMovedInSameReference;
+    public event EventHandler<IPartitionListener.EntryMovedInSameReferenceArgs> EntryMovedInSameReference
+    {
+        add => _entryMovedInSameReference.Add(value);
+        remove => _entryMovedInSameReference.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.EntryMovedInSameReferenceArgs> _entryMovedInSameReference =
+        new();
 
     /// <inheritdoc />
     public void MoveEntryInSameReference(IWritableNode parent, Reference reference, Index oldIndex, Index newIndex,
         IReferenceTarget target) =>
-        EntryMovedInSameReference?.Invoke(_sender, new(parent, reference, newIndex, oldIndex, target));
+        _entryMovedInSameReference.Invoke(_sender, new(parent, reference, newIndex, oldIndex, target));
+
+    /// <inheritdoc />
+    public bool CanRaiseMoveEntryInSameReference() => _entryMovedInSameReference.HasSubscribers;
 
     /// <inheritdoc />
     public event EventHandler<IPartitionListener.ReferenceResolveInfoAddedArgs>? ReferenceResolveInfoAdded;
@@ -274,4 +311,45 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     public void ChangedReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
         ResolveInfo? resolveInfo, TargetNode oldTarget) =>
         ReferenceTargetChanged?.Invoke(_sender, new(parent, reference, index, newTarget, resolveInfo, oldTarget));
+}
+
+class CountingEventHandler<T>
+{
+    private int _subscriberCount = 0;
+    public event EventHandler<T>? Event;
+
+    public void Invoke(object sender, T args)
+    {
+        if (HasSubscribers && Event != null)
+            Event.Invoke(sender, args);
+    }
+
+    public void Add(EventHandler<T> handler)
+    {
+        lock (this)
+        {
+            Event += handler;
+            _subscriberCount++;
+        }
+    }
+
+    public void Remove(EventHandler<T> handler)
+    {
+        lock (this)
+        {
+            Event -= handler;
+            _subscriberCount--;
+        }
+    }
+
+    public bool HasSubscribers
+    {
+        get
+        {
+            lock (this)
+            {
+                return _subscriberCount > 0;
+            }
+        }
+    }
 }
