@@ -286,9 +286,12 @@ public partial class @record : AnnotationInstanceBase, @interface
         public @record SetDouble(@interface value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.record_double);
+		SingleContainmentEvent<@interface> evt = new(ClassLanguage.Instance.record_double, this, value, _double);
+		evt.CollectOldData();
 		SetParentNull(_double);
 		AttachChild(value);
 		_double = value;
+		evt.RaiseEvent();
 		return this;
 	}
 

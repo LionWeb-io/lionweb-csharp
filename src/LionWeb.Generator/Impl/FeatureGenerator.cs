@@ -137,9 +137,12 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 .Xdoc(XdocThrowsIfSetToNull())
         }.Concat(RequiredFeatureSetter([
                 AsureNotNullCall(),
+                SingleContainmentEventVariable(),
+                EventCollectOldDataCall(),
                 SetParentNullCall(containment),
                 AttachChildCall(),
                 AssignFeatureField(),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ])
             .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
@@ -151,18 +154,28 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }.Concat(
             OptionalFeatureSetter([
-                Variable(
-                    "evt",
-                    AsType(typeof(NodeBase.SingleContainmentEvent<>), AsType(feature.GetFeatureType())),
-                    NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
-                ),
-                ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("CollectOldData")))),
+                SingleContainmentEventVariable(),
+                EventCollectOldDataCall(),
                 SetParentNullCall(containment),
                 AttachChildCall(),
                 AssignFeatureField(),
-                ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("RaiseEvent")))),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ]));
+
+    private LocalDeclarationStatementSyntax SingleContainmentEventVariable() =>
+        Variable(
+            "evt",
+            AsType(typeof(NodeBase.SingleContainmentEvent<>), AsType(feature.GetFeatureType())),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
+        );
+
+    private ExpressionStatementSyntax EventCollectOldDataCall() =>
+        ExpressionStatement(
+            InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("CollectOldData"))));
+
+    private ExpressionStatementSyntax EventRaiseEventCall() =>
+        ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("RaiseEvent"))));
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax>

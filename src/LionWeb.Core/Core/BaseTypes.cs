@@ -905,7 +905,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         private INode? _oldParent;
         private Containment? _oldContainment;
         private int _oldIndex;
-        private readonly T? _newValue1;
 
         public SingleContainmentEvent(Containment containment, NodeBase newParent, T? newValue, T? oldValue)
         {
@@ -934,7 +933,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 return;
 
             _oldIndex = _oldContainment.Multiple
-                ? M2Extensions.AsNodes<INode>(_oldParent.Get(_oldContainment)).ToList().IndexOf(_newValue1)
+                ? M2Extensions.AsNodes<INode>(_oldParent.Get(_oldContainment)).ToList().IndexOf(_newValue)
                 : 0;
         }
 

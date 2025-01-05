@@ -603,9 +603,12 @@ public partial class Circle : Shape
         public Circle SetCenter(Coord value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.Circle_center);
+		SingleContainmentEvent<Coord> evt = new(ShapesLanguage.Instance.Circle_center, this, value, _center);
+		evt.CollectOldData();
 		SetParentNull(_center);
 		AttachChild(value);
 		_center = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -776,9 +779,12 @@ public partial class CompositeShape : Shape
         public CompositeShape SetEvilPart(IShape value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.CompositeShape_evilPart);
+		SingleContainmentEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_evilPart, this, value, _evilPart);
+		evt.CollectOldData();
 		SetParentNull(_evilPart);
 		AttachChild(value);
 		_evilPart = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1381,9 +1387,12 @@ public partial class Line : Shape, INamedWritable
         public Line SetEnd(Coord value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.Line_end);
+		SingleContainmentEvent<Coord> evt = new(ShapesLanguage.Instance.Line_end, this, value, _end);
+		evt.CollectOldData();
 		SetParentNull(_end);
 		AttachChild(value);
 		_end = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1400,9 +1409,12 @@ public partial class Line : Shape, INamedWritable
         public Line SetStart(Coord value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.Line_start);
+		SingleContainmentEvent<Coord> evt = new(ShapesLanguage.Instance.Line_start, this, value, _start);
+		evt.CollectOldData();
 		SetParentNull(_start);
 		AttachChild(value);
 		_start = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1749,9 +1761,12 @@ public partial class OffsetDuplicate : Shape
         public OffsetDuplicate SetOffset(Coord value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_offset);
+		SingleContainmentEvent<Coord> evt = new(ShapesLanguage.Instance.OffsetDuplicate_offset, this, value, _offset);
+		evt.CollectOldData();
 		SetParentNull(_offset);
 		AttachChild(value);
 		_offset = value;
+		evt.RaiseEvent();
 		return this;
 	}
 

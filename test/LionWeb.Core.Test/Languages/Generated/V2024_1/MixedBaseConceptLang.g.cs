@@ -139,9 +139,12 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetCont(NodeBase value)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
+		SingleContainmentEvent<NodeBase> evt = new(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont, this, value, _cont);
+		evt.CollectOldData();
 		SetParentNull(_cont);
 		AttachChild(value);
 		_cont = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
