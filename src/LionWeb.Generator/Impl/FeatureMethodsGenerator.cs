@@ -34,7 +34,8 @@ using Property = Core.M3.Property;
 /// - SetInternal()
 /// - CollectAllSetFeatures()
 /// </summary>
-public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion) : ClassifierGeneratorBase(names, lionWebVersion)
+public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion)
+    : ClassifierGeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="FeatureMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> FeatureMethods()
@@ -187,8 +188,9 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private List<StatementSyntax> GenSetInternalMultiOptionalReference(Reference reference) =>
     [
         EnumerableVar(reference),
-        ClearCall(reference),
-        LinkAddCall(reference),
+        ExpressionStatement(Call("SetReferenceWithEvents", MetaProperty(reference),
+            ParseExpression("enumerable.ToList()"), FeatureField(reference))
+        ),
         ReturnTrue()
     ];
 
@@ -270,7 +272,10 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(
-                new List<StatementSyntax> { ParseStatement("List<Feature> result = base.CollectAllSetFeatures().ToList();") }
+                new List<StatementSyntax>
+                    {
+                        ParseStatement("List<Feature> result = base.CollectAllSetFeatures().ToList();")
+                    }
                     .Concat(FeaturesToImplement(classifier).Select(GenCollectAllSetFeatures))
                     .Append(ReturnStatement(IdentifierName("result")))
             ));

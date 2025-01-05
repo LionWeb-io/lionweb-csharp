@@ -30,7 +30,7 @@ public class ReferenceTests_Single_Listener
         var source = new OffsetDuplicate("g");
         partition.AddShapes([source]);
         var reference = new Line("myId");
-        
+
         int events = 0;
         ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) =>
         {
@@ -42,10 +42,33 @@ public class ReferenceTests_Single_Listener
         };
 
         source.AltSource = reference;
-        
+
         Assert.AreEqual(1, events);
     }
-    
+
+    [TestMethod]
+    public void ReferenceAdded_Optional_Reflective()
+    {
+        var partition = new Geometry("g");
+        var source = new OffsetDuplicate("g");
+        partition.AddShapes([source]);
+        var reference = new Line("myId");
+
+        int events = 0;
+        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(source, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.newTarget);
+        };
+
+        source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, reference);
+
+        Assert.AreEqual(1, events);
+    }
+
     [TestMethod]
     public void ReferenceDeleted_Optional()
     {
@@ -54,7 +77,7 @@ public class ReferenceTests_Single_Listener
         partition.AddShapes([source]);
         var reference = new Line("myId");
         source.AltSource = reference;
-        
+
         int events = 0;
         ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
         {
@@ -66,10 +89,34 @@ public class ReferenceTests_Single_Listener
         };
 
         source.AltSource = null;
-        
+
         Assert.AreEqual(1, events);
     }
-    
+
+    [TestMethod]
+    public void ReferenceDeleted_Optional_Reflective()
+    {
+        var partition = new Geometry("g");
+        var source = new OffsetDuplicate("g");
+        partition.AddShapes([source]);
+        var reference = new Line("myId");
+        source.AltSource = reference;
+
+        int events = 0;
+        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(source, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.deletedTarget);
+        };
+
+        source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, null);
+
+        Assert.AreEqual(1, events);
+    }
+
     [TestMethod]
     public void ReferenceChanged_Optional()
     {
@@ -100,15 +147,46 @@ public class ReferenceTests_Single_Listener
         Assert.AreEqual(1, events);
         Assert.AreEqual(0, badEvents);
     }
-    
+
     [TestMethod]
-    public void ReferenceAdded_Required()
+    public void ReferenceChanged_Optional_Reflective()
+    {
+        var partition = new Geometry("g");
+        var source = new OffsetDuplicate("g");
+        partition.AddShapes([source]);
+        var oldTarget = new Line("oldTarget");
+        source.AltSource = oldTarget;
+        var newTarget = new Line("newTarget");
+
+        int events = 0;
+        ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(source, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.replacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.newTarget);
+        };
+
+        int badEvents = 0;
+        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) => badEvents++;
+
+        source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, newTarget);
+
+        Assert.AreEqual(1, events);
+        Assert.AreEqual(0, badEvents);
+    }
+
+    [TestMethod]
+    public void ReferenceAdded_Required_Reflective()
     {
         var partition = new Geometry("g");
         var source = new OffsetDuplicate("g");
         partition.AddShapes([source]);
         var reference = new Line("myId");
-        
+
         int events = 0;
         ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) =>
         {
@@ -119,11 +197,11 @@ public class ReferenceTests_Single_Listener
             Assert.AreEqual(new ReferenceTarget(null, reference), args.newTarget);
         };
 
-        source.Source = reference;
-        
+        source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, reference);
+
         Assert.AreEqual(1, events);
     }
-    
+
     [TestMethod]
     public void ReferenceDeleted_Required()
     {
@@ -132,7 +210,7 @@ public class ReferenceTests_Single_Listener
         partition.AddShapes([source]);
         var reference = new Line("myId");
         source.Source = reference;
-        
+
         int events = 0;
         ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
         {
@@ -144,10 +222,35 @@ public class ReferenceTests_Single_Listener
         };
 
         Assert.ThrowsException<InvalidValueException>(() => source.Source = null);
-        
+
         Assert.AreEqual(0, events);
     }
-    
+
+    [TestMethod]
+    public void ReferenceDeleted_Required_Reflective()
+    {
+        var partition = new Geometry("g");
+        var source = new OffsetDuplicate("g");
+        partition.AddShapes([source]);
+        var reference = new Line("myId");
+        source.Source = reference;
+
+        int events = 0;
+        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(source, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.deletedTarget);
+        };
+
+        Assert.ThrowsException<InvalidValueException>(() =>
+            source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, null));
+
+        Assert.AreEqual(0, events);
+    }
+
     [TestMethod]
     public void ReferenceChanged_Required()
     {
@@ -174,6 +277,37 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) => badEvents++;
 
         source.Source = newTarget;
+
+        Assert.AreEqual(1, events);
+        Assert.AreEqual(0, badEvents);
+    }
+    
+    [TestMethod]
+    public void ReferenceChanged_Required_Reflective()
+    {
+        var partition = new Geometry("g");
+        var source = new OffsetDuplicate("g");
+        partition.AddShapes([source]);
+        var oldTarget = new Line("oldTarget");
+        source.Source = oldTarget;
+        var newTarget = new Line("newTarget");
+
+        int events = 0;
+        ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(source, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.reference);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.replacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.newTarget);
+        };
+
+        int badEvents = 0;
+        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) => badEvents++;
+
+        source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, newTarget);
 
         Assert.AreEqual(1, events);
         Assert.AreEqual(0, badEvents);

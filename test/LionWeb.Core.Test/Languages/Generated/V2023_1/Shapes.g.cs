@@ -517,8 +517,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
 		{
 			var enumerable = ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value);
-			_materials.Clear();
-			AddMaterials(enumerable);
+			SetReferenceWithEvents(ShapesLanguage.Instance.BillOfMaterials_materials, enumerable.ToList(), _materials);
 			return true;
 		}
 
@@ -2016,8 +2015,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
 			var enumerable = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value);
-			_shapes.Clear();
-			AddShapes(enumerable);
+			SetReferenceWithEvents(ShapesLanguage.Instance.ReferenceGeometry_shapes, enumerable.ToList(), _shapes);
 			return true;
 		}
 
