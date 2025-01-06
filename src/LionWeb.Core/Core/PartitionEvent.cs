@@ -23,10 +23,10 @@ using M3;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
-public abstract class PartitionEventBase<T> where T : INode
+public abstract class PartitionEventBase<T> where T : IReadableNode
 {
     protected readonly IPartitionCommander? _partitionCommander;
-    protected readonly INode _newParent;
+    protected readonly NodeBase _newParent;
 
     protected PartitionEventBase(NodeBase newParent)
     {
@@ -58,7 +58,7 @@ public abstract class PartitionMultipleContainmentEventBase<T> : PartitionContai
     protected PartitionMultipleContainmentEventBase(Containment containment, NodeBase newParent, List<T>? newValues) :
         base(containment, newParent)
     {
-        _newValues = newValues?.ToDictionary<T, T, Old?>(k => k, k => null) ?? [];
+        _newValues = newValues?.ToDictionary<T, T, Old?>(k => k, _ => null) ?? [];
     }
 
     /// <inheritdoc />
@@ -370,4 +370,58 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                                             .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
                                         _partitionCommander
                                             .CanRaiseMoveChildInSameContainment());
+}
+
+public class SetReferenceEvent<T> : PartitionEventBase<T> where T : IReadableNode
+{
+    private readonly Reference _reference;
+    private List<IListComparer<T>.Change> _changes = [];
+
+    public SetReferenceEvent(Reference reference, NodeBase newParent, List<T> safeNodes, List<T> storage) : base(newParent)
+    {
+        _reference = reference;
+
+        if (!IsActive())
+            return;
+
+        var listComparer = new StepwiseListComparer<T>(storage, safeNodes);
+        _changes = listComparer.Compare();
+    }
+
+    /// <inheritdoc />
+    public override void CollectOldData() { }
+
+    /// <inheritdoc />
+    public override void RaiseEvent()
+    {
+        if (!IsActive())
+            return;
+        
+        foreach (var change in _changes)
+        {
+            switch (change)
+            {
+                case IListComparer<T>.Added added:
+                    _partitionCommander.AddReference(_newParent, _reference, added.RightIndex,
+                        new ReferenceTarget(null, added.Element));
+                    break;
+                case IListComparer<T>.Moved moved:
+                    _partitionCommander.MoveEntryInSameReference(_newParent, _reference, moved.LeftIndex, moved.RightIndex,
+                        new ReferenceTarget(null, moved.LeftElement));
+                    break;
+                case IListComparer<T>.Deleted deleted:
+                    _partitionCommander.DeleteReference(_newParent, _reference, deleted.LeftIndex,
+                        new ReferenceTarget(null, deleted.Element));
+                    break;
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    [MemberNotNullWhen(true, nameof(_partitionCommander))]
+    protected override bool IsActive() =>
+        _partitionCommander != null && (_partitionCommander.CanRaiseAddReference() ||
+                                       _partitionCommander.CanRaiseMoveEntryInSameReference() ||
+                                       _partitionCommander.CanRaiseDeleteReference());
+
 }

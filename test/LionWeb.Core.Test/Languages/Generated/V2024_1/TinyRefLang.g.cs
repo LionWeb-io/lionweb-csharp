@@ -193,7 +193,11 @@ public partial class MyConcept : ConceptInstanceBase
 		{
 			var safeNodes = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TinyRefLang.MyConcept>(value).ToList();
 			AssureNonEmpty(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-			SetReferenceWithEvents(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, safeNodes, _multivaluedRef);
+			SetReferenceEvent<MyConcept> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef);
+			evt.CollectOldData();
+			_multivaluedRef.Clear();
+			_multivaluedRef.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 

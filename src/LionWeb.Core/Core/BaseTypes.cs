@@ -23,7 +23,6 @@ using M3;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-using Utilities;
 
 /// An interface that LionWeb AST nodes implement to provide <em>read</em> access.
 public interface IReadableNode
@@ -863,46 +862,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         {
             partitionCommander.AddReference(this, reference, index++, new ReferenceTarget(null, node)
             );
-        }
-    }
-
-    protected void SetReferenceWithEvents<T>(Reference reference, List<T> safeNodes, List<T> storage)
-        where T : IReadableNode
-    {
-        var partitionCommander = GetPartitionCommander();
-        List<IListComparer<T>.Change> changes = [];
-        if (partitionCommander != null && (partitionCommander.CanRaiseAddReference() ||
-                                           partitionCommander.CanRaiseMoveEntryInSameReference() ||
-                                           partitionCommander.CanRaiseDeleteReference())
-           )
-        {
-            var listComparer = new StepwiseListComparer<T>(storage, safeNodes);
-            changes = listComparer.Compare();
-        }
-
-        storage.Clear();
-        storage.AddRange(safeNodes);
-
-        if (partitionCommander == null)
-            return;
-
-        foreach (var change in changes)
-        {
-            switch (change)
-            {
-                case IListComparer<T>.Added added:
-                    partitionCommander.AddReference(this, reference, added.RightIndex,
-                        new ReferenceTarget(null, added.Element));
-                    break;
-                case IListComparer<T>.Moved moved:
-                    partitionCommander.MoveEntryInSameReference(this, reference, moved.LeftIndex, moved.RightIndex,
-                        new ReferenceTarget(null, moved.LeftElement));
-                    break;
-                case IListComparer<T>.Deleted deleted:
-                    partitionCommander.DeleteReference(this, reference, deleted.LeftIndex,
-                        new ReferenceTarget(null, deleted.Element));
-                    break;
-            }
         }
     }
 

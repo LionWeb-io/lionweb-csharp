@@ -171,7 +171,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
     [
         SafeNodesVar(containment),
-        AddMultipleContainmentEventVariable(containment),
+        SetContainmentEventVariable(containment),
         EventCollectOldDataCall(),
         RemoveSelfParentCall(containment),
         OptionalAddRangeCall(containment),
@@ -183,7 +183,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         SafeNodesVar(containment),
         AssureNonEmptyCall(containment),
-        AddMultipleContainmentEventVariable(containment),
+        SetContainmentEventVariable(containment),
         EventCollectOldDataCall(),
         RemoveSelfParentCall(containment),
         RequiredAddRangeCall(containment),
@@ -196,7 +196,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         SafeNodesVar(reference),
         AssureNotNullCall(reference),
         AssureNotNullMembersCall(reference),
-        SetReferencesWithEventsCall(reference),
+        SetReferenceEventVariable(reference),
+        EventCollectOldDataCall(),
+        ClearFieldCall(reference),
+        ReferenceAddRangeCall(reference),
+        EventRaiseEventCall(),
         ReturnTrue()
     ];
 
@@ -204,16 +208,36 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         SafeNodesVar(reference),
         AssureNonEmptyCall(reference),
-        SetReferencesWithEventsCall(reference),
+        SetReferenceEventVariable(reference),
+        EventCollectOldDataCall(),
+        ClearFieldCall(reference),
+        ReferenceAddRangeCall(reference),
+        EventRaiseEventCall(),
         ReturnTrue()
     ];
-    
-    private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(Containment containment) =>
+
+    private ExpressionStatementSyntax ClearFieldCall(Reference reference) =>
+        ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear"))));
+
+    private ExpressionStatementSyntax ReferenceAddRangeCall(Reference reference) =>
+        ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("AddRange")),
+            AsArguments([IdentifierName("safeNodes")])));
+
+    private LocalDeclarationStatementSyntax SetContainmentEventVariable(Containment containment) =>
         Variable(
             "evt",
             AsType(typeof(SetContainmentEvent<>), AsType(containment.GetFeatureType())),
             NewCall([
                 MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment)
+            ])
+        );
+
+    private LocalDeclarationStatementSyntax SetReferenceEventVariable(Reference reference) =>
+        Variable(
+            "evt",
+            AsType(typeof(SetReferenceEvent<>), AsType(reference.GetFeatureType())),
+            NewCall([
+                MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference)
             ])
         );
 
@@ -252,16 +276,6 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             FeatureField(containment),
             MetaProperty(containment)
         ));
-
-    private ExpressionStatementSyntax LinkAddCall(Link link) =>
-        ExpressionStatement(InvocationExpression(LinkAdd(link),
-            AsArguments([IdentifierName("safeNodes")])
-        ));
-
-    private ExpressionStatementSyntax SetReferencesWithEventsCall(Reference reference) =>
-        ExpressionStatement(Call("SetReferenceWithEvents", MetaProperty(reference),
-            ParseExpression("safeNodes"), FeatureField(reference))
-        );
 
     private CastExpressionSyntax CastValueType(Feature feature) =>
         CastExpression(NullableType(AsType(feature.GetFeatureType(), true)), IdentifierName("value"));

@@ -548,7 +548,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-			SetReferenceWithEvents(ShapesLanguage.Instance.BillOfMaterials_materials, safeNodes, _materials);
+			SetReferenceEvent<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials);
+			evt.CollectOldData();
+			_materials.Clear();
+			_materials.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -1711,7 +1715,11 @@ public partial class MaterialGroup : ConceptInstanceBase
 		{
 			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
-			SetReferenceWithEvents(ShapesLanguage.Instance.MaterialGroup_materials, safeNodes, _materials);
+			SetReferenceEvent<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials);
+			evt.CollectOldData();
+			_materials.Clear();
+			_materials.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -2108,7 +2116,11 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-			SetReferenceWithEvents(ShapesLanguage.Instance.ReferenceGeometry_shapes, safeNodes, _shapes);
+			SetReferenceEvent<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes);
+			evt.CollectOldData();
+			_shapes.Clear();
+			_shapes.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 
