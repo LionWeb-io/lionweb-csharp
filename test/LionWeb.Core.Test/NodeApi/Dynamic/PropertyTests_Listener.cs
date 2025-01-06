@@ -31,9 +31,9 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         parent.Listener.PropertyAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(doc, args.node);
-            Assert.AreSame(Documentation_text, args.property);
-            Assert.AreEqual("hello", args.newValue);
+            Assert.AreSame(doc, args.Node);
+            Assert.AreSame(Documentation_text, args.Property);
+            Assert.AreEqual("hello", args.NewValue);
         };
 
         doc.Set(Documentation_text, "hello");
@@ -53,9 +53,9 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         parent.Listener.PropertyDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(doc, args.node);
-            Assert.AreSame(Documentation_text, args.property);
-            Assert.AreEqual("hello", args.oldValue);
+            Assert.AreSame(doc, args.Node);
+            Assert.AreSame(Documentation_text, args.Property);
+            Assert.AreEqual("hello", args.OldValue);
         };
         doc.Set(Documentation_text, null);
 
@@ -75,10 +75,10 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         parent.Listener.PropertyChanged += (sender, args) =>
         {
             events++;
-            Assert.AreSame(doc, args.node);
-            Assert.AreSame(Documentation_text, args.property);
-            Assert.AreEqual("hello", args.oldValue);
-            Assert.AreEqual("bye", args.newValue);
+            Assert.AreSame(doc, args.Node);
+            Assert.AreSame(Documentation_text, args.Property);
+            Assert.AreEqual("hello", args.OldValue);
+            Assert.AreEqual("bye", args.NewValue);
         };
 
         int badEvents = 0;

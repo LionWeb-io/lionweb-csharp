@@ -23,66 +23,126 @@ using PropertyValue = object;
 using ResolveInfo = string;
 using TargetNode = IReadableNode;
 
+/// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestListener"/> events.
 public class ForestEventHandler : IForestListener, IForestCommander
 {
     private readonly object _sender;
 
+    /// <inheritdoc cref="ForestEventHandler"/>
+    /// <param name="sender">Optional sender of the events.</param>
     public ForestEventHandler(object? sender = null)
     {
         _sender = sender ?? this;
     }
 
     /// <inheritdoc />
-    public event EventHandler<IForestListener.NewPartitionArgs>? NewPartition;
+    public event EventHandler<IForestListener.NewPartitionArgs> NewPartition
+    {
+        add => _newPartition.Add(value);
+        remove => _newPartition.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IForestListener.NewPartitionArgs> _newPartition = new();
 
     /// <inheritdoc />
-    public void AddPartition(IReadableNode newPartition) =>
-        NewPartition?.Invoke(_sender, new(newPartition));
+    public void AddPartition(IPartitionInstance newPartition) =>
+        _newPartition.Invoke(_sender, new(newPartition));
 
     /// <inheritdoc />
-    public event EventHandler<IForestListener.PartitionDeletedArgs>? PartitionDeleted;
+    public bool CanRaiseAddPartition() => _newPartition.HasSubscribers;
 
     /// <inheritdoc />
-    public void DeletePartition(IReadableNode deletedPartition) =>
-        PartitionDeleted?.Invoke(_sender, new(deletedPartition));
+    public event EventHandler<IForestListener.PartitionDeletedArgs> PartitionDeleted
+    {
+        add => _partitionDeleted.Add(value);
+        remove => _partitionDeleted.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IForestListener.PartitionDeletedArgs> _partitionDeleted = new();
+
+    /// <inheritdoc />
+    public void DeletePartition(IPartitionInstance deletedPartition) =>
+        _partitionDeleted.Invoke(_sender, new(deletedPartition));
+
+    /// <inheritdoc />
+    public bool CanRaiseDeletePartition() => _partitionDeleted.HasSubscribers;
 }
 
+/// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionListener"/> events.
 public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 {
     private readonly object _sender;
 
+    /// <inheritdoc cref="PartitionEventHandler"/>
+    /// <param name="sender">Optional sender of the events.</param>
     public PartitionEventHandler(object? sender = null)
     {
         _sender = sender ?? this;
     }
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ClassifierChangedArgs>? ClassifierChanged;
+    public event EventHandler<IPartitionListener.ClassifierChangedArgs> ClassifierChanged
+    {
+        add => _classifierChanged.Add(value);
+        remove => _classifierChanged.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ClassifierChangedArgs> _classifierChanged = new();
 
     /// <inheritdoc />
     public void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier) =>
-        ClassifierChanged?.Invoke(_sender, new(node, newClassifier, oldClassifier));
+        _classifierChanged.Invoke(_sender, new(node, newClassifier, oldClassifier));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.PropertyAddedArgs>? PropertyAdded;
+    public bool CanRaiseChangeClassifier() => _classifierChanged.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.PropertyAddedArgs> PropertyAdded
+    {
+        add => _propertyAdded.Add(value);
+        remove => _propertyAdded.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.PropertyAddedArgs> _propertyAdded = new();
 
     /// <inheritdoc />
     public void AddProperty(IWritableNode node, Property property, PropertyValue newValue) =>
-        PropertyAdded?.Invoke(_sender, new(node, property, newValue));
+        _propertyAdded.Invoke(_sender, new(node, property, newValue));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.PropertyDeletedArgs>? PropertyDeleted;
+    public bool CanRaiseAddProperty() => _propertyAdded.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.PropertyDeletedArgs> PropertyDeleted
+    {
+        add => _propertyDeleted.Add(value);
+        remove => _propertyDeleted.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.PropertyDeletedArgs> _propertyDeleted = new();
 
     /// <inheritdoc />
     public void DeleteProperty(IWritableNode node, Property property, PropertyValue oldValue) =>
-        PropertyDeleted?.Invoke(_sender, new(node, property, oldValue));
+        _propertyDeleted.Invoke(_sender, new(node, property, oldValue));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.PropertyChangedArgs>? PropertyChanged;
+    public bool CanRaiseDeleteProperty() => _propertyDeleted.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.PropertyChangedArgs> PropertyChanged
+    {
+        add => _propertyChanged.Add(value);
+        remove => _propertyChanged.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.PropertyChangedArgs> _propertyChanged = new();
 
     /// <inheritdoc />
     public void ChangeProperty(IWritableNode node, Property property, PropertyValue newValue, PropertyValue oldValue) =>
-        PropertyChanged?.Invoke(_sender, new(node, property, newValue, oldValue));
+        _propertyChanged.Invoke(_sender, new(node, property, newValue, oldValue));
+
+    /// <inheritdoc />
+    public bool CanRaiseChangeProperty() => _propertyChanged.HasSubscribers;
 
     /// <inheritdoc />
     public event EventHandler<IPartitionListener.ChildAddedArgs> ChildAdded
@@ -195,42 +255,89 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     public bool CanRaiseMoveChildInSameContainment() => _childMovedInSameContainment.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationAddedArgs>? AnnotationAdded;
+    public event EventHandler<IPartitionListener.AnnotationAddedArgs> AnnotationAdded
+    {
+        add => _annotationAdded.Add(value);
+        remove => _annotationAdded.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.AnnotationAddedArgs> _annotationAdded = new();
 
     /// <inheritdoc />
     public void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index) =>
-        AnnotationAdded?.Invoke(_sender, new(parent, newAnnotation, index));
+        _annotationAdded.Invoke(_sender, new(parent, newAnnotation, index));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationDeletedArgs>? AnnotationDeleted;
+    public bool CanRaiseAddAnnotation() => _annotationAdded.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.AnnotationDeletedArgs> AnnotationDeleted
+    {
+        add => _annotationDeleted.Add(value);
+        remove => _annotationDeleted.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.AnnotationDeletedArgs> _annotationDeleted = new();
 
     /// <inheritdoc />
     public void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index) =>
-        AnnotationDeleted?.Invoke(_sender, new(deletedAnnotation, parent, index));
+        _annotationDeleted.Invoke(_sender, new(deletedAnnotation, parent, index));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationReplacedArgs>? AnnotationReplaced;
+    public bool CanRaiseDeleteAnnotation() => _annotationDeleted.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.AnnotationReplacedArgs> AnnotationReplaced
+    {
+        add => _annotationReplaced.Add(value);
+        remove => _annotationReplaced.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.AnnotationReplacedArgs> _annotationReplaced = new();
 
     /// <inheritdoc />
     public void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
         Index index) =>
-        AnnotationReplaced?.Invoke(_sender, new(newAnnotation, replacedAnnotation, parent, index));
+        _annotationReplaced.Invoke(_sender, new(newAnnotation, replacedAnnotation, parent, index));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationMovedFromOtherParentArgs>? AnnotationMovedFromOtherParent;
+    public bool CanRaiseReplaceAnnotation() => _annotationReplaced.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.AnnotationMovedFromOtherParentArgs> AnnotationMovedFromOtherParent
+    {
+        add => _annotationMovedFromOtherParent.Add(value);
+        remove => _annotationMovedFromOtherParent.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.AnnotationMovedFromOtherParentArgs>
+        _annotationMovedFromOtherParent = new();
 
     /// <inheritdoc />
     public void MoveAnnotationFromOtherParent(IWritableNode newParent, Index newIndex, IWritableNode movedAnnotation,
         IWritableNode oldParent, Index oldIndex) =>
-        AnnotationMovedFromOtherParent?.Invoke(_sender, new(newParent, newIndex, movedAnnotation, oldParent, oldIndex));
+        _annotationMovedFromOtherParent.Invoke(_sender, new(newParent, newIndex, movedAnnotation, oldParent, oldIndex));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationMovedInSameParentArgs>? AnnotationMovedInSameParent;
+    public bool CanRaiseMoveAnnotationFromOtherParent() => _annotationMovedFromOtherParent.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.AnnotationMovedInSameParentArgs> AnnotationMovedInSameParent
+    {
+        add => _annotationMovedInSameParent.Add(value);
+        remove => _annotationMovedInSameParent.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.AnnotationMovedInSameParentArgs>
+        _annotationMovedInSameParent = new();
 
     /// <inheritdoc />
     public void MoveAnnotationInSameParent(Index newIndex, IWritableNode movedAnnotation, IWritableNode parent,
         Index oldIndex) =>
-        AnnotationMovedInSameParent?.Invoke(_sender, new(newIndex, movedAnnotation, parent, oldIndex));
+        _annotationMovedInSameParent.Invoke(_sender, new(newIndex, movedAnnotation, parent, oldIndex));
+
+    /// <inheritdoc />
+    public bool CanRaiseMoveAnnotationInSameParent() => _annotationMovedInSameParent.HasSubscribers;
 
     /// <inheritdoc />
     public event EventHandler<IPartitionListener.ReferenceAddedArgs> ReferenceAdded
@@ -283,23 +390,44 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     public bool CanRaiseChangeReference() => _referenceChanged.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.EntryMovedFromOtherReferenceArgs>? EntryMovedFromOtherReference;
+    public event EventHandler<IPartitionListener.EntryMovedFromOtherReferenceArgs> EntryMovedFromOtherReference
+    {
+        add => _entryMovedFromOtherReference.Add(value);
+        remove => _entryMovedFromOtherReference.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.EntryMovedFromOtherReferenceArgs>
+        _entryMovedFromOtherReference = new();
 
     /// <inheritdoc />
     public void MoveEntryFromOtherReference(IWritableNode newParent, Reference newReference, Index newIndex,
         IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target) =>
-        EntryMovedFromOtherReference?.Invoke(_sender,
+        _entryMovedFromOtherReference.Invoke(_sender,
             new(newParent, newReference, newIndex, oldParent, oldReference, oldIndex, target));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.EntryMovedFromOtherReferenceInSameParentArgs>?
-        EntryMovedFromOtherReferenceInSameParent;
+    public bool CanRaiseMoveEntryFromOtherReference() => _entryMovedFromOtherReference.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.EntryMovedFromOtherReferenceInSameParentArgs>
+        EntryMovedFromOtherReferenceInSameParent
+        {
+            add => _entryMovedFromOtherReferenceInSameParent.Add(value);
+            remove => _entryMovedFromOtherReferenceInSameParent.Remove(value);
+        }
+
+    private readonly CountingEventHandler<IPartitionListener.EntryMovedFromOtherReferenceInSameParentArgs>
+        _entryMovedFromOtherReferenceInSameParent = new();
 
     /// <inheritdoc />
     public void MoveEntryFromOtherReferenceInSameParent(IWritableNode parent, Reference newReference, Index newIndex,
         Reference oldReference, Index oldIndex, IReferenceTarget target) =>
-        EntryMovedFromOtherReferenceInSameParent?.Invoke(_sender,
+        _entryMovedFromOtherReferenceInSameParent.Invoke(_sender,
             new(parent, newReference, newIndex, oldReference, oldIndex, target));
+
+    /// <inheritdoc />
+    public bool CanRaiseMoveEntryFromOtherReferenceInSameParent() =>
+        _entryMovedFromOtherReferenceInSameParent.HasSubscribers;
 
     /// <inheritdoc />
     public event EventHandler<IPartitionListener.EntryMovedInSameReferenceArgs> EntryMovedInSameReference
@@ -320,58 +448,119 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     public bool CanRaiseMoveEntryInSameReference() => _entryMovedInSameReference.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceResolveInfoAddedArgs>? ReferenceResolveInfoAdded;
+    public event EventHandler<IPartitionListener.ReferenceResolveInfoAddedArgs> ReferenceResolveInfoAdded
+    {
+        add => _referenceResolveInfoAdded.Add(value);
+        remove => _referenceResolveInfoAdded.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ReferenceResolveInfoAddedArgs> _referenceResolveInfoAdded =
+        new();
 
     /// <inheritdoc />
     public void AddReferenceResolveInfo(IWritableNode parent, Reference reference, Index index,
         ResolveInfo newResolveInfo,
         TargetNode target) =>
-        ReferenceResolveInfoAdded?.Invoke(_sender, new(parent, reference, index, newResolveInfo, target));
+        _referenceResolveInfoAdded.Invoke(_sender, new(parent, reference, index, newResolveInfo, target));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceResolveInfoDeletedArgs>? ReferenceResolveInfoDeleted;
+    public bool CanRaiseAddReferenceResolveInfo() => _referenceResolveInfoAdded.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ReferenceResolveInfoDeletedArgs> ReferenceResolveInfoDeleted
+    {
+        add => _referenceResolveInfoDeleted.Add(value);
+        remove => _referenceResolveInfoDeleted.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ReferenceResolveInfoDeletedArgs>
+        _referenceResolveInfoDeleted = new();
 
     /// <inheritdoc />
     public void DeleteReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, TargetNode target,
         ResolveInfo deletedResolveInfo) =>
-        ReferenceResolveInfoDeleted?.Invoke(_sender, new(parent, reference, index, target, deletedResolveInfo));
+        _referenceResolveInfoDeleted.Invoke(_sender, new(parent, reference, index, target, deletedResolveInfo));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceResolveInfoChangedArgs>? ReferenceResolveInfoChanged;
+    public bool CanRaiseDeleteReferenceResolveInfo() => _referenceResolveInfoDeleted.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ReferenceResolveInfoChangedArgs> ReferenceResolveInfoChanged
+    {
+        add => _referenceResolveInfoChanged.Add(value);
+        remove => _referenceResolveInfoChanged.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ReferenceResolveInfoChangedArgs>
+        _referenceResolveInfoChanged = new();
 
     /// <inheritdoc />
     public void ChangeReferenceResolveInfo(IWritableNode parent, Reference reference, Index index,
         ResolveInfo newResolveInfo,
         TargetNode? target, ResolveInfo replacedResolveInfo) =>
-        ReferenceResolveInfoChanged?.Invoke(_sender,
+        _referenceResolveInfoChanged.Invoke(_sender,
             new(parent, reference, index, newResolveInfo, target, replacedResolveInfo));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceTargetAddedArgs>? ReferenceTargetAdded;
+    public bool CanRaiseChangeReferenceResolveInfo() => _referenceResolveInfoChanged.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ReferenceTargetAddedArgs> ReferenceTargetAdded
+    {
+        add => _referenceTargetAdded.Add(value);
+        remove => _referenceTargetAdded.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ReferenceTargetAddedArgs> _referenceTargetAdded = new();
 
     /// <inheritdoc />
     public void AddReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
         ResolveInfo resolveInfo) =>
-        ReferenceTargetAdded?.Invoke(_sender, new(parent, reference, index, newTarget, resolveInfo));
+        _referenceTargetAdded.Invoke(_sender, new(parent, reference, index, newTarget, resolveInfo));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceTargetDeletedArgs>? ReferenceTargetDeleted;
+    public bool CanRaiseAddReferenceTarget() => _referenceTargetAdded.HasSubscribers;
+
+    /// <inheritdoc />
+    public event EventHandler<IPartitionListener.ReferenceTargetDeletedArgs> ReferenceTargetDeleted
+    {
+        add => _referenceTargetDeleted.Add(value);
+        remove => _referenceTargetDeleted.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ReferenceTargetDeletedArgs>
+        _referenceTargetDeleted = new();
 
     /// <inheritdoc />
     public void DeleteReferenceTarget(IWritableNode parent, Reference reference, Index index, ResolveInfo resolveInfo,
         TargetNode deletedTarget) =>
-        ReferenceTargetDeleted?.Invoke(_sender, new(parent, reference, index, resolveInfo, deletedTarget));
+        _referenceTargetDeleted.Invoke(_sender, new(parent, reference, index, resolveInfo, deletedTarget));
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceTargetChangedArgs>? ReferenceTargetChanged;
+    public bool CanRaiseDeleteReferenceTarget() => _referenceTargetDeleted.HasSubscribers;
 
     /// <inheritdoc />
-    public void ChangedReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
+    public event EventHandler<IPartitionListener.ReferenceTargetChangedArgs> ReferenceTargetChanged
+    {
+        add => _referenceTargetChanged.Add(value);
+        remove => _referenceTargetChanged.Remove(value);
+    }
+
+    private readonly CountingEventHandler<IPartitionListener.ReferenceTargetChangedArgs>
+        _referenceTargetChanged = new();
+
+    /// <inheritdoc />
+    public void ChangeReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
         ResolveInfo? resolveInfo, TargetNode oldTarget) =>
-        ReferenceTargetChanged?.Invoke(_sender, new(parent, reference, index, newTarget, resolveInfo, oldTarget));
+        _referenceTargetChanged.Invoke(_sender, new(parent, reference, index, newTarget, resolveInfo, oldTarget));
+
+    /// <inheritdoc />
+    public bool CanRaiseChangeReferenceTarget() => _referenceTargetChanged.HasSubscribers;
 }
 
-class CountingEventHandler<T>
+/// Event handler that keeps track of the number of listeners.
+/// Used to avoid expensive event argument preparation if nobody is listening.
+internal class CountingEventHandler<T>
 {
     private int _subscriberCount = 0;
     public event EventHandler<T>? Event;

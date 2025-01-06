@@ -35,10 +35,10 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(parent, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(doc, args.newChild);
+            Assert.AreSame(parent, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(doc, args.NewChild);
         };
 
         parent.Documentation = doc;
@@ -56,10 +56,10 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(parent, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(doc, args.newChild);
+            Assert.AreSame(parent, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(doc, args.NewChild);
         };
 
         parent.SetDocumentation(doc);
@@ -77,10 +77,10 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(parent, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(doc, args.newChild);
+            Assert.AreSame(parent, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(doc, args.NewChild);
         };
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
@@ -100,13 +100,13 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
         {
             events++;
-            Assert.AreSame(oldParent, args.oldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(parent, args.newParent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(doc, args.movedChild);
+            Assert.AreSame(oldParent, args.OldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(parent, args.NewParent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(doc, args.MovedChild);
         };
 
         parent.Documentation = doc;
@@ -126,13 +126,13 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
         {
             events++;
-            Assert.AreSame(oldParent, args.oldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(parent, args.newParent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(doc, args.movedChild);
+            Assert.AreSame(oldParent, args.OldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(parent, args.NewParent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(doc, args.MovedChild);
         };
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
@@ -153,21 +153,21 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
         {
             events++;
-            Assert.AreSame(oldParent, args.oldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(parent, args.newParent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(doc, args.movedChild);
+            Assert.AreSame(oldParent, args.OldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(parent, args.NewParent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(doc, args.MovedChild);
         };
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(parent, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(replacedDoc, args.deletedChild);
+            Assert.AreSame(parent, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(replacedDoc, args.DeletedChild);
         };
 
         parent.Documentation = doc;
@@ -188,21 +188,21 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
         {
             events++;
-            Assert.AreSame(oldParent, args.oldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(parent, args.newParent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(doc, args.movedChild);
+            Assert.AreSame(oldParent, args.OldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(parent, args.NewParent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(doc, args.MovedChild);
         };
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(parent, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(replacedDoc, args.deletedChild);
+            Assert.AreSame(parent, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(replacedDoc, args.DeletedChild);
         };
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
@@ -221,12 +221,12 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
         {
             events++;
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(doc, args.movedChild);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(doc, args.MovedChild);
         };
 
         offsetDuplicate.Docs = doc;
@@ -245,12 +245,12 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
         {
             events++;
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(doc, args.movedChild);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(doc, args.MovedChild);
         };
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
@@ -270,20 +270,20 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
         {
             events++;
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(doc, args.movedChild);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(doc, args.MovedChild);
         };
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(replacedDoc, args.deletedChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(replacedDoc, args.DeletedChild);
         };
 
         offsetDuplicate.Docs = doc;
@@ -303,20 +303,20 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
         {
             events++;
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(doc, args.movedChild);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(doc, args.MovedChild);
         };
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(replacedDoc, args.deletedChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(replacedDoc, args.DeletedChild);
         };
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
@@ -337,11 +337,11 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildReplaced += (sender, args) =>
         {
             events++;
-            Assert.AreSame(parent, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(doc, args.newChild);
-            Assert.AreEqual(oldDoc, args.replacedChild);
+            Assert.AreSame(parent, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(doc, args.NewChild);
+            Assert.AreEqual(oldDoc, args.ReplacedChild);
         };
 
         parent.Documentation = doc;
@@ -360,11 +360,11 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildReplaced += (sender, args) =>
         {
             events++;
-            Assert.AreSame(parent, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(doc, args.newChild);
-            Assert.AreEqual(oldDoc, args.replacedChild);
+            Assert.AreSame(parent, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(doc, args.NewChild);
+            Assert.AreEqual(oldDoc, args.ReplacedChild);
         };
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
@@ -462,10 +462,10 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(parent, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(oldDoc, args.deletedChild);
+            Assert.AreSame(parent, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(oldDoc, args.DeletedChild);
         };
 
         parent.Documentation = null;
@@ -483,10 +483,10 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(parent, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(oldDoc, args.deletedChild);
+            Assert.AreSame(parent, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(oldDoc, args.DeletedChild);
         };
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);

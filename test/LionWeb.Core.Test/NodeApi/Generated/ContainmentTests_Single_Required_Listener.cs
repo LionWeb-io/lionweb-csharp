@@ -35,10 +35,10 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(coord, args.newChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(coord, args.NewChild);
         };
 
         offsetDuplicate.Offset = coord;
@@ -57,10 +57,10 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(coord, args.newChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(coord, args.NewChild);
         };
 
         offsetDuplicate.SetOffset(coord);
@@ -79,10 +79,10 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(coord, args.newChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(coord, args.NewChild);
         };
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
@@ -102,13 +102,13 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
         {
             events++;
-            Assert.AreSame(oldParent, args.oldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.newParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(coord, args.movedChild);
+            Assert.AreSame(oldParent, args.OldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.NewParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(coord, args.MovedChild);
         };
 
         offsetDuplicate.Offset = coord;
@@ -128,13 +128,13 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
         {
             events++;
-            Assert.AreSame(oldParent, args.oldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.newParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(coord, args.movedChild);
+            Assert.AreSame(oldParent, args.OldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.NewParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(coord, args.MovedChild);
         };
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
@@ -155,21 +155,21 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
         {
             events++;
-            Assert.AreSame(oldParent, args.oldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.newParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(coord, args.movedChild);
+            Assert.AreSame(oldParent, args.OldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.NewParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(coord, args.MovedChild);
         };
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(replacedCoord, args.deletedChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(replacedCoord, args.DeletedChild);
         };
 
         offsetDuplicate.Offset = coord;
@@ -190,21 +190,21 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
         {
             events++;
-            Assert.AreSame(oldParent, args.oldParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.newParent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(coord, args.movedChild);
+            Assert.AreSame(oldParent, args.OldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.NewParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(coord, args.MovedChild);
         };
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(replacedCoord, args.deletedChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(replacedCoord, args.DeletedChild);
         };
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
@@ -223,12 +223,12 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
         {
             events++;
-            Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(coord, args.movedChild);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(coord, args.MovedChild);
         };
 
         offsetDuplicate.Offset = coord;
@@ -247,12 +247,12 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
         {
             events++;
-            Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(coord, args.movedChild);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(coord, args.MovedChild);
         };
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
@@ -272,20 +272,20 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
         {
             events++;
-            Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(coord, args.movedChild);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(coord, args.MovedChild);
         };
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(replacedCoord, args.deletedChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(replacedCoord, args.DeletedChild);
         };
 
         offsetDuplicate.Offset = coord;
@@ -305,20 +305,20 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
         {
             events++;
-            Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.oldContainment);
-            Assert.AreEqual(0, args.oldIndex);
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.newContainment);
-            Assert.AreEqual(0, args.newIndex);
-            Assert.AreEqual(coord, args.movedChild);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
+            Assert.AreEqual(0, args.OldIndex);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.NewContainment);
+            Assert.AreEqual(0, args.NewIndex);
+            Assert.AreEqual(coord, args.MovedChild);
         };
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(replacedCoord, args.deletedChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(replacedCoord, args.DeletedChild);
         };
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
@@ -340,11 +340,11 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildReplaced += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(coord, args.newChild);
-            Assert.AreEqual(oldCoord, args.replacedChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(coord, args.NewChild);
+            Assert.AreEqual(oldCoord, args.ReplacedChild);
         };
 
         offsetDuplicate.Offset = coord;
@@ -364,11 +364,11 @@ public class ContainmentTests_Single_Required_Listener
         ((IPartitionInstance)parent).Listener.ChildReplaced += (sender, args) =>
         {
             events++;
-            Assert.AreSame(offsetDuplicate, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.containment);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(coord, args.newChild);
-            Assert.AreEqual(oldCoord, args.replacedChild);
+            Assert.AreSame(offsetDuplicate, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(coord, args.NewChild);
+            Assert.AreEqual(oldCoord, args.ReplacedChild);
         };
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);

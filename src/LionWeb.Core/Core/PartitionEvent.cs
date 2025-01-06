@@ -23,33 +23,53 @@ using M3;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
+/// Encapsulates event-related logic and data to execute
+/// <see cref="CollectOldData">before</see> and <see cref="RaiseEvent">after</see>
+/// the actual manipulation of the underlying nodes for one specific <see cref="Feature"/>.
+/// <typeparam name="T">Type of nodes of the represented <see cref="Feature"/>.</typeparam>
 public abstract class PartitionEventBase<T> where T : IReadableNode
 {
-    protected readonly IPartitionCommander? _partitionCommander;
-    protected readonly NodeBase _newParent;
+    /// <see cref="IPartitionCommander"/> to use for our events, if any.
+    protected readonly IPartitionCommander? PartitionCommander;
 
+    /// Owner of the represented <see cref="Feature"/>.
+    protected readonly NodeBase NewParent;
+
+    /// <param name="newParent"> Owner of the represented <see cref="Feature"/>.</param>
     protected PartitionEventBase(NodeBase newParent)
     {
-        _newParent = newParent;
-        _partitionCommander = newParent.GetPartitionCommander();
+        NewParent = newParent;
+        PartitionCommander = newParent.GetPartitionCommander();
     }
 
+    /// Logic to execute <i>before</i> any changes to the underlying nodes.
     public abstract void CollectOldData();
+
+    /// Logic to execute <i>after</i> any changes to the underlying nodes.
     public abstract void RaiseEvent();
 
-    [MemberNotNullWhen(true, nameof(_partitionCommander))]
+    /// <summary>
+    /// Whether this event should execute at all.
+    /// </summary>
+    [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected abstract bool IsActive();
 }
 
+/// Encapsulates event-related logic and data for <see cref="Containment"/>s.
+/// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public abstract class PartitionContainmentEventBase<T> : PartitionEventBase<T> where T : INode
 {
-    protected readonly Containment _containment;
+    /// Represented <see cref="Containment"/>.
+    protected readonly Containment Containment;
 
+    /// <param name="containment">Represented <see cref="Containment"/>.</param>
+    /// <param name="newParent"> Owner of the represented <paramref name="containment"/>.</param>
     protected PartitionContainmentEventBase(Containment containment, NodeBase newParent) : base(newParent)
     {
-        _containment = containment;
+        Containment = containment;
     }
 
+    /// Collects <see cref="OldContainmentInfo"/> from <paramref name="value"/>, to be used in <see cref="PartitionEventBase{T}.CollectOldData"/>
     protected OldContainmentInfo? Collect(T value)
     {
         var oldParent = value.GetParent();
@@ -63,21 +83,31 @@ public abstract class PartitionContainmentEventBase<T> : PartitionEventBase<T> w
         var oldIndex = oldContainment.Multiple
             ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment)).ToList().IndexOf(value)
             : 0;
-        
+
         return new OldContainmentInfo(oldParent, oldContainment, oldIndex);
     }
 
+    /// Context of a node before it has been removed from its previous <paramref name="Parent"/>.
+    /// <param name="Parent"></param>
+    /// <param name="Containment"></param>
+    /// <param name="Index"></param>
     protected record OldContainmentInfo(INode Parent, Containment Containment, int Index);
 }
 
+/// Encapsulates event-related logic and data for <i>multiple</i> <see cref="Containment"/>s.
+/// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public abstract class PartitionMultipleContainmentEventBase<T> : PartitionContainmentEventBase<T> where T : INode
 {
-    protected Dictionary<T, OldContainmentInfo?> _newValues;
+    /// Newly set values and their previous context.
+    protected readonly Dictionary<T, OldContainmentInfo?> NewValues;
 
+    /// <param name="containment">Represented <see cref="Containment"/>.</param>
+    /// <param name="newParent"> Owner of the represented <paramref name="containment"/>.</param>
+    /// <param name="newValues">Newly set values.</param>
     protected PartitionMultipleContainmentEventBase(Containment containment, NodeBase newParent, List<T>? newValues) :
         base(containment, newParent)
     {
-        _newValues = newValues?.ToDictionary<T, T, OldContainmentInfo?>(k => k, _ => null) ?? [];
+        NewValues = newValues?.ToDictionary<T, T, OldContainmentInfo?>(k => k, _ => null) ?? [];
     }
 
     /// <inheritdoc />
@@ -86,17 +116,23 @@ public abstract class PartitionMultipleContainmentEventBase<T> : PartitionContai
         if (!IsActive())
             return;
 
-        foreach (T setValue in _newValues.Keys.ToList())
+        foreach (T setValue in NewValues.Keys.ToList())
         {
-            _newValues[setValue] = Collect(setValue);
+            NewValues[setValue] = Collect(setValue);
         }
     }
 }
 
+/// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Containment"/>s.
+/// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> where T : INode
 {
     private readonly List<IListComparer<T>.Change> _changes = [];
 
+    /// <param name="containment">Represented <see cref="Containment"/>.</param>
+    /// <param name="newParent"> Owner of the represented <paramref name="containment"/>.</param>
+    /// <param name="setValues">Newly set values.</param>
+    /// <param name="existingValues">Values previously present in <paramref name="containment"/>.</param>
     public SetContainmentEvent(
         Containment containment,
         NodeBase newParent,
@@ -122,16 +158,16 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
             switch (change)
             {
                 case IListComparer<T>.Added added:
-                    switch (added, _newValues[added.Element])
+                    switch (added, NewValues[added.Element])
                     {
                         case ({ }, null):
-                            _partitionCommander.AddChild(_newParent, added.Element, _containment, added.RightIndex);
+                            PartitionCommander.AddChild(NewParent, added.Element, Containment, added.RightIndex);
                             break;
 
-                        case ({ }, { } o) when o.Parent != _newParent:
-                            _partitionCommander.MoveChildFromOtherContainment(
-                                _newParent,
-                                _containment,
+                        case ({ }, { } o) when o.Parent != NewParent:
+                            PartitionCommander.MoveChildFromOtherContainment(
+                                NewParent,
+                                Containment,
                                 added.RightIndex,
                                 added.Element,
                                 o.Parent,
@@ -141,12 +177,12 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
                             break;
 
 
-                        case ({ }, { } o) when o.Parent == _newParent && o.Containment != _containment:
-                            _partitionCommander.MoveChildFromOtherContainmentInSameParent(
-                                _containment,
+                        case ({ }, { } o) when o.Parent == NewParent && o.Containment != Containment:
+                            PartitionCommander.MoveChildFromOtherContainmentInSameParent(
+                                Containment,
                                 added.RightIndex,
                                 added.Element,
-                                _newParent,
+                                NewParent,
                                 o.Containment,
                                 o.Index
                             );
@@ -159,42 +195,49 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
                     break;
 
                 case IListComparer<T>.Moved moved:
-                    _partitionCommander.MoveChildInSameContainment(moved.RightIndex, moved.LeftElement, _newParent,
-                        _containment, moved.LeftIndex);
+                    PartitionCommander.MoveChildInSameContainment(moved.RightIndex, moved.LeftElement, NewParent,
+                        Containment, moved.LeftIndex);
                     break;
                 case IListComparer<T>.Deleted deleted:
-                    _partitionCommander.DeleteChild(deleted.Element, _newParent, _containment, deleted.LeftIndex);
+                    PartitionCommander.DeleteChild(deleted.Element, NewParent, Containment, deleted.LeftIndex);
                     break;
             }
         }
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(_partitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
-        _partitionCommander != null && (_partitionCommander.CanRaiseAddChild() ||
-                                        _partitionCommander.CanRaiseDeleteChild() ||
-                                        _partitionCommander
-                                            .CanRaiseMoveChildFromOtherContainment() ||
-                                        _partitionCommander
-                                            .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
-                                        _partitionCommander
-                                            .CanRaiseMoveChildInSameContainment());
+        PartitionCommander != null && (PartitionCommander.CanRaiseAddChild() ||
+                                       PartitionCommander.CanRaiseDeleteChild() ||
+                                       PartitionCommander
+                                           .CanRaiseMoveChildFromOtherContainment() ||
+                                       PartitionCommander
+                                           .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
+                                       PartitionCommander
+                                           .CanRaiseMoveChildInSameContainment());
 }
 
+/// Encapsulates event-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Containment"/>s.
+/// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEventBase<T> where T : INode
 {
     private int _newIndex;
 
+    /// <param name="containment">Represented <see cref="Containment"/>.</param>
+    /// <param name="newParent"> Owner of the represented <paramref name="containment"/>.</param>
+    /// <param name="addedValues">Newly added values.</param>
+    /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
+    /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <paramref name="containment"/>.</param>
     public AddMultipleContainmentsEvent(
         Containment containment,
         NodeBase newParent,
         List<T>? addedValues,
         List<T> existingValues,
-        int? newIndex = null
+        int? startIndex = null
     ) : base(containment, newParent, addedValues)
     {
-        _newIndex = newIndex ?? Math.Max(existingValues.Count - 1, 0);
+        _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
     }
 
     /// <inheritdoc />
@@ -203,18 +246,18 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
         if (!IsActive())
             return;
 
-        foreach ((T? added, OldContainmentInfo? old) in _newValues)
+        foreach ((T? added, OldContainmentInfo? old) in NewValues)
         {
             switch (added, old)
             {
                 case ({ }, null):
-                    _partitionCommander.AddChild(_newParent, added, _containment, _newIndex);
+                    PartitionCommander.AddChild(NewParent, added, Containment, _newIndex);
                     break;
 
-                case ({ }, { } o) when o.Parent != _newParent:
-                    _partitionCommander.MoveChildFromOtherContainment(
-                        _newParent,
-                        _containment,
+                case ({ }, { } o) when o.Parent != NewParent:
+                    PartitionCommander.MoveChildFromOtherContainment(
+                        NewParent,
+                        Containment,
                         _newIndex,
                         added,
                         o.Parent,
@@ -224,26 +267,26 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
                     break;
 
 
-                case ({ }, { } o) when o.Parent == _newParent && o.Containment == _containment && o.Index == _newIndex:
+                case ({ }, { } o) when o.Parent == NewParent && o.Containment == Containment && o.Index == _newIndex:
                     // no-op
                     break;
 
-                case ({ }, { } o) when o.Parent == _newParent && o.Containment == _containment:
-                    _partitionCommander.MoveChildInSameContainment(
+                case ({ }, { } o) when o.Parent == NewParent && o.Containment == Containment:
+                    PartitionCommander.MoveChildInSameContainment(
                         _newIndex,
                         added,
-                        _newParent,
+                        NewParent,
                         o.Containment,
                         o.Index
                     );
                     break;
 
-                case ({ }, { } o) when o.Parent == _newParent && o.Containment != _containment:
-                    _partitionCommander.MoveChildFromOtherContainmentInSameParent(
-                        _containment,
+                case ({ }, { } o) when o.Parent == NewParent && o.Containment != Containment:
+                    PartitionCommander.MoveChildFromOtherContainmentInSameParent(
+                        Containment,
                         _newIndex,
                         added,
-                        _newParent,
+                        NewParent,
                         o.Containment,
                         o.Index
                     );
@@ -258,17 +301,19 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(_partitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
-        _partitionCommander != null && (_partitionCommander.CanRaiseAddChild() ||
-                                        _partitionCommander
-                                            .CanRaiseMoveChildFromOtherContainment() ||
-                                        _partitionCommander
-                                            .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
-                                        _partitionCommander
-                                            .CanRaiseMoveChildInSameContainment());
+        PartitionCommander != null && (PartitionCommander.CanRaiseAddChild() ||
+                                       PartitionCommander
+                                           .CanRaiseMoveChildFromOtherContainment() ||
+                                       PartitionCommander
+                                           .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
+                                       PartitionCommander
+                                           .CanRaiseMoveChildInSameContainment());
 }
 
+/// Encapsulates event-related logic and data for changing <i>single</i> <see cref="Containment"/>s.
+/// <typeparam name="T">Type of node of the represented <see cref="Containment"/>.</typeparam>
 public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where T : INode
 {
     private readonly T? _newValue;
@@ -278,6 +323,10 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
     private Containment? _oldContainment;
     private int _oldIndex;
 
+    /// <param name="containment">Represented <see cref="Containment"/>.</param>
+    /// <param name="newParent"> Owner of the represented <paramref name="containment"/>.</param>
+    /// <param name="newValue">Newly set value.</param>
+    /// <param name="oldValue">Previous value of <paramref name="containment"/>.</param>
     public SingleContainmentEvent(Containment containment, NodeBase newParent, T? newValue, T? oldValue)
         : base(containment, newParent)
     {
@@ -292,7 +341,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
             return;
 
         OldContainmentInfo? oldInfo = Collect(_newValue);
-        if(oldInfo == null)
+        if (oldInfo == null)
             return;
 
         _oldParent = oldInfo.Parent;
@@ -309,46 +358,46 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
         switch (_oldValue, _newValue, _oldParent)
         {
             case (null, null, _):
-                // fall-through
+            // fall-through
             case ({ }, { }, _) when Equals(_oldValue, _newValue):
                 // no-op
                 break;
 
             case ({ }, null, _):
-                _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
+                PartitionCommander.DeleteChild(_oldValue, NewParent, Containment, 0);
                 break;
 
             case (null, { }, null):
-                _partitionCommander.AddChild(_newParent, _newValue, _containment, 0);
+                PartitionCommander.AddChild(NewParent, _newValue, Containment, 0);
                 break;
 
             case ({ }, { }, null):
-                _partitionCommander.ReplaceChild(_newValue, _oldValue, _newParent, _containment, 0);
+                PartitionCommander.ReplaceChild(_newValue, _oldValue, NewParent, Containment, 0);
                 break;
 
             case (null, { }, { })
-                when _oldParent == _newParent && _oldContainment != _containment:
-                _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, 0, _newValue,
-                    _newParent, _oldContainment, _oldIndex);
+                when _oldParent == NewParent && _oldContainment != Containment:
+                PartitionCommander.MoveChildFromOtherContainmentInSameParent(Containment, 0, _newValue,
+                    NewParent, _oldContainment, _oldIndex);
                 break;
 
             case ({ }, { }, { })
-                when _oldParent == _newParent && _oldContainment != _containment:
-                _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
-                _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, 0, _newValue,
-                    _newParent, _oldContainment, _oldIndex);
+                when _oldParent == NewParent && _oldContainment != Containment:
+                PartitionCommander.DeleteChild(_oldValue, NewParent, Containment, 0);
+                PartitionCommander.MoveChildFromOtherContainmentInSameParent(Containment, 0, _newValue,
+                    NewParent, _oldContainment, _oldIndex);
                 break;
 
             case ({ }, { }, { })
-                when _oldParent != _newParent:
-                _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
-                _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, 0, _newValue,
+                when _oldParent != NewParent:
+                PartitionCommander.DeleteChild(_oldValue, NewParent, Containment, 0);
+                PartitionCommander.MoveChildFromOtherContainment(NewParent, Containment, 0, _newValue,
                     _oldParent, _oldContainment, _oldIndex);
                 break;
 
             case (null, { }, { })
-                when _oldParent != _newParent:
-                _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, 0, _newValue,
+                when _oldParent != NewParent:
+                PartitionCommander.MoveChildFromOtherContainment(NewParent, Containment, 0, _newValue,
                     _oldParent, _oldContainment, _oldIndex);
                 break;
 
@@ -358,25 +407,32 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(_partitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
-        _partitionCommander != null && (_partitionCommander.CanRaiseAddChild() ||
-                                        _partitionCommander.CanRaiseDeleteChild() ||
-                                        _partitionCommander.CanRaiseReplaceChild() ||
-                                        _partitionCommander
-                                            .CanRaiseMoveChildFromOtherContainment() ||
-                                        _partitionCommander
-                                            .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
-                                        _partitionCommander
-                                            .CanRaiseMoveChildInSameContainment());
+        PartitionCommander != null && (PartitionCommander.CanRaiseAddChild() ||
+                                       PartitionCommander.CanRaiseDeleteChild() ||
+                                       PartitionCommander.CanRaiseReplaceChild() ||
+                                       PartitionCommander
+                                           .CanRaiseMoveChildFromOtherContainment() ||
+                                       PartitionCommander
+                                           .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
+                                       PartitionCommander
+                                           .CanRaiseMoveChildInSameContainment());
 }
 
+/// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Reference"/>s.
+/// <typeparam name="T">Type of nodes of the represented <see cref="Reference"/>.</typeparam>
 public class SetReferenceEvent<T> : PartitionEventBase<T> where T : IReadableNode
 {
     private readonly Reference _reference;
-    private List<IListComparer<T>.Change> _changes = [];
+    private readonly List<IListComparer<T>.Change> _changes = [];
 
-    public SetReferenceEvent(Reference reference, NodeBase newParent, List<T> safeNodes, List<T> storage) : base(newParent)
+    /// <param name="reference">Represented <see cref="Reference"/>.</param>
+    /// <param name="newParent"> Owner of the represented <paramref name="reference"/>.</param>
+    /// <param name="safeNodes">Newly added values.</param>
+    /// <param name="storage">Values already present in <paramref name="reference"/>.</param>
+    public SetReferenceEvent(Reference reference, NodeBase newParent, List<T> safeNodes, List<T> storage) :
+        base(newParent)
     {
         _reference = reference;
 
@@ -395,21 +451,22 @@ public class SetReferenceEvent<T> : PartitionEventBase<T> where T : IReadableNod
     {
         if (!IsActive())
             return;
-        
+
         foreach (var change in _changes)
         {
             switch (change)
             {
                 case IListComparer<T>.Added added:
-                    _partitionCommander.AddReference(_newParent, _reference, added.RightIndex,
+                    PartitionCommander.AddReference(NewParent, _reference, added.RightIndex,
                         new ReferenceTarget(null, added.Element));
                     break;
                 case IListComparer<T>.Moved moved:
-                    _partitionCommander.MoveEntryInSameReference(_newParent, _reference, moved.LeftIndex, moved.RightIndex,
+                    PartitionCommander.MoveEntryInSameReference(NewParent, _reference, moved.LeftIndex,
+                        moved.RightIndex,
                         new ReferenceTarget(null, moved.LeftElement));
                     break;
                 case IListComparer<T>.Deleted deleted:
-                    _partitionCommander.DeleteReference(_newParent, _reference, deleted.LeftIndex,
+                    PartitionCommander.DeleteReference(NewParent, _reference, deleted.LeftIndex,
                         new ReferenceTarget(null, deleted.Element));
                     break;
             }
@@ -417,10 +474,9 @@ public class SetReferenceEvent<T> : PartitionEventBase<T> where T : IReadableNod
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(_partitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
-        _partitionCommander != null && (_partitionCommander.CanRaiseAddReference() ||
-                                       _partitionCommander.CanRaiseMoveEntryInSameReference() ||
-                                       _partitionCommander.CanRaiseDeleteReference());
-
+        PartitionCommander != null && (PartitionCommander.CanRaiseAddReference() ||
+                                       PartitionCommander.CanRaiseMoveEntryInSameReference() ||
+                                       PartitionCommander.CanRaiseDeleteReference());
 }

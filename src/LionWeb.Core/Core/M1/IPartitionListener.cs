@@ -23,379 +23,659 @@ using ResolveInfo = string;
 using TargetNode = IReadableNode;
 using PropertyValue = object;
 
-public interface IForestListener
-{
-    record NewPartitionArgs(IReadableNode newPartition);
-
-    event EventHandler<NewPartitionArgs> NewPartition;
-
-    record PartitionDeletedArgs(IReadableNode deletedPartition);
-
-    event EventHandler<PartitionDeletedArgs> PartitionDeleted;
-}
-
-public interface IForestCommander
-{
-    void AddPartition(IReadableNode newPartition);
-    // bool CanRaiseAddPartition();
-
-    void DeletePartition(IReadableNode deletedPartition);
-    // bool CanRaiseDeletePartition();
-}
-
-public interface IReferenceTarget
-{
-    ResolveInfo? ResolveInfo { get; }
-    TargetNode? Reference { get; }
-}
-
-public readonly record struct ReferenceTarget(ResolveInfo? ResolveInfo, TargetNode? Reference) : IReferenceTarget;
-
+/// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+/// <seealso cref="IPartitionCommander"/>
+/// <seealso cref="PartitionEventHandler"/>
 public interface IPartitionListener
 {
     #region Nodes
 
-    record ClassifierChangedArgs(IWritableNode node, Classifier newClassifier, Classifier oldClassifier);
+    /// <inheritdoc cref="IPartitionListener.ClassifierChanged"/>
+    /// <param name="Node"></param>
+    /// <param name="NewClassifier"></param>
+    /// <param name="OldClassifier"></param>
+    record ClassifierChangedArgs(IWritableNode Node, Classifier NewClassifier, Classifier OldClassifier);
 
+    /// <seealso cref="IPartitionCommander.ChangeClassifier"/>
     event EventHandler<ClassifierChangedArgs> ClassifierChanged;
 
     #endregion
 
     #region Properties
 
-    record PropertyAddedArgs(IWritableNode node, Property property, PropertyValue newValue);
+    /// <inheritdoc cref="IPartitionListener.PropertyAdded"/>
+    /// <param name="Node"></param>
+    /// <param name="Property"></param>
+    /// <param name="NewValue"></param>
+    record PropertyAddedArgs(IWritableNode Node, Property Property, PropertyValue NewValue);
 
+    /// <seealso cref="IPartitionCommander.AddProperty"/>
     event EventHandler<PropertyAddedArgs> PropertyAdded;
 
-    record PropertyDeletedArgs(IWritableNode node, Property property, PropertyValue oldValue);
+    /// <inheritdoc cref="IPartitionListener.PropertyDeleted"/>
+    /// <param name="Node"></param>
+    /// <param name="Property"></param>
+    /// <param name="OldValue"></param>
+    record PropertyDeletedArgs(IWritableNode Node, Property Property, PropertyValue OldValue);
 
+    /// <seealso cref="IPartitionCommander.DeleteProperty"/>
     event EventHandler<PropertyDeletedArgs> PropertyDeleted;
 
-    record PropertyChangedArgs(IWritableNode node, Property property, PropertyValue newValue, PropertyValue oldValue);
+    /// <inheritdoc cref="IPartitionListener.PropertyChanged"/>
+    /// <param name="Node"></param>
+    /// <param name="Property"></param>
+    /// <param name="NewValue"></param>
+    /// <param name="OldValue"></param>
+    record PropertyChangedArgs(IWritableNode Node, Property Property, PropertyValue NewValue, PropertyValue OldValue);
 
+    /// <seealso cref="IPartitionCommander.ChangeProperty"/>
     event EventHandler<PropertyChangedArgs> PropertyChanged;
 
     #endregion
 
     #region Children
 
-    record ChildAddedArgs(IWritableNode parent, IWritableNode newChild, Containment containment, Index index);
+    /// <inheritdoc cref="IPartitionListener.ChildAdded"/>
+    /// <param name="Parent"></param>
+    /// <param name="NewChild"></param>
+    /// <param name="Containment"></param>
+    /// <param name="Index"></param>
+    record ChildAddedArgs(IWritableNode Parent, IWritableNode NewChild, Containment Containment, Index Index);
 
+    /// <seealso cref="IPartitionCommander.AddChild"/>
     event EventHandler<ChildAddedArgs> ChildAdded;
 
-    record ChildDeletedArgs(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index);
+    /// <inheritdoc cref="IPartitionListener.ChildDeleted"/>
+    /// <param name="DeletedChild"></param>
+    /// <param name="Parent"></param>
+    /// <param name="Containment"></param>
+    /// <param name="Index"></param>
+    record ChildDeletedArgs(IWritableNode DeletedChild, IWritableNode Parent, Containment Containment, Index Index);
 
+    /// <seealso cref="IPartitionCommander.DeleteChild"/>
     event EventHandler<ChildDeletedArgs> ChildDeleted;
 
+    /// <inheritdoc cref="IPartitionListener.ChildReplaced"/>
+    /// <param name="NewChild"></param>
+    /// <param name="ReplacedChild"></param>
+    /// <param name="Parent"></param>
+    /// <param name="Containment"></param>
+    /// <param name="Index"></param>
     record ChildReplacedArgs(
-        IWritableNode newChild,
-        IWritableNode replacedChild,
-        IWritableNode parent,
-        Containment containment,
-        Index index);
+        IWritableNode NewChild,
+        IWritableNode ReplacedChild,
+        IWritableNode Parent,
+        Containment Containment,
+        Index Index);
 
+    /// <seealso cref="IPartitionCommander.ReplaceChild"/>
     event EventHandler<ChildReplacedArgs> ChildReplaced;
 
+    /// <inheritdoc cref="IPartitionListener.ChildMovedFromOtherContainment"/>
+    /// <param name="NewParent"></param>
+    /// <param name="NewContainment"></param>
+    /// <param name="NewIndex"></param>
+    /// <param name="MovedChild"></param>
+    /// <param name="OldParent"></param>
+    /// <param name="OldContainment"></param>
+    /// <param name="OldIndex"></param>
     record ChildMovedFromOtherContainmentArgs(
-        IWritableNode newParent,
-        Containment newContainment,
-        Index newIndex,
-        IWritableNode movedChild,
-        IWritableNode oldParent,
-        Containment oldContainment,
-        Index oldIndex);
+        IWritableNode NewParent,
+        Containment NewContainment,
+        Index NewIndex,
+        IWritableNode MovedChild,
+        IWritableNode OldParent,
+        Containment OldContainment,
+        Index OldIndex);
 
+    /// <seealso cref="IPartitionCommander.MoveChildFromOtherContainment"/>
     event EventHandler<ChildMovedFromOtherContainmentArgs> ChildMovedFromOtherContainment;
 
+    /// <inheritdoc cref="IPartitionListener.ChildMovedFromOtherContainmentInSameParent"/>
+    /// <param name="NewContainment"></param>
+    /// <param name="NewIndex"></param>
+    /// <param name="MovedChild"></param>
+    /// <param name="Parent"></param>
+    /// <param name="OldContainment"></param>
+    /// <param name="OldIndex"></param>
     record ChildMovedFromOtherContainmentInSameParentArgs(
-        Containment newContainment,
-        Index newIndex,
-        IWritableNode movedChild,
-        IWritableNode parent,
-        Containment oldContainment,
-        Index oldIndex);
+        Containment NewContainment,
+        Index NewIndex,
+        IWritableNode MovedChild,
+        IWritableNode Parent,
+        Containment OldContainment,
+        Index OldIndex);
 
+    /// <seealso cref="IPartitionCommander.CanRaiseMoveChildFromOtherContainmentInSameParent"/>
     event EventHandler<ChildMovedFromOtherContainmentInSameParentArgs> ChildMovedFromOtherContainmentInSameParent;
 
+    /// <inheritdoc cref="IPartitionListener.ChildMovedInSameContainment"/>
+    /// <param name="NewIndex"></param>
+    /// <param name="MovedChild"></param>
+    /// <param name="Parent"></param>
+    /// <param name="Containment"></param>
+    /// <param name="OldIndex"></param>
     record ChildMovedInSameContainmentArgs(
-        Index newIndex,
-        IWritableNode movedChild,
-        IWritableNode parent,
-        Containment containment,
-        Index oldIndex);
+        Index NewIndex,
+        IWritableNode MovedChild,
+        IWritableNode Parent,
+        Containment Containment,
+        Index OldIndex);
 
+    /// <seealso cref="IPartitionCommander.MoveChildInSameContainment"/>
     event EventHandler<ChildMovedInSameContainmentArgs> ChildMovedInSameContainment;
 
     #endregion
 
     #region Annotations
 
-    record AnnotationAddedArgs(IWritableNode parent, IWritableNode newAnnotation, Index index);
+    /// <inheritdoc cref="IPartitionListener.AnnotationAdded"/>
+    /// <param name="Parent"></param>
+    /// <param name="NewAnnotation"></param>
+    /// <param name="Index"></param>
+    record AnnotationAddedArgs(IWritableNode Parent, IWritableNode NewAnnotation, Index Index);
 
+    /// <seealso cref="IPartitionCommander.AddAnnotation"/>
     event EventHandler<AnnotationAddedArgs> AnnotationAdded;
 
-    record AnnotationDeletedArgs(IWritableNode deletedAnnotation, IWritableNode parent, Index index);
+    /// <inheritdoc cref="IPartitionListener.AnnotationDeleted"/>
+    /// <param name="DeletedAnnotation"></param>
+    /// <param name="Parent"></param>
+    /// <param name="Index"></param>
+    record AnnotationDeletedArgs(IWritableNode DeletedAnnotation, IWritableNode Parent, Index Index);
 
+    /// <seealso cref="IPartitionCommander.DeleteAnnotation"/>
     event EventHandler<AnnotationDeletedArgs> AnnotationDeleted;
 
+    /// <inheritdoc cref="IPartitionListener.AnnotationReplaced"/>
+    /// <param name="NewAnnotation"></param>
+    /// <param name="ReplacedAnnotation"></param>
+    /// <param name="Parent"></param>
+    /// <param name="Index"></param>
     record AnnotationReplacedArgs(
-        IWritableNode newAnnotation,
-        IWritableNode replacedAnnotation,
-        IWritableNode parent,
-        Index index);
+        IWritableNode NewAnnotation,
+        IWritableNode ReplacedAnnotation,
+        IWritableNode Parent,
+        Index Index);
 
+    /// <seealso cref="IPartitionCommander.ReplaceAnnotation"/>
     event EventHandler<AnnotationReplacedArgs> AnnotationReplaced;
 
+    /// <inheritdoc cref="IPartitionListener.AnnotationMovedFromOtherParent"/>
+    /// <param name="NewParent"></param>
+    /// <param name="NewIndex"></param>
+    /// <param name="MovedAnnotation"></param>
+    /// <param name="OldParent"></param>
+    /// <param name="OldIndex"></param>
     record AnnotationMovedFromOtherParentArgs(
-        IWritableNode newParent,
-        Index newIndex,
-        IWritableNode movedAnnotation,
-        IWritableNode oldParent,
-        Index oldIndex);
+        IWritableNode NewParent,
+        Index NewIndex,
+        IWritableNode MovedAnnotation,
+        IWritableNode OldParent,
+        Index OldIndex);
 
+    /// <seealso cref="IPartitionCommander.MoveAnnotationFromOtherParent"/>
     event EventHandler<AnnotationMovedFromOtherParentArgs> AnnotationMovedFromOtherParent;
 
+    /// <inheritdoc cref="IPartitionListener.remove_AnnotationMovedInSameParent"/>
+    /// <param name="NewIndex"></param>
+    /// <param name="MovedAnnotation"></param>
+    /// <param name="Parent"></param>
+    /// <param name="OldIndex"></param>
     record AnnotationMovedInSameParentArgs(
-        Index newIndex,
-        IWritableNode movedAnnotation,
-        IWritableNode parent,
-        Index oldIndex);
+        Index NewIndex,
+        IWritableNode MovedAnnotation,
+        IWritableNode Parent,
+        Index OldIndex);
 
+    /// <seealso cref="IPartitionCommander.MoveAnnotationInSameParent"/>
     event EventHandler<AnnotationMovedInSameParentArgs> AnnotationMovedInSameParent;
 
     #endregion
 
     #region References
 
-    record ReferenceAddedArgs(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget);
+    /// <inheritdoc cref="IPartitionListener.ReferenceAdded"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="Index"></param>
+    /// <param name="NewTarget"></param>
+    record ReferenceAddedArgs(IWritableNode Parent, Reference Reference, Index Index, IReferenceTarget NewTarget);
 
+    /// <seealso cref="IPartitionCommander.AddReference"/>
     event EventHandler<ReferenceAddedArgs> ReferenceAdded;
 
-    record ReferenceDeletedArgs(IWritableNode parent, Reference reference, Index index, IReferenceTarget deletedTarget);
+    /// <inheritdoc cref="IPartitionListener.ReferenceDeleted"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="Index"></param>
+    /// <param name="DeletedTarget"></param>
+    record ReferenceDeletedArgs(IWritableNode Parent, Reference Reference, Index Index, IReferenceTarget DeletedTarget);
 
+    /// <seealso cref="IPartitionCommander.DeleteReference"/>
     event EventHandler<ReferenceDeletedArgs> ReferenceDeleted;
 
+    /// <inheritdoc cref="IPartitionListener.ReferenceChanged"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="Index"></param>
+    /// <param name="NewTarget"></param>
+    /// <param name="ReplacedTarget"></param>
     record ReferenceChangedArgs(
-        IWritableNode parent,
-        Reference reference,
-        Index index,
-        IReferenceTarget newTarget,
-        IReferenceTarget replacedTarget);
+        IWritableNode Parent,
+        Reference Reference,
+        Index Index,
+        IReferenceTarget NewTarget,
+        IReferenceTarget ReplacedTarget);
 
+    /// <seealso cref="IPartitionCommander.ChangeReference"/>
     event EventHandler<ReferenceChangedArgs> ReferenceChanged;
 
+    /// <inheritdoc cref="IPartitionListener.EntryMovedFromOtherReference"/>
+    /// <param name="NewParent"></param>
+    /// <param name="NewReference"></param>
+    /// <param name="NewIndex"></param>
+    /// <param name="OldParent"></param>
+    /// <param name="OldReference"></param>
+    /// <param name="OldIndex"></param>
+    /// <param name="Target"></param>
     record EntryMovedFromOtherReferenceArgs(
-        IWritableNode newParent,
-        Reference newReference,
-        Index newIndex,
-        IWritableNode oldParent,
-        Reference oldReference,
-        Index oldIndex,
-        IReferenceTarget target);
+        IWritableNode NewParent,
+        Reference NewReference,
+        Index NewIndex,
+        IWritableNode OldParent,
+        Reference OldReference,
+        Index OldIndex,
+        IReferenceTarget Target);
 
+    /// <seealso cref="IPartitionCommander.MoveEntryFromOtherReference"/>
     event EventHandler<EntryMovedFromOtherReferenceArgs> EntryMovedFromOtherReference;
 
+    /// <inheritdoc cref="IPartitionListener.EntryMovedFromOtherReferenceInSameParent"/>
+    /// <param name="Parent"></param>
+    /// <param name="NewReference"></param>
+    /// <param name="NewIndex"></param>
+    /// <param name="OldReference"></param>
+    /// <param name="OldIndex"></param>
+    /// <param name="Target"></param>
     record EntryMovedFromOtherReferenceInSameParentArgs(
-        IWritableNode parent,
-        Reference newReference,
-        Index newIndex,
-        Reference oldReference,
-        Index oldIndex,
-        IReferenceTarget target);
+        IWritableNode Parent,
+        Reference NewReference,
+        Index NewIndex,
+        Reference OldReference,
+        Index OldIndex,
+        IReferenceTarget Target);
 
+    /// <seealso cref="IPartitionCommander.MoveEntryFromOtherReferenceInSameParent"/>
     event EventHandler<EntryMovedFromOtherReferenceInSameParentArgs> EntryMovedFromOtherReferenceInSameParent;
 
+    /// <inheritdoc cref="IPartitionListener.EntryMovedInSameReference"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="OldIndex"></param>
+    /// <param name="NewIndex"></param>
+    /// <param name="Target"></param>
     record EntryMovedInSameReferenceArgs(
-        IWritableNode parent,
-        Reference reference,
-        Index oldIndex,
-        Index newIndex,
-        IReferenceTarget target);
+        IWritableNode Parent,
+        Reference Reference,
+        Index OldIndex,
+        Index NewIndex,
+        IReferenceTarget Target);
 
+    /// <seealso cref="IPartitionCommander.MoveEntryInSameReference"/>
     event EventHandler<EntryMovedInSameReferenceArgs> EntryMovedInSameReference;
 
+    /// <inheritdoc cref="IPartitionListener.ReferenceResolveInfoAdded"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="Index"></param>
+    /// <param name="NewResolveInfo"></param>
+    /// <param name="Target"></param>
     record ReferenceResolveInfoAddedArgs(
-        IWritableNode parent,
-        Reference reference,
-        Index index,
-        ResolveInfo newResolveInfo,
-        TargetNode target);
+        IWritableNode Parent,
+        Reference Reference,
+        Index Index,
+        ResolveInfo NewResolveInfo,
+        TargetNode Target);
 
+    /// <seealso cref="IPartitionCommander.AddReferenceResolveInfo"/>
     event EventHandler<ReferenceResolveInfoAddedArgs> ReferenceResolveInfoAdded;
 
+    /// <inheritdoc cref="IPartitionListener.ReferenceResolveInfoDeleted"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="Index"></param>
+    /// <param name="Target"></param>
+    /// <param name="DeletedResolveInfo"></param>
     record ReferenceResolveInfoDeletedArgs(
-        IWritableNode parent,
-        Reference reference,
-        Index index,
-        TargetNode target,
-        ResolveInfo deletedResolveInfo);
+        IWritableNode Parent,
+        Reference Reference,
+        Index Index,
+        TargetNode Target,
+        ResolveInfo DeletedResolveInfo);
 
+    /// <seealso cref="IPartitionCommander.DeleteReferenceResolveInfo"/>
     event EventHandler<ReferenceResolveInfoDeletedArgs> ReferenceResolveInfoDeleted;
 
+    /// <inheritdoc cref="IPartitionListener.ReferenceResolveInfoChanged"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="Index"></param>
+    /// <param name="NewResolveInfo"></param>
+    /// <param name="Target"></param>
+    /// <param name="ReplacedResolveInfo"></param>
     record ReferenceResolveInfoChangedArgs(
-        IWritableNode parent,
-        Reference reference,
-        Index index,
-        ResolveInfo newResolveInfo,
-        TargetNode? target,
-        ResolveInfo replacedResolveInfo);
+        IWritableNode Parent,
+        Reference Reference,
+        Index Index,
+        ResolveInfo NewResolveInfo,
+        TargetNode? Target,
+        ResolveInfo ReplacedResolveInfo);
 
+    /// <seealso cref="IPartitionCommander.ChangeReferenceResolveInfo"/>
     event EventHandler<ReferenceResolveInfoChangedArgs> ReferenceResolveInfoChanged;
 
+    /// <inheritdoc cref="IPartitionListener.ReferenceTargetAdded"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="Index"></param>
+    /// <param name="NewTarget"></param>
+    /// <param name="ResolveInfo"></param>
     record ReferenceTargetAddedArgs(
-        IWritableNode parent,
-        Reference reference,
-        Index index,
-        TargetNode newTarget,
-        ResolveInfo resolveInfo);
+        IWritableNode Parent,
+        Reference Reference,
+        Index Index,
+        TargetNode NewTarget,
+        ResolveInfo ResolveInfo);
 
+    /// <seealso cref="IPartitionCommander.AddReferenceTarget"/>
     event EventHandler<ReferenceTargetAddedArgs> ReferenceTargetAdded;
 
+    /// <inheritdoc cref="IPartitionListener.ReferenceTargetDeleted"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="Index"></param>
+    /// <param name="ResolveInfo"></param>
+    /// <param name="DeletedTarget"></param>
     record ReferenceTargetDeletedArgs(
-        IWritableNode parent,
-        Reference reference,
-        Index index,
-        ResolveInfo resolveInfo,
-        TargetNode deletedTarget);
+        IWritableNode Parent,
+        Reference Reference,
+        Index Index,
+        ResolveInfo ResolveInfo,
+        TargetNode DeletedTarget);
 
+    /// <seealso cref="IPartitionCommander.DeleteReferenceTarget"/>
     event EventHandler<ReferenceTargetDeletedArgs> ReferenceTargetDeleted;
 
+    /// <inheritdoc cref="IPartitionListener.ReferenceTargetChanged"/>
+    /// <param name="Parent"></param>
+    /// <param name="Reference"></param>
+    /// <param name="Index"></param>
+    /// <param name="NewTarget"></param>
+    /// <param name="ResolveInfo"></param>
+    /// <param name="OldTarget"></param>
     record ReferenceTargetChangedArgs(
-        IWritableNode parent,
-        Reference reference,
-        Index index,
-        TargetNode newTarget,
-        ResolveInfo? resolveInfo,
-        TargetNode oldTarget);
+        IWritableNode Parent,
+        Reference Reference,
+        Index Index,
+        TargetNode NewTarget,
+        ResolveInfo? ResolveInfo,
+        TargetNode OldTarget);
 
+    /// <seealso cref="IPartitionCommander.ChangeReferenceTarget"/>
     event EventHandler<ReferenceTargetChangedArgs> ReferenceTargetChanged;
 
     #endregion
 }
 
+/// Raises events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+/// <seealso cref="IPartitionListener"/>
+/// <seealso cref="PartitionEventHandler"/>
 public interface IPartitionCommander
 {
     #region Nodes
 
+    /// <seealso cref="IPartitionListener.ClassifierChanged"/>
     void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier);
-    // bool CanRaiseChangeClassifier();
+
+    /// Whether anybody would receive the <see cref="ChangeClassifier"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="ChangeClassifier"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseChangeClassifier();
 
     #endregion
 
     #region Properties
 
+    /// <seealso cref="IPartitionListener.PropertyAdded"/>
     void AddProperty(IWritableNode node, Property property, PropertyValue newValue);
-    // bool CanRaiseAddProperty();
+    
+    /// Whether anybody would receive the <see cref="AddProperty"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="AddProperty"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseAddProperty();
 
+    /// <seealso cref="IPartitionListener.PropertyDeleted"/>
     void DeleteProperty(IWritableNode node, Property property, PropertyValue oldValue);
-    // bool CanRaiseDeleteProperty();
+    
+    /// Whether anybody would receive the <see cref="DeleteProperty"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="DeleteProperty"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseDeleteProperty();
 
+    /// <seealso cref="IPartitionListener.PropertyChanged"/>
     void ChangeProperty(IWritableNode node, Property property, PropertyValue newValue, PropertyValue oldValue);
-    // bool CanRaiseChangeProperty();
+    
+    /// Whether anybody would receive the <see cref="ChangeProperty"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="ChangeProperty"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseChangeProperty();
 
     #endregion
 
     #region Children
 
+    /// <seealso cref="IPartitionListener.ChildAdded"/>
     void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index);
+    
+    /// Whether anybody would receive the <see cref="AddChild"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="AddChild"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseAddChild();
 
+    /// <seealso cref="IPartitionListener.ChildDeleted"/>
     void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index);
+    
+    /// Whether anybody would receive the <see cref="DeleteChild"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="DeleteChild"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseDeleteChild();
 
+    /// <seealso cref="IPartitionListener.ChildReplaced"/>
     void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
         Containment containment, Index index);
 
+    /// Whether anybody would receive the <see cref="ReplaceChild"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="ReplaceChild"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseReplaceChild();
 
+    /// <seealso cref="IPartitionListener.ChildMovedFromOtherContainment"/>
     void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
         IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex);
 
+    /// Whether anybody would receive the <see cref="MoveChildFromOtherContainment"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="MoveChildFromOtherContainment"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseMoveChildFromOtherContainment();
 
+    /// <seealso cref="IPartitionListener.ChildMovedFromOtherContainmentInSameParent"/>
     void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex, IWritableNode movedChild,
         IWritableNode parent, Containment oldContainment, Index oldIndex);
-
+    
+    /// Whether anybody would receive the <see cref="MoveChildFromOtherContainmentInSameParent"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="MoveChildFromOtherContainmentInSameParent"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseMoveChildFromOtherContainmentInSameParent();
 
+    /// <seealso cref="IPartitionListener.ChildMovedInSameContainment"/>
     void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
         Containment containment, Index oldIndex);
-
+    
+    /// Whether anybody would receive the <see cref="MoveChildInSameContainment"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="MoveChildInSameContainment"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseMoveChildInSameContainment();
 
     #endregion
 
     #region Annotations
 
+    /// <seealso cref="IPartitionListener.AnnotationAdded"/>
     void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index);
-    // bool CanRaiseAddAnnotation();
+    
+    /// Whether anybody would receive the <see cref="AddAnnotation"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="AddAnnotation"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseAddAnnotation();
 
+    /// <seealso cref="IPartitionListener.AnnotationDeleted"/>
     void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index);
-    // bool CanRaiseDeleteAnnotation();
+    
+    /// Whether anybody would receive the <see cref="DeleteAnnotation"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="DeleteAnnotation"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseDeleteAnnotation();
 
+    /// <seealso cref="IPartitionListener.AnnotationReplaced"/>
     void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
         Index index);
-    // bool CanRaiseReplaceAnnotation();
+    
+    /// Whether anybody would receive the <see cref="ReplaceAnnotation"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="ReplaceAnnotation"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseReplaceAnnotation();
 
+    /// <seealso cref="IPartitionListener.AnnotationMovedFromOtherParent"/>
     void MoveAnnotationFromOtherParent(IWritableNode newParent, Index newIndex, IWritableNode movedAnnotation,
         IWritableNode oldParent, Index oldIndex);
-    // bool CanRaiseMoveAnnotationFromOtherParent();
+    
+    /// Whether anybody would receive the <see cref="MoveAnnotationFromOtherParent"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="MoveAnnotationFromOtherParent"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseMoveAnnotationFromOtherParent();
 
+    /// <seealso cref="IPartitionListener.AnnotationMovedInSameParent"/>
     void MoveAnnotationInSameParent(Index newIndex, IWritableNode movedAnnotation, IWritableNode parent,
         Index oldIndex);
-    // bool CanRaiseMoveAnnotationInSameParent();
+    
+    /// Whether anybody would receive the <see cref="MoveAnnotationInSameParent"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="MoveAnnotationInSameParent"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseMoveAnnotationInSameParent();
 
     #endregion
 
     #region References
 
+    /// <seealso cref="IPartitionListener.ReferenceAdded"/>
     void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget);
+    
+    /// Whether anybody would receive the <see cref="AddReference"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="AddReference"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseAddReference();
 
+    /// <seealso cref="IPartitionListener.ReferenceDeleted"/>
     void DeleteReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget deletedTarget);
+    
+    /// Whether anybody would receive the <see cref="DeleteReference"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="DeleteReference"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseDeleteReference();
 
+    /// <seealso cref="IPartitionListener.ReferenceChanged"/>
     void ChangeReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
         IReferenceTarget replacedTarget);
-
+    
+    /// Whether anybody would receive the <see cref="ChangeReference"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="ChangeReference"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseChangeReference();
 
+    /// <seealso cref="IPartitionListener.EntryMovedFromOtherReference"/>
     void MoveEntryFromOtherReference(IWritableNode newParent, Reference newReference, Index newIndex,
         IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target);
-    // bool CanRaiseMoveEntryFromOtherReference();
+    
+    /// Whether anybody would receive the <see cref="MoveEntryFromOtherReference"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="MoveEntryFromOtherReference"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseMoveEntryFromOtherReference();
 
+    /// <seealso cref="IPartitionListener.EntryMovedFromOtherReferenceInSameParent"/>
     void MoveEntryFromOtherReferenceInSameParent(IWritableNode parent, Reference newReference, Index newIndex,
         Reference oldReference, Index oldIndex, IReferenceTarget target);
-    // bool CanRaiseMoveEntryFromOtherReferenceInSameParent();
+    
+    /// Whether anybody would receive the <see cref="MoveEntryFromOtherReferenceInSameParent"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="MoveEntryFromOtherReferenceInSameParent"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseMoveEntryFromOtherReferenceInSameParent();
 
+    /// <seealso cref="IPartitionListener.EntryMovedInSameReference"/>
     void MoveEntryInSameReference(IWritableNode parent, Reference reference, Index oldIndex, Index newIndex,
         IReferenceTarget target);
-
+    
+    /// Whether anybody would receive the <see cref="MoveEntryInSameReference"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="MoveEntryInSameReference"/> event; <c>false</c> otherwise.</returns>
     bool CanRaiseMoveEntryInSameReference();
 
+    /// <seealso cref="IPartitionListener.ReferenceResolveInfoAdded"/>
     void AddReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, ResolveInfo newResolveInfo,
         TargetNode target);
-    // bool CanRaiseAddReferenceResolveInfo();
+    
+    /// Whether anybody would receive the <see cref="AddReferenceResolveInfo"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="AddReferenceResolveInfo"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseAddReferenceResolveInfo();
 
+    /// <seealso cref="IPartitionListener.ReferenceResolveInfoDeleted"/>
     void DeleteReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, TargetNode target,
         ResolveInfo deletedResolveInfo);
-    // bool CanRaiseDeleteReferenceResolveInfo();
+        
+    /// Whether anybody would receive the <see cref="DeleteReferenceResolveInfo"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="DeleteReferenceResolveInfo"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseDeleteReferenceResolveInfo();
 
+    /// <seealso cref="IPartitionListener.ReferenceResolveInfoChanged"/>
     void ChangeReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, ResolveInfo newResolveInfo,
         TargetNode? target, ResolveInfo replacedResolveInfo);
-    // bool CanRaiseChangeReferenceResolveInfo();
+    
+    /// Whether anybody would receive the <see cref="ChangeReferenceResolveInfo"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="ChangeReferenceResolveInfo"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseChangeReferenceResolveInfo();
 
+    /// <seealso cref="IPartitionListener.ReferenceTargetAdded"/>
     void AddReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
         ResolveInfo resolveInfo);
-    // bool CanRaiseAddReferenceTarget();
+        
+    /// Whether anybody would receive the <see cref="AddReferenceTarget"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="AddReferenceTarget"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseAddReferenceTarget();
 
+    /// <seealso cref="IPartitionListener.ReferenceTargetDeleted"/>
     void DeleteReferenceTarget(IWritableNode parent, Reference reference, Index index, ResolveInfo resolveInfo,
         TargetNode deletedTarget);
-    // bool CanRaiseDeleteReferenceTarget();
+    
+    /// Whether anybody would receive the <see cref="DeleteReferenceTarget"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="DeleteReferenceTarget"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseDeleteReferenceTarget();
 
-    void ChangedReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
+    /// <seealso cref="IPartitionListener.ReferenceTargetChanged"/>
+    void ChangeReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
         ResolveInfo? resolveInfo, TargetNode oldTarget);
-    // bool CanRaiseChangeReferenceTarget();
+    
+    /// Whether anybody would receive the <see cref="ChangeReferenceTarget"/> event.
+    /// <returns><c>true</c> if someone would receive the <see cref="ChangeReferenceTarget"/> event; <c>false</c> otherwise.</returns>
+    bool CanRaiseChangeReferenceTarget();
 
     #endregion
 }
+
+/// <summary>
+/// Describes a reference target.
+///
+/// <para>
+/// At least one of <see cref="ResolveInfo"/> and <see cref="Reference"/> MUST be non-null.
+/// </para>
+/// </summary>
+/// <seealso cref="LionWeb.Core.Serialization.SerializedReferenceTarget"/>
+public interface IReferenceTarget
+{
+    /// Textual hint that might be used to find the target node of this reference.
+    ResolveInfo? ResolveInfo { get; }
+    
+    /// Target node of this reference.
+    TargetNode? Reference { get; }
+}
+
+/// <inheritdoc cref="IReferenceTarget"/>
+public readonly record struct ReferenceTarget(ResolveInfo? ResolveInfo, TargetNode? Reference) : IReferenceTarget;

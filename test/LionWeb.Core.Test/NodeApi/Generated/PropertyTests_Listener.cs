@@ -33,9 +33,9 @@ public class PropertyTests_Listener
         ((IPartitionInstance)parent).Listener.PropertyAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(doc, args.node);
-            Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.property);
-            Assert.AreEqual("hello", args.newValue);
+            Assert.AreSame(doc, args.Node);
+            Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.Property);
+            Assert.AreEqual("hello", args.NewValue);
         };
 
         doc.Text = "hello";
@@ -55,9 +55,9 @@ public class PropertyTests_Listener
         ((IPartitionInstance)parent).Listener.PropertyDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(doc, args.node);
-            Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.property);
-            Assert.AreEqual("hello", args.oldValue);
+            Assert.AreSame(doc, args.Node);
+            Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.Property);
+            Assert.AreEqual("hello", args.OldValue);
         };
         doc.Text = null;
 
@@ -77,10 +77,10 @@ public class PropertyTests_Listener
         ((IPartitionInstance)parent).Listener.PropertyChanged += (sender, args) =>
         {
             events++;
-            Assert.AreSame(doc, args.node);
-            Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.property);
-            Assert.AreEqual("hello", args.oldValue);
-            Assert.AreEqual("bye", args.newValue);
+            Assert.AreSame(doc, args.Node);
+            Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.Property);
+            Assert.AreEqual("hello", args.OldValue);
+            Assert.AreEqual("bye", args.NewValue);
         };
 
         int badEvents = 0;
@@ -104,9 +104,9 @@ public class PropertyTests_Listener
         ((IPartitionInstance)parent).Listener.PropertyAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(circle, args.node);
-            Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.property);
-            Assert.AreEqual("hello", args.newValue);
+            Assert.AreSame(circle, args.Node);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
+            Assert.AreEqual("hello", args.NewValue);
         };
 
         circle.Uuid = "hello";
@@ -126,9 +126,9 @@ public class PropertyTests_Listener
         ((IPartitionInstance)parent).Listener.PropertyDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(circle, args.node);
-            Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.property);
-            Assert.AreEqual("hello", args.oldValue);
+            Assert.AreSame(circle, args.Node);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
+            Assert.AreEqual("hello", args.OldValue);
         };
         Assert.ThrowsException<InvalidValueException>(() => circle.Uuid = null);
 
@@ -147,10 +147,10 @@ public class PropertyTests_Listener
         ((IPartitionInstance)parent).Listener.PropertyChanged += (sender, args) =>
         {
             events++;
-            Assert.AreSame(circle, args.node);
-            Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.property);
-            Assert.AreEqual("hello", args.oldValue);
-            Assert.AreEqual("bye", args.newValue);
+            Assert.AreSame(circle, args.Node);
+            Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
+            Assert.AreEqual("hello", args.OldValue);
+            Assert.AreEqual("bye", args.NewValue);
         };
 
         int badEvents = 0;

@@ -113,7 +113,12 @@ public interface IConceptInstance<out T> : IReadableNode<T>, IConceptInstance wh
 /// <inheritdoc />
 public interface IPartitionInstance : IConceptInstance
 {
+    /// Optional hook to listen to partition events.
+    /// Not supported by every implementation. 
     IPartitionListener? Listener { get => null; }
+    
+    /// Optional hook to raise partition events.
+    /// Not supported by every implementation. 
     IPartitionCommander? Commander { get => null; }
 }
 
@@ -456,6 +461,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         return false;
     }
 
+    /// <summary>
+    /// Tries to retrieve the <see cref="IPartitionInstance.Commander"/> from this node's <see cref="Concept.Partition"/>.
+    /// </summary>
+    /// <returns>This node's <see cref="IPartitionCommander"/>, if available.</returns>
     protected internal virtual IPartitionCommander? GetPartitionCommander()
     {
         INode current = this;
@@ -733,6 +742,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="list">Nodes to remove from <paramref name="storage"/>.</param>
     /// <param name="storage">Storage potentially containing members of <paramref name="list"/>.</param>
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
+    /// <param name="remover">
+    /// Optional Action to call for each removed element of <paramref name="list"/>.
+    /// Only called if <see cref="GetPartitionCommander"/> is available.
+    /// </param>
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
@@ -768,6 +781,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// </summary>
     /// <param name="safeNodes">Nodes to remove.</param>
     /// <param name="storage">Storage of nodes.</param>
+    /// <param name="remover">
+    /// Optional Action to call for each removed element of <paramref name="list"/>.
+    /// Only called if <see cref="GetPartitionCommander"/> is available.
+    /// </param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, int, T>? remover)
         where T : INode
@@ -786,15 +803,18 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
+    /// Raises <see cref="IPartitionCommander.DeleteReference"/> for <paramref name="reference"/>.
     protected Action<IPartitionCommander, int, T> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
         (commander, index, node) =>
             commander.DeleteReference(this, reference, index, new ReferenceTarget(null, node));
 
+    /// Raises <see cref="IPartitionCommander.DeleteChild"/> for <paramref name="containment"/>.
     protected Action<IPartitionCommander, int, T> ContainmentRemover<T>(Containment containment)
         where T : INode =>
         (commander, index, node) =>
             commander.DeleteChild(node, this, containment, index);
 
+    /// Raises <see cref="IPartitionCommander.DeleteAnnotation"/>.
     private Action<IPartitionCommander, int, INode> AnnotationRemover() =>
         (commander, index, node) => commander.DeleteAnnotation(node, this, index);
 
@@ -802,13 +822,18 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     #region Listener Helpers
 
+    /// Raises either <see cref="IPartitionCommander.AddProperty"/>, <see cref="IPartitionCommander.DeleteProperty"/> or
+    /// <see cref="IPartitionCommander.ChangeProperty"/> for <paramref name="property"/>,
+    /// depending on <paramref name="oldValue"/> and <paramref name="newValue"/>.
     protected void RaisePropertyEvent(Property property, object? oldValue, object? newValue)
     {
         var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null)
+        if (partitionCommander == null || !(partitionCommander.CanRaiseAddProperty() ||
+                                            partitionCommander.CanRaiseDeleteProperty() ||
+                                            partitionCommander.CanRaiseChangeProperty()))
             return;
 
-        switch ((oldValue, newValue))
+        switch (oldValue, newValue)
         {
             case (null, { } v):
                 partitionCommander.AddProperty(this, property, v);
@@ -822,6 +847,9 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
+    /// Raises either <see cref="IPartitionCommander.AddReference"/>, <see cref="IPartitionCommander.DeleteReference"/> or
+    /// <see cref="IPartitionCommander.ChangeReference"/> for <paramref name="reference"/>,
+    /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
     protected void RaiseSingleReferenceEvent(Reference reference, IReadableNode? oldTarget, IReadableNode? newTarget)
     {
         var partitionCommander = GetPartitionCommander();
@@ -850,14 +878,19 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
-    protected void RaiseReferenceAddEvent<T>(Reference reference, List<T> safeNodes, int previousCount)
+    /// Raises <see cref="IPartitionCommander.AddReference"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
+    /// <param name="reference">Reference to raise events for.</param>
+    /// <param name="safeNodes">Targets to raise events for.</param>
+    /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
+    /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
+    protected void RaiseReferenceAddEvent<T>(Reference reference, List<T> safeNodes, int startIndex)
         where T : IReadableNode
     {
         var partitionCommander = GetPartitionCommander();
         if (partitionCommander == null || !partitionCommander.CanRaiseAddReference())
             return;
 
-        int index = previousCount;
+        int index = startIndex;
         foreach (var node in safeNodes)
         {
             partitionCommander.AddReference(this, reference, index++, new ReferenceTarget(null, node)

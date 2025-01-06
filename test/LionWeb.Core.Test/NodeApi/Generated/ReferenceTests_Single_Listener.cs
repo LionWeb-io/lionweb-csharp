@@ -35,10 +35,10 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, reference), args.newTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.NewTarget);
         };
 
         source.AltSource = reference;
@@ -58,10 +58,10 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, reference), args.newTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.NewTarget);
         };
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, reference);
@@ -82,10 +82,10 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, reference), args.deletedTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.DeletedTarget);
         };
 
         source.AltSource = null;
@@ -106,10 +106,10 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, reference), args.deletedTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.DeletedTarget);
         };
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, null);
@@ -131,11 +131,11 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.replacedTarget);
-            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.newTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.ReplacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         };
 
         int badEvents = 0;
@@ -162,11 +162,11 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.replacedTarget);
-            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.newTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.ReplacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         };
 
         int badEvents = 0;
@@ -191,10 +191,10 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, reference), args.newTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.NewTarget);
         };
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, reference);
@@ -215,10 +215,10 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, reference), args.deletedTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.DeletedTarget);
         };
 
         Assert.ThrowsException<InvalidValueException>(() => source.Source = null);
@@ -239,10 +239,10 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, reference), args.deletedTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, reference), args.DeletedTarget);
         };
 
         Assert.ThrowsException<InvalidValueException>(() =>
@@ -265,11 +265,11 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.replacedTarget);
-            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.newTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.ReplacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         };
 
         int badEvents = 0;
@@ -296,11 +296,11 @@ public class ReferenceTests_Single_Listener
         ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
         {
             events++;
-            Assert.AreSame(source, args.parent);
-            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.reference);
-            Assert.AreEqual(0, args.index);
-            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.replacedTarget);
-            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.newTarget);
+            Assert.AreSame(source, args.Parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
+            Assert.AreEqual(0, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.ReplacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         };
 
         int badEvents = 0;
