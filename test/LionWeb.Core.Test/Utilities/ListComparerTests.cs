@@ -238,6 +238,15 @@ public class ListComparerTests : ListComparerTestsBase
         );
     }
 
+    private class NodeIdComparer : IEqualityComparer<INode>
+    {
+        public bool Equals(INode? x, INode? y) =>
+            x?.GetId() == y?.GetId();
+
+        public int GetHashCode(INode obj) =>
+            obj.GetId().GetHashCode();
+    }
+
     [TestMethod]
     public void SwapTwoNodes_SameId_CustomComparer()
     {
