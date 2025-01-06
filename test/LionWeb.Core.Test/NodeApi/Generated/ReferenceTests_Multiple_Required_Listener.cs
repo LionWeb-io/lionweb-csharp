@@ -415,7 +415,7 @@ public class ReferenceTests_Multiple_Required_Listener
             events++;
         };
 
-        Assert.ThrowsException<InvalidValueException>(() =>         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
+        Assert.ThrowsException<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
 
         Assert.AreEqual(0, events);
     }

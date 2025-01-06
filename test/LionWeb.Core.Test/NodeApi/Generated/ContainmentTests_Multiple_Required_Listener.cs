@@ -46,6 +46,55 @@ public class ContainmentTests_Multiple_Required_Listener
         Assert.AreEqual(1, events);
     }
 
+    [TestMethod]
+    public void Single_Add_FromOtherParent()
+    {
+        var compositeShape = new CompositeShape("cs");
+        var line = new Line("myId");
+        var parent = new Geometry("g") { Shapes = [compositeShape, line] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.oldParent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.oldContainment);
+            Assert.AreEqual(1, args.oldIndex);
+            Assert.AreSame(compositeShape, args.newParent);
+            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.newContainment);
+            Assert.AreEqual(0, args.newIndex);
+            Assert.AreEqual(line, args.movedChild);
+        };
+
+        compositeShape.AddParts([line]);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void Single_Add_FromSameParent()
+    {
+        var line = new Line("myId");
+        var compositeShape = new CompositeShape("cs") {DisabledParts = [line]};
+        var parent = new Geometry("g") { Shapes = [compositeShape] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.oldContainment);
+            Assert.AreEqual(0, args.oldIndex);
+            Assert.AreSame(compositeShape, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.newContainment);
+            Assert.AreEqual(0, args.newIndex);
+            Assert.AreEqual(line, args.movedChild);
+        };
+
+        compositeShape.AddParts([line]);
+
+        Assert.AreEqual(1, events);
+    }
+
     #region Insert
 
     [TestMethod]
@@ -185,6 +234,59 @@ public class ContainmentTests_Multiple_Required_Listener
 
         compositeShape.InsertParts(2, [line]);
      
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void Single_Insert_FromOtherParent()
+    {
+        var circleA = new Circle("cIdA");
+        var circleB = new Circle("cIdB");
+        var compositeShape = new CompositeShape("cs") { Parts = [circleA, circleB] };
+        var line = new Line("myId");
+        var parent = new Geometry("g") { Shapes = [compositeShape, line] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.oldParent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.oldContainment);
+            Assert.AreEqual(1, args.oldIndex);
+            Assert.AreSame(compositeShape, args.newParent);
+            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.newContainment);
+            Assert.AreEqual(2, args.newIndex);
+            Assert.AreEqual(line, args.movedChild);
+        };
+
+        compositeShape.InsertParts(2, [line]);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void Single_Insert_FromSameParent()
+    {
+        var line = new Line("myId");
+        var circleA = new Circle("cIdA");
+        var circleB = new Circle("cIdB");
+        var compositeShape = new CompositeShape("cs") {DisabledParts = [line], Parts = [circleA, circleB]};
+        var parent = new Geometry("g") { Shapes = [compositeShape] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.oldContainment);
+            Assert.AreEqual(0, args.oldIndex);
+            Assert.AreSame(compositeShape, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.newContainment);
+            Assert.AreEqual(1, args.newIndex);
+            Assert.AreEqual(line, args.movedChild);
+        };
+
+        compositeShape.InsertParts(1, [line]);
+
         Assert.AreEqual(1, events);
     }
 
