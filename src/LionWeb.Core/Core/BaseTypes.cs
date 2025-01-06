@@ -1137,6 +1137,128 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         private record struct Old(INode Parent, Containment Containment, int Index);
     }
 
+    public class SetContainmentEvent<T> where T : INode
+    {
+        private readonly Containment _containment;
+        private readonly INode _newParent;
+        private readonly Dictionary<T, Old?> _setValues;
+        private readonly List<T> _existingValues;
+        private readonly IPartitionCommander? _partitionCommander;
+        private readonly List<IListComparer<T>.Change> _changes = [];
+
+        public SetContainmentEvent(
+            Containment containment,
+            NodeBase newParent,
+            List<T>? setValues,
+            List<T> existingValues
+        )
+        {
+            _containment = containment;
+            _newParent = newParent;
+            _setValues = setValues?.ToDictionary<T, T, Old?>(k => k, k => null) ?? [];
+            _existingValues = existingValues;
+
+            _partitionCommander = newParent.GetPartitionCommander();
+
+            if (!IsActive() || setValues == null)
+                return;
+
+            var listComparer = new StepwiseListComparer<T>(existingValues, setValues);
+            _changes = listComparer.Compare();
+        }
+
+        public void CollectOldData()
+        {
+            if (!IsActive())
+                return;
+
+            foreach (T setValue in _setValues.Keys.ToList())
+            {
+                var oldParent = setValue.GetParent();
+                if (oldParent == null)
+                    continue;
+
+                var oldContainment = oldParent.GetContainmentOf(setValue);
+                if (oldContainment == null)
+                    continue;
+
+                var oldIndex = oldContainment.Multiple
+                    ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment)).ToList().IndexOf(setValue)
+                    : 0;
+
+                _setValues[setValue] = new Old(oldParent, oldContainment, oldIndex);
+            }
+        }
+
+        public void RaiseEvent()
+        {
+            if (!IsActive())
+                return;
+
+            foreach (var change in _changes)
+            {
+                switch (change)
+                {
+                    case IListComparer<T>.Added added:
+                        switch (added, _setValues[added.Element])
+                        {
+                            case ({ }, null):
+                                _partitionCommander.AddChild(_newParent, added.Element, _containment, added.RightIndex);
+                                break;
+
+                            case ({ }, { } o) when o.Parent != _newParent:
+                                _partitionCommander.MoveChildFromOtherContainment(
+                                    _newParent,
+                                    _containment,
+                                    added.RightIndex,
+                                    added.Element,
+                                    o.Parent,
+                                    o.Containment,
+                                    o.Index
+                                );
+                                break;
+
+                    
+                            case ({ }, { } o) when o.Parent == _newParent && o.Containment != _containment:
+                                _partitionCommander.MoveChildFromOtherContainmentInSameParent(
+                                    _containment,
+                                    added.RightIndex,
+                                    added.Element,
+                                    _newParent,
+                                    o.Containment,
+                                    o.Index
+                                );
+                                break;
+
+                            default:
+                                throw new ArgumentException("Unknown state");
+                        }
+                        break;
+                    
+                    case IListComparer<T>.Moved moved:
+                        _partitionCommander.MoveChildInSameContainment(moved.RightIndex, moved.LeftElement, _newParent, _containment, moved.LeftIndex);
+                        break;
+                    case IListComparer<T>.Deleted deleted:
+                        _partitionCommander.DeleteChild(deleted.Element, _newParent, _containment, deleted.LeftIndex);
+                        break;
+                }
+            }
+        }
+
+        [MemberNotNullWhen(true, nameof(_partitionCommander))]
+        private bool IsActive() =>
+            _partitionCommander != null && (_partitionCommander.CanRaiseAddChild() ||
+                                            _partitionCommander.CanRaiseDeleteChild() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildFromOtherContainment() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildInSameContainment());
+
+        private record struct Old(INode Parent, Containment Containment, int Index);
+    }
+
     #endregion
 }
 

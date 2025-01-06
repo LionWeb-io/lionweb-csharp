@@ -170,13 +170,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
         );
 
-    private ExpressionStatementSyntax EventCollectOldDataCall() =>
-        ExpressionStatement(
-            InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("CollectOldData"))));
-
-    private ExpressionStatementSyntax EventRaiseEventCall() =>
-        ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("RaiseEvent"))));
-
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
             {
@@ -472,24 +465,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             FeatureField(containment),
             MetaProperty(containment),
             CallGeneric("ContainmentRemover", AsType(containment.Type), MetaProperty(containment))
-        ));
-
-    private ExpressionStatementSyntax RequiredAddRangeCall(Containment containment) =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
-            AsArguments([
-                Call("SetSelfParent", IdentifierName("safeNodes"),
-                    MetaProperty(containment)
-                )
-            ])
-        ));
-
-    private ExpressionStatementSyntax OptionalAddRangeCall(Containment containment) =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
-            AsArguments([
-                Call("SetSelfParent", IdentifierName("safeNodes"), MetaProperty(containment))
-            ])
         ));
 
     private ExpressionStatementSyntax SimpleAddRangeCall(Reference reference) =>

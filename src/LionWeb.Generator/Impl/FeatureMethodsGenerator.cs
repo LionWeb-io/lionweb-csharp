@@ -171,8 +171,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
     [
         SafeNodesVar(containment),
+        AddMultipleContainmentEventVariable(containment),
+        EventCollectOldDataCall(),
         RemoveSelfParentCall(containment),
-        LinkAddCall(containment),
+        OptionalAddRangeCall(containment),
+        EventRaiseEventCall(),
         ReturnTrue()
     ];
 
@@ -180,8 +183,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         SafeNodesVar(containment),
         AssureNonEmptyCall(containment),
+        AddMultipleContainmentEventVariable(containment),
+        EventCollectOldDataCall(),
         RemoveSelfParentCall(containment),
-        LinkAddCall(containment),
+        RequiredAddRangeCall(containment),
+        EventRaiseEventCall(),
         ReturnTrue()
     ];
 
@@ -201,6 +207,15 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         SetReferencesWithEventsCall(reference),
         ReturnTrue()
     ];
+    
+    private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(Containment containment) =>
+        Variable(
+            "evt",
+            AsType(typeof(NodeBase.SetContainmentEvent<>), AsType(containment.GetFeatureType())),
+            NewCall([
+                MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment)
+            ])
+        );
 
     private BinaryPatternSyntax NullOrTypePattern(Feature feature) =>
         BinaryPattern(

@@ -67,4 +67,29 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
             IdentifierName("safeNodes"),
             MetaProperty(link)
         ));
+
+    protected ExpressionStatementSyntax EventCollectOldDataCall() =>
+        ExpressionStatement(
+            InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("CollectOldData"))));
+
+    protected ExpressionStatementSyntax EventRaiseEventCall() =>
+        ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("RaiseEvent"))));
+
+    protected ExpressionStatementSyntax OptionalAddRangeCall(Containment containment) =>
+        ExpressionStatement(InvocationExpression(
+            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
+            AsArguments([
+                Call("SetSelfParent", IdentifierName("safeNodes"), MetaProperty(containment))
+            ])
+        ));
+
+    protected ExpressionStatementSyntax RequiredAddRangeCall(Containment containment) =>
+        ExpressionStatement(InvocationExpression(
+            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
+            AsArguments([
+                Call("SetSelfParent", IdentifierName("safeNodes"),
+                    MetaProperty(containment)
+                )
+            ])
+        ));
 }

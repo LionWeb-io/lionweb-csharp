@@ -525,8 +525,11 @@ public partial class Library : ConceptInstanceBase
 		{
 			var safeNodes = LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value).ToList();
 			AssureNonEmpty(safeNodes, LibraryLanguage.Instance.Library_books);
+			SetContainmentEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books);
+			evt.CollectOldData();
 			RemoveSelfParent(_books.ToList(), _books, LibraryLanguage.Instance.Library_books);
-			AddBooks(safeNodes);
+			_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
+			evt.RaiseEvent();
 			return true;
 		}
 

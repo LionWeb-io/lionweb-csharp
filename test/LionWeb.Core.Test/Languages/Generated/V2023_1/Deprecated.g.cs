@@ -297,8 +297,11 @@ public partial class DeprConcept : ConceptInstanceBase
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
 		{
 			var safeNodes = DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface>(value).ToList();
+			SetContainmentEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild);
+			evt.CollectOldData();
 			RemoveSelfParent(_deprChild.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-			AddDeprChild(safeNodes);
+			_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
+			evt.RaiseEvent();
 			return true;
 		}
 

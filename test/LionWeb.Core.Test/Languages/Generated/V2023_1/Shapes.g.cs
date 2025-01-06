@@ -513,8 +513,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup>(value).ToList();
+			SetContainmentEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups);
+			evt.CollectOldData();
 			RemoveSelfParent(_altGroups.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-			AddAltGroups(safeNodes);
+			_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -532,8 +535,11 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.MaterialGroup>(value).ToList();
+			SetContainmentEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups);
+			evt.CollectOldData();
 			RemoveSelfParent(_groups.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
-			AddGroups(safeNodes);
+			_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -902,8 +908,11 @@ public partial class CompositeShape : Shape
 		{
 			var safeNodes = ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
+			SetContainmentEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts);
+			evt.CollectOldData();
 			RemoveSelfParent(_disabledParts.ToList(), _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-			AddDisabledParts(safeNodes);
+			_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -922,8 +931,11 @@ public partial class CompositeShape : Shape
 		{
 			var safeNodes = ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
+			SetContainmentEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts);
+			evt.CollectOldData();
 			RemoveSelfParent(_parts.ToList(), _parts, ShapesLanguage.Instance.CompositeShape_parts);
-			AddParts(safeNodes);
+			_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -1336,8 +1348,11 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.IShape>(value).ToList();
+			SetContainmentEvent<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes);
+			evt.CollectOldData();
 			RemoveSelfParent(_shapes.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes);
-			AddShapes(safeNodes);
+			_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -2274,8 +2289,11 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2.Coord>(value).ToList();
+			SetContainmentEvent<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints);
+			evt.CollectOldData();
 			RemoveSelfParent(_fixpoints.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
-			AddFixpoints(safeNodes);
+			_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
+			evt.RaiseEvent();
 			return true;
 		}
 

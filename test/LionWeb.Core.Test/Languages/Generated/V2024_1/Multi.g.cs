@@ -165,8 +165,11 @@ public partial class Container : ConceptInstanceBase
 		{
 			var safeNodes = MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(value).ToList();
 			AssureNonEmpty(safeNodes, MultiLanguage.Instance.Container_libraries);
+			SetContainmentEvent<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries);
+			evt.CollectOldData();
 			RemoveSelfParent(_libraries.ToList(), _libraries, MultiLanguage.Instance.Container_libraries);
-			AddLibraries(safeNodes);
+			_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
+			evt.RaiseEvent();
 			return true;
 		}
 
