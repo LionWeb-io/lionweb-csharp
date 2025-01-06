@@ -181,17 +181,7 @@ public class ListComparerTests : ListComparerTestsBase
         );
 
     [TestMethod]
-    public void Hirschberg()
-    {
-        const string left = "abcdef";
-        const string right = "bcda";
-        var hirschberg = new Hirschberg(left, right, new int[left.Length + 1, right.Length + 1]);
-        hirschberg.run();
-        Console.WriteLine(string.Join("\n", hirschberg.actions));
-    }
-
-    [TestMethod]
-    public void Hirschberg2() =>
+    public void Hirschberg() =>
         AssertCompare(
             "abcdef",
             "bcda",
@@ -251,7 +241,7 @@ public class ListComparerTests : ListComparerTestsBase
     private class NodeIdComparer : IEqualityComparer<INode>
     {
         public bool Equals(INode? x, INode? y) =>
-            x.GetId() == y.GetId();
+            x?.GetId() == y?.GetId();
 
         public int GetHashCode(INode obj) =>
             obj.GetId().GetHashCode();
