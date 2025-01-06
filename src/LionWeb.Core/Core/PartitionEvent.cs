@@ -49,16 +49,35 @@ public abstract class PartitionContainmentEventBase<T> : PartitionEventBase<T> w
     {
         _containment = containment;
     }
+
+    protected OldContainmentInfo? Collect(T value)
+    {
+        var oldParent = value.GetParent();
+        if (oldParent == null)
+            return null;
+
+        var oldContainment = oldParent.GetContainmentOf(value);
+        if (oldContainment == null)
+            return null;
+
+        var oldIndex = oldContainment.Multiple
+            ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment)).ToList().IndexOf(value)
+            : 0;
+        
+        return new OldContainmentInfo(oldParent, oldContainment, oldIndex);
+    }
+
+    protected record OldContainmentInfo(INode Parent, Containment Containment, int Index);
 }
 
 public abstract class PartitionMultipleContainmentEventBase<T> : PartitionContainmentEventBase<T> where T : INode
 {
-    protected Dictionary<T, Old?> _newValues;
+    protected Dictionary<T, OldContainmentInfo?> _newValues;
 
     protected PartitionMultipleContainmentEventBase(Containment containment, NodeBase newParent, List<T>? newValues) :
         base(containment, newParent)
     {
-        _newValues = newValues?.ToDictionary<T, T, Old?>(k => k, _ => null) ?? [];
+        _newValues = newValues?.ToDictionary<T, T, OldContainmentInfo?>(k => k, _ => null) ?? [];
     }
 
     /// <inheritdoc />
@@ -69,23 +88,9 @@ public abstract class PartitionMultipleContainmentEventBase<T> : PartitionContai
 
         foreach (T setValue in _newValues.Keys.ToList())
         {
-            var oldParent = setValue.GetParent();
-            if (oldParent == null)
-                continue;
-
-            var oldContainment = oldParent.GetContainmentOf(setValue);
-            if (oldContainment == null)
-                continue;
-
-            var oldIndex = oldContainment.Multiple
-                ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment)).ToList().IndexOf(setValue)
-                : 0;
-
-            _newValues[setValue] = new Old(oldParent, oldContainment, oldIndex);
+            _newValues[setValue] = Collect(setValue);
         }
     }
-
-    protected record struct Old(INode Parent, Containment Containment, int Index);
 }
 
 public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> where T : INode
@@ -198,7 +203,7 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
         if (!IsActive())
             return;
 
-        foreach ((T? added, Old? old) in _newValues)
+        foreach ((T? added, OldContainmentInfo? old) in _newValues)
         {
             switch (added, old)
             {
@@ -283,23 +288,16 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
     /// <inheritdoc />
     public override void CollectOldData()
     {
-        if (!IsActive())
+        if (!IsActive() || _newValue == null)
             return;
 
-        if (_newValue == null)
+        OldContainmentInfo? oldInfo = Collect(_newValue);
+        if(oldInfo == null)
             return;
 
-        _oldParent = _newValue.GetParent();
-        if (_oldParent == null)
-            return;
-
-        _oldContainment = _oldParent.GetContainmentOf(_newValue);
-        if (_oldContainment == null)
-            return;
-
-        _oldIndex = _oldContainment.Multiple
-            ? M2Extensions.AsNodes<INode>(_oldParent.Get(_oldContainment)).ToList().IndexOf(_newValue)
-            : 0;
+        _oldParent = oldInfo.Parent;
+        _oldContainment = oldInfo.Containment;
+        _oldIndex = oldInfo.Index;
     }
 
     /// <inheritdoc />
@@ -311,8 +309,9 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
         switch (_oldValue, _newValue, _oldParent)
         {
             case (null, null, _):
-            case ({ }, { }, _) when Equals(_oldValue, _newValue):
                 // fall-through
+            case ({ }, { }, _) when Equals(_oldValue, _newValue):
+                // no-op
                 break;
 
             case ({ }, null, _):
