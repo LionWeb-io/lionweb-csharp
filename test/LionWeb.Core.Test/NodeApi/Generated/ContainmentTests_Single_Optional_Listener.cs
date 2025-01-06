@@ -68,12 +68,33 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
+    public void Single_Reflective()
+    {
+        var parent = new Geometry("g");
+        var doc = new Documentation("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildAdded += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(doc, args.newChild);
+        };
+
+        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
     public void Single_FromOtherParent()
     {
         var parent = new Geometry("g");
-        
+
         var doc = new Documentation("myId");
-        var oldParent = new OffsetDuplicate("oldParent") {Docs = doc};
+        var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
 
         int events = 0;
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
@@ -94,13 +115,39 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
+    public void Single_FromOtherParent_Reflective()
+    {
+        var parent = new Geometry("g");
+
+        var doc = new Documentation("myId");
+        var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(oldParent, args.oldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.oldContainment);
+            Assert.AreEqual(0, args.oldIndex);
+            Assert.AreSame(parent, args.newParent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.newContainment);
+            Assert.AreEqual(0, args.newIndex);
+            Assert.AreEqual(doc, args.movedChild);
+        };
+
+        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
     public void Single_FromOtherParent_Replace()
     {
         var replacedDoc = new Documentation("replacedDoc");
-        var parent = new Geometry("g") {Documentation = replacedDoc};
-        
+        var parent = new Geometry("g") { Documentation = replacedDoc };
+
         var doc = new Documentation("myId");
-        var oldParent = new OffsetDuplicate("oldParent") {Docs = doc};
+        var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
 
         int events = 0;
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
@@ -129,11 +176,46 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
+    public void Single_FromOtherParent_Replace_Reflective()
+    {
+        var replacedDoc = new Documentation("replacedDoc");
+        var parent = new Geometry("g") { Documentation = replacedDoc };
+
+        var doc = new Documentation("myId");
+        var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(oldParent, args.oldParent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.oldContainment);
+            Assert.AreEqual(0, args.oldIndex);
+            Assert.AreSame(parent, args.newParent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.newContainment);
+            Assert.AreEqual(0, args.newIndex);
+            Assert.AreEqual(doc, args.movedChild);
+        };
+        ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(replacedDoc, args.deletedChild);
+        };
+
+        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+
+        Assert.AreEqual(2, events);
+    }
+
+    [TestMethod]
     public void Single_FromSameParent()
     {
         var doc = new Documentation("myId");
-        var offsetDuplicate = new OffsetDuplicate("g") {SecretDocs = doc};
-        var parent = new Geometry("g") {Shapes = [offsetDuplicate]};
+        var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc };
+        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int events = 0;
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
@@ -153,12 +235,36 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
+    public void Single_FromSameParent_Reflective()
+    {
+        var doc = new Documentation("myId");
+        var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc };
+        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.oldContainment);
+            Assert.AreEqual(0, args.oldIndex);
+            Assert.AreSame(offsetDuplicate, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.newContainment);
+            Assert.AreEqual(0, args.newIndex);
+            Assert.AreEqual(doc, args.movedChild);
+        };
+
+        offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
     public void Single_FromSameParent_Replace()
     {
         var replacedDoc = new Documentation("replacedDoc");
         var doc = new Documentation("myId");
-        var offsetDuplicate = new OffsetDuplicate("g") {SecretDocs = doc, Docs = replacedDoc};
-        var parent = new Geometry("g") {Shapes = [offsetDuplicate]};
+        var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc, Docs = replacedDoc };
+        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int events = 0;
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
@@ -181,6 +287,39 @@ public class ContainmentTests_Single_Optional_Listener
         };
 
         offsetDuplicate.Docs = doc;
+
+        Assert.AreEqual(2, events);
+    }
+
+    [TestMethod]
+    public void Single_FromSameParent_Replace_Reflective()
+    {
+        var replacedDoc = new Documentation("replacedDoc");
+        var doc = new Documentation("myId");
+        var offsetDuplicate = new OffsetDuplicate("g") { SecretDocs = doc, Docs = replacedDoc };
+        var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.oldContainment);
+            Assert.AreEqual(0, args.oldIndex);
+            Assert.AreSame(offsetDuplicate, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.newContainment);
+            Assert.AreEqual(0, args.newIndex);
+            Assert.AreEqual(doc, args.movedChild);
+        };
+        ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(offsetDuplicate, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_docs, args.containment);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(replacedDoc, args.deletedChild);
+        };
+
+        offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_docs, doc);
 
         Assert.AreEqual(2, events);
     }
@@ -211,6 +350,29 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
+    public void Existing_Reflective()
+    {
+        var oldDoc = new Documentation("old");
+        var parent = new Geometry("g") { Documentation = oldDoc };
+        var doc = new Documentation("myId");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildReplaced += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(doc, args.newChild);
+            Assert.AreEqual(oldDoc, args.replacedChild);
+        };
+
+        parent.Set(ShapesLanguage.Instance.Geometry_documentation, doc);
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
     public void Existing_Same()
     {
         var oldDoc = new Documentation("old");
@@ -225,6 +387,25 @@ public class ContainmentTests_Single_Optional_Listener
         ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) => events++;
 
         parent.Documentation = oldDoc;
+
+        Assert.AreEqual(0, events);
+    }
+
+    [TestMethod]
+    public void Existing_Same_Reflective()
+    {
+        var oldDoc = new Documentation("old");
+        var parent = new Geometry("g") { Documentation = oldDoc };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildReplaced += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildAdded += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildMovedInSameContainment += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) => events++;
+
+        parent.Set(ShapesLanguage.Instance.Geometry_documentation, oldDoc);
 
         Assert.AreEqual(0, events);
     }
@@ -254,6 +435,24 @@ public class ContainmentTests_Single_Optional_Listener
     }
 
     [TestMethod]
+    public void Null_Reflective()
+    {
+        var parent = new Geometry("g");
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildReplaced += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildAdded += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainment += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildMovedInSameContainment += (sender, args) => events++;
+        ((IPartitionInstance)parent).Listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) => events++;
+
+        parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);
+
+        Assert.AreEqual(0, events);
+    }
+
+    [TestMethod]
     public void Null_Existing()
     {
         var oldDoc = new Documentation("old");
@@ -270,6 +469,27 @@ public class ContainmentTests_Single_Optional_Listener
         };
 
         parent.Documentation = null;
+
+        Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void Null_Existing_Reflective()
+    {
+        var oldDoc = new Documentation("old");
+        var parent = new Geometry("g") { Documentation = oldDoc };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
+        {
+            events++;
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_documentation, args.containment);
+            Assert.AreEqual(0, args.index);
+            Assert.AreEqual(oldDoc, args.deletedChild);
+        };
+
+        parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);
 
         Assert.AreEqual(1, events);
     }
