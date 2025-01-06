@@ -20,16 +20,35 @@ namespace LionWeb.Core.Utilities;
 using LeftIndex = int;
 using RightIndex = int;
 
+/// Compares two lists and reports <see cref="Added"/>, <see cref="Deleted"/>, and <see cref="Moved"/> elements.
+/// The lists should be passed to the constructor of implementing classes.
+/// <typeparam name="T">Type of elements of the compared lists.</typeparam>
 public interface IListComparer<T>
 {
-    List<Change> Compare();
+    /// Compares the two lists passed to the constructor.
+    /// <returns>All changes that convert the <i>left</i> list to the <i>right</i> list.</returns>
+    List<IChange> Compare();
 
-    interface Change;
+    /// A change to a list.
+    interface IChange
+    {
+        /// Changed element.
+        T Element { get; }
+    };
 
-    record struct Added(T Element, RightIndex RightIndex) : Change;
+    /// <paramref name="Element"/> added at <paramref name="RightIndex"/>.
+    readonly record struct Added(T Element, RightIndex RightIndex) : IChange;
 
-    record struct Deleted(T Element, LeftIndex LeftIndex) : Change;
+    /// <paramref name="Element"/> deleted from <paramref name="LeftIndex"/>.
+    readonly record struct Deleted(T Element, LeftIndex LeftIndex) : IChange;
 
-    record struct Moved(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
-        : Change;
+    /// <paramref name="LeftElement"/> moved from <paramref name="LeftIndex"/> to <paramref name="RightIndex"/>.
+    /// We report <paramref name="RightElement"/> separately because it might not be identical to <paramref name="LeftElement"/>
+    /// (if we use a custom <see cref="IEqualityComparer{T}"/>).
+    readonly record struct Moved(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
+        : IChange
+    {
+        /// Changed <see cref="LeftElement"/>.
+        public T Element { get => LeftElement; }
+    }
 }

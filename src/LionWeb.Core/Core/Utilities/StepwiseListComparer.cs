@@ -20,6 +20,11 @@ namespace LionWeb.Core.Utilities;
 using LeftIndex = int;
 using RightIndex = int;
 
+/// <inheritdoc />
+/// <remarks>
+/// <see cref="ListComparer{T}"/> reports <i>all</i> changes based on the original and result indices.
+/// This class converts them into stepwise changes, i.e. the indices in each step are based on all previous changes. 
+/// </remarks>
 public class StepwiseListComparer<T> : IListComparer<T>
 {
     private readonly IListComparer<T> _listComparer;
@@ -27,14 +32,11 @@ public class StepwiseListComparer<T> : IListComparer<T>
     private readonly Dictionary<LeftIndex, RightIndex> _leftIndices;
     private readonly Dictionary<RightIndex, LeftIndex> _rightIndices;
 
+    /// <inheritdoc cref="ListComparer{T}(List{T}, List{T}, IEqualityComparer{T}?)"/>
     public StepwiseListComparer(List<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
-        : this(Math.Max(left.Count, right.Count), new ListComparer<T>(left, right, comparer))
     {
-    }
-
-    protected StepwiseListComparer(int maxSize, IListComparer<T> listComparer)
-    {
-        _listComparer = listComparer;
+        var maxSize = Math.Max(left.Count, right.Count);
+        _listComparer = new ListComparer<T>(left, right, comparer);
 
         _leftIndices = new Dictionary<LeftIndex, RightIndex>(maxSize);
         _rightIndices = new Dictionary<RightIndex, LeftIndex>(maxSize);
@@ -47,7 +49,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
     }
 
     /// <inheritdoc />
-    public List<IListComparer<T>.Change> Compare()
+    public List<IListComparer<T>.IChange> Compare()
     {
         var allChanges = _listComparer.Compare();
 
@@ -58,17 +60,17 @@ public class StepwiseListComparer<T> : IListComparer<T>
             .ToList();
     }
 
-    private IEnumerable<IListComparer<T>.Change> Added(List<IListComparer<T>.Change> allChanges) =>
+    private IEnumerable<IListComparer<T>.IChange> Added(List<IListComparer<T>.IChange> allChanges) =>
         allChanges
             .OfType<IListComparer<T>.Added>()
             .OrderBy(a => a.RightIndex)
             .Select(added =>
             {
                 Add(added.RightIndex);
-                return (IListComparer<T>.Change)(added with { RightIndex = _rightIndices[added.RightIndex] });
+                return (IListComparer<T>.IChange)(added with { RightIndex = _rightIndices[added.RightIndex] });
             });
 
-    private IEnumerable<IListComparer<T>.Change> Moved(List<IListComparer<T>.Change> allChanges) =>
+    private IEnumerable<IListComparer<T>.IChange> Moved(List<IListComparer<T>.IChange> allChanges) =>
         allChanges
             .OfType<IListComparer<T>.Moved>()
             .OrderBy(a => a.RightIndex)
@@ -76,20 +78,20 @@ public class StepwiseListComparer<T> : IListComparer<T>
             {
                 Add(moved.RightIndex);
                 Delete(moved.RightIndex);
-                return (IListComparer<T>.Change)(moved with
+                return (IListComparer<T>.IChange)(moved with
                 {
                     LeftIndex = _leftIndices[moved.LeftIndex], RightIndex = _rightIndices[moved.RightIndex]
                 });
             });
 
-    private IEnumerable<IListComparer<T>.Change> Deleted(List<IListComparer<T>.Change> allChanges) =>
+    private IEnumerable<IListComparer<T>.IChange> Deleted(List<IListComparer<T>.IChange> allChanges) =>
         allChanges
             .OfType<IListComparer<T>.Deleted>()
             .OrderBy(a => a.LeftIndex)
             .Select(deleted =>
             {
                 Delete(deleted.LeftIndex);
-                return (IListComparer<T>.Change)(deleted with { LeftIndex = _leftIndices[deleted.LeftIndex] });
+                return (IListComparer<T>.IChange)(deleted with { LeftIndex = _leftIndices[deleted.LeftIndex] });
             });
 
     private void Add(RightIndex rightIndex)

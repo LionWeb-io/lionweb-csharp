@@ -21,6 +21,7 @@ using CostBase = short;
 using LeftIndex = int;
 using RightIndex = int;
 
+/// <inheritdoc />
 /// <remarks>
 /// Implements the Hirschberg O(n) space algorithm for finding an alignment.
 /// Inspired by David Powell's Java implementation at https://github.com/drpowell/AlignDemo/blob/master/Hirschberg.java
@@ -43,7 +44,7 @@ public class ListComparer<T> : IListComparer<T>
     private readonly SortedList<LeftIndex, (T, LeftIndex)> _deleted = [];
 
     /// <summary>
-    /// Compares two lists, and returns the minimum number of <see cref="IListComparer{T}.Change">changes</see>
+    /// Compares two lists, and returns the minimum number of <see cref="IListComparer{T}.IChange">changes</see>
     /// to convert <paramref name="left"/> into <paramref name="right"/>. 
     /// </summary>
     public ListComparer(List<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
@@ -65,20 +66,20 @@ public class ListComparer<T> : IListComparer<T>
     }
 
     /// <inheritdoc />
-    public List<IListComparer<T>.Change> Compare()
+    public List<IListComparer<T>.IChange> Compare()
     {
-        Console.WriteLine("Hirschberg" + " running.");
+        // Console.WriteLine("Hirschberg" + " running.");
         CompareInternal();
-        Console.WriteLine("Hirschberg" + " done. Cost=" + _editCost + "\n");
-        Console.WriteLine(TraceBack());
-        Console.WriteLine("\n" + "Cells computed = " + _cellsComputed);
-
-        Console.WriteLine($"added:\n  {Join(_added)}");
-        Console.WriteLine($"deleted:\n  {Join(_deleted)}");
+        // Console.WriteLine("Hirschberg" + " done. Cost=" + _editCost + "\n");
+        // Console.WriteLine(TraceBack());
+        // Console.WriteLine("\n" + "Cells computed = " + _cellsComputed);
+        //
+        // Console.WriteLine($"added:\n  {Join(_added)}");
+        // Console.WriteLine($"deleted:\n  {Join(_deleted)}");
 
         var result = CollectChanges();
 
-        Console.WriteLine($"\nchanges:\n  {string.Join("\n  ", result)}");
+        // Console.WriteLine($"\nchanges:\n  {string.Join("\n  ", result)}");
 
         return result;
 
@@ -88,9 +89,11 @@ public class ListComparer<T> : IListComparer<T>
         }
     }
 
-    private List<IListComparer<T>.Change> CollectChanges()
+    /// The original algorithm only detects additions and deletions.
+    /// We replace matching add/delete pairs by one move change, and keep the remaining additions and deletions.
+    private List<IListComparer<T>.IChange> CollectChanges()
     {
-        List<IListComparer<T>.Change> result = [];
+        List<IListComparer<T>.IChange> result = [];
         foreach ((T, RightIndex) addedEntry in _added.Values.ToList())
         {
             (T, LeftIndex) deletedEntry = _deleted.Values.FirstOrDefault(p => Equals(p.Item1, addedEntry.Item1));
@@ -109,8 +112,8 @@ public class ListComparer<T> : IListComparer<T>
             }
         }
 
-        result.AddRange(_added.Values.Select(c => new IListComparer<T>.Added(c.Item1, c.Item2)).Cast<IListComparer<T>.Change>());
-        result.AddRange(_deleted.Values.Select(c => new IListComparer<T>.Deleted(c.Item1, c.Item2)).Cast<IListComparer<T>.Change>());
+        result.AddRange(_added.Values.Select(c => new IListComparer<T>.Added(c.Item1, c.Item2)).Cast<IListComparer<T>.IChange>());
+        result.AddRange(_deleted.Values.Select(c => new IListComparer<T>.Deleted(c.Item1, c.Item2)).Cast<IListComparer<T>.IChange>());
 
         return result;
     }

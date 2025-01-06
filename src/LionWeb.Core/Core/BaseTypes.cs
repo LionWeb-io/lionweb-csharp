@@ -782,7 +782,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="safeNodes">Nodes to remove.</param>
     /// <param name="storage">Storage of nodes.</param>
     /// <param name="remover">
-    /// Optional Action to call for each removed element of <paramref name="list"/>.
+    /// Optional Action to call for each removed element of <paramref name="safeNodes"/>.
     /// Only called if <see cref="GetPartitionCommander"/> is available.
     /// </param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>

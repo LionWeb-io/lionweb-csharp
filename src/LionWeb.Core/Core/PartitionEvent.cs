@@ -127,7 +127,7 @@ public abstract class PartitionMultipleContainmentEventBase<T> : PartitionContai
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> where T : INode
 {
-    private readonly List<IListComparer<T>.Change> _changes = [];
+    private readonly List<IListComparer<T>.IChange> _changes = [];
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="newParent"> Owner of the represented <paramref name="containment"/>.</param>
@@ -408,6 +408,9 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
 
     /// <inheritdoc />
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(_oldParent))]
+    [MemberNotNullWhen(true, nameof(_oldContainment))]
+    [MemberNotNullWhen(true, nameof(_oldIndex))]
     protected override bool IsActive() =>
         PartitionCommander != null && (PartitionCommander.CanRaiseAddChild() ||
                                        PartitionCommander.CanRaiseDeleteChild() ||
@@ -425,7 +428,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
 public class SetReferenceEvent<T> : PartitionEventBase<T> where T : IReadableNode
 {
     private readonly Reference _reference;
-    private readonly List<IListComparer<T>.Change> _changes = [];
+    private readonly List<IListComparer<T>.IChange> _changes = [];
 
     /// <param name="reference">Represented <see cref="Reference"/>.</param>
     /// <param name="newParent"> Owner of the represented <paramref name="reference"/>.</param>

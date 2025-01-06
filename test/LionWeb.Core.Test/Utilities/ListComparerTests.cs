@@ -229,7 +229,7 @@ public class ListComparerTests : ListComparerTestsBase
         var comparer = new ListComparer<INode>([a, b], [b, a]);
         var changes = comparer.Compare();
         CollectionAssert.AreEquivalent(
-            new List<IListComparer<INode>.Change> { new IListComparer<INode>.Moved(a, 0, a, 1) },
+            new List<IListComparer<INode>.IChange> { new IListComparer<INode>.Moved(a, 0, a, 1) },
             changes
         );
     }
@@ -243,7 +243,7 @@ public class ListComparerTests : ListComparerTestsBase
         var comparer = new ListComparer<INode>([a, b], [b, a]);
         var changes = comparer.Compare();
         CollectionAssert.AreEquivalent(
-            new List<IListComparer<INode>.Change> { new IListComparer<INode>.Moved(a, 0, a, 1) },
+            new List<IListComparer<INode>.IChange> { new IListComparer<INode>.Moved(a, 0, a, 1) },
             changes
         );
     }
@@ -267,7 +267,7 @@ public class ListComparerTests : ListComparerTestsBase
         var comparer = new ListComparer<INode>([a, b], [b, a], new NodeIdComparer());
         var changes = comparer.Compare();
         CollectionAssert.AreEquivalent(
-            new List<IListComparer<INode>.Change> { },
+            new List<IListComparer<INode>.IChange> { },
             changes
         );
     }

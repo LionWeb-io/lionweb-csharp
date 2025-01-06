@@ -32,7 +32,7 @@ public abstract class ListComparerTestsBase
         var comparer = CreateComparer(left, right);
         var changes = comparer.Compare();
         CollectionAssert.AreEquivalent(
-            results.Select(r => (IListComparer<char>.Change)(r.changeKind switch
+            results.Select(r => (IListComparer<char>.IChange)(r.changeKind switch
             {
                 Add => new IListComparer<char>.Added(r.left, r.leftIndex),
                 Delete => new IListComparer<char>.Deleted(r.left, r.leftIndex),
