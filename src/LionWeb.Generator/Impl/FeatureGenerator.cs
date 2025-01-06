@@ -166,7 +166,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private LocalDeclarationStatementSyntax SingleContainmentEventVariable() =>
         Variable(
             "evt",
-            AsType(typeof(NodeBase.SingleContainmentEvent<>), AsType(feature.GetFeatureType())),
+            AsType(typeof(SingleContainmentEvent<>), AsType(feature.GetFeatureType())),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
         );
 
@@ -303,7 +303,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(ExpressionSyntax index) =>
         Variable(
             "evt",
-            AsType(typeof(NodeBase.AddMultipleContainmentsEvent<>), AsType(feature.GetFeatureType())),
+            AsType(typeof(AddMultipleContainmentsEvent<>), AsType(feature.GetFeatureType())),
             NewCall([
                 MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index
             ])

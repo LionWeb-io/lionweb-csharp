@@ -211,7 +211,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(Containment containment) =>
         Variable(
             "evt",
-            AsType(typeof(NodeBase.SetContainmentEvent<>), AsType(containment.GetFeatureType())),
+            AsType(typeof(SetContainmentEvent<>), AsType(containment.GetFeatureType())),
             NewCall([
                 MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment)
             ])
