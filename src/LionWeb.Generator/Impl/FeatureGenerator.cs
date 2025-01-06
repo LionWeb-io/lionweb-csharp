@@ -272,7 +272,13 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             MultipleLinkField(containment), MultipleLinkProperty(containment, AsReadOnlyCall(containment))
         }.Concat(
             LinkAdder(containment, [
+                SafeNodesVariable(),
+                AssureNotNullCall(containment),
+                AssureNotNullMembersCall(containment),
+                AddMultipleContainmentEventVariable(0.AsLiteral()),
+                EventCollectOldDataCall(),
                 OptionalAddRangeCall(containment),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -281,13 +287,26 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(containment),
                 AssureNoSelfMoveCall(containment),
+                AssureNotNullMembersCall(containment),
+                AddMultipleContainmentEventVariable(IdentifierName("index")),
+                EventCollectOldDataCall(),
                 InsertRangeCall(containment),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
             LinkRemover(containment, [
                 OptionalRemoveSelfParentCall(containment),
                 ReturnStatement(This())
+            ])
+        );
+
+    private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(ExpressionSyntax index) =>
+        Variable(
+            "evt",
+            AsType(typeof(NodeBase.AddMultipleContainmentsEvent<>), AsType(feature.GetFeatureType())),
+            NewCall([
+                MetaProperty(feature), This(), index, IdentifierName("safeNodes"), FeatureField(feature)
             ])
         );
 
@@ -444,7 +463,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         ExpressionStatement(Call("RemoveSelfParent",
             OptionalNodesToList(),
             FeatureField(containment),
-            MetaProperty(containment)
+            MetaProperty(containment),
+            CallGeneric("ContainmentRemover", AsType(containment.Type), MetaProperty(containment))
         ));
 
     private ExpressionStatementSyntax RequiredAddRangeCall(Containment containment) =>
@@ -461,9 +481,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         ExpressionStatement(InvocationExpression(
             MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
             AsArguments([
-                Call("SetSelfParent", OptionalNodesToList(),
-                    MetaProperty(containment)
-                )
+                Call("SetSelfParent", IdentifierName("safeNodes"), MetaProperty(containment))
             ])
         ));
 

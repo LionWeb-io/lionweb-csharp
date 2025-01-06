@@ -62,9 +62,9 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
             MetaProperty(link)
         ));
 
-    protected ExpressionStatementSyntax AssureNotNullMembersCall(Reference reference) =>
+    protected ExpressionStatementSyntax AssureNotNullMembersCall(Link link) =>
         ExpressionStatement(Call("AssureNotNullMembers",
             IdentifierName("safeNodes"),
-            MetaProperty(reference)
+            MetaProperty(link)
         ));
 }

@@ -336,7 +336,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		_altGroups.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.BillOfMaterials_altGroups));
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, 0, safeNodes, _altGroups);
+		evt.CollectOldData();
+		_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -347,14 +353,18 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		AssureNoSelfMove(index, safeNodes, _altGroups);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, index, safeNodes, _altGroups);
+		evt.CollectOldData();
 		_altGroups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
+		evt.RaiseEvent();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials RemoveAltGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		RemoveSelfParent(nodes?.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups, ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_altGroups));
 		return this;
 	}
 
@@ -385,7 +395,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		_groups.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.BillOfMaterials_groups));
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
+		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, 0, safeNodes, _groups);
+		evt.CollectOldData();
+		_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -396,14 +412,18 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		AssureNoSelfMove(index, safeNodes, _groups);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
+		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, index, safeNodes, _groups);
+		evt.CollectOldData();
 		_groups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
+		evt.RaiseEvent();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials RemoveGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
+		RemoveSelfParent(nodes?.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups, ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_groups));
 		return this;
 	}
 
@@ -1223,7 +1243,13 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	/// <remarks>Optional Multiple Containment</remarks>
         public Geometry AddShapes(IEnumerable<IShape> nodes)
 	{
-		_shapes.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.Geometry_shapes));
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, 0, safeNodes, _shapes);
+		evt.CollectOldData();
+		_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1234,14 +1260,18 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNoSelfMove(index, safeNodes, _shapes);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, index, safeNodes, _shapes);
+		evt.CollectOldData();
 		_shapes.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
+		evt.RaiseEvent();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public Geometry RemoveShapes(IEnumerable<IShape> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes);
+		RemoveSelfParent(nodes?.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes, ContainmentRemover<IShape>(ShapesLanguage.Instance.Geometry_shapes));
 		return this;
 	}
 
@@ -2102,7 +2132,13 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <remarks>Optional Multiple Containment</remarks>
         public Shape AddFixpoints(IEnumerable<Coord> nodes)
 	{
-		_fixpoints.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.IShape_fixpoints));
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
+		AddMultipleContainmentsEvent<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, 0, safeNodes, _fixpoints);
+		evt.CollectOldData();
+		_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
+		evt.RaiseEvent();
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
@@ -2114,7 +2150,11 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		AssureNoSelfMove(index, safeNodes, _fixpoints);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
+		AddMultipleContainmentsEvent<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, index, safeNodes, _fixpoints);
+		evt.CollectOldData();
 		_fixpoints.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
+		evt.RaiseEvent();
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
@@ -2122,7 +2162,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <remarks>Optional Multiple Containment</remarks>
         public Shape RemoveFixpoints(IEnumerable<Coord> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
+		RemoveSelfParent(nodes?.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints, ContainmentRemover<Coord>(ShapesLanguage.Instance.IShape_fixpoints));
 		return this;
 	}
 

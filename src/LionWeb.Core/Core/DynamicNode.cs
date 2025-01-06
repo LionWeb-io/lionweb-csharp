@@ -188,7 +188,7 @@ public class DynamicNode : NodeBase
                 AssureOptionalCount(value, enumerable, containment);
 
                 if (_settings.TryGetValue(containment, out var oldValue) && oldValue is List<INode> oldList)
-                    RemoveSelfParent(oldList?.ToList(), oldList, containment);
+                    RemoveSelfParent(oldList?.ToList(), oldList, containment, null);
 
                 SetSelfParent(enumerable, containment);
                 UpdateSettings(enumerable, containment);

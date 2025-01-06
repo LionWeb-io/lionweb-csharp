@@ -185,7 +185,13 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete("deprChild comment")]
 	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes)
 	{
-		_deprChild.AddRange(SetSelfParent(nodes?.ToList(), DeprecatedLanguage.Instance.DeprConcept_deprChild));
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
+		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
+		AddMultipleContainmentsEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, 0, safeNodes, _deprChild);
+		evt.CollectOldData();
+		_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -197,7 +203,11 @@ public partial class DeprConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNoSelfMove(index, safeNodes, _deprChild);
+		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
+		AddMultipleContainmentsEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, index, safeNodes, _deprChild);
+		evt.CollectOldData();
 		_deprChild.InsertRange(index, SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -205,7 +215,7 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete("deprChild comment")]
 	public DeprConcept RemoveDeprChild(IEnumerable<DeprIface> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
+		RemoveSelfParent(nodes?.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild, ContainmentRemover<DeprIface>(DeprecatedLanguage.Instance.DeprConcept_deprChild));
 		return this;
 	}
 

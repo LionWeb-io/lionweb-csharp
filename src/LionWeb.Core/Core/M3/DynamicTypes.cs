@@ -356,13 +356,13 @@ public abstract class DynamicLanguageEntity : DynamicIKeyed, LanguageEntity
 public abstract class DynamicClassifier(string id, DynamicLanguage? language)
     : DynamicLanguageEntity(id, language), Classifier
 {
-    private readonly List<Feature> _features = [];
+    private readonly List<DynamicFeature> _features = [];
 
     /// <inheritdoc />
     public IReadOnlyList<Feature> Features => _features.AsReadOnly();
 
     /// <inheritdoc cref="Features"/>
-    public void AddFeatures(IEnumerable<Feature> features) =>
+    public void AddFeatures(IEnumerable<DynamicFeature> features) =>
         _features.AddRange(SetSelfParent(features?.ToList(), _m3.Classifier_features));
 
     /// <inheritdoc />
@@ -375,7 +375,7 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
 
         var c = GetContainmentOf(child);
         if (c == _m3.Classifier_features)
-            return _features.Remove((Feature)child);
+            return _features.Remove((DynamicFeature)child);
 
         return false;
     }
@@ -429,7 +429,7 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
             {
                 case IEnumerable e:
                     RemoveSelfParent(_features?.ToList(), _features, _m3.Classifier_features);
-                    AddFeatures(e.OfType<Feature>().ToArray());
+                    AddFeatures(e.Cast<DynamicFeature>().ToArray());
                     return true;
                 default:
                     throw new InvalidValueException(feature, value);
@@ -746,13 +746,13 @@ public class DynamicPrimitiveType(string id, DynamicLanguage? language) : Dynami
 /// <inheritdoc cref="Enumeration"/>
 public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicDatatype(id, language), Enumeration
 {
-    private readonly List<EnumerationLiteral> _literals = [];
+    private readonly List<DynamicEnumerationLiteral> _literals = [];
 
     /// <inheritdoc />
     public IReadOnlyList<EnumerationLiteral> Literals => _literals.AsReadOnly();
 
     /// <inheritdoc cref="Literals"/>
-    public void AddLiterals(IEnumerable<EnumerationLiteral> literals) =>
+    public void AddLiterals(IEnumerable<DynamicEnumerationLiteral> literals) =>
         _literals.AddRange(SetSelfParent(literals?.ToList(), _m3.Enumeration_literals));
 
     /// <inheritdoc />
@@ -765,7 +765,7 @@ public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicD
 
         var c = GetContainmentOf(child);
         if (c == _m3.Enumeration_literals)
-            return _literals.Remove((EnumerationLiteral)child);
+            return _literals.Remove((DynamicEnumerationLiteral)child);
 
         return false;
     }
@@ -822,7 +822,7 @@ public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicD
             {
                 case IEnumerable e:
                     RemoveSelfParent(_literals?.ToList(), _literals, _m3.Enumeration_literals);
-                    AddLiterals(e.OfType<EnumerationLiteral>().ToArray());
+                    AddLiterals(e.Cast<DynamicEnumerationLiteral>().ToArray());
                     return true;
                 default:
                     throw new InvalidValueException(feature, value);
@@ -857,13 +857,13 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language)
         new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
             (ILionCoreLanguageWithStructuredDataType)this.GetLanguage().LionWebVersion.LionCore).Value;
 
-    private readonly List<Field> _fields = [];
+    private readonly List<DynamicField> _fields = [];
 
     /// <inheritdoc />
     public IReadOnlyList<Field> Fields => _fields.AsReadOnly();
 
     /// <inheritdoc cref="Fields"/>
-    public void AddFields(IEnumerable<Field> fields) =>
+    public void AddFields(IEnumerable<DynamicField> fields) =>
         _fields.AddRange(SetSelfParent(fields?.ToList(), _m3.StructuredDataType_fields));
 
     /// <inheritdoc />
@@ -876,7 +876,7 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language)
 
         var c = GetContainmentOf(child);
         if (c == _m3.StructuredDataType_fields)
-            return _fields.Remove((Field)child);
+            return _fields.Remove((DynamicField)child);
 
         return false;
     }
@@ -933,7 +933,7 @@ public class DynamicStructuredDataType(string id, DynamicLanguage? language)
             {
                 case IEnumerable e:
                     RemoveSelfParent(_fields?.ToList(), _fields, _m3.StructuredDataType_fields);
-                    AddFields(e.OfType<Field>().ToArray());
+                    AddFields(e.Cast<DynamicField>().ToArray());
                     return true;
                 default:
                     throw new InvalidValueException(feature, value);
@@ -1085,13 +1085,13 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
         return version != null;
     }
 
-    private readonly List<LanguageEntity> _entities = [];
+    private readonly List<DynamicLanguageEntity> _entities = [];
 
     /// <inheritdoc />
     public IReadOnlyList<LanguageEntity> Entities => _entities.AsReadOnly();
 
     /// <inheritdoc cref="Entities"/>
-    public void AddEntities(IEnumerable<LanguageEntity> entities) =>
+    public void AddEntities(IEnumerable<DynamicLanguageEntity> entities) =>
         _entities.AddRange(SetSelfParent(entities?.ToList(), _m3.Language_entities));
 
     private readonly List<Language> _dependsOn = [];
@@ -1174,7 +1174,7 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
             {
                 case IEnumerable e:
                     RemoveSelfParent(_entities?.ToList(), _entities, _m3.Language_entities);
-                    AddEntities(e.OfType<LanguageEntity>().ToArray());
+                    AddEntities(e.Cast<DynamicLanguageEntity>().ToArray());
                     return true;
                 default:
                     throw new InvalidValueException(feature, value);

@@ -401,7 +401,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     /// <inheritdoc />
     public virtual bool RemoveAnnotations(IEnumerable<INode> annotations) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null);
+        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover());
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() => [];
@@ -449,7 +449,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 throw new InvalidValueException(feature, value);
             var enumerable = M2Extensions.AsNodes<INode>(value).ToList();
             AssureAnnotations(enumerable);
-            RemoveSelfParent(_annotations.ToList(), _annotations, null);
+            RemoveSelfParent(_annotations.ToList(), _annotations, null, AnnotationRemover());
             AddAnnotations(enumerable);
             return true;
         }
@@ -581,10 +581,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="link">Link of <paramref name="storage"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     /// <exception cref="InvalidValueException">If <paramref name="storage"/> were empty after removing all of <paramref name="safeNodes"/>.</exception>
-    protected void AssureNotClearing<T>(List<T> safeNodes, List<T> storage, Link link) where T : IReadableNode
+    protected void AssureNotClearing<T>(List<T> safeNodes, List<T> storage, Link link) where T : INode
     {
         var copy = new List<T>(storage);
-        RemoveAll(safeNodes, copy, (_, _, _) => { });
+        RemoveAll(safeNodes, copy, null);
         if (copy.Count == 0)
             throw new InvalidValueException(link, safeNodes);
     }
@@ -699,18 +699,15 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <typeparam name="T">Type of members of <paramref name="list"/>.</typeparam>
     /// <returns><paramref name="list"/> as new list.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected List<T> SetSelfParent<T>([NotNull] List<T>? list, Link? link) where T : IReadableNode
+    protected List<T> SetSelfParent<T>([NotNull] List<T>? list, Link? link) where T : INode
     {
         AssureNotNull(list, link);
         AssureNotNullMembers(list, link);
 
         return list.Select(n =>
         {
-            if (n is INode iNode)
-            {
-                DetachChildInternal(iNode);
-                SetParentInternal(iNode, this);
-            }
+            DetachChildInternal(n);
+            SetParentInternal(n, this);
 
             return n;
         }).ToList();
@@ -726,8 +723,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if <paramref name="node"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="node"/> is <c>null</c> or not an instance of <typeparamref name="T"/>.</exception>
-    protected bool RemoveSelfParent<T>(IReadableNode node, List<T> storage, Link? link)
-        where T : class, IReadableNode =>
+    protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link)
+        where T : class, INode =>
         RemoveSelfParent(AsList<T>(node, link), storage, link);
 
     /// <summary>
@@ -740,18 +737,27 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link)
-        where T : IReadableNode
+    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link,
+        Action<IPartitionCommander, int, T>? remover = null)
+        where T : INode
     {
         AssureNotNull(list, link);
         AssureNotNullMembers(list, link);
 
+        var partitionCommander = GetPartitionCommander();
+
         bool result = false;
-        foreach (T n in list)
+        foreach (T node in list)
         {
-            result |= storage.Remove(n);
-            if (n is INode iNode)
-                SetParentInternal(iNode, null);
+            var index = storage.IndexOf(node);
+            if (index < 0)
+                continue;
+
+            storage.RemoveAt(index);
+            result = true;
+            SetParentInternal(node, null);
+            if (partitionCommander != null && remover != null)
+                remover(partitionCommander, index, node);
         }
 
         return result;
@@ -764,28 +770,34 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="safeNodes">Nodes to remove.</param>
     /// <param name="storage">Storage of nodes.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
-    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, int, T> remover)
-        where T : IReadableNode
+    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, int, T>? remover)
+        where T : INode
     {
         var partitionCommander = GetPartitionCommander();
 
         foreach (var node in safeNodes)
         {
             var index = storage.IndexOf(node);
-            if (index >= 0)
-            {
-                storage.RemoveAt(index);
-                if (partitionCommander != null)
-                {
-                    remover(partitionCommander, index, node);
-                }
-            }
+            if (index < 0)
+                continue;
+
+            storage.RemoveAt(index);
+            if (partitionCommander != null && remover != null)
+                remover(partitionCommander, index, node);
         }
     }
 
     protected Action<IPartitionCommander, int, T> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
         (commander, index, node) =>
             commander.DeleteReference(this, reference, index, new ReferenceTarget(null, node));
+
+    protected Action<IPartitionCommander, int, T> ContainmentRemover<T>(Containment containment)
+        where T : INode =>
+        (commander, index, node) =>
+            commander.DeleteChild(node, this, containment, index);
+
+    private Action<IPartitionCommander, int, INode> AnnotationRemover() =>
+        (commander, index, node) => commander.DeleteAnnotation(node, this, index);
 
     #endregion
 
@@ -1002,6 +1014,188 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                                                 .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
                                             _partitionCommander
                                                 .CanRaiseMoveChildInSameContainment());
+    }
+
+    public class AddMultipleContainmentsEvent<T> where T : INode
+    {
+        private readonly Containment _containment;
+        private readonly INode _newParent;
+        private readonly Dictionary<T, Old?> _addedValues;
+        private readonly List<T> _existingValues;
+        private readonly IPartitionCommander? _partitionCommander;
+
+        private int _newIndex;
+
+        public AddMultipleContainmentsEvent(Containment containment, NodeBase newParent, int newIndex,
+            List<T>? addedValues,
+            List<T> existingValues)
+        {
+            _containment = containment;
+            _newParent = newParent;
+            _addedValues = addedValues?.ToDictionary<T, T, Old?>(k => k, k => null) ?? [];
+            _existingValues = existingValues;
+            _newIndex = newIndex;
+
+            _partitionCommander = newParent.GetPartitionCommander();
+        }
+
+        public void CollectOldData()
+        {
+            if (!IsActive())
+                return;
+
+            foreach (T addedValue in _addedValues.Keys.ToList())
+            {
+                var oldParent = addedValue.GetParent();
+                if (oldParent == null)
+                    continue;
+
+                var oldContainment = oldParent.GetContainmentOf(addedValue);
+                if (oldContainment == null)
+                    continue;
+
+                var oldIndex = oldContainment.Multiple
+                    ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment)).ToList().IndexOf(addedValue)
+                    : 0;
+
+                _addedValues[addedValue] = new Old(oldParent, oldContainment, oldIndex);
+            }
+        }
+
+        public void RaiseEvent()
+        {
+            if (!IsActive())
+                return;
+
+            foreach ((T? added, Old? old) in _addedValues)
+            {
+                switch (added, old)
+                {
+                    case ({ }, { } o)
+                        when o.Parent == _newParent && o.Containment != _containment:
+                        _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, _newIndex, added,
+                            _newParent, o.Containment, o.Index);
+                        break;
+
+                    case ({ }, { } o)
+                        when o.Parent != _newParent:
+                        _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, _newIndex, added,
+                            o.Parent,
+                            o.Containment, o.Index);
+                        break;
+
+                    case ({ }, null):
+                        _partitionCommander.AddChild(_newParent, added, _containment, _newIndex);
+                        break;
+
+                    default:
+                        throw new ArgumentException("Unknown state");
+                }
+
+                _newIndex++;
+            }
+        }
+
+        private bool IsActive() =>
+            _partitionCommander != null && (_partitionCommander.CanRaiseAddChild() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildFromOtherContainment() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildInSameContainment());
+
+        private record struct Old(INode Parent, Containment Containment, int Index);
+    }
+
+    public class RemoveMultipleContainmentsEvent<T> where T : INode
+    {
+        private readonly Containment _containment;
+        private readonly INode _newParent;
+        private readonly Dictionary<T, Old?> _removedValues;
+        private readonly List<T> _existingValues;
+        private readonly IPartitionCommander? _partitionCommander;
+
+        private int _newIndex;
+
+        public RemoveMultipleContainmentsEvent(Containment containment, NodeBase newParent, List<T>? removedValues,
+            List<T> existingValues)
+        {
+            _containment = containment;
+            _newParent = newParent;
+            _removedValues = removedValues?.ToDictionary<T, T, Old?>(k => k, k => null) ?? [];
+            _existingValues = existingValues;
+
+            _partitionCommander = newParent.GetPartitionCommander();
+        }
+
+        public void CollectOldData()
+        {
+            if (!IsActive())
+                return;
+
+            foreach (T addedValue in _removedValues.Keys.ToList())
+            {
+                var oldParent = addedValue.GetParent();
+                if (oldParent == null)
+                    continue;
+
+                var oldContainment = oldParent.GetContainmentOf(addedValue);
+                if (oldContainment == null)
+                    continue;
+
+                var oldIndex = oldContainment.Multiple
+                    ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment)).ToList().IndexOf(addedValue)
+                    : 0;
+
+                _removedValues[addedValue] = new Old(oldParent, oldContainment, oldIndex);
+            }
+        }
+
+        public void RaiseEvent()
+        {
+            if (!IsActive())
+                return;
+
+            foreach ((T? removed, Old? old) in _removedValues)
+            {
+                switch (added: removed, old)
+                {
+                    case ({ }, { } o)
+                        when o.Parent == _newParent && o.Containment != _containment:
+                        _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, _newIndex, removed,
+                            _newParent, o.Containment, o.Index);
+                        break;
+
+                    case ({ }, { } o)
+                        when o.Parent != _newParent:
+                        _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, _newIndex, removed,
+                            o.Parent,
+                            o.Containment, o.Index);
+                        break;
+
+                    case ({ }, null):
+                        _partitionCommander.AddChild(_newParent, removed, _containment, _newIndex);
+                        break;
+
+                    default:
+                        throw new ArgumentException("Unknown state");
+                }
+
+                _newIndex++;
+            }
+        }
+
+        private bool IsActive() =>
+            _partitionCommander != null && (_partitionCommander.CanRaiseAddChild() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildFromOtherContainment() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildFromOtherContainmentInSameParent() ||
+                                            _partitionCommander
+                                                .CanRaiseMoveChildInSameContainment());
+
+        private record struct Old(INode Parent, Containment Containment, int Index);
     }
 
     #endregion
