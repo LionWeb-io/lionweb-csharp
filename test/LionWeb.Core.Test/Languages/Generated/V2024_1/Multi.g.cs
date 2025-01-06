@@ -102,7 +102,10 @@ public partial class Container : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
+		AddMultipleContainmentsEvent<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, 0, safeNodes, _libraries);
+		evt.CollectOldData();
 		_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -115,7 +118,10 @@ public partial class Container : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
 		AssureNoSelfMove(index, safeNodes, _libraries);
+		AddMultipleContainmentsEvent<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, index, safeNodes, _libraries);
+		evt.CollectOldData();
 		_libraries.InsertRange(index, SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -126,7 +132,7 @@ public partial class Container : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, MultiLanguage.Instance.Container_libraries);
 		AssureNotClearing(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		RemoveSelfParent(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
+		RemoveSelfParent(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries, ContainmentRemover<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library>(MultiLanguage.Instance.Container_libraries));
 		return this;
 	}
 

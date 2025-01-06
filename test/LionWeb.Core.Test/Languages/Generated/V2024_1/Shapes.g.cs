@@ -758,7 +758,10 @@ public partial class CompositeShape : Shape
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, 0, safeNodes, _disabledParts);
+		evt.CollectOldData();
 		_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -771,7 +774,10 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		AssureNoSelfMove(index, safeNodes, _disabledParts);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, index, safeNodes, _disabledParts);
+		evt.CollectOldData();
 		_disabledParts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -782,7 +788,7 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		AssureNotClearing(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		RemoveSelfParent(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		RemoveSelfParent(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts, ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_disabledParts));
 		return this;
 	}
 
@@ -821,7 +827,10 @@ public partial class CompositeShape : Shape
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, 0, safeNodes, _parts);
+		evt.CollectOldData();
 		_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -834,7 +843,10 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
 		AssureNoSelfMove(index, safeNodes, _parts);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, index, safeNodes, _parts);
+		evt.CollectOldData();
 		_parts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -845,7 +857,7 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
 		AssureNotClearing(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
-		RemoveSelfParent(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		RemoveSelfParent(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts, ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_parts));
 		return this;
 	}
 

@@ -219,7 +219,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             LinkAdder(containment, [
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
+                    AddMultipleContainmentEventVariable(0.AsLiteral()),
+                    EventCollectOldDataCall(),
                     RequiredAddRangeCall(containment),
+                    EventRaiseEventCall(),
                     ReturnStatement(This())
                 ])
                 .Select(a => XdocRequiredAdder(a, containment))
@@ -229,7 +232,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
                     AssureNoSelfMoveCall(containment),
+                    AddMultipleContainmentEventVariable(IdentifierName("index")),
+                    EventCollectOldDataCall(),
                     InsertRangeCall(containment),
+                    EventRaiseEventCall(),
                     ReturnStatement(This())
                 ])
                 .Select(i => XdocRequiredInserter(i, containment))
@@ -456,7 +462,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         ExpressionStatement(Call("RemoveSelfParent",
             IdentifierName("safeNodes"),
             FeatureField(containment),
-            MetaProperty(containment)
+            MetaProperty(containment),
+            CallGeneric("ContainmentRemover", AsType(containment.Type), MetaProperty(containment))
         ));
 
     private ExpressionStatementSyntax OptionalRemoveSelfParentCall(Containment containment) =>
