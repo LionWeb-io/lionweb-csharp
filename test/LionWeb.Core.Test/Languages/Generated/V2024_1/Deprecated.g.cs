@@ -188,7 +188,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		AddMultipleContainmentsEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, 0, safeNodes, _deprChild);
+		AddMultipleContainmentsEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, null);
 		evt.CollectOldData();
 		_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
 		evt.RaiseEvent();
@@ -204,7 +204,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNoSelfMove(index, safeNodes, _deprChild);
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		AddMultipleContainmentsEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, index, safeNodes, _deprChild);
+		AddMultipleContainmentsEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, index);
 		evt.CollectOldData();
 		_deprChild.InsertRange(index, SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
 		evt.RaiseEvent();

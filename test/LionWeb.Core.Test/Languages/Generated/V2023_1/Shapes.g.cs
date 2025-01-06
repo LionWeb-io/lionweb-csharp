@@ -339,7 +339,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, 0, safeNodes, _altGroups);
+		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, null);
 		evt.CollectOldData();
 		_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
 		evt.RaiseEvent();
@@ -354,7 +354,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		AssureNoSelfMove(index, safeNodes, _altGroups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, index, safeNodes, _altGroups);
+		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, index);
 		evt.CollectOldData();
 		_altGroups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
 		evt.RaiseEvent();
@@ -398,7 +398,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
-		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, 0, safeNodes, _groups);
+		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, null);
 		evt.CollectOldData();
 		_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
 		evt.RaiseEvent();
@@ -413,7 +413,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		AssureNoSelfMove(index, safeNodes, _groups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
-		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, index, safeNodes, _groups);
+		AddMultipleContainmentsEvent<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, index);
 		evt.CollectOldData();
 		_groups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
 		evt.RaiseEvent();
@@ -758,7 +758,7 @@ public partial class CompositeShape : Shape
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, 0, safeNodes, _disabledParts);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, null);
 		evt.CollectOldData();
 		_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
 		evt.RaiseEvent();
@@ -774,7 +774,7 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		AssureNoSelfMove(index, safeNodes, _disabledParts);
-		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, index, safeNodes, _disabledParts);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, index);
 		evt.CollectOldData();
 		_disabledParts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
 		evt.RaiseEvent();
@@ -827,7 +827,7 @@ public partial class CompositeShape : Shape
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
-		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, 0, safeNodes, _parts);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, null);
 		evt.CollectOldData();
 		_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
 		evt.RaiseEvent();
@@ -843,7 +843,7 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
 		AssureNoSelfMove(index, safeNodes, _parts);
-		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, index, safeNodes, _parts);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, index);
 		evt.CollectOldData();
 		_parts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
 		evt.RaiseEvent();
@@ -1258,7 +1258,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
-		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, 0, safeNodes, _shapes);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, null);
 		evt.CollectOldData();
 		_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
 		evt.RaiseEvent();
@@ -1273,7 +1273,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNoSelfMove(index, safeNodes, _shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
-		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, index, safeNodes, _shapes);
+		AddMultipleContainmentsEvent<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, index);
 		evt.CollectOldData();
 		_shapes.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
 		evt.RaiseEvent();
@@ -2147,7 +2147,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
-		AddMultipleContainmentsEvent<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, 0, safeNodes, _fixpoints);
+		AddMultipleContainmentsEvent<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, null);
 		evt.CollectOldData();
 		_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
 		evt.RaiseEvent();
@@ -2163,7 +2163,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		AssureNoSelfMove(index, safeNodes, _fixpoints);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
-		AddMultipleContainmentsEvent<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, index, safeNodes, _fixpoints);
+		AddMultipleContainmentsEvent<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, index);
 		evt.CollectOldData();
 		_fixpoints.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
 		evt.RaiseEvent();

@@ -437,7 +437,7 @@ public partial class Library : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		AddMultipleContainmentsEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, 0, safeNodes, _books);
+		AddMultipleContainmentsEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null);
 		evt.CollectOldData();
 		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
 		evt.RaiseEvent();
@@ -453,7 +453,7 @@ public partial class Library : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
 		AssureNoSelfMove(index, safeNodes, _books);
-		AddMultipleContainmentsEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, index, safeNodes, _books);
+		AddMultipleContainmentsEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, index);
 		evt.CollectOldData();
 		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
 		evt.RaiseEvent();

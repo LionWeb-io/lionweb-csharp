@@ -965,32 +965,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                     _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
                     break;
 
-                case (null, { }, { })
-                    when _oldParent == _newParent && _oldContainment != _containment:
-                    _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, 0, _newValue,
-                        _newParent, _oldContainment, _oldIndex);
-                    break;
-
-                case ({ }, { }, { })
-                    when _oldParent == _newParent && _oldContainment != _containment:
-                    _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
-                    _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, 0, _newValue,
-                        _newParent, _oldContainment, _oldIndex);
-                    break;
-
-                case ({ }, { }, { })
-                    when _oldParent != _newParent:
-                    _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
-                    _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, 0, _newValue,
-                        _oldParent, _oldContainment, _oldIndex);
-                    break;
-
-                case (null, { }, { })
-                    when _oldParent != _newParent:
-                    _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, 0, _newValue,
-                        _oldParent, _oldContainment, _oldIndex);
-                    break;
-
                 case (null, { }, null):
                     _partitionCommander.AddChild(_newParent, _newValue, _containment, 0);
                     break;
@@ -999,11 +973,38 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                     _partitionCommander.ReplaceChild(_newValue, _oldValue, _newParent, _containment, 0);
                     break;
 
+                case (null, { }, { })
+                    when _oldParent == _newParent && _oldContainment != _containment:
+                    _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, 0, _newValue,
+                        _newParent, _oldContainment, _oldIndex);
+                    break;
+
+                case ({ }, { }, { })
+                    when _oldParent == _newParent && _oldContainment != _containment:
+                    _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
+                    _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, 0, _newValue,
+                        _newParent, _oldContainment, _oldIndex);
+                    break;
+
+                case ({ }, { }, { })
+                    when _oldParent != _newParent:
+                    _partitionCommander.DeleteChild(_oldValue, _newParent, _containment, 0);
+                    _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, 0, _newValue,
+                        _oldParent, _oldContainment, _oldIndex);
+                    break;
+
+                case (null, { }, { })
+                    when _oldParent != _newParent:
+                    _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, 0, _newValue,
+                        _oldParent, _oldContainment, _oldIndex);
+                    break;
+
                 default:
                     throw new ArgumentException("Unknown state");
             }
         }
 
+        [MemberNotNullWhen(true, nameof(_partitionCommander))]
         private bool IsActive() =>
             _partitionCommander != null && (_partitionCommander.CanRaiseAddChild() ||
                                             _partitionCommander.CanRaiseDeleteChild() ||
@@ -1021,20 +1022,22 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         private readonly Containment _containment;
         private readonly INode _newParent;
         private readonly Dictionary<T, Old?> _addedValues;
-        private readonly List<T> _existingValues;
         private readonly IPartitionCommander? _partitionCommander;
 
         private int _newIndex;
 
-        public AddMultipleContainmentsEvent(Containment containment, NodeBase newParent, int newIndex,
+        public AddMultipleContainmentsEvent(
+            Containment containment,
+            NodeBase newParent,
             List<T>? addedValues,
-            List<T> existingValues)
+            List<T> existingValues,
+            int? newIndex = null
+        )
         {
             _containment = containment;
             _newParent = newParent;
             _addedValues = addedValues?.ToDictionary<T, T, Old?>(k => k, k => null) ?? [];
-            _existingValues = existingValues;
-            _newIndex = newIndex;
+            _newIndex = newIndex ?? Math.Max(existingValues.Count - 1, 0);
 
             _partitionCommander = newParent.GetPartitionCommander();
         }
@@ -1071,21 +1074,46 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             {
                 switch (added, old)
                 {
-                    case ({ }, { } o)
-                        when o.Parent == _newParent && o.Containment != _containment:
-                        _partitionCommander.MoveChildFromOtherContainmentInSameParent(_containment, _newIndex, added,
-                            _newParent, o.Containment, o.Index);
-                        break;
-
-                    case ({ }, { } o)
-                        when o.Parent != _newParent:
-                        _partitionCommander.MoveChildFromOtherContainment(_newParent, _containment, _newIndex, added,
-                            o.Parent,
-                            o.Containment, o.Index);
-                        break;
-
                     case ({ }, null):
                         _partitionCommander.AddChild(_newParent, added, _containment, _newIndex);
+                        break;
+
+                    case ({ }, { } o) when o.Parent != _newParent:
+                        _partitionCommander.MoveChildFromOtherContainment(
+                            _newParent,
+                            _containment,
+                            _newIndex,
+                            added,
+                            o.Parent,
+                            o.Containment,
+                            o.Index
+                        );
+                        break;
+
+                    
+                    case ({ }, { } o) when o.Parent == _newParent && o.Containment == _containment && o.Index == _newIndex:
+                        // no-op
+                        break;
+                    
+                    case ({ }, { } o) when o.Parent == _newParent && o.Containment == _containment:
+                        _partitionCommander.MoveChildInSameContainment(
+                            _newIndex,
+                            added,
+                            _newParent,
+                            o.Containment,
+                            o.Index
+                        );
+                        break;
+
+                    case ({ }, { } o) when o.Parent == _newParent && o.Containment != _containment:
+                        _partitionCommander.MoveChildFromOtherContainmentInSameParent(
+                            _containment,
+                            _newIndex,
+                            added,
+                            _newParent,
+                            o.Containment,
+                            o.Index
+                        );
                         break;
 
                     default:
@@ -1096,6 +1124,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             }
         }
 
+        [MemberNotNullWhen(true, nameof(_partitionCommander))]
         private bool IsActive() =>
             _partitionCommander != null && (_partitionCommander.CanRaiseAddChild() ||
                                             _partitionCommander

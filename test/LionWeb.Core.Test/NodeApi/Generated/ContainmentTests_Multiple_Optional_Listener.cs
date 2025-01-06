@@ -94,6 +94,30 @@ public class ContainmentTests_Multiple_Optional_Listener
         Assert.AreEqual(1, events);
     }
 
+
+    [TestMethod]
+    public void Single_Add_FromSameContainment()
+    {
+        var line = new Line("myId");
+        var circle = new Circle("circle");
+        var parent = new Geometry("g") { Shapes = [line, circle] };
+
+        int events = 0;
+        ((IPartitionInstance)parent).Listener.ChildMovedInSameContainment += (sender, args) =>
+        {
+            events++;
+            Assert.AreEqual(0, args.oldIndex);
+            Assert.AreSame(parent, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.containment);
+            Assert.AreEqual(1, args.newIndex);
+            Assert.AreEqual(line, args.movedChild);
+        };
+
+        parent.AddShapes([line]);
+
+        Assert.AreEqual(1, events);
+    }
+
     #region Insert
 
     [TestMethod]
@@ -281,6 +305,35 @@ public class ContainmentTests_Multiple_Optional_Listener
         compositeShape.InsertParts(1, [line]);
 
         Assert.AreEqual(1, events);
+    }
+
+    [TestMethod]
+    public void Single_Insert_FromSameContainment()
+    {
+        var circleA = new Circle("cIdA");
+        var circleB = new Circle("cIdB");
+        var lineA = new Line("lineA");
+        var lineB = new Line("lineB");
+        var compositeShape = new CompositeShape("parent") { Parts = [lineA, circleA, lineB, circleB] };
+        var parent = new Geometry("g") { Shapes = [compositeShape] };
+        List<IShape> values = [lineA, lineB];
+
+        int events = 0;
+        int[] oldIndices = [0, 2];
+        int[] indices = [2, 3];
+        ((IPartitionInstance)parent).Listener.ChildMovedInSameContainment += (sender, args) =>
+        {
+            Assert.AreEqual(oldIndices[events], args.oldIndex);
+            Assert.AreSame(compositeShape, args.parent);
+            Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.containment);
+            Assert.AreEqual(indices[events], args.newIndex);
+            Assert.AreEqual(values[events], args.movedChild);
+            events++;
+        };
+
+        compositeShape.InsertParts(2, values);
+
+        Assert.AreEqual(2, events);
     }
 
     #endregion
@@ -733,12 +786,12 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        int[] indexes = { 0, 1 };
+        int[] indices = [0, 1];
         ((IPartitionInstance)parent).Listener.ChildDeleted += (sender, args) =>
         {
             Assert.AreSame(parent, args.parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.containment);
-            Assert.AreEqual(indexes[events], args.index);
+            Assert.AreEqual(indices[events], args.index);
             Assert.AreEqual(values[events], args.deletedChild);
             events++;
         };

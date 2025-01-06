@@ -219,7 +219,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             LinkAdder(containment, [
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
-                    AddMultipleContainmentEventVariable(0.AsLiteral()),
+                    AddMultipleContainmentEventVariable(Null()),
                     EventCollectOldDataCall(),
                     RequiredAddRangeCall(containment),
                     EventRaiseEventCall(),
@@ -281,7 +281,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(containment),
                 AssureNotNullMembersCall(containment),
-                AddMultipleContainmentEventVariable(0.AsLiteral()),
+                AddMultipleContainmentEventVariable(Null()),
                 EventCollectOldDataCall(),
                 OptionalAddRangeCall(containment),
                 EventRaiseEventCall(),
@@ -312,7 +312,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             "evt",
             AsType(typeof(NodeBase.AddMultipleContainmentsEvent<>), AsType(feature.GetFeatureType())),
             NewCall([
-                MetaProperty(feature), This(), index, IdentifierName("safeNodes"), FeatureField(feature)
+                MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index
             ])
         );
 

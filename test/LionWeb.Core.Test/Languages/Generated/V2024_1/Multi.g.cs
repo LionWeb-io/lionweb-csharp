@@ -102,7 +102,7 @@ public partial class Container : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		AddMultipleContainmentsEvent<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, 0, safeNodes, _libraries);
+		AddMultipleContainmentsEvent<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, null);
 		evt.CollectOldData();
 		_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
 		evt.RaiseEvent();
@@ -118,7 +118,7 @@ public partial class Container : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
 		AssureNoSelfMove(index, safeNodes, _libraries);
-		AddMultipleContainmentsEvent<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, index, safeNodes, _libraries);
+		AddMultipleContainmentsEvent<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, index);
 		evt.CollectOldData();
 		_libraries.InsertRange(index, SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
 		evt.RaiseEvent();
