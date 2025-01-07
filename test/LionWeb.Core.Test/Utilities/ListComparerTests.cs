@@ -265,12 +265,22 @@ public class ListComparerTests : ListComparerTestsBase
     [TestMethod]
     public void AddDeleteMove() =>
         AssertCompare(
-            "aBcD",
-            "aEcB",
+            "abcDefgHij",
+            "abceKfgiDj",
             [
-                new(Add, 'E', 1),
-                new(Delete, 'D', 3),
-                new(Move, 'B', 1, 3),
+                new(Add, 'K', 4),
+                new(Delete, 'H', 7),
+                new(Move, 'D', 3, 8),
+            ]
+        );
+
+    [TestMethod]
+    public void Replaced() =>
+        AssertCompare(
+            "aBc",
+            "aDc",
+            [
+                new(Replace, 'B', 1, right: 'D')
             ]
         );
 

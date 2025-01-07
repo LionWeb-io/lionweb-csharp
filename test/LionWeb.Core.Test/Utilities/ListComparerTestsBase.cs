@@ -25,7 +25,8 @@ public abstract class ListComparerTestsBase
 {
     protected const int Add = 0;
     protected const int Delete = 1;
-    protected const int Move = 2;
+    protected const int Replace = 2;
+    protected const int Move = 3;
 
     protected void AssertCompare(string left, string right, EasyToEnterResult[] results)
     {
@@ -36,7 +37,13 @@ public abstract class ListComparerTestsBase
             {
                 Add => new IListComparer<char>.Added(r.left, r.leftIndex),
                 Delete => new IListComparer<char>.Deleted(r.left, r.leftIndex),
-                Move => new IListComparer<char>.Moved(r.left, r.leftIndex, (char)r.left, (Int32)r.rightIndex),
+                Replace => new IListComparer<char>.Replaced(r.left, r.leftIndex, (char)r.right),
+                Move => new IListComparer<char>.Moved(
+                    r.left,
+                    r.leftIndex,
+                    (char)(r.right ?? r.left),
+                    (int)r.rightIndex
+                ),
                 _ => throw new InvalidOperationException()
             })).ToList(),
             changes
@@ -49,5 +56,6 @@ public abstract class ListComparerTestsBase
         int changeKind,
         char left,
         LeftIndex leftIndex,
-        RightIndex? rightIndex = null);
+        RightIndex? rightIndex = null,
+        char? right = null);
 }
