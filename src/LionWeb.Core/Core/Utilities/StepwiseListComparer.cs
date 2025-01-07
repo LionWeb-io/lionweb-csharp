@@ -53,71 +53,71 @@ public class StepwiseListComparer<T> : IListComparer<T>
     {
         var allChanges = _listComparer.Compare();
 
-        // Execution order is important
-        return Added(allChanges)
-            .Concat(Moved(allChanges))
-            .Concat(Deleted(allChanges))
+        return allChanges
+            .OrderBy(it => it.Index)
+            .Select(change => change switch
+            {
+                IListComparer<T>.Added added => Added(added),
+                IListComparer<T>.Deleted deleted => Deleted(deleted),
+                IListComparer<T>.Replaced replaced => Replaced(replaced),
+                IListComparer<T>.Moved moved => Moved(moved),
+            })
             .ToList();
     }
 
-    private IEnumerable<IListComparer<T>.IChange> Added(List<IListComparer<T>.IChange> allChanges) =>
-        allChanges
-            .OfType<IListComparer<T>.Added>()
-            .OrderBy(a => a.RightIndex)
-            .Select(added =>
-            {
-                Add(added.RightIndex);
-                return (IListComparer<T>.IChange)(added with { RightIndex = _rightIndices[added.RightIndex] });
-            });
-
-    private IEnumerable<IListComparer<T>.IChange> Moved(List<IListComparer<T>.IChange> allChanges) =>
-        allChanges
-            .OfType<IListComparer<T>.Moved>()
-            .OrderBy(a => a.RightIndex)
-            .Select(moved =>
-            {
-                Add(moved.RightIndex);
-                Delete(moved.RightIndex);
-                return (IListComparer<T>.IChange)(moved with
-                {
-                    LeftIndex = _leftIndices[moved.LeftIndex], RightIndex = _rightIndices[moved.RightIndex]
-                });
-            });
-
-    private IEnumerable<IListComparer<T>.IChange> Deleted(List<IListComparer<T>.IChange> allChanges) =>
-        allChanges
-            .OfType<IListComparer<T>.Deleted>()
-            .OrderBy(a => a.LeftIndex)
-            .Select(deleted =>
-            {
-                Delete(deleted.LeftIndex);
-                return (IListComparer<T>.IChange)(deleted with { LeftIndex = _leftIndices[deleted.LeftIndex] });
-            });
-
-    private void Add(RightIndex rightIndex)
+    private IListComparer<T>.IChange Added(IListComparer<T>.Added added)
     {
-        var leftIndex = _rightIndices[rightIndex];
-        _rightIndices[rightIndex] = rightIndex;
-        Increment(leftIndex, _leftIndices);
-        Increment(rightIndex + 1, _rightIndices);
+        Add(added.RightIndex);
+        return added with { RightIndex = _rightIndices[added.RightIndex] };
     }
 
-    private void Delete(LeftIndex leftIndex)
+    private IListComparer<T>.IChange Replaced(IListComparer<T>.Replaced replaced) =>
+        replaced with { LeftIndex = _leftIndices[replaced.LeftIndex] };
+
+    private IListComparer<T>.IChange Moved(IListComparer<T>.Moved moved)
     {
-        var rightIndex = _leftIndices[leftIndex];
-        Decrement(leftIndex + 1, _leftIndices);
-        Decrement(rightIndex + 1, _rightIndices);
+        Add(Math.Min(moved.LeftIndex, moved.RightIndex) + 1, moved.RightIndex);
+        Delete(moved.LeftIndex, Math.Max(moved.LeftIndex, moved.RightIndex) - 1);
+        return moved with
+        {
+            LeftIndex = _leftIndices[moved.LeftIndex], RightIndex = _rightIndices[moved.RightIndex]
+        };
     }
 
-    private void Increment(int lowerBound, Dictionary<int, int> dictionary)
+    private IListComparer<T>.IChange Deleted(IListComparer<T>.Deleted deleted)
     {
-        for (int i = lowerBound; i < dictionary.Count; i++)
+        Delete(deleted.LeftIndex);
+        return deleted with { LeftIndex = _leftIndices[deleted.LeftIndex] };
+    }
+
+    private void Add(RightIndex lowerBoundInclusive, RightIndex? upperBoundExclusive = null)
+    {
+        LeftIndex leftLowerBoundInclusive = _rightIndices[lowerBoundInclusive];
+        LeftIndex? leftUpperBoundExclusive = upperBoundExclusive != null ? _rightIndices[(RightIndex)upperBoundExclusive] : null;
+        _rightIndices[lowerBoundInclusive] = lowerBoundInclusive;
+        Increment(leftLowerBoundInclusive, _leftIndices, leftUpperBoundExclusive);
+        Increment(lowerBoundInclusive + 1, _rightIndices, upperBoundExclusive);
+    }
+
+    private void Delete(LeftIndex lowerBoundInclusive, LeftIndex? upperBoundExclusive = null)
+    {
+        RightIndex rightLowerBoundInclusive = _leftIndices[lowerBoundInclusive];
+        RightIndex? rightUpperBoundExclusive = upperBoundExclusive != null ? _leftIndices[(LeftIndex)upperBoundExclusive] : null;
+        Decrement(lowerBoundInclusive + 1, _leftIndices, upperBoundExclusive);
+        Decrement(rightLowerBoundInclusive, _rightIndices, rightUpperBoundExclusive);
+    }
+
+    private void Increment(int lowerBoundInclusive, Dictionary<int, int> dictionary, int? upperBoundExclusive = null)
+    {
+        int upperBound = upperBoundExclusive ?? dictionary.Count;
+        for (int i = lowerBoundInclusive; i < upperBound; i++)
             dictionary[i] += 1;
     }
 
-    private void Decrement(int lowerBound, Dictionary<int, int> dictionary)
+    private void Decrement(int lowerBoundInclusive, Dictionary<int, int> dictionary, int? upperBoundExclusive = null)
     {
-        for (int i = lowerBound; i < dictionary.Count; i++)
+        int upperBound = upperBoundExclusive ?? dictionary.Count;
+        for (int i = lowerBoundInclusive; i < upperBound; i++)
             dictionary[i] -= 1;
     }
 }

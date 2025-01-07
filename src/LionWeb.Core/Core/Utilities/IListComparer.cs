@@ -20,7 +20,7 @@ namespace LionWeb.Core.Utilities;
 using LeftIndex = int;
 using RightIndex = int;
 
-/// Compares two lists and reports <see cref="Added"/>, <see cref="Deleted"/>, and <see cref="Moved"/> elements.
+/// Compares two lists and reports <see cref="Added"/>, <see cref="Deleted"/>, <see cref="Replaced"/>, and <see cref="Moved"/> elements.
 /// The lists should be passed to the constructor of implementing classes.
 /// <typeparam name="T">Type of elements of the compared lists.</typeparam>
 public interface IListComparer<T>
@@ -34,13 +34,20 @@ public interface IListComparer<T>
     {
         /// Changed element.
         T Element { get; }
+        int Index { get; }
     };
 
     /// <paramref name="Element"/> added at <paramref name="RightIndex"/>.
-    readonly record struct Added(T Element, RightIndex RightIndex) : IChange;
+    readonly record struct Added(T Element, RightIndex RightIndex) : IChange
+    {
+        public int Index => RightIndex;
+    }
 
     /// <paramref name="Element"/> deleted from <paramref name="LeftIndex"/>.
-    readonly record struct Deleted(T Element, LeftIndex LeftIndex) : IChange;
+    readonly record struct Deleted(T Element, LeftIndex LeftIndex) : IChange
+    {
+        public int Index => LeftIndex;
+    }
 
     /// <paramref name="LeftElement"/> moved from <paramref name="LeftIndex"/> to <paramref name="RightIndex"/>.
     /// We report <paramref name="RightElement"/> separately because it might not be identical to <paramref name="LeftElement"/>
@@ -49,6 +56,15 @@ public interface IListComparer<T>
         : IChange
     {
         /// Changed <see cref="LeftElement"/>.
-        public T Element { get => LeftElement; }
+        public T Element => LeftElement;
+        public int Index => LeftIndex;
+    }
+    
+    /// <paramref name="LeftElement"/> at <paramref name="LeftIndex"/> replaced by <paramref name="RightElement"/>.
+    readonly record struct Replaced(T LeftElement, LeftIndex LeftIndex, T RightElement) : IChange
+    {
+        /// Changed <see cref="LeftElement"/>.
+        public T Element => LeftElement;
+        public int Index => LeftIndex;
     }
 }

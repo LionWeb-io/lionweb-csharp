@@ -52,6 +52,82 @@ public class StepwiseListComparerTests : ListComparerTestsBase
         );
 
     [TestMethod]
+    public void DeleteEveryOther() =>
+        AssertCompare(
+            "aBcDefGhijKl",
+            "acefhijl",
+            [
+                new(Delete, 'B', 1),
+                new(Delete, 'D', 2),
+                new(Delete, 'G', 4),
+                new(Delete, 'K', 7),
+            ]
+        );
+
+    [TestMethod]
+    public void AddEveryOther() =>
+        AssertCompare(
+            "acefhijl",
+            "aBcDefGhijKl",
+            [
+                new(Add, 'B', 1),
+                new(Add, 'D', 3),
+                new(Add, 'G', 6),
+                new(Add, 'K', 10),
+            ]
+        );
+
+    [TestMethod]
+    public void AddDeleteEveryOther() =>
+        AssertCompare(
+            "aBceFgi",
+            "acDegHi",
+            [
+                new(Delete, 'B', 1),
+                new(Add, 'D', 2),
+                new(Delete, 'F', 4),
+                new(Add, 'H', 5),
+            ]
+        );
+
+    [TestMethod]
+    public void AddMultipleThenMoveRight() =>
+        AssertCompare(
+            "aceFgi",
+            "aBcDegFHi",
+            [
+                new(Add, 'B', 1),
+                new(Add, 'D', 3),
+                new(Move, 'F', 5, 6),
+                new(Add, 'H', 7),
+            ]
+        );
+
+    [TestMethod]
+    public void MoveEveryOtherForward() =>
+        AssertCompare(
+            "aBcDe",
+            "acBeD",
+            [
+                new(Move, 'B', 1, 2),
+                new(Move, 'D', 3, 4),
+            ]
+        );
+
+    [TestMethod]
+    public void MoveEveryOtherSwap() =>
+        AssertCompare(
+            "abcdXefgYhij",
+            // "abcdefgXYhij",
+            // "abcdefgXYhij",
+            "abcdYefgXhij",
+            [
+                new(Move, 'X', 4, 8),
+                new(Move, 'Y', 8, 4),
+            ]
+        );
+
+    [TestMethod]
     public void RightEmptyOne() =>
         AssertCompare(
             "a",
@@ -96,6 +172,7 @@ public class StepwiseListComparerTests : ListComparerTestsBase
     public void MoveTwoFarRight() =>
         AssertCompare(
             "aBCdefghijkl",
+            // "aCdefghBijkl",
             "adefghiBCjkl",
             [
                 new(Move, 'B', 1, 7),
@@ -153,8 +230,8 @@ public class StepwiseListComparerTests : ListComparerTestsBase
             "acdEfghiBjkl",
             "aBcdfghijkl",
             [
-                new(Move, 'B', 8, 1),
-                new(Delete, 'E', 3)
+                new(Delete, 'E', 3),
+                new(Move, 'B', 7, 1),
             ]
         );
 
@@ -174,8 +251,8 @@ public class StepwiseListComparerTests : ListComparerTestsBase
             "abCdefgHijkl",
             "abHdefgCijkl",
             [
+                new(Move, 'C', 2, 7),
                 new(Move, 'H', 7, 2),
-                new(Move, 'C', 3, 7)
             ]
         );
 
@@ -183,6 +260,7 @@ public class StepwiseListComparerTests : ListComparerTestsBase
     public void Hirschberg() =>
         AssertCompare(
             "AbcdEF",
+            // "bcdAEF",
             "bcdA",
             [
                 new(Move, 'A', 0, 3),
@@ -212,15 +290,27 @@ public class StepwiseListComparerTests : ListComparerTestsBase
     [TestMethod]
     public void AddDeleteMove() =>
         AssertCompare(
-            "aBcD",
-            "aEcB",
+            "abcDefgHij",
+            // "abcefgHiDj",
+            // "abceKfgHiDj",
+            // "abceKfgHiDj",
+            "abceKfgiDj",
             [
-                new(Add, 'E', 1),
-                new(Move, 'B', 2, 3),
-                new(Delete, 'D', 4),
+                new(Move, 'D', 3, 8),
+                new(Add, 'K', 4),
+                new(Delete, 'H', 7),
             ]
         );
 
+    [TestMethod]
+    public void Replaced() =>
+        AssertCompare(
+            "aBc",
+            "aDc",
+            [
+                new(Replace, 'B', 1, right: 'D')
+            ]
+        );
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new StepwiseListComparer<char>(left.ToList(), right.ToList());
 }
