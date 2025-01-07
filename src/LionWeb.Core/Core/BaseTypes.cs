@@ -837,9 +837,9 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     protected void RaisePropertyEvent(Property property, object? oldValue, object? newValue)
     {
         var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null || !(partitionCommander.CanRaiseAddProperty() ||
-                                            partitionCommander.CanRaiseDeleteProperty() ||
-                                            partitionCommander.CanRaiseChangeProperty()))
+        if (partitionCommander == null || !(partitionCommander.CanRaiseAddProperty ||
+                                            partitionCommander.CanRaiseDeleteProperty ||
+                                            partitionCommander.CanRaiseChangeProperty))
             return;
 
         switch (oldValue, newValue)
@@ -862,9 +862,9 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     protected void RaiseSingleReferenceEvent(Reference reference, IReadableNode? oldTarget, IReadableNode? newTarget)
     {
         var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null || !(partitionCommander.CanRaiseAddReference() ||
-                                            partitionCommander.CanRaiseDeleteReference() ||
-                                            partitionCommander.CanRaiseChangeReference())
+        if (partitionCommander == null || !(partitionCommander.CanRaiseAddReference ||
+                                            partitionCommander.CanRaiseDeleteReference ||
+                                            partitionCommander.CanRaiseChangeReference)
            )
             return;
 
@@ -896,7 +896,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         where T : IReadableNode
     {
         var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null || !partitionCommander.CanRaiseAddReference())
+        if (partitionCommander == null || !partitionCommander.CanRaiseAddReference)
             return;
 
         int index = startIndex;

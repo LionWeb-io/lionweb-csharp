@@ -439,8 +439,10 @@ public interface IPartitionCommander
     void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier);
 
     /// Whether anybody would receive the <see cref="ChangeClassifier"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="ChangeClassifier"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseChangeClassifier();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="ChangeClassifier"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseChangeClassifier { get; }
 
     #endregion
 
@@ -448,24 +450,30 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.PropertyAdded"/>
     void AddProperty(IWritableNode node, Property property, PropertyValue newValue);
-    
+
     /// Whether anybody would receive the <see cref="AddProperty"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="AddProperty"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseAddProperty();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="AddProperty"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseAddProperty { get; }
 
     /// <seealso cref="IPartitionListener.PropertyDeleted"/>
     void DeleteProperty(IWritableNode node, Property property, PropertyValue oldValue);
-    
+
     /// Whether anybody would receive the <see cref="DeleteProperty"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="DeleteProperty"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseDeleteProperty();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="DeleteProperty"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseDeleteProperty { get; }
 
     /// <seealso cref="IPartitionListener.PropertyChanged"/>
     void ChangeProperty(IWritableNode node, Property property, PropertyValue newValue, PropertyValue oldValue);
-    
+
     /// Whether anybody would receive the <see cref="ChangeProperty"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="ChangeProperty"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseChangeProperty();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="ChangeProperty"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseChangeProperty { get; }
 
     #endregion
 
@@ -473,49 +481,61 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ChildAdded"/>
     void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index);
-    
+
     /// Whether anybody would receive the <see cref="AddChild"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="AddChild"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseAddChild();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="AddChild"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseAddChild { get; }
 
     /// <seealso cref="IPartitionListener.ChildDeleted"/>
     void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index);
-    
+
     /// Whether anybody would receive the <see cref="DeleteChild"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="DeleteChild"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseDeleteChild();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="DeleteChild"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseDeleteChild { get; }
 
     /// <seealso cref="IPartitionListener.ChildReplaced"/>
     void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
         Containment containment, Index index);
 
     /// Whether anybody would receive the <see cref="ReplaceChild"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="ReplaceChild"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseReplaceChild();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="ReplaceChild"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseReplaceChild { get; }
 
     /// <seealso cref="IPartitionListener.ChildMovedFromOtherContainment"/>
     void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
         IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex);
 
     /// Whether anybody would receive the <see cref="MoveChildFromOtherContainment"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="MoveChildFromOtherContainment"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseMoveChildFromOtherContainment();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="MoveChildFromOtherContainment"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseMoveChildFromOtherContainment { get; }
 
     /// <seealso cref="IPartitionListener.ChildMovedFromOtherContainmentInSameParent"/>
     void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex, IWritableNode movedChild,
         IWritableNode parent, Containment oldContainment, Index oldIndex);
-    
+
     /// Whether anybody would receive the <see cref="MoveChildFromOtherContainmentInSameParent"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="MoveChildFromOtherContainmentInSameParent"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseMoveChildFromOtherContainmentInSameParent();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="MoveChildFromOtherContainmentInSameParent"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseMoveChildFromOtherContainmentInSameParent { get; }
 
     /// <seealso cref="IPartitionListener.ChildMovedInSameContainment"/>
     void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
         Containment containment, Index oldIndex);
-    
+
     /// Whether anybody would receive the <see cref="MoveChildInSameContainment"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="MoveChildInSameContainment"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseMoveChildInSameContainment();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="MoveChildInSameContainment"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseMoveChildInSameContainment { get; }
 
     #endregion
 
@@ -523,41 +543,51 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.AnnotationAdded"/>
     void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index);
-    
+
     /// Whether anybody would receive the <see cref="AddAnnotation"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="AddAnnotation"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseAddAnnotation();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="AddAnnotation"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseAddAnnotation { get; }
 
     /// <seealso cref="IPartitionListener.AnnotationDeleted"/>
     void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index);
-    
+
     /// Whether anybody would receive the <see cref="DeleteAnnotation"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="DeleteAnnotation"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseDeleteAnnotation();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="DeleteAnnotation"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseDeleteAnnotation { get; }
 
     /// <seealso cref="IPartitionListener.AnnotationReplaced"/>
     void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
         Index index);
-    
+
     /// Whether anybody would receive the <see cref="ReplaceAnnotation"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="ReplaceAnnotation"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseReplaceAnnotation();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="ReplaceAnnotation"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseReplaceAnnotation { get; }
 
     /// <seealso cref="IPartitionListener.AnnotationMovedFromOtherParent"/>
     void MoveAnnotationFromOtherParent(IWritableNode newParent, Index newIndex, IWritableNode movedAnnotation,
         IWritableNode oldParent, Index oldIndex);
-    
+
     /// Whether anybody would receive the <see cref="MoveAnnotationFromOtherParent"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="MoveAnnotationFromOtherParent"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseMoveAnnotationFromOtherParent();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="MoveAnnotationFromOtherParent"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseMoveAnnotationFromOtherParent { get; }
 
     /// <seealso cref="IPartitionListener.AnnotationMovedInSameParent"/>
     void MoveAnnotationInSameParent(Index newIndex, IWritableNode movedAnnotation, IWritableNode parent,
         Index oldIndex);
-    
+
     /// Whether anybody would receive the <see cref="MoveAnnotationInSameParent"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="MoveAnnotationInSameParent"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseMoveAnnotationInSameParent();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="MoveAnnotationInSameParent"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseMoveAnnotationInSameParent { get; }
 
     #endregion
 
@@ -565,97 +595,121 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ReferenceAdded"/>
     void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget);
-    
+
     /// Whether anybody would receive the <see cref="AddReference"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="AddReference"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseAddReference();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="AddReference"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseAddReference { get; }
 
     /// <seealso cref="IPartitionListener.ReferenceDeleted"/>
     void DeleteReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget deletedTarget);
-    
+
     /// Whether anybody would receive the <see cref="DeleteReference"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="DeleteReference"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseDeleteReference();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="DeleteReference"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseDeleteReference { get; }
 
     /// <seealso cref="IPartitionListener.ReferenceChanged"/>
     void ChangeReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
         IReferenceTarget replacedTarget);
-    
+
     /// Whether anybody would receive the <see cref="ChangeReference"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="ChangeReference"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseChangeReference();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="ChangeReference"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseChangeReference { get; }
 
     /// <seealso cref="IPartitionListener.EntryMovedFromOtherReference"/>
     void MoveEntryFromOtherReference(IWritableNode newParent, Reference newReference, Index newIndex,
         IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target);
-    
+
     /// Whether anybody would receive the <see cref="MoveEntryFromOtherReference"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="MoveEntryFromOtherReference"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseMoveEntryFromOtherReference();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="MoveEntryFromOtherReference"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseMoveEntryFromOtherReference { get; }
 
     /// <seealso cref="IPartitionListener.EntryMovedFromOtherReferenceInSameParent"/>
     void MoveEntryFromOtherReferenceInSameParent(IWritableNode parent, Reference newReference, Index newIndex,
         Reference oldReference, Index oldIndex, IReferenceTarget target);
-    
+
     /// Whether anybody would receive the <see cref="MoveEntryFromOtherReferenceInSameParent"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="MoveEntryFromOtherReferenceInSameParent"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseMoveEntryFromOtherReferenceInSameParent();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="MoveEntryFromOtherReferenceInSameParent"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseMoveEntryFromOtherReferenceInSameParent { get; }
 
     /// <seealso cref="IPartitionListener.EntryMovedInSameReference"/>
     void MoveEntryInSameReference(IWritableNode parent, Reference reference, Index oldIndex, Index newIndex,
         IReferenceTarget target);
-    
+
     /// Whether anybody would receive the <see cref="MoveEntryInSameReference"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="MoveEntryInSameReference"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseMoveEntryInSameReference();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="MoveEntryInSameReference"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseMoveEntryInSameReference { get; }
 
     /// <seealso cref="IPartitionListener.ReferenceResolveInfoAdded"/>
     void AddReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, ResolveInfo newResolveInfo,
         TargetNode target);
-    
+
     /// Whether anybody would receive the <see cref="AddReferenceResolveInfo"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="AddReferenceResolveInfo"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseAddReferenceResolveInfo();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="AddReferenceResolveInfo"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseAddReferenceResolveInfo { get; }
 
     /// <seealso cref="IPartitionListener.ReferenceResolveInfoDeleted"/>
     void DeleteReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, TargetNode target,
         ResolveInfo deletedResolveInfo);
-        
+
     /// Whether anybody would receive the <see cref="DeleteReferenceResolveInfo"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="DeleteReferenceResolveInfo"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseDeleteReferenceResolveInfo();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="DeleteReferenceResolveInfo"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseDeleteReferenceResolveInfo { get; }
 
     /// <seealso cref="IPartitionListener.ReferenceResolveInfoChanged"/>
     void ChangeReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, ResolveInfo newResolveInfo,
         TargetNode? target, ResolveInfo replacedResolveInfo);
-    
+
     /// Whether anybody would receive the <see cref="ChangeReferenceResolveInfo"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="ChangeReferenceResolveInfo"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseChangeReferenceResolveInfo();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="ChangeReferenceResolveInfo"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseChangeReferenceResolveInfo { get; }
 
     /// <seealso cref="IPartitionListener.ReferenceTargetAdded"/>
     void AddReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
         ResolveInfo resolveInfo);
-        
+
     /// Whether anybody would receive the <see cref="AddReferenceTarget"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="AddReferenceTarget"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseAddReferenceTarget();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="AddReferenceTarget"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseAddReferenceTarget { get; }
 
     /// <seealso cref="IPartitionListener.ReferenceTargetDeleted"/>
     void DeleteReferenceTarget(IWritableNode parent, Reference reference, Index index, ResolveInfo resolveInfo,
         TargetNode deletedTarget);
-    
+
     /// Whether anybody would receive the <see cref="DeleteReferenceTarget"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="DeleteReferenceTarget"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseDeleteReferenceTarget();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="DeleteReferenceTarget"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseDeleteReferenceTarget { get; }
 
     /// <seealso cref="IPartitionListener.ReferenceTargetChanged"/>
     void ChangeReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
         ResolveInfo? resolveInfo, TargetNode oldTarget);
-    
+
     /// Whether anybody would receive the <see cref="ChangeReferenceTarget"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="ChangeReferenceTarget"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseChangeReferenceTarget();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="ChangeReferenceTarget"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseChangeReferenceTarget { get; }
 
     #endregion
 }

@@ -50,8 +50,10 @@ public interface IForestCommander
     void AddPartition(IPartitionInstance newPartition);
 
     /// Whether anybody would receive the <see cref="AddPartition"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="AddPartition"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseAddPartition();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="AddPartition"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseAddPartition { get; }
 
     /// A partition has been deleted from this forest.
     /// <param name="deletedPartition">The deleted partition.</param>
@@ -59,6 +61,8 @@ public interface IForestCommander
     void DeletePartition(IPartitionInstance deletedPartition);
 
     /// Whether anybody would receive the <see cref="DeletePartition"/> event.
-    /// <returns><c>true</c> if someone would receive the <see cref="DeletePartition"/> event; <c>false</c> otherwise.</returns>
-    bool CanRaiseDeletePartition();
+    /// <value>
+    ///     <c>true</c> if someone would receive the <see cref="DeletePartition"/> event; <c>false</c> otherwise.
+    /// </value>
+    bool CanRaiseDeletePartition { get; }
 }
