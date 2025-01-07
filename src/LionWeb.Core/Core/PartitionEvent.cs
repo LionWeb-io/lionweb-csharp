@@ -55,6 +55,8 @@ public abstract class PartitionEventBase<T> where T : IReadableNode
     protected abstract bool IsActive();
 }
 
+#region Containment
+
 /// Encapsulates event-related logic and data for <see cref="Containment"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public abstract class PartitionContainmentEventBase<T> : PartitionEventBase<T> where T : INode
@@ -116,9 +118,9 @@ public abstract class PartitionMultipleContainmentEventBase<T> : PartitionContai
         if (!IsActive())
             return;
 
-        foreach (T setValue in NewValues.Keys.ToList())
+        foreach (T newValue in NewValues.Keys.ToList())
         {
-            NewValues[setValue] = Collect(setValue);
+            NewValues[newValue] = Collect(newValue);
         }
     }
 }
@@ -423,6 +425,10 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                                            .CanRaiseMoveChildInSameContainment());
 }
 
+#endregion
+
+#region Reference
+
 /// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Reference"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Reference"/>.</typeparam>
 public class SetReferenceEvent<T> : PartitionEventBase<T> where T : IReadableNode
@@ -483,3 +489,199 @@ public class SetReferenceEvent<T> : PartitionEventBase<T> where T : IReadableNod
                                        PartitionCommander.CanRaiseMoveEntryInSameReference() ||
                                        PartitionCommander.CanRaiseDeleteReference());
 }
+
+#endregion
+
+#region Annotation
+
+/// Encapsulates event-related logic and data for <i>multiple</i> <see cref="Annotation"/>s.
+public abstract class PartitionAnnotationEventBase : PartitionEventBase<INode>
+{
+    /// Newly set values and their previous context.
+    protected readonly Dictionary<INode, OldAnnotationInfo?> NewValues;
+
+    /// <param name="newParent"> Owner of the represented <see cref="Annotation"/>s.</param>
+    /// <param name="newValues">Newly set values.</param>
+    protected PartitionAnnotationEventBase(NodeBase newParent, List<INode>? newValues) : base(newParent)
+    {
+        NewValues = newValues?.ToDictionary<INode, INode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
+    }
+
+    /// <inheritdoc />
+    public override void CollectOldData()
+    {
+        if (!IsActive())
+            return;
+
+        foreach (var newValue in NewValues.Keys.ToList())
+        {
+            var oldParent = newValue.GetParent();
+            if (oldParent == null)
+                continue;
+
+            var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(newValue);
+
+            NewValues[newValue] = new(oldParent, oldIndex);
+        }
+    }
+
+    /// Context of an annotation instance before it has been removed from its previous <paramref name="Parent"/>.
+    /// <param name="Parent"></param>
+    /// <param name="Index"></param>
+    protected record OldAnnotationInfo(INode Parent, int Index);
+}
+
+/// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
+public class SetAnnotationEvent : PartitionAnnotationEventBase
+{
+    private readonly List<IListComparer<INode>.IChange> _changes = [];
+
+    /// <param name="newParent"> Owner of the represented <see cref="Annotation"/>s.</param>
+    /// <param name="setValues">Newly set values.</param>
+    /// <param name="existingValues">Values previously present in <see cref="IReadableNode.GetAnnotations"/>.</param>
+    public SetAnnotationEvent(
+        NodeBase newParent,
+        List<INode>? setValues,
+        List<INode> existingValues
+    ) : base(newParent, setValues)
+    {
+        if (!IsActive() || setValues == null)
+            return;
+
+        var listComparer = new StepwiseListComparer<INode>(existingValues, setValues);
+        _changes = listComparer.Compare();
+    }
+
+    /// <inheritdoc />
+    public override void RaiseEvent()
+    {
+        if (!IsActive())
+            return;
+
+        foreach (var change in _changes)
+        {
+            switch (change)
+            {
+                case IListComparer<INode>.Added added:
+                    switch (added, NewValues[added.Element])
+                    {
+                        case ({ }, null):
+                            PartitionCommander.AddAnnotation(NewParent, added.Element, added.RightIndex);
+                            break;
+
+                        case ({ }, { } o) when o.Parent != NewParent:
+                            PartitionCommander.MoveAnnotationFromOtherParent(
+                                NewParent,
+                                added.RightIndex,
+                                added.Element,
+                                o.Parent,
+                                o.Index
+                            );
+                            break;
+
+
+                        default:
+                            throw new ArgumentException("Unknown state");
+                    }
+
+                    break;
+
+                case IListComparer<INode>.Moved moved:
+                    PartitionCommander.MoveAnnotationInSameParent(
+                        moved.RightIndex,
+                        moved.LeftElement,
+                        NewParent,
+                        moved.LeftIndex
+                        );
+                    break;
+
+                case IListComparer<INode>.Deleted deleted:
+                    PartitionCommander.DeleteAnnotation(deleted.Element, NewParent, deleted.LeftIndex);
+                    break;
+            }
+        }
+    }
+
+    /// <inheritdoc />
+    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    protected override bool IsActive() =>
+        PartitionCommander != null && (PartitionCommander.CanRaiseAddAnnotation() ||
+                                       PartitionCommander.CanRaiseDeleteAnnotation() ||
+                                       PartitionCommander.CanRaiseMoveAnnotationFromOtherParent() ||
+                                       PartitionCommander.CanRaiseMoveAnnotationInSameParent());
+}
+
+/// Encapsulates event-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Annotation"/>s.
+public class AddMultipleAnnotationsEvent : PartitionAnnotationEventBase
+{
+    private int _newIndex;
+
+    /// <param name="newParent"> Owner of the represented <see cref="Annotation"/>.</param>
+    /// <param name="addedValues">Newly added values.</param>
+    /// <param name="existingValues">Values already present in <see cref="IReadableNode.GetAnnotations"/>.</param>
+    /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <see cref="Annotation"/>s.</param>
+    public AddMultipleAnnotationsEvent(
+        NodeBase newParent,
+        List<INode>? addedValues,
+        List<INode> existingValues,
+        int? startIndex = null
+    ) : base(newParent, addedValues)
+    {
+        _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
+    }
+
+    /// <inheritdoc />
+    public override void RaiseEvent()
+    {
+        if (!IsActive())
+            return;
+
+        foreach ((INode? added, OldAnnotationInfo? old) in NewValues)
+        {
+            switch (added, old)
+            {
+                case ({ }, null):
+                    PartitionCommander.AddAnnotation(NewParent, added, _newIndex);
+                    break;
+
+                case ({ }, { } o) when o.Parent != NewParent:
+                    PartitionCommander.MoveAnnotationFromOtherParent(
+                        NewParent,
+                        _newIndex,
+                        added,
+                        o.Parent,
+                        o.Index
+                    );
+                    break;
+
+
+                case ({ }, { } o) when o.Parent == NewParent && o.Index == _newIndex:
+                    // no-op
+                    break;
+
+                case ({ }, { } o) when o.Parent == NewParent:
+                    PartitionCommander.MoveAnnotationInSameParent(
+                        _newIndex,
+                        added,
+                        NewParent,
+                        o.Index
+                    );
+                    break;
+
+                default:
+                    throw new ArgumentException("Unknown state");
+            }
+
+            _newIndex++;
+        }
+    }
+
+    /// <inheritdoc />
+    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    protected override bool IsActive() =>
+        PartitionCommander != null && (PartitionCommander.CanRaiseAddAnnotation() ||
+                                       PartitionCommander.CanRaiseMoveAnnotationFromOtherParent() ||
+                                       PartitionCommander.CanRaiseMoveAnnotationInSameParent());
+}
+
+#endregion

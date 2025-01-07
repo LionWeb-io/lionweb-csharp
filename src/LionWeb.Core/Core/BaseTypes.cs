@@ -391,7 +391,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     {
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
+        AddMultipleAnnotationsEvent evt = new(this, safeAnnotations, _annotations, null);
+        evt.CollectOldData();
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
+        evt.RaiseEvent();
     }
 
     /// <inheritdoc />
@@ -400,7 +403,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
+        AddMultipleAnnotationsEvent evt = new(this, safeAnnotations, _annotations, index);
+        evt.CollectOldData();
         _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
+        evt.RaiseEvent();
     }
 
     /// <inheritdoc />
@@ -451,10 +457,13 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         {
             if (value is not IEnumerable)
                 throw new InvalidValueException(feature, value);
-            var enumerable = M2Extensions.AsNodes<INode>(value).ToList();
-            AssureAnnotations(enumerable);
-            RemoveSelfParent(_annotations.ToList(), _annotations, null, AnnotationRemover());
-            AddAnnotations(enumerable);
+            var safeNodes = M2Extensions.AsNodes<INode>(value).ToList();
+            AssureAnnotations(safeNodes);
+            SetAnnotationEvent evt = new(this, safeNodes, _annotations);
+            evt.CollectOldData();
+            RemoveSelfParent(_annotations.ToList(), _annotations, null);
+            _annotations.AddRange(SetSelfParent(safeNodes, null));
+            evt.RaiseEvent();
             return true;
         }
 
