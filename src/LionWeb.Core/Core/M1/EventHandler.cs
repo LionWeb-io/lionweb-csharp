@@ -42,7 +42,7 @@ public class ForestEventHandler : IForestListener, IForestCommander
         remove => _newPartition.Remove(value);
     }
 
-    private readonly CountingEventHandler<IForestListener.NewPartitionArgs> _newPartition = new();
+    private readonly ShortCircuitEventHandler<IForestListener.NewPartitionArgs> _newPartition = new();
 
     /// <inheritdoc />
     public void AddPartition(IPartitionInstance newPartition) =>
@@ -58,7 +58,7 @@ public class ForestEventHandler : IForestListener, IForestCommander
         remove => _partitionDeleted.Remove(value);
     }
 
-    private readonly CountingEventHandler<IForestListener.PartitionDeletedArgs> _partitionDeleted = new();
+    private readonly ShortCircuitEventHandler<IForestListener.PartitionDeletedArgs> _partitionDeleted = new();
 
     /// <inheritdoc />
     public void DeletePartition(IPartitionInstance deletedPartition) =>
@@ -87,7 +87,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _classifierChanged.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ClassifierChangedArgs> _classifierChanged = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.ClassifierChangedArgs> _classifierChanged = new();
 
     /// <inheritdoc />
     public void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier) =>
@@ -103,7 +103,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _propertyAdded.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.PropertyAddedArgs> _propertyAdded = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.PropertyAddedArgs> _propertyAdded = new();
 
     /// <inheritdoc />
     public void AddProperty(IWritableNode node, Property property, PropertyValue newValue) =>
@@ -119,7 +119,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _propertyDeleted.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.PropertyDeletedArgs> _propertyDeleted = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.PropertyDeletedArgs> _propertyDeleted = new();
 
     /// <inheritdoc />
     public void DeleteProperty(IWritableNode node, Property property, PropertyValue oldValue) =>
@@ -135,7 +135,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _propertyChanged.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.PropertyChangedArgs> _propertyChanged = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.PropertyChangedArgs> _propertyChanged = new();
 
     /// <inheritdoc />
     public void ChangeProperty(IWritableNode node, Property property, PropertyValue newValue, PropertyValue oldValue) =>
@@ -151,7 +151,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _childAdded.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ChildAddedArgs> _childAdded = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.ChildAddedArgs> _childAdded = new();
 
     /// <inheritdoc />
     public void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index) =>
@@ -167,7 +167,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _childDeleted.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ChildDeletedArgs> _childDeleted = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.ChildDeletedArgs> _childDeleted = new();
 
     /// <inheritdoc />
     public void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index) =>
@@ -183,7 +183,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _childReplaced.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ChildReplacedArgs> _childReplaced = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.ChildReplacedArgs> _childReplaced = new();
 
     /// <inheritdoc />
     public void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
@@ -201,7 +201,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _childMovedFromOtherContainment.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ChildMovedFromOtherContainmentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.ChildMovedFromOtherContainmentArgs>
         _childMovedFromOtherContainment = new();
 
     /// <inheritdoc />
@@ -221,7 +221,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
             remove => _childMovedFromOtherContainmentInSameParent.Remove(value);
         }
 
-    private readonly CountingEventHandler<IPartitionListener.ChildMovedFromOtherContainmentInSameParentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.ChildMovedFromOtherContainmentInSameParentArgs>
         _childMovedFromOtherContainmentInSameParent = new();
 
     /// <inheritdoc />
@@ -241,7 +241,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _childMovedInSameContainment.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ChildMovedInSameContainmentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.ChildMovedInSameContainmentArgs>
         _childMovedInSameContainment = new();
 
     /// <inheritdoc />
@@ -260,7 +260,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _annotationAdded.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.AnnotationAddedArgs> _annotationAdded = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationAddedArgs> _annotationAdded = new();
 
     /// <inheritdoc />
     public void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index) =>
@@ -276,7 +276,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _annotationDeleted.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.AnnotationDeletedArgs> _annotationDeleted = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationDeletedArgs> _annotationDeleted = new();
 
     /// <inheritdoc />
     public void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index) =>
@@ -292,7 +292,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _annotationReplaced.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.AnnotationReplacedArgs> _annotationReplaced = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationReplacedArgs> _annotationReplaced = new();
 
     /// <inheritdoc />
     public void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
@@ -309,7 +309,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _annotationMovedFromOtherParent.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.AnnotationMovedFromOtherParentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationMovedFromOtherParentArgs>
         _annotationMovedFromOtherParent = new();
 
     /// <inheritdoc />
@@ -327,7 +327,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _annotationMovedInSameParent.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.AnnotationMovedInSameParentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationMovedInSameParentArgs>
         _annotationMovedInSameParent = new();
 
     /// <inheritdoc />
@@ -345,7 +345,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _referenceAdded.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ReferenceAddedArgs> _referenceAdded = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceAddedArgs> _referenceAdded = new();
 
     /// <inheritdoc />
     public void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget) =>
@@ -361,7 +361,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _referenceDeleted.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ReferenceDeletedArgs> _referenceDeleted = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceDeletedArgs> _referenceDeleted = new();
 
     /// <inheritdoc />
     public void DeleteReference(IWritableNode parent, Reference reference, Index index,
@@ -378,7 +378,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _referenceChanged.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ReferenceChangedArgs> _referenceChanged = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceChangedArgs> _referenceChanged = new();
 
     /// <inheritdoc />
     public void ChangeReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
@@ -395,7 +395,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _entryMovedFromOtherReference.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.EntryMovedFromOtherReferenceArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.EntryMovedFromOtherReferenceArgs>
         _entryMovedFromOtherReference = new();
 
     /// <inheritdoc />
@@ -415,7 +415,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
             remove => _entryMovedFromOtherReferenceInSameParent.Remove(value);
         }
 
-    private readonly CountingEventHandler<IPartitionListener.EntryMovedFromOtherReferenceInSameParentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.EntryMovedFromOtherReferenceInSameParentArgs>
         _entryMovedFromOtherReferenceInSameParent = new();
 
     /// <inheritdoc />
@@ -434,7 +434,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _entryMovedInSameReference.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.EntryMovedInSameReferenceArgs> _entryMovedInSameReference =
+    private readonly ShortCircuitEventHandler<IPartitionListener.EntryMovedInSameReferenceArgs> _entryMovedInSameReference =
         new();
 
     /// <inheritdoc />
@@ -452,7 +452,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _referenceResolveInfoAdded.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ReferenceResolveInfoAddedArgs> _referenceResolveInfoAdded =
+    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceResolveInfoAddedArgs> _referenceResolveInfoAdded =
         new();
 
     /// <inheritdoc />
@@ -471,7 +471,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _referenceResolveInfoDeleted.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ReferenceResolveInfoDeletedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceResolveInfoDeletedArgs>
         _referenceResolveInfoDeleted = new();
 
     /// <inheritdoc />
@@ -489,7 +489,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _referenceResolveInfoChanged.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ReferenceResolveInfoChangedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceResolveInfoChangedArgs>
         _referenceResolveInfoChanged = new();
 
     /// <inheritdoc />
@@ -509,7 +509,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _referenceTargetAdded.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ReferenceTargetAddedArgs> _referenceTargetAdded = new();
+    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceTargetAddedArgs> _referenceTargetAdded = new();
 
     /// <inheritdoc />
     public void AddReferenceTarget(IWritableNode parent, Reference reference, Index index, TargetNode newTarget,
@@ -526,7 +526,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _referenceTargetDeleted.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ReferenceTargetDeletedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceTargetDeletedArgs>
         _referenceTargetDeleted = new();
 
     /// <inheritdoc />
@@ -544,7 +544,7 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
         remove => _referenceTargetChanged.Remove(value);
     }
 
-    private readonly CountingEventHandler<IPartitionListener.ReferenceTargetChangedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceTargetChangedArgs>
         _referenceTargetChanged = new();
 
     /// <inheritdoc />
@@ -556,11 +556,10 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     public bool CanRaiseChangeReferenceTarget => _referenceTargetChanged.HasSubscribers;
 }
 
-/// Event handler that keeps track of the number of listeners.
+/// Event handler that allows to check for existing subscribers.
 /// Used to avoid expensive event argument preparation if nobody is listening.
-internal class CountingEventHandler<T>
+internal class ShortCircuitEventHandler<T>
 {
-    private int _subscriberCount = 0;
     public event EventHandler<T>? Event;
 
     public void Invoke(object sender, T args)
@@ -574,7 +573,6 @@ internal class CountingEventHandler<T>
         lock (this)
         {
             Event += handler;
-            _subscriberCount++;
         }
     }
 
@@ -583,7 +581,6 @@ internal class CountingEventHandler<T>
         lock (this)
         {
             Event -= handler;
-            _subscriberCount--;
         }
     }
 
@@ -593,7 +590,7 @@ internal class CountingEventHandler<T>
         {
             lock (this)
             {
-                return _subscriberCount > 0;
+                return Event != null;
             }
         }
     }
