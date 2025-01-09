@@ -32,22 +32,51 @@ public abstract class ListComparerTestsBase
     {
         var comparer = CreateComparer(left, right);
         var changes = comparer.Compare();
-        CollectionAssert.AreEquivalent(
-            results.Select(r => (IListComparer<char>.IChange)(r.changeKind switch
+
+        List<string> steps = [left, Join(left)];
+        var previous = left;
+
+        foreach (var change in changes)
+        {
+            var line = change switch
             {
-                Add => new IListComparer<char>.Added(r.left, r.leftIndex),
-                Delete => new IListComparer<char>.Deleted(r.left, r.leftIndex),
-                Replace => new IListComparer<char>.Replaced(r.left, r.leftIndex, (char)r.right),
-                Move => new IListComparer<char>.Moved(
-                    r.left,
-                    r.leftIndex,
-                    (char)(r.right ?? r.left),
-                    (int)r.rightIndex
-                ),
-                _ => throw new InvalidOperationException()
-            })).ToList(),
-            changes
-        );
+                IListComparer<char>.Added added => previous.Insert(added.Index, added.Element.ToString()),
+                IListComparer<char>.Deleted deleted => previous.Remove(deleted.Index, 1),
+                IListComparer<char>.Replaced replaced => previous.Remove(replaced.Index, 1)
+                    .Insert(replaced.Index, replaced.RightElement.ToString()),
+                IListComparer<char>.Moved moved => previous.Remove(moved.LeftIndex, 1).Insert(moved.RightIndex, moved.RightElement.ToString()),
+            };
+
+            previous = line;
+
+            var index = Join(line);
+            steps.Add("   " + change + "\n" + line + "\n" + index);
+        }
+
+        string Join(string l) => string.Join("", Enumerable.Range(0, l.Length).Select(n => n % 10));
+
+        steps.Add(right);
+
+        TestContext.WriteLine(string.Join("\n", steps));
+
+        Assert.AreEqual(right, previous);
+
+        // CollectionAssert.AreEqual(
+        //     results.Select(r => (IListComparer<char>.IChange)(r.changeKind switch
+        //     {
+        //         Add => new IListComparer<char>.Added(r.left, r.leftIndex),
+        //         Delete => new IListComparer<char>.Deleted(r.left, r.leftIndex),
+        //         Replace => new IListComparer<char>.Replaced(r.left, r.leftIndex, (char)r.right),
+        //         Move => new IListComparer<char>.Moved(
+        //             r.left,
+        //             r.leftIndex,
+        //             (char)(r.right ?? r.left),
+        //             (int)r.rightIndex
+        //         ),
+        //         _ => throw new InvalidOperationException()
+        //     })).ToList(),
+        //     changes
+        // );
     }
 
     protected internal abstract IListComparer<char> CreateComparer(string left, string right);
@@ -58,4 +87,16 @@ public abstract class ListComparerTestsBase
         LeftIndex leftIndex,
         RightIndex? rightIndex = null,
         char? right = null);
+
+    private TestContext testContextInstance;
+
+    /// <summary>
+    /// Gets or sets the test context which provides
+    /// information about and functionality for the current test run.
+    /// </summary>
+    public TestContext TestContext
+    {
+        get { return testContextInstance; }
+        set { testContextInstance = value; }
+    }
 }

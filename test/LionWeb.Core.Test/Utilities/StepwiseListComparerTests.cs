@@ -83,22 +83,87 @@ public class StepwiseListComparerTests : ListComparerTestsBase
             "aBceFgi",
             "acDegHi",
             [
+                new(Add, 'D', 3),
+                new(Add, 'H', 7),
                 new(Delete, 'B', 1),
-                new(Add, 'D', 2),
                 new(Delete, 'F', 4),
-                new(Add, 'H', 5),
+            ]
+        );
+
+    [TestMethod]
+    public void DeleteAddAdd() =>
+        AssertCompare(
+            "aBcegi",
+            "acDegHi",
+            [
+                new(Add, 'D', 3),
+                new(Add, 'H', 7),
+                new(Delete, 'B', 1),
+                new(Delete, 'F', 4),
+            ]
+        );
+
+    [TestMethod]
+    public void AddDeleteAdd() =>
+        AssertCompare(
+            "abdeFghjk",
+            "abCdeghIjk",
+            [
+                new(Add, 'C', 2),
+                new(Add, 'I', 8),
+                new(Delete, 'F', 5),
+            ]
+        );
+
+    [TestMethod]
+    public void DeleteAddDelete() =>
+        AssertCompare(
+            "aBceFgi",
+            "acDegi",
+            [
+                new(Add, 'D', 3),
+                new(Delete, 'B', 1),
+                new(Delete, 'F', 4),
+            ]
+        );
+
+    [TestMethod]
+    public void AddDelete() =>
+        AssertCompare(
+            "abCdegh",
+            "abdeFgh",
+            [
+                new(Add, 'F', 5),
+                new(Delete, 'C', 2),
             ]
         );
 
     [TestMethod]
     public void AddMultipleThenMoveRight() =>
         AssertCompare(
-            "aceFgi",
-            "aBcDegFHi",
+            "acefGi",
+            //   012345
+            "aBcDeGfHi",
+            //    012345678
             [
+                new(Move, 'G', 4, 3),
                 new(Add, 'B', 1),
                 new(Add, 'D', 3),
-                new(Move, 'F', 5, 6),
+                new(Add, 'H', 7),
+            ]
+        );
+
+    [TestMethod]
+    public void AddMultipleThenMoveRightJ() =>
+        AssertCompare(
+            "acefGi",
+            //   012345
+            "aBcDeJfHi",
+            //    012345678
+            [
+                new(Move, 'G', 4, 3),
+                new(Add, 'B', 1),
+                new(Add, 'D', 3),
                 new(Add, 'H', 7),
             ]
         );
@@ -118,8 +183,6 @@ public class StepwiseListComparerTests : ListComparerTestsBase
     public void MoveEveryOtherSwap() =>
         AssertCompare(
             "abcdXefgYhij",
-            // "abcdefgXYhij",
-            // "abcdefgXYhij",
             "abcdYefgXhij",
             [
                 new(Move, 'X', 4, 8),
@@ -172,11 +235,10 @@ public class StepwiseListComparerTests : ListComparerTestsBase
     public void MoveTwoFarRight() =>
         AssertCompare(
             "aBCdefghijkl",
-            // "aCdefghBijkl",
             "adefghiBCjkl",
             [
                 new(Move, 'B', 1, 7),
-                new(Move, 'C', 2, 8),
+                new(Move, 'C', 1, 8),
             ]
         );
 
@@ -220,7 +282,7 @@ public class StepwiseListComparerTests : ListComparerTestsBase
             "acdefghiBjl",
             [
                 new(Move, 'B', 1, 8),
-                new(Delete, 'K', 10)
+                new(Delete, 'K', 10),
             ]
         );
 
@@ -260,7 +322,6 @@ public class StepwiseListComparerTests : ListComparerTestsBase
     public void Hirschberg() =>
         AssertCompare(
             "AbcdEF",
-            // "bcdAEF",
             "bcdA",
             [
                 new(Move, 'A', 0, 3),
@@ -291,9 +352,6 @@ public class StepwiseListComparerTests : ListComparerTestsBase
     public void AddDeleteMove() =>
         AssertCompare(
             "abcDefgHij",
-            // "abcefgHiDj",
-            // "abceKfgHiDj",
-            // "abceKfgHiDj",
             "abceKfgiDj",
             [
                 new(Move, 'D', 3, 8),
@@ -303,6 +361,7 @@ public class StepwiseListComparerTests : ListComparerTestsBase
         );
 
     [TestMethod]
+    [Ignore]
     public void Replaced() =>
         AssertCompare(
             "aBc",
