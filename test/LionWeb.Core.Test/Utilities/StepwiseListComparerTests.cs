@@ -361,6 +361,18 @@ public class StepwiseListComparerTests : ListComparerTestsBase
         );
 
     [TestMethod]
+    public void MoveDeleteDelete() =>
+        AssertCompare(
+            "abcDeKfgHij",
+            "abcefgiDj",
+            [
+                new(Move, 'D', 3, 8),
+                new(Add, 'K', 4),
+                new(Delete, 'H', 7),
+            ]
+        );
+
+    [TestMethod]
     [Ignore]
     public void Replaced() =>
         AssertCompare(
