@@ -161,6 +161,31 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
         );
     }
 
+    [TestMethod]
+    public void Whatever()
+    {
+        _inputChanges =
+        [
+            new IListComparer<char>.Added('X', 2),
+            new IListComparer<char>.Added('G', 4),
+            new IListComparer<char>.Added('H', 5),
+            new IListComparer<char>.Deleted('D', 3),
+            new IListComparer<char>.Deleted('E', 4),
+            new IListComparer<char>.Deleted('F', 5),
+        ];
+        
+        AssertCompare(
+            "abcDEF",
+            "abXcGH",
+            [
+                new(Add, 'D', 3),
+                new(Add, 'H', 7),
+                new(Delete, 'B', 1),
+                new(Delete, 'F', 4),
+            ]
+        );
+    }
+
 
     class DummyListComparer : IListComparer<char>
     {

@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Utilities;
 
 using M3;
+using System.Diagnostics;
 using LeftIndex = int;
 using RightIndex = int;
 
@@ -39,7 +40,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
 
     /// <inheritdoc cref="ListComparer{T}(List{T}, List{T}, IEqualityComparer{T}?)"/>
     public StepwiseListComparer(List<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
-     : this(Math.Max(left.Count, right.Count), right.Count- left.Count, new ListComparer<T>(left, right, comparer))
+        : this(Math.Max(left.Count, right.Count), right.Count - left.Count, new ListComparer<T>(left, right, comparer))
     {
     }
 
@@ -60,106 +61,191 @@ public class StepwiseListComparer<T> : IListComparer<T>
         }
     }
 
+    /// We need to make additions and deletions comparable.
+    /// For this, we make the longest list possible, with all the additions executed,
+    /// but none of the deletions yet.
+    private List<IListComparer<T>.IChange> AllInOne(List<IListComparer<T>.IChange> inputChanges)
+    {
+        List<IListComparer<T>.IChange> result = [];
+
+        var remainingChanges = inputChanges.ToList();
+
+        Type currentChangeType = null;
+        var leftMostChange = LeftMostChange();
+
+        while (leftMostChange != null)
+        {
+            remainingChanges.Remove(leftMostChange);
+
+            // if (currentChangeType != null && currentChangeType != leftMostChange.GetType())
+            // {
+            //     foreach (var d in remainingChanges)
+            //     {
+            //         d.Index += 1;
+            //     }
+            // } else
+            {
+                switch (leftMostChange)
+                {
+                    case IListComparer<T>.Added added:
+                        foreach (var d in remainingChanges
+                                     .OfType<IListComparer<T>.Deleted>())
+                        {
+                            d.LeftIndex += 1;
+                        }
+
+                        break;
+
+                    case IListComparer<T>.Deleted deleted:
+                        foreach (var a in remainingChanges
+                                     .OfType<IListComparer<T>.Added>()
+                                )
+                        {
+                            a.RightIndex += 1;
+                        }
+
+                        break;
+                }
+            }
+
+            currentChangeType = leftMostChange.GetType();
+            result.Add(leftMostChange);
+            leftMostChange = LeftMostChange();
+        }
+
+        return result;
+
+        IListComparer<T>.IChange? LeftMostChange()
+        {
+            return remainingChanges
+                .OrderBy(c => c.Index)
+                .ThenBy(c => c is IListComparer<T>.Deleted ? 0 : 1)
+                .FirstOrDefault();
+        }
+    }
+
     /// <inheritdoc />
     public List<IListComparer<T>.IChange> Compare()
     {
         _allChanges = _listComparer.Compare();
-        
-        Console.WriteLine("allChanges: \n"+ string.Join("\n", _allChanges));
-        
-        var changes = _allChanges
-            .Select(c => (IListComparer<T>.IChange) c.Clone())
-            .ToList();
 
+        Console.WriteLine("allChanges: \n" + string.Join("\n", _allChanges));
+
+        var allInOne = AllInOne(_allChanges);
+
+        Console.WriteLine("\nallInOne: \n" + string.Join("\n", allInOne));
+
+        var changes = allInOne;
+
+        List<IListComparer<T>.IChange> result = [];
+
+        int delta = 0;
+        Type currentChangeType = null;
+        
         for (int i = 0; i < changes.Count; i++)
         {
             var change = changes[i];
 
-            Console.WriteLine("\ncurrent: "+ change);
+            Console.WriteLine("\ncurrent: " + change);
 
-            switch (change)
-            {
-                case IListComparer<T>.Added added:
-                    for (int j = 0; j < i; j++)
-                    {
-                        var change1 = changes[j];
-                        if (change1 is IListComparer<T>.IRightChange right && added.RightIndex < right.RightIndex && right.RightIndex > 0)
-                            right.RightIndex -= 1;
-                    }
+            var x = change.Index;
+            x = x - delta;
+            change.Index = x;
             
-                    for (int j = i + 1; j < changes.Count; j++)
-                    {
-                        var change2 = changes[j];
-                        if (change2 is IListComparer<T>.ILeftChange left && added.RightIndex - _delta < left.LeftIndex)
-                            left.LeftIndex += 1;
-                    }
-
-                    _delta++;
-                    break;
-                
-                case IListComparer<T>.Deleted deleted:
-                    _delta--;
-                    for (int j = 0; j < i; j++)
-                    {
-                        var change1 = changes[j];
-                        if (change1 is IListComparer<T>.IRightChange right && deleted.LeftIndex + _delta < right.RightIndex)
-                            right.RightIndex += 1;
-                    }
+            // if (currentChangeType != change.GetType())
+            if (change is IListComparer<T>.Deleted)
+                delta++;
             
-                    for (int j = i + 1; j < changes.Count; j++)
-                    {
-                        var change2 = changes[j];
-                        if (change2 is IListComparer<T>.ILeftChange left && deleted.LeftIndex < left.LeftIndex && left.LeftIndex > 0)
-                            left.LeftIndex -= 1;
-                    }
-
-                    break;
-                
-                case IListComparer<T>.Moved moved:
-                    // changes after me
-                    for (int j = i + 1; j < changes.Count; j++)
-                    {
-                        var change2 = changes[j];
-                        if (change2 is IListComparer<T>.ILeftChange moveAfterMeLeft)
-                        {
-                            if (moved.RightIndex > moveAfterMeLeft.LeftIndex && moved.LeftIndex < moveAfterMeLeft.LeftIndex) 
-                                moveAfterMeLeft.LeftIndex -= 1;
-                        }
-                        if (change2 is IListComparer<T>.Moved moveAfterMeRight)
-                        {
-                            if (moved.RightIndex <= moveAfterMeRight.LeftIndex && moved.LeftIndex > moveAfterMeRight.RightIndex)
-                                moveAfterMeRight.LeftIndex += 1;
-                        }
-                        // if (change2 is IListComparer<T>.Moved moveAfterMe)
-                        // {
-                        //     if (moved.RightIndex <= moveAfterMe.LeftIndex && moved.LeftIndex > moveAfterMe.RightIndex)
-                        //         moveAfterMe.LeftIndex += 1;
-                        //     if (moved.RightIndex > moveAfterMe.LeftIndex && moved.LeftIndex < moveAfterMe.LeftIndex) 
-                        //         moveAfterMe.LeftIndex -= 1;
-                        // }
-                    }
-
-                    // changes before me
-                    for (int j = 0; j < i; j++)
-                    {
-                        var change2 = changes[j];
-                        if (change2 is IListComparer<T>.Moved moveBeforeMe)
-                        {
-                            if (moved.RightIndex <= moveBeforeMe.RightIndex && moved.LeftIndex > moveBeforeMe.RightIndex)
-                                moveBeforeMe.RightIndex -= 1;
-                            if (moved.RightIndex > moveBeforeMe.RightIndex && moved.LeftIndex < moveBeforeMe.LeftIndex) 
-                                moveBeforeMe.LeftIndex += 1;
-                        }
-                    }
-
-                    break;
-            }
+            currentChangeType = change.GetType();
             
-            Console.WriteLine(string.Join("\n", changes));
+            result.Add(change);
+            // switch (change)
+            // {
+            //     case IListComparer<T>.Added added:
+            //         var rightIndex = added.RightIndex;
+            //
+            //         // deduct additions left of me that haven't been executed yet
+            //         // example: I add to rightmost place.
+            //         // This place only exists if all more-left additions have been executed.
+            //         rightIndex -= changes[i..]
+            //             .OfType<IListComparer<T>.Added>()
+            //             .Count(a => a.RightIndex < rightIndex);
+            //
+            //         rightIndex += changes[0..i]
+            //             .OfType<IListComparer<T>.Deleted>()
+            //             .Count(d => d.LeftIndex <= rightIndex);
+            //
+            //         added.RightIndex = rightIndex;
+            //         result.Add(added);
+            //         break;
+            //
+            //     case IListComparer<T>.Deleted deleted:
+            //         var leftIndex = deleted.LeftIndex;
+            //
+            //         // deduct deletions left of me that already have been executed
+            //         // example: I delete from the rightmost place.
+            //         // If any deletion has already been executed that removes from a more-left place,
+            //         // this place doesn't exist anymore.
+            //         leftIndex -= changes[0..i]
+            //             .OfType<IListComparer<T>.Deleted>()
+            //             .Count(d => d.LeftIndex < leftIndex);
+            //
+            //         leftIndex += changes[0..i]
+            //             .OfType<IListComparer<T>.Added>()
+            //             .Count(a => a.RightIndex <= leftIndex);
+            //
+            //         deleted.LeftIndex = leftIndex;
+            //         result.Add(deleted);
+            //
+            //         break;
+            //
+            //     case IListComparer<T>.Moved moved:
+            //         // changes after me
+            //         for (int j = i + 1; j < changes.Count; j++)
+            //         {
+            //             var change2 = changes[j];
+            //             if (change2 is IListComparer<T>.ILeftChange moveAfterMeLeft)
+            //             {
+            //                 if (moved.RightIndex > moveAfterMeLeft.LeftIndex &&
+            //                     moved.LeftIndex < moveAfterMeLeft.LeftIndex)
+            //                     moveAfterMeLeft.LeftIndex -= 1;
+            //             }
+            //
+            //             if (change2 is IListComparer<T>.Moved moveAfterMeRight)
+            //             {
+            //                 if (moved.RightIndex <= moveAfterMeRight.LeftIndex &&
+            //                     moved.LeftIndex > moveAfterMeRight.RightIndex)
+            //                     moveAfterMeRight.LeftIndex += 1;
+            //             }
+            //             // if (change2 is IListComparer<T>.Moved moveAfterMe)
+            //             // {
+            //             //     if (moved.RightIndex <= moveAfterMe.LeftIndex && moved.LeftIndex > moveAfterMe.RightIndex)
+            //             //         moveAfterMe.LeftIndex += 1;
+            //             //     if (moved.RightIndex > moveAfterMe.LeftIndex && moved.LeftIndex < moveAfterMe.LeftIndex) 
+            //             //         moveAfterMe.LeftIndex -= 1;
+            //             // }
+            //         }
+            //
+            //         // changes before me
+            //         for (int j = 0; j < i; j++)
+            //         {
+            //             var change2 = changes[j];
+            //             if (change2 is IListComparer<T>.Moved moveBeforeMe)
+            //             {
+            //                 if (moved.RightIndex <= moveBeforeMe.RightIndex &&
+            //                     moved.LeftIndex > moveBeforeMe.RightIndex)
+            //                     moveBeforeMe.RightIndex -= 1;
+            //                 if (moved.RightIndex > moveBeforeMe.RightIndex && moved.LeftIndex < moveBeforeMe.LeftIndex)
+            //                     moveBeforeMe.LeftIndex += 1;
+            //             }
+            //         }
+            //
+            //         break;
+            // }
+
+            Console.WriteLine(string.Join("\n", result));
         }
 
-        List<IListComparer<T>.IChange> result = [];
-        
         for (var i = 0; i < changes.Count; i++)
         {
             var change = changes[i];
@@ -172,24 +258,24 @@ public class StepwiseListComparer<T> : IListComparer<T>
                     {
                         LeftIndex leftIndex = deleted.LeftIndex;
                         RightIndex rightIndex = added.RightIndex;
-                        
+
                         if (leftIndex > rightIndex)
                             leftIndex -= 1;
                         else
                             rightIndex -= 1;
                         // aBcdf
                         // 01234
-                        
+
                         result.Add(new IListComparer<T>.Moved(deleted.Element, leftIndex, added.Element, rightIndex));
                         i++;
                         continue;
                     }
                 }
             }
-            
-            result.Add(change);
+
+            // result.Add(change);
         }
-        
+
         return result;
 
         void AdjustRight(int i, RightIndex ownIndex)
@@ -197,10 +283,11 @@ public class StepwiseListComparer<T> : IListComparer<T>
             for (int j = 0; j < i; j++)
             {
                 var change = changes[j];
-                if (change is IListComparer<T>.IRightChange right && ownIndex < right.RightIndex && right.RightIndex > 0)
+                if (change is IListComparer<T>.IRightChange right && ownIndex < right.RightIndex &&
+                    right.RightIndex > 0)
                     right.RightIndex -= 1;
             }
-            
+
             for (int j = i + 1; j < changes.Count; j++)
             {
                 var change = changes[j];
@@ -208,7 +295,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
                     left.LeftIndex += 1;
             }
         }
-        
+
         void AdjustLeft(int i, LeftIndex ownIndex)
         {
             for (int j = 0; j < i; j++)
@@ -217,7 +304,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
                 if (change is IListComparer<T>.IRightChange right && ownIndex + _delta <= right.RightIndex)
                     right.RightIndex += 1;
             }
-            
+
             for (int j = i + 1; j < changes.Count; j++)
             {
                 var change = changes[j];
@@ -245,11 +332,8 @@ public class StepwiseListComparer<T> : IListComparer<T>
         {
             Add(moved.LeftIndex, moved.RightIndex);
         }
-        
-        return moved with
-        {
-            LeftIndex = _leftIndices[moved.LeftIndex], RightIndex = _rightIndices[moved.RightIndex]
-        };
+
+        return moved with { LeftIndex = _leftIndices[moved.LeftIndex], RightIndex = _rightIndices[moved.RightIndex] };
     }
 
     private IListComparer<T>.IChange Deleted(IListComparer<T>.Deleted deleted)
@@ -261,7 +345,8 @@ public class StepwiseListComparer<T> : IListComparer<T>
     private void Add(RightIndex lowerBoundInclusive, RightIndex? upperBoundExclusive = null)
     {
         LeftIndex leftLowerBoundInclusive = _rightIndices[lowerBoundInclusive];
-        LeftIndex? leftUpperBoundExclusive = upperBoundExclusive != null ? _rightIndices[(RightIndex)upperBoundExclusive] : null;
+        LeftIndex? leftUpperBoundExclusive =
+            upperBoundExclusive != null ? _rightIndices[(RightIndex)upperBoundExclusive] : null;
         _rightIndices[lowerBoundInclusive] = leftLowerBoundInclusive + 1;
         Increment(leftLowerBoundInclusive, _leftIndices, leftUpperBoundExclusive);
         // Decrement(lowerBoundInclusive + 1, _rightIndices, upperBoundExclusive);
@@ -270,7 +355,8 @@ public class StepwiseListComparer<T> : IListComparer<T>
     private void Delete(LeftIndex lowerBoundInclusive, LeftIndex? upperBoundExclusive = null)
     {
         RightIndex rightLowerBoundInclusive = _leftIndices[lowerBoundInclusive];
-        RightIndex? rightUpperBoundExclusive = upperBoundExclusive != null ? _leftIndices[(LeftIndex)upperBoundExclusive] : null;
+        RightIndex? rightUpperBoundExclusive =
+            upperBoundExclusive != null ? _leftIndices[(LeftIndex)upperBoundExclusive] : null;
         Decrement(lowerBoundInclusive + 1, _leftIndices, upperBoundExclusive);
         // Increment(rightLowerBoundInclusive, _rightIndices, rightUpperBoundExclusive);
     }
@@ -288,7 +374,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
         for (int i = lowerBoundInclusive; i < upperBound; i++)
             dictionary[i] -= 1;
     }
-    
+
     private void Increment(int lowerBoundInclusive, Map<int, int> map, int? upperBoundExclusive = null)
     {
         int upperBound = upperBoundExclusive ?? map.Count;
@@ -302,7 +388,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
         for (int i = lowerBoundInclusive; i < upperBound; i++)
             map.Put(i, map.Forward[i] - 1);
     }
-    
+
     public class Map<T1, T2>
     {
         private Dictionary<T1, T2> _forward = new Dictionary<T1, T2>();
@@ -317,10 +403,12 @@ public class StepwiseListComparer<T> : IListComparer<T>
         public class Indexer<T3, T4>
         {
             private Dictionary<T3, T4> _dictionary;
+
             public Indexer(Dictionary<T3, T4> dictionary)
             {
                 _dictionary = dictionary;
             }
+
             public T4 this[T3 index]
             {
                 get { return _dictionary[index]; }
@@ -333,17 +421,16 @@ public class StepwiseListComparer<T> : IListComparer<T>
             _forward.Add(t1, t2);
             _reverse.Add(t2, t1);
         }
-        
+
         public void Put(T1 t1, T2 t2)
         {
             _forward[t1] = t2;
             _reverse[t2] = t1;
         }
-        
+
         public int Count => _forward.Count;
 
         public Indexer<T1, T2> Forward { get; private set; }
         public Indexer<T2, T1> Reverse { get; private set; }
     }
-    
 }

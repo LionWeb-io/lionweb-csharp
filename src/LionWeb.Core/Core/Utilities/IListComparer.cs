@@ -34,7 +34,7 @@ public interface IListComparer<T>
     {
         /// Changed element.
         T Element { get; }
-        int Index { get; }
+        int Index { get; set; }
     };
 
     interface ILeftChange : IChange
@@ -48,28 +48,47 @@ public interface IListComparer<T>
     }
 
     /// <paramref name="Element"/> added at <paramref name="RightIndex"/>.
-    record struct Added(T Element, RightIndex RightIndex) : IRightChange
+    record Added(T Element, RightIndex RightIndex) : IRightChange
     {
-        public int Index => RightIndex;
+        public int Index
+        {
+            get => RightIndex;
+            set => RightIndex = value;
+        }
+
+        public RightIndex RightIndex { get; set; } = RightIndex;
         object ICloneable.Clone() => this with {};
     }
 
     /// <paramref name="Element"/> deleted from <paramref name="LeftIndex"/>.
-    record struct Deleted(T Element, LeftIndex LeftIndex) : ILeftChange
+    record Deleted(T Element, LeftIndex LeftIndex) : ILeftChange
     {
-        public int Index => LeftIndex;
+        public int Index
+        {
+            get => LeftIndex;
+            set => LeftIndex = value;
+        }
+
+        public LeftIndex LeftIndex { get; set; } = LeftIndex;
         object ICloneable.Clone() => this with {};
     }
 
     /// <paramref name="LeftElement"/> moved from <paramref name="LeftIndex"/> to <paramref name="RightIndex"/>.
     /// We report <paramref name="RightElement"/> separately because it might not be identical to <paramref name="LeftElement"/>
     /// (if we use a custom <see cref="IEqualityComparer{T}"/>).
-    record struct Moved(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
+    record Moved(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
         : ILeftChange, IRightChange
     {
+        public RightIndex RightIndex { get; set; } = RightIndex;
+        public LeftIndex LeftIndex { get; set; } = LeftIndex;
         /// Changed <see cref="LeftElement"/>.
         public T Element => LeftElement;
-        public int Index => LeftIndex;
+        public int Index
+        {
+            get => LeftIndex;
+            set => LeftIndex = value;
+        }
+
         object ICloneable.Clone() => this with {};
     }
     
@@ -78,7 +97,12 @@ public interface IListComparer<T>
     {
         /// Changed <see cref="LeftElement"/>.
         public T Element => LeftElement;
-        public int Index => LeftIndex;
+        public int Index
+        {
+            get => LeftIndex;
+            set => LeftIndex = value;
+        }
+
         object ICloneable.Clone() => this with {};
     }
 }
