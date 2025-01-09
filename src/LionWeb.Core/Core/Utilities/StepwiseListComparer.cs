@@ -28,6 +28,7 @@ using RightIndex = int;
 /// </remarks>
 public class StepwiseListComparer<T> : IListComparer<T>
 {
+    private int _delta;
     private readonly IListComparer<T> _listComparer;
 
     private readonly Dictionary<LeftIndex, RightIndex> _leftIndices;
@@ -38,12 +39,13 @@ public class StepwiseListComparer<T> : IListComparer<T>
 
     /// <inheritdoc cref="ListComparer{T}(List{T}, List{T}, IEqualityComparer{T}?)"/>
     public StepwiseListComparer(List<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
-     : this(Math.Max(left.Count, right.Count), new ListComparer<T>(left, right, comparer))
+     : this(Math.Max(left.Count, right.Count), right.Count- left.Count, new ListComparer<T>(left, right, comparer))
     {
     }
 
-    public StepwiseListComparer(int maxSize, IListComparer<T> listComparer)
+    public StepwiseListComparer(int maxSize, int delta, IListComparer<T> listComparer)
     {
+        _delta = delta;
         _listComparer = listComparer;
 
         _leftIndices = new Dictionary<LeftIndex, RightIndex>(maxSize);
@@ -78,11 +80,39 @@ public class StepwiseListComparer<T> : IListComparer<T>
             switch (change)
             {
                 case IListComparer<T>.Added added:
-                    AdjustRight(i, added.RightIndex);
+                    for (int j = 0; j < i; j++)
+                    {
+                        var change1 = changes[j];
+                        if (change1 is IListComparer<T>.IRightChange right && added.RightIndex < right.RightIndex && right.RightIndex > 0)
+                            right.RightIndex -= 1;
+                    }
+            
+                    for (int j = i + 1; j < changes.Count; j++)
+                    {
+                        var change2 = changes[j];
+                        if (change2 is IListComparer<T>.ILeftChange left && added.RightIndex - _delta < left.LeftIndex)
+                            left.LeftIndex += 1;
+                    }
+
+                    _delta++;
                     break;
                 
                 case IListComparer<T>.Deleted deleted:
-                    AdjustLeft(i, deleted.LeftIndex);
+                    _delta--;
+                    for (int j = 0; j < i; j++)
+                    {
+                        var change1 = changes[j];
+                        if (change1 is IListComparer<T>.IRightChange right && deleted.LeftIndex + _delta < right.RightIndex)
+                            right.RightIndex += 1;
+                    }
+            
+                    for (int j = i + 1; j < changes.Count; j++)
+                    {
+                        var change2 = changes[j];
+                        if (change2 is IListComparer<T>.ILeftChange left && deleted.LeftIndex < left.LeftIndex && left.LeftIndex > 0)
+                            left.LeftIndex -= 1;
+                    }
+
                     break;
                 
                 case IListComparer<T>.Moved moved:
@@ -174,7 +204,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
             for (int j = i + 1; j < changes.Count; j++)
             {
                 var change = changes[j];
-                if (change is IListComparer<T>.ILeftChange left && ownIndex <= left.LeftIndex)
+                if (change is IListComparer<T>.ILeftChange left && ownIndex - _delta <= left.LeftIndex)
                     left.LeftIndex += 1;
             }
         }
@@ -184,7 +214,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
             for (int j = 0; j < i; j++)
             {
                 var change = changes[j];
-                if (change is IListComparer<T>.IRightChange right && ownIndex < right.RightIndex)
+                if (change is IListComparer<T>.IRightChange right && ownIndex + _delta <= right.RightIndex)
                     right.RightIndex += 1;
             }
             

@@ -175,5 +175,5 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
     }
 
     protected internal override IListComparer<char> CreateComparer(string left, string right) =>
-        new StepwiseListComparer<char>(Math.Max(left.Length, right.Length), new DummyListComparer(_inputChanges));
+        new StepwiseListComparer<char>(Math.Max(left.Length, right.Length), left.Length, new DummyListComparer(_inputChanges));
 }
