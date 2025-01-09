@@ -109,7 +109,12 @@ public class ListComparer<T> : IListComparer<T>
                 RightIndex rightIndex = addedEntry.Item2;
 
                 if (leftIndex != rightIndex || !Equals(leftElement, rightElement))
-                    result.Add(new IListComparer<T>.Moved(leftElement, leftIndex, rightElement, rightIndex));
+                {
+                    result.Add(new IListComparer<T>.Added(rightElement,rightIndex));
+                    result.Add(new IListComparer<T>.Deleted(leftElement,leftIndex));
+                    // result.Add(new IListComparer<T>.Moved(leftElement, leftIndex, rightElement, rightIndex));
+                }
+
                 _added.RemoveAt(_added.IndexOfValue(addedEntry));
                 _deleted.RemoveAt(indexOfValue);
                 // continue;

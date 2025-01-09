@@ -30,41 +30,55 @@ public interface IListComparer<T>
     List<IChange> Compare();
 
     /// A change to a list.
-    interface IChange
+    interface IChange : ICloneable
     {
         /// Changed element.
         T Element { get; }
         int Index { get; }
     };
 
+    interface ILeftChange : IChange
+    {
+        LeftIndex LeftIndex { get; set; }
+    }
+
+    interface IRightChange : IChange
+    {
+        RightIndex RightIndex { get; set; }
+    }
+
     /// <paramref name="Element"/> added at <paramref name="RightIndex"/>.
-    readonly record struct Added(T Element, RightIndex RightIndex) : IChange
+    record struct Added(T Element, RightIndex RightIndex) : IRightChange
     {
         public int Index => RightIndex;
+        object ICloneable.Clone() => this with {};
     }
 
     /// <paramref name="Element"/> deleted from <paramref name="LeftIndex"/>.
-    readonly record struct Deleted(T Element, LeftIndex LeftIndex) : IChange
+    record struct Deleted(T Element, LeftIndex LeftIndex) : ILeftChange
     {
         public int Index => LeftIndex;
+        object ICloneable.Clone() => this with {};
     }
 
     /// <paramref name="LeftElement"/> moved from <paramref name="LeftIndex"/> to <paramref name="RightIndex"/>.
     /// We report <paramref name="RightElement"/> separately because it might not be identical to <paramref name="LeftElement"/>
     /// (if we use a custom <see cref="IEqualityComparer{T}"/>).
-    readonly record struct Moved(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
-        : IChange
+    record struct Moved(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
+        : ILeftChange, IRightChange
     {
         /// Changed <see cref="LeftElement"/>.
         public T Element => LeftElement;
         public int Index => LeftIndex;
+        object ICloneable.Clone() => this with {};
     }
     
     /// <paramref name="LeftElement"/> at <paramref name="LeftIndex"/> replaced by <paramref name="RightElement"/>.
-    readonly record struct Replaced(T LeftElement, LeftIndex LeftIndex, T RightElement) : IChange
+    record struct Replaced(T LeftElement, LeftIndex LeftIndex, T RightElement) : ILeftChange
     {
         /// Changed <see cref="LeftElement"/>.
         public T Element => LeftElement;
         public int Index => LeftIndex;
+        object ICloneable.Clone() => this with {};
     }
 }
