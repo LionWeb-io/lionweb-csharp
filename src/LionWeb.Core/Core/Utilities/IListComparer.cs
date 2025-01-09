@@ -56,7 +56,7 @@ public interface IListComparer<T>
             set => RightIndex = value;
         }
 
-        public RightIndex RightIndex { get; set; } = RightIndex;
+        public virtual RightIndex RightIndex { get; set; } = RightIndex;
         object ICloneable.Clone() => this with {};
     }
 
@@ -69,7 +69,7 @@ public interface IListComparer<T>
             set => LeftIndex = value;
         }
 
-        public LeftIndex LeftIndex { get; set; } = LeftIndex;
+        public virtual LeftIndex LeftIndex { get; set; } = LeftIndex;
         object ICloneable.Clone() => this with {};
     }
 
@@ -85,10 +85,17 @@ public interface IListComparer<T>
         public T Element => LeftElement;
         public int Index
         {
-            get => LeftIndex;
-            set => LeftIndex = value;
+            get => LeftIndex < RightIndex ? LeftIndex : RightIndex;
+            set => SetIndex(value);
         }
 
+        private LeftIndex SetIndex(int value) => LeftIndex < RightIndex ? LeftIndex = value : RightIndex = value;
+
+        public int RightEdge => LeftIndex > RightIndex ? LeftIndex : RightIndex;
+        
+        public bool MoveLeftToRight => LeftIndex < RightIndex;
+        public bool MoveRightToLeft => RightIndex > LeftIndex;
+        
         object ICloneable.Clone() => this with {};
     }
     
