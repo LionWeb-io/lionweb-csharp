@@ -59,18 +59,18 @@ public class StepwiseListComparer<T> : IListComparer<T>
 
             switch (leftMostChange)
             {
-                case IListComparer<T>.Added:
+                case IListComparer<T>.IRightChange:
                     foreach (var d in remainingChanges
-                                 .OfType<IListComparer<T>.Deleted>())
+                                 .OfType<IListComparer<T>.ILeftChange>())
                     {
                         d.LeftIndex += 1;
                     }
 
                     break;
 
-                case IListComparer<T>.Deleted:
+                case IListComparer<T>.ILeftChange:
                     foreach (var a in remainingChanges
-                                 .OfType<IListComparer<T>.Added>()
+                                 .OfType<IListComparer<T>.IRightChange>()
                             )
                     {
                         a.RightIndex += 1;
@@ -89,7 +89,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
         {
             return remainingChanges
                 .OrderBy(c => c.Index)
-                .ThenBy(c => c is IListComparer<T>.Deleted ? 0 : 1)
+                .ThenBy(c => c is IListComparer<T>.ILeftChange ? 0 : 1)
                 .FirstOrDefault();
         }
     }
@@ -115,7 +115,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
 
             change.Index -= delta;
             
-            if (change is IListComparer<T>.Deleted)
+            if (change is IListComparer<T>.ILeftChange)
                 delta++;
 
             result.Add(change);
