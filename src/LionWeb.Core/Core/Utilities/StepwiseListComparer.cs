@@ -145,11 +145,31 @@ public class StepwiseListComparer<T> : IListComparer<T>
             var currentResult = result[i];
             if (currentResult is IListComparer<T>.Added a)
             {
-                var partnerDelete = result[i..].OfType<IListComparer<T>.Deleted>()
-                    .FirstOrDefault(o => o.Element.Equals(currentResult.Element));
-                if (partnerDelete != null)
+                for (var j = i + 1; j < result.Count; j++)
                 {
-                    
+                    var partner = result[j];
+                    if (partner is IListComparer<T>.Deleted partnerDelete && a.Element.Equals(partnerDelete.Element))
+                    {
+                        for (var k = j - 1; k > i; k--)
+                        {
+                            var intermediate = result[k];
+                            if (intermediate is IListComparer<T>.Added interAdd)
+                            {
+                                // interAdd.RightIndex += 1;
+                                partnerDelete.LeftIndex -= 1;
+                                result[k] = partnerDelete;
+                                result[k + 1] = intermediate;
+                            }
+        
+                            if (intermediate is IListComparer<T>.Deleted interDel)
+                            {
+                                // interDel.LeftIndex -= 1;
+                                partnerDelete.LeftIndex += 1;
+                                result[k] = partnerDelete;
+                                result[k + 1] = intermediate;
+                            }
+                        }
+                    }
                 }
             } else if (currentResult is IListComparer<T>.Deleted d)
             {
@@ -177,7 +197,6 @@ public class StepwiseListComparer<T> : IListComparer<T>
                                 result[k + 1] = intermediate;
                             }
                         }
-                        
                     }
                 }
             }
