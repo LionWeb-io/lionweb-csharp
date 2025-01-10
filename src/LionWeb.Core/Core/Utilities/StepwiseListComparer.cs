@@ -169,6 +169,9 @@ public class StepwiseListComparer<T> : IListComparer<T>
                                 result[k + 1] = intermediate;
                             }
                         }
+                        result[i] = new IListComparer<T>.Moved(partnerDelete.Element, partnerDelete.LeftIndex-1, a.Element, a.RightIndex);
+                        result.RemoveAt(i+1);
+                        i--;
                     }
                 }
             } else if (currentResult is IListComparer<T>.Deleted d)
@@ -197,6 +200,9 @@ public class StepwiseListComparer<T> : IListComparer<T>
                                 result[k + 1] = intermediate;
                             }
                         }
+                        result[i] = new IListComparer<T>.Moved(d.Element, d.LeftIndex, partnerAdd.Element, partnerAdd.RightIndex);
+                        result.RemoveAt(i+1);
+                        i--;
                     }
                 }
             }
