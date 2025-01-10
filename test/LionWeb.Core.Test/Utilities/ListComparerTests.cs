@@ -21,7 +21,7 @@ using Core.Utilities;
 using Languages.Generated.V2023_1.Shapes.M2;
 
 [TestClass]
-public class ListComparerTests : ListComparerTestsBase
+public class ListComparerTests : AbsoluteIndexListComparerTestsBase
 {
     [TestMethod]
     public void Empty() =>
@@ -313,6 +313,12 @@ public class ListComparerTests : ListComparerTestsBase
             ]
         );
 
+    protected internal override IListComparer<char> CreateComparer(string left, string right)
+        => new ListComparer<char>(left.ToList(), right.ToList());
+}
+
+public abstract class AbsoluteIndexListComparerTestsBase : ListComparerTestsBase
+{
     protected override List<IListComparer<char>.IChange> AssertCompare(string left, string right)
     {
         var comparer = CreateComparer(left, right);
@@ -351,7 +357,4 @@ public class ListComparerTests : ListComparerTestsBase
 
         return changes;
     }
-
-    protected internal override IListComparer<char> CreateComparer(string left, string right)
-        => new ListComparer<char>(left.ToList(), right.ToList());
 }
