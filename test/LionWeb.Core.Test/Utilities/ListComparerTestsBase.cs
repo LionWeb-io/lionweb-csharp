@@ -28,12 +28,12 @@ public abstract class ListComparerTestsBase
     protected const int Replace = 2;
     protected const int Move = 3;
 
-    protected void AssertCompare(string left, string right, EasyToEnterResult[] results)
+    protected virtual List<IListComparer<char>.IChange> AssertCompare(string left, string right)
     {
         var comparer = CreateComparer(left, right);
         var changes = comparer.Compare();
 
-        List<string> steps = [left, Join(left)];
+        List<string> steps = [left, IndexString(left)];
         var previous = left;
 
         foreach (var change in changes)
@@ -49,11 +49,9 @@ public abstract class ListComparerTestsBase
 
             previous = line;
 
-            var index = Join(line);
+            var index = IndexString(line);
             steps.Add("   " + change + "\n" + line + "\n" + index);
         }
-
-        string Join(string l) => string.Join("", Enumerable.Range(0, l.Length).Select(n => n % 10));
 
         steps.Add(right);
 
@@ -61,22 +59,31 @@ public abstract class ListComparerTestsBase
 
         Assert.AreEqual(right, previous);
 
-        // CollectionAssert.AreEqual(
-        //     results.Select(r => (IListComparer<char>.IChange)(r.changeKind switch
-        //     {
-        //         Add => new IListComparer<char>.Added(r.left, r.leftIndex),
-        //         Delete => new IListComparer<char>.Deleted(r.left, r.leftIndex),
-        //         Replace => new IListComparer<char>.Replaced(r.left, r.leftIndex, (char)r.right),
-        //         Move => new IListComparer<char>.Moved(
-        //             r.left,
-        //             r.leftIndex,
-        //             (char)(r.right ?? r.left),
-        //             (int)r.rightIndex
-        //         ),
-        //         _ => throw new InvalidOperationException()
-        //     })).ToList(),
-        //     changes
-        // );
+        return changes;
+    }
+
+    protected string IndexString(string l) => string.Join("", Enumerable.Range(0, l.Length).Select(n => n % 10));
+
+    protected void AssertCompare(string left, string right, EasyToEnterResult[] results)
+    {
+        var changes = AssertCompare(left, right);
+
+        CollectionAssert.AreEqual(
+            results.Select(r => (IListComparer<char>.IChange)(r.changeKind switch
+            {
+                Add => new IListComparer<char>.Added(r.left, r.leftIndex),
+                Delete => new IListComparer<char>.Deleted(r.left, r.leftIndex),
+                Replace => new IListComparer<char>.Replaced(r.left, r.leftIndex, (char)r.right),
+                Move => new IListComparer<char>.Moved(
+                    r.left,
+                    r.leftIndex,
+                    (char)(r.right ?? r.left),
+                    (int)r.rightIndex
+                ),
+                _ => throw new InvalidOperationException()
+            })).ToList(),
+            changes
+        );
     }
 
     protected internal abstract IListComparer<char> CreateComparer(string left, string right);

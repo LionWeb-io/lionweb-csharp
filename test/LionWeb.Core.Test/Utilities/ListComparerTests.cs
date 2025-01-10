@@ -79,7 +79,8 @@ public class ListComparerTests : ListComparerTestsBase
             "aBcdefghijkl",
             "acdefghiBjkl",
             [
-                new(Move, 'B', 1, 8),
+                new(Delete, 'B', 1),
+                new(Add, 'B', 8),
             ]
         );
 
@@ -89,7 +90,8 @@ public class ListComparerTests : ListComparerTestsBase
             "acdefghiBjkl",
             "aBcdefghijkl",
             [
-                new(Move, 'B', 8, 1),
+                new(Delete, 'B', 8),
+                new(Add, 'B', 1),
             ]
         );
 
@@ -99,8 +101,10 @@ public class ListComparerTests : ListComparerTestsBase
             "aBCdefghijkl",
             "adefghiBCjkl",
             [
-                new(Move, 'B', 1, 7),
-                new(Move, 'C', 2, 8),
+                new(Delete, 'B', 1),
+                new(Delete, 'C', 2),
+                new(Add, 'B', 7),
+                new(Add, 'C', 8),
             ]
         );
 
@@ -110,8 +114,10 @@ public class ListComparerTests : ListComparerTestsBase
             "adefghiBCjkl",
             "aBCdefghijkl",
             [
-                new(Move, 'B', 7, 1),
-                new(Move, 'C', 8, 2),
+                new(Delete, 'B', 7),
+                new(Delete, 'C', 8),
+                new(Add, 'B', 1),
+                new(Add, 'C', 2),
             ]
         );
 
@@ -121,8 +127,10 @@ public class ListComparerTests : ListComparerTestsBase
             "aBcDefghijkl",
             "acefghiBDjkl",
             [
-                new(Move, 'B', 1, 7),
-                new(Move, 'D', 3, 8),
+                new(Delete, 'B', 1),
+                new(Delete, 'D', 3),
+                new(Add, 'B', 7),
+                new(Add, 'D', 8),
             ]
         );
 
@@ -132,8 +140,10 @@ public class ListComparerTests : ListComparerTestsBase
             "acefghiBDjkl",
             "aBcDefghijkl",
             [
-                new(Move, 'B', 7, 1),
-                new(Move, 'D', 8, 3),
+                new(Delete, 'B', 7),
+                new(Delete, 'D', 8),
+                new(Add, 'B', 1),
+                new(Add, 'D', 3),
             ]
         );
 
@@ -143,8 +153,11 @@ public class ListComparerTests : ListComparerTestsBase
             "aBcdefghijKl",
             "acdefghiBjl",
             [
-                new(Move, 'B', 1, 8),
-                new(Delete, 'K', 10)
+                new(Delete, 'B', 1),
+                new(Delete, 'j', 9),
+                new(Delete, 'K', 10),
+                new(Add, 'B', 8),
+                new(Add, 'j', 9),
             ]
         );
 
@@ -154,8 +167,9 @@ public class ListComparerTests : ListComparerTestsBase
             "acdEfghiBjkl",
             "aBcdfghijkl",
             [
-                new(Move, 'B', 8, 1),
-                new(Delete, 'E', 3)
+                new(Delete, 'E', 3),
+                new(Delete, 'B', 8),
+                new(Add, 'B', 1),
             ]
         );
 
@@ -165,7 +179,8 @@ public class ListComparerTests : ListComparerTestsBase
             "ab",
             "ba",
             [
-                new(Move, 'a', 0, 1)
+                new(Delete, 'a', 0),
+                new(Add, 'a', 1),
             ]
         );
 
@@ -175,8 +190,10 @@ public class ListComparerTests : ListComparerTestsBase
             "abCdefgHijkl",
             "abHdefgCijkl",
             [
-                new(Move, 'H', 7, 2),
-                new(Move, 'C', 2, 7)
+                new(Delete, 'C', 2),
+                new(Delete, 'H', 7),
+                new(Add, 'H', 2),
+                new(Add, 'C', 7),
             ]
         );
 
@@ -186,9 +203,10 @@ public class ListComparerTests : ListComparerTestsBase
             "abcdef",
             "bcda",
             [
-                new(Move, 'a', 0, 3),
+                new(Delete, 'a', 0),
                 new(Delete, 'e', 4),
                 new(Delete, 'f', 5),
+                new(Add, 'a', 3),
             ]
         );
 
@@ -198,7 +216,8 @@ public class ListComparerTests : ListComparerTestsBase
             "a" + new string('x', 2000),
             new string('x', 2000) + "a",
             [
-                new(Move, 'a', 0, 2000)
+                new(Delete, 'a',0),
+                new(Add, 'a', 2000)
             ]
         );
 
@@ -218,8 +237,12 @@ public class ListComparerTests : ListComparerTestsBase
 
         var comparer = new ListComparer<INode>([a, b], [b, a]);
         var changes = comparer.Compare();
-        CollectionAssert.AreEquivalent(
-            new List<IListComparer<INode>.IChange> { new IListComparer<INode>.Moved(a, 0, a, 1) },
+        CollectionAssert.AreEqual(
+            new List<IListComparer<INode>.IChange>
+            {
+                new IListComparer<INode>.Deleted(a, 0),
+                new IListComparer<INode>.Added(a, 1),
+            },
             changes
         );
     }
@@ -232,8 +255,12 @@ public class ListComparerTests : ListComparerTestsBase
 
         var comparer = new ListComparer<INode>([a, b], [b, a]);
         var changes = comparer.Compare();
-        CollectionAssert.AreEquivalent(
-            new List<IListComparer<INode>.IChange> { new IListComparer<INode>.Moved(a, 0, a, 1) },
+        CollectionAssert.AreEqual(
+            new List<IListComparer<INode>.IChange>
+            {
+                new IListComparer<INode>.Deleted(a, 0),
+                new IListComparer<INode>.Added(a, 1),
+            },
             changes
         );
     }
@@ -256,7 +283,7 @@ public class ListComparerTests : ListComparerTestsBase
 
         var comparer = new ListComparer<INode>([a, b], [b, a], new NodeIdComparer());
         var changes = comparer.Compare();
-        CollectionAssert.AreEquivalent(
+        CollectionAssert.AreEqual(
             new List<IListComparer<INode>.IChange> { },
             changes
         );
@@ -268,9 +295,10 @@ public class ListComparerTests : ListComparerTestsBase
             "abcDefgHij",
             "abceKfgiDj",
             [
-                new(Add, 'K', 4),
+                new(Delete, 'D', 3),
                 new(Delete, 'H', 7),
-                new(Move, 'D', 3, 8),
+                new(Add, 'K', 4),
+                new(Add, 'D', 8),
             ]
         );
 
@@ -280,9 +308,49 @@ public class ListComparerTests : ListComparerTestsBase
             "aBc",
             "aDc",
             [
-                new(Replace, 'B', 1, right: 'D')
+                new(Delete, 'B', 1),
+                new(Add, 'D', 1),
             ]
         );
+
+    protected override List<IListComparer<char>.IChange> AssertCompare(string left, string right)
+    {
+        var comparer = CreateComparer(left, right);
+        var changes = comparer.Compare();
+
+        List<string> steps = [left, IndexString(left)];
+        var previous = left;
+
+        int deleteDelta = 0;
+        foreach (var deleted in changes.OfType<IListComparer<char>.Deleted>())
+        {
+            var line = previous.Remove(deleted.Index - deleteDelta, 1);
+            deleteDelta++;
+
+            previous = line;
+
+            var index = IndexString(line);
+            steps.Add("   " + deleted + "\n" + line + "\n" + index);
+        }
+
+        foreach (var added in changes.OfType<IListComparer<char>.Added>().OrderBy(a => a.Index))
+        {
+            var line = previous.Insert(added.Index, added.Element.ToString());
+
+            previous = line;
+
+            var index = IndexString(line);
+            steps.Add("   " + added + "\n" + line + "\n" + index);
+        }
+
+        steps.Add(right);
+
+        TestContext.WriteLine(string.Join("\n", steps));
+
+        Assert.AreEqual(right, previous);
+
+        return changes;
+    }
 
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new ListComparer<char>(left.ToList(), right.ToList());
