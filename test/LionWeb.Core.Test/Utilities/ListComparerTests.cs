@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.Utilities;
 
 using Core.Utilities;
 using Languages.Generated.V2023_1.Shapes.M2;
+using System.Diagnostics;
 
 [TestClass]
 public class ListComparerTests : AbsoluteIndexListComparerTestsBase
@@ -361,4 +362,27 @@ public abstract class AbsoluteIndexListComparerTestsBase : ListComparerTestsBase
 
         return changes;
     }
+}
+
+internal class DebugOnlyTestClassAttribute : TestClassAttribute
+{
+    public override TestMethodAttribute? GetTestMethodAttribute(TestMethodAttribute? testMethodAttribute)
+    {
+        if (!Debugger.IsAttached)
+            return new DummyTestMethodAttribute();
+        
+        return base.GetTestMethodAttribute(testMethodAttribute);
+    }
+}
+
+internal class DummyTestMethodAttribute : TestMethodAttribute
+{
+    public override TestResult[] Execute(ITestMethod testMethod) =>
+    [
+        new TestResult
+            {
+                Outcome = UnitTestOutcome.Inconclusive,
+                TestContextMessages = "This test can only be run with a debugger attached."
+            }
+    ];
 }

@@ -40,11 +40,14 @@ public abstract class ListComparerTestsBase
         {
             var line = change switch
             {
-                IListComparer<char>.Added added => previous.Insert(added.Index, added.Element.ToString()),
+                IListComparer<char>.Added added => added.Index <= previous.Length
+                    ? previous.Insert(added.Index, added.Element.ToString())
+                    : previous + added.Element.ToString(),
                 IListComparer<char>.Deleted deleted => previous.Remove(deleted.Index, 1),
                 IListComparer<char>.Replaced replaced => previous.Remove(replaced.Index, 1)
                     .Insert(replaced.Index, replaced.RightElement.ToString()),
-                IListComparer<char>.Moved moved => previous.Remove(moved.LeftIndex, 1).Insert(moved.RightIndex, moved.RightElement.ToString()),
+                IListComparer<char>.Moved moved => previous.Remove(moved.LeftIndex, 1)
+                    .Insert(moved.RightIndex, moved.RightElement.ToString()),
             };
 
             previous = line;
