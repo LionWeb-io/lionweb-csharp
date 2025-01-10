@@ -324,6 +324,8 @@ public abstract class AbsoluteIndexListComparerTestsBase : ListComparerTestsBase
         var comparer = CreateComparer(left, right);
         var changes = comparer.Compare();
 
+        Console.WriteLine("originalChanges: \n" + string.Join("\n", changes));
+
         List<string> steps = [left, IndexString(left)];
         var previous = left;
 
@@ -341,7 +343,9 @@ public abstract class AbsoluteIndexListComparerTestsBase : ListComparerTestsBase
 
         foreach (var added in changes.OfType<IListComparer<char>.Added>().OrderBy(a => a.Index))
         {
-            var line = previous.Insert(added.Index, added.Element.ToString());
+            var line = added.Index <= previous.Length 
+                    ? previous.Insert(added.Index, added.Element.ToString())
+                    : previous + added.Element.ToString();
 
             previous = line;
 
