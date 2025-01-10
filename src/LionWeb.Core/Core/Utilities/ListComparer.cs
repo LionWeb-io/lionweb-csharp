@@ -89,58 +89,15 @@ public class ListComparer<T> : IListComparer<T>
         }
     }
 
-    /// The original algorithm only detects additions and deletions.
-    /// We replace matching add/delete pairs by one
-    ///   replace change iff they are on the same index,
-    ///   move change iff they are on different index,
-    /// and keep the remaining additions and deletions.
-    private List<IListComparer<T>.IChange> CollectChanges()
-    {
-        List<IListComparer<T>.IChange> result = [];
-        foreach ((T, RightIndex) addedEntry in _added.Values.ToList())
-        {
-            (T, LeftIndex) deletedSameEntry = _deleted.Values.FirstOrDefault(p => Equals(p.Item1, addedEntry.Item1));
-            if (!deletedSameEntry.Equals(default))
-            {
-                LeftIndex indexOfValue = _deleted.IndexOfValue(deletedSameEntry);
-                T leftElement = deletedSameEntry.Item1;
-                LeftIndex leftIndex = deletedSameEntry.Item2;
-                T rightElement = addedEntry.Item1;
-                RightIndex rightIndex = addedEntry.Item2;
-
-                if (leftIndex != rightIndex || !Equals(leftElement, rightElement))
-                {
-                    result.Add(new IListComparer<T>.Added(rightElement,rightIndex));
-                    result.Add(new IListComparer<T>.Deleted(leftElement,leftIndex));
-                    // result.Add(new IListComparer<T>.Moved(leftElement, leftIndex, rightElement, rightIndex));
-                }
-
-                _added.RemoveAt(_added.IndexOfValue(addedEntry));
-                _deleted.RemoveAt(indexOfValue);
-                // continue;
-            }
-
-            // (T, LeftIndex) deletedSameIndex = _deleted.Values.FirstOrDefault(p => Equals(p.Item2, addedEntry.Item2));
-            // if (!deletedSameIndex.Equals(default))
-            // {
-            //     LeftIndex indexOfValue = _deleted.IndexOfValue(deletedSameIndex);
-            //     T leftElement = deletedSameIndex.Item1;
-            //     LeftIndex leftIndex = deletedSameIndex.Item2;
-            //     T rightElement = addedEntry.Item1;
-            //
-            //     result.Add(new IListComparer<T>.Replaced(leftElement, leftIndex, rightElement));
-            //     _added.RemoveAt(_added.IndexOfValue(addedEntry));
-            //     _deleted.RemoveAt(indexOfValue);
-            // }
-        }
-
-        result.AddRange(_added.Values.Select(c => new IListComparer<T>.Added(c.Item1, c.Item2))
-            .Cast<IListComparer<T>.IChange>());
-        result.AddRange(_deleted.Values.Select(c => new IListComparer<T>.Deleted(c.Item1, c.Item2))
-            .Cast<IListComparer<T>.IChange>());
-
-        return result;
-    }
+    private List<IListComparer<T>.IChange> CollectChanges() =>
+        _deleted
+            .Values
+            .Select(c => (IListComparer<T>.IChange)new IListComparer<T>.Deleted(c.Item1, c.Item2))
+            .Concat(_added
+                .Values
+                .Select(c => (IListComparer<T>.IChange)new IListComparer<T>.Added(c.Item1, c.Item2))
+            )
+            .ToList();
 
     private void CompareInternal()
     {
