@@ -62,10 +62,10 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "acefhijl",
             "aBcDefGhijKl",
             [
-                new(Add, 'K', 7),
-                new(Add, 'G', 4),
-                new(Add, 'D', 2),
                 new(Add, 'B', 1),
+                new(Add, 'D', 3),
+                new(Add, 'G', 6),
+                new(Add, 'K', 10),
             ]
         );
     }
@@ -85,10 +85,10 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "aBceFgi",
             "acDegHi",
     [
-                new(Add, 'D', 3),
-                new(Add, 'H', 7),
                 new(Delete, 'B', 1),
+                new(Add, 'D', 2),
                 new(Delete, 'F', 4),
+                new(Add, 'H', 5),
             ]
         );
     }
@@ -108,10 +108,10 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "aBceFgi",
             "acDegHi",
     [
-                new(Add, 'D', 3),
-                new(Add, 'H', 7),
                 new(Delete, 'B', 1),
+                new(Add, 'D', 2),
                 new(Delete, 'F', 4),
+                new(Add, 'H', 5),
             ]
         );
     }
@@ -131,10 +131,10 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "aBceFgi",
             "acDegHi",
     [
-                new(Add, 'D', 3),
-                new(Add, 'H', 7),
                 new(Delete, 'B', 1),
+                new(Add, 'D', 2),
                 new(Delete, 'F', 4),
+                new(Add, 'H', 5),
             ]
         );
     }
@@ -153,10 +153,9 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "aceFgi",
             "acDegHi",
             [
-                new(Add, 'D', 3),
-                new(Add, 'H', 7),
-                new(Delete, 'B', 1),
+                new(Add, 'D', 2),
                 new(Delete, 'F', 4),
+                new(Add, 'H', 5),
             ]
         );
     }
@@ -178,10 +177,12 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "abcDEF",
             "abXcGH",
             [
-                new(Add, 'D', 3),
-                new(Add, 'H', 7),
-                new(Delete, 'B', 1),
+                new(Add, 'X', 2),
+                new(Delete, 'D', 4),
+                new(Delete, 'E', 4),
                 new(Delete, 'F', 4),
+                new(Add, 'G', 4),
+                new(Add, 'H', 5),
             ]
         );
     }
