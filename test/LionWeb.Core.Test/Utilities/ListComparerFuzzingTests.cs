@@ -43,6 +43,8 @@ public class ListComparerFuzzingTests : AbsoluteIndexListComparerTestsBase
     [TestMethod]
     public void Ex0() => AssertCompare("JK", "wm3cKcpKyBnI");
 
+    [TestMethod]
+    public void Ex1() => AssertCompare("yiM2g","4yYqIGg4gAi");
 
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new ListComparer<char>(left.ToList(), right.ToList());
