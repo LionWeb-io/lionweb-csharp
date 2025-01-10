@@ -66,7 +66,7 @@ public class StepwiseFuzzingTests : ListComparerTestsBase
     [TestMethod]
     [DynamicData(nameof(TestData))]
     public void Fuzz(string left, string right)
-        => AssertCompare(left, right, []);
+        => AssertCompare(left, right);
 
     [TestMethod]
     public void Ex0() => AssertCompare("bRaMC1I0P2tFS", "0RYG", []);
