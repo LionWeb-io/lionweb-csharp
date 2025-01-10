@@ -21,6 +21,34 @@ using Core.Utilities;
 using Serialization;
 
 [TestClass]
+public class ListComparerFuzzingTests : AbsoluteIndexListComparerTestsBase
+{
+    const int Tries = 1000;
+    private const int MaxLength = 15;
+
+    public static IEnumerable<object[]> TestData
+    {
+        get => Enumerable.Range(0, Tries).Select(i => new object[]
+        {
+            StringRandomizer.Random(new Random().Next(MaxLength)),
+            StringRandomizer.Random(new Random().Next(MaxLength)),
+        });
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(TestData))]
+    public void Fuzz(string left, string right)
+        => AssertCompare(left, right);
+
+    [TestMethod]
+    public void Ex0() => AssertCompare("JK", "wm3cKcpKyBnI");
+
+
+    protected internal override IListComparer<char> CreateComparer(string left, string right)
+        => new ListComparer<char>(left.ToList(), right.ToList());
+}
+
+[TestClass]
 public class StepwiseFuzzingTests : ListComparerTestsBase
 {
     const int Tries = 1000;
@@ -42,7 +70,6 @@ public class StepwiseFuzzingTests : ListComparerTestsBase
 
     [TestMethod]
     public void Ex0() => AssertCompare("bRaMC1I0P2tFS", "0RYG", []);
-    
     
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new StepwiseListComparer<char>(left.ToList(), right.ToList());
