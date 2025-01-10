@@ -128,7 +128,7 @@ public class StepwiseListComparer<T> : IListComparer<T>
             Console.WriteLine("\ncurrent: " + change);
 
             change.Index -= delta;
-            
+
             if (change is IListComparer<T>.Deleted)
                 delta++;
 
@@ -136,80 +136,8 @@ public class StepwiseListComparer<T> : IListComparer<T>
 
             Console.WriteLine(string.Join("\n", result));
         }
-        
-        Console.WriteLine("\nbeforeMoveAdjustment: \n" + string.Join("\n", result));
 
-        
-        for (var i = 0; i < result.Count; i++)
-        {
-            var currentResult = result[i];
-            if (currentResult is IListComparer<T>.Added a)
-            {
-                for (var j = i + 1; j < result.Count; j++)
-                {
-                    var partner = result[j];
-                    if (partner is IListComparer<T>.Deleted partnerDelete && a.Element.Equals(partnerDelete.Element))
-                    {
-                        for (var k = j - 1; k > i; k--)
-                        {
-                            var intermediate = result[k];
-                            if (intermediate is IListComparer<T>.Added interAdd)
-                            {
-                                // interAdd.RightIndex += 1;
-                                partnerDelete.LeftIndex -= 1;
-                                result[k] = partnerDelete;
-                                result[k + 1] = intermediate;
-                            }
-        
-                            if (intermediate is IListComparer<T>.Deleted interDel)
-                            {
-                                // interDel.LeftIndex -= 1;
-                                partnerDelete.LeftIndex += 1;
-                                result[k] = partnerDelete;
-                                result[k + 1] = intermediate;
-                            }
-                        }
-                        result[i] = new IListComparer<T>.Moved(partnerDelete.Element, partnerDelete.LeftIndex-1, a.Element, a.RightIndex);
-                        result.RemoveAt(i+1);
-                        i--;
-                    }
-                }
-            } else if (currentResult is IListComparer<T>.Deleted d)
-            {
-                for (var j = i + 1; j < result.Count; j++)
-                {
-                    var partner = result[j];
-                    if (partner is IListComparer<T>.Added partnerAdd && d.Element.Equals(partnerAdd.Element))
-                    {
-                        for (var k = j - 1; k > i; k--)
-                        {
-                            var intermediate = result[k];
-                            if (intermediate is IListComparer<T>.Added interAdd)
-                            {
-                                // interAdd.RightIndex += 1;
-                                partnerAdd.RightIndex -= 1;
-                                result[k] = partnerAdd;
-                                result[k + 1] = intermediate;
-                            }
-        
-                            if (intermediate is IListComparer<T>.Deleted interDel)
-                            {
-                                // interDel.LeftIndex -= 1;
-                                partnerAdd.RightIndex += 1;
-                                result[k] = partnerAdd;
-                                result[k + 1] = intermediate;
-                            }
-                        }
-                        result[i] = new IListComparer<T>.Moved(d.Element, d.LeftIndex, partnerAdd.Element, partnerAdd.RightIndex);
-                        result.RemoveAt(i+1);
-                        i--;
-                    }
-                }
-            }
-        
-        }
-
-        Console.WriteLine("\nafterMoveAdjustment: \n" + string.Join("\n", result));
+        Console.WriteLine("\nafter StepwiseListComparer: \n" + string.Join("\n", result));
 
         return result;
     }

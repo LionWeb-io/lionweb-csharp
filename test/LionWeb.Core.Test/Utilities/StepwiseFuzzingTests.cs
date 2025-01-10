@@ -23,8 +23,8 @@ using Serialization;
 [TestClass]
 public class StepwiseFuzzingTests : ListComparerTestsBase
 {
-    const int Tries = 10;
-    private const int MaxLength = 30;
+    const int Tries = 1000;
+    private const int MaxLength = 15;
 
     public static IEnumerable<object[]> TestData
     {
@@ -40,6 +40,10 @@ public class StepwiseFuzzingTests : ListComparerTestsBase
     public void Fuzz(string left, string right)
         => AssertCompare(left, right, []);
 
+    [TestMethod]
+    public void Ex0() => AssertCompare("bRaMC1I0P2tFS", "0RYG", []);
+    
+    
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new StepwiseListComparer<char>(left.ToList(), right.ToList());
 }
