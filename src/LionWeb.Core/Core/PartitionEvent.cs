@@ -145,7 +145,7 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
         if (!IsActive() || setValues == null)
             return;
 
-        var listComparer = new StepwiseListComparer<T>(existingValues, setValues);
+        var listComparer = new MoveDetector<T>(new StepwiseListComparer<T>(existingValues, setValues).Compare());
         _changes = listComparer.Compare();
     }
 
@@ -499,7 +499,7 @@ public class SetReferenceEvent<T> : PartitionEventBase<T> where T : IReadableNod
         if (!IsActive())
             return;
 
-        var listComparer = new StepwiseListComparer<T>(storage, safeNodes);
+        var listComparer = new MoveDetector<T>(new StepwiseListComparer<T>(storage, safeNodes).Compare());
         _changes = listComparer.Compare();
     }
 
@@ -599,7 +599,7 @@ public class SetAnnotationEvent : PartitionAnnotationEventBase
         if (!IsActive() || setValues == null)
             return;
 
-        var listComparer = new StepwiseListComparer<INode>(existingValues, setValues);
+        var listComparer = new MoveDetector<INode>(new StepwiseListComparer<INode>(existingValues, setValues).Compare());
         _changes = listComparer.Compare();
     }
 
