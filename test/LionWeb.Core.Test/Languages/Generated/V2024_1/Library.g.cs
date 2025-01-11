@@ -188,7 +188,9 @@ public partial class Book : ConceptInstanceBase
         public Book SetAuthor(Writer value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
+		Writer? oldValue = _author;
 		_author = value;
+		RaiseSingleReferenceEvent(LibraryLanguage.Instance.Book_author, oldValue, value);
 		return this;
 	}
 
@@ -202,7 +204,9 @@ public partial class Book : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Book SetPages(int value)
 	{
+		int? oldValue = _pages;
 		_pages = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Book_pages, oldValue, value);
 		return this;
 	}
 
@@ -219,7 +223,9 @@ public partial class Book : ConceptInstanceBase
         public Book SetTitle(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
+		string? oldValue = _title;
 		_title = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Book_title, oldValue, value);
 		return this;
 	}
 
@@ -232,7 +238,9 @@ public partial class Book : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Book SetType(BookType? value)
 	{
+		BookType? oldValue = _type;
 		_type = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Book_type, oldValue, value);
 		return this;
 	}
 
@@ -358,7 +366,9 @@ public partial class GuideBookWriter : Writer
         public GuideBookWriter SetCountries(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.GuideBookWriter_countries);
+		string? oldValue = _countries;
 		_countries = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.GuideBookWriter_countries, oldValue, value);
 		return this;
 	}
 
@@ -427,7 +437,10 @@ public partial class Library : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		AddMultipleContainmentsEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null);
+		evt.CollectOldData();
 		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -440,7 +453,10 @@ public partial class Library : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
 		AssureNoSelfMove(index, safeNodes, _books);
+		AddMultipleContainmentsEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, index);
+		evt.CollectOldData();
 		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -451,7 +467,7 @@ public partial class Library : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, LibraryLanguage.Instance.Library_books);
 		AssureNotClearing(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		RemoveSelfParent(safeNodes, _books, LibraryLanguage.Instance.Library_books);
+		RemoveSelfParent(safeNodes, _books, LibraryLanguage.Instance.Library_books, ContainmentRemover<Book>(LibraryLanguage.Instance.Library_books));
 		return this;
 	}
 
@@ -468,7 +484,9 @@ public partial class Library : ConceptInstanceBase
         public Library SetName(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Library_name);
+		string? oldValue = _name;
 		_name = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Library_name, oldValue, value);
 		return this;
 	}
 
@@ -505,10 +523,13 @@ public partial class Library : ConceptInstanceBase
 			return true;
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
 		{
-			var enumerable = LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value).ToList();
-			AssureNonEmpty(enumerable, LibraryLanguage.Instance.Library_books);
+			var safeNodes = LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value).ToList();
+			AssureNonEmpty(safeNodes, LibraryLanguage.Instance.Library_books);
+			SetContainmentEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books);
+			evt.CollectOldData();
 			RemoveSelfParent(_books.ToList(), _books, LibraryLanguage.Instance.Library_books);
-			AddBooks(enumerable);
+			_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -580,7 +601,9 @@ public partial class SpecialistBookWriter : Writer
         public SpecialistBookWriter SetSubject(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.SpecialistBookWriter_subject);
+		string? oldValue = _subject;
 		_subject = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.SpecialistBookWriter_subject, oldValue, value);
 		return this;
 	}
 
@@ -649,7 +672,9 @@ public partial class Writer : ConceptInstanceBase
         public Writer SetName(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Writer_name);
+		string? oldValue = _name;
 		_name = value;
+		RaisePropertyEvent(LibraryLanguage.Instance.Writer_name, oldValue, value);
 		return this;
 	}
 

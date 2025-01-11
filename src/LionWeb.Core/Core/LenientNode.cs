@@ -159,7 +159,7 @@ public class LenientNode : NodeBase, INode
         if (feature == null)
         {
             var enumerable = M2Extensions.AsNodes<INode>(value).ToList();
-            RemoveSelfParent(_annotations.ToList(), _annotations, null);
+            RemoveSelfParent(_annotations.ToList(), _annotations, null, null);
             AddAnnotations(enumerable);
             return true;
         }
@@ -234,7 +234,7 @@ public class LenientNode : NodeBase, INode
                 SetParentNull(n);
                 return;
             case List<INode> oldList:
-                RemoveSelfParent(oldList.ToList(), oldList, c);
+                RemoveSelfParent(oldList.ToList(), oldList, c, null);
                 return;
         }
     }
@@ -294,5 +294,5 @@ public class LenientNode : NodeBase, INode
 
     /// <inheritdoc />
     public override bool RemoveAnnotations(IEnumerable<INode> annotations) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null);
+        RemoveSelfParent(annotations?.ToList(), _annotations, null, null);
 }

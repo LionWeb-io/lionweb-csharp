@@ -31,8 +31,8 @@ public abstract class DynamicNodeTestsBase
         _lang = ShapesDynamic.Language;
     }
 
-    protected DynamicNode newReferenceGeometry(string id) =>
-        _lang.GetFactory().CreateNode(id, _lang.ClassifierByKey("key-ReferenceGeometry")) as DynamicNode ??
+    protected DynamicPartitionInstance newReferenceGeometry(string id) =>
+        _lang.GetFactory().CreateNode(id, _lang.ClassifierByKey("key-ReferenceGeometry")) as DynamicPartitionInstance ??
         throw new AssertFailedException();
 
     protected DynamicNode newLine(string id) =>
@@ -51,8 +51,8 @@ public abstract class DynamicNodeTestsBase
         _lang.GetFactory().CreateNode(id, _lang.ClassifierByKey("key-Documentation")) as DynamicNode ??
         throw new AssertFailedException();
 
-    protected DynamicNode newGeometry(string id) =>
-        _lang.GetFactory().CreateNode(id, _lang.ClassifierByKey("key-Geometry")) as DynamicNode ??
+    protected DynamicPartitionInstance newGeometry(string id) =>
+        _lang.GetFactory().CreateNode(id, _lang.ClassifierByKey("key-Geometry")) as DynamicPartitionInstance ??
         throw new AssertFailedException();
 
     protected DynamicNode newCircle(string id) =>

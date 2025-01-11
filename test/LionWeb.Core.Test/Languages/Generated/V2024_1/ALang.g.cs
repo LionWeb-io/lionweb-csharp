@@ -116,7 +116,9 @@ public partial class AConcept : ConceptInstanceBase
 	/// <remarks>Optional Single Reference</remarks>
         public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? value)
 	{
+		LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? oldValue = _bRef;
 		_bRef = value;
+		RaiseSingleReferenceEvent(ALangLanguage.Instance.AConcept_BRef, oldValue, value);
 		return this;
 	}
 

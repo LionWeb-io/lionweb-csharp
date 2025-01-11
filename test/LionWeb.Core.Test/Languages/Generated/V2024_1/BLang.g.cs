@@ -107,7 +107,9 @@ public partial class BConcept : ConceptInstanceBase
         public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum value)
 	{
 		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
+		LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum? oldValue = _aEnumProp;
 		_aEnumProp = value;
+		RaisePropertyEvent(BLangLanguage.Instance.BConcept_AEnumProp, oldValue, value);
 		return this;
 	}
 
@@ -120,7 +122,9 @@ public partial class BConcept : ConceptInstanceBase
 	/// <remarks>Optional Single Reference</remarks>
         public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? value)
 	{
+		LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? oldValue = _aRef;
 		_aRef = value;
+		RaiseSingleReferenceEvent(BLangLanguage.Instance.BConcept_ARef, oldValue, value);
 		return this;
 	}
 
