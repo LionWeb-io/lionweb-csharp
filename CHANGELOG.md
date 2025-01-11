@@ -31,6 +31,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Deserializer supports selecting alternate language versions (see `DeserializerHandlerSelectOtherLanguageVersion`).
 * Introduced `Language.LionWebVersion` and `Language.SetFactory()`.
 * Introduced `LenientNode` to support migration scenarios.
+* Introduced interfaces `IPartitionInstance`, `IAnnotationInstance`, and `IConceptInstance` for applicable nodes.
 ### Fixed
 ### Changed
 * `LionWeb.Core.Serialization.JsonUtils`:
