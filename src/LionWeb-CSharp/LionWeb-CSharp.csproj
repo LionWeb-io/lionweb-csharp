@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <AssemblyName>LionWeb-CSharp</AssemblyName>
         <Title>LionWeb-CSharp</Title>
         <Description>This package contains the C# reference implementation of the LionWeb core functionality</Description>
         <PackageReadmeFile>README.md</PackageReadmeFile>
