@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <AssemblyName>LionWeb-CSharp-Generator</AssemblyName>
         <Title>LionWeb-CSharp-Generator</Title>
         <Description>A generator that generates C# source code from a LionWeb M2</Description>
         <TargetFramework>net8.0</TargetFramework>
