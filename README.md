@@ -27,7 +27,7 @@ It's triggered:
 * On every event for a Pull Request, including opening one.
 * When a commit (on any branch) is tagged.
     Provided that restoring, building, packaging, and running all tests are all successful,
-    then NuGet packages (for) `LionWeb.Core` and `LionWeb.Generator` are published to [NuGet “Central”](https://www.nuget.org/) with the tag as version identification.
+    then NuGet packages (for) `LionWeb-CSharp` and `LionWeb-CSharp-Generator` are published to [NuGet “Central”](https://www.nuget.org/) with the tag as version identification.
 
 ### NuGet API keys
 
@@ -38,7 +38,7 @@ At least one of the keys listed there should have the following characteristics:
 
 * “Push” permission — either “new packages and package versions” or “only new package versions”, but preferably the former.
 * Package owner: LionWeb
-* Packages: LionWeb-CSharp, LionWeb-CSharp-Generator; or Glob pattern: *
+* Packages: `LionWeb-CSharp`, `LionWeb-CSharp-Generator`; or Glob pattern: `*`
 
 **Note**! Whenever you have to (re-)generate an API key, make sure that the key is associated with all of the LionWeb-CSharp packages to publish.
 If it's not, then you click the “Edit” link, and *then* re-generate the key.
