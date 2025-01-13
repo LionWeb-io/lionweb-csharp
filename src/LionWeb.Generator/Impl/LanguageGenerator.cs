@@ -57,8 +57,8 @@ public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : L
         ClassDeclaration(LanguageName)
             .WithAttributeLists(AsAttributes([
                 AsAttribute(AsType(typeof(LionCoreLanguage)), [
-                    ("Key", names.Language.Key.AsLiteral()),
-                    ("Version", names.Language.Version.AsLiteral())
+                    ("Key", _names.Language.Key.AsLiteral()),
+                    ("Version", _names.Language.Version.AsLiteral())
                 ])
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))

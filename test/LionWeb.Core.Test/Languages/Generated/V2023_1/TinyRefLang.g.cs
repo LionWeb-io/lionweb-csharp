@@ -107,7 +107,9 @@ public partial class MyConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		int previousCount = _multivaluedRef.Count;
 		_multivaluedRef.AddRange(safeNodes);
+		RaiseReferenceAddEvent(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, safeNodes, previousCount);
 		return this;
 	}
 
@@ -121,6 +123,7 @@ public partial class MyConcept : ConceptInstanceBase
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		_multivaluedRef.InsertRange(index, safeNodes);
+		RaiseReferenceAddEvent(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, safeNodes, index);
 		return this;
 	}
 
@@ -132,7 +135,7 @@ public partial class MyConcept : ConceptInstanceBase
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNotClearing(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		RemoveAll(safeNodes, _multivaluedRef);
+		RemoveAll(safeNodes, _multivaluedRef, ReferenceRemover<MyConcept>(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef));
 		return this;
 	}
 
@@ -149,7 +152,9 @@ public partial class MyConcept : ConceptInstanceBase
         public MyConcept SetSingularRef(MyConcept value)
 	{
 		AssureNotNull(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
+		MyConcept? oldValue = _singularRef;
 		_singularRef = value;
+		RaiseSingleReferenceEvent(TinyRefLangLanguage.Instance.MyConcept_singularRef, oldValue, value);
 		return this;
 	}
 
@@ -186,10 +191,13 @@ public partial class MyConcept : ConceptInstanceBase
 			return true;
 		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(feature))
 		{
-			var enumerable = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.TinyRefLang.MyConcept>(value).ToList();
-			AssureNonEmpty(enumerable, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+			var safeNodes = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.TinyRefLang.MyConcept>(value).ToList();
+			AssureNonEmpty(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+			SetReferenceEvent<MyConcept> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef);
+			evt.CollectOldData();
 			_multivaluedRef.Clear();
-			AddMultivaluedRef(enumerable);
+			_multivaluedRef.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 

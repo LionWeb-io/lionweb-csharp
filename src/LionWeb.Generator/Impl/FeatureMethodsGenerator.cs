@@ -34,7 +34,8 @@ using Property = Core.M3.Property;
 /// - SetInternal()
 /// - CollectAllSetFeatures()
 /// </summary>
-public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion) : ClassifierGeneratorBase(names, lionWebVersion)
+public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion)
+    : ClassifierGeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="FeatureMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> FeatureMethods()
@@ -169,37 +170,76 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
     [
-        EnumerableVar(containment),
+        SafeNodesVar(containment),
+        SetContainmentEventVariable(containment),
+        EventCollectOldDataCall(),
         RemoveSelfParentCall(containment),
-        LinkAddCall(containment),
+        OptionalAddRangeCall(containment),
+        EventRaiseEventCall(),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiRequiredContainment(Containment containment) =>
     [
-        EnumerableToListVar(containment),
+        SafeNodesVar(containment),
         AssureNonEmptyCall(containment),
+        SetContainmentEventVariable(containment),
+        EventCollectOldDataCall(),
         RemoveSelfParentCall(containment),
-        LinkAddCall(containment),
+        RequiredAddRangeCall(containment),
+        EventRaiseEventCall(),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiOptionalReference(Reference reference) =>
     [
-        EnumerableVar(reference),
-        ClearCall(reference),
-        LinkAddCall(reference),
+        SafeNodesVar(reference),
+        AssureNotNullCall(reference),
+        AssureNotNullMembersCall(reference),
+        SetReferenceEventVariable(reference),
+        EventCollectOldDataCall(),
+        ClearFieldCall(reference),
+        ReferenceAddRangeCall(reference),
+        EventRaiseEventCall(),
         ReturnTrue()
     ];
 
     private List<StatementSyntax> GenSetInternalMultiRequiredReference(Reference reference) =>
     [
-        EnumerableToListVar(reference),
+        SafeNodesVar(reference),
         AssureNonEmptyCall(reference),
-        ClearCall(reference),
-        LinkAddCall(reference),
+        SetReferenceEventVariable(reference),
+        EventCollectOldDataCall(),
+        ClearFieldCall(reference),
+        ReferenceAddRangeCall(reference),
+        EventRaiseEventCall(),
         ReturnTrue()
     ];
+
+    private ExpressionStatementSyntax ClearFieldCall(Reference reference) =>
+        ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear"))));
+
+    private ExpressionStatementSyntax ReferenceAddRangeCall(Reference reference) =>
+        ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("AddRange")),
+            AsArguments([IdentifierName("safeNodes")])));
+
+    private LocalDeclarationStatementSyntax SetContainmentEventVariable(Containment containment) =>
+        Variable(
+            "evt",
+            AsType(typeof(SetContainmentEvent<>), AsType(containment.GetFeatureType())),
+            NewCall([
+                MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment)
+            ])
+        );
+
+    private LocalDeclarationStatementSyntax SetReferenceEventVariable(Reference reference) =>
+        Variable(
+            "evt",
+            AsType(typeof(SetReferenceEvent<>), AsType(reference.GetFeatureType())),
+            NewCall([
+                MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference)
+            ])
+        );
 
     private BinaryPatternSyntax NullOrTypePattern(Feature feature) =>
         BinaryPattern(
@@ -222,16 +262,13 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             NewCall([IdentifierName("feature"), IdentifierName("value")], AsType(typeof(InvalidValueException)))
         );
 
-    private LocalDeclarationStatementSyntax EnumerableVar(Link link) =>
-        Variable("enumerable", Var(), AsNodesCall(link));
-
-    private LocalDeclarationStatementSyntax EnumerableToListVar(Link link) =>
-        Variable("enumerable", Var(),
+    private LocalDeclarationStatementSyntax SafeNodesVar(Link link) =>
+        Variable("safeNodes", Var(),
             InvocationExpression(MemberAccess(AsNodesCall(link), IdentifierName("ToList")))
         );
 
     private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
-        ExpressionStatement(Call("AssureNonEmpty", IdentifierName("enumerable"), MetaProperty(link)));
+        ExpressionStatement(Call("AssureNonEmpty", IdentifierName("safeNodes"), MetaProperty(link)));
 
     private ExpressionStatementSyntax RemoveSelfParentCall(Containment containment) =>
         ExpressionStatement(Call("RemoveSelfParent",
@@ -239,16 +276,6 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             FeatureField(containment),
             MetaProperty(containment)
         ));
-
-    private ExpressionStatementSyntax LinkAddCall(Link link) =>
-        ExpressionStatement(InvocationExpression(LinkAdd(link),
-            AsArguments([IdentifierName("enumerable")])
-        ));
-
-    private ExpressionStatementSyntax ClearCall(Reference reference) =>
-        ExpressionStatement(
-            InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear")))
-        );
 
     private CastExpressionSyntax CastValueType(Feature feature) =>
         CastExpression(NullableType(AsType(feature.GetFeatureType(), true)), IdentifierName("value"));
@@ -270,7 +297,10 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(
-                new List<StatementSyntax> { ParseStatement("List<Feature> result = base.CollectAllSetFeatures().ToList();") }
+                new List<StatementSyntax>
+                    {
+                        ParseStatement("List<Feature> result = base.CollectAllSetFeatures().ToList();")
+                    }
                     .Concat(FeaturesToImplement(classifier).Select(GenCollectAllSetFeatures))
                     .Append(ReturnStatement(IdentifierName("result")))
             ));

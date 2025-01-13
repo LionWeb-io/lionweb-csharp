@@ -116,7 +116,9 @@ public partial class EnumHolder : ConceptInstanceBase
         public EnumHolder SetEnumValue(MyEnum value)
 	{
 		AssureNotNull(value, WithEnumLanguage.Instance.EnumHolder_enumValue);
+		MyEnum? oldValue = _enumValue;
 		_enumValue = value;
+		RaisePropertyEvent(WithEnumLanguage.Instance.EnumHolder_enumValue, oldValue, value);
 		return this;
 	}
 

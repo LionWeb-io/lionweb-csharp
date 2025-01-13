@@ -39,7 +39,8 @@ using Property = Core.M3.Property;
 /// - InsertFeature()
 /// - RemoveFeature()
 /// </summary>
-public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
+public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion)
+    : ClassifierGeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="FeatureGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> Members() =>
@@ -91,7 +92,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     {
         List<StatementSyntax> setterBody =
         [
+            OldValueVariable(),
             AssignFeatureField(),
+            RaisePropertyEventCall(),
             ReturnStatement(This())
         ];
         if (IsReferenceType(property))
@@ -111,10 +114,20 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
             .Concat(
                 OptionalFeatureSetter([
+                    OldValueVariable(),
                     AssignFeatureField(),
+                    RaisePropertyEventCall(),
                     ReturnStatement(This())
                 ])
             );
+
+    private LocalDeclarationStatementSyntax OldValueVariable() =>
+        Variable("oldValue", NullableType(AsType(feature.GetFeatureType())), FeatureField(feature));
+
+    private ExpressionStatementSyntax RaisePropertyEventCall() =>
+        ExpressionStatement(
+            Call("RaisePropertyEvent", MetaProperty(feature), IdentifierName("oldValue"), IdentifierName("value"))
+        );
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
@@ -124,9 +137,12 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 .Xdoc(XdocThrowsIfSetToNull())
         }.Concat(RequiredFeatureSetter([
                 AsureNotNullCall(),
+                SingleContainmentEventVariable(),
+                EventCollectOldDataCall(),
                 SetParentNullCall(containment),
                 AttachChildCall(),
                 AssignFeatureField(),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ])
             .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
@@ -136,15 +152,23 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
-        new List<MemberDeclarationSyntax>
-        {
-            SingleFeatureField(), SingleOptionalFeatureProperty()
-        }.Concat(OptionalFeatureSetter([
-            SetParentNullCall(containment),
-            AttachChildCall(),
-            AssignFeatureField(),
-            ReturnStatement(This())
-        ]));
+        new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }.Concat(
+            OptionalFeatureSetter([
+                SingleContainmentEventVariable(),
+                EventCollectOldDataCall(),
+                SetParentNullCall(containment),
+                AttachChildCall(),
+                AssignFeatureField(),
+                EventRaiseEventCall(),
+                ReturnStatement(This())
+            ]));
+
+    private LocalDeclarationStatementSyntax SingleContainmentEventVariable() =>
+        Variable(
+            "evt",
+            AsType(typeof(SingleContainmentEvent<>), AsType(feature.GetFeatureType())),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
+        );
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
@@ -155,7 +179,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             }
             .Concat(RequiredFeatureSetter([
                     AsureNotNullCall(),
+                    OldValueVariable(),
                     AssignFeatureField(),
+                    RaiseSingleReferenceEventCall(),
                     ReturnStatement(This())
                 ])
                 .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
@@ -164,9 +190,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
             .Concat(OptionalFeatureSetter([
+                OldValueVariable(),
                 AssignFeatureField(),
+                RaiseSingleReferenceEventCall(),
                 ReturnStatement(This())
             ]));
+
+    private ExpressionStatementSyntax RaiseSingleReferenceEventCall() =>
+        ExpressionStatement(
+            Call("RaiseSingleReferenceEvent", MetaProperty(feature), IdentifierName("oldValue"),
+                IdentifierName("value"))
+        );
 
     private IEnumerable<MemberDeclarationSyntax> RequiredMultiContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
@@ -178,7 +212,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             LinkAdder(containment, [
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
+                    AddMultipleContainmentEventVariable(Null()),
+                    EventCollectOldDataCall(),
                     RequiredAddRangeCall(containment),
+                    EventRaiseEventCall(),
                     ReturnStatement(This())
                 ])
                 .Select(a => XdocRequiredAdder(a, containment))
@@ -188,7 +225,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
                     AssureNoSelfMoveCall(containment),
+                    AddMultipleContainmentEventVariable(IdentifierName("index")),
+                    EventCollectOldDataCall(),
                     InsertRangeCall(containment),
+                    EventRaiseEventCall(),
                     ReturnStatement(This())
                 ])
                 .Select(i => XdocRequiredInserter(i, containment))
@@ -231,7 +271,13 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             MultipleLinkField(containment), MultipleLinkProperty(containment, AsReadOnlyCall(containment))
         }.Concat(
             LinkAdder(containment, [
+                SafeNodesVariable(),
+                AssureNotNullCall(containment),
+                AssureNotNullMembersCall(containment),
+                AddMultipleContainmentEventVariable(Null()),
+                EventCollectOldDataCall(),
                 OptionalAddRangeCall(containment),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -240,13 +286,26 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(containment),
                 AssureNoSelfMoveCall(containment),
+                AssureNotNullMembersCall(containment),
+                AddMultipleContainmentEventVariable(IdentifierName("index")),
+                EventCollectOldDataCall(),
                 InsertRangeCall(containment),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
             LinkRemover(containment, [
                 OptionalRemoveSelfParentCall(containment),
                 ReturnStatement(This())
+            ])
+        );
+
+    private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(ExpressionSyntax index) =>
+        Variable(
+            "evt",
+            AsType(typeof(AddMultipleContainmentsEvent<>), AsType(feature.GetFeatureType())),
+            NewCall([
+                MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index
             ])
         );
 
@@ -261,7 +320,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
+                    PreviousCountVariable(reference),
                     SimpleAddRangeCall(reference),
+                    RaiseReferenceAddEventCall("previousCount"),
                     ReturnStatement(This())
                 ])
                 .Select(a => XdocRequiredAdder(a, reference))
@@ -272,6 +333,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
                     SimpleInsertRangeCall(reference),
+                    RaiseReferenceAddEventCall("index"),
                     ReturnStatement(This())
                 ])
                 .Select(i => XdocRequiredInserter(i, reference))
@@ -281,7 +343,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
                     AssureNotClearingCall(reference),
-                    SimpleRemoveAllCall(reference),
+                    RemoveAllCall(reference),
                     ReturnStatement(This())
                 ])
                 .Select(r => XdocRequiredRemover(r, reference))
@@ -296,7 +358,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
+                PreviousCountVariable(reference),
                 SimpleAddRangeCall(reference),
+                RaiseReferenceAddEventCall("previousCount"),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -306,6 +370,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
                 SimpleInsertRangeCall(reference),
+                RaiseReferenceAddEventCall("index"),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -313,9 +378,19 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
-                SimpleRemoveAllCall(reference),
+                RemoveAllCall(reference),
                 ReturnStatement(This())
             ])
+        );
+
+    private ExpressionStatementSyntax RaiseReferenceAddEventCall(string index) =>
+        ExpressionStatement(Call("RaiseReferenceAddEvent",
+            [MetaProperty(feature), IdentifierName("safeNodes"), IdentifierName(index)])
+        );
+
+    private LocalDeclarationStatementSyntax PreviousCountVariable(Reference reference) =>
+        Variable("previousCount", AsType(typeof(int)),
+            MemberAccess(FeatureField(reference), IdentifierName("Count"))
         );
 
     private bool IsReferenceType(Property property) =>
@@ -337,12 +412,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             MetaProperty(link)
         ));
 
-    private ExpressionStatementSyntax AssureNotNullCall(Link link) =>
-        ExpressionStatement(Call("AssureNotNull",
-            IdentifierName("safeNodes"),
-            MetaProperty(link)
-        ));
-
     private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
         ExpressionStatement(Call("AssureNonEmpty",
             IdentifierName("safeNodes"),
@@ -356,12 +425,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             FeatureField(link)
         ));
 
-    private ExpressionStatementSyntax AssureNotNullMembersCall(Reference reference) =>
-        ExpressionStatement(Call("AssureNotNullMembers",
-            IdentifierName("safeNodes"),
-            MetaProperty(reference)
-        ));
-
     private ExpressionStatementSyntax AsureNotNullCall() =>
         ExpressionStatement(Call("AssureNotNull",
             IdentifierName("value"),
@@ -370,11 +433,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private static LocalDeclarationStatementSyntax SafeNodesVariable() =>
         Variable("safeNodes", Var(), OptionalNodesToList());
-
-    private static LocalDeclarationStatementSyntax NotNullSafeNodesVariable() =>
-        Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(IdentifierName("nodes"), IdentifierName("ToList")))
-        );
 
     private static ConditionalAccessExpressionSyntax OptionalNodesToList() =>
         ConditionalAccessExpression(IdentifierName("nodes"),
@@ -397,34 +455,16 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         ExpressionStatement(Call("RemoveSelfParent",
             IdentifierName("safeNodes"),
             FeatureField(containment),
-            MetaProperty(containment)
+            MetaProperty(containment),
+            CallGeneric("ContainmentRemover", AsType(containment.Type), MetaProperty(containment))
         ));
 
     private ExpressionStatementSyntax OptionalRemoveSelfParentCall(Containment containment) =>
         ExpressionStatement(Call("RemoveSelfParent",
             OptionalNodesToList(),
             FeatureField(containment),
-            MetaProperty(containment)
-        ));
-
-    private ExpressionStatementSyntax RequiredAddRangeCall(Containment containment) =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
-            AsArguments([
-                Call("SetSelfParent", IdentifierName("safeNodes"),
-                    MetaProperty(containment)
-                )
-            ])
-        ));
-
-    private ExpressionStatementSyntax OptionalAddRangeCall(Containment containment) =>
-        ExpressionStatement(InvocationExpression(
-            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
-            AsArguments([
-                Call("SetSelfParent", OptionalNodesToList(),
-                    MetaProperty(containment)
-                )
-            ])
+            MetaProperty(containment),
+            CallGeneric("ContainmentRemover", AsType(containment.Type), MetaProperty(containment))
         ));
 
     private ExpressionStatementSyntax SimpleAddRangeCall(Reference reference) =>
@@ -433,8 +473,13 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             AsArguments([IdentifierName("safeNodes")])
         ));
 
-    private ExpressionStatementSyntax SimpleRemoveAllCall(Reference reference) =>
-        ExpressionStatement(Call("RemoveAll", IdentifierName("safeNodes"), FeatureField(reference)));
+    private ExpressionStatementSyntax RemoveAllCall(Reference reference) =>
+        ExpressionStatement(Call(
+            "RemoveAll",
+            IdentifierName("safeNodes"),
+            FeatureField(reference),
+            CallGeneric("ReferenceRemover", AsType(reference.Type), MetaProperty(reference))
+        ));
 
     private ExpressionStatementSyntax SimpleInsertRangeCall(Reference reference) =>
         ExpressionStatement(InvocationExpression(
