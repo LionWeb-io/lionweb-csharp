@@ -30,7 +30,7 @@ public class MoveDetector<T> : IListComparer<T>
     {
         List<IListComparer<T>.Moved> movingChanges = [];
         
-        // extract moves from the list of changes
+        // Extract moves from the list of changes
         for (var i = 0; i < _changes.Count; i++)
         {
             var currentResult = _changes[i];
@@ -81,7 +81,6 @@ public class MoveDetector<T> : IListComparer<T>
                 Console.WriteLine("   after extracting this couple: \n" + string.Join("\n", _changes));
             }
         }
-        Console.WriteLine("\n   after extracting move pairs: \n" + string.Join("\n", _changes));
         
         // Add moves to the tail of the changes list
         for  (var i = 0; i < movingChanges.Count; i++)
@@ -125,10 +124,9 @@ public class MoveDetector<T> : IListComparer<T>
                     currentChange.LeftIndex -= 1;
                 }
             }
-            _changes.Add(currentChange);
+            if (currentChange.LeftIndex != currentChange.RightIndex)
+                _changes.Add(currentChange);
         }
-
-        // We now also get moves with identical left and right indices. We can remove those to optimise
         
         Console.WriteLine("\nafter MoveDetector: \n" + string.Join("\n", _changes));
         return _changes;

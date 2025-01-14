@@ -87,7 +87,6 @@ public class MoveDetectorListComparer2Tests : ListComparerTestsBase
                 new(Delete, 'F', 3),
                 new(Add, 'D', 2),
                 new(Add, 'H', 5),
-                new(Move, 'e', 3, 3),
             ]
         );
 
@@ -124,7 +123,6 @@ public class MoveDetectorListComparer2Tests : ListComparerTestsBase
                 new(Delete, 'B', 1),
                 new(Delete, 'F', 3),
                 new(Add, 'D', 2),
-                new(Move, 'e', 3, 3),
             ]
         );
 
@@ -353,7 +351,6 @@ public class MoveDetectorListComparer2Tests : ListComparerTestsBase
             [
                 new(Delete, 'K', 10),
                 new(Move, 'B', 1, 8),
-                new(Move, 'j', 9, 9),
             ]
         );
 
