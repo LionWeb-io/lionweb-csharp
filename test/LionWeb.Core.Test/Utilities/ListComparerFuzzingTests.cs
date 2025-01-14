@@ -44,7 +44,7 @@ public class ListComparerFuzzingTests : AbsoluteIndexListComparerTestsBase
     public void Ex0() => AssertCompare("JK", "wm3cKcpKyBnI");
 
     [TestMethod]
-    public void Ex1() => AssertCompare("yiM2g","4yYqIGg4gAi");
+    public void Ex1() => AssertCompare("yiM2g", "4yYqIGg4gAi");
 
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new ListComparer<char>(left.ToList(), right.ToList());
@@ -72,7 +72,7 @@ public class StepwiseFuzzingTests : ListComparerTestsBase
 
     [TestMethod]
     public void Ex0() => AssertCompare("bRaMC1I0P2tFS", "0RYG");
-    
+
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new StepwiseListComparer<char>(left.ToList(), right.ToList());
 }
@@ -100,7 +100,66 @@ public class RelativeChangesFuzzingTests : ListComparerTestsBase
 
     [TestMethod]
     public void Ex0() => AssertCompare("bRaMC1I0P2tFS", "0RYG");
-    
+
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new RelativeChangesListComparer<char>(left.ToList(), right.ToList());
+}
+
+[DebugOnlyTestClass]
+// [TestClass]
+public class MoveDetectorFuzzingTests : ListComparerTestsBase
+{
+    const int Tries = 10;
+    private const int MaxLength = 15;
+
+    public static IEnumerable<object[]> TestData
+    {
+        get => GetTestData();
+    }
+
+    private static IEnumerable<object[]> GetTestData()
+    {
+        var random = new Random();
+
+        return Enumerable.Range(0, Tries).Select(i =>
+        {
+            var left = StringRandomizer.Random(random.Next(MaxLength), "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ");
+            var leftSize = left.Count();
+            int oneFifth = (int)(leftSize * 0.2);
+            var moveCount = random.Next(oneFifth, oneFifth * 3);
+            var addCount = random.Next(0, leftSize);
+            var deleteCount = random.Next(0, oneFifth * 2);
+
+            var right = left;
+
+            for (int i1 = 0; i1 < deleteCount; i1++)
+                right = right.DRemove(random.Next(right.Length));
+
+            for (int i2 = 0; i2 < addCount; i2++)
+                right = right.DAdd(random.Next(right.Length), StringRandomizer.RandomChar("ABCDEFGHIJKLMNOPQRSTUVWXYZ"));
+
+            for (int i3 = 0; i3 < moveCount; i3++)
+            {
+                var leftIndex = random.Next(right.Length);
+
+                int rightIndex;
+                do
+                {
+                    rightIndex = random.Next(right.Length);
+                } while (rightIndex == leftIndex || right[leftIndex] == right[rightIndex]);
+
+                right = right.DMove(leftIndex, rightIndex, right[leftIndex]);
+            }
+
+            return new object[] { left, right };
+        });
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(TestData))]
+    public void Fuzz(string left, string right)
+        => AssertCompare(left, right);
+
+    protected internal override IListComparer<char> CreateComparer(string left, string right)
+        => new MoveDetector<char>(new RelativeChangesListComparer<char>(left.ToList(), right.ToList()).Compare());
 }

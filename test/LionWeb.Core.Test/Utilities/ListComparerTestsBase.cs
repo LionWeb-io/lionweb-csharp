@@ -40,14 +40,10 @@ public abstract class ListComparerTestsBase
         {
             var line = change switch
             {
-                IListComparer<char>.Added added => added.Index <= previous.Length
-                    ? previous.Insert(added.Index, added.Element.ToString())
-                    : previous + added.Element.ToString(),
-                IListComparer<char>.Deleted deleted => previous.Remove(deleted.Index, 1),
-                IListComparer<char>.Replaced replaced => previous.Remove(replaced.Index, 1)
-                    .Insert(replaced.Index, replaced.RightElement.ToString()),
-                IListComparer<char>.Moved moved => previous.Remove(moved.LeftIndex, 1)
-                    .Insert(moved.RightIndex, moved.RightElement.ToString()),
+                IListComparer<char>.Added added => previous.DAdd(added.Index, added.Element),
+                IListComparer<char>.Deleted deleted => previous.DRemove(deleted.Index),
+                IListComparer<char>.Replaced replaced => previous.DReplace(replaced.Index, replaced.RightElement),
+                IListComparer<char>.Moved moved => previous.DMove(moved.LeftIndex, moved.RightIndex, moved.RightElement),
             };
 
             previous = line;
@@ -109,4 +105,27 @@ public abstract class ListComparerTestsBase
         get { return testContextInstance; }
         set { testContextInstance = value; }
     }
+}
+
+static class StringExtensions
+{
+    public static string DAdd(this string previous, int index, char element) =>
+        index <= previous.Length
+        ? previous.Insert(index, element.ToString())
+        : previous + element.ToString();
+
+    public static string DRemove(this string previous, int index) =>
+        previous.Remove(index, 1);
+
+    public static string DReplace(this string previous, int index, char element) => 
+        previous
+            .Remove(index, 1)
+        .Insert(index, element.ToString());
+
+    public static string DMove(this string previous, int leftIndex, int rightIndex, char element) => 
+        previous
+            .Remove(leftIndex, 1)
+        .Insert(rightIndex, element.ToString());
+
+
 }
