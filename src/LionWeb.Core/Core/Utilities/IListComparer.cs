@@ -94,7 +94,7 @@ public interface IListComparer<T>
         public int RightEdge => LeftIndex > RightIndex ? LeftIndex : RightIndex;
         
         public bool MoveLeftToRight => LeftIndex < RightIndex;
-        public bool MoveRightToLeft => RightIndex > LeftIndex;
+        public bool MoveRightToLeft => RightIndex < LeftIndex;
         
         object ICloneable.Clone() => this with {};
     }
