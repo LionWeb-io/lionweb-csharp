@@ -28,6 +28,114 @@ public class MoveDetector<T> : IListComparer<T>
 
     public List<IListComparer<T>.IChange> Compare()
     {
+        List<IListComparer<T>.Moved> movingChanges = [];
+        
+        // extract moves from the list of changes
+        for (var i = 0; i < _changes.Count; i++)
+        {
+            var currentResult = _changes[i];
+            bool isAMove = false;
+            
+            if (currentResult is IListComparer<T>.Deleted d)
+            {
+                for (var j = i + 1; j < _changes.Count; j++)
+                {
+                    var partner = _changes[j];
+                    if (partner is IListComparer<T>.Added partnerAdd && d.Element.Equals(partnerAdd.Element))
+                    {
+                        Console.WriteLine("\nCouple detected as a move: " + d + " " + partnerAdd);
+                        
+                        for (var k = j - 1; k > i; k--)
+                        {
+                            var intermediate = _changes[k];
+                            if (intermediate is IListComparer<T>.Added interAdd)
+                                if (interAdd.RightIndex > d.LeftIndex && interAdd.RightIndex < partnerAdd.RightIndex)
+                                {
+                                    interAdd.RightIndex += 1;
+                                    _changes[k] = interAdd;
+                                } 
+                                else if (interAdd.RightIndex <= d.LeftIndex)
+                                {
+                                    d.LeftIndex += 1;
+                                }
+                            if (intermediate is IListComparer<T>.Deleted interDel)
+                            {
+                                interDel.LeftIndex += 1;
+                                _changes[k] = interDel;
+                            }   
+                        }
+                        
+                        movingChanges.Add(new IListComparer<T>.Moved(d.Element, d.LeftIndex, 
+                                            partnerAdd.Element, partnerAdd.RightIndex));
+                        _changes.RemoveAt(j);
+                        isAMove = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isAMove) 
+            {
+                _changes.RemoveAt(i);
+                i--;
+                Console.WriteLine("   after extracting this couple: \n" + string.Join("\n", _changes));
+            }
+        }
+        Console.WriteLine("\n   after extracting move pairs: \n" + string.Join("\n", _changes));
+        
+        // Add moves to the tail of the changes list
+        for  (var i = 0; i < movingChanges.Count; i++)
+        {
+            var currentChange = movingChanges[i];
+            
+            for (var j = i + 1; j < movingChanges.Count; j++)
+            {
+                if (currentChange.MoveLeftToRight)
+                {
+                    if (movingChanges[j].LeftIndex > currentChange.LeftIndex &&
+                        movingChanges[j].LeftIndex <= currentChange.RightIndex)
+                    {
+                        movingChanges[j].LeftIndex -= 1;
+                        if (movingChanges[j].MoveLeftToRight &&
+                            movingChanges[j].RightIndex > currentChange.RightIndex)
+                        {
+                            currentChange.RightIndex += 1;
+                        } 
+                        else if (movingChanges[j].MoveLeftToRight &&
+                                 movingChanges[j].RightIndex <= currentChange.RightIndex)
+                        {
+                            movingChanges[j].RightIndex -= 1;
+                        } 
+                        else if (movingChanges[j].MoveRightToLeft &&
+                                 movingChanges[j].RightIndex <= currentChange.LeftIndex)
+                        {
+                            currentChange.LeftIndex -= 1;
+                        }
+                        else if (movingChanges[j].MoveRightToLeft &&
+                                 movingChanges[j].RightIndex >= currentChange.LeftIndex)
+                        {
+                            movingChanges[j].RightIndex -= 1;
+                        }
+                    }
+                } 
+                else if (currentChange.MoveRightToLeft && movingChanges[j].MoveRightToLeft &&
+                         movingChanges[j].RightIndex <= currentChange.RightIndex)
+                {
+                    currentChange.RightIndex -= 1;
+                    currentChange.LeftIndex -= 1;
+                }
+            }
+            _changes.Add(currentChange);
+        }
+
+        // We now also get moves with identical left and right indices. We can remove those to optimise
+        
+        Console.WriteLine("\nafter MoveDetector: \n" + string.Join("\n", _changes));
+        return _changes;
+    }
+    /*
+    public List<IListComparer<T>.IChange> Compare()
+    {
         for (var i = 0; i < _changes.Count; i++)
         {
             var currentResult = _changes[i];
@@ -38,6 +146,7 @@ public class MoveDetector<T> : IListComparer<T>
                     var partner = _changes[j];
                     if (partner is IListComparer<T>.Deleted partnerDelete && a.Element.Equals(partnerDelete.Element))
                     {
+                        Console.WriteLine("\nCouple detected as a move (first variant): " + a + "   " + partnerDelete);
                         for (var k = j - 1; k > i; k--)
                         {
                             var intermediate = _changes[k];
@@ -71,29 +180,40 @@ public class MoveDetector<T> : IListComparer<T>
                     var partner = _changes[j];
                     if (partner is IListComparer<T>.Added partnerAdd && d.Element.Equals(partnerAdd.Element))
                     {
+                        Console.WriteLine("\nCouple detected as a move: " + d + " " + partnerAdd);
+                        var shift = 1;
+                        if (d.LeftIndex < partnerAdd.RightIndex) // move from left to right?
+                            shift = -1;
+                        
                         for (var k = j - 1; k > i; k--)
                         {
                             var intermediate = _changes[k];
                             if (intermediate is IListComparer<T>.Added interAdd)
                             {
                                 // interAdd.RightIndex += 1;
-                                partnerAdd.RightIndex -= 1;
+                                //if (interAdd.RightIndex < partnerAdd.RightIndex)
+                                    partnerAdd.RightIndex -= 1;
                                 _changes[k] = partnerAdd;
-                                _changes[k + 1] = intermediate;
+                                //interAdd.RightIndex += 1; // hmmm
+                                _changes[k + 1] = interAdd;
                             }
 
                             if (intermediate is IListComparer<T>.Deleted interDel)
                             {
                                 // interDel.LeftIndex -= 1;
-                                partnerAdd.RightIndex += 1;
+                                //if (interDel.LeftIndex < partnerAdd.RightIndex)
+                                    partnerAdd.RightIndex += 1;
                                 _changes[k] = partnerAdd;
-                                _changes[k + 1] = intermediate;
+                                //interDel.LeftIndex += shift;
+                                _changes[k + 1] = interDel;
                             }
                         }
 
                         _changes[i] = new IListComparer<T>.Moved(d.Element, d.LeftIndex, partnerAdd.Element,
                             partnerAdd.RightIndex);
                         _changes.RemoveAt(i + 1);
+                        
+                        Console.WriteLine("   after this move detected: \n" + string.Join("\n", _changes));
                         i--;
                     }
                 }
@@ -103,5 +223,5 @@ public class MoveDetector<T> : IListComparer<T>
         Console.WriteLine("\nafter MoveDetector: \n" + string.Join("\n", _changes));
 
         return _changes;
-    }
+    }*/
 }
