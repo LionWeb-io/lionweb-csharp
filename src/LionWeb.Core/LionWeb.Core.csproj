@@ -9,6 +9,11 @@
         <RootNamespace>LionWeb</RootNamespace>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\" />
         <None Include="LICENSE" Pack="true" PackagePath="\" />
