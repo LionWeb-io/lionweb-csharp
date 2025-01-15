@@ -37,7 +37,7 @@ jobs:
       - name: Pack NuGet packages
         run: |
           foreach ($packageDir in (Get-ChildItem src/)) {
-            dotnet pack --configuration Release --output ${{env.NuGetDirectory}} $packageDir
+            dotnet pack --configuration Release --output ${{env.NuGetDirectory}} $packageDir -p:IncludeSymbols=true -p:SymbolPackageFormat=snupkg
           }
 
       - name: Publish NuGet packages

@@ -30,4 +30,9 @@
       </None>
     </ItemGroup>
 
+    <PropertyGroup>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
 </Project>
