@@ -360,7 +360,7 @@ public class DeserializationTests
             .WithLanguage(v1)
             .WithLanguage(v2)
             .WithLanguage(v3)
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .WithHandler(new ClosestVersionDeserializerHandler())
             .Build();
 

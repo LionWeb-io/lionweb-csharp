@@ -30,10 +30,10 @@ public class UnresolvableReferenceTargetTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<CompressedId?, string?, Feature, IWritableNode, IReadableNode?> heal)
+    private class DeserializerHealingHandler(Func<ICompressedId?, string?, Feature, IWritableNode, IReadableNode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo,
+        public override IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, string? resolveInfo,
             Feature reference, IReadableNode node) => heal(targetId, resolveInfo, reference, (IWritableNode)node);
     }
 

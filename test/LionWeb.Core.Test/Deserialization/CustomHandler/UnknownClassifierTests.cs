@@ -30,10 +30,10 @@ public class UnknownClassifierTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<CompressedMetaPointer, CompressedId, Classifier?> heal)
+    private class DeserializerHealingHandler(Func<CompressedMetaPointer, ICompressedId, Classifier?> heal)
         : DeserializerExceptionHandler
     {
-        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) =>
+        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id) =>
             heal(classifier, id);
     }
 
@@ -65,7 +65,7 @@ public class UnknownClassifierTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
-            .WithUncompressedIds()
+            .WithCompressedIds(new(KeepOriginal:true))
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);

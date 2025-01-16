@@ -26,17 +26,104 @@ using System.Text;
 /// Checks for duplicate node ids in an efficient manner.
 public class DuplicateIdChecker
 {
-    private readonly HashSet<CompressedId> _knownIds = new();
+    private readonly HashSet<ICompressedId> _knownIds = new();
 
     /// Whether <paramref name="compressedId"/> has been seen before by this instance.
-    public bool IsIdDuplicate(CompressedId compressedId) =>
+    public bool IsIdDuplicate(ICompressedId compressedId) =>
         !_knownIds.Add(compressedId);
 }
 
-/// Stores a LionWeb node id in a compact format, optionally preserving the original.
-public readonly struct CompressedId : IEquatable<CompressedId>
+/// <summary>
+/// A potentially compressed id.
+/// Implementation differ in their memory vs. computation tradeoffs.
+/// </summary>
+public interface ICompressedId
 {
-    private CompressedId(byte[] identifier, string? original)
+    /// The original node id, if available.
+    public string? Original { get; }
+    
+    /// <summary>
+    /// Creates either a new <see cref="CompressedId"/> or <see cref="UncompressedId"/>.
+    /// </summary>
+    /// <param name="id">Node id to compress.</param>
+    /// <param name="config">Whether to store the uncompressed original. Uses more memory, but eases debugging.</param>
+    /// <returns>The newly created compressed id.</returns>
+    public static ICompressedId Create(string id, CompressedIdConfig config)
+    {
+        if (config.Compress)
+        {
+            var sha1 = SHA1.Create();
+            var idHash = sha1.ComputeHash(CompressedElement.AsBytes(id));
+            return new CompressedId(idHash, config.KeepOriginal ? id : null);
+        }
+
+        return new UncompressedId(id);
+    }
+    
+    /// <param name="id">Id to compress.</param>
+    /// <param name="keepOriginal">Whether we keep the original around.</param>
+    [Obsolete(message: "Use Create(string id, CompressedIdConfig config) instead.")]
+    public static ICompressedId Create(string id, bool keepOriginal) =>
+        Create(id, new CompressedIdConfig(KeepOriginal: keepOriginal));
+}
+
+/// <summary>
+/// Configuration which optimizations to apply to (potentially compressed) ids.
+/// </summary>
+/// <param name="Compress">Whether we compress ids at all; defaults to <c>false</c>.</param>
+/// <param name="KeepOriginal">Whether we keep the original around for compressed ids; defaults to <c>false</c>. Uses more memory, but eases debugging.</param>
+public record CompressedIdConfig(bool Compress = false, bool KeepOriginal = false);
+
+/// <summary>
+/// An uncompressed id that always stores its original.
+///
+/// <para>
+/// More memory efficient for models with typical ids longer than 20 characters,
+/// but a bit faster.
+/// </para>
+/// </summary>
+/// <param name="original">Original, uncompressed id.</param>
+public readonly struct UncompressedId(string original) : ICompressedId, IEquatable<UncompressedId>
+{
+    /// <inheritdoc />
+    public string Original => original;
+    
+    /// <inheritdoc />
+    public override string ToString() =>
+        Original;
+
+    /// <inheritdoc />
+    public override int GetHashCode() =>
+        Original.GetHashCode();
+
+
+    /// <inheritdoc />
+    public override bool Equals(object? obj) =>
+        obj is UncompressedId other && Equals(other);
+
+    /// <inheritdoc />
+    public bool Equals(UncompressedId other) =>
+        Original.Equals(other.Original);
+
+    /// <inheritdoc cref="Equals(UncompressedId)"/>
+    public static bool operator ==(UncompressedId left, UncompressedId right) =>
+        left.Equals(right);
+
+    /// <inheritdoc cref="Equals(UncompressedId)"/>
+    public static bool operator !=(UncompressedId left, UncompressedId right) =>
+        !left.Equals(right);
+}
+
+/// <summary>
+/// Stores a LionWeb node id in a compact format, optionally preserving the original.
+///
+/// <para>
+/// If used without storing the original more memory efficient, but a bit slower.
+/// </para>
+/// </summary>
+public readonly struct CompressedId : ICompressedId, IEquatable<CompressedId>
+{
+    internal CompressedId(byte[] identifier, string? original)
     {
         Identifier = identifier;
         Original = original;
@@ -46,19 +133,6 @@ public readonly struct CompressedId : IEquatable<CompressedId>
 
     /// The original node id, if available.
     public string? Original { get; }
-
-    /// <summary>
-    /// Creates a new <see cref="CompressedId"/>.
-    /// </summary>
-    /// <param name="id">Node id to compress.</param>
-    /// <param name="keepOriginal">Whether to store the uncompressed original. Uses more memory, but eases debugging.</param>
-    /// <returns>The newly created compressed id.</returns>
-    public static CompressedId Create(string id, bool keepOriginal)
-    {
-        var sha1 = SHA1.Create();
-        var idHash = sha1.ComputeHash(CompressedElement.AsBytes(id));
-        return new CompressedId(idHash, keepOriginal ? id : null);
-    }
 
     /// <inheritdoc />
     public override string ToString() =>
@@ -89,7 +163,7 @@ public readonly struct CompressedId : IEquatable<CompressedId>
 /// Stores a LionWeb MetaPointer in a compact format, optionally preserving the original.
 public readonly struct CompressedMetaPointer : IEquatable<CompressedMetaPointer>
 {
-    private CompressedMetaPointer(CompressedId language, CompressedId version, CompressedId key, MetaPointer? original)
+    private CompressedMetaPointer(ICompressedId language, ICompressedId version, ICompressedId key, MetaPointer? original)
     {
         Language = language;
         Version = version;
@@ -98,13 +172,13 @@ public readonly struct CompressedMetaPointer : IEquatable<CompressedMetaPointer>
     }
 
     /// The MetaPointer's language in compressed format.
-    public CompressedId Language { get; }
+    public ICompressedId Language { get; }
 
     /// The MetaPointer's version in compressed format.
-    public CompressedId Version { get; }
+    public ICompressedId Version { get; }
 
     /// The MetaPointer's key in compressed format.
-    public CompressedId Key { get; }
+    public ICompressedId Key { get; }
 
     /// The original MetaPointer, if available.
     public MetaPointer? Original { get; }
@@ -113,15 +187,25 @@ public readonly struct CompressedMetaPointer : IEquatable<CompressedMetaPointer>
     /// Creates a new <see cref="CompressedMetaPointer"/>.
     /// </summary>
     /// <param name="metaPointer">MetaPointer id to compress.</param>
+    /// <param name="config">Whether to store the uncompressed original. Uses more memory, but eases debugging.</param>
+    /// <returns>The newly created compressed MetaPointer.</returns>
+    public static CompressedMetaPointer Create(MetaPointer metaPointer, CompressedIdConfig config) =>
+        new(
+            ICompressedId.Create(metaPointer.Language, config),
+            ICompressedId.Create(metaPointer.Version, config),
+            ICompressedId.Create(metaPointer.Key, config),
+            config.KeepOriginal ? metaPointer : null
+        );
+
+    /// <summary>
+    /// Creates a new <see cref="CompressedMetaPointer"/>.
+    /// </summary>
+    /// <param name="metaPointer">MetaPointer id to compress.</param>
     /// <param name="keepOriginal">Whether to store the uncompressed original. Uses more memory, but eases debugging.</param>
     /// <returns>The newly created compressed MetaPointer.</returns>
+    [Obsolete(message: "Use Create(string id, CompressedIdConfig config) instead.")]
     public static CompressedMetaPointer Create(MetaPointer metaPointer, bool keepOriginal) =>
-        new(
-            CompressedId.Create(metaPointer.Language, keepOriginal),
-            CompressedId.Create(metaPointer.Version, keepOriginal),
-            CompressedId.Create(metaPointer.Key, keepOriginal),
-            keepOriginal ? metaPointer : null
-        );
+        Create(metaPointer, new CompressedIdConfig(KeepOriginal: keepOriginal));
 
     /// <inheritdoc />
     public override string ToString() =>

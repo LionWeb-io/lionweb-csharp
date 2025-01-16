@@ -26,7 +26,7 @@ public class DeserializerBuilder
     private readonly Dictionary<Language, INodeFactory> _languages = new();
     private readonly HashSet<IReadableNode> _dependentNodes = new();
     private IDeserializerHandler? _handler;
-    private bool _storeUncompressedIds = false;
+    private CompressedIdConfig _compressedIdConfig = new();
     private LionWebVersions _lionWebVersion = LionWebVersions.Current;
     private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
 
@@ -74,15 +74,21 @@ public class DeserializerBuilder
         return this;
     }
 
-    /// Whether to store uncompressed node and meta-pointer ids during processing.
-    /// Takes more memory, but eases debugging.
-    /// Defaults to <c>false</c>. 
-    public DeserializerBuilder WithUncompressedIds(bool storeUncompressedIds = true)
+    /// Whether to compress ids, and whether to store uncompressed node and meta-pointer ids
+    /// alongside the compressed ones during processing.
+    public DeserializerBuilder WithCompressedIds(CompressedIdConfig? config = null)
     {
-        _storeUncompressedIds = storeUncompressedIds;
+        _compressedIdConfig = config ?? new ();
         return this;
     }
 
+    /// <inheritdoc cref="WithCompressedIds(LionWeb.Core.M1.CompressedIdConfig?)"/>
+    /// <param name="compress">Whether we compress ids at all.</param>
+    /// <param name="keepOriginal">Whether we keep the original around for compressed ids. Uses more memory, but eases debugging.</param>
+    [Obsolete("Use WithCompressedIds(CompressedIdConfig) instead.")]
+    public DeserializerBuilder WithCompressedIds(bool keepOriginal = true, bool compress = true) =>
+        WithCompressedIds(new CompressedIdConfig(compress, keepOriginal));
+    
     /// Whether we try to resolve references by <see cref="LionWeb.Core.Serialization.SerializedReferenceTarget.ResolveInfo"/>.
     /// Defaults to <see cref="ReferenceResolveInfoHandling.None"/>.
     public DeserializerBuilder WithReferenceResolveInfoHandling(
@@ -109,7 +115,7 @@ public class DeserializerBuilder
     {
         IDeserializer result = new Deserializer(_lionWebVersion, _handler)
         {
-            StoreUncompressedIds = _storeUncompressedIds, ResolveInfoHandling = _referenceResolveInfoHandling
+            CompressedIdConfig = _compressedIdConfig, ResolveInfoHandling = _referenceResolveInfoHandling
         };
         foreach ((Language language, INodeFactory factory) in _languages)
         {

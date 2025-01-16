@@ -32,7 +32,7 @@ public class DeserializationNameTests
         SerializationChunk chunk = NonUniqueNameChunk();
 
         var deserializer = new DeserializerBuilder()
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .WithLanguage(ShapesLanguage.Instance)
             .WithReferenceResolveInfoHandling(ReferenceResolveInfoHandling.Name)
             .Build();
@@ -50,7 +50,7 @@ public class DeserializationNameTests
         SerializationChunk chunk = NonUniqueNameChunk();
 
         var deserializer = new DeserializerBuilder()
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .WithLanguage(ShapesLanguage.Instance)
             .WithReferenceResolveInfoHandling(ReferenceResolveInfoHandling.NameIfUnique)
             .Build();
@@ -64,7 +64,7 @@ public class DeserializationNameTests
         SerializationChunk chunk = NonUniqueNameChunk();
 
         var deserializer = new DeserializerBuilder()
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .WithLanguage(ShapesLanguage.Instance)
             .WithReferenceResolveInfoHandling(ReferenceResolveInfoHandling.None)
             .Build();
@@ -147,7 +147,7 @@ public class DeserializationNameTests
         SerializationChunk chunk = UniqueNameChunk();
 
         var deserializer = new DeserializerBuilder()
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .WithLanguage(ShapesLanguage.Instance)
             .WithReferenceResolveInfoHandling(ReferenceResolveInfoHandling.Name)
             .Build();
@@ -165,7 +165,7 @@ public class DeserializationNameTests
         SerializationChunk chunk = UniqueNameChunk();
 
         var deserializer = new DeserializerBuilder()
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .WithLanguage(ShapesLanguage.Instance)
             .WithReferenceResolveInfoHandling(ReferenceResolveInfoHandling.NameIfUnique)
             .Build();

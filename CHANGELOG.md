@@ -32,6 +32,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Introduced `Language.LionWebVersion` and `Language.SetFactory()`.
 * Introduced `LenientNode` to support migration scenarios.
 * Introduced interfaces `IPartitionInstance`, `IAnnotationInstance`, and `IConceptInstance` for applicable nodes.
+* Introduced optionally compressed ids during deserialization.
 ### Fixed
 ### Changed
 * `LionWeb.Core.Serialization.JsonUtils`:

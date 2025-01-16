@@ -31,8 +31,8 @@ public class DeserializerIgnoringHandlerTests
     public void unknown_classifier()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnknownClassifier(
-            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
-            CompressedId.Create("a", true)));
+            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
+            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true))));
     }
 
 
@@ -40,7 +40,7 @@ public class DeserializerIgnoringHandlerTests
     public void duplicate_node_id()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().DuplicateNodeId(
-            CompressedId.Create("a", true),
+            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
             new Line("line"),
             new Line("line")));
     }
@@ -49,7 +49,7 @@ public class DeserializerIgnoringHandlerTests
     public void unknown_feature()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnknownFeature<Containment>(
-            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
+            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
             new DynamicConcept("concept", new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
             new Line("line")));
     }
@@ -58,7 +58,7 @@ public class DeserializerIgnoringHandlerTests
     public void invalid_feature()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().InvalidFeature<Containment>(
-            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
+            CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
             new DynamicConcept("concept", new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
             new Line("line")));
     }
@@ -86,7 +86,7 @@ public class DeserializerIgnoringHandlerTests
     public void unresolvable_child()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableChild(
-            CompressedId.Create("a", true),
+            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
             new DynamicContainment("dyn-containment",
                 new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
             new Line("line")));
@@ -96,7 +96,7 @@ public class DeserializerIgnoringHandlerTests
     public void unresolvable_reference_target()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableReferenceTarget(
-            CompressedId.Create("a", true),
+            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
             "resolve-info",
             new DynamicReference("dyn-reference",
                 new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
@@ -107,7 +107,7 @@ public class DeserializerIgnoringHandlerTests
     public void unresolvable_annotation()
     {
         Assert.IsNull(new DeserializerIgnoringHandler().UnresolvableAnnotation(
-            CompressedId.Create("a", true),
+            ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
             new Line("line")));
     }
 
@@ -162,12 +162,12 @@ public class DeserializerIgnoringHandlerTests
             "a",
             new DynamicProperty("dyn-property",
                 new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
-            CompressedId.Create("b", true)));
+            ICompressedId.Create("b", new CompressedIdConfig(KeepOriginal:true))));
     }
 
     [TestMethod]
     public void skip_deserializing_dependent_node()
     {
-        Assert.IsTrue(new DeserializerIgnoringHandler().SkipDeserializingDependentNode(CompressedId.Create("a", true)));
+        Assert.IsTrue(new DeserializerIgnoringHandler().SkipDeserializingDependentNode(ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true))));
     }
 }

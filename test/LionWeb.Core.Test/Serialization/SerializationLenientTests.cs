@@ -59,7 +59,7 @@ public class SerializationLenientTests
             .WithLanguage(BLangLanguage.Instance)
             .WithLanguage(WithEnumLanguage.Instance)
             .WithHandler(new LenientHandler())
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(true, true))
             .Build()
             .Deserialize(serializationChunk);
 
@@ -108,7 +108,7 @@ public class SerializationLenientTests
                 .OfType<Classifier>()
                 .SelectMany(c => c.Features)
                 .FirstOrDefault(f =>
-                    CompressedMetaPointer.Create(f.ToMetaPointer(), false).Equals(feature));
+                    CompressedMetaPointer.Create(f.ToMetaPointer(), new CompressedIdConfig(true, false)).Equals(feature));
 
             return replacementFeature;
         }

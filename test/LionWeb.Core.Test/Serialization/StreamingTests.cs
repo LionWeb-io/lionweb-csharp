@@ -34,8 +34,8 @@ public class StreamingTests
         _language = ShapesLanguage.Instance;
     }
 
-    // private const long _maxSize = 1_500_000L;
-    private const long _maxSize = 1_500L;
+    private const long _maxSize = 1_500_000L;
+    // private const long _maxSize = 1_500L;
 
     [TestMethod]
     public void MassSerialization()
@@ -97,9 +97,11 @@ public class StreamingTests
         // Assembly.GetExecutingAssembly().GetManifestResourceStream("LionWeb.Core.Test.resources.expected.json") ??
         //     throw new AssertFailedException();
 
-        var deserializer = new DeserializerBuilder()
-            .WithLanguage(_language)
-            .Build();
+        var deserializer = new Deserializer(LionWebVersions.v2024_1) { CompressedIdConfig = new(KeepOriginal: true) };
+            // .WithLanguage(_language)
+            // .Build();
+            deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);
+            deserializer.RegisterInstantiatedLanguage(_language);
 
         List<IReadableNode> nodes = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).GetAwaiter().GetResult();
 

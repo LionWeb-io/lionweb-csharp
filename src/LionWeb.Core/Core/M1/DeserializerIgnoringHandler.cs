@@ -23,14 +23,14 @@ using M3;
 public class DeserializerIgnoringHandler : IDeserializerHandler
 {
     /// <inheritdoc />
-    public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id)
+    public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id)
     {
         LogMessage($"On node with id={id}: couldn't find specified classifier {classifier} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
-    public string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, IReadableNode node)
+    public string? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node)
     {
         LogMessage($"Duplicate node with id={existingNode.GetId()}");
         return null;
@@ -125,7 +125,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId)
+    public object? InvalidPropertyValue<TValue>(string? value, Feature property, ICompressedId nodeId)
     {
         LogMessage($"On node with id={nodeId}: invalid property value {value} for property {property} - skipping");
         return null;
@@ -136,14 +136,14 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     #region unresolveable nodes
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IReadableNode node)
+    public virtual IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node)
     {
         LogMessage($"On node with id={node.GetId()}: couldn't find child with id={childId} - skipping.");
         return null;
     }
 
     /// <inheritdoc />
-    public virtual IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId,
+    public virtual IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId,
         string? resolveInfo,
         Feature reference,
         IReadableNode node)
@@ -153,7 +153,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IReadableNode node)
+    public virtual IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node)
     {
         LogMessage($"On node with id={node.GetId()}: couldn't find annotation with id={annotationId} - skipping.");
         return null;
@@ -167,7 +167,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
 
 
     /// <inheritdoc />
-    public bool SkipDeserializingDependentNode(CompressedId id)
+    public bool SkipDeserializingDependentNode(ICompressedId id)
     {
         LogMessage($"Skip deserializing {id} because dependent nodes contains node with same id");
         return true;

@@ -25,7 +25,7 @@ using Serialization;
 public partial class LanguageDeserializer : DeserializerBase<IReadableNode, ILanguageDeserializerHandler>,
     ILanguageDeserializer
 {
-    private readonly Dictionary<CompressedId, SerializedNode> _serializedNodesById = new();
+    private readonly Dictionary<ICompressedId, SerializedNode> _serializedNodesById = new();
 
     private readonly DeserializerBuilder _deserializerBuilder = new();
 

@@ -20,8 +20,8 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
-using CompressedContainment = (CompressedMetaPointer, List<CompressedId>);
-using CompressedReference = (CompressedMetaPointer, List<(CompressedId?, string?)>);
+using CompressedContainment = (CompressedMetaPointer, List<ICompressedId>);
+using CompressedReference = (CompressedMetaPointer, List<(ICompressedId?, string?)>);
 
 /// <summary>
 /// Instances of this class can deserialize a <see cref="SerializationChunk"/> as a list of <see cref="IWritableNode"/>s that are root nodes.
@@ -36,10 +36,10 @@ public partial class Deserializer : DeserializerBase<IWritableNode, IDeserialize
     /// 
     /// * Don't make any assumptions on feature validity. Rather, call <see cref="IWritableNode.Set"/>, let it decide, and react on exceptions.
     ///   Rationale: Different implementations might accept different levels of "broken" nodes. 
-    private readonly Dictionary<CompressedId, List<CompressedContainment>> _containmentsByOwnerId = new();
+    private readonly Dictionary<ICompressedId, List<CompressedContainment>> _containmentsByOwnerId = new();
 
-    private readonly Dictionary<CompressedId, List<CompressedReference>> _referencesByOwnerId = new();
-    private readonly Dictionary<CompressedId, List<CompressedId>> _annotationsByOwnerId = new();
+    private readonly Dictionary<ICompressedId, List<CompressedReference>> _referencesByOwnerId = new();
+    private readonly Dictionary<ICompressedId, List<ICompressedId>> _annotationsByOwnerId = new();
 
     /// <inheritdoc />
     public Deserializer(LionWebVersions lionWebVersion, IDeserializerHandler? handler = null) :

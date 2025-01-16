@@ -30,10 +30,10 @@ public class InvalidPropertyValueTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<string?, Feature, CompressedId, object?> heal)
+    private class DeserializerHealingHandler(Func<string?, Feature, ICompressedId, object?> heal)
         : DeserializerExceptionHandler
     {
-        public override object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId) =>
+        public override object? InvalidPropertyValue<TValue>(string? value, Feature property, ICompressedId nodeId) =>
             heal(value, property, nodeId);
     }
 
@@ -71,7 +71,7 @@ public class InvalidPropertyValueTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
-            .WithUncompressedIds()
+            .WithCompressedIds(new(KeepOriginal:true))
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk);

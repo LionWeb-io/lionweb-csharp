@@ -24,11 +24,11 @@ using Serialization;
 public class DeserializerExceptionHandler : IDeserializerHandler
 {
     /// <inheritdoc />
-    public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id) =>
+    public virtual Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id) =>
         throw new UnsupportedClassifierException(classifier, $"On node with id={id}: ");
 
     /// <inheritdoc />
-    public virtual string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
+    public virtual string? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
         throw new DeserializerException($"Duplicate node with id={existingNode.GetId()}");
 
     /// <inheritdoc />
@@ -96,7 +96,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"On node with id={node.GetId()}: unknown property type {property /*.Type*/} with value {value}");
 
     /// <inheritdoc />
-    public virtual object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId) =>
+    public virtual object? InvalidPropertyValue<TValue>(string? value, Feature property, ICompressedId nodeId) =>
         throw new DeserializerException(
             $"On node with id={nodeId}: invalid property value '{value}' for property {property}");
 
@@ -105,11 +105,11 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     #region unresolveable nodes
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IReadableNode node) =>
+    public virtual IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) =>
         throw new DeserializerException($"On node with id={node.GetId()}: couldn't find child with id={childId}");
 
     /// <inheritdoc />
-    public virtual IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId,
+    public virtual IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId,
         string? resolveInfo,
         Feature reference,
         IReadableNode node) =>
@@ -117,7 +117,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"On node with id={node.GetId()}: couldn't find reference target with id={targetId}");
 
     /// <inheritdoc />
-    public virtual IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IReadableNode node) =>
+    public virtual IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: couldn't find annotation with id={annotationId}");
 
@@ -129,7 +129,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
             $"On node with id={node.GetId()}:");
 
     /// <inheritdoc />
-    public virtual bool SkipDeserializingDependentNode(CompressedId id) =>
+    public virtual bool SkipDeserializingDependentNode(ICompressedId id) =>
         throw new DeserializerException(
             $"Skip deserializing {id} because dependentLanguages contains node with same id");
 }

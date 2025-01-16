@@ -75,7 +75,7 @@ public class LanguageSerializationTests
         var redeserialized =
             new LanguageDeserializer(_lionWebVersion)
             {
-                StoreUncompressedIds = true
+                CompressedIdConfig = new(KeepOriginal: true)
             }.Deserialize(serializationChunk);
         Language redeserializedShapes = redeserialized.Cast<INode>().OfType<Language>().First();
 
@@ -108,7 +108,7 @@ public class LanguageSerializationTests
         var redeserialized2 =
             new LanguageDeserializer(_lionWebVersion)
             {
-                StoreUncompressedIds = true
+                CompressedIdConfig = new(KeepOriginal: true)
             }.Deserialize(serializationChunk2);
         Language redeserializedShapes2 = redeserialized2.Cast<INode>().OfType<Language>()
             .First(l => l.Key == ShapesLanguage.Instance.Key);
@@ -138,7 +138,7 @@ public class LanguageSerializationTests
 
     private class SkipDeserializationHandler : LanguageDeserializerExceptionHandler
     {
-        public override bool SkipDeserializingDependentNode(CompressedId id) => false;
+        public override bool SkipDeserializingDependentNode(ICompressedId id) => false;
     }
 
     [TestMethod]
@@ -152,7 +152,7 @@ public class LanguageSerializationTests
             LionWebVersions.v2024_1.BuiltIns
         ];
         var chunk =
-            new Serializer(LionWebVersions.v2024_1_Compatible) { StoreUncompressedIds = true }.SerializeToChunk(input);
+            new Serializer(LionWebVersions.v2024_1_Compatible) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(input);
 
         var deserializer =
             new LanguageDeserializer(LionWebVersions.v2024_1_Compatible, new SkipDeserializationHandler());

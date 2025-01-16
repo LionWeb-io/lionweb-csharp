@@ -94,7 +94,7 @@ public class LionWebVersionsTests
         CreateInstances(LionWebVersions.v2023_1, out _, out _, out var input);
 
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new Serializer(LionWebVersions.v2024_1) { StoreUncompressedIds = true }.SerializeToChunk(input)
+            new Serializer(LionWebVersions.v2024_1) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(input)
         );
     }
 
@@ -104,7 +104,7 @@ public class LionWebVersionsTests
         CreateInstances(LionWebVersions.v2023_1, out _, out _, out var input);
 
         var chunk =
-            new Serializer(LionWebVersions.v2024_1_Compatible) { StoreUncompressedIds = true }.SerializeToChunk(input);
+            new Serializer(LionWebVersions.v2024_1_Compatible) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(input);
         Assert.AreEqual("2024.1", chunk.SerializationFormatVersion);
     }
 
@@ -114,7 +114,7 @@ public class LionWebVersionsTests
         CreateInstances(LionWebVersions.v2024_1, out _, out _, out var input);
 
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk(input)
+            new Serializer(LionWebVersions.v2023_1) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(input)
         );
     }
 
@@ -136,7 +136,7 @@ public class LionWebVersionsTests
         node23.Set(concept23.FeatureByKey("key-myRef"), node24);
 
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk([node23, node24])
+            new Serializer(LionWebVersions.v2023_1) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk([node23, node24])
         );
     }
 
@@ -157,7 +157,7 @@ public class LionWebVersionsTests
 
         node23.Set(concept23.FeatureByKey("key-myRef"), node24);
 
-        var chunk = new Serializer(LionWebVersions.v2024_1_Compatible) { StoreUncompressedIds = true }
+        var chunk = new Serializer(LionWebVersions.v2024_1_Compatible) { CompressedIdConfig = new(KeepOriginal: true) }
             .SerializeToChunk([node23, node24]);
 
         Assert.AreEqual("2024.1", chunk.SerializationFormatVersion);
@@ -177,7 +177,7 @@ public class LionWebVersionsTests
                 .WithLanguage(lang23)
                 .WithLanguage(lang24)
                 .WithLionWebVersion(LionWebVersions.v2023_1)
-                .WithUncompressedIds(true)
+                .WithCompressedIds(new(KeepOriginal:true))
                 .Build()
         );
     }
@@ -195,7 +195,7 @@ public class LionWebVersionsTests
             .WithLanguage(lang23)
             .WithLanguage(lang24)
             .WithLionWebVersion(LionWebVersions.v2024_1_Compatible)
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .Build();
 
         var chunk = new SerializationChunk
@@ -253,7 +253,7 @@ public class LionWebVersionsTests
             .WithLanguage(lang23)
             .WithLanguage(lang24)
             .WithLionWebVersion(LionWebVersions.v2024_1_Compatible)
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .Build();
 
         var chunk = new SerializationChunk
@@ -307,7 +307,7 @@ public class LionWebVersionsTests
         var deserializer = new DeserializerBuilder()
             .WithLanguage(lang23)
             .WithLionWebVersion(LionWebVersions.v2023_1)
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .Build();
 
         var stream = new MemoryStream();
@@ -336,7 +336,7 @@ public class LionWebVersionsTests
         var deserializer = new DeserializerBuilder()
             .WithLanguage(lang23)
             .WithLionWebVersion(LionWebVersions.v2023_1)
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal:true))
             .Build();
 
         var stream = new MemoryStream();
@@ -406,7 +406,7 @@ public class LionWebVersionsTests
         var language = CreateLanguage(lionWebVersion.VersionString.Replace(".", "_"), lionWebVersion);
         SerializationChunk chunk = new Serializer(lionWebVersion)
         {
-            StoreUncompressedIds = true, PersistLionCoreReferenceTargetIds = false
+            CompressedIdConfig = new(KeepOriginal: true), PersistLionCoreReferenceTargetIds = false
         }.SerializeToChunk(language.Descendants(true, true));
 
         foreach (var target in chunk
@@ -420,7 +420,7 @@ public class LionWebVersionsTests
             Assert.IsNotNull(target.ResolveInfo);
         }
 
-        var deserialized = new LanguageDeserializer(lionWebVersion) { StoreUncompressedIds = true }
+        var deserialized = new LanguageDeserializer(lionWebVersion) { CompressedIdConfig = new(KeepOriginal: true) }
             .Deserialize(chunk).Cast<IReadableNode>()
             .ToList();
 
@@ -440,7 +440,7 @@ public class LionWebVersionsTests
         var language = CreateLanguage(lionWebVersion.VersionString.Replace(".", "_"), lionWebVersion);
         SerializationChunk chunk = new Serializer(lionWebVersion)
         {
-            StoreUncompressedIds = true, PersistLionCoreReferenceTargetIds = true
+            CompressedIdConfig = new(KeepOriginal: true), PersistLionCoreReferenceTargetIds = true
         }.SerializeToChunk(language.Descendants(true, true));
 
         foreach (var target in chunk
@@ -453,7 +453,7 @@ public class LionWebVersionsTests
             Assert.IsNotNull(target.ResolveInfo);
         }
 
-        var deserialized = new LanguageDeserializer(lionWebVersion) { StoreUncompressedIds = true }
+        var deserialized = new LanguageDeserializer(lionWebVersion) { CompressedIdConfig = new(KeepOriginal: true) }
             .Deserialize(chunk).Cast<IReadableNode>()
             .ToList();
 
@@ -467,11 +467,11 @@ public class LionWebVersionsTests
     {
         var language = CreateLanguage("2023_1_", LionWebVersions.v2023_1);
         SerializationChunk chunk =
-            new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk(
+            new Serializer(LionWebVersions.v2023_1) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(
                 language.Descendants(true, true));
 
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new LanguageDeserializer(LionWebVersions.v2024_1) { StoreUncompressedIds = true }.Deserialize(chunk)
+            new LanguageDeserializer(LionWebVersions.v2024_1) { CompressedIdConfig = new(KeepOriginal: true) }.Deserialize(chunk)
         );
     }
 
@@ -480,10 +480,10 @@ public class LionWebVersionsTests
     {
         var language = CreateLanguage("2023_1_", LionWebVersions.v2023_1);
         SerializationChunk chunk =
-            new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk(
+            new Serializer(LionWebVersions.v2023_1) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(
                 language.Descendants(true, true));
 
-        var deserialized = new LanguageDeserializer(LionWebVersions.v2024_1_Compatible) { StoreUncompressedIds = true }
+        var deserialized = new LanguageDeserializer(LionWebVersions.v2024_1_Compatible) { CompressedIdConfig = new(KeepOriginal: true) }
             .Deserialize(chunk)
             .Cast<IReadableNode>()
             .ToList();
@@ -500,11 +500,11 @@ public class LionWebVersionsTests
     {
         var language = CreateLanguage("2024_1_", LionWebVersions.v2024_1);
         SerializationChunk chunk =
-            new Serializer(LionWebVersions.v2024_1) { StoreUncompressedIds = true }.SerializeToChunk(
+            new Serializer(LionWebVersions.v2024_1) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(
                 language.Descendants(true, true));
 
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new LanguageDeserializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.Deserialize(chunk)
+            new LanguageDeserializer(LionWebVersions.v2023_1) { CompressedIdConfig = new(KeepOriginal: true) }.Deserialize(chunk)
         );
     }
 
@@ -514,7 +514,7 @@ public class LionWebVersionsTests
         var language = CreateLanguage("2023_1_", LionWebVersions.v2023_1);
 
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new Serializer(LionWebVersions.v2024_1) { StoreUncompressedIds = true }.SerializeToChunk(
+            new Serializer(LionWebVersions.v2024_1) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(
                 language.Descendants(true, true))
         );
     }
@@ -525,7 +525,7 @@ public class LionWebVersionsTests
         var language = CreateLanguage("2024_1_", LionWebVersions.v2024_1);
 
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new Serializer(LionWebVersions.v2023_1) { StoreUncompressedIds = true }.SerializeToChunk(
+            new Serializer(LionWebVersions.v2023_1) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(
                 language.Descendants(true, true))
         );
     }
@@ -538,7 +538,7 @@ public class LionWebVersionsTests
         var deserializer = new DeserializerBuilder()
             .WithLanguage(language)
             .WithLionWebVersion(lionWebVersion)
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
         List<IReadableNode> nodes = deserializer.Deserialize(chunk);
         return nodes;
@@ -549,7 +549,7 @@ public class LionWebVersionsTests
     {
         DynamicLanguage language = CreateInstances(lionWebVersion, out conceptNodeA, out conceptNodeB,
             out List<IReadableNode> input);
-        chunk = new Serializer(lionWebVersion) { StoreUncompressedIds = true }.SerializeToChunk(input);
+        chunk = new Serializer(lionWebVersion) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(input);
         return language;
     }
 

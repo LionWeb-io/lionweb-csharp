@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
-using CompressedContainment = (CompressedMetaPointer, List<CompressedId>);
+using CompressedContainment = (CompressedMetaPointer, List<ICompressedId>);
 
 public partial class Deserializer
 {
@@ -67,7 +67,7 @@ public partial class Deserializer
         }
     }
 
-    private void RegisterAnnotations(SerializedNode serializedNode, CompressedId compressedId)
+    private void RegisterAnnotations(SerializedNode serializedNode, ICompressedId compressedId)
     {
         if (serializedNode.Annotations.Length == 0)
             return;
@@ -78,7 +78,7 @@ public partial class Deserializer
             .ToList();
     }
 
-    private void RegisterReferences(SerializedNode serializedNode, CompressedId compressedId)
+    private void RegisterReferences(SerializedNode serializedNode, ICompressedId compressedId)
     {
         if (serializedNode.References.Length == 0)
             return;
@@ -89,7 +89,7 @@ public partial class Deserializer
             .ToList();
     }
 
-    private void RegisterContainments(SerializedNode serializedNode, CompressedId compressedId)
+    private void RegisterContainments(SerializedNode serializedNode, ICompressedId compressedId)
     {
         if (serializedNode.Containments.Length == 0)
             return;

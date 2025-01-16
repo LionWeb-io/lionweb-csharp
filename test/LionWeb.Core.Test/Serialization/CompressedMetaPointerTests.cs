@@ -26,8 +26,8 @@ public class CompressedMetaPointerTests
     [TestMethod]
     public void Equals()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false);
-        var right = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
+        var right = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsTrue(actual);
     }
@@ -35,8 +35,8 @@ public class CompressedMetaPointerTests
     [TestMethod]
     public void NotEquals()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false);
-        var right = CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), false);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
+        var right = CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsFalse(actual);
     }
@@ -44,36 +44,36 @@ public class CompressedMetaPointerTests
     [TestMethod]
     public void HashCode()
     {
-        Assert.AreEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false).GetHashCode());
+        Assert.AreEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 
     [TestMethod]
     public void NotHashCode()
     {
-        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), false).GetHashCode());
+        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 
     [TestMethod]
     public void ToString_Compressed()
     {
         Assert.AreNotEqual(new MetaPointer("a", "b", "c").ToString(),
-            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false).ToString());
+            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).ToString());
     }
 
     [TestMethod]
     public void ToString_Original()
     {
         Assert.AreEqual(new MetaPointer("a", "b", "c").ToString(),
-            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true).ToString());
+            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, true)).ToString());
     }
 
     [TestMethod]
     public void NotEquals_DifferentLanguage()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false);
-        var right = CompressedMetaPointer.Create(new MetaPointer("x", "b", "c"), false);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
+        var right = CompressedMetaPointer.Create(new MetaPointer("x", "b", "c"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsFalse(actual);
     }
@@ -81,15 +81,15 @@ public class CompressedMetaPointerTests
     [TestMethod]
     public void NotHashCode_DifferentLanguage()
     {
-        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("x", "b", "c"), false).GetHashCode());
+        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("x", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 
     [TestMethod]
     public void NotEquals_DifferentVersion()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false);
-        var right = CompressedMetaPointer.Create(new MetaPointer("a", "y", "c"), false);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
+        var right = CompressedMetaPointer.Create(new MetaPointer("a", "y", "c"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsFalse(actual);
     }
@@ -97,15 +97,15 @@ public class CompressedMetaPointerTests
     [TestMethod]
     public void NotHashCode_DifferentVersion()
     {
-        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("a", "y", "c"), false).GetHashCode());
+        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("a", "y", "c"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 
     [TestMethod]
     public void NotEquals_DifferentKey()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false);
-        var right = CompressedMetaPointer.Create(new MetaPointer("a", "b", "z"), false);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
+        var right = CompressedMetaPointer.Create(new MetaPointer("a", "b", "z"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsFalse(actual);
     }
@@ -113,15 +113,15 @@ public class CompressedMetaPointerTests
     [TestMethod]
     public void NotHashCode_DifferentKey()
     {
-        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("a", "b", "z"), false).GetHashCode());
+        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("a", "b", "z"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 
     [TestMethod]
     public void NotEquals_DifferentLengths()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "bb", "ccc"), false);
-        var right = CompressedMetaPointer.Create(new MetaPointer("aaa", "bb", "c"), false);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "bb", "ccc"), new CompressedIdConfig(true, false));
+        var right = CompressedMetaPointer.Create(new MetaPointer("aaa", "bb", "c"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsFalse(actual);
     }
@@ -129,28 +129,28 @@ public class CompressedMetaPointerTests
     [TestMethod]
     public void NotHashCode_DifferentLengths()
     {
-        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "bb", "ccc"), false).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("aaa", "bb", "c"), false).GetHashCode());
+        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "bb", "ccc"), new CompressedIdConfig(true, false)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("aaa", "bb", "c"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 
     [TestMethod]
     public void KeepOriginal()
     {
         Assert.AreEqual(new MetaPointer("a", "b", "c"),
-            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true).Original);
+            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, true)).Original);
     }
 
     [TestMethod]
     public void DontKeepOriginal()
     {
-        Assert.IsNull(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false).Original);
+        Assert.IsNull(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).Original);
     }
 
     [TestMethod]
     public void Equals_original()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true);
-        var right = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
+        var right = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsTrue(actual);
     }
@@ -158,8 +158,8 @@ public class CompressedMetaPointerTests
     [TestMethod]
     public void NotEquals_original()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true);
-        var right = CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), true);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
+        var right = CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsFalse(actual);
     }
@@ -168,22 +168,22 @@ public class CompressedMetaPointerTests
     public void HashCode_original()
     {
         Assert.AreEqual(
-            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true).GetHashCode());
+            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 
     [TestMethod]
     public void NotHashCode_original()
     {
-        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), true).GetHashCode());
+        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 
     [TestMethod]
     public void Equals_mixed()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true);
-        var right = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, true));
+        var right = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsTrue(actual);
     }
@@ -191,8 +191,8 @@ public class CompressedMetaPointerTests
     [TestMethod]
     public void NotEquals_mixed()
     {
-        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true);
-        var right = CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), false);
+        var left = CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, true));
+        var right = CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), new CompressedIdConfig(true, false));
         var actual = left.Equals(right);
         Assert.IsFalse(actual);
     }
@@ -201,14 +201,14 @@ public class CompressedMetaPointerTests
     public void HashCode_mixed()
     {
         Assert.AreEqual(
-            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), false).GetHashCode());
+            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, true)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 
     [TestMethod]
     public void NotHashCode_mixed()
     {
-        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), true).GetHashCode(),
-            CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), false).GetHashCode());
+        Assert.AreNotEqual(CompressedMetaPointer.Create(new MetaPointer("a", "b", "c"), new CompressedIdConfig(true, true)).GetHashCode(),
+            CompressedMetaPointer.Create(new MetaPointer("x", "y", "z"), new CompressedIdConfig(true, false)).GetHashCode());
     }
 }

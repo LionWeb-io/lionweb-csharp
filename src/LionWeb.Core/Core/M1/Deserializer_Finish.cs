@@ -42,7 +42,7 @@ public partial class Deserializer
 
     #region Containments
 
-    private void InstallContainments(CompressedId compressedId)
+    private void InstallContainments(ICompressedId compressedId)
     {
         if (!_containmentsByOwnerId.TryGetValue(compressedId, out var containments))
             return;
@@ -64,7 +64,7 @@ public partial class Deserializer
         }
     }
 
-    private IWritableNode? FindChild(IWritableNode node, Feature containment, CompressedId childId)
+    private IWritableNode? FindChild(IWritableNode node, Feature containment, ICompressedId childId)
     {
         IWritableNode? result = _deserializedNodesById.TryGetValue(childId, out var existingChild)
             ? existingChild as IWritableNode
@@ -77,7 +77,7 @@ public partial class Deserializer
 
     #region References
 
-    private void InstallReferences(CompressedId compressedId)
+    private void InstallReferences(ICompressedId compressedId)
     {
         if (!_referencesByOwnerId.TryGetValue(compressedId, out var references))
             return;
@@ -89,7 +89,7 @@ public partial class Deserializer
 
     #region Annotations
 
-    private void InstallAnnotations(CompressedId compressedId)
+    private void InstallAnnotations(ICompressedId compressedId)
     {
         if (!_annotationsByOwnerId.TryGetValue(compressedId, out var annotationIds))
             return;
@@ -104,7 +104,7 @@ public partial class Deserializer
         node.AddAnnotations(annotations);
     }
 
-    private IWritableNode? FindAnnotation(IWritableNode node, CompressedId annotationId)
+    private IWritableNode? FindAnnotation(IWritableNode node, ICompressedId annotationId)
     {
         if (!_deserializedNodesById.TryGetValue(annotationId, out var result))
             result = _handler.UnresolvableAnnotation(annotationId, node);
