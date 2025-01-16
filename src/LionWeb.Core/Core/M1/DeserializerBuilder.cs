@@ -113,9 +113,9 @@ public class DeserializerBuilder
     /// </exception>
     public IDeserializer Build()
     {
-        IDeserializer result = new Deserializer(_lionWebVersion, _handler)
+        IDeserializer result = new Deserializer(_lionWebVersion, _handler, _compressedIdConfig)
         {
-            CompressedIdConfig = _compressedIdConfig, ResolveInfoHandling = _referenceResolveInfoHandling
+            ResolveInfoHandling = _referenceResolveInfoHandling
         };
         foreach ((Language language, INodeFactory factory) in _languages)
         {

@@ -53,6 +53,7 @@ public class SerializationLenientTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         var readableNodes = new DeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
             .WithLanguage(ShapesLanguage.Instance)
             .WithCustomFactory(ShapesLanguage.Instance, new LenientFactory(ShapesLanguage.Instance))
             .WithLanguage(LibraryLanguage.Instance)

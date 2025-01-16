@@ -42,8 +42,8 @@ public partial class Deserializer : DeserializerBase<IWritableNode, IDeserialize
     private readonly Dictionary<ICompressedId, List<ICompressedId>> _annotationsByOwnerId = new();
 
     /// <inheritdoc />
-    public Deserializer(LionWebVersions lionWebVersion, IDeserializerHandler? handler = null) :
-        base(lionWebVersion, handler ?? new DeserializerExceptionHandler())
+    public Deserializer(LionWebVersions lionWebVersion, IDeserializerHandler? handler = null, CompressedIdConfig? compressedIdConfig = null) :
+        base(lionWebVersion, handler ?? new DeserializerExceptionHandler(), compressedIdConfig ?? new())
     {
     }
 }

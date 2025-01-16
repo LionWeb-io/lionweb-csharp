@@ -53,12 +53,14 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
     /// <param name="lionWebVersion">Version of LionWeb standard to use.</param>
     /// <param name="handler">Optional handler to customize this deserializer's behaviour in non-regular situations.</param>
-    protected DeserializerBase(LionWebVersions lionWebVersion, H handler)
+    /// <param name="compressedIdConfig">How to store compressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.</param>
+    protected DeserializerBase(LionWebVersions lionWebVersion, H handler, CompressedIdConfig compressedIdConfig)
     {
         _m3 = lionWebVersion.LionCore;
         _builtIns = lionWebVersion.BuiltIns;
         _handler = handler;
         _deserializerMetaInfo = new DeserializerMetaInfo(_handler);
+        _deserializerMetaInfo.CompressedIdConfig = compressedIdConfig;
         _versionSpecifics = IDeserializerVersionSpecifics.Create(lionWebVersion, this, _deserializerMetaInfo, _handler);
         _versionSpecifics.RegisterBuiltins();
     }
@@ -66,12 +68,10 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get => _versionSpecifics.Version; }
 
-    /// Whether we store uncompressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
-    /// Uses more memory, but very helpful for debugging. 
+    /// How to store compressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
     public CompressedIdConfig CompressedIdConfig
     {
         get => _deserializerMetaInfo.CompressedIdConfig;
-        init => _deserializerMetaInfo.CompressedIdConfig = value;
     }
 
     /// Whether we try to resolve references by <see cref="LionWeb.Core.Serialization.SerializedReferenceTarget.ResolveInfo"/>.

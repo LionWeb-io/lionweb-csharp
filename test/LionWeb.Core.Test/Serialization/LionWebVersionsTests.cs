@@ -420,7 +420,7 @@ public class LionWebVersionsTests
             Assert.IsNotNull(target.ResolveInfo);
         }
 
-        var deserialized = new LanguageDeserializer(lionWebVersion) { CompressedIdConfig = new(KeepOriginal: true) }
+        var deserialized = new LanguageDeserializer(lionWebVersion, compressedIdConfig: new(KeepOriginal: true))
             .Deserialize(chunk).Cast<IReadableNode>()
             .ToList();
 
@@ -453,7 +453,7 @@ public class LionWebVersionsTests
             Assert.IsNotNull(target.ResolveInfo);
         }
 
-        var deserialized = new LanguageDeserializer(lionWebVersion) { CompressedIdConfig = new(KeepOriginal: true) }
+        var deserialized = new LanguageDeserializer(lionWebVersion, compressedIdConfig: new(KeepOriginal: true))
             .Deserialize(chunk).Cast<IReadableNode>()
             .ToList();
 
@@ -471,7 +471,7 @@ public class LionWebVersionsTests
                 language.Descendants(true, true));
 
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new LanguageDeserializer(LionWebVersions.v2024_1) { CompressedIdConfig = new(KeepOriginal: true) }.Deserialize(chunk)
+            new LanguageDeserializer(LionWebVersions.v2024_1, compressedIdConfig: new(KeepOriginal: true)).Deserialize(chunk)
         );
     }
 
@@ -483,7 +483,7 @@ public class LionWebVersionsTests
             new Serializer(LionWebVersions.v2023_1) { CompressedIdConfig = new(KeepOriginal: true) }.SerializeToChunk(
                 language.Descendants(true, true));
 
-        var deserialized = new LanguageDeserializer(LionWebVersions.v2024_1_Compatible) { CompressedIdConfig = new(KeepOriginal: true) }
+        var deserialized = new LanguageDeserializer(LionWebVersions.v2024_1_Compatible, compressedIdConfig: new(KeepOriginal: true))
             .Deserialize(chunk)
             .Cast<IReadableNode>()
             .ToList();
@@ -504,7 +504,7 @@ public class LionWebVersionsTests
                 language.Descendants(true, true));
 
         Assert.ThrowsException<VersionMismatchException>(() =>
-            new LanguageDeserializer(LionWebVersions.v2023_1) { CompressedIdConfig = new(KeepOriginal: true) }.Deserialize(chunk)
+            new LanguageDeserializer(LionWebVersions.v2023_1, compressedIdConfig: new(KeepOriginal: true)).Deserialize(chunk)
         );
     }
 
