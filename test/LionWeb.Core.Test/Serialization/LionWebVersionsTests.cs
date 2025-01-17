@@ -177,7 +177,7 @@ public class LionWebVersionsTests
                 .WithLanguage(lang23)
                 .WithLanguage(lang24)
                 .WithLionWebVersion(LionWebVersions.v2023_1)
-                .WithCompressedIds(new(KeepOriginal:true))
+                .WithCompressedIds(new(KeepOriginal: true))
                 .Build()
         );
     }
@@ -195,7 +195,7 @@ public class LionWebVersionsTests
             .WithLanguage(lang23)
             .WithLanguage(lang24)
             .WithLionWebVersion(LionWebVersions.v2024_1_Compatible)
-            .WithCompressedIds(new(KeepOriginal:true))
+            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         var chunk = new SerializationChunk
@@ -253,7 +253,7 @@ public class LionWebVersionsTests
             .WithLanguage(lang23)
             .WithLanguage(lang24)
             .WithLionWebVersion(LionWebVersions.v2024_1_Compatible)
-            .WithCompressedIds(new(KeepOriginal:true))
+            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         var chunk = new SerializationChunk
@@ -307,7 +307,7 @@ public class LionWebVersionsTests
         var deserializer = new DeserializerBuilder()
             .WithLanguage(lang23)
             .WithLionWebVersion(LionWebVersions.v2023_1)
-            .WithCompressedIds(new(KeepOriginal:true))
+            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         var stream = new MemoryStream();
@@ -336,7 +336,7 @@ public class LionWebVersionsTests
         var deserializer = new DeserializerBuilder()
             .WithLanguage(lang23)
             .WithLionWebVersion(LionWebVersions.v2023_1)
-            .WithCompressedIds(new(KeepOriginal:true))
+            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         var stream = new MemoryStream();

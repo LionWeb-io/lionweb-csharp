@@ -41,7 +41,7 @@ public interface ICompressedId
 {
     /// The original node id, if available.
     public string? Original { get; }
-    
+
     /// <summary>
     /// Creates either a new <see cref="CompressedId"/> or <see cref="UncompressedId"/>.
     /// </summary>
@@ -59,7 +59,7 @@ public interface ICompressedId
 
         return new UncompressedId(id);
     }
-    
+
     /// <param name="id">Id to compress.</param>
     /// <param name="keepOriginal">Whether we keep the original around.</param>
     [Obsolete(message: "Use Create(string id, CompressedIdConfig config) instead.")]
@@ -70,9 +70,39 @@ public interface ICompressedId
 /// <summary>
 /// Configuration which optimizations to apply to (potentially compressed) ids.
 /// </summary>
-/// <param name="Compress">Whether we compress ids at all; defaults to <c>false</c>.</param>
-/// <param name="KeepOriginal">Whether we keep the original around for compressed ids; defaults to <c>false</c>. Uses more memory, but eases debugging.</param>
-public record CompressedIdConfig(bool Compress = false, bool KeepOriginal = false);
+public record CompressedIdConfig
+{
+    /// <summary>
+    /// Configuration which optimizations to apply to (potentially compressed) ids.
+    /// </summary>
+    /// <param name="Compress">
+    /// Whether we compress ids at all; defaults to <c>false</c>.
+    /// If set to <c>false</c>, <paramref name="KeepOriginal"/> MUST be <c>null</c> or <c>true</c>.
+    /// </param>
+    /// <param name="KeepOriginal">
+    /// Whether we keep the original around for compressed ids; defaults to <c>false</c>.
+    /// Uses more memory, but eases debugging.
+    /// </param>
+    public CompressedIdConfig(bool Compress = false, bool? KeepOriginal = null)
+    {
+        if (!Compress && KeepOriginal is false)
+            throw new ArgumentException($"If we don't {nameof(Compress)}, we MUST {nameof(KeepOriginal)}");
+        this.Compress = Compress;
+        this.KeepOriginal = KeepOriginal ?? false;
+    }
+
+    /// <summary>Whether we compress ids at all; defaults to <c>false</c>.</summary>
+    public bool Compress { get; init; }
+
+    /// <summary>Whether we keep the original around for compressed ids; defaults to <c>false</c>. Uses more memory, but eases debugging.</summary>
+    public bool KeepOriginal { get; init; }
+
+    public void Deconstruct(out bool Compress, out bool KeepOriginal)
+    {
+        Compress = this.Compress;
+        KeepOriginal = this.KeepOriginal;
+    }
+}
 
 /// <summary>
 /// An uncompressed id that always stores its original.
@@ -87,7 +117,7 @@ public readonly struct UncompressedId(string original) : ICompressedId, IEquatab
 {
     /// <inheritdoc />
     public string Original => original;
-    
+
     /// <inheritdoc />
     public override string ToString() =>
         Original;
@@ -163,7 +193,8 @@ public readonly struct CompressedId : ICompressedId, IEquatable<CompressedId>
 /// Stores a LionWeb MetaPointer in a compact format, optionally preserving the original.
 public readonly struct CompressedMetaPointer : IEquatable<CompressedMetaPointer>
 {
-    private CompressedMetaPointer(ICompressedId language, ICompressedId version, ICompressedId key, MetaPointer? original)
+    private CompressedMetaPointer(ICompressedId language, ICompressedId version, ICompressedId key,
+        MetaPointer? original)
     {
         Language = language;
         Version = version;
