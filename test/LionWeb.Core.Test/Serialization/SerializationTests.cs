@@ -314,6 +314,251 @@ public class SerializationTests
         }, serializer.UsedLanguages.ToList());
     }
 
+    [TestMethod]
+    public void EmptyFeatures_Serialize()
+    {
+        var circle = new Circle("circle");
+        var node = new OffsetDuplicate("od") { Uuid = "abc", Source = circle, Docs = new Documentation("docs") };
+
+        var serializer = new Serializer(_lionWebVersion) { SerializeEmptyFeatures = true };
+
+        var chunk = serializer.SerializeToChunk([node, circle]);
+
+        var lang = ShapesLanguage.Instance;
+        var langKey = lang.Key;
+        var langVersion = lang.Version;
+        var expected = new SerializationChunk
+        {
+            SerializationFormatVersion = _lionWebVersion.VersionString,
+            Languages = [new SerializedLanguageReference { Key = langKey, Version = langVersion }],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "od",
+                    Classifier = lang.OffsetDuplicate.ToMetaPointer(),
+                    Properties =
+                    [
+                        new SerializedProperty { Property = lang.IShape_uuid.ToMetaPointer(), Value = "abc" },
+                        new SerializedProperty
+                        {
+                            Property = _lionWebVersion.BuiltIns.INamed_name.ToMetaPointer(), Value = null
+                        },
+                    ],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = lang.OffsetDuplicate_docs.ToMetaPointer(), Children = ["docs"]
+                        },
+                        new SerializedContainment
+                        {
+                            Containment = lang.IShape_fixpoints.ToMetaPointer(), Children = []
+                        },
+                        new SerializedContainment
+                        {
+                            Containment = lang.OffsetDuplicate_secretDocs.ToMetaPointer(), Children = []
+                        },
+                        new SerializedContainment
+                        {
+                            Containment = lang.OffsetDuplicate_offset.ToMetaPointer(), Children = []
+                        },
+                        new SerializedContainment { Containment = lang.Shape_shapeDocs.ToMetaPointer(), Children = [] },
+                    ],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = lang.OffsetDuplicate_source.ToMetaPointer(),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "circle", ResolveInfo = null }
+                            ]
+                        },
+                        new SerializedReference
+                        {
+                            Reference = lang.OffsetDuplicate_altSource.ToMetaPointer(), Targets = []
+                        }
+                    ],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "docs",
+                    Classifier = lang.Documentation.ToMetaPointer(),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = lang.Documentation_technical.ToMetaPointer(), Value = null
+                        },
+                        new SerializedProperty { Property = lang.Documentation_text.ToMetaPointer(), Value = null },
+                    ],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "od"
+                },
+                new SerializedNode
+                {
+                    Id = "circle",
+                    Classifier = lang.Circle.ToMetaPointer(),
+                    Properties =
+                    [
+                        new SerializedProperty { Property = lang.IShape_uuid.ToMetaPointer(), Value = null },
+                        new SerializedProperty { Property = lang.Circle_r.ToMetaPointer(), Value = null },
+                        new SerializedProperty
+                        {
+                            Property = _lionWebVersion.BuiltIns.INamed_name.ToMetaPointer(), Value = null
+                        },
+                    ],
+                    Containments =
+                    [
+                        new SerializedContainment { Containment = lang.Circle_center.ToMetaPointer(), Children = [] },
+                        new SerializedContainment
+                        {
+                            Containment = lang.IShape_fixpoints.ToMetaPointer(), Children = []
+                        },
+                        new SerializedContainment { Containment = lang.Shape_shapeDocs.ToMetaPointer(), Children = [] },
+                    ],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                }
+            ]
+        };
+
+        AssertEquals(expected, chunk);
+    }
+
+    [TestMethod]
+    public void EmptyFeatures_Skip()
+    {
+        var circle = new Circle("circle");
+        var node = new OffsetDuplicate("od") { Uuid = "abc", Source = circle, Docs = new Documentation("docs") };
+
+        var serializer = new Serializer(_lionWebVersion) { SerializeEmptyFeatures = false };
+
+        var chunk = serializer.SerializeToChunk([node, circle]);
+
+        var langKey = ShapesLanguage.Instance.Key;
+        var langVersion = ShapesLanguage.Instance.Version;
+        var expected = new SerializationChunk
+        {
+            SerializationFormatVersion = _lionWebVersion.VersionString,
+            Languages = [new SerializedLanguageReference { Key = langKey, Version = langVersion }],
+            Nodes =
+            [
+                new SerializedNode
+                {
+                    Id = "od",
+                    Classifier = new MetaPointer(langKey, langVersion, ShapesLanguage.Instance.OffsetDuplicate.Key),
+                    Properties =
+                    [
+                        new SerializedProperty
+                        {
+                            Property = new MetaPointer(langKey, langVersion,
+                                ShapesLanguage.Instance.IShape_uuid.Key),
+                            Value = "abc"
+                        }
+                    ],
+                    Containments =
+                    [
+                        new SerializedContainment
+                        {
+                            Containment = new MetaPointer(langKey, langVersion,
+                                ShapesLanguage.Instance.OffsetDuplicate_docs.Key),
+                            Children = ["docs"]
+                        }
+                    ],
+                    References =
+                    [
+                        new SerializedReference
+                        {
+                            Reference = new MetaPointer(langKey, langVersion,
+                                ShapesLanguage.Instance.OffsetDuplicate_source.Key),
+                            Targets =
+                            [
+                                new SerializedReferenceTarget { Reference = "circle", ResolveInfo = null }
+                            ]
+                        }
+                    ],
+                    Annotations = [],
+                    Parent = null
+                },
+                new SerializedNode
+                {
+                    Id = "docs",
+                    Classifier = new MetaPointer(langKey, langVersion, ShapesLanguage.Instance.Documentation.Key),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = "od"
+                },
+                new SerializedNode
+                {
+                    Id = "circle",
+                    Classifier = new MetaPointer(langKey, langVersion, ShapesLanguage.Instance.Circle.Key),
+                    Properties = [],
+                    Containments = [],
+                    References = [],
+                    Annotations = [],
+                    Parent = null
+                }
+            ]
+        };
+
+        AssertEquals(expected, chunk);
+    }
+
+    private void AssertEquals(SerializationChunk expected, SerializationChunk actual)
+    {
+        Assert.AreEqual(expected.SerializationFormatVersion, actual.SerializationFormatVersion);
+        CollectionAssert.AreEqual(expected.Languages, actual.Languages);
+        Assert.AreEqual(expected.Nodes.Length, actual.Nodes.Length);
+        var expectedNodes = expected.Nodes.GetEnumerator();
+        var actualNodes = actual.Nodes.GetEnumerator();
+        while (expectedNodes.MoveNext() && actualNodes.MoveNext())
+        {
+            var expectedNode = (SerializedNode)expectedNodes.Current!;
+            var actualNode = (SerializedNode)actualNodes.Current!;
+            Assert.AreEqual(expectedNode.Id, actualNode.Id);
+            Assert.AreEqual(expectedNode.Classifier, actualNode.Classifier);
+            CollectionAssert.AreEqual(
+                expectedNode.Properties.OrderBy(p => p.Property.Key).ToList(),
+                actualNode.Properties.OrderBy(p => p.Property.Key).ToList()
+            );
+
+            Assert.AreEqual(expectedNode.Containments.Length, actualNode.Containments.Length);
+            using var expectedContainments = expectedNode.Containments.OrderBy(c => c.Containment.Key).GetEnumerator();
+            using var actualContainments = actualNode.Containments.OrderBy(c => c.Containment.Key).GetEnumerator();
+            while (expectedContainments.MoveNext() && actualContainments.MoveNext())
+            {
+                var expectedContainment = expectedContainments.Current;
+                var actualContainment = actualContainments.Current;
+                Assert.AreEqual(expectedContainment.Containment, actualContainment.Containment);
+                CollectionAssert.AreEqual(expectedContainment.Children, actualContainment.Children);
+            }
+
+            Assert.AreEqual(expectedNode.References.Length, actualNode.References.Length);
+            using var expectedReferences = expectedNode.References.OrderBy(r => r.Reference.Key).GetEnumerator();
+            using var actualReferences = actualNode.References.OrderBy(r => r.Reference.Key).GetEnumerator();
+            while (expectedReferences.MoveNext() && actualReferences.MoveNext())
+            {
+                var expectedReference = expectedReferences.Current;
+                var actualReference = actualReferences.Current;
+                Assert.AreEqual(expectedReference.Reference, actualReference.Reference);
+                CollectionAssert.AreEqual(expectedReference.Targets, actualReference.Targets);
+            }
+
+            CollectionAssert.AreEqual(expectedNode.Annotations, actualNode.Annotations);
+
+            Assert.AreEqual(expectedNode.Parent, actualNode.Parent);
+        }
+    }
+
     private TestContext testContextInstance;
 
     /// <summary>
