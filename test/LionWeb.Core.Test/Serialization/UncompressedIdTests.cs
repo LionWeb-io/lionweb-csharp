@@ -25,8 +25,8 @@ public class UncompressedIdTests
     [TestMethod]
     public void Equals()
     {
-        var left = ICompressedId.Create("a", new CompressedIdConfig(false, false));
-        var right = ICompressedId.Create("a", new CompressedIdConfig(false, false));
+        var left = ICompressedId.Create("a", new CompressedIdConfig(false));
+        var right = ICompressedId.Create("a", new CompressedIdConfig(false));
         var actual = left.Equals(right);
         Assert.IsTrue(actual);
     }
@@ -34,8 +34,8 @@ public class UncompressedIdTests
     [TestMethod]
     public void NotEquals()
     {
-        var left = ICompressedId.Create("a", new CompressedIdConfig(false, false));
-        var right = ICompressedId.Create("b", new CompressedIdConfig(false, false));
+        var left = ICompressedId.Create("a", new CompressedIdConfig(false));
+        var right = ICompressedId.Create("b", new CompressedIdConfig(false));
         var actual = left.Equals(right);
         Assert.IsFalse(actual);
     }
@@ -43,21 +43,15 @@ public class UncompressedIdTests
     [TestMethod]
     public void HashCode()
     {
-        Assert.AreEqual(ICompressedId.Create("a", new CompressedIdConfig(false, false)).GetHashCode(),
-            ICompressedId.Create("a", new CompressedIdConfig(false, false)).GetHashCode());
+        Assert.AreEqual(ICompressedId.Create("a", new CompressedIdConfig(false)).GetHashCode(),
+            ICompressedId.Create("a", new CompressedIdConfig(false)).GetHashCode());
     }
 
     [TestMethod]
     public void NotHashCode()
     {
-        Assert.AreNotEqual(ICompressedId.Create("a", new CompressedIdConfig(false, false)).GetHashCode(),
-            ICompressedId.Create("b", new CompressedIdConfig(false, false)).GetHashCode());
-    }
-
-    [TestMethod]
-    public void ToString_Compressed()
-    {
-        Assert.AreEqual("a", ICompressedId.Create("a",new CompressedIdConfig(false, false)).ToString());
+        Assert.AreNotEqual(ICompressedId.Create("a", new CompressedIdConfig(false)).GetHashCode(),
+            ICompressedId.Create("b", new CompressedIdConfig(false)).GetHashCode());
     }
 
     [TestMethod]
@@ -70,12 +64,6 @@ public class UncompressedIdTests
     public void KeepOriginal()
     {
         Assert.AreEqual("a", ICompressedId.Create("a", new CompressedIdConfig(false, true)).Original);
-    }
-
-    [TestMethod]
-    public void DontKeepOriginal()
-    {
-        Assert.IsNotNull(ICompressedId.Create("a", new CompressedIdConfig(false, false)).Original);
     }
 
     [TestMethod]
@@ -109,38 +97,5 @@ public class UncompressedIdTests
     {
         Assert.AreNotEqual(ICompressedId.Create("a", new CompressedIdConfig(false, true)).GetHashCode(),
             ICompressedId.Create("b", new CompressedIdConfig(false, true)).GetHashCode());
-    }
-
-    [TestMethod]
-    public void Equals_mixed()
-    {
-        var left = ICompressedId.Create("a", new CompressedIdConfig(false, true));
-        var right = ICompressedId.Create("a", new CompressedIdConfig(false, false));
-        var actual = left.Equals(right);
-        Assert.IsTrue(actual);
-    }
-
-    [TestMethod]
-    public void NotEquals_mixed()
-    {
-        var left = ICompressedId.Create("a", new CompressedIdConfig(false, true));
-        var right = ICompressedId.Create("b",new CompressedIdConfig(false, false));
-        var actual = left.Equals(right);
-        Assert.IsFalse(actual);
-    }
-
-    [TestMethod]
-    public void HashCode_mixed()
-    {
-        Assert.AreEqual(
-            ICompressedId.Create("a", new CompressedIdConfig(false, true)).GetHashCode(),
-            ICompressedId.Create("a", new CompressedIdConfig(false, false)).GetHashCode());
-    }
-
-    [TestMethod]
-    public void NotHashCode_mixed()
-    {
-        Assert.AreNotEqual(ICompressedId.Create("a", new CompressedIdConfig(false, true)).GetHashCode(),
-            ICompressedId.Create("b", new CompressedIdConfig(false, false)).GetHashCode());
     }
 }
