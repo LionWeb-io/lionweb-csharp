@@ -16,7 +16,18 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Deprecated
 ### Security
 
-## [0.2.3] - unreleased
+## [0.2.4] - 2025-01-17
+
+### Added
+* Introduced optionally compressed ids during deserialization.
+* Added option to skip serialization of unset features.
+### Fixed
+### Changed
+### Removed
+### Deprecated
+### Security
+
+## [0.2.3] - 2025-01-13
 
 ### Added
 * Introduced `LionWeb.Core.LionWebVersions` to support multiple versions of LionWeb specification in a controlled manner.
@@ -32,7 +43,6 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Introduced `Language.LionWebVersion` and `Language.SetFactory()`.
 * Introduced `LenientNode` to support migration scenarios.
 * Introduced interfaces `IPartitionInstance`, `IAnnotationInstance`, and `IConceptInstance` for applicable nodes.
-* Introduced optionally compressed ids during deserialization.
 ### Fixed
 ### Changed
 * `LionWeb.Core.Serialization.JsonUtils`:
