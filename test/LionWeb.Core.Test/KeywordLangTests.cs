@@ -59,7 +59,7 @@ public class KeywordLangTests
         SerializationChunk chunk = new Serializer(lionWebVersion).SerializeToChunk(input);
 
         IDeserializer deserializer = new DeserializerBuilder()
-            .WithCompressedIds(new(KeepOriginal:true))
+            .WithCompressedIds(new(KeepOriginal: true))
             .WithLanguage(ClassLanguage.Instance)
             .Build();
 
