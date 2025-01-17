@@ -49,6 +49,9 @@ public interface ISerializer
 
     /// Version of LionWeb standard to use.
     LionWebVersions LionWebVersion { get; }
+
+    /// Whether features without value should appear in serialization; defaults to <c>true</c>.
+    bool SerializeEmptyFeatures { get; init; }
 }
 
 /// Extension methods for <see cref="ISerializer"/>.

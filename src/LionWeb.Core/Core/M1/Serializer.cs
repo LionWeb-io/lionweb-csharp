@@ -66,11 +66,14 @@ public class Serializer : ISerializer
     /// Uses more memory, but very helpful for debugging.
     /// Defaults to <c>false</c>. 
     public CompressedIdConfig CompressedIdConfig { get; init; } = new();
-    
+
     /// Whether references to LionCore nodes (<see cref="ILionCoreLanguage"/>, <see cref="IBuiltInsLanguage"/>)
     /// should include the target node's id, or only the resolveInfo.
     /// Defaults to false.
     public bool PersistLionCoreReferenceTargetIds { get; init; } = false;
+
+    /// <inheritdoc />
+    public bool SerializeEmptyFeatures { get; init; } = true;
 
     /// <inheritdoc />
     public IEnumerable<SerializedNode> Serialize(IEnumerable<IReadableNode> allNodes)
@@ -199,11 +202,16 @@ public class Serializer : ISerializer
     }
 
     private IEnumerable<SerializedProperty> CollectUnsetProperties(IReadableNode node, ISet<Feature> allFeatures,
-        Dictionary<Feature, object?> properties) =>
-        allFeatures
-            .OfType<Property>()
-            .Except(properties.Keys, new FeatureComparer())
-            .Select(p => SerializeProperty(node, p, null));
+        Dictionary<Feature, object?> properties)
+    {
+        if (SerializeEmptyFeatures)
+            return allFeatures
+                .OfType<Property>()
+                .Except(properties.Keys, new FeatureComparer())
+                .Select(p => SerializeProperty(node, p, null));
+
+        return [];
+    }
 
     #endregion
 
@@ -237,11 +245,16 @@ public class Serializer : ISerializer
     }
 
     private IEnumerable<SerializedContainment> CollectUnsetContainments(ISet<Feature> allFeatures,
-        Dictionary<Feature, object?> containments) =>
-        allFeatures
-            .OfType<Containment>()
-            .Except(containments.Keys, new FeatureComparer())
-            .Select<Feature, SerializedContainment>(c => SerializeContainment([], c));
+        Dictionary<Feature, object?> containments)
+    {
+        if (SerializeEmptyFeatures)
+            return allFeatures
+                .OfType<Containment>()
+                .Except(containments.Keys, new FeatureComparer())
+                .Select<Feature, SerializedContainment>(c => SerializeContainment([], c));
+
+        return [];
+    }
 
     #endregion
 
@@ -282,16 +295,18 @@ public class Serializer : ISerializer
             .FirstOrDefault();
 
         var referenceTarget = PersistLionCoreReferenceTargetIds ? target.GetId() : null;
-        
+
         return hostingLanguage?.Key switch
         {
             ILionCoreLanguage.LanguageKey => new SerializedReferenceTarget
             {
-                Reference = referenceTarget, ResolveInfo = ConcatResolveInfo(target, ILionCoreLanguage.ResolveInfoPrefix),
+                Reference = referenceTarget,
+                ResolveInfo = ConcatResolveInfo(target, ILionCoreLanguage.ResolveInfoPrefix),
             },
             IBuiltInsLanguage.LanguageKey => new SerializedReferenceTarget
             {
-                Reference = referenceTarget, ResolveInfo = ConcatResolveInfo(target, IBuiltInsLanguage.ResolveInfoPrefix),
+                Reference = referenceTarget,
+                ResolveInfo = ConcatResolveInfo(target, IBuiltInsLanguage.ResolveInfoPrefix),
             },
             _ => new SerializedReferenceTarget { Reference = target.GetId(), ResolveInfo = target.GetNodeName() }
         };
@@ -305,11 +320,16 @@ public class Serializer : ISerializer
         } + ((IKeyed)target).Name;
 
     private IEnumerable<SerializedReference> CollectUnsetReferences(ISet<Feature> allFeatures,
-        Dictionary<Feature, object?> references) =>
-        allFeatures
-            .OfType<Reference>()
-            .Except(references.Keys, new FeatureComparer())
-            .Select<Feature, SerializedReference>(c => SerializeReference([], c));
+        Dictionary<Feature, object?> references)
+    {
+        if (SerializeEmptyFeatures)
+            return allFeatures
+                .OfType<Reference>()
+                .Except(references.Keys, new FeatureComparer())
+                .Select<Feature, SerializedReference>(c => SerializeReference([], c));
+
+        return [];
+    }
 
     #endregion
 
@@ -339,6 +359,6 @@ public class Serializer : ISerializer
 
     private IEnumerable<IReadableNode> AsNodes(KeyValuePair<Feature, object?> pair) =>
         pair.Value != null ? M2Extensions.AsNodes<IReadableNode>(pair.Value) : [];
-    
+
     #endregion
 }
