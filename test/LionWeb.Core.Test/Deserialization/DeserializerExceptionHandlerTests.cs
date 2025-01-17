@@ -34,8 +34,8 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<UnsupportedClassifierException>(() =>
             new DeserializerExceptionHandler().UnknownClassifier(
-                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
-                CompressedId.Create("a", true)));
+                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(true, false)),
+                ICompressedId.Create("a", new CompressedIdConfig(true, true))));
     }
 
     [TestMethod]
@@ -43,7 +43,7 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().DuplicateNodeId(
-                CompressedId.Create("a", true),
+                ICompressedId.Create("a", new CompressedIdConfig(true, true)),
                 new Line("line"),
                 new Line("line")));
     }
@@ -53,7 +53,7 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<UnknownFeatureException>(() =>
             new DeserializerExceptionHandler().UnknownFeature<Containment>(
-                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
+                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
                 new DynamicConcept("concept", new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
                 new Line("line")));
     }
@@ -63,7 +63,7 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<UnknownFeatureException>(() =>
             new DeserializerExceptionHandler().InvalidFeature<Containment>(
-                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), true),
+                CompressedMetaPointer.Create(new MetaPointer("key-Shapes", "1", "key-Geometry"), new CompressedIdConfig(KeepOriginal:true)),
                 new DynamicConcept("concept", new DynamicLanguage("lang", _lionWebVersion)) { Name = "concept-name" },
                 new Line("line")));
     }
@@ -110,7 +110,7 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableChild(
-                CompressedId.Create("a", true),
+                ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
                 new DynamicContainment("dyn-containment",
                     new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
                 new Line("line")));
@@ -121,7 +121,7 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableReferenceTarget(
-                CompressedId.Create("a", true),
+                ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
                 "resolve-info",
                 new DynamicReference("dyn-reference",
                     new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
@@ -133,7 +133,7 @@ public class DeserializerExceptionHandlerTests
     {
         Assert.ThrowsException<DeserializerException>(() =>
             new DeserializerExceptionHandler().UnresolvableAnnotation(
-                CompressedId.Create("a", true),
+                ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true)),
                 new Line("line")));
     }
 
@@ -203,13 +203,13 @@ public class DeserializerExceptionHandlerTests
                 "a",
                 new DynamicProperty("dyn-property",
                     new DynamicConcept("dyn-concept", new DynamicLanguage("dyn-lang", _lionWebVersion))),
-                CompressedId.Create("b", true)));
+                ICompressedId.Create("b", new CompressedIdConfig(KeepOriginal:true))));
     }
 
     [TestMethod]
     public void skip_deserializing_dependent_node()
     {
         Assert.ThrowsException<DeserializerException>(() =>
-            new DeserializerExceptionHandler().SkipDeserializingDependentNode(CompressedId.Create("a", true)));
+            new DeserializerExceptionHandler().SkipDeserializingDependentNode(ICompressedId.Create("a", new CompressedIdConfig(KeepOriginal:true))));
     }
 }

@@ -55,7 +55,7 @@ internal class DeserializerVersionSpecifics_2024_1<T, H>(
     protected virtual object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype,
         string value)
     {
-        CompressedId compressedId = _metaInfo.Compress(node.GetId());
+        ICompressedId compressedId = _metaInfo.Compress(node.GetId());
         return datatype switch
         {
             var b when b == BuiltInsLanguage_2024_1.Instance.Boolean => bool.TryParse(value, out var result)

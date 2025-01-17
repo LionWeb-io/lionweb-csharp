@@ -73,10 +73,8 @@ public class LanguageSerializationTests
         var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
 
         var redeserialized =
-            new LanguageDeserializer(_lionWebVersion)
-            {
-                StoreUncompressedIds = true
-            }.Deserialize(serializationChunk);
+            new LanguageDeserializer(_lionWebVersion, compressedIdConfig: new(KeepOriginal: true))
+                .Deserialize(serializationChunk);
         Language redeserializedShapes = redeserialized.Cast<INode>().OfType<Language>().First();
 
         var language =
@@ -106,10 +104,8 @@ public class LanguageSerializationTests
         var serializationChunk2 = new Serializer(_lionWebVersion).SerializeToChunk([redeserializedShapes, language]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
         var redeserialized2 =
-            new LanguageDeserializer(_lionWebVersion)
-            {
-                StoreUncompressedIds = true
-            }.Deserialize(serializationChunk2);
+            new LanguageDeserializer(_lionWebVersion, compressedIdConfig: new(KeepOriginal: true)).Deserialize(
+                serializationChunk2);
         Language redeserializedShapes2 = redeserialized2.Cast<INode>().OfType<Language>()
             .First(l => l.Key == ShapesLanguage.Instance.Key);
         DynamicClassifier redeserializedCircle2 =
@@ -138,7 +134,7 @@ public class LanguageSerializationTests
 
     private class SkipDeserializationHandler : LanguageDeserializerExceptionHandler
     {
-        public override bool SkipDeserializingDependentNode(CompressedId id) => false;
+        public override bool SkipDeserializingDependentNode(ICompressedId id) => false;
     }
 
     [TestMethod]
@@ -152,7 +148,8 @@ public class LanguageSerializationTests
             LionWebVersions.v2024_1.BuiltIns
         ];
         var chunk =
-            new Serializer(LionWebVersions.v2024_1_Compatible) { StoreUncompressedIds = true }.SerializeToChunk(input);
+            new Serializer(LionWebVersions.v2024_1_Compatible) { CompressedIdConfig = new(KeepOriginal: true) }
+                .SerializeToChunk(input);
 
         var deserializer =
             new LanguageDeserializer(LionWebVersions.v2024_1_Compatible, new SkipDeserializationHandler());
@@ -160,9 +157,11 @@ public class LanguageSerializationTests
         var actual = deserializer.Deserialize(chunk).Cast<Language>().ToList();
 
         // We can't just compare the language nodes, because M3 concepts are self-defined (e.g. LionCore.Classifier = Concept, not Language)
-        
-        using var expectedEnumerator = input.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, true, true)).GetEnumerator();
-        using var actualEnumerator = actual.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, true, true)).GetEnumerator();
+
+        using var expectedEnumerator =
+            input.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, true, true)).GetEnumerator();
+        using var actualEnumerator =
+            actual.SelectMany(i => M1Extensions.Descendants<IKeyed>(i, true, true)).GetEnumerator();
 
         while (expectedEnumerator.MoveNext() && actualEnumerator.MoveNext())
         {
@@ -172,7 +171,7 @@ public class LanguageSerializationTests
             Assert.AreEqual(ex.GetId(), act.GetId());
             Assert.AreEqual(ex.Name, act.Name);
         }
-        
+
         Assert.IsFalse(expectedEnumerator.MoveNext());
         Assert.IsFalse(actualEnumerator.MoveNext());
     }

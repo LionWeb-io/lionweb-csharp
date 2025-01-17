@@ -65,7 +65,7 @@ public class Serializer : ISerializer
     /// Whether we store uncompressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
     /// Uses more memory, but very helpful for debugging.
     /// Defaults to <c>false</c>. 
-    public bool StoreUncompressedIds { get; init; } = false;
+    public CompressedIdConfig CompressedIdConfig { get; init; } = new();
     
     /// Whether references to LionCore nodes (<see cref="ILionCoreLanguage"/>, <see cref="IBuiltInsLanguage"/>)
     /// should include the target node's id, or only the resolveInfo.
@@ -321,8 +321,8 @@ public class Serializer : ISerializer
 
     #region Helpers
 
-    private CompressedId Compress(string id) =>
-        CompressedId.Create(id, StoreUncompressedIds);
+    private ICompressedId Compress(string id) =>
+        ICompressedId.Create(id, CompressedIdConfig);
 
     /// Compares features with special handling for LionCore features (only compared by key).
     private class FeatureComparer : IEqualityComparer<Feature>

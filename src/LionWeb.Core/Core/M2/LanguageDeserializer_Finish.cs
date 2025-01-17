@@ -39,7 +39,7 @@ public partial class LanguageDeserializer
     {
         _deserializerBuilder
             .WithHandler(_handler)
-            .WithUncompressedIds(StoreUncompressedIds)
+            .WithCompressedIds(CompressedIdConfig)
             .WithLanguages(_deserializedNodesById.Values.OfType<Language>())
             .WithDependentNodes(_deserializedNodesById.Values)
             .WithLionWebVersion(LionWebVersion);
@@ -79,7 +79,7 @@ public partial class LanguageDeserializer
             var parentId = serializedAnnotation.Parent;
             if (parentId != null)
             {
-                CompressedId compressedParentId = Compress(parentId);
+                ICompressedId compressedParentId = Compress(parentId);
 
                 if (_deserializedNodesById.TryGetValue(compressedParentId, out readableParent) &&
                     readableParent is IWritableNode w)

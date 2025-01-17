@@ -30,9 +30,9 @@ public class SkipDeserializingDependentNodeTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<CompressedId, bool> heal) : DeserializerExceptionHandler
+    private class DeserializerHealingHandler(Func<ICompressedId, bool> heal) : DeserializerExceptionHandler
     {
-        public override bool SkipDeserializingDependentNode(CompressedId id) => heal(id);
+        public override bool SkipDeserializingDependentNode(ICompressedId id) => heal(id);
     }
 
 
@@ -86,7 +86,7 @@ public class SkipDeserializingDependentNodeTests
         IDeserializer deserializer = new DeserializerBuilder()
             .WithHandler(deserializerHealingHandler)
             .WithLanguage(ShapesLanguage.Instance)
-            .WithUncompressedIds(true)
+            .WithCompressedIds(new(KeepOriginal: true))
             .Build();
 
         List<IReadableNode> deserializedNodes = deserializer.Deserialize(serializationChunk, [coord]);

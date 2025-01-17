@@ -30,10 +30,10 @@ public class UnresolvableChildTests
 {
     private readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
-    private class DeserializerHealingHandler(Func<CompressedId, Feature, IWritableNode, IWritableNode?> heal)
+    private class DeserializerHealingHandler(Func<ICompressedId, Feature, IWritableNode, IWritableNode?> heal)
         : DeserializerExceptionHandler
     {
-        public override IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IReadableNode node)
+        public override IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node)
             => heal(childId, containment, (IWritableNode)node);
     }
 

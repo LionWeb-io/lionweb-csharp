@@ -30,11 +30,11 @@ using System.Diagnostics.CodeAnalysis;
 public class DeserializerMetaInfo(IDeserializerHandler handler)
 {
     private readonly Dictionary<Language, INodeFactory> _language2NodeFactory = new();
-    private readonly Dictionary<CompressedId, List<Language>> _languagesByKey = new();
+    private readonly Dictionary<ICompressedId, List<Language>> _languagesByKey = new();
     private readonly Dictionary<CompressedMetaPointer, Classifier> _classifiers = new();
     private readonly Dictionary<CompressedMetaPointer, Feature> _features = new();
     
-    internal bool StoreUncompressedIds { get; set; } = false;
+    internal CompressedIdConfig CompressedIdConfig { get; set; } = new();
 
     internal void RegisterInstantiatedLanguage(Language language, INodeFactory factory)
     {
@@ -61,7 +61,7 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
         if (!LookupClassifier(compressedMetaPointer, out var classifier))
         {
             classifier =
-                handler.UnknownClassifier(compressedMetaPointer, CompressedId.Create(id, StoreUncompressedIds));
+                handler.UnknownClassifier(compressedMetaPointer, ICompressedId.Create(id, CompressedIdConfig));
             if (classifier == null)
                 return null;
         }
@@ -114,9 +114,9 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
     internal bool LookupFactory(Language language, [MaybeNullWhen(false)] out INodeFactory factory) =>
         _language2NodeFactory.TryGetValue(language, out factory);
 
-    internal CompressedId Compress(string id) =>
-        CompressedId.Create(id, StoreUncompressedIds);
+    internal ICompressedId Compress(string id) =>
+        ICompressedId.Create(id, CompressedIdConfig);
 
     private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
-        CompressedMetaPointer.Create(metaPointer, StoreUncompressedIds);
+        CompressedMetaPointer.Create(metaPointer, CompressedIdConfig);
 }

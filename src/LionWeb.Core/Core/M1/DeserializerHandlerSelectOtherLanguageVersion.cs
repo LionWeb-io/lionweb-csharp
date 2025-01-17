@@ -55,7 +55,7 @@ public static class DeserializerHandlerSelectOtherLanguageVersion
         };
 
         var candidates = keyed
-            .Where(k => CompressedId.Create(k.Key, false).Equals(metaPointer.Key))
+            .Where(k => ICompressedId.Create(k.Key, new CompressedIdConfig()).Equals(metaPointer.Key))
             .OrderBy(f => f.GetLanguage(), languageComparer);
 
         return candidates

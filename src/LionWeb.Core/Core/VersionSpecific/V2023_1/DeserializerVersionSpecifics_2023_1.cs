@@ -50,7 +50,7 @@ internal class DeserializerVersionSpecifics_2023_1<T, H>(
 
     private object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype, string value)
     {
-        CompressedId compressedId = _metaInfo.Compress(node.GetId());
+        ICompressedId compressedId = _metaInfo.Compress(node.GetId());
         return datatype switch
         {
             var b when b == BuiltInsLanguage_2023_1.Instance.Boolean =>

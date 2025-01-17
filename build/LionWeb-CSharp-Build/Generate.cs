@@ -27,9 +27,9 @@ using LionWeb.Generator.Names;
 foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 {
     ShapesDefinition._lionWebVersion = lionWebVersion;
-    
+
     Console.WriteLine($"\n### LionWeb specification version: {lionWebVersion}\n");
-    
+
     SerializeLanguagesLocally(lionWebVersion, "lioncore", lionWebVersion.LionCore);
     SerializeLanguagesLocally(lionWebVersion, "shapes", ShapesDefinition.Language);
 
@@ -64,11 +64,11 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(tinyRefLang, $"{prefix}.TinyRefLang"),
         new(deprecatedLang, $"{prefix}.DeprecatedLang"),
     ];
-    
-    if(sdtLang != null)
+
+    if (sdtLang != null)
         names.Add(new(sdtLang, $"{prefix}.SDTLang"));
-    
-    if(keywordLang != null)
+
+    if (keywordLang != null)
         names.Add(new(keywordLang, $"@namespace.@int.@public"));
 
     names.AddRange(testLanguagesDefinitions
@@ -90,7 +90,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 
     foreach (var name in names)
     {
-        var generator = new GeneratorFacade { Names = name, LionWebVersion = lionWebVersion};
+        var generator = new GeneratorFacade { Names = name, LionWebVersion = lionWebVersion };
         generator.Generate();
         Console.WriteLine($"generated code for: {name.Language.Name}");
 
@@ -110,11 +110,12 @@ void SerializeLanguagesLocally(LionWebVersions lionWebVersion, string name, para
         languages.SelectMany(l => M1Extensions.Descendants<IReadableNode>(l, true, true)));
 }
 
-DynamicLanguage[] DeserializeExternalLanguage(LionWebVersions lionWebVersion, string name, params Language[] dependentLanguages)
+DynamicLanguage[] DeserializeExternalLanguage(LionWebVersions lionWebVersion, string name,
+    params Language[] dependentLanguages)
 {
-    SerializationChunk serializationChunk = JsonUtils.ReadJsonFromString<SerializationChunk>(File.ReadAllText($"chunks/externalDefs/{lionWebVersion.VersionString}/{name}.json"));
-    return new LanguageDeserializer(lionWebVersion)
-    {
-        StoreUncompressedIds = true
-    }.Deserialize(serializationChunk, dependentLanguages).ToArray();
+    SerializationChunk serializationChunk =
+        JsonUtils.ReadJsonFromString<SerializationChunk>(
+            File.ReadAllText($"chunks/externalDefs/{lionWebVersion.VersionString}/{name}.json"));
+    return new LanguageDeserializer(lionWebVersion, compressedIdConfig: new(KeepOriginal: true))
+        .Deserialize(serializationChunk, dependentLanguages).ToArray();
 }

@@ -35,7 +35,7 @@ public interface IDeserializerHandler
     /// <param name="classifier">Unknown classifier.</param>
     /// <param name="id">Node id the unknown classifier appeared.</param>
     /// <returns>Replacement classifier to use, or <c>null</c> to skip node <paramref name="id"/>.</returns>
-    Classifier? UnknownClassifier(CompressedMetaPointer classifier, CompressedId id);
+    Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id);
 
     /// <summary>
     /// <paramref name="nodeId"/> is same for <paramref name="existingNode"/> and <paramref name="node"/>. 
@@ -46,7 +46,7 @@ public interface IDeserializerHandler
     /// <returns>Replacement node id to use for <paramref name="node"/>, or <c>null</c> to skip <paramref name="node"/>.</returns>
     /// <remarks>For both <paramref name="existingNode"/> and <paramref name="node"/>, only node id and properties are populated -- no other features.</remarks>
     /// <remarks>If returned replacement node id is not unique, deserializer keeps calling this method, might lead to an infinite loop.</remarks>
-    string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, IReadableNode node);
+    string? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node);
 
     /// <summary>
     /// Cannot resolve <paramref name="metaPointer"/>, but know about at least one language
@@ -169,7 +169,7 @@ public interface IDeserializerHandler
     /// <param name="nodeId">Node that has property <paramref name="property"/>.</param>
     /// <typeparam name="TValue">Type of value to be used for property <paramref name="property"/> in node <paramref name="nodeId"/>.</typeparam>
     /// <returns>Replacement value to use, or <c>null</c> to skip property <paramref name="property"/>.</returns>
-    object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId);
+    object? InvalidPropertyValue<TValue>(string? value, Feature property, ICompressedId nodeId);
 
     #endregion
 
@@ -182,7 +182,7 @@ public interface IDeserializerHandler
     /// <param name="containment">Containment that should contain <paramref name="childId"/>.</param>
     /// <param name="node">Node that mentions <paramref name="childId"/> as child.</param>
     /// <returns>Replacement child node to use, or <c>null</c> to skip child <paramref name="childId"/>.</returns>
-    IWritableNode? UnresolvableChild(CompressedId childId, Feature containment, IReadableNode node);
+    IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node);
 
     /// <summary>
     /// Cannot find node with id <paramref name="targetId"/> mentioned as reference target in <paramref name="node"/> in reference <paramref name="reference"/>.
@@ -192,7 +192,7 @@ public interface IDeserializerHandler
     /// <param name="reference">Reference that should contain <paramref name="targetId"/>.</param>
     /// <param name="node">Node that mentions <paramref name="targetId"/> as reference target.</param>
     /// <returns>Replacement reference target node to use, or <c>null</c> to skip reference target <paramref name="targetId"/>.</returns>
-    IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo, Feature reference,
+    IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, string? resolveInfo, Feature reference,
         IReadableNode node);
 
     /// <summary>
@@ -201,7 +201,7 @@ public interface IDeserializerHandler
     /// <param name="annotationId">Unresolvable annotation node id.</param>
     /// <param name="node">Node that mentions <paramref name="annotationId"/> as annotation.</param>
     /// <returns>Replacement annotation node to use, or <c>null</c> to skip annotation node <paramref name="annotationId"/>.</returns>
-    IWritableNode? UnresolvableAnnotation(CompressedId annotationId, IReadableNode node);
+    IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node);
 
     #endregion
 
@@ -211,7 +211,7 @@ public interface IDeserializerHandler
     /// <param name="id">Node id appearing in both deserialized nodes and dependent nodes.</param>
     /// <returns><c>true</c> if we should skip the deserialized node if the same node id appears in dependent nodes;
     /// <c>false</c> if we should still deserialize the node.</returns>
-    bool SkipDeserializingDependentNode(CompressedId id);
+    bool SkipDeserializingDependentNode(ICompressedId id);
 
     /// <summary>
     /// Cannot install references into <paramref name="node"/>. 
