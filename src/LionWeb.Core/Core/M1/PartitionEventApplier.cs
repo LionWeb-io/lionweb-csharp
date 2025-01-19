@@ -48,6 +48,9 @@ public class PartitionEventApplier
             OnRemoteChildAdded(sender, args.Parent, args.NewChild, args.Containment, args.Index);
         listener.ChildDeleted += (sender, args) =>
             OnRemoteChildDeleted(sender, args.DeletedChild, args.Parent, args.Containment, args.Index);
+        listener.ChildMovedFromOtherContainment += (sender, args) =>
+            OnRemoteChildMovedFromOtherContainment(sender, args.NewParent, args.NewContainment, args.NewIndex,
+                args.MovedChild, args.OldParent, args.OldContainment, args.OldIndex);
     }
 
     private void Init()
@@ -124,26 +127,33 @@ public class PartitionEventApplier
 
         var clone = Clone(newChildNode);
 
-        object newValue = clone;
+        var newValue = Insert(localParent, containment, index, clone);
+
+        localParent.Set(containment, newValue);
+    }
+
+    private static object Insert(INode localParent, Containment containment, Index index, INode nodeToInsert)
+    {
+        object newValue = nodeToInsert;
         if (containment.Multiple)
         {
             var existingChildren = localParent.Get(containment);
             if (existingChildren is IList l)
             {
                 var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                children.Insert(index, clone);
+                children.Insert(index, nodeToInsert);
                 newValue = children;
             }
         }
 
-        localParent.Set(containment, newValue);
+        return newValue;
     }
 
     private void OnRemoteChildDeleted(object? sender, IWritableNode deletedChild, IWritableNode parent,
         Containment containment, Index index)
     {
         var localParent = Lookup(parent.GetId());
-        
+
         object newValue = null;
         if (containment.Multiple)
         {
@@ -158,7 +168,21 @@ public class PartitionEventApplier
 
         localParent.Set(containment, newValue);
     }
-    
+
+    private void OnRemoteChildMovedFromOtherContainment(object? sender, IWritableNode newParent,
+        Containment newContainment,
+        Index newIndex,
+        IWritableNode movedChild,
+        IWritableNode oldParent,
+        Containment oldContainment,
+        Index oldIndex)
+    {
+        var localNewParent = Lookup(newParent.GetId());
+        var newValue = Insert(localNewParent, newContainment, newIndex, Lookup(movedChild.GetId()));
+
+        localNewParent.Set(newContainment, newValue);
+    }
+
     #endregion
 
     #endregion

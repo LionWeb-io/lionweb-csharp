@@ -236,6 +236,7 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEventBase<T> where T : INode
 {
+    private readonly List<T> _existingValues;
     private Index _newIndex;
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
@@ -251,7 +252,8 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
         Index? startIndex = null
     ) : base(containment, newParent, addedValues)
     {
-        _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
+        _existingValues = existingValues;
+        _newIndex = startIndex ?? Math.Max(existingValues.Count, 0);
     }
 
     /// <inheritdoc />
@@ -285,6 +287,8 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
                     break;
 
                 case not null when old.Parent == NewParent && old.Containment == Containment:
+                    // if (old.Index > _newIndex)
+                    //     _newIndex--;
                     PartitionCommander.MoveChildInSameContainment(
                         _newIndex,
                         added,

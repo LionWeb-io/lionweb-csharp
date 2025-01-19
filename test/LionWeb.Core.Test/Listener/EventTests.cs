@@ -239,6 +239,43 @@ public class EventTests
 
     #endregion
 
+    #region ChildMovedFromOtherContainment
+
+    [TestMethod]
+    public void ChildMovedFromOtherContainment_Multiple()
+    {
+        var moved = new Circle("moved");
+        var origin = new CompositeShape("origin") { Parts = [moved] };
+        var node = new Geometry("a") { Shapes = [origin] };
+
+        var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.AddShapes([moved]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void ChildMovedFromOtherContainment_Single()
+    {
+        var moved = new Documentation("moved");
+        var node = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+
+        var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };;
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.Documentation = moved;
+
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+
     #endregion
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
