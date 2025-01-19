@@ -57,6 +57,17 @@ public class PartitionEventApplier
         listener.ChildMovedInSameContainment += (sender, args) =>
             OnRemoteChildMovedInSameContainment(sender, args.NewIndex, args.MovedChild, args.Parent, args.Containment,
                 args.OldIndex);
+
+        listener.AnnotationAdded += (sender, args) =>
+            OnRemoteAnnotationAdded(sender, args.Parent, args.NewAnnotation, args.Index);
+        listener.AnnotationDeleted += (sender, args) =>
+            OnRemoteAnnotationDeleted(sender, args.DeletedAnnotation, args.Parent, args.Index);
+        listener.AnnotationMovedFromOtherParent += (sender, args) =>
+            OnRemoteAnnotationMovedFromOtherParent(sender, args.NewParent, args.NewIndex, args.MovedAnnotation,
+                args.OldParent, args.OldIndex);
+        listener.AnnotationMovedInSameParent += (sender, args) =>
+            OnRemoteAnnotationMovedInSameParent(sender, args.NewIndex, args.MovedAnnotation, args.Parent,
+                args.OldIndex);
     }
 
     private void Init()
@@ -68,9 +79,14 @@ public class PartitionEventApplier
             return;
 
         listener.ChildAdded += (sender, args) =>
-            OnLocalChildAdded(sender, args.Parent, args.NewChild, args.Containment, args.Index);
+            RegisterNode(args.NewChild);
         listener.ChildDeleted += (sender, args) =>
-            OnLocalChildDeleted(sender, args.DeletedChild, args.Parent, args.Containment, args.Index);
+            UnregisterNode(args.DeletedChild);
+        
+        listener.AnnotationAdded += (sender, args) =>
+            RegisterNode(args.NewAnnotation);
+        listener.AnnotationDeleted += (sender, args) =>
+            UnregisterNode(args.DeletedAnnotation);
     }
 
     private void RegisterNode(IReadableNode newNode)
@@ -233,17 +249,43 @@ public class PartitionEventApplier
 
     #endregion
 
+    #region Annotations
+
+    private void OnRemoteAnnotationAdded(object? sender, IWritableNode parent, IWritableNode newAnnotation, Index index)
+    {
+        var localParent = Lookup(parent.GetId());
+        localParent.InsertAnnotations(index, [Clone((INode)newAnnotation)]);
+    }
+
+    private void OnRemoteAnnotationDeleted(object? sender, IWritableNode deletedAnnotation, IWritableNode parent,
+        Index index)
+    {
+        var localParent = Lookup(parent.GetId());
+        localParent.RemoveAnnotations([Lookup(deletedAnnotation.GetId())]);
+    }
+
+    private void OnRemoteAnnotationMovedFromOtherParent(object? sender, IWritableNode newParent,
+        Index newIndex,
+        IWritableNode movedAnnotation,
+        IWritableNode oldParent,
+        Index oldIndex)
+    {
+        var localNewParent = Lookup(newParent.GetId());
+        localNewParent.InsertAnnotations(newIndex, [Lookup(movedAnnotation.GetId())]);
+    }
+
+    private void OnRemoteAnnotationMovedInSameParent(object? sender,
+        Index newIndex,
+        IWritableNode movedAnnotation,
+        IWritableNode parent,
+        Index oldIndex)
+    {
+        var localParent = Lookup(parent.GetId());
+        INode nodeToInsert = Lookup(movedAnnotation.GetId());
+        localParent.InsertAnnotations(newIndex, [nodeToInsert]);
+    }
+
     #endregion
-
-    #region Local
-
-    private void OnLocalChildAdded(object? sender, IWritableNode parent, IWritableNode newChild,
-        Containment containment, Index index) =>
-        RegisterNode(newChild);
-
-    private void OnLocalChildDeleted(object? sender, IWritableNode deletedChild, IWritableNode parent,
-        Containment containment, Index index) =>
-        UnregisterNode(deletedChild);
 
     #endregion
 }

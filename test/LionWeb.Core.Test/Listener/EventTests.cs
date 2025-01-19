@@ -264,7 +264,7 @@ public class EventTests
         var moved = new Documentation("moved");
         var node = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = moved }] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };;
+        var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
         var applier = new PartitionEventApplier(clone);
         applier.Subscribe(node.Listener);
@@ -344,6 +344,211 @@ public class EventTests
         applier.Subscribe(node.Listener);
 
         node.InsertShapes(0, [moved]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+
+    #endregion
+
+    #region Annotations
+
+    #region AnnotationAdded
+
+    [TestMethod]
+    public void AnnotationAdded_Multiple_Only()
+    {
+        var node = new Geometry("a");
+
+        var clone = new Geometry("a");
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        var added = new BillOfMaterials("added");
+        node.AddAnnotations([added]);
+
+        AssertEquals([node], [clone]);
+        Assert.AreNotSame(added, clone.GetAnnotations()[0]);
+    }
+
+    [TestMethod]
+    public void AnnotationAdded_Multiple_First()
+    {
+        var node = new Geometry("a");
+        node.AddAnnotations([new BillOfMaterials("bof")]);
+
+        var clone = new Geometry("a");
+        clone.AddAnnotations([new BillOfMaterials("bof")]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        var added = new BillOfMaterials("added");
+        node.InsertAnnotations(0, [added]);
+
+        AssertEquals([node], [clone]);
+        Assert.AreNotSame(added, clone.GetAnnotations()[0]);
+    }
+
+    [TestMethod]
+    public void AnnotationAdded_Multiple_Last()
+    {
+        var node = new Geometry("a");
+        node.AddAnnotations([new BillOfMaterials("bof")]);
+
+        var clone = new Geometry("a");
+        clone.AddAnnotations([new BillOfMaterials("bof")]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        var added = new BillOfMaterials("added");
+        node.InsertAnnotations(1, [added]);
+
+        AssertEquals([node], [clone]);
+        Assert.AreNotSame(added, clone.GetAnnotations()[1]);
+    }
+
+    [TestMethod]
+    public void AnnotationAdded_Deep()
+    {
+        var node = new Geometry("a");
+
+        var clone = new Geometry("a");
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        var added = new BillOfMaterials("added")
+        {
+            AltGroups = [new MaterialGroup("mg") { MatterState = MatterState.gas }]
+        };
+        node.AddAnnotations([added]);
+
+        AssertEquals([node], [clone]);
+        Assert.AreNotSame(added, clone.GetAnnotations()[0]);
+    }
+
+    #endregion
+
+    #region AnnotationDeleted
+
+    [TestMethod]
+    public void AnnotationDeleted_Multiple_Only()
+    {
+        var deleted = new BillOfMaterials("deleted");
+        var node = new Geometry("a");
+        node.AddAnnotations([deleted]);
+
+        var clone = new Geometry("a");
+        clone.AddAnnotations([new BillOfMaterials("deleted")]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.RemoveAnnotations([deleted]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void AnnotationDeleted_Multiple_First()
+    {
+        var deleted = new BillOfMaterials("deleted");
+        var node = new Geometry("a");
+        node.AddAnnotations([deleted, new BillOfMaterials("bof")]);
+
+        var clone = new Geometry("a");
+        clone.AddAnnotations([new BillOfMaterials("deleted"), new BillOfMaterials("bof")]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.RemoveAnnotations([deleted]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void AnnotationDeleted_Multiple_Last()
+    {
+        var deleted = new BillOfMaterials("deleted");
+        var node = new Geometry("a");
+        node.AddAnnotations([new BillOfMaterials("bof"), deleted]);
+
+        var clone = new Geometry("a");
+        clone.AddAnnotations([new BillOfMaterials("bof"), new BillOfMaterials("deleted")]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.RemoveAnnotations([deleted]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+
+    #region AnnotationMovedFromOtherParent
+
+    [TestMethod]
+    public void AnnotationMovedFromOtherParent_Multiple()
+    {
+        var moved = new BillOfMaterials("moved");
+        var origin = new CompositeShape("origin");
+        origin.AddAnnotations([moved]);
+        var node = new Geometry("a") { Shapes = [origin] };
+
+        var cloneOrigin = new CompositeShape("origin");
+        cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
+        var clone = new Geometry("a") { Shapes = [cloneOrigin] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.AddAnnotations([moved]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+
+    #region AnnotationMovedInSameParent
+
+    [TestMethod]
+    public void AnnotationMovedInSameParent_Forward()
+    {
+        var moved = new BillOfMaterials("moved");
+        var node = new Geometry("a");
+        node.AddAnnotations([moved, new BillOfMaterials("bof")]);
+
+        var clone = new Geometry("a");
+        clone.AddAnnotations([new BillOfMaterials("moved"), new BillOfMaterials("bof")]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.AddAnnotations([moved]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void AnnotationMovedInSameParent_Backward()
+    {
+        var moved = new BillOfMaterials("moved");
+        var node = new Geometry("a");
+        node.AddAnnotations([new BillOfMaterials("bof"), moved]);
+
+        var clone = new Geometry("a");
+        clone.AddAnnotations([new BillOfMaterials("bof"), new BillOfMaterials("moved")]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.InsertAnnotations(0, [moved]);
 
         AssertEquals([node], [clone]);
     }
