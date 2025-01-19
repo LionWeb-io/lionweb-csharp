@@ -287,8 +287,8 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
                     break;
 
                 case not null when old.Parent == NewParent && old.Containment == Containment:
-                    // if (old.Index > _newIndex)
-                    //     _newIndex--;
+                    if (old.Index < _newIndex)
+                        _newIndex--;
                     PartitionCommander.MoveChildInSameContainment(
                         _newIndex,
                         added,

@@ -314,6 +314,42 @@ public class EventTests
 
     #endregion
 
+    #region ChildMovedInSameContainment
+
+    [TestMethod]
+    public void ChildMovedInSameContainment_Forward()
+    {
+        var moved = new Circle("moved");
+        var node = new Geometry("a") { Shapes = [moved, new Line("l")] };
+
+        var clone = new Geometry("a") { Shapes = [new Circle("moved"), new Line("l")] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.AddShapes([moved]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void ChildMovedInSameContainment_Backward()
+    {
+        var moved = new Circle("moved");
+        var node = new Geometry("a") { Shapes = [new Line("l"), moved] };
+
+        var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("moved")] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.InsertShapes(0, [moved]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+
     #endregion
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

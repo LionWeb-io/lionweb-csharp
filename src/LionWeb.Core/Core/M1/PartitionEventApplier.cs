@@ -54,6 +54,9 @@ public class PartitionEventApplier
         listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
             OnRemoteChildMovedFromOtherContainmentInSameParent(sender, args.NewContainment, args.NewIndex,
                 args.MovedChild, args.Parent, args.OldContainment, args.OldIndex);
+        listener.ChildMovedInSameContainment += (sender, args) =>
+            OnRemoteChildMovedInSameContainment(sender, args.NewIndex, args.MovedChild, args.Parent, args.Containment,
+                args.OldIndex);
     }
 
     private void Init()
@@ -204,6 +207,28 @@ public class PartitionEventApplier
         var newValue = Insert(localParent, newContainment, newIndex, Lookup(movedChild.GetId()));
 
         localParent.Set(newContainment, newValue);
+    }
+
+    private void OnRemoteChildMovedInSameContainment(object? sender,
+        Index newIndex,
+        IWritableNode movedChild,
+        IWritableNode parent,
+        Containment containment,
+        Index oldIndex)
+    {
+        var localParent = Lookup(parent.GetId());
+        INode nodeToInsert = Lookup(movedChild.GetId());
+        object newValue = nodeToInsert;
+        var existingChildren = localParent.Get(containment);
+        if (existingChildren is IList l)
+        {
+            var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+            children.RemoveAt(oldIndex);
+            children.Insert(newIndex, nodeToInsert);
+            newValue = children;
+        }
+
+        localParent.Set(containment, newValue);
     }
 
     #endregion
