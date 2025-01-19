@@ -37,8 +37,10 @@ public class PartitionEventApplier
 
     public void Subscribe(IPartitionListener listener)
     {
-        listener.PropertyAdded +=
-            (sender, args) => OnRemotePropertyAdded(sender, args.Node, args.Property, args.NewValue);
+        listener.PropertyAdded += (sender, args) =>
+            OnRemotePropertyAdded(sender, args.Node, args.Property, args.NewValue);
+        listener.PropertyDeleted += (sender, args) =>
+            OnRemotePropertyDeleted(sender, args.Node, args.Property, args.OldValue);
         listener.PropertyChanged += (sender, args) =>
             OnRemotePropertyChanged(sender, args.Node, args.Property, args.NewValue, args.OldValue);
 
@@ -84,6 +86,10 @@ public class PartitionEventApplier
     private void OnRemotePropertyAdded(object? sender, IWritableNode node, Property property,
         SemanticPropertyValue newValue) =>
         Lookup(node.GetId()).Set(property, newValue);
+
+    private void OnRemotePropertyDeleted(object? sender, IWritableNode node, Property property,
+        SemanticPropertyValue oldValue) =>
+        Lookup(node.GetId()).Set(property, null);
 
     private void OnRemotePropertyChanged(object? sender, IWritableNode node, Property property,
         SemanticPropertyValue newValue, SemanticPropertyValue oldValue) =>

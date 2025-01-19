@@ -61,6 +61,23 @@ public class EventTests
         AssertEquals([node], [clone]);
     }
 
+    [TestMethod]
+    public void PropertyDeleted()
+    {
+        var docs = new Documentation("c") { Text = "Hello" };
+        var node = new Geometry("a") { Documentation = docs };
+
+        var cloneDocs = new Documentation("c") { Text = "Hello" };
+        var clone = new Geometry("a") { Documentation = cloneDocs };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        docs.Text = null;
+
+        AssertEquals([node], [clone]);
+    }
+
     #endregion
 
     #region Children
