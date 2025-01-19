@@ -73,6 +73,9 @@ public class PartitionEventApplier
             OnRemoteReferenceAdded(sender, args.Parent, args.Reference, args.Index, args.NewTarget);
         listener.ReferenceDeleted += (sender, args) =>
             OnRemoteReferenceDeleted(sender, args.Parent, args.Reference, args.Index, args.DeletedTarget);
+        listener.ReferenceChanged += (sender, args) =>
+            OnRemoteReferenceChanged(sender, args.Parent, args.Reference, args.Index, args.NewTarget,
+                args.ReplacedTarget);
     }
 
     private void Init()
@@ -340,6 +343,27 @@ public class PartitionEventApplier
             {
                 var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
                 targets.RemoveAt(index);
+                newValue = targets;
+            }
+        }
+
+        localParent.Set(reference, newValue);
+    }
+
+    private void OnRemoteReferenceChanged(object? sender, IWritableNode parent, Reference reference, Index index,
+        IReferenceTarget newTarget, IReferenceTarget replacedTarget)
+    {
+        var localParent = Lookup(parent.GetId());
+
+        object newValue = Lookup(newTarget.Reference.GetId());
+        if (reference.Multiple)
+        {
+            var existingTargets = localParent.Get(reference);
+            if (existingTargets is IList l)
+            {
+                var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
+                targets.Insert(index, (IReadableNode)newValue);
+                targets.RemoveAt(index + 1);
                 newValue = targets;
             }
         }

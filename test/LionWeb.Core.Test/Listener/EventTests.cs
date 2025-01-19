@@ -727,6 +727,32 @@ public class EventTests
 
     #endregion
 
+    #region ReferenceChanged
+
+    [TestMethod]
+    public void ReferenceChanged_Single()
+    {
+        var circle = new Circle("circle");
+        var line = new Line("line");
+        var od = new OffsetDuplicate("od") { AltSource = circle };
+        var node = new Geometry("a") { Shapes = [od, circle, line] };
+
+        var cloneCircle = new Circle("circle");
+        var clone = new Geometry("a")
+        {
+            Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle, new Line("line")]
+        };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        od.AltSource = line;
+
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+
     #endregion
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
