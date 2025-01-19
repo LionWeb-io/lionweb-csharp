@@ -20,6 +20,7 @@ namespace LionWeb.Core.M1;
 using M3;
 using System.Collections;
 using Utilities;
+using SemanticPropertyValue = object;
 
 public class PartitionEventApplier
 {
@@ -36,6 +37,8 @@ public class PartitionEventApplier
 
     public void Subscribe(IPartitionListener listener)
     {
+        listener.PropertyAdded += (sender, args) => OnRemoteChildAdded(sender, args.Node, args.Property, args.NewValue);
+        
         listener.ChildAdded += (sender, args) =>
             OnRemoteChildAdded(sender, args.Parent, args.NewChild, args.Containment, args.Index);
     }
@@ -55,8 +58,8 @@ public class PartitionEventApplier
         }
     }
 
-    protected virtual INode? Lookup(NodeId remoteNodeId) =>
-        (INode?)_nodeById.GetValueOrDefault(remoteNodeId);
+    protected virtual INode Lookup(NodeId remoteNodeId) =>
+        (INode)_nodeById[remoteNodeId];
 
     protected virtual INode Clone(INode remoteNode) =>
         new SameIdCloner(remoteNode.Descendants(true, true)).Clone()[remoteNode];
@@ -73,10 +76,22 @@ public class PartitionEventApplier
 
     #region Remote
 
+    #region Properties
+
+    private void OnRemoteChildAdded(object? sender, IWritableNode node, Property property, SemanticPropertyValue newValue)
+    {
+        Lookup(node.GetId()).Set(property, newValue);
+    }
+    
+
+    #endregion
+
+    #region Children
+    
     private void OnRemoteChildAdded(object? sender, IWritableNode parent, IWritableNode newChild,
         Containment containment, Index index)
     {
-        var localParent = Lookup(parent.GetId()) ?? throw new NullReferenceException();
+        var localParent = Lookup(parent.GetId());
         var newChildNode = (INode)newChild;
 
         var clone = Clone(newChildNode);
@@ -95,6 +110,8 @@ public class PartitionEventApplier
 
         localParent.Set(containment, newValue);
     }
+    
+    #endregion
 
     #endregion
 

@@ -19,7 +19,7 @@ namespace LionWeb.Core.M1;
 
 using M3;
 using TargetNode = IReadableNode;
-using PropertyValue = object;
+using SemanticPropertyValue = object;
 
 /// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 /// <seealso cref="IPartitionCommander"/>
@@ -45,7 +45,7 @@ public interface IPartitionListener
     /// <param name="Node"></param>
     /// <param name="Property"></param>
     /// <param name="NewValue"></param>
-    record PropertyAddedArgs(IWritableNode Node, Property Property, PropertyValue NewValue);
+    record PropertyAddedArgs(IWritableNode Node, Property Property, SemanticPropertyValue NewValue);
 
     /// <seealso cref="IPartitionCommander.AddProperty"/>
     event EventHandler<PropertyAddedArgs> PropertyAdded;
@@ -54,7 +54,7 @@ public interface IPartitionListener
     /// <param name="Node"></param>
     /// <param name="Property"></param>
     /// <param name="OldValue"></param>
-    record PropertyDeletedArgs(IWritableNode Node, Property Property, PropertyValue OldValue);
+    record PropertyDeletedArgs(IWritableNode Node, Property Property, SemanticPropertyValue OldValue);
 
     /// <seealso cref="IPartitionCommander.DeleteProperty"/>
     event EventHandler<PropertyDeletedArgs> PropertyDeleted;
@@ -64,7 +64,7 @@ public interface IPartitionListener
     /// <param name="Property"></param>
     /// <param name="NewValue"></param>
     /// <param name="OldValue"></param>
-    record PropertyChangedArgs(IWritableNode Node, Property Property, PropertyValue NewValue, PropertyValue OldValue);
+    record PropertyChangedArgs(IWritableNode Node, Property Property, SemanticPropertyValue NewValue, SemanticPropertyValue OldValue);
 
     /// <seealso cref="IPartitionCommander.ChangeProperty"/>
     event EventHandler<PropertyChangedArgs> PropertyChanged;
@@ -447,7 +447,7 @@ public interface IPartitionCommander
     #region Properties
 
     /// <seealso cref="IPartitionListener.PropertyAdded"/>
-    void AddProperty(IWritableNode node, Property property, PropertyValue newValue);
+    void AddProperty(IWritableNode node, Property property, SemanticPropertyValue newValue);
 
     /// Whether anybody would receive the <see cref="AddProperty"/> event.
     /// <value>
@@ -456,7 +456,7 @@ public interface IPartitionCommander
     bool CanRaiseAddProperty { get; }
 
     /// <seealso cref="IPartitionListener.PropertyDeleted"/>
-    void DeleteProperty(IWritableNode node, Property property, PropertyValue oldValue);
+    void DeleteProperty(IWritableNode node, Property property, SemanticPropertyValue oldValue);
 
     /// Whether anybody would receive the <see cref="DeleteProperty"/> event.
     /// <value>
@@ -465,7 +465,7 @@ public interface IPartitionCommander
     bool CanRaiseDeleteProperty { get; }
 
     /// <seealso cref="IPartitionListener.PropertyChanged"/>
-    void ChangeProperty(IWritableNode node, Property property, PropertyValue newValue, PropertyValue oldValue);
+    void ChangeProperty(IWritableNode node, Property property, SemanticPropertyValue newValue, SemanticPropertyValue oldValue);
 
     /// Whether anybody would receive the <see cref="ChangeProperty"/> event.
     /// <value>

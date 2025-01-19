@@ -25,13 +25,40 @@ using Comparer = Core.Utilities.Comparer;
 [TestClass]
 public class EventTests
 {
+    #region Properties
+
+    #region PropertyAdded
+    
+    [TestMethod]
+    public void PropertyAdded()
+    {
+        var circle = new Circle("c");
+        var node = new Geometry("a") { Shapes = [circle] };
+        
+        var cloneCircle = new Circle("c");
+        var clone = new Geometry("a") { Shapes = [cloneCircle] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        circle.Name = "Hello";
+        
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+    
+    #endregion
+
+    #region Children
+
     #region ChildAdded
 
     [TestMethod]
     public void ChildAdded_Multiple_Only()
     {
         var node = new Geometry("a");
-        
+       
         var clone = new Geometry("a");
 
         var applier = new PartitionEventApplier(clone);
@@ -139,6 +166,8 @@ public class EventTests
         AssertEquals([node], [clone]);
         Assert.AreNotSame(added, clone.Shapes[0]);
     }
+
+    #endregion
 
     #endregion
 
