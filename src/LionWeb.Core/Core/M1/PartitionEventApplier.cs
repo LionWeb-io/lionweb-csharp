@@ -48,6 +48,8 @@ public class PartitionEventApplier
             OnRemoteChildAdded(sender, args.Parent, args.NewChild, args.Containment, args.Index);
         listener.ChildDeleted += (sender, args) =>
             OnRemoteChildDeleted(sender, args.DeletedChild, args.Parent, args.Containment, args.Index);
+        listener.ChildReplaced += (sender, args) =>
+            OnRemoteChildReplaced(sender, args.NewChild, args.ReplacedChild, args.Parent, args.Containment, args.Index);
         listener.ChildMovedFromOtherContainment += (sender, args) =>
             OnRemoteChildMovedFromOtherContainment(sender, args.NewParent, args.NewContainment, args.NewIndex,
                 args.MovedChild, args.OldParent, args.OldContainment, args.OldIndex);
@@ -198,6 +200,28 @@ public class PartitionEventApplier
             {
                 var children = new List<IWritableNode>(l.Cast<IWritableNode>());
                 children.RemoveAt(index);
+                newValue = children;
+            }
+        }
+
+        localParent.Set(containment, newValue);
+    }
+
+    private void OnRemoteChildReplaced(object? sender, IWritableNode newChild, IWritableNode replacedChild,
+        IWritableNode parent,
+        Containment containment, Index index)
+    {
+        var localParent = Lookup(parent.GetId());
+
+        object newValue = Clone((INode)newChild);
+        if (containment.Multiple)
+        {
+            var existingChildren = localParent.Get(containment);
+            if (existingChildren is IList l)
+            {
+                var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                children.Insert(index, (IWritableNode)newValue);
+                children.RemoveAt(index + 1);
                 newValue = children;
             }
         }

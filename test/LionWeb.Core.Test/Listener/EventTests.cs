@@ -239,6 +239,49 @@ public class EventTests
 
     #endregion
 
+    #region ChildReplaced
+
+    [TestMethod]
+    public void ChildReplaced_Single()
+    {
+        var node = new Geometry("a") { Documentation = new Documentation("replaced") { Text = "a" } };
+
+        var clone = new Geometry("a") { Documentation = new Documentation("replaced") { Text = "a" } };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        var added = new Documentation("added") { Text = "added" };
+        node.Documentation = added;
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void ChildReplaced_Deep()
+    {
+        var node = new Geometry("a");
+        var bof = new BillOfMaterials("bof")
+        {
+            DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid }
+        };
+        node.AddAnnotations([bof]);
+
+        var clone = new Geometry("a");
+        clone.AddAnnotations([
+            new BillOfMaterials("bof") { DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid } }
+        ]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        bof.DefaultGroup = new MaterialGroup("replaced") { MatterState = MatterState.gas };
+
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+
     #region ChildMovedFromOtherContainment
 
     [TestMethod]
