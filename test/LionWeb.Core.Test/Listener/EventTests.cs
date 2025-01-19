@@ -27,14 +27,12 @@ public class EventTests
 {
     #region Properties
 
-    #region PropertyAdded
-    
     [TestMethod]
     public void PropertyAdded()
     {
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
-        
+
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
@@ -42,12 +40,27 @@ public class EventTests
         applier.Subscribe(node.Listener);
 
         circle.Name = "Hello";
-        
+
         AssertEquals([node], [clone]);
     }
 
-    #endregion
-    
+    [TestMethod]
+    public void PropertyChanged()
+    {
+        var circle = new Circle("c") { Name = "Hello" };
+        var node = new Geometry("a") { Shapes = [circle] };
+
+        var cloneCircle = new Circle("c") { Name = "Hello" };
+        var clone = new Geometry("a") { Shapes = [cloneCircle] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        circle.Name = "Bye";
+
+        AssertEquals([node], [clone]);
+    }
+
     #endregion
 
     #region Children
@@ -58,7 +71,7 @@ public class EventTests
     public void ChildAdded_Multiple_Only()
     {
         var node = new Geometry("a");
-       
+
         var clone = new Geometry("a");
 
         var applier = new PartitionEventApplier(clone);
@@ -66,7 +79,7 @@ public class EventTests
 
         var added = new Circle("added");
         node.AddShapes([added]);
-        
+
         AssertEquals([node], [clone]);
         Assert.AreNotSame(added, clone.Shapes[0]);
     }
@@ -76,14 +89,16 @@ public class EventTests
     {
         var node = new Geometry("a")
         {
-            Shapes = [
+            Shapes =
+            [
                 new Line("l")
             ]
         };
-        
+
         var clone = new Geometry("a")
         {
-            Shapes = [
+            Shapes =
+            [
                 new Line("l")
             ]
         };
@@ -93,7 +108,7 @@ public class EventTests
 
         var added = new Circle("added");
         node.InsertShapes(0, [added]);
-        
+
         AssertEquals([node], [clone]);
         Assert.AreNotSame(added, clone.Shapes[0]);
     }
@@ -103,14 +118,16 @@ public class EventTests
     {
         var node = new Geometry("a")
         {
-            Shapes = [
+            Shapes =
+            [
                 new Line("l")
             ]
         };
-        
+
         var clone = new Geometry("a")
         {
-            Shapes = [
+            Shapes =
+            [
                 new Line("l")
             ]
         };
@@ -120,7 +137,7 @@ public class EventTests
 
         var added = new Circle("added");
         node.InsertShapes(1, [added]);
-        
+
         AssertEquals([node], [clone]);
         Assert.AreNotSame(added, clone.Shapes[1]);
     }
@@ -129,7 +146,7 @@ public class EventTests
     public void ChildAdded_Single()
     {
         var node = new Geometry("a");
-        
+
         var clone = new Geometry("a");
 
         var applier = new PartitionEventApplier(clone);
@@ -137,7 +154,7 @@ public class EventTests
 
         var added = new Documentation("added");
         node.Documentation = added;
-        
+
         AssertEquals([node], [clone]);
         Assert.AreNotSame(added, clone.Documentation);
     }
@@ -146,23 +163,15 @@ public class EventTests
     public void ChildAdded_Deep()
     {
         var node = new Geometry("a");
-        
+
         var clone = new Geometry("a");
 
         var applier = new PartitionEventApplier(clone);
         applier.Subscribe(node.Listener);
 
-        var added = new Circle("added")
-        {
-            Center = new Coord("coord")
-            {
-                X = 1,
-                Y = 2,
-                Z = 3
-            }
-        };
+        var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
         node.AddShapes([added]);
-        
+
         AssertEquals([node], [clone]);
         Assert.AreNotSame(added, clone.Shapes[0]);
     }
@@ -176,5 +185,4 @@ public class EventTests
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
-    
 }

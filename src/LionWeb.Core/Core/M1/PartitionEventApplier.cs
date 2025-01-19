@@ -37,8 +37,11 @@ public class PartitionEventApplier
 
     public void Subscribe(IPartitionListener listener)
     {
-        listener.PropertyAdded += (sender, args) => OnRemoteChildAdded(sender, args.Node, args.Property, args.NewValue);
-        
+        listener.PropertyAdded +=
+            (sender, args) => OnRemotePropertyAdded(sender, args.Node, args.Property, args.NewValue);
+        listener.PropertyChanged += (sender, args) =>
+            OnRemotePropertyChanged(sender, args.Node, args.Property, args.NewValue, args.OldValue);
+
         listener.ChildAdded += (sender, args) =>
             OnRemoteChildAdded(sender, args.Parent, args.NewChild, args.Containment, args.Index);
     }
@@ -78,16 +81,18 @@ public class PartitionEventApplier
 
     #region Properties
 
-    private void OnRemoteChildAdded(object? sender, IWritableNode node, Property property, SemanticPropertyValue newValue)
-    {
+    private void OnRemotePropertyAdded(object? sender, IWritableNode node, Property property,
+        SemanticPropertyValue newValue) =>
         Lookup(node.GetId()).Set(property, newValue);
-    }
-    
+
+    private void OnRemotePropertyChanged(object? sender, IWritableNode node, Property property,
+        SemanticPropertyValue newValue, SemanticPropertyValue oldValue) =>
+        Lookup(node.GetId()).Set(property, newValue);
 
     #endregion
 
     #region Children
-    
+
     private void OnRemoteChildAdded(object? sender, IWritableNode parent, IWritableNode newChild,
         Containment containment, Index index)
     {
@@ -110,7 +115,7 @@ public class PartitionEventApplier
 
         localParent.Set(containment, newValue);
     }
-    
+
     #endregion
 
     #endregion
