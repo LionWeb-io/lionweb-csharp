@@ -36,7 +36,7 @@ public class DuplicateIdChecker
 /// Stores a LionWeb node id in a compact format, optionally preserving the original.
 public readonly struct CompressedId : IEquatable<CompressedId>
 {
-    private CompressedId(byte[] identifier, string? original)
+    private CompressedId(byte[] identifier, NodeId? original)
     {
         Identifier = identifier;
         Original = original;
@@ -45,7 +45,7 @@ public readonly struct CompressedId : IEquatable<CompressedId>
     private byte[] Identifier { get; }
 
     /// The original node id, if available.
-    public string? Original { get; }
+    public NodeId? Original { get; }
 
     /// <summary>
     /// Creates a new <see cref="CompressedId"/>.
@@ -53,7 +53,7 @@ public readonly struct CompressedId : IEquatable<CompressedId>
     /// <param name="id">Node id to compress.</param>
     /// <param name="keepOriginal">Whether to store the uncompressed original. Uses more memory, but eases debugging.</param>
     /// <returns>The newly created compressed id.</returns>
-    public static CompressedId Create(string id, bool keepOriginal)
+    public static CompressedId Create(NodeId id, bool keepOriginal)
     {
         var sha1 = SHA1.Create();
         var idHash = sha1.ComputeHash(CompressedElement.AsBytes(id));

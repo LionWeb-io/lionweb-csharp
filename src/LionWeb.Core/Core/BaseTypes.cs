@@ -31,7 +31,7 @@ public interface IReadableNode
     /// A node id has no "meaning". 
     /// An id must be a valid <i>identifier</i>, i.e. a non-empty string of arbitrary length
     /// comprised of uppercase or lowercase A to Z, 1 to 9, - (dash) and _ (underscore).
-    public string GetId();
+    public NodeId GetId();
 
     /// <summary>
     /// The parent of the node, or <c>null</c> if the node is a root node.
@@ -177,7 +177,7 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="IReadableNode.GetAnnotations"/>
     /// <seealso cref="AddAnnotations"/>
     /// <seealso cref="RemoveAnnotations"/>
-    public void InsertAnnotations(int index, IEnumerable<IWritableNode> annotations);
+    public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations);
 
     /// <summary>
     /// Removes <see cref="Annotation">annotations</see> to <c>this</c> node.
@@ -260,11 +260,11 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
     public void AddAnnotations(IEnumerable<T> annotations);
 
     /// <inheritdoc/>
-    void IWritableNode.InsertAnnotations(int index, IEnumerable<IWritableNode> annotations) =>
+    void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
         InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
-    public void InsertAnnotations(int index, IEnumerable<T> annotations);
+    public void InsertAnnotations(Index index, IEnumerable<T> annotations);
 
     /// <inheritdoc/>
     bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) =>
@@ -315,7 +315,7 @@ public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : I
     /// <param name="id"><c>this</c> node's <see cref="IReadableNode.GetId">id</see>.</param>
     /// <param name="parent"><c>this</c> node's <see cref="IReadableNode.GetParent">parent</see></param>
     /// <exception cref="InvalidIdException">If <paramref name="id"/> is not a <see cref="IReadableNode.GetId">valid identifier</see>.</exception>
-    protected ReadableNodeBase(string id, T? parent)
+    protected ReadableNodeBase(NodeId id, T? parent)
     {
         if (id == null || !IdRegex().IsMatch(id))
             throw new InvalidIdException(id);
@@ -324,10 +324,10 @@ public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : I
         _parent = parent;
     }
 
-    private readonly string _id;
+    private readonly NodeId _id;
 
     /// <inheritdoc />
-    public string GetId() => _id;
+    public NodeId GetId() => _id;
 
     /// <inheritdoc cref="IReadableNode.GetParent()"/>
     /// <c>protected</c> so it can be changed by <see cref="NodeBase"/>.
@@ -362,7 +362,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// </summary>
     /// <param name="id"><c>this</c> node's <see cref="IReadableNode.GetId">id</see>.</param>
     /// <exception cref="InvalidIdException">If <paramref name="id"/> is not a <see cref="IReadableNode.GetId">valid identifier</see>.</exception>
-    protected NodeBase(string id) : base(id, null) { }
+    protected NodeBase(NodeId id) : base(id, null) { }
 
     /// <inheritdoc />
     void IWritableNode<INode>.SetParent(INode? parent) =>
@@ -398,7 +398,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public virtual void InsertAnnotations(int index, IEnumerable<INode> annotations)
+    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
@@ -562,7 +562,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="storage">List to check for.</param>
     /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
     /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is in out of range of <paramref name="storage"/>.</exception>
-    protected void AssureInRange<T>(int index, IList<T> storage)
+    protected void AssureInRange<T>(Index index, IList<T> storage)
     {
         if ((uint)index > (uint)storage.Count)
             throw new ArgumentOutOfRangeException(nameof(index), index, null);
@@ -583,7 +583,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// If trying to insert nodes at the end of <paramref name="storage"/>,
     /// and any of <paramref name="safeNodes"/> is already contained in <paramref name="storage"/>.
     /// </exception>
-    protected void AssureNoSelfMove<T>(int index, List<T> safeNodes, List<T> storage)
+    protected void AssureNoSelfMove<T>(Index index, List<T> safeNodes, List<T> storage)
     {
         if (index == storage.Count && safeNodes.Any(storage.Contains))
             throw new ArgumentOutOfRangeException(nameof(index), index, null);
@@ -759,7 +759,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
     protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link,
-        Action<IPartitionCommander, int, T>? remover = null)
+        Action<IPartitionCommander, Index, T>? remover = null)
         where T : INode
     {
         AssureNotNull(list, link);
@@ -795,7 +795,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// Only called if <see cref="GetPartitionCommander"/> is available.
     /// </param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
-    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, int, T>? remover)
+    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, Index, T>? remover)
         where T : INode
     {
         var partitionCommander = GetPartitionCommander();
@@ -813,18 +813,18 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// Raises <see cref="IPartitionCommander.DeleteReference"/> for <paramref name="reference"/>.
-    protected Action<IPartitionCommander, int, T> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
+    protected Action<IPartitionCommander, Index, T> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
         (commander, index, node) =>
             commander.DeleteReference(this, reference, index, new ReferenceTarget(null, node));
 
     /// Raises <see cref="IPartitionCommander.DeleteChild"/> for <paramref name="containment"/>.
-    protected Action<IPartitionCommander, int, T> ContainmentRemover<T>(Containment containment)
+    protected Action<IPartitionCommander, Index, T> ContainmentRemover<T>(Containment containment)
         where T : INode =>
         (commander, index, node) =>
             commander.DeleteChild(node, this, containment, index);
 
     /// Raises <see cref="IPartitionCommander.DeleteAnnotation"/>.
-    private Action<IPartitionCommander, int, INode> AnnotationRemover() =>
+    private Action<IPartitionCommander, Index, INode> AnnotationRemover() =>
         (commander, index, node) => commander.DeleteAnnotation(node, this, index);
 
     #endregion
@@ -892,14 +892,14 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="safeNodes">Targets to raise events for.</param>
     /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
-    protected void RaiseReferenceAddEvent<T>(Reference reference, List<T> safeNodes, int startIndex)
+    protected void RaiseReferenceAddEvent<T>(Reference reference, List<T> safeNodes, Index startIndex)
         where T : IReadableNode
     {
         var partitionCommander = GetPartitionCommander();
         if (partitionCommander == null || !partitionCommander.CanRaiseAddReference)
             return;
 
-        int index = startIndex;
+        Index index = startIndex;
         foreach (var node in safeNodes)
         {
             partitionCommander.AddReference(this, reference, index++, new ReferenceTarget(null, node)
@@ -914,7 +914,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 public abstract class AnnotationInstanceBase : NodeBase, IAnnotationInstance<INode>
 {
     /// <inheritdoc />
-    protected AnnotationInstanceBase(string id) : base(id) { }
+    protected AnnotationInstanceBase(NodeId id) : base(id) { }
 
     /// <inheritdoc cref="IAnnotationInstance.GetClassifier()" />
     public override Classifier GetClassifier() => GetAnnotation();
@@ -927,7 +927,7 @@ public abstract class AnnotationInstanceBase : NodeBase, IAnnotationInstance<INo
 public abstract class ConceptInstanceBase : NodeBase, IConceptInstance<INode>
 {
     /// <inheritdoc />
-    protected ConceptInstanceBase(string id) : base(id) { }
+    protected ConceptInstanceBase(NodeId id) : base(id) { }
 
     /// <inheritdoc cref="IConceptInstance.GetClassifier()" />
     public override Classifier GetClassifier() => GetConcept();
@@ -940,5 +940,5 @@ public abstract class ConceptInstanceBase : NodeBase, IConceptInstance<INode>
 public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionInstance<INode>
 {
     /// <inheritdoc />
-    protected PartitionInstanceBase(string id) : base(id) { }
+    protected PartitionInstanceBase(NodeId id) : base(id) { }
 }

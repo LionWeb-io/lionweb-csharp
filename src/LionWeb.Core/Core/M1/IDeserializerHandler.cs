@@ -46,7 +46,7 @@ public interface IDeserializerHandler
     /// <returns>Replacement node id to use for <paramref name="node"/>, or <c>null</c> to skip <paramref name="node"/>.</returns>
     /// <remarks>For both <paramref name="existingNode"/> and <paramref name="node"/>, only node id and properties are populated -- no other features.</remarks>
     /// <remarks>If returned replacement node id is not unique, deserializer keeps calling this method, might lead to an infinite loop.</remarks>
-    string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, IReadableNode node);
+    NodeId? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, IReadableNode node);
 
     /// <summary>
     /// Cannot resolve <paramref name="metaPointer"/>, but know about at least one language
@@ -138,7 +138,7 @@ public interface IDeserializerHandler
     /// <param name="property">Property in <paramref name="node"/> that contains <paramref name="key"/>.</param>
     /// <param name="node">Node that has <paramref name="property"/> with value <paramref name="key"/>.</param>
     /// <returns>Replacement C# enumeration literal to use, or <c>null</c> to skip property <paramref name="property"/>.</returns>
-    Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property, IReadableNode node);
+    Enum? UnknownEnumerationLiteral(MetaPointerKey key, Enumeration enumeration, Feature property, IReadableNode node);
 
     /// <summary>
     /// Cannot find field with <see cref="IKeyed.Key"/> <paramref name="key"/> in <paramref name="structuredDataType"/>.
@@ -148,7 +148,7 @@ public interface IDeserializerHandler
     /// <param name="property">Property in <paramref name="node"/> that contains <paramref name="key"/>.</param>
     /// <param name="node">Node that has <paramref name="property"/> with value <paramref name="key"/>.</param>
     /// <returns>Replacement field to use, or <c>null</c> to skip field <paramref name="key"/>.</returns>
-    Field? UnknownField(string key, StructuredDataType structuredDataType, Feature property, IReadableNode node);
+    Field? UnknownField(MetaPointerKey key, StructuredDataType structuredDataType, Feature property, IReadableNode node);
 
     /// <summary>
     /// Cannot process <paramref name="datatype"/> in <paramref name="property"/>.
@@ -158,7 +158,7 @@ public interface IDeserializerHandler
     /// <param name="property">Property with unknown Datatype.</param>
     /// <param name="node">Node that has property <paramref name="property"/>.</param>
     /// <returns>Replacement value to use, or <c>null</c> to skip property <paramref name="property"/>.</returns>
-    object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property, IReadableNode node);
+    object? UnknownDatatype(PropertyValue? value, LanguageEntity datatype, Feature property, IReadableNode node);
 
     /// <summary>
     /// Cannot put <paramref name="value"/> into <paramref name="property"/>.
@@ -169,7 +169,7 @@ public interface IDeserializerHandler
     /// <param name="nodeId">Node that has property <paramref name="property"/>.</param>
     /// <typeparam name="TValue">Type of value to be used for property <paramref name="property"/> in node <paramref name="nodeId"/>.</typeparam>
     /// <returns>Replacement value to use, or <c>null</c> to skip property <paramref name="property"/>.</returns>
-    object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId);
+    object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, CompressedId nodeId);
 
     #endregion
 
@@ -192,7 +192,7 @@ public interface IDeserializerHandler
     /// <param name="reference">Reference that should contain <paramref name="targetId"/>.</param>
     /// <param name="node">Node that mentions <paramref name="targetId"/> as reference target.</param>
     /// <returns>Replacement reference target node to use, or <c>null</c> to skip reference target <paramref name="targetId"/>.</returns>
-    IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, string? resolveInfo, Feature reference,
+    IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId, ResolveInfo? resolveInfo, Feature reference,
         IReadableNode node);
 
     /// <summary>

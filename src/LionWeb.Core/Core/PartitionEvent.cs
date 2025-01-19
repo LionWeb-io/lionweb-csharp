@@ -93,7 +93,7 @@ public abstract class PartitionContainmentEventBase<T> : PartitionEventBase<T> w
     /// <param name="Parent"></param>
     /// <param name="Containment"></param>
     /// <param name="Index"></param>
-    protected record OldContainmentInfo(INode Parent, Containment Containment, int Index);
+    protected record OldContainmentInfo(INode Parent, Containment Containment, Index Index);
 }
 
 /// Encapsulates event-related logic and data for <i>multiple</i> <see cref="Containment"/>s.
@@ -236,7 +236,7 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEventBase<T> where T : INode
 {
-    private int _newIndex;
+    private Index _newIndex;
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="newParent"> Owner of the represented <paramref name="containment"/>.</param>
@@ -248,7 +248,7 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
         NodeBase newParent,
         List<T>? addedValues,
         List<T> existingValues,
-        int? startIndex = null
+        Index? startIndex = null
     ) : base(containment, newParent, addedValues)
     {
         _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
@@ -579,7 +579,7 @@ public abstract class PartitionAnnotationEventBase : PartitionEventBase<INode>
     /// Context of an annotation instance before it has been removed from its previous <paramref name="Parent"/>.
     /// <param name="Parent"></param>
     /// <param name="Index"></param>
-    protected record OldAnnotationInfo(INode Parent, int Index);
+    protected record OldAnnotationInfo(INode Parent, Index Index);
 }
 
 /// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
@@ -665,7 +665,7 @@ public class SetAnnotationEvent : PartitionAnnotationEventBase
 /// Encapsulates event-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Annotation"/>s.
 public class AddMultipleAnnotationsEvent : PartitionAnnotationEventBase
 {
-    private int _newIndex;
+    private Index _newIndex;
 
     /// <param name="newParent"> Owner of the represented <see cref="Annotation"/>.</param>
     /// <param name="addedValues">Newly added values.</param>
@@ -675,7 +675,7 @@ public class AddMultipleAnnotationsEvent : PartitionAnnotationEventBase
         NodeBase newParent,
         List<INode>? addedValues,
         List<INode> existingValues,
-        int? startIndex = null
+        Index? startIndex = null
     ) : base(newParent, addedValues)
     {
         _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);

@@ -18,9 +18,7 @@
 namespace LionWeb.Core.M1;
 
 using M3;
-using Index = int;
 using PropertyValue = object;
-using ResolveInfo = string;
 using TargetNode = IReadableNode;
 
 /// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestListener"/> events.

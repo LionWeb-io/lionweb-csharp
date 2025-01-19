@@ -30,7 +30,7 @@ public interface INodeFactory
 {
     /// <returns>A node created given the <paramref name="id">ID</paramref> and <paramref name="classifier">Classifier</paramref>.</returns>
     /// <exception cref="UnsupportedClassifierException">If <paramref name="classifier"/> cannot be instantiated.</exception>
-    public INode CreateNode(string id, Classifier classifier);
+    public INode CreateNode(NodeId id, Classifier classifier);
 
     /// <returns>The C# (runtime) enumeration literal corresponding to the given <paramref name="literal">LionCore M3 enumeration literal</paramref>.</returns>
     /// <exception cref="UnsupportedEnumerationLiteralException">If <paramref name="literal"/> cannot be found.</exception>
@@ -100,11 +100,11 @@ public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
     public readonly Language Language = language;
 
     /// <inheritdoc />
-    public abstract INode CreateNode(string id, Classifier classifier);
+    public abstract INode CreateNode(NodeId id, Classifier classifier);
 
     /// Fallback implementation of <see cref="CreateNode"/> that <see cref="LogWarning">logs</see> a warning,
     /// and instantiates an instance of the generic <see cref="DynamicNode"/> that's not backed by a specific class.
-    protected INode FallbackCreateNode(string id, Classifier classifier)
+    protected INode FallbackCreateNode(NodeId id, Classifier classifier)
     {
         LogWarning(
             $"No class was generated for classifier with meta-pointer {classifier.ToMetaPointer()} - returning direct instance of Node.");
@@ -113,7 +113,7 @@ public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
 
     /// Default implementation of <see cref="CreateNode"/> that instantiates
     /// an instance of the generic <see cref="DynamicNode"/> that's not backed by a specific class.
-    protected DynamicNode CreateDynamicNode(string id, Classifier classifier) => classifier switch
+    protected DynamicNode CreateDynamicNode(NodeId id, Classifier classifier) => classifier switch
     {
         Annotation a => new DynamicAnnotationInstance(id, a),
         Concept { Partition: true } c => new DynamicPartitionInstance(id, c),
@@ -126,7 +126,7 @@ public abstract class AbstractBaseNodeFactory(Language language) : INodeFactory
         Console.WriteLine($"[WARNING]{message}");
 
     /// Creates a new, unique <see cref="IReadableNode.GetId">node id</see>.
-    protected virtual string GetNewId() => IdUtils.NewId();
+    protected virtual NodeId GetNewId() => IdUtils.NewId();
 
     /// <inheritdoc />
     public abstract Enum GetEnumerationLiteral(EnumerationLiteral literal);
@@ -187,7 +187,7 @@ public class MultiLanguageNodeFactory : INodeFactory
     }
 
     /// <inheritdoc />
-    public INode CreateNode(string id, Classifier classifier)
+    public INode CreateNode(NodeId id, Classifier classifier)
         => _map[classifier.GetLanguage()].CreateNode(id, classifier);
 
     /// <inheritdoc />
@@ -204,7 +204,7 @@ public class MultiLanguageNodeFactory : INodeFactory
 public class ReflectiveBaseNodeFactory(Language language) : AbstractBaseNodeFactory(language)
 {
     /// <inheritdoc />
-    public override INode CreateNode(string id, Classifier classifier) =>
+    public override INode CreateNode(NodeId id, Classifier classifier) =>
         CreateDynamicNode(id, classifier);
 
     private readonly Dictionary<Enumeration, Type> _enums = [];

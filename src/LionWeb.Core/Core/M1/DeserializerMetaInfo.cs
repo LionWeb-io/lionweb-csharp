@@ -55,7 +55,7 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
         }
     }
 
-    internal INode? Instantiate(string id, MetaPointer metaPointer)
+    internal INode? Instantiate(NodeId id, MetaPointer metaPointer)
     {
         var compressedMetaPointer = Compress(metaPointer);
         if (!LookupClassifier(compressedMetaPointer, out var classifier))
@@ -114,7 +114,7 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
     internal bool LookupFactory(Language language, [MaybeNullWhen(false)] out INodeFactory factory) =>
         _language2NodeFactory.TryGetValue(language, out factory);
 
-    internal CompressedId Compress(string id) =>
+    internal CompressedId Compress(NodeId id) =>
         CompressedId.Create(id, StoreUncompressedIds);
 
     private CompressedMetaPointer Compress(MetaPointer metaPointer) =>

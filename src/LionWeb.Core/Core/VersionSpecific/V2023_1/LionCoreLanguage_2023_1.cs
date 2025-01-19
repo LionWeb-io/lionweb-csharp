@@ -363,7 +363,7 @@ public sealed class LionCoreLanguage_2023_1 : LanguageBase<LionCoreFactory_2023_
     public override string Name => ILionCoreLanguage.LanguageName;
 
     /// <inheritdoc />
-    public override string Key => ILionCoreLanguage.LanguageKey;
+    public override MetaPointerKey Key => ILionCoreLanguage.LanguageKey;
 
     /// <inheritdoc />
     public override string Version => LionWebVersion.VersionString;
@@ -580,37 +580,37 @@ public sealed class LionCoreFactory_2023_1 : INodeFactory
     }
 
     /// <inheritdoc cref="M3.Annotation"/>
-    public DynamicAnnotation Annotation(string id) => new(id, null);
-
-    /// <inheritdoc cref="M3.Concept"/>
-    public DynamicConcept Concept(string id) => new(id, null);
+    public DynamicAnnotation Annotation(NodeId id) => new(id, null);
 
     /// <inheritdoc cref="M3.Containment"/>
-    public DynamicContainment Containment(string id) => new(id, null);
+    public DynamicContainment Containment(NodeId id) => new(id, null);
+
+    /// <inheritdoc cref="M3.Concept"/>
+    public DynamicConcept Concept(NodeId id) => new(id, null);
 
     /// <inheritdoc cref="M3.Enumeration"/>
-    public DynamicEnumeration Enumeration(string id) => new(id, null);
+    public DynamicEnumeration Enumeration(NodeId id) => new(id, null);
 
     /// <inheritdoc cref="M3.EnumerationLiteral"/>
-    public DynamicEnumerationLiteral EnumerationLiteral(string id) => new(id, null);
+    public DynamicEnumerationLiteral EnumerationLiteral(NodeId id) => new(id, null);
 
     /// <inheritdoc cref="M3.Interface"/>
-    public DynamicInterface Interface(string id) => new(id, null);
+    public DynamicInterface Interface(NodeId id) => new(id, null);
 
     /// <inheritdoc cref="M3.Language"/>
-    public DynamicLanguage Language(string id) => new(id, _language.LionWebVersion);
+    public DynamicLanguage Language(NodeId id) => new(id, _language.LionWebVersion);
 
     /// <inheritdoc cref="M3.PrimitiveType"/>
-    public DynamicPrimitiveType PrimitiveType(string id) => new(id, null);
+    public DynamicPrimitiveType PrimitiveType(NodeId id) => new(id, null);
 
     /// <inheritdoc cref="M3.Property"/>
-    public DynamicProperty Property(string id) => new(id, null);
+    public DynamicProperty Property(NodeId id) => new(id, null);
 
     /// <inheritdoc cref="M3.Reference"/>
-    public DynamicReference Reference(string id) => new(id, null);
+    public DynamicReference Reference(NodeId id) => new(id, null);
 
     /// <inheritdoc />
-    public INode CreateNode(string id, Classifier classifier)
+    public INode CreateNode(NodeId id, Classifier classifier)
     {
         if (classifier == _language.Annotation)
             return Annotation(id);

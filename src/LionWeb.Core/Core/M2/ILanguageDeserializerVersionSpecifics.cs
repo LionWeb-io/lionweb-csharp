@@ -42,15 +42,15 @@ internal interface ILanguageDeserializerVersionSpecifics : IVersionSpecifics
         };
 
     /// <seealso cref="LanguageDeserializer.CreateNodeWithProperties"/>
-    public DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, string id);
+    public DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, NodeId id);
 
     /// <seealso cref="LanguageDeserializer.InstallLanguageContainments"/>
     public void InstallLanguageContainments(SerializedNode serializedNode, IReadableNode node,
-        ILookup<string, IKeyed> serializedContainmentsLookup);
+        ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup);
 
     /// <seealso cref="LanguageDeserializer.InstallLanguageReferences"/>
     public void InstallLanguageReferences(SerializedNode serializedNode, IReadableNode node,
-        ILookup<string, IKeyed?> serializedReferencesLookup);
+        ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup);
 }
 
 internal abstract class LanguageDeserializerVersionSpecificsBase(
@@ -63,26 +63,26 @@ internal abstract class LanguageDeserializerVersionSpecificsBase(
 
     public abstract LionWebVersions Version { get; }
 
-    public abstract DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, string id);
+    public abstract DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, NodeId id);
 
     public abstract void InstallLanguageContainments(SerializedNode serializedNode, IReadableNode node,
-        ILookup<string, IKeyed> serializedContainmentsLookup);
+        ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup);
 
     public abstract void InstallLanguageReferences(SerializedNode serializedNode, IReadableNode node,
-        ILookup<string, IKeyed?> serializedReferencesLookup);
+        ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup);
 }
 
 internal abstract class NodeCreatorBase
 {
     private readonly LanguageDeserializerVersionSpecificsBase _versionSpecifics;
     internal readonly SerializedNode _serializedNode;
-    private readonly Dictionary<string, string?> _serializedPropertiesByKey;
-    internal readonly string _key;
+    private readonly Dictionary<MetaPointerKey, PropertyValue?> _serializedPropertiesByKey;
+    internal readonly MetaPointerKey _key;
     internal readonly string _name;
-    internal readonly string _id;
+    internal readonly NodeId _id;
 
     internal NodeCreatorBase(LanguageDeserializerVersionSpecificsBase versionSpecifics, SerializedNode serializedNode,
-        string id)
+        NodeId id)
     {
         _versionSpecifics = versionSpecifics;
         _serializedNode = serializedNode;
@@ -171,7 +171,7 @@ internal abstract class ContainmentsInstallerBase(
     LanguageDeserializerVersionSpecificsBase versionSpecifics,
     SerializedNode serializedNode,
     IReadableNode node,
-    ILookup<string, IKeyed> serializedContainmentsLookup)
+    ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup)
 {
     internal readonly LanguageDeserializerVersionSpecificsBase _versionSpecifics = versionSpecifics;
     internal readonly IReadableNode _node = node;
@@ -222,7 +222,7 @@ internal abstract class ReferencesInstallerBase(
     LanguageDeserializerVersionSpecificsBase versionSpecifics,
     SerializedNode serializedNode,
     IReadableNode node,
-    ILookup<string, IKeyed?> serializedReferencesLookup)
+    ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup)
 {
     internal readonly IReadableNode _node = node;
     internal readonly LanguageDeserializerVersionSpecificsBase _versionSpecifics = versionSpecifics;

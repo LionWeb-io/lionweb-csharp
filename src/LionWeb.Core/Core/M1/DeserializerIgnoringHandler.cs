@@ -30,7 +30,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public string? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, IReadableNode node)
+    public NodeId? DuplicateNodeId(CompressedId nodeId, IReadableNode existingNode, IReadableNode node)
     {
         LogMessage($"Duplicate node with id={existingNode.GetId()}");
         return null;
@@ -101,7 +101,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     #region properties
 
     /// <inheritdoc />
-    public Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property, IReadableNode node)
+    public Enum? UnknownEnumerationLiteral(MetaPointerKey key, Enumeration enumeration, Feature property, IReadableNode node)
     {
         LogMessage(
             $"On node with id={node.GetId()}: unknown enumeration literal for enumeration {enumeration} with key {key} - skipping");
@@ -109,7 +109,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public Field? UnknownField(string key, StructuredDataType structuredDataType, Feature property, IReadableNode node)
+    public Field? UnknownField(MetaPointerKey key, StructuredDataType structuredDataType, Feature property, IReadableNode node)
     {
         LogMessage(
             $"On node with id={node.GetId()}: unknown field for structured datatype {structuredDataType} with key {key} = skipping");
@@ -117,7 +117,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property, IReadableNode node)
+    public object? UnknownDatatype(PropertyValue? value, LanguageEntity datatype, Feature property, IReadableNode node)
     {
         LogMessage(
             $"On node with id={node.GetId()}: unknown datatype {property /*.Type*/} with value {value} - skipping");
@@ -125,7 +125,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
     }
 
     /// <inheritdoc />
-    public object? InvalidPropertyValue<TValue>(string? value, Feature property, CompressedId nodeId)
+    public object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, CompressedId nodeId)
     {
         LogMessage($"On node with id={nodeId}: invalid property value {value} for property {property} - skipping");
         return null;
@@ -144,7 +144,7 @@ public class DeserializerIgnoringHandler : IDeserializerHandler
 
     /// <inheritdoc />
     public virtual IReadableNode? UnresolvableReferenceTarget(CompressedId? targetId,
-        string? resolveInfo,
+        ResolveInfo? resolveInfo,
         Feature reference,
         IReadableNode node)
     {

@@ -35,7 +35,7 @@ public static class M2Extensions
     /// <param name="key">Key of the requested thing.</param>
     /// <returns>A <typeparamref name="T"/> with the given key, or:</returns>
     /// <exception cref="KeyNotFoundException">If the given <paramref name="ts"/> does not contain a thing with the given key.</exception>
-    private static T FindByKey<T>(this IEnumerable<T> ts, string key) where T : IKeyed
+    private static T FindByKey<T>(this IEnumerable<T> ts, MetaPointerKey key) where T : IKeyed
     {
         IEnumerable<T> result = ts.Where(t => t.Key == key);
         if (!result.Any())
@@ -55,7 +55,7 @@ public static class M2Extensions
     /// <param name="key">Key of the requested classifier.</param>
     /// <returns>Classifier with <paramref name="key"/> contained in <paramref name="language"/>.</returns>
     /// <exception cref="KeyNotFoundException">If <paramref name="language"/> does not contain a classifier with <paramref name="key"/>.</exception>
-    public static Classifier ClassifierByKey(this Language language, string key)
+    public static Classifier ClassifierByKey(this Language language, MetaPointerKey key)
         => language
             .Entities
             .OfType<Classifier>()
@@ -68,7 +68,7 @@ public static class M2Extensions
     /// <param name="key">Key of requested feature.</param>
     /// <returns>Feature with <paramref name="key"/> contained in <paramref name="classifier"/> or any of its generalizations.</returns>
     /// <exception cref="InvalidOperationException">If <paramref name="classifier"/> or any of its generalizations does not contain a feature with <paramref name="key"/>.</exception>
-    public static Feature FeatureByKey(this Classifier classifier, string key)
+    public static Feature FeatureByKey(this Classifier classifier, MetaPointerKey key)
         => classifier
             .AllFeatures()
             .FindByKey(key);
@@ -287,7 +287,7 @@ public static class M2Extensions
     /// <param name="key">Key of the requested structured datatype.</param>
     /// <returns>Structured DataType with <paramref name="key"/> contained in <paramref name="language"/>.</returns>
     /// <exception cref="KeyNotFoundException">If <paramref name="language"/> does not contain a structured datatype with <paramref name="key"/>.</exception>
-    public static StructuredDataType StructuredDataTypeByKey(this Language language, string key)
+    public static StructuredDataType StructuredDataTypeByKey(this Language language, MetaPointerKey key)
         => language
             .Entities
             .OfType<StructuredDataType>()
@@ -300,7 +300,7 @@ public static class M2Extensions
     /// <param name="key">Key of requested field.</param>
     /// <returns>Field with <paramref name="key"/> contained in <paramref name="structuredDataType"/>.</returns>
     /// <exception cref="InvalidOperationException">If <paramref name="structuredDataType"/> does not contain a field with <paramref name="key"/>.</exception>
-    public static Field FieldByKey(this StructuredDataType structuredDataType, string key)
+    public static Field FieldByKey(this StructuredDataType structuredDataType, MetaPointerKey key)
         => structuredDataType
             .Fields
             .FindByKey(key);

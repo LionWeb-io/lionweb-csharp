@@ -226,7 +226,7 @@ public abstract class ClonerBase
         throw new InvalidOperationException();
 
     /// Provides a new id for a new instance equivalent to <paramref name="inputNode"/>.
-    protected virtual string GetNewId(INode inputNode) => IdUtils.NewId();
+    protected virtual NodeId GetNewId(INode inputNode) => IdUtils.NewId();
 
     /// Whether <paramref name="prop"/> of <paramref name="inputNode"/> should be cloned.
     protected abstract bool IncludeProperty(INode inputNode, Property prop);

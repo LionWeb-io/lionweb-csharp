@@ -18,8 +18,6 @@
 namespace LionWeb.Core.M1;
 
 using M3;
-using Index = int;
-using ResolveInfo = string;
 using TargetNode = IReadableNode;
 using PropertyValue = object;
 

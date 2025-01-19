@@ -1,6 +1,6 @@
-// Copyright 2024 TRUMPF Laser SE and other contributors
+﻿// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
@@ -15,17 +15,8 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Utilities;
-
-/// <summary>
-/// Utility methods for working with LionWeb-compliant IDs.
-/// </summary>
-public static class IdUtils
-{
-    /// <returns>A generated, unique ID in base64url-format.</returns>
-    public static NodeId NewId()
-        => Convert.ToBase64String(Guid.NewGuid().ToByteArray())
-            .Replace("+", "-")
-            .Replace("/", "_")
-            .Replace("=", "");  // padding ='s can be safely removed
-}
+global using NodeId = string;
+global using PropertyValue = string;
+global using ResolveInfo = string;
+global using MetaPointerKey = string;
+global using Index = int;

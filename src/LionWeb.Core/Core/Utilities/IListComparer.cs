@@ -17,8 +17,8 @@
 
 namespace LionWeb.Core.Utilities;
 
-using LeftIndex = int;
-using RightIndex = int;
+using LeftIndex = Index;
+using RightIndex = Index;
 
 /// Compares two lists and reports <see cref="Added"/>, <see cref="Deleted"/>, and <see cref="Moved"/> elements.
 /// The lists should be passed to the constructor of implementing classes.

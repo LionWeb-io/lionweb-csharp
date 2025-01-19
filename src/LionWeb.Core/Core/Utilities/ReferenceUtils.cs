@@ -30,7 +30,7 @@ using M3;
 /// <param name="TargetNode">The target <see cref="IReadableNode"/> of the reference (relation)</param>
 /// </param>
 // ReSharper disable NotAccessedPositionalProperty.Global
-public record ReferenceValue(IReadableNode SourceNode, Reference Reference, int? Index, IReadableNode TargetNode);
+public record ReferenceValue(IReadableNode SourceNode, Reference Reference, Index? Index, IReadableNode TargetNode);
 
 /// <summary>
 /// Extension methods to deal with references, i.e. values of <see cref="Reference"/> features.

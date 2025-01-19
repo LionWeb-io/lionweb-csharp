@@ -31,7 +31,7 @@ public abstract class LionCoreAttribute : Attribute;
 public abstract class LionCoreKeyAttribute : LionCoreAttribute
 {
     /// <inheritdoc cref="IKeyed.Key"/>
-    public required string Key { get; init; }
+    public required MetaPointerKey Key { get; init; }
 }
 
 /// <summary>
@@ -125,7 +125,7 @@ public static class AttributeExtensions
     /// </summary>
     /// <param name="enumValue">The enumeration value</param>
     /// <returns>The key declared on the given enumeration value</returns>
-    public static string? LionCoreKey(this Enum enumValue)
+    public static MetaPointerKey? LionCoreKey(this Enum enumValue)
         => GetAttributeOfType<LionCoreMetaPointer>(enumValue)?.Key;
 
     /// <summary>
@@ -133,6 +133,6 @@ public static class AttributeExtensions
     /// </summary>
     /// <param name="propertyInfo">The C# property</param>
     /// <returns>The key declared on the given C# property</returns>
-    public static string? LionCoreKey(this PropertyInfo propertyInfo)
+    public static MetaPointerKey? LionCoreKey(this PropertyInfo propertyInfo)
         => propertyInfo.GetCustomAttributes<LionCoreMetaPointer>().FirstOrDefault()?.Key;
 }

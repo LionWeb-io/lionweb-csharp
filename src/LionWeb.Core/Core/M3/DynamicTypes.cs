@@ -24,9 +24,9 @@ using Utilities;
 // The types here implement the LionCore M3.
 
 /// <inheritdoc cref="IKeyed"/>
-public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
+public abstract class DynamicIKeyed(NodeId id) : NodeBase(id), IKeyed
 {
-    private string? _key;
+    private MetaPointerKey? _key;
     private string? _name;
 
     /// <inheritdoc />
@@ -38,14 +38,14 @@ public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
         new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
-    public string Key
+    public MetaPointerKey Key
     {
         get => _key ?? throw new UnsetFeatureException(_m3.IKeyed_key);
         set => _key = value;
     }
 
     /// <inheritdoc />
-    public bool TryGetKey(out string? key)
+    public bool TryGetKey(out MetaPointerKey? key)
     {
         key = _key;
         return key != null;
@@ -128,7 +128,7 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
     public bool Optional { get; set; }
 
     /// <inheritdoc />
-    protected DynamicFeature(string id, DynamicClassifier? parent) : base(id)
+    protected DynamicFeature(NodeId id, DynamicClassifier? parent) : base(id)
     {
         parent?.AddFeatures([this]);
         _parent = parent;
@@ -179,7 +179,7 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
 }
 
 /// <inheritdoc cref="Property"/>
-public class DynamicProperty(string id, DynamicClassifier? classifier) : DynamicFeature(id, classifier), Property
+public class DynamicProperty(NodeId id, DynamicClassifier? classifier) : DynamicFeature(id, classifier), Property
 {
     private Datatype? _type;
 
@@ -245,7 +245,7 @@ public class DynamicProperty(string id, DynamicClassifier? classifier) : Dynamic
 }
 
 /// <inheritdoc cref="Link"/>
-public abstract class DynamicLink(string id, DynamicClassifier? classifier) : DynamicFeature(id, classifier), Link
+public abstract class DynamicLink(NodeId id, DynamicClassifier? classifier) : DynamicFeature(id, classifier), Link
 {
     private Classifier? _type;
 
@@ -328,14 +328,14 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier) : Dy
 }
 
 /// <inheritdoc cref="Containment"/>
-public class DynamicContainment(string id, DynamicClassifier? classifier) : DynamicLink(id, classifier), Containment
+public class DynamicContainment(NodeId id, DynamicClassifier? classifier) : DynamicLink(id, classifier), Containment
 {
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.Containment;
 }
 
 /// <inheritdoc cref="Reference"/>
-public class DynamicReference(string id, DynamicClassifier? classifier) : DynamicLink(id, classifier), Reference
+public class DynamicReference(NodeId id, DynamicClassifier? classifier) : DynamicLink(id, classifier), Reference
 {
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.Reference;
@@ -345,7 +345,7 @@ public class DynamicReference(string id, DynamicClassifier? classifier) : Dynami
 public abstract class DynamicLanguageEntity : DynamicIKeyed, LanguageEntity
 {
     /// <inheritdoc />
-    protected DynamicLanguageEntity(string id, DynamicLanguage? language)
+    protected DynamicLanguageEntity(NodeId id, DynamicLanguage? language)
         : base(id)
     {
         _parent = language;
@@ -353,7 +353,7 @@ public abstract class DynamicLanguageEntity : DynamicIKeyed, LanguageEntity
 }
 
 /// <inheritdoc cref="Classifier"/>
-public abstract class DynamicClassifier(string id, DynamicLanguage? language)
+public abstract class DynamicClassifier(NodeId id, DynamicLanguage? language)
     : DynamicLanguageEntity(id, language), Classifier
 {
     private readonly List<DynamicFeature> _features = [];
@@ -441,7 +441,7 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
 }
 
 /// <inheritdoc cref="Concept"/>
-public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClassifier(id, language), Concept
+public class DynamicConcept(NodeId id, DynamicLanguage? language) : DynamicClassifier(id, language), Concept
 {
     /// <inheritdoc />
     public bool Abstract { get; set; }
@@ -563,7 +563,7 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
 }
 
 /// <inheritdoc cref="Annotation"/>
-public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicClassifier(id, language), Annotation
+public class DynamicAnnotation(NodeId id, DynamicLanguage? language) : DynamicClassifier(id, language), Annotation
 {
     private Classifier? _annotates;
     
@@ -672,7 +672,7 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
 }
 
 /// <inheritdoc cref="Interface"/>
-public class DynamicInterface(string id, DynamicLanguage? language) : DynamicClassifier(id, language), Interface
+public class DynamicInterface(NodeId id, DynamicLanguage? language) : DynamicClassifier(id, language), Interface
 {
     private readonly List<Interface> _extends = [];
 
@@ -733,18 +733,18 @@ public class DynamicInterface(string id, DynamicLanguage? language) : DynamicCla
 }
 
 /// <inheritdoc cref="Datatype"/>
-public abstract class DynamicDatatype(string id, DynamicLanguage? language)
+public abstract class DynamicDatatype(NodeId id, DynamicLanguage? language)
     : DynamicLanguageEntity(id, language), Datatype;
 
 /// <inheritdoc cref="PrimitiveType"/>
-public class DynamicPrimitiveType(string id, DynamicLanguage? language) : DynamicDatatype(id, language), PrimitiveType
+public class DynamicPrimitiveType(NodeId id, DynamicLanguage? language) : DynamicDatatype(id, language), PrimitiveType
 {
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.PrimitiveType;
 }
 
 /// <inheritdoc cref="Enumeration"/>
-public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicDatatype(id, language), Enumeration
+public class DynamicEnumeration(NodeId id, DynamicLanguage? language) : DynamicDatatype(id, language), Enumeration
 {
     private readonly List<DynamicEnumerationLiteral> _literals = [];
 
@@ -837,7 +837,7 @@ public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicD
 public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
 {
     /// <inheritdoc />
-    public DynamicEnumerationLiteral(string id, DynamicEnumeration? enumeration)
+    public DynamicEnumerationLiteral(NodeId id, DynamicEnumeration? enumeration)
         : base(id)
     {
         enumeration?.AddLiterals([this]);
@@ -849,7 +849,7 @@ public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
 }
 
 /// <inheritdoc cref="StructuredDataType"/>
-public class DynamicStructuredDataType(string id, DynamicLanguage? language)
+public class DynamicStructuredDataType(NodeId id, DynamicLanguage? language)
     : DynamicDatatype(id, language), StructuredDataType
 {
     /// <inheritdoc />
@@ -996,7 +996,7 @@ public class DynamicField : DynamicIKeyed, Field
     private Datatype? _type;
 
     /// <inheritdoc cref="Field"/>
-    public DynamicField(string id, DynamicStructuredDataType? structuredDataType) : base(id)
+    public DynamicField(NodeId id, DynamicStructuredDataType? structuredDataType) : base(id)
     {
         structuredDataType?.AddFields([this]);
         _parent = structuredDataType;
@@ -1064,7 +1064,7 @@ public class DynamicField : DynamicIKeyed, Field
 }
 
 /// <inheritdoc cref="Language"/>
-public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : DynamicIKeyed(id), Language
+public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : DynamicIKeyed(id), Language
 {
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;

@@ -59,5 +59,5 @@ public interface ISerializerHandler
     /// <param name="value">The value we don't know how to serialize.</param>
     /// <returns><paramref name="value"/> as string, will be written verbatim to JSON;
     /// or <c>null</c> to skip serializing this property.</returns>
-    string? UnknownDatatype(IReadableNode node, Feature property, object? value);
+    PropertyValue? UnknownDatatype(IReadableNode node, Feature property, object? value);
 }

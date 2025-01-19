@@ -62,9 +62,9 @@ internal abstract class SerializerVersionSpecificsBase : ISerializerVersionSpeci
     public SerializedProperty SerializeProperty(IReadableNode node, Feature property, object? value) =>
         new SerializedProperty { Property = property.ToMetaPointer(), Value = ConvertDatatype(node, property, value) };
 
-    protected abstract string? ConvertDatatype(IReadableNode node, Feature feature, object? value);
+    protected abstract PropertyValue? ConvertDatatype(IReadableNode node, Feature feature, object? value);
 
-    protected string? ConvertEnumeration(Enum e)
+    protected PropertyValue? ConvertEnumeration(Enum e)
     {
         var lionCoreMetaPointer = AttributeExtensions.GetAttributeOfType<LionCoreMetaPointer>(e);
 
@@ -88,7 +88,7 @@ internal abstract class SerializerVersionSpecificsBase : ISerializerVersionSpeci
     /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
     /// conforming to the LionWeb JSON serialization format.
     /// </summary>
-    protected string? ConvertPrimitiveType(object value) => value switch
+    protected PropertyValue? ConvertPrimitiveType(object value) => value switch
     {
         null => null,
         bool boolean => boolean ? "true" : "false",

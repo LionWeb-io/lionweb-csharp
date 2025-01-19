@@ -21,7 +21,7 @@ using M2;
 using M3;
 using Serialization;
 using CompressedContainment = (CompressedMetaPointer, List<CompressedId>);
-using CompressedReference = (CompressedMetaPointer, List<(CompressedId?, string?)>);
+using CompressedReference = (CompressedMetaPointer, List<(CompressedId?, ResolveInfo?)>);
 
 /// <summary>
 /// Instances of this class can deserialize a <see cref="SerializationChunk"/> as a list of <see cref="IWritableNode"/>s that are root nodes.

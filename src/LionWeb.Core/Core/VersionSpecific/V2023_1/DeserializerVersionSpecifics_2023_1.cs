@@ -36,7 +36,7 @@ internal class DeserializerVersionSpecifics_2023_1<T, H>(
         RegisterLanguage(BuiltInsLanguage_2023_1.Instance);
 
     public override object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype,
-        string? value)
+        PropertyValue? value)
     {
         var convertedValue = (datatype, value) switch
         {
@@ -48,7 +48,7 @@ internal class DeserializerVersionSpecifics_2023_1<T, H>(
         return convertedValue;
     }
 
-    private object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype, string value)
+    private object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype, PropertyValue value)
     {
         CompressedId compressedId = _metaInfo.Compress(node.GetId());
         return datatype switch

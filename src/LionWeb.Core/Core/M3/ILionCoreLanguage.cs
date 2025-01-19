@@ -23,7 +23,7 @@ namespace LionWeb.Core.M3;
 public interface ILionCoreLanguage : Language
 {
     /// Key of all LionWeb LionCore M3 language implementations.
-    public const string LanguageKey = "LionCore-M3";
+    public const MetaPointerKey LanguageKey = "LionCore-M3";
 
     /// Name of all LionWeb LionCore M3 language implementations.
     protected const string LanguageName = "LionCore_M3";
@@ -159,7 +159,7 @@ public interface ILionCoreLanguageWithStructuredDataType : ILionCoreLanguage
 /// <inheritdoc />
 public sealed class M3Concept : ConceptBase<ILionCoreLanguage>
 {
-    internal M3Concept(string id, ILionCoreLanguage parent) : base(id, parent)
+    internal M3Concept(NodeId id, ILionCoreLanguage parent) : base(id, parent)
     {
     }
 
@@ -191,7 +191,7 @@ public sealed class M3Concept : ConceptBase<ILionCoreLanguage>
 /// <inheritdoc />
 public sealed class M3Interface : InterfaceBase<ILionCoreLanguage>
 {
-    internal M3Interface(string id, ILionCoreLanguage parent) : base(id, parent)
+    internal M3Interface(NodeId id, ILionCoreLanguage parent) : base(id, parent)
     {
     }
 
@@ -217,7 +217,7 @@ public sealed class M3Interface : InterfaceBase<ILionCoreLanguage>
 /// <inheritdoc />
 public sealed class M3Reference : ReferenceBase<ILionCoreLanguage>
 {
-    internal M3Reference(string id, Classifier parent, ILionCoreLanguage language) : base(id, parent, language)
+    internal M3Reference(NodeId id, Classifier parent, ILionCoreLanguage language) : base(id, parent, language)
     {
     }
 
@@ -245,7 +245,7 @@ public sealed class M3Reference : ReferenceBase<ILionCoreLanguage>
 /// <inheritdoc />
 public sealed class M3Containment : ContainmentBase<ILionCoreLanguage>
 {
-    internal M3Containment(string id, Classifier parent, ILionCoreLanguage language) : base(id, parent, language)
+    internal M3Containment(NodeId id, Classifier parent, ILionCoreLanguage language) : base(id, parent, language)
     {
     }
 
@@ -273,7 +273,7 @@ public sealed class M3Containment : ContainmentBase<ILionCoreLanguage>
 /// <inheritdoc />
 public sealed class M3Property : PropertyBase<ILionCoreLanguage>
 {
-    internal M3Property(string id, Classifier parent, ILionCoreLanguage language) : base(id, parent, language)
+    internal M3Property(NodeId id, Classifier parent, ILionCoreLanguage language) : base(id, parent, language)
     {
     }
 

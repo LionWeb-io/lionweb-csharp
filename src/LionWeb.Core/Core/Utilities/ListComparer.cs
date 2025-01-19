@@ -18,8 +18,8 @@
 namespace LionWeb.Core.Utilities;
 
 using CostBase = short;
-using LeftIndex = int;
-using RightIndex = int;
+using LeftIndex = Index;
+using RightIndex = Index;
 
 /// <inheritdoc />
 /// <remarks>
