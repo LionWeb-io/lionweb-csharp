@@ -46,13 +46,22 @@ public class PartitionEventApplier
 
         listener.ChildAdded += (sender, args) =>
             OnRemoteChildAdded(sender, args.Parent, args.NewChild, args.Containment, args.Index);
+        listener.ChildDeleted += (sender, args) =>
+            OnRemoteChildDeleted(sender, args.DeletedChild, args.Parent, args.Containment, args.Index);
     }
 
     private void Init()
     {
         RegisterNode(_localPartition);
-        _localPartition.Listener.ChildAdded += (sender, args) =>
+
+        var listener = _localPartition.Listener;
+        if (listener == null)
+            return;
+
+        listener.ChildAdded += (sender, args) =>
             OnLocalChildAdded(sender, args.Parent, args.NewChild, args.Containment, args.Index);
+        listener.ChildDeleted += (sender, args) =>
+            OnLocalChildDeleted(sender, args.DeletedChild, args.Parent, args.Containment, args.Index);
     }
 
     private void RegisterNode(IReadableNode newNode)
@@ -60,6 +69,14 @@ public class PartitionEventApplier
         foreach (var node in M1Extensions.Descendants(newNode, true, true))
         {
             _nodeById[node.GetId()] = node;
+        }
+    }
+
+    private void UnregisterNode(IReadableNode newNode)
+    {
+        foreach (var node in M1Extensions.Descendants(newNode, true, true))
+        {
+            _nodeById.Remove(node.GetId());
         }
     }
 
@@ -122,6 +139,26 @@ public class PartitionEventApplier
         localParent.Set(containment, newValue);
     }
 
+    private void OnRemoteChildDeleted(object? sender, IWritableNode deletedChild, IWritableNode parent,
+        Containment containment, Index index)
+    {
+        var localParent = Lookup(parent.GetId());
+        
+        object newValue = null;
+        if (containment.Multiple)
+        {
+            var existingChildren = localParent.Get(containment);
+            if (existingChildren is IList l)
+            {
+                var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                children.RemoveAt(index);
+                newValue = children;
+            }
+        }
+
+        localParent.Set(containment, newValue);
+    }
+    
     #endregion
 
     #endregion
@@ -131,6 +168,10 @@ public class PartitionEventApplier
     private void OnLocalChildAdded(object? sender, IWritableNode parent, IWritableNode newChild,
         Containment containment, Index index) =>
         RegisterNode(newChild);
+
+    private void OnLocalChildDeleted(object? sender, IWritableNode deletedChild, IWritableNode parent,
+        Containment containment, Index index) =>
+        UnregisterNode(deletedChild);
 
     #endregion
 }

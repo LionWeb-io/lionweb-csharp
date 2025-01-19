@@ -104,21 +104,9 @@ public class EventTests
     [TestMethod]
     public void ChildAdded_Multiple_First()
     {
-        var node = new Geometry("a")
-        {
-            Shapes =
-            [
-                new Line("l")
-            ]
-        };
+        var node = new Geometry("a") { Shapes = [new Line("l")] };
 
-        var clone = new Geometry("a")
-        {
-            Shapes =
-            [
-                new Line("l")
-            ]
-        };
+        var clone = new Geometry("a") { Shapes = [new Line("l")] };
 
         var applier = new PartitionEventApplier(clone);
         applier.Subscribe(node.Listener);
@@ -133,21 +121,9 @@ public class EventTests
     [TestMethod]
     public void ChildAdded_Multiple_Last()
     {
-        var node = new Geometry("a")
-        {
-            Shapes =
-            [
-                new Line("l")
-            ]
-        };
+        var node = new Geometry("a") { Shapes = [new Line("l")] };
 
-        var clone = new Geometry("a")
-        {
-            Shapes =
-            [
-                new Line("l")
-            ]
-        };
+        var clone = new Geometry("a") { Shapes = [new Line("l")] };
 
         var applier = new PartitionEventApplier(clone);
         applier.Subscribe(node.Listener);
@@ -191,6 +167,74 @@ public class EventTests
 
         AssertEquals([node], [clone]);
         Assert.AreNotSame(added, clone.Shapes[0]);
+    }
+
+    #endregion
+
+    #region ChildDeleted
+
+    [TestMethod]
+    public void ChildDeleted_Multiple_Only()
+    {
+        var deleted = new Circle("deleted");
+        var node = new Geometry("a") { Shapes = [deleted] };
+
+        var clone = new Geometry("a") { Shapes = [new Circle("deleted")] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.RemoveShapes([deleted]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void ChildDeleted_Multiple_First()
+    {
+        var deleted = new Circle("deleted");
+        var node = new Geometry("a") { Shapes = [deleted, new Line("l")] };
+
+        var clone = new Geometry("a") { Shapes = [new Circle("deleted"), new Line("l")] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.RemoveShapes([deleted]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void ChildDeleted_Multiple_Last()
+    {
+        var deleted = new Circle("deleted");
+        var node = new Geometry("a") { Shapes = [new Line("l"), deleted] };
+
+        var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("deleted")] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.RemoveShapes([deleted]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void ChildDeleted_Single()
+    {
+        var deleted = new Documentation("deleted");
+        var node = new Geometry("a") { Documentation = deleted };
+
+        var clone = new Geometry("a") { Documentation = new Documentation("deleted") };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        node.Documentation = null;
+
+        AssertEquals([node], [clone]);
     }
 
     #endregion
