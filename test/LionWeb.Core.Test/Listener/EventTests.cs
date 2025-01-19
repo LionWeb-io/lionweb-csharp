@@ -641,6 +641,92 @@ public class EventTests
 
     #endregion
 
+    #region ReferenceDeleted
+
+    [TestMethod]
+    public void ReferenceDeleted_Multiple_Only()
+    {
+        var line = new Line("line");
+        var bof = new BillOfMaterials("bof") { Materials = [line] };
+        var node = new Geometry("a") { Shapes = [line] };
+        node.AddAnnotations([bof]);
+
+        var cloneLine = new Line("line");
+        var clone = new Geometry("a") { Shapes = [cloneLine] };
+        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine] }]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        bof.RemoveMaterials([line]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void ReferenceDeleted_Multiple_First()
+    {
+        var circle = new Circle("circle");
+        var line = new Line("line");
+        var bof = new BillOfMaterials("bof") { Materials = [line, circle] };
+        var node = new Geometry("a") { Shapes = [line, circle] };
+        node.AddAnnotations([bof]);
+
+        var cloneCircle = new Circle("circle");
+        var cloneLine = new Line("line");
+        var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
+        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine, cloneCircle] }]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        bof.RemoveMaterials([line]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void ReferenceDeleted_Multiple_Last()
+    {
+        var circle = new Circle("circle");
+        var line = new Line("line");
+        var bof = new BillOfMaterials("bof") { Materials = [circle, line] };
+        var node = new Geometry("a") { Shapes = [line, circle] };
+        node.AddAnnotations([bof]);
+
+        var cloneCircle = new Circle("circle");
+        var cloneLine = new Line("line");
+        var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
+        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle, cloneLine] }]);
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        bof.RemoveMaterials([line]);
+
+        AssertEquals([node], [clone]);
+    }
+
+    [TestMethod]
+    public void ReferenceDeleted_Single()
+    {
+        var circle = new Circle("circle");
+        var od = new OffsetDuplicate("od") { AltSource = circle };
+        var node = new Geometry("a") { Shapes = [od, circle] };
+
+        var cloneCircle = new Circle("circle");
+        var clone = new Geometry("a") { Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle] };
+
+        var applier = new PartitionEventApplier(clone);
+        applier.Subscribe(node.Listener);
+
+        od.AltSource = null;
+
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+
     #endregion
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

@@ -68,9 +68,11 @@ public class PartitionEventApplier
         listener.AnnotationMovedInSameParent += (sender, args) =>
             OnRemoteAnnotationMovedInSameParent(sender, args.NewIndex, args.MovedAnnotation, args.Parent,
                 args.OldIndex);
-        
+
         listener.ReferenceAdded += (sender, args) =>
             OnRemoteReferenceAdded(sender, args.Parent, args.Reference, args.Index, args.NewTarget);
+        listener.ReferenceDeleted += (sender, args) =>
+            OnRemoteReferenceDeleted(sender, args.Parent, args.Reference, args.Index, args.DeletedTarget);
     }
 
     private void Init()
@@ -323,6 +325,26 @@ public class PartitionEventApplier
         }
 
         return newValue;
+    }
+
+    private void OnRemoteReferenceDeleted(object? sender, IWritableNode parent, Reference reference, Index index,
+        IReferenceTarget deletedTarget)
+    {
+        var localParent = Lookup(parent.GetId());
+
+        object newValue = null;
+        if (reference.Multiple)
+        {
+            var existingTargets = localParent.Get(reference);
+            if (existingTargets is IList l)
+            {
+                var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
+                targets.RemoveAt(index);
+                newValue = targets;
+            }
+        }
+
+        localParent.Set(reference, newValue);
     }
 
     #endregion
