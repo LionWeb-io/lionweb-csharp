@@ -68,6 +68,9 @@ public class PartitionEventApplier
         listener.AnnotationMovedInSameParent += (sender, args) =>
             OnRemoteAnnotationMovedInSameParent(sender, args.NewIndex, args.MovedAnnotation, args.Parent,
                 args.OldIndex);
+        
+        listener.ReferenceAdded += (sender, args) =>
+            OnRemoteReferenceAdded(sender, args.Parent, args.Reference, args.Index, args.NewTarget);
     }
 
     private void Init()
@@ -82,7 +85,7 @@ public class PartitionEventApplier
             RegisterNode(args.NewChild);
         listener.ChildDeleted += (sender, args) =>
             UnregisterNode(args.DeletedChild);
-        
+
         listener.AnnotationAdded += (sender, args) =>
             RegisterNode(args.NewAnnotation);
         listener.AnnotationDeleted += (sender, args) =>
@@ -149,12 +152,12 @@ public class PartitionEventApplier
 
         var clone = Clone(newChildNode);
 
-        var newValue = Insert(localParent, containment, index, clone);
+        var newValue = InsertContainment(localParent, containment, index, clone);
 
         localParent.Set(containment, newValue);
     }
 
-    private static object Insert(INode localParent, Containment containment, Index index, INode nodeToInsert)
+    private object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
     {
         object newValue = nodeToInsert;
         if (containment.Multiple)
@@ -206,7 +209,7 @@ public class PartitionEventApplier
         Index oldIndex)
     {
         var localNewParent = Lookup(newParent.GetId());
-        var newValue = Insert(localNewParent, newContainment, newIndex, Lookup(movedChild.GetId()));
+        var newValue = InsertContainment(localNewParent, newContainment, newIndex, Lookup(movedChild.GetId()));
 
         localNewParent.Set(newContainment, newValue);
     }
@@ -220,7 +223,7 @@ public class PartitionEventApplier
         Index oldIndex)
     {
         var localParent = Lookup(parent.GetId());
-        var newValue = Insert(localParent, newContainment, newIndex, Lookup(movedChild.GetId()));
+        var newValue = InsertContainment(localParent, newContainment, newIndex, Lookup(movedChild.GetId()));
 
         localParent.Set(newContainment, newValue);
     }
@@ -283,6 +286,43 @@ public class PartitionEventApplier
         var localParent = Lookup(parent.GetId());
         INode nodeToInsert = Lookup(movedAnnotation.GetId());
         localParent.InsertAnnotations(newIndex, [nodeToInsert]);
+    }
+
+    #endregion
+
+    #region References
+
+    private void OnRemoteReferenceAdded(object? sender, IWritableNode parent, Reference reference, Index index,
+        IReferenceTarget newTarget)
+    {
+        var localParent = Lookup(parent.GetId());
+        INode target = Lookup(newTarget.Reference.GetId());
+        var newValue = InsertReference(localParent, reference, index, target);
+
+        localParent.Set(reference, newValue);
+    }
+
+    private object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
+    {
+        object newValue = target;
+        if (reference.Multiple)
+        {
+            if (localParent.CollectAllSetFeatures().Contains(reference))
+            {
+                var existingTargets = localParent.Get(reference);
+                if (existingTargets is IList l)
+                {
+                    var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
+                    targets.Insert(index, target);
+                    newValue = targets;
+                }
+            } else
+            {
+                newValue = new List<IReadableNode>() { target };
+            }
+        }
+
+        return newValue;
     }
 
     #endregion
