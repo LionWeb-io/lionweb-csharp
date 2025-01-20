@@ -16,13 +16,14 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Deprecated
 ### Security
 
-## [0.2.4] - 2025-01-17
+## [0.2.4] - tbd
 
 ### Added
 * Introduced optionally compressed ids during deserialization.
 * Added option to skip serialization of unset features.
 ### Fixed
 ### Changed
+* Added explicit LionWebVersions parameter to DynamicIKeyed.
 ### Removed
 ### Deprecated
 ### Security

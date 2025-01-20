@@ -71,18 +71,18 @@ public class TextualizerTests
     {
         var language = new DynamicLanguage("lang", _lionWebVersion) { Key = "key-lang", Version = "0" };
 
-        var concept = new DynamicConcept("concept", language) { Key = "key-concept" };
+        var concept = new DynamicConcept("concept", _lionWebVersion, language) { Key = "key-concept" };
         language.AddEntities([concept]);
 
         // shows that INamed_name is declared as a set feature, but its getter still throws:
         Assert.IsTrue(concept.CollectAllSetFeatures().Contains(_builtIns.INamed_name));
         Assert.ThrowsException<UnsetFeatureException>(() => concept.Name);
 
-        var property = new DynamicProperty("prop", concept) { Key = "key-prop" };
+        var property = new DynamicProperty("prop", _lionWebVersion, concept) { Key = "key-prop" };
         property.Type = _builtIns.String;
-        var containment = new DynamicContainment("cont", concept) { Key = "key-cont" };
+        var containment = new DynamicContainment("cont", _lionWebVersion, concept) { Key = "key-cont" };
         containment.Type = concept;
-        var reference = new DynamicReference("ref", concept) { Key = "key-ref" };
+        var reference = new DynamicReference("ref", _lionWebVersion, concept) { Key = "key-ref" };
         reference.Type = concept;
         concept.AddFeatures([property, containment, reference]);
 

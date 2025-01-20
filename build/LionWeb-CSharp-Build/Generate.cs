@@ -43,6 +43,8 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var withEnumLanguage = DeserializeExternalLanguage(lionWebVersion, "with-enum").First();
     withEnumLanguage.Name = "WithEnum";
     var specificLanguage = ISpecificLanguage.Get(lionWebVersion);
+    // If we update MPS-Specific in MPS, we want to re-generate it. Otherwise, we use the shipped version.
+    // var specificLanguage = DeserializeExternalLanguage(lionWebVersion, "MpsSpecific-metamodel-annotated").First();
     var deprecatedLang = DeserializeExternalLanguage(lionWebVersion, "deprecated", specificLanguage).First();
     deprecatedLang.Name = "Deprecated";
     var shapesLanguage = ShapesDefinition.Language;
@@ -63,6 +65,9 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(bLang, $"{prefix}.Circular.B") { NamespaceMappings = { [aLang] = $"{prefix}.Circular.A" } },
         new(tinyRefLang, $"{prefix}.TinyRefLang"),
         new(deprecatedLang, $"{prefix}.DeprecatedLang"),
+        // We don't really want these file in tests project, but update the version in Generator.
+        // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
+        // new(specificLanguage, $"LionWeb.Generator.VersionSpecific.V{lionWebVersion.VersionString.Replace('.', '_')}")
     ];
 
     if (sdtLang != null)

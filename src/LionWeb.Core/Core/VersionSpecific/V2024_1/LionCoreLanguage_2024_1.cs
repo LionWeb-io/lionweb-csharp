@@ -639,40 +639,40 @@ public sealed class LionCoreFactory_2024_1 : INodeFactory
     }
 
     /// <inheritdoc cref="LionWeb.Core.M3.Annotation"/>
-    public DynamicAnnotation Annotation(string id) => new(id, null);
+    public DynamicAnnotation Annotation(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.Concept"/>
-    public DynamicConcept Concept(string id) => new(id, null);
+    public DynamicConcept Concept(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.Containment"/>
-    public DynamicContainment Containment(string id) => new(id, null);
+    public DynamicContainment Containment(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.Enumeration"/>
-    public DynamicEnumeration Enumeration(string id) => new(id, null);
+    public DynamicEnumeration Enumeration(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.EnumerationLiteral"/>
-    public DynamicEnumerationLiteral EnumerationLiteral(string id) => new(id, null);
+    public DynamicEnumerationLiteral EnumerationLiteral(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.Field"/>
-    public DynamicField Field(string id) => new(id, null);
+    public DynamicField Field(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.Interface"/>
-    public DynamicInterface Interface(string id) => new(id, null);
+    public DynamicInterface Interface(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.Language"/>
     public DynamicLanguage Language(string id) => new(id, _language.LionWebVersion);
 
     /// <inheritdoc cref="LionWeb.Core.M3.PrimitiveType"/>
-    public DynamicPrimitiveType PrimitiveType(string id) => new(id, null);
+    public DynamicPrimitiveType PrimitiveType(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.Property"/>
-    public DynamicProperty Property(string id) => new(id, null);
+    public DynamicProperty Property(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.Reference"/>
-    public DynamicReference Reference(string id) => new(id, null);
+    public DynamicReference Reference(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc cref="LionWeb.Core.M3.StructuredDataType"/>
-    public DynamicStructuredDataType StructuredDataType(string id) => new(id, null);
+    public DynamicStructuredDataType StructuredDataType(string id) => new(id, LionWebVersions.v2024_1, null);
 
     /// <inheritdoc />
     public INode CreateNode(string id, Classifier classifier)

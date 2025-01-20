@@ -97,40 +97,40 @@ internal abstract class NodeCreatorBase
 
     public virtual DynamicIKeyed Create() => _serializedNode.Classifier switch
     {
-        var s when s.Key == LionCore.Annotation.Key => new DynamicAnnotation(_id, null) { Key = _key, Name = _name },
-        var s when s.Key == LionCore.Concept.Key => new DynamicConcept(_id, null)
+        var s when s.Key == LionCore.Annotation.Key => new DynamicAnnotation(_id, _versionSpecifics.Version, null) { Key = _key, Name = _name },
+        var s when s.Key == LionCore.Concept.Key => new DynamicConcept(_id, _versionSpecifics.Version, null)
         {
             Key = _key,
             Name = _name,
             Abstract = LookupBool(LionCore.Concept_abstract),
             Partition = LookupBool(LionCore.Concept_partition)
         },
-        var s when s.Key == LionCore.Containment.Key => new DynamicContainment(_id, null)
+        var s when s.Key == LionCore.Containment.Key => new DynamicContainment(_id, _versionSpecifics.Version, null)
         {
             Key = _key,
             Name = _name,
             Optional = LookupBool(LionCore.Feature_optional),
             Multiple = LookupBool(LionCore.Link_multiple)
         },
-        var s when s.Key == LionCore.Enumeration.Key => new DynamicEnumeration(_id, null) { Key = _key, Name = _name },
-        var s when s.Key == LionCore.EnumerationLiteral.Key => new DynamicEnumerationLiteral(_id, null)
+        var s when s.Key == LionCore.Enumeration.Key => new DynamicEnumeration(_id, _versionSpecifics.Version, null) { Key = _key, Name = _name },
+        var s when s.Key == LionCore.EnumerationLiteral.Key => new DynamicEnumerationLiteral(_id, _versionSpecifics.Version, null)
         {
             Key = _key, Name = _name
         },
-        var s when s.Key == LionCore.Interface.Key => new DynamicInterface(_id, null) { Key = _key, Name = _name },
+        var s when s.Key == LionCore.Interface.Key => new DynamicInterface(_id, _versionSpecifics.Version, null) { Key = _key, Name = _name },
         var s when s.Key == LionCore.Language.Key => new DynamicLanguage(_id, Version)
         {
             Key = _key, Name = _name, Version = LookupString(LionCore.Language_version)
         },
-        var s when s.Key == LionCore.PrimitiveType.Key => new DynamicPrimitiveType(_id, null)
+        var s when s.Key == LionCore.PrimitiveType.Key => new DynamicPrimitiveType(_id, _versionSpecifics.Version, null)
         {
             Key = _key, Name = _name
         },
-        var s when s.Key == LionCore.Property.Key => new DynamicProperty(_id, null)
+        var s when s.Key == LionCore.Property.Key => new DynamicProperty(_id, _versionSpecifics.Version, null)
         {
             Key = _key, Name = _name, Optional = LookupBool(LionCore.Feature_optional)
         },
-        var s when s.Key == LionCore.Reference.Key => new DynamicReference(_id, null)
+        var s when s.Key == LionCore.Reference.Key => new DynamicReference(_id, _versionSpecifics.Version, null)
         {
             Key = _key,
             Name = _name,
