@@ -43,6 +43,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var withEnumLanguage = DeserializeExternalLanguage(lionWebVersion, "with-enum").First();
     withEnumLanguage.Name = "WithEnum";
     var specificLanguage = ISpecificLanguage.Get(lionWebVersion);
+    // var specificLanguage = DeserializeExternalLanguage(lionWebVersion, "MpsSpecific-metamodel-annotated").First();
     var deprecatedLang = DeserializeExternalLanguage(lionWebVersion, "deprecated", specificLanguage).First();
     deprecatedLang.Name = "Deprecated";
     var shapesLanguage = ShapesDefinition.Language;
@@ -63,6 +64,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(bLang, $"{prefix}.Circular.B") { NamespaceMappings = { [aLang] = $"{prefix}.Circular.A" } },
         new(tinyRefLang, $"{prefix}.TinyRefLang"),
         new(deprecatedLang, $"{prefix}.DeprecatedLang"),
+        // new(specificLanguage, $"LionWeb.Generator.VersionSpecific.V{lionWebVersion.VersionString.Replace('.', '_')}")
     ];
 
     if (sdtLang != null)

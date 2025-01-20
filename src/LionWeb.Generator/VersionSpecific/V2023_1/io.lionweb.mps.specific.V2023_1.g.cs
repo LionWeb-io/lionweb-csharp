@@ -6,30 +6,30 @@
 #nullable enable
 namespace LionWeb.Generator.VersionSpecific.V2023_1;
 
-using Core;
-using Core.M2;
-using Core.M3;
-using Core.VersionSpecific.V2023_1;
 using Io.Lionweb.Mps.Specific;
-using Core.Utilities;
+using LionWeb.Core;
+using LionWeb.Core.M2;
+using LionWeb.Core.M3;
+using LionWeb.Core.Utilities;
+using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
 
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "0")]
 public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecificLanguage
 {
-	public static readonly SpecificLanguage Instance = new Lazy<SpecificLanguage>(() => new("io-lionweb-mps-specific")).Value;
+	internal static readonly SpecificLanguage Instance = new Lazy<SpecificLanguage>(() => new("io-lionweb-mps-specific")).Value;
 	public SpecificLanguage(string id) : base(id, LionWebVersions.v2023_1)
 	{
-		_conceptDescription = new(() => new AnnotationBase<SpecificLanguage>("ConceptDescription", this) { Key = "ConceptDescription", Name = "ConceptDescription", AnnotatesLazy = new(() => LionCoreLanguage_2023_1.Instance.Classifier), FeaturesLazy = new(() => [ConceptDescription_conceptAlias, ConceptDescription_conceptShortDescription]) });
-		_conceptDescription_conceptAlias = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptAlias", ConceptDescription, this) { Key = "ConceptDescription-conceptAlias", Name = "conceptAlias", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
-		_conceptDescription_conceptShortDescription = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptShortDescription", ConceptDescription, this) { Key = "ConceptDescription-conceptShortDescription", Name = "conceptShortDescription", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
-		_deprecated = new(() => new AnnotationBase<SpecificLanguage>("Deprecated", this) { Key = "Deprecated", Name = "Deprecated", AnnotatesLazy = new(() => LionCoreLanguage_2023_1.Instance.IKeyed), FeaturesLazy = new(() => [Deprecated_build, Deprecated_comment]) });
-		_deprecated_build = new(() => new PropertyBase<SpecificLanguage>("Deprecated-build", Deprecated, this) { Key = "Deprecated-build", Name = "build", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
-		_deprecated_comment = new(() => new PropertyBase<SpecificLanguage>("Deprecated-comment", Deprecated, this) { Key = "Deprecated-comment", Name = "comment", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
-		_shortDescription = new(() => new AnnotationBase<SpecificLanguage>("ShortDescription", this) { Key = "ShortDescription", Name = "ShortDescription", AnnotatesLazy = new(() => BuiltInsLanguage_2023_1.Instance.Node), FeaturesLazy = new(() => [ShortDescription_description]) });
-		_shortDescription_description = new(() => new PropertyBase<SpecificLanguage>("ShortDescription-description", ShortDescription, this) { Key = "ShortDescription-description", Name = "description", Optional = true, Type = BuiltInsLanguage_2023_1.Instance.String });
-		_virtualPackage = new(() => new AnnotationBase<SpecificLanguage>("VirtualPackage", this) { Key = "VirtualPackage", Name = "VirtualPackage", AnnotatesLazy = new(() => BuiltInsLanguage_2023_1.Instance.Node), ImplementsLazy = new(() => [BuiltInsLanguage_2023_1.Instance.INamed]) });
+		_conceptDescription = new(() => new AnnotationBase<SpecificLanguage>("ConceptDescription", this) { Key = "ConceptDescription", Name = "ConceptDescription", AnnotatesLazy = new(() => _m3.Classifier), FeaturesLazy = new(() => [ConceptDescription_conceptAlias, ConceptDescription_conceptShortDescription]) });
+		_conceptDescription_conceptAlias = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptAlias", ConceptDescription, this) { Key = "ConceptDescription-conceptAlias", Name = "conceptAlias", Optional = true, Type = _builtIns.String });
+		_conceptDescription_conceptShortDescription = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptShortDescription", ConceptDescription, this) { Key = "ConceptDescription-conceptShortDescription", Name = "conceptShortDescription", Optional = true, Type = _builtIns.String });
+		_deprecated = new(() => new AnnotationBase<SpecificLanguage>("Deprecated", this) { Key = "Deprecated", Name = "Deprecated", AnnotatesLazy = new(() => _m3.IKeyed), FeaturesLazy = new(() => [Deprecated_build, Deprecated_comment]) });
+		_deprecated_build = new(() => new PropertyBase<SpecificLanguage>("Deprecated-build", Deprecated, this) { Key = "Deprecated-build", Name = "build", Optional = true, Type = _builtIns.String });
+		_deprecated_comment = new(() => new PropertyBase<SpecificLanguage>("Deprecated-comment", Deprecated, this) { Key = "Deprecated-comment", Name = "comment", Optional = true, Type = _builtIns.String });
+		_shortDescription = new(() => new AnnotationBase<SpecificLanguage>("ShortDescription", this) { Key = "ShortDescription", Name = "ShortDescription", AnnotatesLazy = new(() => _builtIns.Node), FeaturesLazy = new(() => [ShortDescription_description]) });
+		_shortDescription_description = new(() => new PropertyBase<SpecificLanguage>("ShortDescription-description", ShortDescription, this) { Key = "ShortDescription-description", Name = "description", Optional = true, Type = _builtIns.String });
+		_virtualPackage = new(() => new AnnotationBase<SpecificLanguage>("VirtualPackage", this) { Key = "VirtualPackage", Name = "VirtualPackage", AnnotatesLazy = new(() => _builtIns.Node), ImplementsLazy = new(() => [_builtIns.INamed]) });
 		_factory = new SpecificFactory(this);
 	}
 
@@ -118,12 +118,13 @@ public class SpecificFactory : AbstractBaseNodeFactory, ISpecificFactory
 		throw new UnsupportedEnumerationLiteralException(literal);
 	}
 
-    /// <inheritdoc/>
-    public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType,
-        IFieldValues fieldValues) =>
-        throw new UnsupportedStructuredDataTypeException(structuredDataType);
+	/// <inheritdoc/>
+        public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(StructuredDataType structuredDataType, IFieldValues fieldValues)
+	{
+		throw new UnsupportedStructuredDataTypeException(structuredDataType);
+	}
 
-    public virtual ConceptDescription NewConceptDescription(string id) => new(id);
+	public virtual ConceptDescription NewConceptDescription(string id) => new(id);
 	public virtual ConceptDescription CreateConceptDescription() => NewConceptDescription(GetNewId());
 	public virtual Deprecated NewDeprecated(string id) => new(id);
 	public virtual Deprecated CreateDeprecated() => NewDeprecated(GetNewId());
@@ -134,7 +135,7 @@ public class SpecificFactory : AbstractBaseNodeFactory, ISpecificFactory
 }
 
 [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "ConceptDescription")]
-public partial class ConceptDescription : NodeBase
+public partial class ConceptDescription : AnnotationInstanceBase
 {
 	private string? _conceptAlias = null;
 	/// <remarks>Optional Property</remarks>
@@ -167,7 +168,7 @@ public partial class ConceptDescription : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => SpecificLanguage.Instance.ConceptDescription;
+        public override Annotation GetAnnotation() => SpecificLanguage.Instance.ConceptDescription;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -221,7 +222,7 @@ public partial class ConceptDescription : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_conceptAlias != default)
 			result.Add(SpecificLanguage.Instance.ConceptDescription_conceptAlias);
 		if (_conceptShortDescription != default)
@@ -231,7 +232,7 @@ public partial class ConceptDescription : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "Deprecated")]
-public partial class Deprecated : NodeBase
+public partial class Deprecated : AnnotationInstanceBase
 {
 	private string? _build = null;
 	/// <remarks>Optional Property</remarks>
@@ -264,7 +265,7 @@ public partial class Deprecated : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => SpecificLanguage.Instance.Deprecated;
+        public override Annotation GetAnnotation() => SpecificLanguage.Instance.Deprecated;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -318,7 +319,7 @@ public partial class Deprecated : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_build != default)
 			result.Add(SpecificLanguage.Instance.Deprecated_build);
 		if (_comment != default)
@@ -328,7 +329,7 @@ public partial class Deprecated : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "ShortDescription")]
-public partial class ShortDescription : NodeBase
+public partial class ShortDescription : AnnotationInstanceBase
 {
 	private string? _description = null;
 	/// <remarks>Optional Property</remarks>
@@ -348,7 +349,7 @@ public partial class ShortDescription : NodeBase
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => SpecificLanguage.Instance.ShortDescription;
+        public override Annotation GetAnnotation() => SpecificLanguage.Instance.ShortDescription;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -385,7 +386,7 @@ public partial class ShortDescription : NodeBase
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_description != default)
 			result.Add(SpecificLanguage.Instance.ShortDescription_description);
 		return result;
@@ -393,15 +394,15 @@ public partial class ShortDescription : NodeBase
 }
 
 [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "VirtualPackage")]
-public partial class VirtualPackage : NodeBase, INamedWritable
+public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 {
 	private string? _name = null;
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If Name has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        [LionCoreMetaPointer(Language = typeof(BuiltInsLanguage_2023_1), Key = "LionCore-builtins-INamed-name")]
+        [LionCoreMetaPointer(Language = typeof(LionWeb.Core.VersionSpecific.V2023_1.BuiltInsLanguage_2023_1), Key = "LionCore-builtins-INamed-name")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
-	public string Name { get => _name ?? throw new UnsetFeatureException(BuiltInsLanguage_2023_1.Instance.INamed_name); set => SetName(value); }
+	public string Name { get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name); set => SetName(value); }
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  INamedWritable INamedWritable.SetName(string value) => SetName(value);
@@ -409,7 +410,7 @@ public partial class VirtualPackage : NodeBase, INamedWritable
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public VirtualPackage SetName(string value)
 	{
-		AssureNotNull(value, BuiltInsLanguage_2023_1.Instance.INamed_name);
+		AssureNotNull(value, _builtIns.INamed_name);
 		_name = value;
 		return this;
 	}
@@ -419,13 +420,13 @@ public partial class VirtualPackage : NodeBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        public override Classifier GetClassifier() => SpecificLanguage.Instance.VirtualPackage;
+        public override Annotation GetAnnotation() => SpecificLanguage.Instance.VirtualPackage;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
-		if (BuiltInsLanguage_2023_1.Instance.INamed_name.EqualsIdentity(feature))
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
 			result = Name;
 			return true;
@@ -439,7 +440,7 @@ public partial class VirtualPackage : NodeBase, INamedWritable
 	{
 		if (base.SetInternal(feature, value))
 			return true;
-		if (BuiltInsLanguage_2023_1.Instance.INamed_name.EqualsIdentity(feature))
+		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
 			if (value is string v)
 			{
@@ -456,9 +457,9 @@ public partial class VirtualPackage : NodeBase, INamedWritable
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
-		var result = base.CollectAllSetFeatures().ToList();
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
 		if (_name != default)
-			result.Add(BuiltInsLanguage_2023_1.Instance.INamed_name);
+			result.Add(_builtIns.INamed_name);
 		return result;
 	}
 }
