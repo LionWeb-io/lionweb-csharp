@@ -18,7 +18,7 @@ using System.Collections.Generic;
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "2024.1")]
 public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecificLanguage
 {
-	internal static readonly SpecificLanguage Instance = new Lazy<SpecificLanguage>(() => new("io-lionweb-mps-specific")).Value;
+	public static readonly SpecificLanguage Instance = new Lazy<SpecificLanguage>(() => new("io-lionweb-mps-specific")).Value;
 	public SpecificLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
 		_conceptDescription = new(() => new AnnotationBase<SpecificLanguage>("ConceptDescription", this) { Key = "ConceptDescription", Name = "ConceptDescription", AnnotatesLazy = new(() => _m3.Classifier), FeaturesLazy = new(() => [ConceptDescription_conceptAlias, ConceptDescription_conceptShortDescription]) });
