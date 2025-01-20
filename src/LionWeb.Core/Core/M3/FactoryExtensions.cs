@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.M3;
 
+using M2;
+
 /// <summary>
 /// Extensions methods that provide factory methods on M3 types whose instances are always contained.
 /// </summary>
@@ -25,7 +27,7 @@ public static class FactoryExtensions
     /// <inheritdoc cref="Annotation"/>
     public static DynamicAnnotation Annotation(this DynamicLanguage language, string id, string key, string name)
     {
-        var annotation = new DynamicAnnotation(id, language) { Key = key, Name = name };
+        var annotation = new DynamicAnnotation(id, language.LionWebVersion, language) { Key = key, Name = name };
         language.AddEntities([annotation]);
         return annotation;
     }
@@ -33,7 +35,7 @@ public static class FactoryExtensions
     /// <inheritdoc cref="Concept"/>
     public static DynamicConcept Concept(this DynamicLanguage language, string id, string key, string name)
     {
-        var concept = new DynamicConcept(id, language) { Key = key, Name = name };
+        var concept = new DynamicConcept(id, language.LionWebVersion, language) { Key = key, Name = name };
         language.AddEntities([concept]);
         return concept;
     }
@@ -41,7 +43,7 @@ public static class FactoryExtensions
     /// <inheritdoc cref="Containment"/>
     public static DynamicContainment Containment(this DynamicClassifier classifier, string id, string key, string name)
     {
-        var containment = new DynamicContainment(id, classifier) { Key = key, Name = name };
+        var containment = new DynamicContainment(id, classifier.GetLanguage().LionWebVersion, classifier) { Key = key, Name = name };
         classifier.AddFeatures([containment]);
         return containment;
     }
@@ -49,7 +51,7 @@ public static class FactoryExtensions
     /// <inheritdoc cref="Enumeration"/>
     public static DynamicEnumeration Enumeration(this DynamicLanguage language, string id, string key, string name)
     {
-        var enumeration = new DynamicEnumeration(id, language) { Key = key, Name = name };
+        var enumeration = new DynamicEnumeration(id, language.LionWebVersion, language) { Key = key, Name = name };
         language.AddEntities([enumeration]);
         return enumeration;
     }
@@ -58,7 +60,7 @@ public static class FactoryExtensions
     public static DynamicEnumerationLiteral EnumerationLiteral(this DynamicEnumeration enumeration, string id,
         string key, string name)
     {
-        var enumerationLiteral = new DynamicEnumerationLiteral(id, enumeration) { Key = key, Name = name };
+        var enumerationLiteral = new DynamicEnumerationLiteral(id, enumeration.GetLanguage().LionWebVersion, enumeration) { Key = key, Name = name };
         enumeration.AddLiterals([enumerationLiteral]);
         return enumerationLiteral;
     }
@@ -67,7 +69,7 @@ public static class FactoryExtensions
     public static DynamicField Field(this DynamicStructuredDataType structuredDataType, string id,
         string key, string name)
     {
-        var field = new DynamicField(id, structuredDataType) { Key = key, Name = name };
+        var field = new DynamicField(id, structuredDataType.GetLanguage().LionWebVersion, structuredDataType) { Key = key, Name = name };
         structuredDataType.AddFields([field]);
         return field;
     }
@@ -82,7 +84,7 @@ public static class FactoryExtensions
     /// <inheritdoc cref="Interface"/>
     public static DynamicInterface Interface(this DynamicLanguage language, string id, string key, string name)
     {
-        var @interface = new DynamicInterface(id, language) { Key = key, Name = name };
+        var @interface = new DynamicInterface(id, language.LionWebVersion, language) { Key = key, Name = name };
         language.AddEntities([@interface]);
         return @interface;
     }
@@ -90,7 +92,7 @@ public static class FactoryExtensions
     /// <inheritdoc cref="PrimitiveType"/>
     public static DynamicPrimitiveType PrimitiveType(this DynamicLanguage language, string id, string key, string name)
     {
-        var primitiveType = new DynamicPrimitiveType(id, language) { Key = key, Name = name };
+        var primitiveType = new DynamicPrimitiveType(id, language.LionWebVersion, language) { Key = key, Name = name };
         language.AddEntities([primitiveType]);
         return primitiveType;
     }
@@ -98,7 +100,7 @@ public static class FactoryExtensions
     /// <inheritdoc cref="Property"/>
     public static DynamicProperty Property(this DynamicClassifier classifier, string id, string key, string name)
     {
-        var property = new DynamicProperty(id, classifier) { Key = key, Name = name };
+        var property = new DynamicProperty(id, classifier.GetLanguage().LionWebVersion, classifier) { Key = key, Name = name };
         classifier.AddFeatures([property]);
         return property;
     }
@@ -106,7 +108,7 @@ public static class FactoryExtensions
     /// <inheritdoc cref="Reference"/>
     public static DynamicReference Reference(this DynamicClassifier classifier, string id, string key, string name)
     {
-        var reference = new DynamicReference(id, classifier) { Key = key, Name = name };
+        var reference = new DynamicReference(id, classifier.GetLanguage().LionWebVersion, classifier) { Key = key, Name = name };
         classifier.AddFeatures([reference]);
         return reference;
     }
@@ -115,7 +117,7 @@ public static class FactoryExtensions
     public static DynamicStructuredDataType StructuredDataType(this DynamicLanguage language, string id, string key,
         string name)
     {
-        var structuredDataType = new DynamicStructuredDataType(id, language) { Key = key, Name = name };
+        var structuredDataType = new DynamicStructuredDataType(id, language.LionWebVersion, language) { Key = key, Name = name };
         language.AddEntities([structuredDataType]);
         return structuredDataType;
     }

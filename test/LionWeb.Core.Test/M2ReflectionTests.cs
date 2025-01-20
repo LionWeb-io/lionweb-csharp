@@ -218,8 +218,8 @@ public class M2ReflectionTests
     [TestMethod]
     public void Language_Set_Entities()
     {
-        Concept conceptA = new DynamicConcept("my-id", lang) { Key = "my-key", Name = "SomeName" };
-        Enumeration enumA = new DynamicEnumeration("enum-id", lang) { Key = "enum-key", Name = "SomeEnum" };
+        Concept conceptA = new DynamicConcept("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
+        Enumeration enumA = new DynamicEnumeration("enum-id", _lionWebVersion, lang) { Key = "enum-key", Name = "SomeEnum" };
         lang.Set(LanguageEntities, new List<LanguageEntity> { conceptA, enumA });
         CollectionAssert.AreEqual(new List<object> { conceptA, enumA }, lang.Entities.ToList());
         lang.Set(LanguageEntities, Enumerable.Empty<LanguageEntity>());
@@ -234,7 +234,7 @@ public class M2ReflectionTests
         Assert.IsTrue(((Language)node).TryGetEntities(out var empty));
         Assert.IsTrue(empty.Count == 0);
 
-        node.AddEntities([new DynamicConcept("b", null)]);
+        node.AddEntities([new DynamicConcept("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Language)node).TryGetEntities(out var value));
         Assert.IsFalse(value.Count == 0);
     }
@@ -320,7 +320,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_TryGet_Name()
     {
-        var node = new DynamicAnnotation("a", null);
+        var node = new DynamicAnnotation("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -343,7 +343,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_TryGet_Key()
     {
-        var node = new DynamicAnnotation("a", null);
+        var node = new DynamicAnnotation("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -354,8 +354,8 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_Set_Features()
     {
-        Property propA = new DynamicProperty("my-id", ann) { Key = "my-key", Name = "SomeName" };
-        Reference refB = new DynamicReference("ref-id", ann) { Key = "ref-key", Name = "SomeRef" };
+        Property propA = new DynamicProperty("my-id", _lionWebVersion, ann) { Key = "my-key", Name = "SomeName" };
+        Reference refB = new DynamicReference("ref-id", _lionWebVersion, ann) { Key = "ref-key", Name = "SomeRef" };
         ann.Set(ClassifierFeatures, new List<Feature> { propA, refB });
         CollectionAssert.AreEqual(new List<object> { propA, refB }, ann.Features.ToList());
         ann.Set(ClassifierFeatures, Enumerable.Empty<Feature>());
@@ -366,11 +366,11 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_TryGet_Features()
     {
-        var node = new DynamicAnnotation("a", lang);
+        var node = new DynamicAnnotation("a", _lionWebVersion, lang);
         Assert.IsTrue(((Annotation)node).TryGetFeatures(out var empty));
         Assert.IsTrue(empty.Count == 0);
 
-        node.AddFeatures([new DynamicProperty("b", null)]);
+        node.AddFeatures([new DynamicProperty("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Annotation)node).TryGetFeatures(out var value));
         Assert.IsFalse(value.Count == 0);
     }
@@ -378,7 +378,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_Set_Annotates()
     {
-        Annotation tgt = new DynamicAnnotation("my-id", lang) { Key = "my-key", Name = "SomeName" };
+        Annotation tgt = new DynamicAnnotation("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
         ann.Set(AnnotationAnnotates, tgt);
         Assert.AreEqual(tgt, ann.Annotates);
         Assert.ThrowsException<InvalidValueException>(() => ann.Set(AnnotationAnnotates, null));
@@ -388,7 +388,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_TryGet_Annotates()
     {
-        var node = new DynamicAnnotation("a", lang);
+        var node = new DynamicAnnotation("a", _lionWebVersion, lang);
         Assert.IsTrue(((Annotation)node).TryGetAnnotates(out var empty));
         Assert.AreEqual(_builtIns.Node, empty);
 
@@ -400,7 +400,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_Set_Extends()
     {
-        Annotation sup = new DynamicAnnotation("my-id", lang) { Key = "my-key", Name = "SomeName" };
+        Annotation sup = new DynamicAnnotation("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
         ann.Set(AnnotationExtends, sup);
         Assert.AreEqual(sup, ann.Extends);
         ann.Set(AnnotationExtends, null);
@@ -411,7 +411,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_TryGet_Extends()
     {
-        var node = new DynamicAnnotation("a", lang);
+        var node = new DynamicAnnotation("a", _lionWebVersion, lang);
         Assert.IsTrue(((Annotation)node).TryGetExtends(out var empty));
         Assert.IsNull(empty);
 
@@ -423,8 +423,8 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_Set_Implements()
     {
-        Interface ifaceA = new DynamicInterface("my-id", lang) { Key = "my-key", Name = "SomeName" };
-        Interface ifaceB = new DynamicInterface("ref-id", lang) { Key = "ref-key", Name = "SomeRef" };
+        Interface ifaceA = new DynamicInterface("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
+        Interface ifaceB = new DynamicInterface("ref-id", _lionWebVersion, lang) { Key = "ref-key", Name = "SomeRef" };
         ann.Set(AnnotationImplements, new List<Interface> { ifaceA, ifaceB });
         CollectionAssert.AreEqual(new List<object> { ifaceA, ifaceB }, ann.Implements.ToList());
         ann.Set(AnnotationImplements, Enumerable.Empty<Interface>());
@@ -435,11 +435,11 @@ public class M2ReflectionTests
     [TestMethod]
     public void Annotation_TryGet_Implements()
     {
-        var node = new DynamicAnnotation("a", lang);
+        var node = new DynamicAnnotation("a", _lionWebVersion, lang);
         Assert.IsTrue(((Annotation)node).TryGetImplements(out var empty));
         Assert.IsTrue(empty.Count == 0);
 
-        node.AddImplements([new DynamicInterface("b", null)]);
+        node.AddImplements([new DynamicInterface("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Annotation)node).TryGetImplements(out var value));
         Assert.IsFalse(value.Count == 0);
     }
@@ -500,7 +500,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_TryGet_Name()
     {
-        var node = new DynamicConcept("a", null);
+        var node = new DynamicConcept("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -522,7 +522,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_TryGet_Key()
     {
-        var node = new DynamicConcept("a", null);
+        var node = new DynamicConcept("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -533,8 +533,8 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_Set_Features()
     {
-        Property propA = new DynamicProperty("my-id", ann) { Key = "my-key", Name = "SomeName" };
-        Reference refB = new DynamicReference("ref-id", ann) { Key = "ref-key", Name = "SomeRef" };
+        Property propA = new DynamicProperty("my-id", _lionWebVersion, ann) { Key = "my-key", Name = "SomeName" };
+        Reference refB = new DynamicReference("ref-id", _lionWebVersion, ann) { Key = "ref-key", Name = "SomeRef" };
         conc.Set(ClassifierFeatures, new List<Feature> { propA, refB });
         CollectionAssert.AreEqual(new List<object> { propA, refB }, conc.Features.ToList());
         conc.Set(ClassifierFeatures, Enumerable.Empty<Feature>());
@@ -545,11 +545,11 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_TryGet_Features()
     {
-        var node = new DynamicConcept("a", lang);
+        var node = new DynamicConcept("a", _lionWebVersion, lang);
         Assert.IsTrue(((Concept)node).TryGetFeatures(out var empty));
         Assert.IsTrue(empty.Count == 0);
 
-        node.AddFeatures([new DynamicProperty("b", null)]);
+        node.AddFeatures([new DynamicProperty("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Concept)node).TryGetFeatures(out var value));
         Assert.IsFalse(value.Count == 0);
     }
@@ -567,7 +567,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_TryGet_Abstract()
     {
-        var node = new DynamicConcept("a", null);
+        var node = new DynamicConcept("a", _lionWebVersion, null);
         Assert.IsTrue(((Concept)node).TryGetAbstract(out var empty));
         Assert.AreEqual(false, empty);
 
@@ -589,7 +589,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_TryGet_Partition()
     {
-        var node = new DynamicConcept("a", null);
+        var node = new DynamicConcept("a", _lionWebVersion, null);
         Assert.IsTrue(((Concept)node).TryGetPartition(out var empty));
         Assert.AreEqual(false, empty);
 
@@ -601,7 +601,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_Set_Extends()
     {
-        Concept sup = new DynamicConcept("my-id", lang) { Key = "my-key", Name = "SomeName" };
+        Concept sup = new DynamicConcept("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
         conc.Set(ConceptExtends, sup);
         Assert.AreEqual(sup, conc.Extends);
         conc.Set(ConceptExtends, null);
@@ -612,7 +612,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_TryGet_Extends()
     {
-        var node = new DynamicConcept("a", null);
+        var node = new DynamicConcept("a", _lionWebVersion, null);
         Assert.IsTrue(((Concept)node).TryGetExtends(out var empty));
         Assert.AreEqual(null, empty);
 
@@ -624,8 +624,8 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_Set_Implements()
     {
-        Interface ifaceA = new DynamicInterface("my-id", lang) { Key = "my-key", Name = "SomeName" };
-        Interface ifaceB = new DynamicInterface("ref-id", lang) { Key = "ref-key", Name = "SomeRef" };
+        Interface ifaceA = new DynamicInterface("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
+        Interface ifaceB = new DynamicInterface("ref-id", _lionWebVersion, lang) { Key = "ref-key", Name = "SomeRef" };
         conc.Set(ConceptImplements, new List<Interface> { ifaceA, ifaceB });
         CollectionAssert.AreEqual(new List<object> { ifaceA, ifaceB }, conc.Implements.ToList());
         conc.Set(ConceptImplements, Enumerable.Empty<Interface>());
@@ -636,11 +636,11 @@ public class M2ReflectionTests
     [TestMethod]
     public void Concept_TryGet_Implements()
     {
-        var node = new DynamicConcept("a", lang);
+        var node = new DynamicConcept("a", _lionWebVersion, lang);
         Assert.IsTrue(((Concept)node).TryGetImplements(out var empty));
         Assert.IsTrue(empty.Count == 0);
 
-        node.AddImplements([new DynamicInterface("b", null)]);
+        node.AddImplements([new DynamicInterface("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Concept)node).TryGetImplements(out var value));
         Assert.IsFalse(value.Count == 0);
     }
@@ -695,7 +695,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Containment_TryGet_Name()
     {
-        var node = new DynamicContainment("a", null);
+        var node = new DynamicContainment("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -717,7 +717,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Containment_TryGet_Key()
     {
-        var node = new DynamicContainment("a", null);
+        var node = new DynamicContainment("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -738,7 +738,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Containment_TryGet_Optional()
     {
-        var node = new DynamicContainment("a", null);
+        var node = new DynamicContainment("a", _lionWebVersion, null);
         Assert.IsTrue(((Containment)node).TryGetOptional(out var empty));
         Assert.AreEqual(false, empty);
 
@@ -760,7 +760,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Containment_TryGet_Multiple()
     {
-        var node = new DynamicContainment("a", null);
+        var node = new DynamicContainment("a", _lionWebVersion, null);
         Assert.IsTrue(((Containment)node).TryGetMultiple(out var empty));
         Assert.AreEqual(false, empty);
 
@@ -781,10 +781,10 @@ public class M2ReflectionTests
     [TestMethod]
     public void Containment_TryGet_Type()
     {
-        var node = new DynamicContainment("a", null);
+        var node = new DynamicContainment("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetType(out _));
 
-        var type = new DynamicConcept("b", null);
+        var type = new DynamicConcept("b", _lionWebVersion, null);
         node.Type = type;
         Assert.IsTrue(node.TryGetType(out var value));
         Assert.AreEqual(type, value);
@@ -841,7 +841,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Reference_TryGet_Name()
     {
-        var node = new DynamicReference("a", null);
+        var node = new DynamicReference("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -863,7 +863,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Reference_TryGet_Key()
     {
-        var node = new DynamicReference("a", null);
+        var node = new DynamicReference("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -884,7 +884,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Reference_TryGet_Optional()
     {
-        var node = new DynamicReference("a", null);
+        var node = new DynamicReference("a", _lionWebVersion, null);
         Assert.IsTrue(((Reference)node).TryGetOptional(out var empty));
         Assert.AreEqual(false, empty);
 
@@ -906,7 +906,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Reference_TryGet_Multiple()
     {
-        var node = new DynamicReference("a", null);
+        var node = new DynamicReference("a", _lionWebVersion, null);
         Assert.IsTrue(((Reference)node).TryGetMultiple(out var empty));
         Assert.AreEqual(false, empty);
 
@@ -927,10 +927,10 @@ public class M2ReflectionTests
     [TestMethod]
     public void Reference_TryGet_Type()
     {
-        var node = new DynamicReference("a", null);
+        var node = new DynamicReference("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetType(out _));
 
-        var type = new DynamicConcept("b", null);
+        var type = new DynamicConcept("b", _lionWebVersion, null);
         node.Type = type;
         Assert.IsTrue(node.TryGetType(out var value));
         Assert.AreEqual(type, value);
@@ -978,7 +978,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Enumeration_TryGet_Name()
     {
-        var node = new DynamicEnumeration("a", null);
+        var node = new DynamicEnumeration("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -1000,7 +1000,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Enumeration_TryGet_Key()
     {
-        var node = new DynamicEnumeration("a", null);
+        var node = new DynamicEnumeration("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -1011,8 +1011,8 @@ public class M2ReflectionTests
     [TestMethod]
     public void Enumeration_Set_Literals()
     {
-        EnumerationLiteral litA = new DynamicEnumerationLiteral("my-id", enm) { Key = "my-key", Name = "SomeName" };
-        EnumerationLiteral litB = new DynamicEnumerationLiteral("ref-id", enm) { Key = "ref-key", Name = "SomeRef" };
+        EnumerationLiteral litA = new DynamicEnumerationLiteral("my-id", _lionWebVersion, enm) { Key = "my-key", Name = "SomeName" };
+        EnumerationLiteral litB = new DynamicEnumerationLiteral("ref-id", _lionWebVersion, enm) { Key = "ref-key", Name = "SomeRef" };
         enm.Set(EnumerationLiterals, new List<EnumerationLiteral> { litA, litB });
         CollectionAssert.AreEqual(new List<object> { litA, litB }, enm.Literals.ToList());
         enm.Set(EnumerationLiterals, Enumerable.Empty<EnumerationLiteral>());
@@ -1023,11 +1023,11 @@ public class M2ReflectionTests
     [TestMethod]
     public void Enumeration_TryGet_Literals()
     {
-        var node = new DynamicEnumeration("a", lang);
+        var node = new DynamicEnumeration("a", _lionWebVersion, lang);
         Assert.IsTrue(((Enumeration)node).TryGetLiterals(out var empty));
         Assert.IsTrue(empty.Count == 0);
 
-        node.AddLiterals([new DynamicEnumerationLiteral("b", null)]);
+        node.AddLiterals([new DynamicEnumerationLiteral("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Enumeration)node).TryGetLiterals(out var value));
         Assert.IsFalse(value.Count == 0);
     }
@@ -1072,7 +1072,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void EnumerationLiteral_TryGet_Name()
     {
-        var node = new DynamicEnumerationLiteral("a", null);
+        var node = new DynamicEnumerationLiteral("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -1094,7 +1094,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void EnumerationLiteral_TryGet_Key()
     {
-        var node = new DynamicEnumerationLiteral("a", null);
+        var node = new DynamicEnumerationLiteral("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -1142,7 +1142,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void PrimitiveType_TryGet_Name()
     {
-        var node = new DynamicPrimitiveType("a", null);
+        var node = new DynamicPrimitiveType("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -1164,7 +1164,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void PrimitiveType_TryGet_Key()
     {
-        var node = new DynamicPrimitiveType("a", null);
+        var node = new DynamicPrimitiveType("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -1216,7 +1216,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Interface_TryGet_Name()
     {
-        var node = new DynamicInterface("a", null);
+        var node = new DynamicInterface("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -1238,7 +1238,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Interface_TryGet_Key()
     {
-        var node = new DynamicInterface("a", null);
+        var node = new DynamicInterface("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -1249,8 +1249,8 @@ public class M2ReflectionTests
     [TestMethod]
     public void Interface_Set_Features()
     {
-        Property propA = new DynamicProperty("my-id", ann) { Key = "my-key", Name = "SomeName" };
-        Reference refB = new DynamicReference("ref-id", ann) { Key = "ref-key", Name = "SomeRef" };
+        Property propA = new DynamicProperty("my-id", _lionWebVersion, ann) { Key = "my-key", Name = "SomeName" };
+        Reference refB = new DynamicReference("ref-id", _lionWebVersion, ann) { Key = "ref-key", Name = "SomeRef" };
         iface.Set(ClassifierFeatures, new List<Feature> { propA, refB });
         CollectionAssert.AreEqual(new List<object> { propA, refB }, iface.Features.ToList());
         iface.Set(ClassifierFeatures, Enumerable.Empty<Feature>());
@@ -1261,11 +1261,11 @@ public class M2ReflectionTests
     [TestMethod]
     public void Interface_TryGet_Features()
     {
-        var node = new DynamicInterface("a", lang);
+        var node = new DynamicInterface("a", _lionWebVersion, lang);
         Assert.IsTrue(((Interface)node).TryGetFeatures(out var empty));
         Assert.IsTrue(empty.Count == 0);
 
-        node.AddFeatures([new DynamicProperty("b", null)]);
+        node.AddFeatures([new DynamicProperty("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Interface)node).TryGetFeatures(out var value));
         Assert.IsFalse(value.Count == 0);
     }
@@ -1273,8 +1273,8 @@ public class M2ReflectionTests
     [TestMethod]
     public void Interface_Set_Extends()
     {
-        Interface ifaceA = new DynamicInterface("my-id", lang) { Key = "my-key", Name = "SomeName" };
-        Interface ifaceB = new DynamicInterface("ref-id", lang) { Key = "ref-key", Name = "SomeRef" };
+        Interface ifaceA = new DynamicInterface("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
+        Interface ifaceB = new DynamicInterface("ref-id", _lionWebVersion, lang) { Key = "ref-key", Name = "SomeRef" };
         iface.Set(InterfaceExtends, new List<Interface> { ifaceA, ifaceB });
         CollectionAssert.AreEqual(new List<object> { ifaceA, ifaceB }, iface.Extends.ToList());
         iface.Set(InterfaceExtends, Enumerable.Empty<Interface>());
@@ -1285,11 +1285,11 @@ public class M2ReflectionTests
     [TestMethod]
     public void Interface_TryGet_Extends()
     {
-        var node = new DynamicInterface("a", lang);
+        var node = new DynamicInterface("a", _lionWebVersion, lang);
         Assert.IsTrue(((Interface)node).TryGetExtends(out var empty));
         Assert.IsTrue(empty.Count == 0);
 
-        node.AddExtends([new DynamicInterface("b", null)]);
+        node.AddExtends([new DynamicInterface("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Interface)node).TryGetExtends(out var value));
         Assert.IsFalse(value.Count == 0);
     }
@@ -1336,7 +1336,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void StructuredDataType_TryGet_Name()
     {
-        var node = new DynamicStructuredDataType("a", null);
+        var node = new DynamicStructuredDataType("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -1357,7 +1357,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void StructuredDataType_TryGet_Key()
     {
-        var node = new DynamicStructuredDataType("a", null);
+        var node = new DynamicStructuredDataType("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -1368,8 +1368,8 @@ public class M2ReflectionTests
     [TestMethod]
     public void StructuredDataType_Set_Fields()
     {
-        Field litA = new DynamicField("my-id", sdt) { Key = "my-key", Name = "SomeName" };
-        Field litB = new DynamicField("ref-id", sdt) { Key = "ref-key", Name = "SomeRef" };
+        Field litA = new DynamicField("my-id", _lionWebVersion, sdt) { Key = "my-key", Name = "SomeName" };
+        Field litB = new DynamicField("ref-id", _lionWebVersion, sdt) { Key = "ref-key", Name = "SomeRef" };
         sdt.Set(Fields, new List<Field> { litA, litB });
         CollectionAssert.AreEqual(new List<object> { litA, litB }, sdt.Fields.ToList());
         sdt.Set(Fields, Enumerable.Empty<Field>());
@@ -1380,11 +1380,11 @@ public class M2ReflectionTests
     [TestMethod]
     public void StructuredDataType_TryGet_Fields()
     {
-        var node = new DynamicStructuredDataType("a", lang);
+        var node = new DynamicStructuredDataType("a", _lionWebVersion, lang);
         Assert.IsFalse(((StructuredDataType)node).TryGetFields(out var empty));
         Assert.IsTrue(empty.Count == 0);
 
-        node.AddFields([new DynamicField("b", null)]);
+        node.AddFields([new DynamicField("b", _lionWebVersion, null)]);
         Assert.IsTrue(((StructuredDataType)node).TryGetFields(out var value));
         Assert.IsFalse(value.Count == 0);
     }
@@ -1429,7 +1429,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Field_TryGet_Name()
     {
-        var node = new DynamicField("a", null);
+        var node = new DynamicField("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetName(out _));
 
         node.Name = "Hello";
@@ -1450,7 +1450,7 @@ public class M2ReflectionTests
     [TestMethod]
     public void Field_TryGet_Key()
     {
-        var node = new DynamicField("a", null);
+        var node = new DynamicField("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetKey(out _));
 
         node.Key = "Hello";
@@ -1476,10 +1476,10 @@ public class M2ReflectionTests
     [TestMethod]
     public void Field_TryGet_Type()
     {
-        var node = new DynamicField("a", null);
+        var node = new DynamicField("a", _lionWebVersion, null);
         Assert.IsFalse(node.TryGetType(out _));
 
-        var type = new DynamicPrimitiveType("b", null);
+        var type = new DynamicPrimitiveType("b", _lionWebVersion, null);
         node.Type = type;
         Assert.IsTrue(node.TryGetType(out var value));
         Assert.AreEqual(type, value);

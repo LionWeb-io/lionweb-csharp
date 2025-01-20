@@ -68,11 +68,11 @@ internal class NodeCreator_2024_1(
 
     public override DynamicIKeyed Create() => _serializedNode.Classifier switch
     {
-        var s when s.Key == LionCore.StructuredDataType.Key => new DynamicStructuredDataType(_id, null)
+        var s when s.Key == LionCore.StructuredDataType.Key => new DynamicStructuredDataType(_id, LionWebVersions.v2024_1, null)
         {
             Key = _key, Name = _name
         },
-        var s when s.Key == LionCore.Field.Key => new DynamicField(_id, null) { Key = _key, Name = _name },
+        var s when s.Key == LionCore.Field.Key => new DynamicField(_id, LionWebVersions.v2024_1, null) { Key = _key, Name = _name },
         _ => base.Create()
     };
 }

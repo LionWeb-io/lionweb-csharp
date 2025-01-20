@@ -24,18 +24,18 @@ using Utilities;
 // The types here implement the LionCore M3.
 
 /// <inheritdoc cref="IKeyed"/>
-public abstract class DynamicIKeyed(string id) : NodeBase(id), IKeyed
+public abstract class DynamicIKeyed(string id, LionWebVersions lionWebVersion) : NodeBase(id), IKeyed
 {
     private string? _key;
     private string? _name;
 
     /// <inheritdoc />
     protected override IBuiltInsLanguage _builtIns =>
-        new Lazy<IBuiltInsLanguage>(() => this.GetLanguage().LionWebVersion.BuiltIns).Value;
+        new Lazy<IBuiltInsLanguage>(() => lionWebVersion.BuiltIns).Value;
 
     /// <inheritdoc />
     protected override ILionCoreLanguage _m3 =>
-        new Lazy<ILionCoreLanguage>(() => this.GetLanguage().LionWebVersion.LionCore).Value;
+        new Lazy<ILionCoreLanguage>(() => lionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
     public string Key
@@ -128,7 +128,7 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
     public bool Optional { get; set; }
 
     /// <inheritdoc />
-    protected DynamicFeature(string id, DynamicClassifier? parent) : base(id)
+    protected DynamicFeature(string id, DynamicClassifier? parent, LionWebVersions lionWebVersion) : base(id, lionWebVersion)
     {
         parent?.AddFeatures([this]);
         _parent = parent;
@@ -179,7 +179,7 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
 }
 
 /// <inheritdoc cref="Property"/>
-public class DynamicProperty(string id, DynamicClassifier? classifier) : DynamicFeature(id, classifier), Property
+public class DynamicProperty(string id, LionWebVersions lionWebVersion, DynamicClassifier? classifier) : DynamicFeature(id, classifier, lionWebVersion), Property
 {
     private Datatype? _type;
 
@@ -245,7 +245,7 @@ public class DynamicProperty(string id, DynamicClassifier? classifier) : Dynamic
 }
 
 /// <inheritdoc cref="Link"/>
-public abstract class DynamicLink(string id, DynamicClassifier? classifier) : DynamicFeature(id, classifier), Link
+public abstract class DynamicLink(string id, DynamicClassifier? classifier, LionWebVersions lionWebVersion) : DynamicFeature(id, classifier, lionWebVersion), Link
 {
     private Classifier? _type;
 
@@ -328,14 +328,14 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier) : Dy
 }
 
 /// <inheritdoc cref="Containment"/>
-public class DynamicContainment(string id, DynamicClassifier? classifier) : DynamicLink(id, classifier), Containment
+public class DynamicContainment(string id, LionWebVersions lionWebVersion, DynamicClassifier? classifier) : DynamicLink(id, classifier, lionWebVersion), Containment
 {
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.Containment;
 }
 
 /// <inheritdoc cref="Reference"/>
-public class DynamicReference(string id, DynamicClassifier? classifier) : DynamicLink(id, classifier), Reference
+public class DynamicReference(string id, LionWebVersions lionWebVersion, DynamicClassifier? classifier) : DynamicLink(id, classifier, lionWebVersion), Reference
 {
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.Reference;
@@ -345,16 +345,16 @@ public class DynamicReference(string id, DynamicClassifier? classifier) : Dynami
 public abstract class DynamicLanguageEntity : DynamicIKeyed, LanguageEntity
 {
     /// <inheritdoc />
-    protected DynamicLanguageEntity(string id, DynamicLanguage? language)
-        : base(id)
+    protected DynamicLanguageEntity(string id, LionWebVersions lionWebVersion, DynamicLanguage? language)
+        : base(id, lionWebVersion)
     {
         _parent = language;
     }
 }
 
 /// <inheritdoc cref="Classifier"/>
-public abstract class DynamicClassifier(string id, DynamicLanguage? language)
-    : DynamicLanguageEntity(id, language), Classifier
+public abstract class DynamicClassifier(string id, LionWebVersions lionWebVersion, DynamicLanguage? language)
+    : DynamicLanguageEntity(id, lionWebVersion, language), Classifier
 {
     private readonly List<Feature> _features = [];
 
@@ -441,7 +441,7 @@ public abstract class DynamicClassifier(string id, DynamicLanguage? language)
 }
 
 /// <inheritdoc cref="Concept"/>
-public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClassifier(id, language), Concept
+public class DynamicConcept(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicClassifier(id, lionWebVersion, language), Concept
 {
     /// <inheritdoc />
     public bool Abstract { get; set; }
@@ -563,7 +563,7 @@ public class DynamicConcept(string id, DynamicLanguage? language) : DynamicClass
 }
 
 /// <inheritdoc cref="Annotation"/>
-public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicClassifier(id, language), Annotation
+public class DynamicAnnotation(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicClassifier(id, lionWebVersion, language), Annotation
 {
     private Classifier? _annotates;
     
@@ -672,7 +672,7 @@ public class DynamicAnnotation(string id, DynamicLanguage? language) : DynamicCl
 }
 
 /// <inheritdoc cref="Interface"/>
-public class DynamicInterface(string id, DynamicLanguage? language) : DynamicClassifier(id, language), Interface
+public class DynamicInterface(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicClassifier(id, lionWebVersion, language), Interface
 {
     private readonly List<Interface> _extends = [];
 
@@ -733,18 +733,18 @@ public class DynamicInterface(string id, DynamicLanguage? language) : DynamicCla
 }
 
 /// <inheritdoc cref="Datatype"/>
-public abstract class DynamicDatatype(string id, DynamicLanguage? language)
-    : DynamicLanguageEntity(id, language), Datatype;
+public abstract class DynamicDatatype(string id, LionWebVersions lionWebVersion, DynamicLanguage? language)
+    : DynamicLanguageEntity(id, lionWebVersion, language), Datatype;
 
 /// <inheritdoc cref="PrimitiveType"/>
-public class DynamicPrimitiveType(string id, DynamicLanguage? language) : DynamicDatatype(id, language), PrimitiveType
+public class DynamicPrimitiveType(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicDatatype(id, lionWebVersion, language), PrimitiveType
 {
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.PrimitiveType;
 }
 
 /// <inheritdoc cref="Enumeration"/>
-public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicDatatype(id, language), Enumeration
+public class DynamicEnumeration(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicDatatype(id, lionWebVersion, language), Enumeration
 {
     private readonly List<EnumerationLiteral> _literals = [];
 
@@ -837,8 +837,8 @@ public class DynamicEnumeration(string id, DynamicLanguage? language) : DynamicD
 public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
 {
     /// <inheritdoc />
-    public DynamicEnumerationLiteral(string id, DynamicEnumeration? enumeration)
-        : base(id)
+    public DynamicEnumerationLiteral(string id, LionWebVersions lionWebVersion, DynamicEnumeration? enumeration)
+        : base(id, lionWebVersion)
     {
         enumeration?.AddLiterals([this]);
         _parent = enumeration;
@@ -849,13 +849,11 @@ public class DynamicEnumerationLiteral : DynamicIKeyed, EnumerationLiteral
 }
 
 /// <inheritdoc cref="StructuredDataType"/>
-public class DynamicStructuredDataType(string id, DynamicLanguage? language)
-    : DynamicDatatype(id, language), StructuredDataType
+public class DynamicStructuredDataType(string id, LionWebVersions lionWebVersion, DynamicLanguage? language)
+    : DynamicDatatype(id, lionWebVersion, language), StructuredDataType
 {
     /// <inheritdoc />
-    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
-        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
-            (ILionCoreLanguageWithStructuredDataType)this.GetLanguage().LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguageWithStructuredDataType _m3 => (ILionCoreLanguageWithStructuredDataType)base._m3;
 
     private readonly List<Field> _fields = [];
 
@@ -989,14 +987,12 @@ public readonly record struct DynamicStructuredDataTypeInstance : IStructuredDat
 public class DynamicField : DynamicIKeyed, Field
 {
     /// <inheritdoc />
-    protected override ILionCoreLanguageWithStructuredDataType _m3 =>
-        new Lazy<ILionCoreLanguageWithStructuredDataType>(() =>
-            (ILionCoreLanguageWithStructuredDataType)this.GetLanguage().LionWebVersion.LionCore).Value;
+    protected override ILionCoreLanguageWithStructuredDataType _m3 => (ILionCoreLanguageWithStructuredDataType)base._m3;
 
     private Datatype? _type;
 
     /// <inheritdoc cref="Field"/>
-    public DynamicField(string id, DynamicStructuredDataType? structuredDataType) : base(id)
+    public DynamicField(string id, LionWebVersions lionWebVersion, DynamicStructuredDataType? structuredDataType) : base(id, lionWebVersion)
     {
         structuredDataType?.AddFields([this]);
         _parent = structuredDataType;
@@ -1064,7 +1060,7 @@ public class DynamicField : DynamicIKeyed, Field
 }
 
 /// <inheritdoc cref="Language"/>
-public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : DynamicIKeyed(id), Language
+public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : DynamicIKeyed(id, lionWebVersion), Language
 {
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;

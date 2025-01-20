@@ -108,15 +108,15 @@ public class TestLanguagesDefinitions
             {
                 Key = "key-tinyRefLang", Name = "TinyRefLang", Version = "0"
             };
-        var myConcept = new DynamicConcept("id-Concept", tinyRefLang) { Key = "key-MyConcept", Name = "MyConcept" };
+        var myConcept = new DynamicConcept("id-Concept", _lionWebVersion, tinyRefLang) { Key = "key-MyConcept", Name = "MyConcept" };
         tinyRefLang.AddEntities([myConcept]);
 
         var singularRef =
-            new DynamicReference("id-MyConcept-singularRef", myConcept)
+            new DynamicReference("id-MyConcept-singularRef", _lionWebVersion, myConcept)
             {
                 Key = "key-MyConcept-singularRef", Name = "singularRef", Type = myConcept
             };
-        var multivalueRef = new DynamicReference("id-Concept-multivaluedRef", myConcept)
+        var multivalueRef = new DynamicReference("id-Concept-multivaluedRef", _lionWebVersion, myConcept)
         {
             Key = "key-MyConcept-multivaluedRef", Name = "multivaluedRef", Type = myConcept, Multiple = true
         };
