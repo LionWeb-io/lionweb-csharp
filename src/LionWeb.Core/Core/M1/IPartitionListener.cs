@@ -731,3 +731,8 @@ public interface IReferenceTarget
 
 /// <inheritdoc cref="IReferenceTarget"/>
 public readonly record struct ReferenceTarget(ResolveInfo? ResolveInfo, TargetNode? Reference) : IReferenceTarget;
+
+public interface IOverridableCommander<T>
+{
+    T? Delegate { get; set; }
+}

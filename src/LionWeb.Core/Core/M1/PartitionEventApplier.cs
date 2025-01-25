@@ -38,46 +38,46 @@ public class PartitionEventApplier
     public void Subscribe(IPartitionListener listener)
     {
         listener.PropertyAdded += (sender, args) =>
-            OnRemotePropertyAdded(sender, args.Node, args.Property, args.NewValue);
+            PauseCommands(() => OnRemotePropertyAdded(sender, args.Node, args.Property, args.NewValue));
         listener.PropertyDeleted += (sender, args) =>
-            OnRemotePropertyDeleted(sender, args.Node, args.Property, args.OldValue);
+            PauseCommands(() => OnRemotePropertyDeleted(sender, args.Node, args.Property, args.OldValue));
         listener.PropertyChanged += (sender, args) =>
-            OnRemotePropertyChanged(sender, args.Node, args.Property, args.NewValue, args.OldValue);
+            PauseCommands(() => OnRemotePropertyChanged(sender, args.Node, args.Property, args.NewValue, args.OldValue));
 
         listener.ChildAdded += (sender, args) =>
-            OnRemoteChildAdded(sender, args.Parent, args.NewChild, args.Containment, args.Index);
+            PauseCommands(() => OnRemoteChildAdded(sender, args.Parent, args.NewChild, args.Containment, args.Index));
         listener.ChildDeleted += (sender, args) =>
-            OnRemoteChildDeleted(sender, args.DeletedChild, args.Parent, args.Containment, args.Index);
+            PauseCommands(() => OnRemoteChildDeleted(sender, args.DeletedChild, args.Parent, args.Containment, args.Index));
         listener.ChildReplaced += (sender, args) =>
-            OnRemoteChildReplaced(sender, args.NewChild, args.ReplacedChild, args.Parent, args.Containment, args.Index);
+            PauseCommands(() => OnRemoteChildReplaced(sender, args.NewChild, args.ReplacedChild, args.Parent, args.Containment, args.Index));
         listener.ChildMovedFromOtherContainment += (sender, args) =>
-            OnRemoteChildMovedFromOtherContainment(sender, args.NewParent, args.NewContainment, args.NewIndex,
-                args.MovedChild, args.OldParent, args.OldContainment, args.OldIndex);
+            PauseCommands(() => OnRemoteChildMovedFromOtherContainment(sender, args.NewParent, args.NewContainment, args.NewIndex,
+                args.MovedChild, args.OldParent, args.OldContainment, args.OldIndex));
         listener.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
-            OnRemoteChildMovedFromOtherContainmentInSameParent(sender, args.NewContainment, args.NewIndex,
-                args.MovedChild, args.Parent, args.OldContainment, args.OldIndex);
+            PauseCommands(() => OnRemoteChildMovedFromOtherContainmentInSameParent(sender, args.NewContainment, args.NewIndex,
+                args.MovedChild, args.Parent, args.OldContainment, args.OldIndex));
         listener.ChildMovedInSameContainment += (sender, args) =>
-            OnRemoteChildMovedInSameContainment(sender, args.NewIndex, args.MovedChild, args.Parent, args.Containment,
-                args.OldIndex);
+            PauseCommands(() => OnRemoteChildMovedInSameContainment(sender, args.NewIndex, args.MovedChild, args.Parent, args.Containment,
+                args.OldIndex));
 
         listener.AnnotationAdded += (sender, args) =>
-            OnRemoteAnnotationAdded(sender, args.Parent, args.NewAnnotation, args.Index);
+            PauseCommands(() => OnRemoteAnnotationAdded(sender, args.Parent, args.NewAnnotation, args.Index));
         listener.AnnotationDeleted += (sender, args) =>
-            OnRemoteAnnotationDeleted(sender, args.DeletedAnnotation, args.Parent, args.Index);
+            PauseCommands(() => OnRemoteAnnotationDeleted(sender, args.DeletedAnnotation, args.Parent, args.Index));
         listener.AnnotationMovedFromOtherParent += (sender, args) =>
-            OnRemoteAnnotationMovedFromOtherParent(sender, args.NewParent, args.NewIndex, args.MovedAnnotation,
-                args.OldParent, args.OldIndex);
+            PauseCommands(() => OnRemoteAnnotationMovedFromOtherParent(sender, args.NewParent, args.NewIndex, args.MovedAnnotation,
+                args.OldParent, args.OldIndex));
         listener.AnnotationMovedInSameParent += (sender, args) =>
-            OnRemoteAnnotationMovedInSameParent(sender, args.NewIndex, args.MovedAnnotation, args.Parent,
-                args.OldIndex);
+            PauseCommands(() => OnRemoteAnnotationMovedInSameParent(sender, args.NewIndex, args.MovedAnnotation, args.Parent,
+                args.OldIndex));
 
         listener.ReferenceAdded += (sender, args) =>
-            OnRemoteReferenceAdded(sender, args.Parent, args.Reference, args.Index, args.NewTarget);
+            PauseCommands(() => OnRemoteReferenceAdded(sender, args.Parent, args.Reference, args.Index, args.NewTarget));
         listener.ReferenceDeleted += (sender, args) =>
-            OnRemoteReferenceDeleted(sender, args.Parent, args.Reference, args.Index, args.DeletedTarget);
+            PauseCommands(() => OnRemoteReferenceDeleted(sender, args.Parent, args.Reference, args.Index, args.DeletedTarget));
         listener.ReferenceChanged += (sender, args) =>
-            OnRemoteReferenceChanged(sender, args.Parent, args.Reference, args.Index, args.NewTarget,
-                args.ReplacedTarget);
+            PauseCommands(() => OnRemoteReferenceChanged(sender, args.Parent, args.Reference, args.Index, args.NewTarget,
+                args.ReplacedTarget));
     }
 
     private void Init()
@@ -103,7 +103,8 @@ public class PartitionEventApplier
     {
         foreach (var node in M1Extensions.Descendants(newNode, true, true))
         {
-            _nodeById[node.GetId()] = node;
+            if (!_nodeById.TryAdd(node.GetId(), node))
+                throw new DuplicateNodeIdException(node, _nodeById[node.GetId()]);
         }
     }
 
@@ -131,37 +132,84 @@ public class PartitionEventApplier
             remoteNode.GetId();
     }
 
+    private void PauseCommands(Func<Action?> action)
+    {
+        IPartitionCommander? previousDelegate = null;
+        Action? postAction = null;
+        try
+        {
+            previousDelegate = DisableCommands();
+
+            postAction = action();
+        } finally
+        {
+            ReenableCommands(previousDelegate);
+            postAction?.Invoke();
+        }
+    }
+    
+    private IPartitionCommander? DisableCommands()
+    {
+        IPartitionCommander? previousDelegate = null;
+        if (_localPartition.Commander is IOverridableCommander<IPartitionCommander> oc)
+        {
+            previousDelegate = oc.Delegate;
+            oc.Delegate = new NoOpPartitionCommander();
+        }
+
+        return previousDelegate;
+    }
+
+    private void ReenableCommands(IPartitionCommander? previousDelegate)
+    {
+        if (_localPartition.Commander is IOverridableCommander<IPartitionCommander> oc)
+        {
+            oc.Delegate = previousDelegate;
+        }
+    }
+
     #region Remote
 
     #region Properties
 
-    private void OnRemotePropertyAdded(object? sender, IWritableNode node, Property property,
-        SemanticPropertyValue newValue) =>
+    private Action? OnRemotePropertyAdded(object? sender, IWritableNode node, Property property,
+        SemanticPropertyValue newValue)
+    {
         Lookup(node.GetId()).Set(property, newValue);
+        return null;
+    }
 
-    private void OnRemotePropertyDeleted(object? sender, IWritableNode node, Property property,
-        SemanticPropertyValue oldValue) =>
+    private Action? OnRemotePropertyDeleted(object? sender, IWritableNode node, Property property,
+        SemanticPropertyValue oldValue)
+    {
         Lookup(node.GetId()).Set(property, null);
+        return null;
+    }
 
-    private void OnRemotePropertyChanged(object? sender, IWritableNode node, Property property,
-        SemanticPropertyValue newValue, SemanticPropertyValue oldValue) =>
+    private Action? OnRemotePropertyChanged(object? sender, IWritableNode node, Property property,
+        SemanticPropertyValue newValue, SemanticPropertyValue oldValue)
+    {
         Lookup(node.GetId()).Set(property, newValue);
+        return null;
+    }
 
     #endregion
 
     #region Children
 
-    private void OnRemoteChildAdded(object? sender, IWritableNode parent, IWritableNode newChild,
+    private Action? OnRemoteChildAdded(object? sender, IWritableNode parent, IWritableNode newChild,
         Containment containment, Index index)
     {
         var localParent = Lookup(parent.GetId());
         var newChildNode = (INode)newChild;
 
         var clone = Clone(newChildNode);
+        RegisterNode(clone);
 
         var newValue = InsertContainment(localParent, containment, index, clone);
 
         localParent.Set(containment, newValue);
+        return null;
     }
 
     private object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
@@ -187,27 +235,29 @@ public class PartitionEventApplier
         return newValue;
     }
 
-    private void OnRemoteChildDeleted(object? sender, IWritableNode deletedChild, IWritableNode parent,
+    private Action? OnRemoteChildDeleted(object? sender, IWritableNode deletedChild, IWritableNode parent,
         Containment containment, Index index)
     {
         var localParent = Lookup(parent.GetId());
 
-        object newValue = null;
+        object? newValue = null;
         if (containment.Multiple)
         {
             var existingChildren = localParent.Get(containment);
             if (existingChildren is IList l)
             {
                 var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                UnregisterNode(children[index]);
                 children.RemoveAt(index);
                 newValue = children;
             }
         }
 
         localParent.Set(containment, newValue);
+        return null;
     }
 
-    private void OnRemoteChildReplaced(object? sender, IWritableNode newChild, IWritableNode replacedChild,
+    private Action? OnRemoteChildReplaced(object? sender, IWritableNode newChild, IWritableNode replacedChild,
         IWritableNode parent,
         Containment containment, Index index)
     {
@@ -220,16 +270,21 @@ public class PartitionEventApplier
             if (existingChildren is IList l)
             {
                 var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                children.Insert(index, (IWritableNode)newValue);
-                children.RemoveAt(index + 1);
+                var newValueNode = (IWritableNode)newValue;
+                children.Insert(index, newValueNode);
+                var removeIndex = index + 1;
+                children.RemoveAt(removeIndex);
+                UnregisterNode(children[removeIndex]);
+                RegisterNode(newValueNode);
                 newValue = children;
             }
         }
 
         localParent.Set(containment, newValue);
+        return null;
     }
 
-    private void OnRemoteChildMovedFromOtherContainment(object? sender, IWritableNode newParent,
+    private Action? OnRemoteChildMovedFromOtherContainment(object? sender, IWritableNode newParent,
         Containment newContainment,
         Index newIndex,
         IWritableNode movedChild,
@@ -241,9 +296,10 @@ public class PartitionEventApplier
         var newValue = InsertContainment(localNewParent, newContainment, newIndex, Lookup(movedChild.GetId()));
 
         localNewParent.Set(newContainment, newValue);
+        return null;
     }
 
-    private void OnRemoteChildMovedFromOtherContainmentInSameParent(object? sender,
+    private Action? OnRemoteChildMovedFromOtherContainmentInSameParent(object? sender,
         Containment newContainment,
         Index newIndex,
         IWritableNode movedChild,
@@ -255,9 +311,10 @@ public class PartitionEventApplier
         var newValue = InsertContainment(localParent, newContainment, newIndex, Lookup(movedChild.GetId()));
 
         localParent.Set(newContainment, newValue);
+        return null;
     }
 
-    private void OnRemoteChildMovedInSameContainment(object? sender,
+    private Action? OnRemoteChildMovedInSameContainment(object? sender,
         Index newIndex,
         IWritableNode movedChild,
         IWritableNode parent,
@@ -277,26 +334,33 @@ public class PartitionEventApplier
         }
 
         localParent.Set(containment, newValue);
+        return null;
     }
 
     #endregion
 
     #region Annotations
 
-    private void OnRemoteAnnotationAdded(object? sender, IWritableNode parent, IWritableNode newAnnotation, Index index)
+    private Action? OnRemoteAnnotationAdded(object? sender, IWritableNode parent, IWritableNode newAnnotation, Index index)
     {
         var localParent = Lookup(parent.GetId());
-        localParent.InsertAnnotations(index, [Clone((INode)newAnnotation)]);
+        var clone = Clone((INode)newAnnotation);
+        RegisterNode(clone);
+        localParent.InsertAnnotations(index, [clone]);
+        return null;
     }
 
-    private void OnRemoteAnnotationDeleted(object? sender, IWritableNode deletedAnnotation, IWritableNode parent,
+    private Action? OnRemoteAnnotationDeleted(object? sender, IWritableNode deletedAnnotation, IWritableNode parent,
         Index index)
     {
         var localParent = Lookup(parent.GetId());
-        localParent.RemoveAnnotations([Lookup(deletedAnnotation.GetId())]);
+        var localDeleted = Lookup(deletedAnnotation.GetId());
+        UnregisterNode(localDeleted);
+        localParent.RemoveAnnotations([localDeleted]);
+        return null;
     }
 
-    private void OnRemoteAnnotationMovedFromOtherParent(object? sender, IWritableNode newParent,
+    private Action? OnRemoteAnnotationMovedFromOtherParent(object? sender, IWritableNode newParent,
         Index newIndex,
         IWritableNode movedAnnotation,
         IWritableNode oldParent,
@@ -304,9 +368,10 @@ public class PartitionEventApplier
     {
         var localNewParent = Lookup(newParent.GetId());
         localNewParent.InsertAnnotations(newIndex, [Lookup(movedAnnotation.GetId())]);
+        return null;
     }
 
-    private void OnRemoteAnnotationMovedInSameParent(object? sender,
+    private Action? OnRemoteAnnotationMovedInSameParent(object? sender,
         Index newIndex,
         IWritableNode movedAnnotation,
         IWritableNode parent,
@@ -315,13 +380,14 @@ public class PartitionEventApplier
         var localParent = Lookup(parent.GetId());
         INode nodeToInsert = Lookup(movedAnnotation.GetId());
         localParent.InsertAnnotations(newIndex, [nodeToInsert]);
+        return null;
     }
 
     #endregion
 
     #region References
 
-    private void OnRemoteReferenceAdded(object? sender, IWritableNode parent, Reference reference, Index index,
+    private Action? OnRemoteReferenceAdded(object? sender, IWritableNode parent, Reference reference, Index index,
         IReferenceTarget newTarget)
     {
         var localParent = Lookup(parent.GetId());
@@ -329,6 +395,7 @@ public class PartitionEventApplier
         var newValue = InsertReference(localParent, reference, index, target);
 
         localParent.Set(reference, newValue);
+        return null;
     }
 
     private object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
@@ -354,7 +421,7 @@ public class PartitionEventApplier
         return newValue;
     }
 
-    private void OnRemoteReferenceDeleted(object? sender, IWritableNode parent, Reference reference, Index index,
+    private Action? OnRemoteReferenceDeleted(object? sender, IWritableNode parent, Reference reference, Index index,
         IReferenceTarget deletedTarget)
     {
         var localParent = Lookup(parent.GetId());
@@ -372,9 +439,10 @@ public class PartitionEventApplier
         }
 
         localParent.Set(reference, newValue);
+        return null;
     }
 
-    private void OnRemoteReferenceChanged(object? sender, IWritableNode parent, Reference reference, Index index,
+    private Action? OnRemoteReferenceChanged(object? sender, IWritableNode parent, Reference reference, Index index,
         IReferenceTarget newTarget, IReferenceTarget replacedTarget)
     {
         var localParent = Lookup(parent.GetId());
@@ -393,6 +461,7 @@ public class PartitionEventApplier
         }
 
         localParent.Set(reference, newValue);
+        return null;
     }
 
     #endregion

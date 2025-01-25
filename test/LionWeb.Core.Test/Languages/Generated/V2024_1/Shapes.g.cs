@@ -1304,14 +1304,17 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	public Geometry(string id) : base(id)
-	{
-	}
+    {
+        _eventHandler = new PartitionEventHandler(this);
+        _commander = new CallSensitivePartitionCommander(_eventHandler);
+    }
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
-	private readonly PartitionEventHandler _eventHandler = new();
-	public IPartitionListener Listener => _eventHandler;
-	public IPartitionCommander Commander => _eventHandler;
+	private readonly PartitionEventHandler _eventHandler;
+    private readonly IPartitionCommander _commander;
+    public IPartitionListener Listener => _eventHandler;
+	public IPartitionCommander Commander => _commander;
 
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
@@ -2083,12 +2086,13 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	public ReferenceGeometry(string id) : base(id)
-	{
-	}
+    {
+        _eventHandler = new PartitionEventHandler(this);
+    }
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
-	private readonly PartitionEventHandler _eventHandler = new();
+	private readonly PartitionEventHandler _eventHandler;
 	public IPartitionListener Listener => _eventHandler;
 	public IPartitionCommander Commander => _eventHandler;
 

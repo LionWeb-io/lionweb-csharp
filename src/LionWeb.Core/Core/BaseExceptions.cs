@@ -55,6 +55,15 @@ public abstract class LionWebExceptionBase : ArgumentException
 /// <param name="id">Invalid id.</param>
 public class InvalidIdException(NodeId? id) : LionWebExceptionBase($"Invalid node id: {id}", "id");
 
+
+/// <summary>
+/// Both <paramref name="a"/> and <paramref name="b"/> have the same node id.
+/// </summary>
+/// <param name="a">Node with same node id as <paramref name="b"/>.</param>
+/// <param name="b">Node with same node id as <paramref name="a"/>.</param>
+public class DuplicateNodeIdException(IReadableNode a, IReadableNode b)
+    : LionWebExceptionBase($"Duplicate node id '{a.GetId()}': {a}, {b}", "id");
+
 /// <summary>
 /// Trying to set a <see cref="Feature"/> to an unsupported value.
 /// </summary>
