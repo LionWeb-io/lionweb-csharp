@@ -24,6 +24,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Fixed
 ### Changed
 * Added explicit LionWebVersions parameter to DynamicIKeyed.
+* Separated `Io.Lionweb.Mps.Specific.ISpecificLanguage` into its own project.
 ### Removed
 ### Deprecated
 ### Security
