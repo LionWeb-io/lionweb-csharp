@@ -78,6 +78,15 @@ public static class EqualityExtensions
         _fieldComparer.GetHashCode(obj);
 }
 
+public class NodeIdComparer : IEqualityComparer<IReadableNode>
+{
+    public bool Equals(IReadableNode? x, IReadableNode? y) =>
+        x?.GetId() == y?.GetId();
+
+    public int GetHashCode(IReadableNode obj) =>
+        obj.GetId().GetHashCode();
+}
+
 /// <summary>
 /// Compares <see cref="Language">Languages</see> by their <see cref="IKeyed.Key"/> and <see cref="Language.Version"/>.
 /// </summary>

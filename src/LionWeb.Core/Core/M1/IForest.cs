@@ -18,6 +18,7 @@
 namespace LionWeb.Core.M1;
 
 using Event.Forest;
+using Utilities;
 
 public interface IForest
 {
@@ -33,11 +34,12 @@ public interface IForest
 
 public class Forest : IForest
 {
-    private readonly HashSet<IPartitionInstance> _partitions = [];
+    private readonly HashSet<IPartitionInstance> _partitions;
     private readonly ForestEventHandler _eventHandler;
 
     public Forest()
     {
+        _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer());
         _eventHandler = new ForestEventHandler(this);
     }
 
