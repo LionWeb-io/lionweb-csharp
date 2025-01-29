@@ -32,7 +32,7 @@ public interface IForestListener
 
     /// <inheritdoc cref="IForestListener.PartitionDeleted"/>
     /// <param name="DeletedPartition">The deleted partition.</param>
-    record PartitionDeletedArgs(IReadableNode DeletedPartition, EventId EventId);
+    record PartitionDeletedArgs(IPartitionInstance DeletedPartition, EventId EventId);
 
     /// A partition has been deleted from this forest.
     /// <seealso cref="IForestCommander.DeletePartition"/>
