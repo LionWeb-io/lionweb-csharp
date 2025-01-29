@@ -30,6 +30,8 @@ using Utilities;
 /// <typeparam name="T">Type of nodes of the represented <see cref="Feature"/>.</typeparam>
 public abstract class PartitionEventBase<T> where T : IReadableNode
 {
+    protected readonly IPartitionInstance? newPartition;
+
     /// <see cref="IPartitionCommander"/> to use for our events, if any.
     protected readonly IPartitionCommander? PartitionCommander;
 
@@ -40,7 +42,8 @@ public abstract class PartitionEventBase<T> where T : IReadableNode
     protected PartitionEventBase(NodeBase newParent)
     {
         NewParent = newParent;
-        PartitionCommander = newParent.GetPartitionCommander();
+        newPartition = newParent.GetPartition();
+        PartitionCommander = newPartition?.Commander;
     }
 
     /// Logic to execute <i>before</i> any changes to the underlying nodes.
@@ -87,14 +90,29 @@ public abstract class PartitionContainmentEventBase<T> : PartitionEventBase<T> w
             ? M2Extensions.AsNodes<INode>(oldParent.Get(oldContainment)).ToList().IndexOf(value)
             : 0;
 
-        return new OldContainmentInfo(oldParent, oldContainment, oldIndex);
+        var oldPartition = value.GetPartition();
+
+        return new OldContainmentInfo(oldParent, oldContainment, oldIndex, oldPartition);
     }
 
     /// Context of a node before it has been removed from its previous <paramref name="Parent"/>.
     /// <param name="Parent"></param>
     /// <param name="Containment"></param>
     /// <param name="Index"></param>
-    protected record OldContainmentInfo(INode Parent, Containment Containment, Index Index);
+    protected record OldContainmentInfo(
+        INode Parent,
+        Containment Containment,
+        Index Index,
+        IPartitionInstance? Partition);
+
+    protected void RaiseOldDeletionEvent(OldContainmentInfo old, EventId eventId, IWritableNode moved)
+    {
+        if (old.Partition != null && old.Partition != newPartition)
+        {
+            old.Partition.Commander
+                ?.DeleteChild(moved, old.Parent, old.Containment, old.Index, eventId);
+        }
+    }
 }
 
 /// Encapsulates event-related logic and data for <i>multiple</i> <see cref="Containment"/>s.
@@ -169,10 +187,13 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
                                 added.Element,
                                 Containment,
                                 added.RightIndex
-                                );
+                            );
                             break;
 
                         case { } old when old.Parent != NewParent:
+                            var eventId = PartitionCommander.CreateEventId();
+                            RaiseOldDeletionEvent(old, eventId, added.Element);
+
                             PartitionCommander.MoveChildFromOtherContainment(
                                 NewParent,
                                 Containment,
@@ -180,7 +201,8 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
                                 added.Element,
                                 old.Parent,
                                 old.Containment,
-                                old.Index
+                                old.Index,
+                                eventId
                             );
                             break;
 
@@ -209,7 +231,7 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
                         NewParent,
                         Containment,
                         moved.LeftIndex
-                        );
+                    );
                     break;
                 case IListComparer<T>.Deleted deleted:
                     PartitionCommander.DeleteChild(
@@ -217,7 +239,7 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
                         NewParent,
                         Containment,
                         deleted.LeftIndex
-                        );
+                    );
                     break;
             }
         }
@@ -272,6 +294,9 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
                     break;
 
                 case not null when old.Parent != NewParent:
+                    var eventId = PartitionCommander.CreateEventId();
+                    RaiseOldDeletionEvent(old, eventId, added);
+                    
                     PartitionCommander.MoveChildFromOtherContainment(
                         NewParent,
                         Containment,
@@ -279,7 +304,8 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
                         added,
                         old.Parent,
                         old.Containment,
-                        old.Index
+                        old.Index,
+                        eventId
                     );
                     break;
 
@@ -369,7 +395,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
         switch (_oldValue, _newValue, _oldContainmentInfo)
         {
             case (null, null, _):
-                // fall-through
+            // fall-through
             case (not null, not null, _) when Equals(_oldValue, _newValue):
                 // no-op
                 break;
@@ -380,7 +406,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                     NewParent,
                     Containment,
                     0
-                    );
+                );
                 break;
 
             case (null, not null, null):
@@ -389,7 +415,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                     _newValue,
                     Containment,
                     0
-                    );
+                );
                 break;
 
             case (not null, not null, null):
@@ -399,7 +425,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                     NewParent,
                     Containment,
                     0
-                    );
+                );
                 break;
 
             case (null, not null, not null)
@@ -411,7 +437,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                     NewParent,
                     _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index
-                    );
+                );
                 break;
 
             case (not null, not null, not null)
@@ -421,7 +447,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                     NewParent,
                     Containment,
                     0
-                    );
+                );
                 PartitionCommander.MoveChildFromOtherContainmentInSameParent(
                     Containment,
                     0,
@@ -429,7 +455,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                     NewParent,
                     _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index
-                    );
+                );
                 break;
 
             case (not null, not null, not null)
@@ -439,7 +465,7 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                     NewParent,
                     Containment,
                     0
-                    );
+                );
                 PartitionCommander.MoveChildFromOtherContainment(
                     NewParent,
                     Containment,
@@ -448,11 +474,13 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                     _oldContainmentInfo.Parent,
                     _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index
-                    );
+                );
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent != NewParent:
+                var eventId = PartitionCommander.CreateEventId();
+                RaiseOldDeletionEvent(_oldContainmentInfo, eventId, _newValue);
                 PartitionCommander.MoveChildFromOtherContainment(
                     NewParent,
                     Containment,
@@ -460,8 +488,9 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
                     _newValue,
                     _oldContainmentInfo.Parent,
                     _oldContainmentInfo.Containment,
-                    _oldContainmentInfo.Index
-                    );
+                    _oldContainmentInfo.Index,
+                    eventId
+                );
                 break;
 
             default:
@@ -576,15 +605,28 @@ public abstract class PartitionAnnotationEventBase : PartitionEventBase<INode>
                 continue;
 
             var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(newValue);
+            
+            var oldPartition = newValue.GetPartition();
 
-            NewValues[newValue] = new(oldParent, oldIndex);
+            NewValues[newValue] = new(oldParent, oldIndex, oldPartition);
         }
     }
 
     /// Context of an annotation instance before it has been removed from its previous <paramref name="Parent"/>.
     /// <param name="Parent"></param>
     /// <param name="Index"></param>
-    protected record OldAnnotationInfo(INode Parent, Index Index);
+    protected record OldAnnotationInfo(INode Parent, Index Index, IPartitionInstance? Partition);
+    
+    
+    protected void RaiseOldDeletionEvent(OldAnnotationInfo old, EventId eventId, IWritableNode moved)
+    {
+        if (old.Partition != null && old.Partition != newPartition)
+        {
+            old.Partition.Commander
+                ?.DeleteAnnotation(moved, old.Parent, old.Index, eventId);
+        }
+    }
+
 }
 
 /// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
@@ -626,12 +668,15 @@ public class SetAnnotationEvent : PartitionAnnotationEventBase
                             break;
 
                         case { } old when old.Parent != NewParent:
+                            var eventId = PartitionCommander.CreateEventId();
+                            RaiseOldDeletionEvent(old, eventId, added.Element);
                             PartitionCommander.MoveAnnotationFromOtherParent(
                                 NewParent,
                                 added.RightIndex,
                                 added.Element,
                                 old.Parent,
-                                old.Index
+                                old.Index,
+                                eventId
                             );
                             break;
 
@@ -648,7 +693,7 @@ public class SetAnnotationEvent : PartitionAnnotationEventBase
                         moved.LeftElement,
                         NewParent,
                         moved.LeftIndex
-                        );
+                    );
                     break;
 
                 case IListComparer<INode>.Deleted deleted:
@@ -701,12 +746,15 @@ public class AddMultipleAnnotationsEvent : PartitionAnnotationEventBase
                     break;
 
                 case not null when old.Parent != NewParent:
+                    var eventId = PartitionCommander.CreateEventId();
+                    RaiseOldDeletionEvent(old, eventId, added);
                     PartitionCommander.MoveAnnotationFromOtherParent(
                         NewParent,
                         _newIndex,
                         added,
                         old.Parent,
-                        old.Index
+                        old.Index,
+                        eventId
                     );
                     break;
 

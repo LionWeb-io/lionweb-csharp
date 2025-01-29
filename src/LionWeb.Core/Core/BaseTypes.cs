@@ -475,21 +475,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// Tries to retrieve the <see cref="IPartitionInstance.Commander"/> from this node's <see cref="Concept.Partition"/>.
     /// </summary>
     /// <returns>This node's <see cref="IPartitionCommander"/>, if available.</returns>
-    protected internal virtual IPartitionCommander? GetPartitionCommander()
-    {
-        INode current = this;
-        INode? root = null;
-        while (current != null)
-        {
-            root = current;
-            current = current.GetParent();
-        }
-
-        if (root == null)
-            return null;
-
-        return (root as IPartitionInstance)?.Commander;
-    }
+    protected internal virtual IPartitionCommander? GetPartitionCommander() =>
+        this.GetPartition()?.Commander;
 
     #region Helpers
 

@@ -18,10 +18,8 @@
 namespace LionWeb.Core.M1.Event.Partition;
 
 using M3;
-using SemanticPropertyValue = object;
-using TargetNode = IReadableNode;
 
-public class NoOpPartitionCommander : IPartitionCommander
+public class NoOpPartitionCommander : EventHandlerBase, IPartitionCommander
 {
     public void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier,
         EventId? eventId = null) { }

@@ -211,4 +211,6 @@ public class CallSensitivePartitionCommander : IPartitionCommander, IOverridable
         TargetDelegate.ChangeReferenceTarget(parent, reference, index, newTarget, resolveInfo, oldTarget, eventId);
 
     public bool CanRaiseChangeReferenceTarget => TargetDelegate.CanRaiseChangeReferenceTarget;
+
+    public EventId CreateEventId() => TargetDelegate.CreateEventId();
 }

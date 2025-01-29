@@ -119,6 +119,9 @@ public class PartitionEventApplier
     protected virtual INode Lookup(NodeId remoteNodeId) =>
         (INode)_nodeById[remoteNodeId];
 
+    protected virtual INode? LookupOpt(NodeId remoteNodeId) =>
+        (INode?)_nodeById.GetValueOrDefault(remoteNodeId);
+
     protected virtual INode Clone(INode remoteNode) =>
         new SameIdCloner(remoteNode.Descendants(true, true)).Clone()[remoteNode];
 
@@ -293,7 +296,8 @@ public class PartitionEventApplier
         Index oldIndex)
     {
         var localNewParent = Lookup(newParent.GetId());
-        var newValue = InsertContainment(localNewParent, newContainment, newIndex, Lookup(movedChild.GetId()));
+        var nodeToInsert = LookupOpt(movedChild.GetId()) ?? Clone((INode)movedChild);
+        var newValue = InsertContainment(localNewParent, newContainment, newIndex, nodeToInsert);
 
         localNewParent.Set(newContainment, newValue);
         return null;
@@ -367,7 +371,8 @@ public class PartitionEventApplier
         Index oldIndex)
     {
         var localNewParent = Lookup(newParent.GetId());
-        localNewParent.InsertAnnotations(newIndex, [Lookup(movedAnnotation.GetId())]);
+        var moved = LookupOpt(movedAnnotation.GetId()) ?? Clone((INode)movedAnnotation);
+        localNewParent.InsertAnnotations(newIndex, [moved]);
         return null;
     }
 

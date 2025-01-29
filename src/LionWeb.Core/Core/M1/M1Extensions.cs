@@ -336,6 +336,9 @@ public static class M1Extensions
             return null;
         }
     }
+    
+    public static IPartitionInstance? GetPartition(this IReadableNode self) =>
+     self as IPartitionInstance ?? self.GetParent()?.GetPartition();
 
     private static List<INode> GetContainmentNodes(INode self)
     {

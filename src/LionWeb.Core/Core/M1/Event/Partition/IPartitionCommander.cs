@@ -303,4 +303,6 @@ public interface IPartitionCommander
     bool CanRaiseChangeReferenceTarget { get; }
 
     #endregion
+
+    public EventId CreateEventId();
 }
