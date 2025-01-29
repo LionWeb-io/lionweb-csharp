@@ -19,7 +19,6 @@ namespace LionWeb.Core.M1.Event.Partition;
 
 using M3;
 using System.Collections;
-using Utilities;
 
 public class PartitionEventApplier : EventApplierBase
 {
@@ -109,19 +108,6 @@ public class PartitionEventApplier : EventApplierBase
 
         localListener.AnnotationAdded -= OnLocalAnnotationAdded;
         localListener.AnnotationDeleted -= OnLocalAnnotationDeleted;
-    }
-
-    protected virtual INode Clone(INode remoteNode) =>
-        new SameIdCloner(remoteNode.Descendants(true, true)).Clone()[remoteNode];
-
-    protected class SameIdCloner : Cloner
-    {
-        public SameIdCloner(IEnumerable<INode> inputNodes) : base(inputNodes)
-        {
-        }
-
-        protected override string GetNewId(INode remoteNode) =>
-            remoteNode.GetId();
     }
 
     private void PauseCommands(Func<Action?> action)

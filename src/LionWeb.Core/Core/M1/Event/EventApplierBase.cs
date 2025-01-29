@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.M1.Event;
 
+using Utilities;
+
 public abstract class EventApplierBase : IDisposable
 {
     protected readonly Dictionary<NodeId, IReadableNode> _nodeById;
@@ -51,6 +53,19 @@ public abstract class EventApplierBase : IDisposable
 
     protected virtual INode? LookupOpt(NodeId remoteNodeId) =>
         (INode?)_nodeById.GetValueOrDefault(remoteNodeId);
+
+    protected virtual INode Clone(INode remoteNode) =>
+        new SameIdCloner(remoteNode.Descendants(true, true)).Clone()[remoteNode];
+
+    protected class SameIdCloner : Cloner
+    {
+        public SameIdCloner(IEnumerable<INode> inputNodes) : base(inputNodes)
+        {
+        }
+
+        protected override string GetNewId(INode remoteNode) =>
+            remoteNode.GetId();
+    }
 
     
 }

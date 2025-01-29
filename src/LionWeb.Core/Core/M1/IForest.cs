@@ -67,8 +67,8 @@ public class Forest : IForest
     }
 
     /// <inheritdoc />
-    public IForestListener? Listener => _eventHandler;
+    public IForestListener Listener => _eventHandler;
 
     /// <inheritdoc />
-    public IForestCommander? Commander => _eventHandler;
+    public IForestCommander Commander => _eventHandler;
 }

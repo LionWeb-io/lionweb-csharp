@@ -23,8 +23,10 @@ public class ForestEventApplier : EventApplierBase
 {
     private readonly IForest _localForest;
     private readonly Dictionary<NodeId, PartitionEventApplier> _localPartitions = [];
-    
-    public ForestEventApplier(IForest localForest, Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(sharedNodeMap)
+    private readonly List<IForestListener> _listeners = [];
+
+    public ForestEventApplier(IForest localForest, Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) :
+        base(sharedNodeMap)
     {
         _localForest = localForest;
         Init();
@@ -36,7 +38,7 @@ public class ForestEventApplier : EventApplierBase
         {
             RegisterPartition(partition);
         }
-        
+
         var forestListener = _localForest.Listener;
         if (forestListener == null)
             return;
@@ -45,13 +47,27 @@ public class ForestEventApplier : EventApplierBase
         forestListener.PartitionDeleted += OnLocalPartitionDeleted;
     }
 
+    public void Subscribe(IForestListener listener)
+    {
+        _listeners.Add(listener);
+
+        listener.NewPartition += OnRemoteNewPartition;
+        listener.PartitionDeleted += OnRemotePartitionDeleted;
+    }
+
     public override void Dispose()
     {
-        foreach (var partitionEventApplier in _localPartitions.Values)
+        foreach (var listener in _listeners)
         {
-            partitionEventApplier.Dispose();
+            listener.NewPartition -= OnRemoteNewPartition;
+            listener.PartitionDeleted -= OnRemotePartitionDeleted;
         }
         
+        foreach (var localPartition in _localPartitions.Values)
+        {
+            localPartition.Dispose();
+        }
+
         var forestListener = _localForest.Listener;
         if (forestListener == null)
             return;
@@ -59,20 +75,53 @@ public class ForestEventApplier : EventApplierBase
         forestListener.NewPartition -= OnLocalNewPartition;
         forestListener.PartitionDeleted -= OnLocalPartitionDeleted;
     }
-    
-    private void RegisterPartition(IPartitionInstance partition) =>
-        _localPartitions[partition.GetId()] = new PartitionEventApplier(partition, _nodeById);
+
+    private void RegisterPartition(IPartitionInstance partition)
+    {
+        PartitionEventApplier applier = new PartitionEventApplier(partition, _nodeById);
+        if (!_localPartitions.TryAdd(partition.GetId(), applier))
+            throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
+    }
+
+    private PartitionEventApplier LookupPartition(IPartitionInstance partition) => _localPartitions[partition.GetId()];
 
     private void UnregisterPartition(IPartitionInstance partition)
     {
-        var partitionEventApplier = _localPartitions[partition.GetId()];
+        var partitionEventApplier = LookupPartition(partition);
         partitionEventApplier.Dispose();
         _localPartitions.Remove(partition.GetId());
     }
+
+    #region Local
 
     private void OnLocalNewPartition(object? sender, IForestListener.NewPartitionArgs args) =>
         RegisterPartition(args.NewPartition);
 
     private void OnLocalPartitionDeleted(object? sender, IForestListener.PartitionDeletedArgs args) =>
         UnregisterPartition(args.DeletedPartition);
+
+    #endregion
+
+    #region Remote
+
+    private void OnRemoteNewPartition(object? sender, IForestListener.NewPartitionArgs args)
+    {
+        var newPartition = (INode)args.NewPartition;
+
+        var clone = (IPartitionInstance)Clone(newPartition);
+
+        _localForest.AddPartitions([clone]);
+
+        var remoteListener = args.NewPartition.Listener;
+        if (remoteListener != null)
+            LookupPartition(clone).Subscribe(remoteListener);
+    }
+
+    private void OnRemotePartitionDeleted(object? sender, IForestListener.PartitionDeletedArgs args)
+    {
+        var localPartition = (IPartitionInstance)Lookup(args.DeletedPartition.GetId());
+        _localForest.RemovePartitions([localPartition]);
+    }
+
+    #endregion
 }
