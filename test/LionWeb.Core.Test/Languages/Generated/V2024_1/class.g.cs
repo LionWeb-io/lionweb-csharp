@@ -189,7 +189,9 @@ public partial class @out : @struct
         public @out SetDefault(@if value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.out_default);
+		@if? oldValue = _default;
 		_default = value;
+		RaisePropertyEvent(ClassLanguage.Instance.out_default, oldValue, value);
 		return this;
 	}
 
@@ -265,7 +267,9 @@ public partial class @record : AnnotationInstanceBase, @interface
         public @record SetString(@enum value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
+		@enum? oldValue = _string;
 		_string = value;
+		RaisePropertyEvent(ClassLanguage.Instance.interface_string, oldValue, value);
 		return this;
 	}
 
@@ -282,9 +286,12 @@ public partial class @record : AnnotationInstanceBase, @interface
         public @record SetDouble(@interface value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.record_double);
+		SingleContainmentEvent<@interface> evt = new(ClassLanguage.Instance.record_double, this, value, _double);
+		evt.CollectOldData();
 		SetParentNull(_double);
 		AttachChild(value);
 		_double = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -400,7 +407,9 @@ public partial class @struct : ConceptInstanceBase, @interface
         public @struct SetString(@enum value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
+		@enum? oldValue = _string;
 		_string = value;
+		RaisePropertyEvent(ClassLanguage.Instance.interface_string, oldValue, value);
 		return this;
 	}
 
@@ -417,7 +426,9 @@ public partial class @struct : ConceptInstanceBase, @interface
         public @struct SetRef(@record value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
+		@record? oldValue = _ref;
 		_ref = value;
+		RaiseSingleReferenceEvent(ClassLanguage.Instance.struct_ref, oldValue, value);
 		return this;
 	}
 
