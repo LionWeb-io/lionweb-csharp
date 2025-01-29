@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1;
+namespace LionWeb.Core.M1.Event.Forest;
 
 /// Provides events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
 /// <seealso cref="IForestCommander"/>
@@ -37,32 +37,4 @@ public interface IForestListener
     /// A partition has been deleted from this forest.
     /// <seealso cref="IForestCommander.DeletePartition"/>
     event EventHandler<PartitionDeletedArgs> PartitionDeleted;
-}
-
-/// Raises events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-/// <seealso cref="IForestListener"/>
-/// <seealso cref="ForestEventHandler"/>
-public interface IForestCommander
-{
-    /// A new partition is being added to this forrest.  
-    /// <param name="newPartition">The newly added partition.</param>
-    /// <seealso cref="IForestListener.NewPartition"/>
-    void AddPartition(IPartitionInstance newPartition);
-
-    /// Whether anybody would receive the <see cref="AddPartition"/> event.
-    /// <value>
-    ///     <c>true</c> if someone would receive the <see cref="AddPartition"/> event; <c>false</c> otherwise.
-    /// </value>
-    bool CanRaiseAddPartition { get; }
-
-    /// A partition has been deleted from this forest.
-    /// <param name="deletedPartition">The deleted partition.</param>
-    /// <seealso cref="IForestListener.PartitionDeleted"/>
-    void DeletePartition(IPartitionInstance deletedPartition);
-
-    /// Whether anybody would receive the <see cref="DeletePartition"/> event.
-    /// <value>
-    ///     <c>true</c> if someone would receive the <see cref="DeletePartition"/> event; <c>false</c> otherwise.
-    /// </value>
-    bool CanRaiseDeletePartition { get; }
 }

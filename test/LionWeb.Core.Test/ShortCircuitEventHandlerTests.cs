@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test;
 
 using M1;
+using M1.Event;
 
 [TestClass]
 public class ShortCircuitEventHandlerTests
