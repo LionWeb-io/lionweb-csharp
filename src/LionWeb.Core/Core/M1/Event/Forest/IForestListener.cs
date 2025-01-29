@@ -24,7 +24,7 @@ public interface IForestListener
 {
     /// <inheritdoc cref="IForestListener.NewPartition"/>
     /// <param name="NewPartition">The newly added partition.</param>
-    record NewPartitionArgs(IPartitionInstance NewPartition);
+    record NewPartitionArgs(IPartitionInstance NewPartition, EventId EventId);
 
     /// A new partition has been added to this forest.
     /// <seealso cref="IForestCommander.AddPartition"/>
@@ -32,7 +32,7 @@ public interface IForestListener
 
     /// <inheritdoc cref="IForestListener.PartitionDeleted"/>
     /// <param name="DeletedPartition">The deleted partition.</param>
-    record PartitionDeletedArgs(IReadableNode DeletedPartition);
+    record PartitionDeletedArgs(IReadableNode DeletedPartition, EventId EventId);
 
     /// A partition has been deleted from this forest.
     /// <seealso cref="IForestCommander.DeletePartition"/>

@@ -32,7 +32,11 @@ public interface IPartitionListener
     /// <param name="Node"></param>
     /// <param name="NewClassifier"></param>
     /// <param name="OldClassifier"></param>
-    record ClassifierChangedArgs(IWritableNode Node, Classifier NewClassifier, Classifier OldClassifier);
+    record ClassifierChangedArgs(
+        IWritableNode Node,
+        Classifier NewClassifier,
+        Classifier OldClassifier,
+        EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.ChangeClassifier"/>
     event EventHandler<ClassifierChangedArgs> ClassifierChanged;
@@ -45,7 +49,7 @@ public interface IPartitionListener
     /// <param name="Node"></param>
     /// <param name="Property"></param>
     /// <param name="NewValue"></param>
-    record PropertyAddedArgs(IWritableNode Node, Property Property, SemanticPropertyValue NewValue);
+    record PropertyAddedArgs(IWritableNode Node, Property Property, SemanticPropertyValue NewValue, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.AddProperty"/>
     event EventHandler<PropertyAddedArgs> PropertyAdded;
@@ -54,7 +58,7 @@ public interface IPartitionListener
     /// <param name="Node"></param>
     /// <param name="Property"></param>
     /// <param name="OldValue"></param>
-    record PropertyDeletedArgs(IWritableNode Node, Property Property, SemanticPropertyValue OldValue);
+    record PropertyDeletedArgs(IWritableNode Node, Property Property, SemanticPropertyValue OldValue, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.DeleteProperty"/>
     event EventHandler<PropertyDeletedArgs> PropertyDeleted;
@@ -64,7 +68,12 @@ public interface IPartitionListener
     /// <param name="Property"></param>
     /// <param name="NewValue"></param>
     /// <param name="OldValue"></param>
-    record PropertyChangedArgs(IWritableNode Node, Property Property, SemanticPropertyValue NewValue, SemanticPropertyValue OldValue);
+    record PropertyChangedArgs(
+        IWritableNode Node,
+        Property Property,
+        SemanticPropertyValue NewValue,
+        SemanticPropertyValue OldValue,
+        EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.ChangeProperty"/>
     event EventHandler<PropertyChangedArgs> PropertyChanged;
@@ -78,7 +87,12 @@ public interface IPartitionListener
     /// <param name="NewChild"></param>
     /// <param name="Containment"></param>
     /// <param name="Index"></param>
-    record ChildAddedArgs(IWritableNode Parent, IWritableNode NewChild, Containment Containment, Index Index);
+    record ChildAddedArgs(
+        IWritableNode Parent,
+        IWritableNode NewChild,
+        Containment Containment,
+        Index Index,
+        EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.AddChild"/>
     event EventHandler<ChildAddedArgs> ChildAdded;
@@ -88,7 +102,12 @@ public interface IPartitionListener
     /// <param name="Parent"></param>
     /// <param name="Containment"></param>
     /// <param name="Index"></param>
-    record ChildDeletedArgs(IWritableNode DeletedChild, IWritableNode Parent, Containment Containment, Index Index);
+    record ChildDeletedArgs(
+        IWritableNode DeletedChild,
+        IWritableNode Parent,
+        Containment Containment,
+        Index Index,
+        EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.DeleteChild"/>
     event EventHandler<ChildDeletedArgs> ChildDeleted;
@@ -104,7 +123,8 @@ public interface IPartitionListener
         IWritableNode ReplacedChild,
         IWritableNode Parent,
         Containment Containment,
-        Index Index);
+        Index Index,
+        EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.ReplaceChild"/>
     event EventHandler<ChildReplacedArgs> ChildReplaced;
@@ -124,7 +144,8 @@ public interface IPartitionListener
         IWritableNode MovedChild,
         IWritableNode OldParent,
         Containment OldContainment,
-        Index OldIndex);
+        Index OldIndex,
+        EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.MoveChildFromOtherContainment"/>
     event EventHandler<ChildMovedFromOtherContainmentArgs> ChildMovedFromOtherContainment;
@@ -142,7 +163,8 @@ public interface IPartitionListener
         IWritableNode MovedChild,
         IWritableNode Parent,
         Containment OldContainment,
-        Index OldIndex);
+        Index OldIndex,
+        EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.CanRaiseMoveChildFromOtherContainmentInSameParent"/>
     event EventHandler<ChildMovedFromOtherContainmentInSameParentArgs> ChildMovedFromOtherContainmentInSameParent;
@@ -158,7 +180,8 @@ public interface IPartitionListener
         IWritableNode MovedChild,
         IWritableNode Parent,
         Containment Containment,
-        Index OldIndex);
+        Index OldIndex,
+        EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.MoveChildInSameContainment"/>
     event EventHandler<ChildMovedInSameContainmentArgs> ChildMovedInSameContainment;
@@ -171,7 +194,7 @@ public interface IPartitionListener
     /// <param name="Parent"></param>
     /// <param name="NewAnnotation"></param>
     /// <param name="Index"></param>
-    record AnnotationAddedArgs(IWritableNode Parent, IWritableNode NewAnnotation, Index Index);
+    record AnnotationAddedArgs(IWritableNode Parent, IWritableNode NewAnnotation, Index Index, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.AddAnnotation"/>
     event EventHandler<AnnotationAddedArgs> AnnotationAdded;
@@ -180,7 +203,7 @@ public interface IPartitionListener
     /// <param name="DeletedAnnotation"></param>
     /// <param name="Parent"></param>
     /// <param name="Index"></param>
-    record AnnotationDeletedArgs(IWritableNode DeletedAnnotation, IWritableNode Parent, Index Index);
+    record AnnotationDeletedArgs(IWritableNode DeletedAnnotation, IWritableNode Parent, Index Index, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.DeleteAnnotation"/>
     event EventHandler<AnnotationDeletedArgs> AnnotationDeleted;
@@ -194,7 +217,7 @@ public interface IPartitionListener
         IWritableNode NewAnnotation,
         IWritableNode ReplacedAnnotation,
         IWritableNode Parent,
-        Index Index);
+        Index Index, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.ReplaceAnnotation"/>
     event EventHandler<AnnotationReplacedArgs> AnnotationReplaced;
@@ -210,7 +233,7 @@ public interface IPartitionListener
         Index NewIndex,
         IWritableNode MovedAnnotation,
         IWritableNode OldParent,
-        Index OldIndex);
+        Index OldIndex, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.MoveAnnotationFromOtherParent"/>
     event EventHandler<AnnotationMovedFromOtherParentArgs> AnnotationMovedFromOtherParent;
@@ -224,7 +247,7 @@ public interface IPartitionListener
         Index NewIndex,
         IWritableNode MovedAnnotation,
         IWritableNode Parent,
-        Index OldIndex);
+        Index OldIndex, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.MoveAnnotationInSameParent"/>
     event EventHandler<AnnotationMovedInSameParentArgs> AnnotationMovedInSameParent;
@@ -238,7 +261,7 @@ public interface IPartitionListener
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
     /// <param name="NewTarget"></param>
-    record ReferenceAddedArgs(IWritableNode Parent, Reference Reference, Index Index, IReferenceTarget NewTarget);
+    record ReferenceAddedArgs(IWritableNode Parent, Reference Reference, Index Index, IReferenceTarget NewTarget, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.AddReference"/>
     event EventHandler<ReferenceAddedArgs> ReferenceAdded;
@@ -248,7 +271,7 @@ public interface IPartitionListener
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
     /// <param name="DeletedTarget"></param>
-    record ReferenceDeletedArgs(IWritableNode Parent, Reference Reference, Index Index, IReferenceTarget DeletedTarget);
+    record ReferenceDeletedArgs(IWritableNode Parent, Reference Reference, Index Index, IReferenceTarget DeletedTarget, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.DeleteReference"/>
     event EventHandler<ReferenceDeletedArgs> ReferenceDeleted;
@@ -264,7 +287,7 @@ public interface IPartitionListener
         Reference Reference,
         Index Index,
         IReferenceTarget NewTarget,
-        IReferenceTarget ReplacedTarget);
+        IReferenceTarget ReplacedTarget, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.ChangeReference"/>
     event EventHandler<ReferenceChangedArgs> ReferenceChanged;
@@ -284,7 +307,7 @@ public interface IPartitionListener
         IWritableNode OldParent,
         Reference OldReference,
         Index OldIndex,
-        IReferenceTarget Target);
+        IReferenceTarget Target, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.MoveEntryFromOtherReference"/>
     event EventHandler<EntryMovedFromOtherReferenceArgs> EntryMovedFromOtherReference;
@@ -302,7 +325,7 @@ public interface IPartitionListener
         Index NewIndex,
         Reference OldReference,
         Index OldIndex,
-        IReferenceTarget Target);
+        IReferenceTarget Target, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.MoveEntryFromOtherReferenceInSameParent"/>
     event EventHandler<EntryMovedFromOtherReferenceInSameParentArgs> EntryMovedFromOtherReferenceInSameParent;
@@ -318,7 +341,7 @@ public interface IPartitionListener
         Reference Reference,
         Index OldIndex,
         Index NewIndex,
-        IReferenceTarget Target);
+        IReferenceTarget Target, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.MoveEntryInSameReference"/>
     event EventHandler<EntryMovedInSameReferenceArgs> EntryMovedInSameReference;
@@ -334,7 +357,7 @@ public interface IPartitionListener
         Reference Reference,
         Index Index,
         ResolveInfo NewResolveInfo,
-        TargetNode Target);
+        TargetNode Target, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.AddReferenceResolveInfo"/>
     event EventHandler<ReferenceResolveInfoAddedArgs> ReferenceResolveInfoAdded;
@@ -350,7 +373,7 @@ public interface IPartitionListener
         Reference Reference,
         Index Index,
         TargetNode Target,
-        ResolveInfo DeletedResolveInfo);
+        ResolveInfo DeletedResolveInfo, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.DeleteReferenceResolveInfo"/>
     event EventHandler<ReferenceResolveInfoDeletedArgs> ReferenceResolveInfoDeleted;
@@ -368,7 +391,7 @@ public interface IPartitionListener
         Index Index,
         ResolveInfo NewResolveInfo,
         TargetNode? Target,
-        ResolveInfo ReplacedResolveInfo);
+        ResolveInfo ReplacedResolveInfo, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.ChangeReferenceResolveInfo"/>
     event EventHandler<ReferenceResolveInfoChangedArgs> ReferenceResolveInfoChanged;
@@ -384,7 +407,7 @@ public interface IPartitionListener
         Reference Reference,
         Index Index,
         TargetNode NewTarget,
-        ResolveInfo ResolveInfo);
+        ResolveInfo ResolveInfo, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.AddReferenceTarget"/>
     event EventHandler<ReferenceTargetAddedArgs> ReferenceTargetAdded;
@@ -400,7 +423,7 @@ public interface IPartitionListener
         Reference Reference,
         Index Index,
         ResolveInfo ResolveInfo,
-        TargetNode DeletedTarget);
+        TargetNode DeletedTarget, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.DeleteReferenceTarget"/>
     event EventHandler<ReferenceTargetDeletedArgs> ReferenceTargetDeleted;
@@ -418,7 +441,7 @@ public interface IPartitionListener
         Index Index,
         TargetNode NewTarget,
         ResolveInfo? ResolveInfo,
-        TargetNode OldTarget);
+        TargetNode OldTarget, EventId EventId) : EventArgsBase(EventId);
 
     /// <seealso cref="IPartitionCommander.ChangeReferenceTarget"/>
     event EventHandler<ReferenceTargetChangedArgs> ReferenceTargetChanged;

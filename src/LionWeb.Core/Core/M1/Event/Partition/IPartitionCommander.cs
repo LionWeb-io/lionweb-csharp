@@ -27,7 +27,7 @@ public interface IPartitionCommander
     #region Nodes
 
     /// <seealso cref="IPartitionListener.ClassifierChanged"/>
-    void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier);
+    void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="ChangeClassifier"/> event.
     /// <value>
@@ -40,7 +40,7 @@ public interface IPartitionCommander
     #region Properties
 
     /// <seealso cref="IPartitionListener.PropertyAdded"/>
-    void AddProperty(IWritableNode node, Property property, Object newValue);
+    void AddProperty(IWritableNode node, Property property, Object newValue, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="AddProperty"/> event.
     /// <value>
@@ -49,7 +49,7 @@ public interface IPartitionCommander
     bool CanRaiseAddProperty { get; }
 
     /// <seealso cref="IPartitionListener.PropertyDeleted"/>
-    void DeleteProperty(IWritableNode node, Property property, Object oldValue);
+    void DeleteProperty(IWritableNode node, Property property, Object oldValue, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="DeleteProperty"/> event.
     /// <value>
@@ -58,7 +58,7 @@ public interface IPartitionCommander
     bool CanRaiseDeleteProperty { get; }
 
     /// <seealso cref="IPartitionListener.PropertyChanged"/>
-    void ChangeProperty(IWritableNode node, Property property, Object newValue, Object oldValue);
+    void ChangeProperty(IWritableNode node, Property property, Object newValue, Object oldValue, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="ChangeProperty"/> event.
     /// <value>
@@ -71,7 +71,7 @@ public interface IPartitionCommander
     #region Children
 
     /// <seealso cref="IPartitionListener.ChildAdded"/>
-    void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index);
+    void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="AddChild"/> event.
     /// <value>
@@ -80,7 +80,7 @@ public interface IPartitionCommander
     bool CanRaiseAddChild { get; }
 
     /// <seealso cref="IPartitionListener.ChildDeleted"/>
-    void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index);
+    void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="DeleteChild"/> event.
     /// <value>
@@ -90,7 +90,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ChildReplaced"/>
     void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
-        Containment containment, Index index);
+        Containment containment, Index index, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="ReplaceChild"/> event.
     /// <value>
@@ -100,7 +100,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ChildMovedFromOtherContainment"/>
     void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
-        IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex);
+        IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveChildFromOtherContainment"/> event.
     /// <value>
@@ -110,7 +110,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ChildMovedFromOtherContainmentInSameParent"/>
     void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex, IWritableNode movedChild,
-        IWritableNode parent, Containment oldContainment, Index oldIndex);
+        IWritableNode parent, Containment oldContainment, Index oldIndex, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveChildFromOtherContainmentInSameParent"/> event.
     /// <value>
@@ -120,7 +120,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ChildMovedInSameContainment"/>
     void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
-        Containment containment, Index oldIndex);
+        Containment containment, Index oldIndex, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveChildInSameContainment"/> event.
     /// <value>
@@ -133,7 +133,7 @@ public interface IPartitionCommander
     #region Annotations
 
     /// <seealso cref="IPartitionListener.AnnotationAdded"/>
-    void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index);
+    void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="AddAnnotation"/> event.
     /// <value>
@@ -142,7 +142,7 @@ public interface IPartitionCommander
     bool CanRaiseAddAnnotation { get; }
 
     /// <seealso cref="IPartitionListener.AnnotationDeleted"/>
-    void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index);
+    void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="DeleteAnnotation"/> event.
     /// <value>
@@ -152,7 +152,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.AnnotationReplaced"/>
     void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
-        Index index);
+        Index index, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="ReplaceAnnotation"/> event.
     /// <value>
@@ -162,7 +162,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.AnnotationMovedFromOtherParent"/>
     void MoveAnnotationFromOtherParent(IWritableNode newParent, Index newIndex, IWritableNode movedAnnotation,
-        IWritableNode oldParent, Index oldIndex);
+        IWritableNode oldParent, Index oldIndex, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveAnnotationFromOtherParent"/> event.
     /// <value>
@@ -172,7 +172,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.AnnotationMovedInSameParent"/>
     void MoveAnnotationInSameParent(Index newIndex, IWritableNode movedAnnotation, IWritableNode parent,
-        Index oldIndex);
+        Index oldIndex, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveAnnotationInSameParent"/> event.
     /// <value>
@@ -185,7 +185,7 @@ public interface IPartitionCommander
     #region References
 
     /// <seealso cref="IPartitionListener.ReferenceAdded"/>
-    void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget);
+    void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="AddReference"/> event.
     /// <value>
@@ -194,7 +194,7 @@ public interface IPartitionCommander
     bool CanRaiseAddReference { get; }
 
     /// <seealso cref="IPartitionListener.ReferenceDeleted"/>
-    void DeleteReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget deletedTarget);
+    void DeleteReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget deletedTarget, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="DeleteReference"/> event.
     /// <value>
@@ -204,7 +204,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ReferenceChanged"/>
     void ChangeReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
-        IReferenceTarget replacedTarget);
+        IReferenceTarget replacedTarget, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="ChangeReference"/> event.
     /// <value>
@@ -214,7 +214,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.EntryMovedFromOtherReference"/>
     void MoveEntryFromOtherReference(IWritableNode newParent, Reference newReference, Index newIndex,
-        IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target);
+        IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveEntryFromOtherReference"/> event.
     /// <value>
@@ -224,7 +224,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.EntryMovedFromOtherReferenceInSameParent"/>
     void MoveEntryFromOtherReferenceInSameParent(IWritableNode parent, Reference newReference, Index newIndex,
-        Reference oldReference, Index oldIndex, IReferenceTarget target);
+        Reference oldReference, Index oldIndex, IReferenceTarget target, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveEntryFromOtherReferenceInSameParent"/> event.
     /// <value>
@@ -234,7 +234,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.EntryMovedInSameReference"/>
     void MoveEntryInSameReference(IWritableNode parent, Reference reference, Index oldIndex, Index newIndex,
-        IReferenceTarget target);
+        IReferenceTarget target, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveEntryInSameReference"/> event.
     /// <value>
@@ -244,7 +244,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ReferenceResolveInfoAdded"/>
     void AddReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, ResolveInfo newResolveInfo,
-        IReadableNode target);
+        IReadableNode target, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="AddReferenceResolveInfo"/> event.
     /// <value>
@@ -254,7 +254,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ReferenceResolveInfoDeleted"/>
     void DeleteReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, IReadableNode target,
-        ResolveInfo deletedResolveInfo);
+        ResolveInfo deletedResolveInfo, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="DeleteReferenceResolveInfo"/> event.
     /// <value>
@@ -264,7 +264,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ReferenceResolveInfoChanged"/>
     void ChangeReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, ResolveInfo newResolveInfo,
-        IReadableNode? target, ResolveInfo replacedResolveInfo);
+        IReadableNode? target, ResolveInfo replacedResolveInfo, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="ChangeReferenceResolveInfo"/> event.
     /// <value>
@@ -274,7 +274,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ReferenceTargetAdded"/>
     void AddReferenceTarget(IWritableNode parent, Reference reference, Index index, IReadableNode newTarget,
-        ResolveInfo resolveInfo);
+        ResolveInfo resolveInfo, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="AddReferenceTarget"/> event.
     /// <value>
@@ -284,7 +284,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ReferenceTargetDeleted"/>
     void DeleteReferenceTarget(IWritableNode parent, Reference reference, Index index, ResolveInfo resolveInfo,
-        IReadableNode deletedTarget);
+        IReadableNode deletedTarget, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="DeleteReferenceTarget"/> event.
     /// <value>
@@ -294,7 +294,7 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionListener.ReferenceTargetChanged"/>
     void ChangeReferenceTarget(IWritableNode parent, Reference reference, Index index, IReadableNode newTarget,
-        ResolveInfo? resolveInfo, IReadableNode oldTarget);
+        ResolveInfo? resolveInfo, IReadableNode oldTarget, EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="ChangeReferenceTarget"/> event.
     /// <value>

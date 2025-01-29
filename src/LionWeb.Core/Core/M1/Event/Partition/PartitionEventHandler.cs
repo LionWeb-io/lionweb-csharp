@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1.Event.Partition;
 using M3;
 
 /// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionListener"/> events.
-public class PartitionEventHandler : IPartitionListener, IPartitionCommander
+public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPartitionCommander
 {
     private readonly object _sender;
 
@@ -41,8 +41,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     private readonly ShortCircuitEventHandler<IPartitionListener.ClassifierChangedArgs> _classifierChanged = new();
 
     /// <inheritdoc />
-    public void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier) =>
-        _classifierChanged.Invoke(_sender, new(node, newClassifier, oldClassifier));
+    public void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier,
+        EventId? eventId = null) =>
+        _classifierChanged.Invoke(_sender, new(node, newClassifier, oldClassifier, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseChangeClassifier => _classifierChanged.HasSubscribers;
@@ -57,8 +58,8 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     private readonly ShortCircuitEventHandler<IPartitionListener.PropertyAddedArgs> _propertyAdded = new();
 
     /// <inheritdoc />
-    public void AddProperty(IWritableNode node, Property property, Object newValue) =>
-        _propertyAdded.Invoke(_sender, new(node, property, newValue));
+    public void AddProperty(IWritableNode node, Property property, object newValue, EventId? eventId = null) =>
+        _propertyAdded.Invoke(_sender, new(node, property, newValue, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseAddProperty => _propertyAdded.HasSubscribers;
@@ -73,8 +74,8 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     private readonly ShortCircuitEventHandler<IPartitionListener.PropertyDeletedArgs> _propertyDeleted = new();
 
     /// <inheritdoc />
-    public void DeleteProperty(IWritableNode node, Property property, Object oldValue) =>
-        _propertyDeleted.Invoke(_sender, new(node, property, oldValue));
+    public void DeleteProperty(IWritableNode node, Property property, object oldValue, EventId? eventId = null) =>
+        _propertyDeleted.Invoke(_sender, new(node, property, oldValue, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseDeleteProperty => _propertyDeleted.HasSubscribers;
@@ -89,8 +90,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     private readonly ShortCircuitEventHandler<IPartitionListener.PropertyChangedArgs> _propertyChanged = new();
 
     /// <inheritdoc />
-    public void ChangeProperty(IWritableNode node, Property property, Object newValue, Object oldValue) =>
-        _propertyChanged.Invoke(_sender, new(node, property, newValue, oldValue));
+    public void ChangeProperty(IWritableNode node, Property property, object newValue, object oldValue,
+        EventId? eventId = null) =>
+        _propertyChanged.Invoke(_sender, new(node, property, newValue, oldValue, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseChangeProperty => _propertyChanged.HasSubscribers;
@@ -105,8 +107,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     private readonly ShortCircuitEventHandler<IPartitionListener.ChildAddedArgs> _childAdded = new();
 
     /// <inheritdoc />
-    public void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index) =>
-        _childAdded.Invoke(_sender, new(parent, newChild, containment, index));
+    public void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index,
+        EventId? eventId = null) =>
+        _childAdded.Invoke(_sender, new(parent, newChild, containment, index, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseAddChild => _childAdded.HasSubscribers;
@@ -121,8 +124,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     private readonly ShortCircuitEventHandler<IPartitionListener.ChildDeletedArgs> _childDeleted = new();
 
     /// <inheritdoc />
-    public void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index) =>
-        _childDeleted.Invoke(_sender, new(deletedChild, parent, containment, index));
+    public void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index,
+        EventId? eventId = null) =>
+        _childDeleted.Invoke(_sender, new(deletedChild, parent, containment, index, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseDeleteChild => _childDeleted.HasSubscribers;
@@ -139,8 +143,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     /// <inheritdoc />
     public void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
         Containment containment,
-        Index index) =>
-        _childReplaced.Invoke(_sender, new(newChild, replacedChild, parent, containment, index));
+        Index index, EventId? eventId = null) =>
+        _childReplaced.Invoke(_sender,
+            new(newChild, replacedChild, parent, containment, index, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseReplaceChild => _childReplaced.HasSubscribers;
@@ -157,9 +162,11 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
-        IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex) =>
+        IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex,
+        EventId? eventId = null) =>
         _childMovedFromOtherContainment.Invoke(_sender,
-            new(newParent, newContainment, newIndex, movedChild, oldParent, oldContainment, oldIndex));
+            new(newParent, newContainment, newIndex, movedChild, oldParent, oldContainment, oldIndex,
+                eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseMoveChildFromOtherContainment => _childMovedFromOtherContainment.HasSubscribers;
@@ -178,9 +185,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     /// <inheritdoc />
     public void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex,
         IWritableNode movedChild,
-        IWritableNode parent, Containment oldContainment, Index oldIndex) =>
+        IWritableNode parent, Containment oldContainment, Index oldIndex, EventId? eventId = null) =>
         _childMovedFromOtherContainmentInSameParent.Invoke(_sender,
-            new(newContainment, newIndex, movedChild, parent, oldContainment, oldIndex));
+            new(newContainment, newIndex, movedChild, parent, oldContainment, oldIndex, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseMoveChildFromOtherContainmentInSameParent =>
@@ -199,8 +206,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     /// <inheritdoc />
     public void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
         Containment containment,
-        Index oldIndex) =>
-        _childMovedInSameContainment.Invoke(_sender, new(newIndex, movedChild, parent, containment, oldIndex));
+        Index oldIndex, EventId? eventId = null) =>
+        _childMovedInSameContainment.Invoke(_sender,
+            new(newIndex, movedChild, parent, containment, oldIndex, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseMoveChildInSameContainment => _childMovedInSameContainment.HasSubscribers;
@@ -215,8 +223,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationAddedArgs> _annotationAdded = new();
 
     /// <inheritdoc />
-    public void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index) =>
-        _annotationAdded.Invoke(_sender, new(parent, newAnnotation, index));
+    public void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index,
+        EventId? eventId = null) =>
+        _annotationAdded.Invoke(_sender, new(parent, newAnnotation, index, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseAddAnnotation => _annotationAdded.HasSubscribers;
@@ -231,8 +240,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationDeletedArgs> _annotationDeleted = new();
 
     /// <inheritdoc />
-    public void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index) =>
-        _annotationDeleted.Invoke(_sender, new(deletedAnnotation, parent, index));
+    public void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index,
+        EventId? eventId = null) =>
+        _annotationDeleted.Invoke(_sender, new(deletedAnnotation, parent, index, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseDeleteAnnotation => _annotationDeleted.HasSubscribers;
@@ -248,8 +258,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
-        Index index) =>
-        _annotationReplaced.Invoke(_sender, new(newAnnotation, replacedAnnotation, parent, index));
+        Index index, EventId? eventId = null) =>
+        _annotationReplaced.Invoke(_sender,
+            new(newAnnotation, replacedAnnotation, parent, index, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseReplaceAnnotation => _annotationReplaced.HasSubscribers;
@@ -266,8 +277,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void MoveAnnotationFromOtherParent(IWritableNode newParent, Index newIndex, IWritableNode movedAnnotation,
-        IWritableNode oldParent, Index oldIndex) =>
-        _annotationMovedFromOtherParent.Invoke(_sender, new(newParent, newIndex, movedAnnotation, oldParent, oldIndex));
+        IWritableNode oldParent, Index oldIndex, EventId? eventId = null) =>
+        _annotationMovedFromOtherParent.Invoke(_sender,
+            new(newParent, newIndex, movedAnnotation, oldParent, oldIndex, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseMoveAnnotationFromOtherParent => _annotationMovedFromOtherParent.HasSubscribers;
@@ -284,8 +296,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void MoveAnnotationInSameParent(Index newIndex, IWritableNode movedAnnotation, IWritableNode parent,
-        Index oldIndex) =>
-        _annotationMovedInSameParent.Invoke(_sender, new(newIndex, movedAnnotation, parent, oldIndex));
+        Index oldIndex, EventId? eventId = null) =>
+        _annotationMovedInSameParent.Invoke(_sender,
+            new(newIndex, movedAnnotation, parent, oldIndex, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseMoveAnnotationInSameParent => _annotationMovedInSameParent.HasSubscribers;
@@ -300,8 +313,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceAddedArgs> _referenceAdded = new();
 
     /// <inheritdoc />
-    public void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget) =>
-        _referenceAdded.Invoke(_sender, new(parent, reference, index, newTarget));
+    public void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
+        EventId? eventId = null) =>
+        _referenceAdded.Invoke(_sender, new(parent, reference, index, newTarget, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseAddReference => _referenceAdded.HasSubscribers;
@@ -317,8 +331,8 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void DeleteReference(IWritableNode parent, Reference reference, Index index,
-        IReferenceTarget deletedTarget) =>
-        _referenceDeleted.Invoke(_sender, new(parent, reference, index, deletedTarget));
+        IReferenceTarget deletedTarget, EventId? eventId = null) =>
+        _referenceDeleted.Invoke(_sender, new(parent, reference, index, deletedTarget, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseDeleteReference => _referenceDeleted.HasSubscribers;
@@ -334,8 +348,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void ChangeReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
-        IReferenceTarget replacedTarget) =>
-        _referenceChanged.Invoke(_sender, new(parent, reference, index, newTarget, replacedTarget));
+        IReferenceTarget replacedTarget, EventId? eventId = null) =>
+        _referenceChanged.Invoke(_sender,
+            new(parent, reference, index, newTarget, replacedTarget, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseChangeReference => _referenceChanged.HasSubscribers;
@@ -352,9 +367,11 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void MoveEntryFromOtherReference(IWritableNode newParent, Reference newReference, Index newIndex,
-        IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target) =>
+        IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target,
+        EventId? eventId = null) =>
         _entryMovedFromOtherReference.Invoke(_sender,
-            new(newParent, newReference, newIndex, oldParent, oldReference, oldIndex, target));
+            new(newParent, newReference, newIndex, oldParent, oldReference, oldIndex, target,
+                eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseMoveEntryFromOtherReference => _entryMovedFromOtherReference.HasSubscribers;
@@ -372,9 +389,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void MoveEntryFromOtherReferenceInSameParent(IWritableNode parent, Reference newReference, Index newIndex,
-        Reference oldReference, Index oldIndex, IReferenceTarget target) =>
+        Reference oldReference, Index oldIndex, IReferenceTarget target, EventId? eventId = null) =>
         _entryMovedFromOtherReferenceInSameParent.Invoke(_sender,
-            new(parent, newReference, newIndex, oldReference, oldIndex, target));
+            new(parent, newReference, newIndex, oldReference, oldIndex, target, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseMoveEntryFromOtherReferenceInSameParent =>
@@ -393,8 +410,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void MoveEntryInSameReference(IWritableNode parent, Reference reference, Index oldIndex, Index newIndex,
-        IReferenceTarget target) =>
-        _entryMovedInSameReference.Invoke(_sender, new(parent, reference, newIndex, oldIndex, target));
+        IReferenceTarget target, EventId? eventId = null) =>
+        _entryMovedInSameReference.Invoke(_sender,
+            new(parent, reference, newIndex, oldIndex, target, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseMoveEntryInSameReference => _entryMovedInSameReference.HasSubscribers;
@@ -413,8 +431,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     /// <inheritdoc />
     public void AddReferenceResolveInfo(IWritableNode parent, Reference reference, Index index,
         ResolveInfo newResolveInfo,
-        IReadableNode target) =>
-        _referenceResolveInfoAdded.Invoke(_sender, new(parent, reference, index, newResolveInfo, target));
+        IReadableNode target, EventId? eventId = null) =>
+        _referenceResolveInfoAdded.Invoke(_sender,
+            new(parent, reference, index, newResolveInfo, target, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseAddReferenceResolveInfo => _referenceResolveInfoAdded.HasSubscribers;
@@ -431,8 +450,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void DeleteReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, IReadableNode target,
-        ResolveInfo deletedResolveInfo) =>
-        _referenceResolveInfoDeleted.Invoke(_sender, new(parent, reference, index, target, deletedResolveInfo));
+        ResolveInfo deletedResolveInfo, EventId? eventId = null) =>
+        _referenceResolveInfoDeleted.Invoke(_sender,
+            new(parent, reference, index, target, deletedResolveInfo, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseDeleteReferenceResolveInfo => _referenceResolveInfoDeleted.HasSubscribers;
@@ -450,9 +470,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
     /// <inheritdoc />
     public void ChangeReferenceResolveInfo(IWritableNode parent, Reference reference, Index index,
         ResolveInfo newResolveInfo,
-        IReadableNode? target, ResolveInfo replacedResolveInfo) =>
+        IReadableNode? target, ResolveInfo replacedResolveInfo, EventId? eventId = null) =>
         _referenceResolveInfoChanged.Invoke(_sender,
-            new(parent, reference, index, newResolveInfo, target, replacedResolveInfo));
+            new(parent, reference, index, newResolveInfo, target, replacedResolveInfo, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseChangeReferenceResolveInfo => _referenceResolveInfoChanged.HasSubscribers;
@@ -469,8 +489,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void AddReferenceTarget(IWritableNode parent, Reference reference, Index index, IReadableNode newTarget,
-        ResolveInfo resolveInfo) =>
-        _referenceTargetAdded.Invoke(_sender, new(parent, reference, index, newTarget, resolveInfo));
+        ResolveInfo resolveInfo, EventId? eventId = null) =>
+        _referenceTargetAdded.Invoke(_sender,
+            new(parent, reference, index, newTarget, resolveInfo, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseAddReferenceTarget => _referenceTargetAdded.HasSubscribers;
@@ -487,8 +508,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void DeleteReferenceTarget(IWritableNode parent, Reference reference, Index index, ResolveInfo resolveInfo,
-        IReadableNode deletedTarget) =>
-        _referenceTargetDeleted.Invoke(_sender, new(parent, reference, index, resolveInfo, deletedTarget));
+        IReadableNode deletedTarget, EventId? eventId = null) =>
+        _referenceTargetDeleted.Invoke(_sender,
+            new(parent, reference, index, resolveInfo, deletedTarget, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseDeleteReferenceTarget => _referenceTargetDeleted.HasSubscribers;
@@ -505,8 +527,9 @@ public class PartitionEventHandler : IPartitionListener, IPartitionCommander
 
     /// <inheritdoc />
     public void ChangeReferenceTarget(IWritableNode parent, Reference reference, Index index, IReadableNode newTarget,
-        ResolveInfo? resolveInfo, IReadableNode oldTarget) =>
-        _referenceTargetChanged.Invoke(_sender, new(parent, reference, index, newTarget, resolveInfo, oldTarget));
+        ResolveInfo? resolveInfo, IReadableNode oldTarget, EventId? eventId = null) =>
+        _referenceTargetChanged.Invoke(_sender,
+            new(parent, reference, index, newTarget, resolveInfo, oldTarget, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public bool CanRaiseChangeReferenceTarget => _referenceTargetChanged.HasSubscribers;
