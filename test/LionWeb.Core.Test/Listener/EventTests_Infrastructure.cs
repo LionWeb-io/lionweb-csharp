@@ -54,7 +54,8 @@ public class EventTests_Infrastructure
         int addedCount = 0;
         added.WaitForNextEvent(b =>
         {
-            added.TryRead(out var item);
+            if (!added.TryRead(out var item))
+                return;
             Console.WriteLine($"added: {item?.ToString() ?? "null"}");
             addedCount++;
         });
@@ -63,7 +64,8 @@ public class EventTests_Infrastructure
         int changedCount = 0;
         changed.WaitForNextEvent(b =>
         {
-            changed.TryRead(out var item);
+            if (!changed.TryRead(out var item))
+                return;
             Console.WriteLine($"changed: {item?.ToString() ?? "null"}");
             changedCount++;
         });
@@ -72,7 +74,8 @@ public class EventTests_Infrastructure
         int allCount = 0;
         all.WaitForNextEvent(b =>
         {
-            all.TryRead(out var item);
+            if (!all.TryRead(out var item))
+                return;
             Console.WriteLine($"all: {item?.ToString() ?? "null"}");
             allCount++;
         });

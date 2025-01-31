@@ -140,7 +140,8 @@ internal class FilteredChannelReader<TWrite, TRead>(Channel<TWrite> input, Func<
 
         bool ContinuationFunction(Task<bool> b)
         {
-            if (!b.Result) return false;
+            if (!b.Result)
+                return false;
 
             if (input.Reader.TryPeek(out TWrite? inputItem))
             {
