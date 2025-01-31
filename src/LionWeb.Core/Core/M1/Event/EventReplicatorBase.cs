@@ -17,14 +17,12 @@
 
 namespace LionWeb.Core.M1.Event;
 
-using System.Threading.Channels;
 using Utilities;
 
-public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable where TEvent : IEvent where TPublisher : IPublisher<TEvent>
+public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable
+    where TEvent : IEvent where TPublisher : IPublisher<TEvent>
 {
     protected readonly Dictionary<NodeId, IReadableNode> _nodeById;
-    private readonly Dictionary<IPublisher<TEvent>, ChannelReader<TEvent>> _channelReaders = [];
-    private readonly CancellationTokenSource _cancellationTokenSource = new();
 
     protected EventReplicatorBase(Dictionary<NodeId, IReadableNode>? sharedNodeMap = null)
     {
@@ -32,36 +30,16 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable wher
     }
 
     public abstract void Subscribe(TPublisher publisher);
-    
+
     /// <inheritdoc />
     public virtual void Dispose()
     {
-        foreach (var channelReader in _channelReaders)
-        {
-            channelReader.Key.Unsubscribe(channelReader.Value);
-        }
-        
-        _cancellationTokenSource.Cancel();
-        _cancellationTokenSource.Dispose();
     }
 
-    protected abstract void ProcessEvent(TEvent @event);
+    protected abstract void ProcessEvent(object? sender, TEvent @event);
 
-    protected void SubscribeChannel(IPublisher<TEvent> publisher)
-    {
-        var channelReader = publisher.Subscribe<TEvent>();
-        _channelReaders.Add(publisher, channelReader);
-        channelReader.WaitForNextEvent(SwitchEvent, _cancellationTokenSource.Token);
-        return;
-
-        void SwitchEvent(bool b)
-        {
-            if (_cancellationTokenSource.IsCancellationRequested)
-                return;
-            if (b && channelReader.TryRead(out var item))
-                ProcessEvent(item);
-        }
-    }
+    protected void SubscribeEvent(IPublisher<TEvent> publisher) =>
+        publisher.Subscribe<TEvent>(ProcessEvent);
 
     protected void RegisterNode(IReadableNode newNode)
     {
@@ -98,17 +76,4 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable wher
         protected override string GetNewId(INode remoteNode) =>
             remoteNode.GetId();
     }
-}
-
-public static class ChannelReaderExtensions
-{
-    public static void WaitForNextEvent<T>(this ChannelReader<T> channelReader, Action<bool> action, CancellationToken cancellationToken = default) =>
-        channelReader
-            .WaitToReadAsync(cancellationToken)
-            .AsTask()
-            .ContinueWith(t =>
-            {
-                action(t.Result);
-                WaitForNextEvent(channelReader, action, cancellationToken);
-            }, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
 }

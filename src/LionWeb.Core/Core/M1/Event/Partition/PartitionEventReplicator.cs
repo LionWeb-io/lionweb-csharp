@@ -35,13 +35,13 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     /// <inheritdoc />
     public override void Subscribe(IPartitionPublisher publisher)
     {
-        SubscribeChannel(publisher);
+        SubscribeEvent(publisher);
 
         _publishers.Add(publisher);
 
         // publisher.PropertyAdded += OnRemotePropertyAdded;
-        publisher.PropertyDeleted += OnRemotePropertyDeleted;
-        publisher.PropertyChanged += OnRemotePropertyChanged;
+        // publisher.PropertyDeleted += OnRemotePropertyDeleted;
+        // publisher.PropertyChanged += OnRemotePropertyChanged;
 
         publisher.ChildAdded += OnRemoteChildAdded;
         publisher.ChildDeleted += OnRemoteChildDeleted;
@@ -61,7 +61,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     }
 
     /// <inheritdoc />
-    protected override void ProcessEvent(IPartitionEvent @event)
+    protected override void ProcessEvent(object? sender, IPartitionEvent? @event)
     {
         switch (@event)
         {

@@ -22,13 +22,10 @@ using M3;
 /// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionPublisher"/> events.
 public class PartitionEventHandler : EventHandlerBase<IPartitionEvent>, IPartitionPublisher, IPartitionCommander
 {
-    private readonly object _sender;
-
     /// <inheritdoc cref="PartitionEventHandler"/>
     /// <param name="sender">Optional sender of the events.</param>
-    public PartitionEventHandler(object? sender)
+    public PartitionEventHandler(object? sender) : base(sender)
     {
-        _sender = sender ?? this;
     }
 
     /// <inheritdoc />

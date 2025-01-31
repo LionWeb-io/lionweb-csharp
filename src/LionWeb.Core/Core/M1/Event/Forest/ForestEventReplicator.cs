@@ -50,7 +50,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     /// <inheritdoc />
     public override void Subscribe(IForestPublisher publisher)
     {
-        SubscribeChannel(publisher);
+        SubscribeEvent(publisher);
         _listeners.Add(publisher);
 
         publisher.NewPartition += OnRemoteNewPartition;
@@ -58,14 +58,14 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     }
 
     /// <inheritdoc />
-    protected override void ProcessEvent(IForestEvent @event)
+    protected override void ProcessEvent(object? sender, IForestEvent? @event)
     {
         switch (@event)
         {
             case IForestPublisher.NewPartitionArgs a:
                 OnRemoteNewPartition(null, a);
                 break;
-            
+
             case IForestPublisher.PartitionDeletedArgs a:
                 OnRemotePartitionDeleted(null, a);
                 break;
@@ -76,13 +76,13 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     public override void Dispose()
     {
         base.Dispose();
-        
+
         foreach (var listener in _listeners)
         {
             listener.NewPartition -= OnRemoteNewPartition;
             listener.PartitionDeleted -= OnRemotePartitionDeleted;
         }
-        
+
         foreach (var localPartition in _localPartitions.Values)
         {
             localPartition.Dispose();
@@ -103,7 +103,8 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
             throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
     }
 
-    private PartitionEventReplicator LookupPartition(IPartitionInstance partition) => _localPartitions[partition.GetId()];
+    private PartitionEventReplicator LookupPartition(IPartitionInstance partition) =>
+        _localPartitions[partition.GetId()];
 
     private void UnregisterPartition(IPartitionInstance partition)
     {

@@ -19,10 +19,7 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1;
-using M1.Event;
 using M1.Event.Partition;
-using System.Threading.Channels;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
@@ -34,9 +31,9 @@ public class EventTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        var added = node.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>();
-        var changed = node.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>();
-        var all = node.Publisher.Subscribe<IPartitionEvent>();
+        node.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => { } );
+        node.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) => { });
+        node.Publisher.Subscribe<IPartitionEvent>((sender, args) => { });
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -50,35 +47,34 @@ public class EventTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        var added = node.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>();
         int addedCount = 0;
-        added.WaitForNextEvent(b =>
-        {
-            if (!added.TryRead(out var item))
-                return;
-            Console.WriteLine($"added: {item?.ToString() ?? "null"}");
-            addedCount++;
-        });
+        node.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => addedCount++);
         
-        var changed = node.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>();
         int changedCount = 0;
-        changed.WaitForNextEvent(b =>
-        {
-            if (!changed.TryRead(out var item))
-                return;
-            Console.WriteLine($"changed: {item?.ToString() ?? "null"}");
-            changedCount++;
-        });
+        node.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) => changedCount++);
 
-        var all = node.Publisher.Subscribe<IPartitionEvent>();
+        circle.Name = "Hello";
+        circle.Name = "World";
+        
+        Assert.AreEqual("World", circle.Name);
+        Assert.AreEqual(1, addedCount);
+        Assert.AreEqual(1, changedCount);
+    }
+
+    [TestMethod]
+    public void MultiListeners_AllRead()
+    {
+        var circle = new Circle("c");
+        var node = new Geometry("a") { Shapes = [circle] };
+
+        int addedCount = 0;
+        node.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => addedCount++);
+        
+        int changedCount = 0;
+        node.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) => changedCount++);
+
         int allCount = 0;
-        all.WaitForNextEvent(b =>
-        {
-            if (!all.TryRead(out var item))
-                return;
-            Console.WriteLine($"all: {item?.ToString() ?? "null"}");
-            allCount++;
-        });
+        node.Publisher.Subscribe<IPartitionEvent>((sender, args) => allCount++);
 
         circle.Name = "Hello";
         circle.Name = "World";

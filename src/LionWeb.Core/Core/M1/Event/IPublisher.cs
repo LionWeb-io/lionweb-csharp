@@ -17,11 +17,9 @@
 
 namespace LionWeb.Core.M1.Event;
 
-using System.Threading.Channels;
-
 public interface IPublisher<in TWrite> where TWrite : IEvent
 {
-    ChannelReader<TRead> Subscribe<TRead>() where TRead : TWrite;
+    void Subscribe<TRead>(EventHandler<TRead> handler) where TRead : TWrite;
     
-    void Unsubscribe<TRead>(ChannelReader<TRead> reader) where TRead : TWrite;
+    void Unsubscribe<TRead>(EventHandler<TRead> handler) where TRead : TWrite;
 }

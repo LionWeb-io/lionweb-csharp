@@ -19,9 +19,7 @@ namespace LionWeb.Core.M1.Event;
 
 using Forest;
 using Partition;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Threading.Channels;
 
 public abstract class EventHandlerBase
 {
@@ -38,29 +36,43 @@ public abstract class EventHandlerBase
         return baseTypes
             .SelectMany(baseType => allTypes
                 .Where(subType => subType.IsAssignableTo(baseType))
-                .Select(subType => (baseType, subType))
+                .SelectMany(subType => new List<(Type, Type)>{
+                    (baseType, subType),
+                    (subType, subType)
+                })
             )
-            .ToLookup(k => k.baseType, e => e.subType);
+            .ToLookup(k => k.Item1, e => e.Item2);
     }
 }
 
 public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TWrite>, IPublisher<TWrite>
     where TWrite : IEvent
 {
-    private readonly Dictionary<object, Channel<TWrite>> _channels = [];
     private readonly Dictionary<Type, int> _subscribedEvents = [];
+    private readonly Dictionary<object, EventHandler<TWrite>> _handlers = [];
+    protected readonly object _sender;
+    private event EventHandler<TWrite>? Event;
 
-    private int nextId = 0;
-    
+    private int _nextId = 0;
+
+
+    /// <inheritdoc cref="EventHandlerBase"/>
+    /// <param name="sender">Optional sender of the events.</param>
+    protected EventHandlerBase(object? sender)
+    {
+        _sender = sender ?? this;
+    }
+
     /// <inheritdoc />
     public virtual EventId CreateEventId() =>
-        nextId++.ToString();
+        _nextId++.ToString();
 
     /// <inheritdoc />
-    public ChannelReader<TRead> Subscribe<TRead>() where TRead : TWrite
+    public void Subscribe<TRead>(EventHandler<TRead> handler) where TRead : TWrite
     {
         var eventType = typeof(TRead);
-        foreach (var subtype in _allSubtypes[eventType])
+        var allSubtype = _allSubtypes[eventType];
+        foreach (var subtype in allSubtype)
         {
             if (_subscribedEvents.TryGetValue(subtype, out var count))
             {
@@ -71,21 +83,24 @@ public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TW
             }
         }
 
-        Channel<TWrite> channel = Channel.CreateUnbounded<TWrite>(new UnboundedChannelOptions
+        EventHandler<TWrite> writeHandler = (sender, args) =>
         {
-            SingleReader = true, SingleWriter = true, AllowSynchronousContinuations = true
-        });
-        var filteredChannelReader =
-            new FilteredChannelReader<TWrite, TRead>(channel, f => _allSubtypes[eventType].Contains(f.GetType()));
-        _channels.Add(filteredChannelReader, channel);
-        return filteredChannelReader;
+            if (args is TRead r)
+                handler.Invoke(sender, r);
+        };
+        _handlers[handler] = writeHandler;
+        
+        Event += writeHandler;
     }
 
+
     /// <inheritdoc />
-    public void Unsubscribe<TRead>(ChannelReader<TRead> reader) where TRead : TWrite
+    public void Unsubscribe<TRead>(EventHandler<TRead> handler) where TRead : TWrite
     {
-        if (!_channels.Remove(reader))
+        if (!_handlers.Remove(handler, out var writeHandler))
             return;
+        
+        Event -= writeHandler;
 
         var eventType = typeof(TRead);
         var allSubtypes = _allSubtypes[eventType];
@@ -96,61 +111,10 @@ public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TW
     }
 
     /// <inheritdoc />
-    public void Raise(TWrite @event)
-    {
-        foreach (var channel in _channels.Values)
-        {
-            channel.Writer.TryWrite(@event);
-        }
-    }
+    public void Raise(TWrite @event) =>
+        Event?.Invoke(_sender, @event);
 
     /// <inheritdoc />
     public bool CanRaise(Type eventType) =>
-        _subscribedEvents.TryGetValue(eventType, out var count) && count > 0;
-}
-
-internal class FilteredChannelReader<TWrite, TRead>(Channel<TWrite> input, Func<TWrite, bool> filter)
-    : ChannelReader<TRead>
-{
-    public override bool TryRead([MaybeNullWhen(false)] out TRead item)
-    {
-        while (input.Reader.TryRead(out TWrite? inputItem))
-        {
-            if (inputItem is TRead r && filter(inputItem))
-            {
-                item = r;
-                return true;
-            }
-        }
-
-        item = default;
-
-        return false;
-    }
-
-
-    public override ValueTask<bool> WaitToReadAsync(CancellationToken cancellationToken = new CancellationToken())
-    {
-        var x = input.Reader
-            .WaitToReadAsync(cancellationToken)
-            .AsTask()
-            .ContinueWith(ContinuationFunction, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
-        
-        return new ValueTask<bool>(x);
-
-        bool ContinuationFunction(Task<bool> b)
-        {
-            if (!b.Result)
-                return false;
-
-            if (input.Reader.TryPeek(out TWrite? inputItem))
-            {
-                if (inputItem is TRead && filter(inputItem))
-                    return true;
-                input.Reader.TryRead(out _);
-            }
-
-            return false;
-        }
-    }
+        Event != null && _subscribedEvents.TryGetValue(eventType, out var count) && count > 0;
 }
