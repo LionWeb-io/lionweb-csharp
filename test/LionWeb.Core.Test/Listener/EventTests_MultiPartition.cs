@@ -39,7 +39,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var applier = new PartitionEventApplier(clone);
+        var applier = new PartitionEventReplicator(clone);
         applier.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
@@ -65,7 +65,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        var applier = new PartitionEventApplier(clone);
+        var applier = new PartitionEventReplicator(clone);
         applier.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
@@ -89,7 +89,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
-        var applier = new PartitionEventApplier(clone);
+        var applier = new PartitionEventReplicator(clone);
         applier.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
@@ -114,7 +114,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var applier = new PartitionEventApplier(clone);
+        var applier = new PartitionEventReplicator(clone);
         applier.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
@@ -150,7 +150,7 @@ public class EventTests_MultiPartition
         cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
         var clone = new Geometry("a") { Shapes = [cloneOrigin] };
 
-        var applier = new PartitionEventApplier(clone);
+        var applier = new PartitionEventReplicator(clone);
         applier.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
@@ -177,7 +177,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") {  };
 
-        var applier = new PartitionEventApplier(clone);
+        var applier = new PartitionEventReplicator(clone);
         applier.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];

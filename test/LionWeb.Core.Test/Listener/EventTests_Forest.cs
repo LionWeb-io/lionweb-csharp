@@ -41,7 +41,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var applier = new ForestEventApplier(cloneForest);
+        var applier = new ForestEventReplicator(cloneForest);
         applier.Subscribe(forest.Publisher);
         
         forest.AddPartitions([node]);
@@ -65,7 +65,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var applier = new ForestEventApplier(cloneForest);
+        var applier = new ForestEventReplicator(cloneForest);
         applier.Subscribe(forest.Publisher);
         
         forest.AddPartitions([node]);
@@ -89,7 +89,7 @@ public class EventTests_Forest
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
 
-        var applier = new ForestEventApplier(cloneForest);
+        var applier = new ForestEventReplicator(cloneForest);
         applier.Subscribe(forest.Publisher);
 
         node.Documentation = moved;
@@ -110,7 +110,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var applier = new ForestEventApplier(cloneForest);
+        var applier = new ForestEventReplicator(cloneForest);
         applier.Subscribe(forest.Publisher);
 
         forest.AddPartitions([node, originPartition]);
