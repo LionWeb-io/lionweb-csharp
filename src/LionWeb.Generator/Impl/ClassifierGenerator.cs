@@ -89,7 +89,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             additionalMembers.AddRange([
                 Field("_eventHandler", AsType(typeof(PartitionEventHandler)), NewCall([]))
                     .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
-                ReadOnlyProperty("Listener", AsType(typeof(IPartitionListener)), IdentifierName("_eventHandler"))
+                ReadOnlyProperty("Publisher", AsType(typeof(IPartitionPublisher)), IdentifierName("_eventHandler"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword)),
                 ReadOnlyProperty("Commander", AsType(typeof(IPartitionCommander)), IdentifierName("_eventHandler"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))

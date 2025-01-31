@@ -19,8 +19,8 @@ namespace LionWeb.Core.M1.Event.Partition;
 
 using M3;
 
-/// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionListener"/> events.
-public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPartitionCommander
+/// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionPublisher"/> events.
+public class PartitionEventHandler : EventHandlerBase, IPartitionPublisher, IPartitionCommander
 {
     private readonly object _sender;
 
@@ -32,13 +32,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     }
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ClassifierChangedArgs> ClassifierChanged
+    public event EventHandler<IPartitionPublisher.ClassifierChangedArgs> ClassifierChanged
     {
         add => _classifierChanged.Add(value);
         remove => _classifierChanged.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ClassifierChangedArgs> _classifierChanged = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ClassifierChangedArgs> _classifierChanged = new();
 
     /// <inheritdoc />
     public void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier,
@@ -49,13 +49,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseChangeClassifier => _classifierChanged.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.PropertyAddedArgs> PropertyAdded
+    public event EventHandler<IPartitionPublisher.PropertyAddedArgs> PropertyAdded
     {
         add => _propertyAdded.Add(value);
         remove => _propertyAdded.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.PropertyAddedArgs> _propertyAdded = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.PropertyAddedArgs> _propertyAdded = new();
 
     /// <inheritdoc />
     public void AddProperty(IWritableNode node, Property property, object newValue, EventId? eventId = null) =>
@@ -65,13 +65,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseAddProperty => _propertyAdded.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.PropertyDeletedArgs> PropertyDeleted
+    public event EventHandler<IPartitionPublisher.PropertyDeletedArgs> PropertyDeleted
     {
         add => _propertyDeleted.Add(value);
         remove => _propertyDeleted.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.PropertyDeletedArgs> _propertyDeleted = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.PropertyDeletedArgs> _propertyDeleted = new();
 
     /// <inheritdoc />
     public void DeleteProperty(IWritableNode node, Property property, object oldValue, EventId? eventId = null) =>
@@ -81,13 +81,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseDeleteProperty => _propertyDeleted.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.PropertyChangedArgs> PropertyChanged
+    public event EventHandler<IPartitionPublisher.PropertyChangedArgs> PropertyChanged
     {
         add => _propertyChanged.Add(value);
         remove => _propertyChanged.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.PropertyChangedArgs> _propertyChanged = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.PropertyChangedArgs> _propertyChanged = new();
 
     /// <inheritdoc />
     public void ChangeProperty(IWritableNode node, Property property, object newValue, object oldValue,
@@ -98,13 +98,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseChangeProperty => _propertyChanged.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildAddedArgs> ChildAdded
+    public event EventHandler<IPartitionPublisher.ChildAddedArgs> ChildAdded
     {
         add => _childAdded.Add(value);
         remove => _childAdded.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ChildAddedArgs> _childAdded = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ChildAddedArgs> _childAdded = new();
 
     /// <inheritdoc />
     public void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index,
@@ -115,13 +115,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseAddChild => _childAdded.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildDeletedArgs> ChildDeleted
+    public event EventHandler<IPartitionPublisher.ChildDeletedArgs> ChildDeleted
     {
         add => _childDeleted.Add(value);
         remove => _childDeleted.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ChildDeletedArgs> _childDeleted = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ChildDeletedArgs> _childDeleted = new();
 
     /// <inheritdoc />
     public void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index,
@@ -132,13 +132,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseDeleteChild => _childDeleted.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildReplacedArgs> ChildReplaced
+    public event EventHandler<IPartitionPublisher.ChildReplacedArgs> ChildReplaced
     {
         add => _childReplaced.Add(value);
         remove => _childReplaced.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ChildReplacedArgs> _childReplaced = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ChildReplacedArgs> _childReplaced = new();
 
     /// <inheritdoc />
     public void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
@@ -151,13 +151,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseReplaceChild => _childReplaced.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildMovedFromOtherContainmentArgs> ChildMovedFromOtherContainment
+    public event EventHandler<IPartitionPublisher.ChildMovedFromOtherContainmentArgs> ChildMovedFromOtherContainment
     {
         add => _childMovedFromOtherContainment.Add(value);
         remove => _childMovedFromOtherContainment.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ChildMovedFromOtherContainmentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>
         _childMovedFromOtherContainment = new();
 
     /// <inheritdoc />
@@ -172,14 +172,14 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseMoveChildFromOtherContainment => _childMovedFromOtherContainment.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildMovedFromOtherContainmentInSameParentArgs>
+    public event EventHandler<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>
         ChildMovedFromOtherContainmentInSameParent
         {
             add => _childMovedFromOtherContainmentInSameParent.Add(value);
             remove => _childMovedFromOtherContainmentInSameParent.Remove(value);
         }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ChildMovedFromOtherContainmentInSameParentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>
         _childMovedFromOtherContainmentInSameParent = new();
 
     /// <inheritdoc />
@@ -194,13 +194,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
         _childMovedFromOtherContainmentInSameParent.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ChildMovedInSameContainmentArgs> ChildMovedInSameContainment
+    public event EventHandler<IPartitionPublisher.ChildMovedInSameContainmentArgs> ChildMovedInSameContainment
     {
         add => _childMovedInSameContainment.Add(value);
         remove => _childMovedInSameContainment.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ChildMovedInSameContainmentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ChildMovedInSameContainmentArgs>
         _childMovedInSameContainment = new();
 
     /// <inheritdoc />
@@ -214,13 +214,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseMoveChildInSameContainment => _childMovedInSameContainment.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationAddedArgs> AnnotationAdded
+    public event EventHandler<IPartitionPublisher.AnnotationAddedArgs> AnnotationAdded
     {
         add => _annotationAdded.Add(value);
         remove => _annotationAdded.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationAddedArgs> _annotationAdded = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.AnnotationAddedArgs> _annotationAdded = new();
 
     /// <inheritdoc />
     public void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index,
@@ -231,13 +231,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseAddAnnotation => _annotationAdded.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationDeletedArgs> AnnotationDeleted
+    public event EventHandler<IPartitionPublisher.AnnotationDeletedArgs> AnnotationDeleted
     {
         add => _annotationDeleted.Add(value);
         remove => _annotationDeleted.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationDeletedArgs> _annotationDeleted = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.AnnotationDeletedArgs> _annotationDeleted = new();
 
     /// <inheritdoc />
     public void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index,
@@ -248,13 +248,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseDeleteAnnotation => _annotationDeleted.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationReplacedArgs> AnnotationReplaced
+    public event EventHandler<IPartitionPublisher.AnnotationReplacedArgs> AnnotationReplaced
     {
         add => _annotationReplaced.Add(value);
         remove => _annotationReplaced.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationReplacedArgs> _annotationReplaced = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.AnnotationReplacedArgs> _annotationReplaced = new();
 
     /// <inheritdoc />
     public void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
@@ -266,13 +266,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseReplaceAnnotation => _annotationReplaced.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationMovedFromOtherParentArgs> AnnotationMovedFromOtherParent
+    public event EventHandler<IPartitionPublisher.AnnotationMovedFromOtherParentArgs> AnnotationMovedFromOtherParent
     {
         add => _annotationMovedFromOtherParent.Add(value);
         remove => _annotationMovedFromOtherParent.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationMovedFromOtherParentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.AnnotationMovedFromOtherParentArgs>
         _annotationMovedFromOtherParent = new();
 
     /// <inheritdoc />
@@ -285,13 +285,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseMoveAnnotationFromOtherParent => _annotationMovedFromOtherParent.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.AnnotationMovedInSameParentArgs> AnnotationMovedInSameParent
+    public event EventHandler<IPartitionPublisher.AnnotationMovedInSameParentArgs> AnnotationMovedInSameParent
     {
         add => _annotationMovedInSameParent.Add(value);
         remove => _annotationMovedInSameParent.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.AnnotationMovedInSameParentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.AnnotationMovedInSameParentArgs>
         _annotationMovedInSameParent = new();
 
     /// <inheritdoc />
@@ -304,13 +304,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseMoveAnnotationInSameParent => _annotationMovedInSameParent.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceAddedArgs> ReferenceAdded
+    public event EventHandler<IPartitionPublisher.ReferenceAddedArgs> ReferenceAdded
     {
         add => _referenceAdded.Add(value);
         remove => _referenceAdded.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceAddedArgs> _referenceAdded = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ReferenceAddedArgs> _referenceAdded = new();
 
     /// <inheritdoc />
     public void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
@@ -321,13 +321,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseAddReference => _referenceAdded.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceDeletedArgs> ReferenceDeleted
+    public event EventHandler<IPartitionPublisher.ReferenceDeletedArgs> ReferenceDeleted
     {
         add => _referenceDeleted.Add(value);
         remove => _referenceDeleted.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceDeletedArgs> _referenceDeleted = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ReferenceDeletedArgs> _referenceDeleted = new();
 
     /// <inheritdoc />
     public void DeleteReference(IWritableNode parent, Reference reference, Index index,
@@ -338,13 +338,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseDeleteReference => _referenceDeleted.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceChangedArgs> ReferenceChanged
+    public event EventHandler<IPartitionPublisher.ReferenceChangedArgs> ReferenceChanged
     {
         add => _referenceChanged.Add(value);
         remove => _referenceChanged.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceChangedArgs> _referenceChanged = new();
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ReferenceChangedArgs> _referenceChanged = new();
 
     /// <inheritdoc />
     public void ChangeReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
@@ -356,13 +356,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseChangeReference => _referenceChanged.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.EntryMovedFromOtherReferenceArgs> EntryMovedFromOtherReference
+    public event EventHandler<IPartitionPublisher.EntryMovedFromOtherReferenceArgs> EntryMovedFromOtherReference
     {
         add => _entryMovedFromOtherReference.Add(value);
         remove => _entryMovedFromOtherReference.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.EntryMovedFromOtherReferenceArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.EntryMovedFromOtherReferenceArgs>
         _entryMovedFromOtherReference = new();
 
     /// <inheritdoc />
@@ -377,14 +377,14 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseMoveEntryFromOtherReference => _entryMovedFromOtherReference.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.EntryMovedFromOtherReferenceInSameParentArgs>
+    public event EventHandler<IPartitionPublisher.EntryMovedFromOtherReferenceInSameParentArgs>
         EntryMovedFromOtherReferenceInSameParent
         {
             add => _entryMovedFromOtherReferenceInSameParent.Add(value);
             remove => _entryMovedFromOtherReferenceInSameParent.Remove(value);
         }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.EntryMovedFromOtherReferenceInSameParentArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.EntryMovedFromOtherReferenceInSameParentArgs>
         _entryMovedFromOtherReferenceInSameParent = new();
 
     /// <inheritdoc />
@@ -398,13 +398,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
         _entryMovedFromOtherReferenceInSameParent.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.EntryMovedInSameReferenceArgs> EntryMovedInSameReference
+    public event EventHandler<IPartitionPublisher.EntryMovedInSameReferenceArgs> EntryMovedInSameReference
     {
         add => _entryMovedInSameReference.Add(value);
         remove => _entryMovedInSameReference.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.EntryMovedInSameReferenceArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.EntryMovedInSameReferenceArgs>
         _entryMovedInSameReference =
             new();
 
@@ -418,13 +418,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseMoveEntryInSameReference => _entryMovedInSameReference.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceResolveInfoAddedArgs> ReferenceResolveInfoAdded
+    public event EventHandler<IPartitionPublisher.ReferenceResolveInfoAddedArgs> ReferenceResolveInfoAdded
     {
         add => _referenceResolveInfoAdded.Add(value);
         remove => _referenceResolveInfoAdded.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceResolveInfoAddedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ReferenceResolveInfoAddedArgs>
         _referenceResolveInfoAdded =
             new();
 
@@ -439,13 +439,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseAddReferenceResolveInfo => _referenceResolveInfoAdded.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceResolveInfoDeletedArgs> ReferenceResolveInfoDeleted
+    public event EventHandler<IPartitionPublisher.ReferenceResolveInfoDeletedArgs> ReferenceResolveInfoDeleted
     {
         add => _referenceResolveInfoDeleted.Add(value);
         remove => _referenceResolveInfoDeleted.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceResolveInfoDeletedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ReferenceResolveInfoDeletedArgs>
         _referenceResolveInfoDeleted = new();
 
     /// <inheritdoc />
@@ -458,13 +458,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseDeleteReferenceResolveInfo => _referenceResolveInfoDeleted.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceResolveInfoChangedArgs> ReferenceResolveInfoChanged
+    public event EventHandler<IPartitionPublisher.ReferenceResolveInfoChangedArgs> ReferenceResolveInfoChanged
     {
         add => _referenceResolveInfoChanged.Add(value);
         remove => _referenceResolveInfoChanged.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceResolveInfoChangedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ReferenceResolveInfoChangedArgs>
         _referenceResolveInfoChanged = new();
 
     /// <inheritdoc />
@@ -478,13 +478,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseChangeReferenceResolveInfo => _referenceResolveInfoChanged.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceTargetAddedArgs> ReferenceTargetAdded
+    public event EventHandler<IPartitionPublisher.ReferenceTargetAddedArgs> ReferenceTargetAdded
     {
         add => _referenceTargetAdded.Add(value);
         remove => _referenceTargetAdded.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceTargetAddedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ReferenceTargetAddedArgs>
         _referenceTargetAdded = new();
 
     /// <inheritdoc />
@@ -497,13 +497,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseAddReferenceTarget => _referenceTargetAdded.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceTargetDeletedArgs> ReferenceTargetDeleted
+    public event EventHandler<IPartitionPublisher.ReferenceTargetDeletedArgs> ReferenceTargetDeleted
     {
         add => _referenceTargetDeleted.Add(value);
         remove => _referenceTargetDeleted.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceTargetDeletedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ReferenceTargetDeletedArgs>
         _referenceTargetDeleted = new();
 
     /// <inheritdoc />
@@ -516,13 +516,13 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionListener, IPart
     public bool CanRaiseDeleteReferenceTarget => _referenceTargetDeleted.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IPartitionListener.ReferenceTargetChangedArgs> ReferenceTargetChanged
+    public event EventHandler<IPartitionPublisher.ReferenceTargetChangedArgs> ReferenceTargetChanged
     {
         add => _referenceTargetChanged.Add(value);
         remove => _referenceTargetChanged.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IPartitionListener.ReferenceTargetChangedArgs>
+    private readonly ShortCircuitEventHandler<IPartitionPublisher.ReferenceTargetChangedArgs>
         _referenceTargetChanged = new();
 
     /// <inheritdoc />

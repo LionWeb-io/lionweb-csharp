@@ -23,7 +23,7 @@ public class ForestEventApplier : EventApplierBase
 {
     private readonly IForest _localForest;
     private readonly Dictionary<NodeId, PartitionEventApplier> _localPartitions = [];
-    private readonly List<IForestListener> _listeners = [];
+    private readonly List<IForestPublisher> _listeners = [];
 
     public ForestEventApplier(IForest localForest, Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) :
         base(sharedNodeMap)
@@ -39,7 +39,7 @@ public class ForestEventApplier : EventApplierBase
             RegisterPartition(partition);
         }
 
-        var forestListener = _localForest.Listener;
+        var forestListener = _localForest.Publisher;
         if (forestListener == null)
             return;
 
@@ -47,12 +47,12 @@ public class ForestEventApplier : EventApplierBase
         forestListener.PartitionDeleted += OnLocalPartitionDeleted;
     }
 
-    public void Subscribe(IForestListener listener)
+    public void Subscribe(IForestPublisher publisher)
     {
-        _listeners.Add(listener);
+        _listeners.Add(publisher);
 
-        listener.NewPartition += OnRemoteNewPartition;
-        listener.PartitionDeleted += OnRemotePartitionDeleted;
+        publisher.NewPartition += OnRemoteNewPartition;
+        publisher.PartitionDeleted += OnRemotePartitionDeleted;
     }
 
     public override void Dispose()
@@ -68,7 +68,7 @@ public class ForestEventApplier : EventApplierBase
             localPartition.Dispose();
         }
 
-        var forestListener = _localForest.Listener;
+        var forestListener = _localForest.Publisher;
         if (forestListener == null)
             return;
 
@@ -94,17 +94,17 @@ public class ForestEventApplier : EventApplierBase
 
     #region Local
 
-    private void OnLocalNewPartition(object? sender, IForestListener.NewPartitionArgs args) =>
+    private void OnLocalNewPartition(object? sender, IForestPublisher.NewPartitionArgs args) =>
         RegisterPartition(args.NewPartition);
 
-    private void OnLocalPartitionDeleted(object? sender, IForestListener.PartitionDeletedArgs args) =>
+    private void OnLocalPartitionDeleted(object? sender, IForestPublisher.PartitionDeletedArgs args) =>
         UnregisterPartition(args.DeletedPartition);
 
     #endregion
 
     #region Remote
 
-    private void OnRemoteNewPartition(object? sender, IForestListener.NewPartitionArgs args)
+    private void OnRemoteNewPartition(object? sender, IForestPublisher.NewPartitionArgs args)
     {
         var newPartition = (INode)args.NewPartition;
 
@@ -112,12 +112,12 @@ public class ForestEventApplier : EventApplierBase
 
         _localForest.AddPartitions([clone]);
 
-        var remoteListener = args.NewPartition.Listener;
+        var remoteListener = args.NewPartition.Publisher;
         if (remoteListener != null)
             LookupPartition(clone).Subscribe(remoteListener);
     }
 
-    private void OnRemotePartitionDeleted(object? sender, IForestListener.PartitionDeletedArgs args)
+    private void OnRemotePartitionDeleted(object? sender, IForestPublisher.PartitionDeletedArgs args)
     {
         var localPartition = (IPartitionInstance)Lookup(args.DeletedPartition.GetId());
         _localForest.RemovePartitions([localPartition]);

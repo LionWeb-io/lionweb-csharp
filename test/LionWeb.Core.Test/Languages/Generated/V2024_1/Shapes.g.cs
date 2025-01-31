@@ -1314,7 +1314,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
 	private readonly PartitionEventHandler _eventHandler;
     private readonly IPartitionCommander _commander;
-    public IPartitionListener Listener => _eventHandler;
+    public IPartitionPublisher Publisher => _eventHandler;
 	public IPartitionCommander Commander => _commander;
 
 	/// <inheritdoc/>
@@ -2094,7 +2094,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
 	private readonly PartitionEventHandler _eventHandler;
-	public IPartitionListener Listener => _eventHandler;
+	public IPartitionPublisher Publisher => _eventHandler;
 	public IPartitionCommander Commander => _eventHandler;
 
 	/// <inheritdoc/>

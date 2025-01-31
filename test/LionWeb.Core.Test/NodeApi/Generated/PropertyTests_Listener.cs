@@ -30,7 +30,7 @@ public class PropertyTests_Listener
         parent.Documentation = doc;
 
         int events = 0;
-        parent.Listener.PropertyAdded += (sender, args) =>
+        parent.Publisher.PropertyAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -52,7 +52,7 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int events = 0;
-        parent.Listener.PropertyDeleted += (sender, args) =>
+        parent.Publisher.PropertyDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -74,7 +74,7 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int events = 0;
-        parent.Listener.PropertyChanged += (sender, args) =>
+        parent.Publisher.PropertyChanged += (sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -84,8 +84,8 @@ public class PropertyTests_Listener
         };
 
         int badEvents = 0;
-        parent.Listener.PropertyAdded += (sender, args) => badEvents++;
-        parent.Listener.PropertyDeleted += (sender, args) => badEvents++;
+        parent.Publisher.PropertyAdded += (sender, args) => badEvents++;
+        parent.Publisher.PropertyDeleted += (sender, args) => badEvents++;
 
         doc.Text = "bye";
 
@@ -101,7 +101,7 @@ public class PropertyTests_Listener
         parent.AddShapes([circle]);
 
         int events = 0;
-        parent.Listener.PropertyAdded += (sender, args) =>
+        parent.Publisher.PropertyAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
@@ -123,7 +123,7 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int events = 0;
-        parent.Listener.PropertyDeleted += (sender, args) =>
+        parent.Publisher.PropertyDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
@@ -144,7 +144,7 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int events = 0;
-        parent.Listener.PropertyChanged += (sender, args) =>
+        parent.Publisher.PropertyChanged += (sender, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
@@ -154,8 +154,8 @@ public class PropertyTests_Listener
         };
 
         int badEvents = 0;
-        parent.Listener.PropertyAdded += (sender, args) => badEvents++;
-        parent.Listener.PropertyDeleted += (sender, args) => badEvents++;
+        parent.Publisher.PropertyAdded += (sender, args) => badEvents++;
+        parent.Publisher.PropertyDeleted += (sender, args) => badEvents++;
 
         circle.Uuid = "bye";
 

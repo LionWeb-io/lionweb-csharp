@@ -32,7 +32,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -53,7 +53,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -76,7 +76,7 @@ public class ContainmentTests_Annotation_Listener
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedFromOtherParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedFromOtherParent += (sender, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -101,7 +101,7 @@ public class ContainmentTests_Annotation_Listener
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedFromOtherParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedFromOtherParent += (sender, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -125,7 +125,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom, new Documentation("doc")]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedInSameParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedInSameParent += (sender, args) =>
         {
             events++;
             Assert.AreEqual(0, args.OldIndex);
@@ -149,7 +149,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom, doc]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedInSameParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedInSameParent += (sender, args) =>
         {
             events++;
             Assert.AreEqual(0, args.OldIndex);
@@ -172,7 +172,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([new Documentation("doc"), bom]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedInSameParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedInSameParent += (sender, args) =>
         {
             events++;
         };
@@ -192,7 +192,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc, bom]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedInSameParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedInSameParent += (sender, args) =>
         {
             events++;
         };
@@ -212,7 +212,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -235,7 +235,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -258,7 +258,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -281,7 +281,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -304,7 +304,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -328,7 +328,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -352,7 +352,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -376,7 +376,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -400,7 +400,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -424,7 +424,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -448,7 +448,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -474,7 +474,7 @@ public class ContainmentTests_Annotation_Listener
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedFromOtherParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedFromOtherParent += (sender, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -502,7 +502,7 @@ public class ContainmentTests_Annotation_Listener
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedFromOtherParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedFromOtherParent += (sender, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -528,7 +528,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedInSameParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedInSameParent += (sender, args) =>
         {
             events++;
             Assert.AreEqual(1, args.OldIndex);
@@ -553,7 +553,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedInSameParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedInSameParent += (sender, args) =>
         {
             events++;
             Assert.AreEqual(1, args.OldIndex);
@@ -578,7 +578,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedInSameParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedInSameParent += (sender, args) =>
         {
             events++;
         };
@@ -599,7 +599,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int events = 0;
-        parent.Listener.AnnotationMovedInSameParent += (sender, args) =>
+        parent.Publisher.AnnotationMovedInSameParent += (sender, args) =>
         {
             events++;
         };
@@ -621,7 +621,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
         };
@@ -641,7 +641,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
         };
@@ -660,7 +660,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom]);
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -682,7 +682,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom]);
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -705,7 +705,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom, doc]);
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -728,7 +728,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom, doc]);
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -751,7 +751,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc, bom]);
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -774,7 +774,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc, bom]);
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -798,7 +798,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -822,7 +822,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -849,7 +849,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
         };
@@ -867,7 +867,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
         };
@@ -885,7 +885,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             events++;
         };
@@ -903,7 +903,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
         };
@@ -924,7 +924,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new List<BillOfMaterials>();
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(line, args.Parent);
@@ -951,7 +951,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(events, args.Index);
@@ -974,7 +974,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(events, args.Index);
@@ -999,7 +999,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(events, args.Index);
@@ -1022,7 +1022,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(events, args.Index);
@@ -1048,7 +1048,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1 + events, args.Index);
@@ -1074,7 +1074,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationAdded += (sender, args) =>
+        parent.Publisher.AnnotationAdded += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1 + events, args.Index);
@@ -1102,7 +1102,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new List<INode>() { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1126,7 +1126,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new List<INode>() { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1149,7 +1149,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
         };
@@ -1172,7 +1172,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             events++;
         };
@@ -1194,7 +1194,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, docA };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1219,7 +1219,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, docA };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1243,7 +1243,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1267,7 +1267,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1292,7 +1292,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
@@ -1317,7 +1317,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
@@ -1343,7 +1343,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
@@ -1369,7 +1369,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
@@ -1396,7 +1396,7 @@ public class ContainmentTests_Annotation_Listener
 
         int events = 0;
         int[] indices = [0, 1];
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(indices[events], args.Index);
@@ -1423,7 +1423,7 @@ public class ContainmentTests_Annotation_Listener
 
         int events = 0;
         int[] indices = [0, 1];
-        parent.Listener.AnnotationDeleted += (sender, args) =>
+        parent.Publisher.AnnotationDeleted += (sender, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(indices[events], args.Index);

@@ -278,7 +278,7 @@ public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstan
     }
 
     /// <inheritdoc />
-    public IPartitionListener Listener { get => _eventHandler; }
+    public IPartitionPublisher Publisher { get => _eventHandler; }
 
     /// <inheritdoc />
     public IPartitionCommander Commander { get => _eventHandler; }

@@ -33,7 +33,7 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -56,7 +56,7 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -80,7 +80,7 @@ public class ReferenceTests_Single_Listener
         source.AltSource = reference;
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -104,7 +104,7 @@ public class ReferenceTests_Single_Listener
         source.AltSource = reference;
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -129,7 +129,7 @@ public class ReferenceTests_Single_Listener
         var newTarget = new Line("newTarget");
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceChanged += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -140,8 +140,8 @@ public class ReferenceTests_Single_Listener
         };
 
         int badEvents = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) => badEvents++;
-        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Publisher.ReferenceAdded += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Publisher.ReferenceDeleted += (sender, args) => badEvents++;
 
         source.AltSource = newTarget;
 
@@ -160,7 +160,7 @@ public class ReferenceTests_Single_Listener
         var newTarget = new Line("newTarget");
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceChanged += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -171,8 +171,8 @@ public class ReferenceTests_Single_Listener
         };
 
         int badEvents = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) => badEvents++;
-        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Publisher.ReferenceAdded += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Publisher.ReferenceDeleted += (sender, args) => badEvents++;
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, newTarget);
 
@@ -189,7 +189,7 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceAdded += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -213,7 +213,7 @@ public class ReferenceTests_Single_Listener
         source.Source = reference;
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -237,7 +237,7 @@ public class ReferenceTests_Single_Listener
         source.Source = reference;
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceDeleted += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -263,7 +263,7 @@ public class ReferenceTests_Single_Listener
         var newTarget = new Line("newTarget");
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceChanged += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -274,8 +274,8 @@ public class ReferenceTests_Single_Listener
         };
 
         int badEvents = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) => badEvents++;
-        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Publisher.ReferenceAdded += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Publisher.ReferenceDeleted += (sender, args) => badEvents++;
 
         source.Source = newTarget;
 
@@ -294,7 +294,7 @@ public class ReferenceTests_Single_Listener
         var newTarget = new Line("newTarget");
 
         int events = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceChanged += (sender, args) =>
+        ((IPartitionInstance)partition).Publisher.ReferenceChanged += (sender, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -305,8 +305,8 @@ public class ReferenceTests_Single_Listener
         };
 
         int badEvents = 0;
-        ((IPartitionInstance)partition).Listener.ReferenceAdded += (sender, args) => badEvents++;
-        ((IPartitionInstance)partition).Listener.ReferenceDeleted += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Publisher.ReferenceAdded += (sender, args) => badEvents++;
+        ((IPartitionInstance)partition).Publisher.ReferenceDeleted += (sender, args) => badEvents++;
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, newTarget);
 

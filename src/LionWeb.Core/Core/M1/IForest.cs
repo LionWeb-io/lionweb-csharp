@@ -28,7 +28,7 @@ public interface IForest
     
     public void RemovePartitions(IEnumerable<IPartitionInstance> partitions);
     
-    IForestListener? Listener { get; }
+    IForestPublisher? Publisher { get; }
     IForestCommander? Commander { get; }
 }
 
@@ -67,7 +67,7 @@ public class Forest : IForest
     }
 
     /// <inheritdoc />
-    public IForestListener Listener => _eventHandler;
+    public IForestPublisher Publisher => _eventHandler;
 
     /// <inheritdoc />
     public IForestCommander Commander => _eventHandler;

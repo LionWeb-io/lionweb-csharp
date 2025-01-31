@@ -24,11 +24,11 @@ using SemanticPropertyValue = object;
 /// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 /// <seealso cref="IPartitionCommander"/>
 /// <seealso cref="PartitionEventHandler"/>
-public interface IPartitionListener
+public interface IPartitionPublisher
 {
     #region Nodes
 
-    /// <inheritdoc cref="IPartitionListener.ClassifierChanged"/>
+    /// <inheritdoc cref="IPartitionPublisher.ClassifierChanged"/>
     /// <param name="Node"></param>
     /// <param name="NewClassifier"></param>
     /// <param name="OldClassifier"></param>
@@ -45,7 +45,7 @@ public interface IPartitionListener
 
     #region Properties
 
-    /// <inheritdoc cref="IPartitionListener.PropertyAdded"/>
+    /// <inheritdoc cref="IPartitionPublisher.PropertyAdded"/>
     /// <param name="Node"></param>
     /// <param name="Property"></param>
     /// <param name="NewValue"></param>
@@ -54,7 +54,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.AddProperty"/>
     event EventHandler<PropertyAddedArgs> PropertyAdded;
 
-    /// <inheritdoc cref="IPartitionListener.PropertyDeleted"/>
+    /// <inheritdoc cref="IPartitionPublisher.PropertyDeleted"/>
     /// <param name="Node"></param>
     /// <param name="Property"></param>
     /// <param name="OldValue"></param>
@@ -63,7 +63,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.DeleteProperty"/>
     event EventHandler<PropertyDeletedArgs> PropertyDeleted;
 
-    /// <inheritdoc cref="IPartitionListener.PropertyChanged"/>
+    /// <inheritdoc cref="IPartitionPublisher.PropertyChanged"/>
     /// <param name="Node"></param>
     /// <param name="Property"></param>
     /// <param name="NewValue"></param>
@@ -82,7 +82,7 @@ public interface IPartitionListener
 
     #region Children
 
-    /// <inheritdoc cref="IPartitionListener.ChildAdded"/>
+    /// <inheritdoc cref="IPartitionPublisher.ChildAdded"/>
     /// <param name="Parent"></param>
     /// <param name="NewChild"></param>
     /// <param name="Containment"></param>
@@ -97,7 +97,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.AddChild"/>
     event EventHandler<ChildAddedArgs> ChildAdded;
 
-    /// <inheritdoc cref="IPartitionListener.ChildDeleted"/>
+    /// <inheritdoc cref="IPartitionPublisher.ChildDeleted"/>
     /// <param name="DeletedChild"></param>
     /// <param name="Parent"></param>
     /// <param name="Containment"></param>
@@ -112,7 +112,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.DeleteChild"/>
     event EventHandler<ChildDeletedArgs> ChildDeleted;
 
-    /// <inheritdoc cref="IPartitionListener.ChildReplaced"/>
+    /// <inheritdoc cref="IPartitionPublisher.ChildReplaced"/>
     /// <param name="NewChild"></param>
     /// <param name="ReplacedChild"></param>
     /// <param name="Parent"></param>
@@ -129,7 +129,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.ReplaceChild"/>
     event EventHandler<ChildReplacedArgs> ChildReplaced;
 
-    /// <inheritdoc cref="IPartitionListener.ChildMovedFromOtherContainment"/>
+    /// <inheritdoc cref="IPartitionPublisher.ChildMovedFromOtherContainment"/>
     /// <param name="NewParent"></param>
     /// <param name="NewContainment"></param>
     /// <param name="NewIndex"></param>
@@ -150,7 +150,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.MoveChildFromOtherContainment"/>
     event EventHandler<ChildMovedFromOtherContainmentArgs> ChildMovedFromOtherContainment;
 
-    /// <inheritdoc cref="IPartitionListener.ChildMovedFromOtherContainmentInSameParent"/>
+    /// <inheritdoc cref="IPartitionPublisher.ChildMovedFromOtherContainmentInSameParent"/>
     /// <param name="NewContainment"></param>
     /// <param name="NewIndex"></param>
     /// <param name="MovedChild"></param>
@@ -169,7 +169,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.CanRaiseMoveChildFromOtherContainmentInSameParent"/>
     event EventHandler<ChildMovedFromOtherContainmentInSameParentArgs> ChildMovedFromOtherContainmentInSameParent;
 
-    /// <inheritdoc cref="IPartitionListener.ChildMovedInSameContainment"/>
+    /// <inheritdoc cref="IPartitionPublisher.ChildMovedInSameContainment"/>
     /// <param name="NewIndex"></param>
     /// <param name="MovedChild"></param>
     /// <param name="Parent"></param>
@@ -190,7 +190,7 @@ public interface IPartitionListener
 
     #region Annotations
 
-    /// <inheritdoc cref="IPartitionListener.AnnotationAdded"/>
+    /// <inheritdoc cref="IPartitionPublisher.AnnotationAdded"/>
     /// <param name="Parent"></param>
     /// <param name="NewAnnotation"></param>
     /// <param name="Index"></param>
@@ -199,7 +199,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.AddAnnotation"/>
     event EventHandler<AnnotationAddedArgs> AnnotationAdded;
 
-    /// <inheritdoc cref="IPartitionListener.AnnotationDeleted"/>
+    /// <inheritdoc cref="IPartitionPublisher.AnnotationDeleted"/>
     /// <param name="DeletedAnnotation"></param>
     /// <param name="Parent"></param>
     /// <param name="Index"></param>
@@ -208,7 +208,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.DeleteAnnotation"/>
     event EventHandler<AnnotationDeletedArgs> AnnotationDeleted;
 
-    /// <inheritdoc cref="IPartitionListener.AnnotationReplaced"/>
+    /// <inheritdoc cref="IPartitionPublisher.AnnotationReplaced"/>
     /// <param name="NewAnnotation"></param>
     /// <param name="ReplacedAnnotation"></param>
     /// <param name="Parent"></param>
@@ -222,7 +222,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.ReplaceAnnotation"/>
     event EventHandler<AnnotationReplacedArgs> AnnotationReplaced;
 
-    /// <inheritdoc cref="IPartitionListener.AnnotationMovedFromOtherParent"/>
+    /// <inheritdoc cref="IPartitionPublisher.AnnotationMovedFromOtherParent"/>
     /// <param name="NewParent"></param>
     /// <param name="NewIndex"></param>
     /// <param name="MovedAnnotation"></param>
@@ -238,7 +238,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.MoveAnnotationFromOtherParent"/>
     event EventHandler<AnnotationMovedFromOtherParentArgs> AnnotationMovedFromOtherParent;
 
-    /// <inheritdoc cref="IPartitionListener.remove_AnnotationMovedInSameParent"/>
+    /// <inheritdoc cref="IPartitionPublisher.remove_AnnotationMovedInSameParent"/>
     /// <param name="NewIndex"></param>
     /// <param name="MovedAnnotation"></param>
     /// <param name="Parent"></param>
@@ -256,7 +256,7 @@ public interface IPartitionListener
 
     #region References
 
-    /// <inheritdoc cref="IPartitionListener.ReferenceAdded"/>
+    /// <inheritdoc cref="IPartitionPublisher.ReferenceAdded"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
@@ -266,7 +266,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.AddReference"/>
     event EventHandler<ReferenceAddedArgs> ReferenceAdded;
 
-    /// <inheritdoc cref="IPartitionListener.ReferenceDeleted"/>
+    /// <inheritdoc cref="IPartitionPublisher.ReferenceDeleted"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
@@ -276,7 +276,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.DeleteReference"/>
     event EventHandler<ReferenceDeletedArgs> ReferenceDeleted;
 
-    /// <inheritdoc cref="IPartitionListener.ReferenceChanged"/>
+    /// <inheritdoc cref="IPartitionPublisher.ReferenceChanged"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
@@ -292,7 +292,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.ChangeReference"/>
     event EventHandler<ReferenceChangedArgs> ReferenceChanged;
 
-    /// <inheritdoc cref="IPartitionListener.EntryMovedFromOtherReference"/>
+    /// <inheritdoc cref="IPartitionPublisher.EntryMovedFromOtherReference"/>
     /// <param name="NewParent"></param>
     /// <param name="NewReference"></param>
     /// <param name="NewIndex"></param>
@@ -312,7 +312,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.MoveEntryFromOtherReference"/>
     event EventHandler<EntryMovedFromOtherReferenceArgs> EntryMovedFromOtherReference;
 
-    /// <inheritdoc cref="IPartitionListener.EntryMovedFromOtherReferenceInSameParent"/>
+    /// <inheritdoc cref="IPartitionPublisher.EntryMovedFromOtherReferenceInSameParent"/>
     /// <param name="Parent"></param>
     /// <param name="NewReference"></param>
     /// <param name="NewIndex"></param>
@@ -330,7 +330,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.MoveEntryFromOtherReferenceInSameParent"/>
     event EventHandler<EntryMovedFromOtherReferenceInSameParentArgs> EntryMovedFromOtherReferenceInSameParent;
 
-    /// <inheritdoc cref="IPartitionListener.EntryMovedInSameReference"/>
+    /// <inheritdoc cref="IPartitionPublisher.EntryMovedInSameReference"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="OldIndex"></param>
@@ -346,7 +346,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.MoveEntryInSameReference"/>
     event EventHandler<EntryMovedInSameReferenceArgs> EntryMovedInSameReference;
 
-    /// <inheritdoc cref="IPartitionListener.ReferenceResolveInfoAdded"/>
+    /// <inheritdoc cref="IPartitionPublisher.ReferenceResolveInfoAdded"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
@@ -362,7 +362,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.AddReferenceResolveInfo"/>
     event EventHandler<ReferenceResolveInfoAddedArgs> ReferenceResolveInfoAdded;
 
-    /// <inheritdoc cref="IPartitionListener.ReferenceResolveInfoDeleted"/>
+    /// <inheritdoc cref="IPartitionPublisher.ReferenceResolveInfoDeleted"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
@@ -378,7 +378,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.DeleteReferenceResolveInfo"/>
     event EventHandler<ReferenceResolveInfoDeletedArgs> ReferenceResolveInfoDeleted;
 
-    /// <inheritdoc cref="IPartitionListener.ReferenceResolveInfoChanged"/>
+    /// <inheritdoc cref="IPartitionPublisher.ReferenceResolveInfoChanged"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
@@ -396,7 +396,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.ChangeReferenceResolveInfo"/>
     event EventHandler<ReferenceResolveInfoChangedArgs> ReferenceResolveInfoChanged;
 
-    /// <inheritdoc cref="IPartitionListener.ReferenceTargetAdded"/>
+    /// <inheritdoc cref="IPartitionPublisher.ReferenceTargetAdded"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
@@ -412,7 +412,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.AddReferenceTarget"/>
     event EventHandler<ReferenceTargetAddedArgs> ReferenceTargetAdded;
 
-    /// <inheritdoc cref="IPartitionListener.ReferenceTargetDeleted"/>
+    /// <inheritdoc cref="IPartitionPublisher.ReferenceTargetDeleted"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="Index"></param>
@@ -428,7 +428,7 @@ public interface IPartitionListener
     /// <seealso cref="IPartitionCommander.DeleteReferenceTarget"/>
     event EventHandler<ReferenceTargetDeletedArgs> ReferenceTargetDeleted;
 
-    /// <inheritdoc cref="IPartitionListener.ReferenceTargetChanged"/>
+    /// <inheritdoc cref="IPartitionPublisher.ReferenceTargetChanged"/>
     /// <param name="Parent"></param>
     /// <param name="Reference"></param>
     /// <param name="Index"></param>

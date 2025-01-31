@@ -23,7 +23,7 @@ using System.Collections;
 public class PartitionEventApplier : EventApplierBase
 {
     private readonly IPartitionInstance _localPartition;
-    private readonly List<IPartitionListener> _listeners = [];
+    private readonly List<IPartitionPublisher> _listeners = [];
 
     public PartitionEventApplier(IPartitionInstance localPartition,
         Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(sharedNodeMap)
@@ -32,36 +32,36 @@ public class PartitionEventApplier : EventApplierBase
         Init();
     }
 
-    public void Subscribe(IPartitionListener listener)
+    public void Subscribe(IPartitionPublisher publisher)
     {
-        _listeners.Add(listener);
+        _listeners.Add(publisher);
 
-        listener.PropertyAdded += OnRemotePropertyAdded;
-        listener.PropertyDeleted += OnRemotePropertyDeleted;
-        listener.PropertyChanged += OnRemotePropertyChanged;
+        publisher.PropertyAdded += OnRemotePropertyAdded;
+        publisher.PropertyDeleted += OnRemotePropertyDeleted;
+        publisher.PropertyChanged += OnRemotePropertyChanged;
 
-        listener.ChildAdded += OnRemoteChildAdded;
-        listener.ChildDeleted += OnRemoteChildDeleted;
-        listener.ChildReplaced += OnRemoteChildReplaced;
-        listener.ChildMovedFromOtherContainment += OnRemoteChildMovedFromOtherContainment;
-        listener.ChildMovedFromOtherContainmentInSameParent += OnRemoteChildMovedFromOtherContainmentInSameParent;
-        listener.ChildMovedInSameContainment += OnRemoteChildMovedInSameContainment;
+        publisher.ChildAdded += OnRemoteChildAdded;
+        publisher.ChildDeleted += OnRemoteChildDeleted;
+        publisher.ChildReplaced += OnRemoteChildReplaced;
+        publisher.ChildMovedFromOtherContainment += OnRemoteChildMovedFromOtherContainment;
+        publisher.ChildMovedFromOtherContainmentInSameParent += OnRemoteChildMovedFromOtherContainmentInSameParent;
+        publisher.ChildMovedInSameContainment += OnRemoteChildMovedInSameContainment;
 
-        listener.AnnotationAdded += OnRemoteAnnotationAdded;
-        listener.AnnotationDeleted += OnRemoteAnnotationDeleted;
-        listener.AnnotationMovedFromOtherParent += OnRemoteAnnotationMovedFromOtherParent;
-        listener.AnnotationMovedInSameParent += OnRemoteAnnotationMovedInSameParent;
+        publisher.AnnotationAdded += OnRemoteAnnotationAdded;
+        publisher.AnnotationDeleted += OnRemoteAnnotationDeleted;
+        publisher.AnnotationMovedFromOtherParent += OnRemoteAnnotationMovedFromOtherParent;
+        publisher.AnnotationMovedInSameParent += OnRemoteAnnotationMovedInSameParent;
 
-        listener.ReferenceAdded += OnRemoteReferenceAdded;
-        listener.ReferenceDeleted += OnRemoteReferenceDeleted;
-        listener.ReferenceChanged += OnRemoteReferenceChanged;
+        publisher.ReferenceAdded += OnRemoteReferenceAdded;
+        publisher.ReferenceDeleted += OnRemoteReferenceDeleted;
+        publisher.ReferenceChanged += OnRemoteReferenceChanged;
     }
 
     private void Init()
     {
         RegisterNode(_localPartition);
 
-        var listener = _localPartition.Listener;
+        var listener = _localPartition.Publisher;
         if (listener == null)
             return;
 
@@ -99,7 +99,7 @@ public class PartitionEventApplier : EventApplierBase
 
         UnregisterNode(_localPartition);
 
-        var localListener = _localPartition.Listener;
+        var localListener = _localPartition.Publisher;
         if (localListener == null)
             return;
 
@@ -148,16 +148,16 @@ public class PartitionEventApplier : EventApplierBase
 
     #region Local
 
-    private void OnLocalChildAdded(object? sender, IPartitionListener.ChildAddedArgs args) =>
+    private void OnLocalChildAdded(object? sender, IPartitionPublisher.ChildAddedArgs args) =>
         RegisterNode(args.NewChild);
 
-    private void OnLocalChildDeleted(object? sender, IPartitionListener.ChildDeletedArgs args) =>
+    private void OnLocalChildDeleted(object? sender, IPartitionPublisher.ChildDeletedArgs args) =>
         UnregisterNode(args.DeletedChild);
 
-    private void OnLocalAnnotationAdded(object? sender, IPartitionListener.AnnotationAddedArgs args) =>
+    private void OnLocalAnnotationAdded(object? sender, IPartitionPublisher.AnnotationAddedArgs args) =>
         RegisterNode(args.NewAnnotation);
 
-    private void OnLocalAnnotationDeleted(object? sender, IPartitionListener.AnnotationDeletedArgs args) =>
+    private void OnLocalAnnotationDeleted(object? sender, IPartitionPublisher.AnnotationDeletedArgs args) =>
         UnregisterNode(args.DeletedAnnotation);
 
     #endregion
@@ -167,21 +167,21 @@ public class PartitionEventApplier : EventApplierBase
 
     #region Properties
 
-    private void OnRemotePropertyAdded(object? sender, IPartitionListener.PropertyAddedArgs args) =>
+    private void OnRemotePropertyAdded(object? sender, IPartitionPublisher.PropertyAddedArgs args) =>
         PauseCommands(() =>
         {
             Lookup(args.Node.GetId()).Set(args.Property, args.NewValue);
             return null;
         });
 
-    private void OnRemotePropertyDeleted(object? sender, IPartitionListener.PropertyDeletedArgs args) =>
+    private void OnRemotePropertyDeleted(object? sender, IPartitionPublisher.PropertyDeletedArgs args) =>
         PauseCommands(() =>
         {
             Lookup(args.Node.GetId()).Set(args.Property, null);
             return null;
         });
 
-    private void OnRemotePropertyChanged(object? sender, IPartitionListener.PropertyChangedArgs args) =>
+    private void OnRemotePropertyChanged(object? sender, IPartitionPublisher.PropertyChangedArgs args) =>
         PauseCommands(() =>
         {
             Lookup(args.Node.GetId()).Set(args.Property, args.NewValue);
@@ -192,7 +192,7 @@ public class PartitionEventApplier : EventApplierBase
 
     #region Children
 
-    private void OnRemoteChildAdded(object? sender, IPartitionListener.ChildAddedArgs args) =>
+    private void OnRemoteChildAdded(object? sender, IPartitionPublisher.ChildAddedArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -207,7 +207,7 @@ public class PartitionEventApplier : EventApplierBase
             return null;
         });
 
-    private void OnRemoteChildDeleted(object? sender, IPartitionListener.ChildDeletedArgs args) =>
+    private void OnRemoteChildDeleted(object? sender, IPartitionPublisher.ChildDeletedArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -229,7 +229,7 @@ public class PartitionEventApplier : EventApplierBase
             return null;
         });
 
-    private void OnRemoteChildReplaced(object? sender, IPartitionListener.ChildReplacedArgs args) =>
+    private void OnRemoteChildReplaced(object? sender, IPartitionPublisher.ChildReplacedArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -256,7 +256,7 @@ public class PartitionEventApplier : EventApplierBase
         });
 
     private void OnRemoteChildMovedFromOtherContainment(object? sender,
-        IPartitionListener.ChildMovedFromOtherContainmentArgs args) =>
+        IPartitionPublisher.ChildMovedFromOtherContainmentArgs args) =>
         PauseCommands(() =>
         {
             var localNewParent = Lookup(args.NewParent.GetId());
@@ -268,7 +268,7 @@ public class PartitionEventApplier : EventApplierBase
         });
 
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(object? sender,
-        IPartitionListener.ChildMovedFromOtherContainmentInSameParentArgs args) =>
+        IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -280,7 +280,7 @@ public class PartitionEventApplier : EventApplierBase
         });
 
     private void OnRemoteChildMovedInSameContainment(object? sender,
-        IPartitionListener.ChildMovedInSameContainmentArgs args) =>
+        IPartitionPublisher.ChildMovedInSameContainmentArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -326,7 +326,7 @@ public class PartitionEventApplier : EventApplierBase
 
     #region Annotations
 
-    private void OnRemoteAnnotationAdded(object? sender, IPartitionListener.AnnotationAddedArgs args) =>
+    private void OnRemoteAnnotationAdded(object? sender, IPartitionPublisher.AnnotationAddedArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -336,7 +336,7 @@ public class PartitionEventApplier : EventApplierBase
             return null;
         });
 
-    private void OnRemoteAnnotationDeleted(object? sender, IPartitionListener.AnnotationDeletedArgs args) =>
+    private void OnRemoteAnnotationDeleted(object? sender, IPartitionPublisher.AnnotationDeletedArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -347,7 +347,7 @@ public class PartitionEventApplier : EventApplierBase
         });
 
     private void OnRemoteAnnotationMovedFromOtherParent(object? sender,
-        IPartitionListener.AnnotationMovedFromOtherParentArgs args) =>
+        IPartitionPublisher.AnnotationMovedFromOtherParentArgs args) =>
         PauseCommands(() =>
         {
             var localNewParent = Lookup(args.NewParent.GetId());
@@ -357,7 +357,7 @@ public class PartitionEventApplier : EventApplierBase
         });
 
     private void OnRemoteAnnotationMovedInSameParent(object? sender,
-        IPartitionListener.AnnotationMovedInSameParentArgs args) =>
+        IPartitionPublisher.AnnotationMovedInSameParentArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -370,7 +370,7 @@ public class PartitionEventApplier : EventApplierBase
 
     #region References
 
-    private void OnRemoteReferenceAdded(object? sender, IPartitionListener.ReferenceAddedArgs args) =>
+    private void OnRemoteReferenceAdded(object? sender, IPartitionPublisher.ReferenceAddedArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -381,7 +381,7 @@ public class PartitionEventApplier : EventApplierBase
             return null;
         });
 
-    private void OnRemoteReferenceDeleted(object? sender, IPartitionListener.ReferenceDeletedArgs args) =>
+    private void OnRemoteReferenceDeleted(object? sender, IPartitionPublisher.ReferenceDeletedArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());
@@ -402,7 +402,7 @@ public class PartitionEventApplier : EventApplierBase
             return null;
         });
 
-    private void OnRemoteReferenceChanged(object? sender, IPartitionListener.ReferenceChangedArgs args) =>
+    private void OnRemoteReferenceChanged(object? sender, IPartitionPublisher.ReferenceChangedArgs args) =>
         PauseCommands(() =>
         {
             var localParent = Lookup(args.Parent.GetId());

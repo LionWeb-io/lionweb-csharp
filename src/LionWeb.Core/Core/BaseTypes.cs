@@ -116,7 +116,7 @@ public interface IPartitionInstance : IConceptInstance
 {
     /// Optional hook to listen to partition events.
     /// Not supported by every implementation. 
-    IPartitionListener? Listener { get => null; }
+    IPartitionPublisher? Publisher { get => null; }
     
     /// Optional hook to raise partition events.
     /// Not supported by every implementation. 
@@ -817,7 +817,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     #endregion
 
-    #region Listener Helpers
+    #region Publisher Helpers
 
     /// Raises either <see cref="IPartitionCommander.AddProperty"/>, <see cref="IPartitionCommander.DeleteProperty"/> or
     /// <see cref="IPartitionCommander.ChangeProperty"/> for <paramref name="property"/>,

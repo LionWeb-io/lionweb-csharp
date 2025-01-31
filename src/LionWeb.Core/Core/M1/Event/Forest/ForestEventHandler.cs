@@ -17,8 +17,8 @@
 
 namespace LionWeb.Core.M1.Event.Forest;
 
-/// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestListener"/> events.
-public class ForestEventHandler : EventHandlerBase, IForestListener, IForestCommander
+/// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestPublisher"/> events.
+public class ForestEventHandler : EventHandlerBase, IForestPublisher, IForestCommander
 {
     private readonly object _sender;
 
@@ -30,13 +30,13 @@ public class ForestEventHandler : EventHandlerBase, IForestListener, IForestComm
     }
 
     /// <inheritdoc />
-    public event EventHandler<IForestListener.NewPartitionArgs> NewPartition
+    public event EventHandler<IForestPublisher.NewPartitionArgs> NewPartition
     {
         add => _newPartition.Add(value);
         remove => _newPartition.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IForestListener.NewPartitionArgs> _newPartition = new();
+    private readonly ShortCircuitEventHandler<IForestPublisher.NewPartitionArgs> _newPartition = new();
 
     /// <inheritdoc />
     public void AddPartition(IPartitionInstance newPartition, EventId? eventId = null) =>
@@ -46,13 +46,13 @@ public class ForestEventHandler : EventHandlerBase, IForestListener, IForestComm
     public bool CanRaiseAddPartition => _newPartition.HasSubscribers;
 
     /// <inheritdoc />
-    public event EventHandler<IForestListener.PartitionDeletedArgs> PartitionDeleted
+    public event EventHandler<IForestPublisher.PartitionDeletedArgs> PartitionDeleted
     {
         add => _partitionDeleted.Add(value);
         remove => _partitionDeleted.Remove(value);
     }
 
-    private readonly ShortCircuitEventHandler<IForestListener.PartitionDeletedArgs> _partitionDeleted = new();
+    private readonly ShortCircuitEventHandler<IForestPublisher.PartitionDeletedArgs> _partitionDeleted = new();
 
     /// <inheritdoc />
     public void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null) =>
