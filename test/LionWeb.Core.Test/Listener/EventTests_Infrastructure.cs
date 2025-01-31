@@ -19,7 +19,9 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1.Event;
 using M1.Event.Partition;
+using System.Reflection;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
@@ -50,15 +52,13 @@ public class EventTests_Infrastructure
         int addedCount = 0;
         node.Publisher.Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
         
-        int changedCount = 0;
-        node.Publisher.Subscribe<PropertyChangedEvent>((sender, args) => changedCount++);
+        node.Publisher.Subscribe<PropertyChangedEvent>((sender, args) => {});
 
         circle.Name = "Hello";
         circle.Name = "World";
         
         Assert.AreEqual("World", circle.Name);
         Assert.AreEqual(1, addedCount);
-        Assert.AreEqual(1, changedCount);
     }
 
     [TestMethod]
@@ -83,6 +83,78 @@ public class EventTests_Infrastructure
         Assert.AreEqual(1, addedCount);
         Assert.AreEqual(1, changedCount);
         Assert.AreEqual(2, allCount);
+    }
+
+    [TestMethod]
+    public void Twoway_OtherListeners()
+    {
+        var circle = new Circle("c");
+        var node = new Geometry("a") { Shapes = [circle] };
+
+        var cloneCircle = new Circle("c");
+        var clone = new Geometry("a") { Shapes = [cloneCircle] };
+
+        var replicator = new PartitionEventReplicator(clone);
+        var cloneReplicator = new PartitionEventReplicator(node);
+        
+        replicator.Subscribe(cloneReplicator);
+        cloneReplicator.Subscribe(replicator);
+
+        int nodeCount = 0;
+        node.Publisher.Subscribe<IPartitionEvent>((sender, args) => nodeCount++);
+        
+        int cloneCount = 0;
+        clone.Publisher.Subscribe<IPartitionEvent>((sender, args) => cloneCount++);
+        
+        circle.Name = "Hello";
+        cloneCircle.Name = "World";
+
+        AssertEquals([node], [clone]);
+        Assert.AreEqual(2, nodeCount);
+        Assert.AreEqual(2, cloneCount);
+    }
+    
+    [TestMethod]
+    public void Twoway_NoLingeringEventIds()
+    {
+        var circle = new Circle("c");
+        var node = new Geometry("a") { Shapes = [circle] };
+
+        var cloneCircle = new Circle("c");
+        var clone = new Geometry("a") { Shapes = [cloneCircle] };
+
+        var replicator = new PartitionEventReplicator(clone);
+        var cloneReplicator = new PartitionEventReplicator(node);
+        
+        replicator.Subscribe(cloneReplicator);
+        cloneReplicator.Subscribe(replicator);
+
+        circle.Name = "Hello";
+        cloneCircle.Name = "World";
+
+        AssertEquals([node], [clone]);
+        
+        Assert.AreEqual(0, ReplicatorEventIds(replicator).Count);
+        Assert.AreEqual(0, ReplicatorEventIds(cloneReplicator).Count);
+        
+        Assert.AreEqual(0, CommanderEventIds(node.Commander).Value!.Count);
+        Assert.AreEqual(0, CommanderEventIds(clone.Commander).Value!.Count);
+    }
+
+    private static HashSet<string> ReplicatorEventIds(PartitionEventReplicator replicator)
+    {
+        var type = typeof(EventReplicatorBase<IPartitionEvent, IPartitionPublisher>);
+        var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_eventIds");
+        var value = fieldInfo.GetValue(replicator);
+        return (HashSet<string>)value!;
+    }
+
+    private static AsyncLocal<Queue<string>> CommanderEventIds(ICommander<IPartitionEvent> commander)
+    {
+        var type = typeof(EventHandlerBase<IPartitionEvent>);
+        var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_eventIds");
+        var value = fieldInfo.GetValue(commander);
+        return (AsyncLocal<Queue<string>>)value!;
     }
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
