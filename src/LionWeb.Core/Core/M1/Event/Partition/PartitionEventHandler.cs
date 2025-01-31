@@ -95,11 +95,15 @@ public class PartitionEventHandler : EventHandlerBase<IPartitionEvent>, IPartiti
 
     /// <inheritdoc />
     public void ChangeProperty(IWritableNode node, Property property, object newValue, object oldValue,
-        EventId? eventId = null) =>
-        _propertyChanged.Invoke(_sender, new(node, property, newValue, oldValue, eventId ?? CreateEventId()));
+        EventId? eventId = null)
+    {
+        var args = new IPartitionPublisher.PropertyChangedArgs(node, property, newValue, oldValue, eventId ?? CreateEventId());
+        _propertyChanged.Invoke(_sender, args);
+        Raise(args);
+    }
 
     /// <inheritdoc />
-    public bool CanRaiseChangeProperty => _propertyChanged.HasSubscribers;
+    public bool CanRaiseChangeProperty => _propertyChanged.HasSubscribers || CanRaise(typeof(IPartitionPublisher.PropertyChangedArgs));
 
     /// <inheritdoc />
     public event EventHandler<IPartitionPublisher.ChildAddedArgs> ChildAdded

@@ -50,9 +50,11 @@ public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TW
     private readonly Dictionary<object, Channel<TWrite>> _channels = [];
     private readonly Dictionary<Type, int> _subscribedEvents = [];
 
+    private int nextId = 0;
+    
     /// <inheritdoc />
     public virtual EventId CreateEventId() =>
-        Guid.NewGuid().ToString();
+        nextId++.ToString();
 
     /// <inheritdoc />
     public ChannelReader<TRead> Subscribe<TRead>() where TRead : TWrite
@@ -69,7 +71,10 @@ public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TW
             }
         }
 
-        Channel<TWrite> channel = Channel.CreateUnbounded<TWrite>();
+        Channel<TWrite> channel = Channel.CreateUnbounded<TWrite>(new UnboundedChannelOptions
+        {
+            SingleReader = true, SingleWriter = true, AllowSynchronousContinuations = true
+        });
         var filteredChannelReader =
             new FilteredChannelReader<TWrite, TRead>(channel, f => _allSubtypes[eventType].Contains(f.GetType()));
         _channels.Add(filteredChannelReader, channel);
@@ -124,18 +129,27 @@ internal class FilteredChannelReader<TWrite, TRead>(Channel<TWrite> input, Func<
     }
 
 
-    public override async ValueTask<bool> WaitToReadAsync(CancellationToken cancellationToken = new CancellationToken())
+    public override ValueTask<bool> WaitToReadAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        while (!cancellationToken.IsCancellationRequested)
+        var x = input.Reader
+            .WaitToReadAsync(cancellationToken)
+            .AsTask()
+            .ContinueWith(ContinuationFunction, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
+        
+        return new ValueTask<bool>(x);
+
+        bool ContinuationFunction(Task<bool> b)
         {
-            var available = await input.Reader.WaitToReadAsync(cancellationToken);
-            if (!available)
-                return false;
+            if (!b.Result) return false;
 
-            if (input.Reader.TryPeek(out TWrite? inputItem) && inputItem is TRead && filter(inputItem))
-                return true;
+            if (input.Reader.TryPeek(out TWrite? inputItem))
+            {
+                if (inputItem is TRead && filter(inputItem))
+                    return true;
+                input.Reader.TryRead(out _);
+            }
+
+            return false;
         }
-
-        return false;
     }
 }

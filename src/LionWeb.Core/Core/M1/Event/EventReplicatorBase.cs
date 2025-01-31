@@ -51,24 +51,16 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable wher
     {
         var channelReader = publisher.Subscribe<TEvent>();
         _channelReaders.Add(publisher, channelReader);
-        WaitForNextEvent();
+        channelReader.WaitForNextEvent(SwitchEvent, _cancellationTokenSource.Token);
         return;
 
-        void SwitchEvent(Task<bool> b)
+        void SwitchEvent(bool b)
         {
             if (_cancellationTokenSource.IsCancellationRequested)
                 return;
-            if (b.Result && channelReader.TryRead(out var item))
+            if (b && channelReader.TryRead(out var item))
                 ProcessEvent(item);
-
-            WaitForNextEvent();
         }
-
-        void WaitForNextEvent() =>
-            channelReader
-                .WaitToReadAsync(_cancellationTokenSource.Token)
-                .AsTask()
-                .ContinueWith(SwitchEvent, _cancellationTokenSource.Token);
     }
 
     protected void RegisterNode(IReadableNode newNode)
@@ -106,4 +98,17 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable wher
         protected override string GetNewId(INode remoteNode) =>
             remoteNode.GetId();
     }
+}
+
+public static class ChannelReaderExtensions
+{
+    public static void WaitForNextEvent<T>(this ChannelReader<T> channelReader, Action<bool> action, CancellationToken cancellationToken = default) =>
+        channelReader
+            .WaitToReadAsync(cancellationToken)
+            .AsTask()
+            .ContinueWith(t =>
+            {
+                action(t.Result);
+                WaitForNextEvent(channelReader, action, cancellationToken);
+            }, cancellationToken, TaskContinuationOptions.ExecuteSynchronously, TaskScheduler.Default);
 }
