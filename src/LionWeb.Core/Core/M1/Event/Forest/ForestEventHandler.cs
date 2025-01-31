@@ -38,9 +38,7 @@ public class ForestEventHandler : EventHandlerBase<IForestEvent>, IForestPublish
     /// <inheritdoc />
     public void AddPartition(IPartitionInstance newPartition, EventId? eventId = null)
     {
-        var args = new IForestPublisher.NewPartitionArgs(newPartition, eventId ?? CreateEventId());
-        Raise(args);
-        _newPartition.Invoke(_sender, args);
+        Raise(new IForestPublisher.NewPartitionArgs(newPartition, eventId ?? CreateEventId()));
     }
 
     /// <inheritdoc />
@@ -58,9 +56,7 @@ public class ForestEventHandler : EventHandlerBase<IForestEvent>, IForestPublish
     /// <inheritdoc />
     public void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null)
     {
-        var args = new IForestPublisher.PartitionDeletedArgs(deletedPartition, eventId ?? CreateEventId());
-        _partitionDeleted.Invoke(_sender, args);
-        Raise(args);
+        Raise(new IForestPublisher.PartitionDeletedArgs(deletedPartition, eventId ?? CreateEventId()));
     }
 
     /// <inheritdoc />
