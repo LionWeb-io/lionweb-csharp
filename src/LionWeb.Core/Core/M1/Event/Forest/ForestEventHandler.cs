@@ -18,47 +18,20 @@
 namespace LionWeb.Core.M1.Event.Forest;
 
 /// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestPublisher"/> events.
-public class ForestEventHandler : EventHandlerBase<IForestEvent>, IForestPublisher, IForestCommander
+/// <param name="sender">Optional sender of the events.</param>
+public class ForestEventHandler(object? sender) : EventHandlerBase<IForestEvent>(sender), IForestPublisher, IForestCommander
 {
-    /// <inheritdoc cref="ForestEventHandler"/>
-    /// <param name="sender">Optional sender of the events.</param>
-    public ForestEventHandler(object? sender) : base(sender)
-    {
-    }
-
     /// <inheritdoc />
-    public event EventHandler<IForestPublisher.NewPartitionArgs> NewPartition
-    {
-        add => _newPartition.Add(value);
-        remove => _newPartition.Remove(value);
-    }
-
-    private readonly ShortCircuitEventHandler<IForestPublisher.NewPartitionArgs> _newPartition = new();
-
-    /// <inheritdoc />
-    public void AddPartition(IPartitionInstance newPartition, EventId? eventId = null)
-    {
+    public void AddPartition(IPartitionInstance newPartition, EventId? eventId = null) =>
         Raise(new IForestPublisher.NewPartitionArgs(newPartition, eventId ?? CreateEventId()));
-    }
 
     /// <inheritdoc />
-    public bool CanRaiseAddPartition => _newPartition.HasSubscribers;
+    public bool CanRaiseAddPartition => CanRaise(typeof(IForestPublisher.NewPartitionArgs));
 
     /// <inheritdoc />
-    public event EventHandler<IForestPublisher.PartitionDeletedArgs> PartitionDeleted
-    {
-        add => _partitionDeleted.Add(value);
-        remove => _partitionDeleted.Remove(value);
-    }
-
-    private readonly ShortCircuitEventHandler<IForestPublisher.PartitionDeletedArgs> _partitionDeleted = new();
-
-    /// <inheritdoc />
-    public void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null)
-    {
+    public void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null) =>
         Raise(new IForestPublisher.PartitionDeletedArgs(deletedPartition, eventId ?? CreateEventId()));
-    }
 
     /// <inheritdoc />
-    public bool CanRaiseDeletePartition => _partitionDeleted.HasSubscribers;
+    public bool CanRaiseDeletePartition => CanRaise(typeof(IForestPublisher.PartitionDeletedArgs));
 }

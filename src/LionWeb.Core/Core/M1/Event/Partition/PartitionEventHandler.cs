@@ -20,14 +20,9 @@ namespace LionWeb.Core.M1.Event.Partition;
 using M3;
 
 /// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionPublisher"/> events.
-public class PartitionEventHandler : EventHandlerBase<IPartitionEvent>, IPartitionPublisher, IPartitionCommander
+/// <param name="sender">Optional sender of the events.</param>
+public class PartitionEventHandler(object? sender) : EventHandlerBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander
 {
-    /// <inheritdoc cref="PartitionEventHandler"/>
-    /// <param name="sender">Optional sender of the events.</param>
-    public PartitionEventHandler(object? sender) : base(sender)
-    {
-    }
-
     /// <inheritdoc />
     public void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier,
         EventId? eventId = null) =>

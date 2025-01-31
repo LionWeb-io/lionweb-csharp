@@ -23,7 +23,6 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 {
     private readonly IForest _localForest;
     private readonly Dictionary<NodeId, PartitionEventReplicator> _localPartitions = [];
-    private readonly List<IForestPublisher> _listeners = [];
 
     public ForestEventReplicator(IForest localForest, Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) :
         base(sharedNodeMap)
@@ -39,22 +38,24 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
             RegisterPartition(partition);
         }
 
-        var forestListener = _localForest.Publisher;
-        if (forestListener == null)
+        var forestPublisher = _localForest.Publisher;
+        if (forestPublisher == null)
             return;
 
-        forestListener.NewPartition += OnLocalNewPartition;
-        forestListener.PartitionDeleted += OnLocalPartitionDeleted;
+        forestPublisher.Subscribe<IForestEvent>(LocalHandler);
     }
 
-    /// <inheritdoc />
-    public override void Subscribe(IForestPublisher publisher)
+    private void LocalHandler(object? sender, IForestEvent @event)
     {
-        SubscribeEvent(publisher);
-        _listeners.Add(publisher);
-
-        publisher.NewPartition += OnRemoteNewPartition;
-        publisher.PartitionDeleted += OnRemotePartitionDeleted;
+        switch (@event)
+        {
+            case IForestPublisher.NewPartitionArgs a:
+                OnLocalNewPartition(sender, a);
+                break;
+            case IForestPublisher.PartitionDeletedArgs a:
+                OnLocalPartitionDeleted(sender, a);
+                break;
+        }
     }
 
     /// <inheritdoc />
@@ -77,12 +78,6 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     {
         base.Dispose();
 
-        foreach (var listener in _listeners)
-        {
-            listener.NewPartition -= OnRemoteNewPartition;
-            listener.PartitionDeleted -= OnRemotePartitionDeleted;
-        }
-
         foreach (var localPartition in _localPartitions.Values)
         {
             localPartition.Dispose();
@@ -92,8 +87,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         if (forestListener == null)
             return;
 
-        forestListener.NewPartition -= OnLocalNewPartition;
-        forestListener.PartitionDeleted -= OnLocalPartitionDeleted;
+        forestListener.Unsubscribe<IForestEvent>(LocalHandler);
     }
 
     private void RegisterPartition(IPartitionInstance partition)
