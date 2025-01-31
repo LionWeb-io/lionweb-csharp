@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.Test.NodeApi.Dynamic;
 
+using M1.Event.Partition;
+
 [TestClass]
 public class PropertyTests_Listener : DynamicNodeTestsBase
 {
@@ -28,13 +30,13 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         parent.Set(Geometry_documentation, doc);
 
         int events = 0;
-        parent.Publisher.PropertyAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(Documentation_text, args.Property);
             Assert.AreEqual("hello", args.NewValue);
-        };
+        });
 
         doc.Set(Documentation_text, "hello");
 
@@ -50,13 +52,13 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         doc.Set(Documentation_text, "hello");
 
         int events = 0;
-        parent.Publisher.PropertyDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(Documentation_text, args.Property);
             Assert.AreEqual("hello", args.OldValue);
-        };
+        });
         doc.Set(Documentation_text, null);
 
 
@@ -72,18 +74,18 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         doc.Set(Documentation_text, "hello");
 
         int events = 0;
-        parent.Publisher.PropertyChanged += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(Documentation_text, args.Property);
             Assert.AreEqual("hello", args.OldValue);
             Assert.AreEqual("bye", args.NewValue);
-        };
+        });
 
         int badEvents = 0;
-        parent.Publisher.PropertyAdded += (sender, args) => badEvents++;
-        parent.Publisher.PropertyDeleted += (sender, args) => badEvents++;
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => badEvents++);
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) => badEvents++);
 
         doc.Set(Documentation_text, "bye");
 

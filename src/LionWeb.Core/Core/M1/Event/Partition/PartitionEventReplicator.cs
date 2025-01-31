@@ -23,7 +23,6 @@ using System.Collections;
 public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPartitionPublisher>
 {
     private readonly IPartitionInstance _localPartition;
-    private readonly List<IPartitionPublisher> _publishers = [];
 
     public PartitionEventReplicator(IPartitionInstance localPartition,
         Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(sharedNodeMap)
@@ -33,85 +32,57 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     }
 
     /// <inheritdoc />
-    public override void Subscribe(IPartitionPublisher publisher)
-    {
-        SubscribeEvent(publisher);
-
-        _publishers.Add(publisher);
-
-        // publisher.PropertyAdded += OnRemotePropertyAdded;
-        // publisher.PropertyDeleted += OnRemotePropertyDeleted;
-        // publisher.PropertyChanged += OnRemotePropertyChanged;
-
-        publisher.ChildAdded += OnRemoteChildAdded;
-        publisher.ChildDeleted += OnRemoteChildDeleted;
-        publisher.ChildReplaced += OnRemoteChildReplaced;
-        publisher.ChildMovedFromOtherContainment += OnRemoteChildMovedFromOtherContainment;
-        publisher.ChildMovedFromOtherContainmentInSameParent += OnRemoteChildMovedFromOtherContainmentInSameParent;
-        publisher.ChildMovedInSameContainment += OnRemoteChildMovedInSameContainment;
-
-        publisher.AnnotationAdded += OnRemoteAnnotationAdded;
-        publisher.AnnotationDeleted += OnRemoteAnnotationDeleted;
-        publisher.AnnotationMovedFromOtherParent += OnRemoteAnnotationMovedFromOtherParent;
-        publisher.AnnotationMovedInSameParent += OnRemoteAnnotationMovedInSameParent;
-
-        publisher.ReferenceAdded += OnRemoteReferenceAdded;
-        publisher.ReferenceDeleted += OnRemoteReferenceDeleted;
-        publisher.ReferenceChanged += OnRemoteReferenceChanged;
-    }
-
-    /// <inheritdoc />
     protected override void ProcessEvent(object? sender, IPartitionEvent? @event)
     {
         switch (@event)
         {
             case IPartitionPublisher.PropertyAddedArgs a:
-                OnRemotePropertyAdded(null, a);
+                OnRemotePropertyAdded(sender, a);
                 break;
             case IPartitionPublisher.PropertyDeletedArgs a:
-                OnRemotePropertyDeleted(null, a);
+                OnRemotePropertyDeleted(sender, a);
                 break;
             case IPartitionPublisher.PropertyChangedArgs a:
-                OnRemotePropertyChanged(null, a);
+                OnRemotePropertyChanged(sender, a);
                 break;
             case IPartitionPublisher.ChildAddedArgs a:
-                OnRemoteChildAdded(null, a);
+                OnRemoteChildAdded(sender, a);
                 break;
             case IPartitionPublisher.ChildDeletedArgs a:
-                OnRemoteChildDeleted(null, a);
+                OnRemoteChildDeleted(sender, a);
                 break;
             case IPartitionPublisher.ChildReplacedArgs a:
-                OnRemoteChildReplaced(null, a);
+                OnRemoteChildReplaced(sender, a);
                 break;
             case IPartitionPublisher.ChildMovedFromOtherContainmentArgs a:
-                OnRemoteChildMovedFromOtherContainment(null, a);
+                OnRemoteChildMovedFromOtherContainment(sender, a);
                 break;
             case IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs a:
-                OnRemoteChildMovedFromOtherContainmentInSameParent(null, a);
+                OnRemoteChildMovedFromOtherContainmentInSameParent(sender, a);
                 break;
             case IPartitionPublisher.ChildMovedInSameContainmentArgs a:
-                OnRemoteChildMovedInSameContainment(null, a);
+                OnRemoteChildMovedInSameContainment(sender, a);
                 break;
             case IPartitionPublisher.AnnotationAddedArgs a:
-                OnRemoteAnnotationAdded(null, a);
+                OnRemoteAnnotationAdded(sender, a);
                 break;
             case IPartitionPublisher.AnnotationDeletedArgs a:
-                OnRemoteAnnotationDeleted(null, a);
+                OnRemoteAnnotationDeleted(sender, a);
                 break;
             case IPartitionPublisher.AnnotationMovedFromOtherParentArgs a:
-                OnRemoteAnnotationMovedFromOtherParent(null, a);
+                OnRemoteAnnotationMovedFromOtherParent(sender, a);
                 break;
             case IPartitionPublisher.AnnotationMovedInSameParentArgs a:
-                OnRemoteAnnotationMovedInSameParent(null, a);
+                OnRemoteAnnotationMovedInSameParent(sender, a);
                 break;
             case IPartitionPublisher.ReferenceAddedArgs a:
-                OnRemoteReferenceAdded(null, a);
+                OnRemoteReferenceAdded(sender, a);
                 break;
             case IPartitionPublisher.ReferenceDeletedArgs a:
-                OnRemoteReferenceDeleted(null, a);
+                OnRemoteReferenceDeleted(sender, a);
                 break;
             case IPartitionPublisher.ReferenceChangedArgs a:
-                OnRemoteReferenceChanged(null, a);
+                OnRemoteReferenceChanged(sender, a);
                 break;
         }
     }
@@ -120,15 +91,30 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     {
         RegisterNode(_localPartition);
 
-        var listener = _localPartition.Publisher;
-        if (listener == null)
+        var publisher = _localPartition.Publisher;
+        if (publisher == null)
             return;
 
-        listener.ChildAdded += OnLocalChildAdded;
-        listener.ChildDeleted += OnLocalChildDeleted;
+        publisher.Subscribe<IPartitionEvent>(LocalHandler);
+    }
 
-        listener.AnnotationAdded += OnLocalAnnotationAdded;
-        listener.AnnotationDeleted += OnLocalAnnotationDeleted;
+    private void LocalHandler(object? sender, IPartitionEvent @event)
+    {
+        switch (@event)
+        {
+            case IPartitionPublisher.ChildAddedArgs a:
+                OnLocalChildAdded(sender, a);
+                break;
+            case IPartitionPublisher.ChildDeletedArgs a:
+                OnLocalChildDeleted(sender, a);
+                break;
+            case IPartitionPublisher.AnnotationAddedArgs a:
+                OnLocalAnnotationAdded(sender, a);
+                break;
+            case IPartitionPublisher.AnnotationDeletedArgs a:
+                OnLocalAnnotationDeleted(sender, a);
+                break;
+        }
     }
 
     /// <inheritdoc />
@@ -136,40 +122,13 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     {
         base.Dispose();
 
-        foreach (var listener in _publishers)
-        {
-            listener.PropertyAdded -= OnRemotePropertyAdded;
-            listener.PropertyDeleted -= OnRemotePropertyDeleted;
-            listener.PropertyChanged -= OnRemotePropertyChanged;
-
-            listener.ChildAdded -= OnRemoteChildAdded;
-            listener.ChildDeleted -= OnRemoteChildDeleted;
-            listener.ChildReplaced -= OnRemoteChildReplaced;
-            listener.ChildMovedFromOtherContainment -= OnRemoteChildMovedFromOtherContainment;
-            listener.ChildMovedFromOtherContainmentInSameParent -= OnRemoteChildMovedFromOtherContainmentInSameParent;
-            listener.ChildMovedInSameContainment -= OnRemoteChildMovedInSameContainment;
-
-            listener.AnnotationAdded -= OnRemoteAnnotationAdded;
-            listener.AnnotationDeleted -= OnRemoteAnnotationDeleted;
-            listener.AnnotationMovedFromOtherParent -= OnRemoteAnnotationMovedFromOtherParent;
-            listener.AnnotationMovedInSameParent -= OnRemoteAnnotationMovedInSameParent;
-
-            listener.ReferenceAdded -= OnRemoteReferenceAdded;
-            listener.ReferenceDeleted -= OnRemoteReferenceDeleted;
-            listener.ReferenceChanged -= OnRemoteReferenceChanged;
-        }
-
         UnregisterNode(_localPartition);
 
-        var localListener = _localPartition.Publisher;
-        if (localListener == null)
+        var localPublisher = _localPartition.Publisher;
+        if (localPublisher == null)
             return;
-
-        localListener.ChildAdded -= OnLocalChildAdded;
-        localListener.ChildDeleted -= OnLocalChildDeleted;
-
-        localListener.AnnotationAdded -= OnLocalAnnotationAdded;
-        localListener.AnnotationDeleted -= OnLocalAnnotationDeleted;
+        
+        localPublisher.Unsubscribe<IPartitionEvent>(LocalHandler);
     }
 
     private void PauseCommands(Func<Action?> action)

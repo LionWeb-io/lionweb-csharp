@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1.Event.Partition;
 
 [TestClass]
 public class ContainmentTests_Multiple_Required_Listener
@@ -32,14 +33,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        };
+        });
 
         compositeShape.AddParts([line]);
 
@@ -54,14 +55,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { line });
 
@@ -76,7 +77,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape, line] };
 
         int events = 0;
-        parent.Publisher.ChildMovedFromOtherContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.OldParent);
@@ -86,7 +87,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
             Assert.AreEqual(0, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.AddParts([line]);
 
@@ -101,7 +102,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape, line] };
 
         int events = 0;
-        parent.Publisher.ChildMovedFromOtherContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.OldParent);
@@ -111,7 +112,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
             Assert.AreEqual(0, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { line });
 
@@ -126,7 +127,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
@@ -135,7 +136,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
             Assert.AreEqual(0, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.AddParts([line]);
 
@@ -150,7 +151,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
@@ -159,7 +160,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
             Assert.AreEqual(0, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { line });
 
@@ -174,7 +175,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [line, circle] };
 
         int events = 0;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
         {
             events++;
             Assert.AreEqual(0, args.OldIndex);
@@ -182,7 +183,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
             Assert.AreEqual(1, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         parent.AddShapes([line]);
 
@@ -197,7 +198,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [line, circle] };
 
         int events = 0;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
         {
             events++;
             Assert.AreEqual(0, args.OldIndex);
@@ -205,7 +206,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
             Assert.AreEqual(1, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circle, line });
 
@@ -220,10 +221,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [circle, line] };
 
         int events = 0;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         parent.AddShapes([line]);
 
@@ -238,10 +239,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [circle, line] };
 
         int events = 0;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circle, line });
 
@@ -258,14 +259,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        };
+        });
 
         compositeShape.InsertParts(0, [line]);
 
@@ -281,14 +282,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        };
+        });
 
         compositeShape.InsertParts(0, [line]);
 
@@ -304,14 +305,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { line, circle });
 
@@ -327,14 +328,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        };
+        });
 
         compositeShape.InsertParts(1, [line]);
 
@@ -350,14 +351,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circle, line });
 
@@ -374,14 +375,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        };
+        });
 
         compositeShape.InsertParts(0, [line]);
 
@@ -398,14 +399,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.NewChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { line, circleA, circleB });
 
@@ -422,14 +423,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.NewChild);
             events++;
-        };
+        });
 
         compositeShape.InsertParts(1, [line]);
 
@@ -446,14 +447,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.NewChild);
             events++;
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, line, circleB });
 
@@ -470,14 +471,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(line, args.NewChild);
             events++;
-        };
+        });
 
         compositeShape.InsertParts(2, [line]);
 
@@ -494,14 +495,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(line, args.NewChild);
             events++;
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB, line });
 
@@ -518,7 +519,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape, line] };
 
         int events = 0;
-        parent.Publisher.ChildMovedFromOtherContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.OldParent);
@@ -528,7 +529,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
             Assert.AreEqual(2, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.InsertParts(2, [line]);
 
@@ -545,7 +546,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape, line] };
 
         int events = 0;
-        parent.Publisher.ChildMovedFromOtherContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.OldParent);
@@ -555,7 +556,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
             Assert.AreEqual(2, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB, line });
 
@@ -572,7 +573,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
@@ -581,7 +582,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
             Assert.AreEqual(1, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.InsertParts(1, [line]);
 
@@ -598,7 +599,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildMovedFromOtherContainmentInSameParent += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
@@ -607,7 +608,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.NewContainment);
             Assert.AreEqual(1, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, line, circleB });
 
@@ -624,7 +625,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
         {
             events++;
             Assert.AreEqual(1, args.OldIndex);
@@ -632,7 +633,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(2, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.InsertParts(2, [line]);
 
@@ -649,7 +650,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
         {
             events++;
             Assert.AreEqual(1, args.OldIndex);
@@ -657,7 +658,7 @@ public class ContainmentTests_Multiple_Required_Listener
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(2, args.NewIndex);
             Assert.AreEqual(line, args.MovedChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB, line });
 
@@ -675,10 +676,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         compositeShape.InsertParts(1, [lineA, lineB]);
 
@@ -696,10 +697,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts,
             new List<INode> { circleA, lineA, lineB, circleB });
@@ -719,10 +720,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts([line]));
 
@@ -737,10 +738,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         Assert.ThrowsException<InvalidValueException>(() =>
             compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { }));
@@ -757,10 +758,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         compositeShape.RemoveParts([line]);
 
@@ -775,10 +776,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts([line]));
 
@@ -794,14 +795,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.DeletedChild);
-        };
+        });
 
         compositeShape.RemoveParts([line]);
 
@@ -817,14 +818,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(line, args.DeletedChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circle });
 
@@ -840,14 +841,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.DeletedChild);
-        };
+        });
 
         compositeShape.RemoveParts([line]);
 
@@ -863,14 +864,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.DeletedChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circle });
 
@@ -887,14 +888,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.DeletedChild);
-        };
+        });
 
         compositeShape.RemoveParts([line]);
 
@@ -911,14 +912,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(line, args.DeletedChild);
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB });
 
@@ -939,10 +940,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.AddParts(values));
 
@@ -956,10 +957,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         var values = new IShape[0];
         Assert.ThrowsException<InvalidValueException>(
@@ -976,10 +977,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.InsertParts(0, values));
 
@@ -994,12 +995,13 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) => events++;
-        parent.Publisher.ChildDeleted += (sender, args) => events++;
-        parent.Publisher.ChildReplaced += (sender, args) => events++;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) => events++;
-        parent.Publisher.ChildMovedFromOtherContainmentInSameParent += (sender, args) => events++;
-        parent.Publisher.ChildMovedFromOtherContainment += (sender, args) => events++;
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildReplacedArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildReplacedArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts(values));
 
@@ -1015,12 +1017,12 @@ public class ContainmentTests_Multiple_Required_Listener
         compositeShape.AddParts([value]);
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) => events++;
-        parent.Publisher.ChildDeleted += (sender, args) => events++;
-        parent.Publisher.ChildReplaced += (sender, args) => events++;
-        parent.Publisher.ChildMovedInSameContainment += (sender, args) => events++;
-        parent.Publisher.ChildMovedFromOtherContainmentInSameParent += (sender, args) => events++;
-        parent.Publisher.ChildMovedFromOtherContainment += (sender, args) => events++;
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildReplacedArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) => events++);
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) => events++);
 
         var values = new List<Coord>();
         Assert.ThrowsException<InvalidValueException>(
@@ -1043,14 +1045,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(events, args.Index);
             Assert.AreEqual(values[events], args.NewChild);
             events++;
-        };
+        });
 
         compositeShape.AddParts(values);
 
@@ -1067,14 +1069,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(events, args.Index);
             Assert.AreEqual(values[events], args.NewChild);
             events++;
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, values);
 
@@ -1093,14 +1095,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(events, args.Index);
             Assert.AreEqual(values[events], args.NewChild);
             events++;
-        };
+        });
 
         compositeShape.InsertParts(0, values);
 
@@ -1119,14 +1121,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1 + events, args.Index);
             Assert.AreEqual(values[events], args.NewChild);
             events++;
-        };
+        });
 
         compositeShape.InsertParts(1, values);
 
@@ -1145,14 +1147,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1 + events, args.Index);
             Assert.AreEqual(values[events], args.NewChild);
             events++;
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts,
             new List<INode> { circleA, valueA, valueB, circleB });
@@ -1174,10 +1176,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new List<IShape> { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts(values));
 
@@ -1194,10 +1196,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts(values));
 
@@ -1216,10 +1218,10 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             events++;
-        };
+        });
 
         compositeShape.RemoveParts(values);
 
@@ -1237,14 +1239,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, circleA };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(circleA, args.DeletedChild);
             events++;
-        };
+        });
 
         compositeShape.RemoveParts(values);
 
@@ -1262,14 +1264,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, circleA };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(circleA, args.DeletedChild);
             events++;
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleB });
 
@@ -1287,14 +1289,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(values[events], args.DeletedChild);
             events++;
-        };
+        });
 
         compositeShape.RemoveParts(values);
 
@@ -1312,14 +1314,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(values[events], args.DeletedChild);
             events++;
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circle });
 
@@ -1338,14 +1340,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(values[events], args.DeletedChild);
             events++;
-        };
+        });
 
         compositeShape.RemoveParts(values);
 
@@ -1364,14 +1366,14 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(values[events], args.DeletedChild);
             events++;
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB });
 
@@ -1391,14 +1393,14 @@ public class ContainmentTests_Multiple_Required_Listener
 
         int events = 0;
         int[] indexes = { 0, 1 };
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(indexes[events], args.Index);
             Assert.AreEqual(values[events], args.DeletedChild);
             events++;
-        };
+        });
 
         compositeShape.RemoveParts(values);
 
@@ -1418,14 +1420,14 @@ public class ContainmentTests_Multiple_Required_Listener
 
         int events = 0;
         int[] indexes = { 0, 1 };
-        parent.Publisher.ChildDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
         {
             Assert.AreSame(compositeShape, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_parts, args.Containment);
             Assert.AreEqual(indexes[events], args.Index);
             Assert.AreEqual(values[events], args.DeletedChild);
             events++;
-        };
+        });
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { circleA, circleB });
 

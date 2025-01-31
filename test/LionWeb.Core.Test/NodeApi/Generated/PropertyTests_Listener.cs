@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1.Event.Partition;
 
 [TestClass]
 public class PropertyTests_Listener
@@ -30,13 +31,13 @@ public class PropertyTests_Listener
         parent.Documentation = doc;
 
         int events = 0;
-        parent.Publisher.PropertyAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.Property);
             Assert.AreEqual("hello", args.NewValue);
-        };
+        });
 
         doc.Text = "hello";
 
@@ -52,13 +53,13 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int events = 0;
-        parent.Publisher.PropertyDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.Property);
             Assert.AreEqual("hello", args.OldValue);
-        };
+        });
         doc.Text = null;
 
 
@@ -74,18 +75,18 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int events = 0;
-        parent.Publisher.PropertyChanged += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.Property);
             Assert.AreEqual("hello", args.OldValue);
             Assert.AreEqual("bye", args.NewValue);
-        };
+        });
 
         int badEvents = 0;
-        parent.Publisher.PropertyAdded += (sender, args) => badEvents++;
-        parent.Publisher.PropertyDeleted += (sender, args) => badEvents++;
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => badEvents++);
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) => badEvents++);
 
         doc.Text = "bye";
 
@@ -101,13 +102,13 @@ public class PropertyTests_Listener
         parent.AddShapes([circle]);
 
         int events = 0;
-        parent.Publisher.PropertyAdded += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
             Assert.AreEqual("hello", args.NewValue);
-        };
+        });
 
         circle.Uuid = "hello";
 
@@ -123,13 +124,13 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int events = 0;
-        parent.Publisher.PropertyDeleted += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
             Assert.AreEqual("hello", args.OldValue);
-        };
+        });
         Assert.ThrowsException<InvalidValueException>(() => circle.Uuid = null);
 
         Assert.AreEqual(0, events);
@@ -144,18 +145,18 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int events = 0;
-        parent.Publisher.PropertyChanged += (sender, args) =>
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
             Assert.AreEqual("hello", args.OldValue);
             Assert.AreEqual("bye", args.NewValue);
-        };
+        });
 
         int badEvents = 0;
-        parent.Publisher.PropertyAdded += (sender, args) => badEvents++;
-        parent.Publisher.PropertyDeleted += (sender, args) => badEvents++;
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => badEvents++);
+        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) => badEvents++);
 
         circle.Uuid = "bye";
 

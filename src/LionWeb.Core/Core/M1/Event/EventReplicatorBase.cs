@@ -22,6 +22,8 @@ using Utilities;
 public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable
     where TEvent : IEvent where TPublisher : IPublisher<TEvent>
 {
+    private readonly List<TPublisher> _publishers = [];
+    
     protected readonly Dictionary<NodeId, IReadableNode> _nodeById;
 
     protected EventReplicatorBase(Dictionary<NodeId, IReadableNode>? sharedNodeMap = null)
@@ -29,11 +31,19 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable
         _nodeById = sharedNodeMap ?? new();
     }
 
-    public abstract void Subscribe(TPublisher publisher);
+    public virtual void Subscribe(TPublisher publisher)
+    {
+        SubscribeEvent(publisher);
+        _publishers.Add(publisher);
+    }
 
     /// <inheritdoc />
     public virtual void Dispose()
     {
+        foreach (var publisher in _publishers)
+        {
+            publisher.Unsubscribe<TEvent>(ProcessEvent);
+        }
     }
 
     protected abstract void ProcessEvent(object? sender, TEvent @event);
