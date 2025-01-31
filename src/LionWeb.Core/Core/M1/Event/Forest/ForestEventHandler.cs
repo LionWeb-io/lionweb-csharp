@@ -18,7 +18,7 @@
 namespace LionWeb.Core.M1.Event.Forest;
 
 /// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestPublisher"/> events.
-public class ForestEventHandler : EventHandlerBase, IForestPublisher, IForestCommander
+public class ForestEventHandler : EventHandlerBase<IForestEvent>, IForestPublisher, IForestCommander
 {
     private readonly object _sender;
 
@@ -39,8 +39,12 @@ public class ForestEventHandler : EventHandlerBase, IForestPublisher, IForestCom
     private readonly ShortCircuitEventHandler<IForestPublisher.NewPartitionArgs> _newPartition = new();
 
     /// <inheritdoc />
-    public void AddPartition(IPartitionInstance newPartition, EventId? eventId = null) =>
-        _newPartition.Invoke(_sender, new(newPartition, eventId ?? CreateEventId()));
+    public void AddPartition(IPartitionInstance newPartition, EventId? eventId = null)
+    {
+        var args = new IForestPublisher.NewPartitionArgs(newPartition, eventId ?? CreateEventId());
+        Raise(args);
+        _newPartition.Invoke(_sender, args);
+    }
 
     /// <inheritdoc />
     public bool CanRaiseAddPartition => _newPartition.HasSubscribers;
@@ -55,8 +59,12 @@ public class ForestEventHandler : EventHandlerBase, IForestPublisher, IForestCom
     private readonly ShortCircuitEventHandler<IForestPublisher.PartitionDeletedArgs> _partitionDeleted = new();
 
     /// <inheritdoc />
-    public void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null) =>
-        _partitionDeleted.Invoke(_sender, new(deletedPartition, eventId ?? CreateEventId()));
+    public void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null)
+    {
+        var args = new IForestPublisher.PartitionDeletedArgs(deletedPartition, eventId ?? CreateEventId());
+        _partitionDeleted.Invoke(_sender, args);
+        Raise(args);
+    }
 
     /// <inheritdoc />
     public bool CanRaiseDeletePartition => _partitionDeleted.HasSubscribers;

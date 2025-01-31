@@ -17,9 +17,10 @@
 
 namespace LionWeb.Core.M1.Event;
 
-public interface IEvent
+public interface ICommander<in T> where T : IEvent
 {
-    EventId EventId { get; }
+    public void Raise(T @event);
+    public bool CanRaise(Type eventType);
+    
+    public EventId CreateEventId();
 }
-
-public abstract record EventArgsBase(EventId EventId) : IEvent;

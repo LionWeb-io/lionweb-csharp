@@ -20,23 +20,26 @@ namespace LionWeb.Core.M1.Event.Partition;
 using M3;
 using System.Collections;
 
-public class PartitionEventApplier : EventApplierBase
+public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPartitionPublisher>
 {
     private readonly IPartitionInstance _localPartition;
-    private readonly List<IPartitionPublisher> _listeners = [];
+    private readonly List<IPartitionPublisher> _publishers = [];
 
-    public PartitionEventApplier(IPartitionInstance localPartition,
+    public PartitionEventReplicator(IPartitionInstance localPartition,
         Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(sharedNodeMap)
     {
         _localPartition = localPartition;
         Init();
     }
 
-    public void Subscribe(IPartitionPublisher publisher)
+    /// <inheritdoc />
+    public override void Subscribe(IPartitionPublisher publisher)
     {
-        _listeners.Add(publisher);
+        SubscribeChannel(publisher);
 
-        publisher.PropertyAdded += OnRemotePropertyAdded;
+        _publishers.Add(publisher);
+
+        // publisher.PropertyAdded += OnRemotePropertyAdded;
         publisher.PropertyDeleted += OnRemotePropertyDeleted;
         publisher.PropertyChanged += OnRemotePropertyChanged;
 
@@ -57,6 +60,62 @@ public class PartitionEventApplier : EventApplierBase
         publisher.ReferenceChanged += OnRemoteReferenceChanged;
     }
 
+    /// <inheritdoc />
+    protected override void ProcessEvent(IPartitionEvent @event)
+    {
+        switch (@event)
+        {
+            case IPartitionPublisher.PropertyAddedArgs a:
+                OnRemotePropertyAdded(null, a);
+                break;
+            case IPartitionPublisher.PropertyDeletedArgs a:
+                OnRemotePropertyDeleted(null, a);
+                break;
+            case IPartitionPublisher.PropertyChangedArgs a:
+                OnRemotePropertyChanged(null, a);
+                break;
+            case IPartitionPublisher.ChildAddedArgs a:
+                OnRemoteChildAdded(null, a);
+                break;
+            case IPartitionPublisher.ChildDeletedArgs a:
+                OnRemoteChildDeleted(null, a);
+                break;
+            case IPartitionPublisher.ChildReplacedArgs a:
+                OnRemoteChildReplaced(null, a);
+                break;
+            case IPartitionPublisher.ChildMovedFromOtherContainmentArgs a:
+                OnRemoteChildMovedFromOtherContainment(null, a);
+                break;
+            case IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs a:
+                OnRemoteChildMovedFromOtherContainmentInSameParent(null, a);
+                break;
+            case IPartitionPublisher.ChildMovedInSameContainmentArgs a:
+                OnRemoteChildMovedInSameContainment(null, a);
+                break;
+            case IPartitionPublisher.AnnotationAddedArgs a:
+                OnRemoteAnnotationAdded(null, a);
+                break;
+            case IPartitionPublisher.AnnotationDeletedArgs a:
+                OnRemoteAnnotationDeleted(null, a);
+                break;
+            case IPartitionPublisher.AnnotationMovedFromOtherParentArgs a:
+                OnRemoteAnnotationMovedFromOtherParent(null, a);
+                break;
+            case IPartitionPublisher.AnnotationMovedInSameParentArgs a:
+                OnRemoteAnnotationMovedInSameParent(null, a);
+                break;
+            case IPartitionPublisher.ReferenceAddedArgs a:
+                OnRemoteReferenceAdded(null, a);
+                break;
+            case IPartitionPublisher.ReferenceDeletedArgs a:
+                OnRemoteReferenceDeleted(null, a);
+                break;
+            case IPartitionPublisher.ReferenceChangedArgs a:
+                OnRemoteReferenceChanged(null, a);
+                break;
+        }
+    }
+
     private void Init()
     {
         RegisterNode(_localPartition);
@@ -72,9 +131,12 @@ public class PartitionEventApplier : EventApplierBase
         listener.AnnotationDeleted += OnLocalAnnotationDeleted;
     }
 
+    /// <inheritdoc />
     public override void Dispose()
     {
-        foreach (var listener in _listeners)
+        base.Dispose();
+
+        foreach (var listener in _publishers)
         {
             listener.PropertyAdded -= OnRemotePropertyAdded;
             listener.PropertyDeleted -= OnRemotePropertyDeleted;
@@ -132,7 +194,7 @@ public class PartitionEventApplier : EventApplierBase
         if (_localPartition.Commander is IOverridableCommander<IPartitionCommander> oc)
         {
             previousDelegate = oc.Delegate;
-            oc.Delegate = new NoOpPartitionCommander();
+            // oc.Delegate = new NoOpPartitionCommander();
         }
 
         return previousDelegate;

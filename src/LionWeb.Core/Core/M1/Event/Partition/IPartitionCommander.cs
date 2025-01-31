@@ -22,12 +22,13 @@ using M3;
 /// Raises events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 /// <seealso cref="IPartitionPublisher"/>
 /// <seealso cref="PartitionEventHandler"/>
-public interface IPartitionCommander
+public interface IPartitionCommander : ICommander<IPartitionEvent>
 {
     #region Nodes
 
     /// <seealso cref="IPartitionPublisher.ClassifierChanged"/>
-    void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier, EventId? eventId = null);
+    void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier,
+        EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="ChangeClassifier"/> event.
     /// <value>
@@ -58,7 +59,8 @@ public interface IPartitionCommander
     bool CanRaiseDeleteProperty { get; }
 
     /// <seealso cref="IPartitionPublisher.PropertyChanged"/>
-    void ChangeProperty(IWritableNode node, Property property, Object newValue, Object oldValue, EventId? eventId = null);
+    void ChangeProperty(IWritableNode node, Property property, Object newValue, Object oldValue,
+        EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="ChangeProperty"/> event.
     /// <value>
@@ -71,7 +73,8 @@ public interface IPartitionCommander
     #region Children
 
     /// <seealso cref="IPartitionPublisher.ChildAdded"/>
-    void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index, EventId? eventId = null);
+    void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index,
+        EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="AddChild"/> event.
     /// <value>
@@ -80,7 +83,8 @@ public interface IPartitionCommander
     bool CanRaiseAddChild { get; }
 
     /// <seealso cref="IPartitionPublisher.ChildDeleted"/>
-    void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index, EventId? eventId = null);
+    void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index,
+        EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="DeleteChild"/> event.
     /// <value>
@@ -100,7 +104,8 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionPublisher.ChildMovedFromOtherContainment"/>
     void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
-        IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex, EventId? eventId = null);
+        IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex,
+        EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveChildFromOtherContainment"/> event.
     /// <value>
@@ -185,7 +190,8 @@ public interface IPartitionCommander
     #region References
 
     /// <seealso cref="IPartitionPublisher.ReferenceAdded"/>
-    void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget, EventId? eventId = null);
+    void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
+        EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="AddReference"/> event.
     /// <value>
@@ -194,7 +200,8 @@ public interface IPartitionCommander
     bool CanRaiseAddReference { get; }
 
     /// <seealso cref="IPartitionPublisher.ReferenceDeleted"/>
-    void DeleteReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget deletedTarget, EventId? eventId = null);
+    void DeleteReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget deletedTarget,
+        EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="DeleteReference"/> event.
     /// <value>
@@ -214,7 +221,8 @@ public interface IPartitionCommander
 
     /// <seealso cref="IPartitionPublisher.EntryMovedFromOtherReference"/>
     void MoveEntryFromOtherReference(IWritableNode newParent, Reference newReference, Index newIndex,
-        IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target, EventId? eventId = null);
+        IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target,
+        EventId? eventId = null);
 
     /// Whether anybody would receive the <see cref="MoveEntryFromOtherReference"/> event.
     /// <value>
@@ -303,6 +311,4 @@ public interface IPartitionCommander
     bool CanRaiseChangeReferenceTarget { get; }
 
     #endregion
-
-    public EventId CreateEventId();
 }

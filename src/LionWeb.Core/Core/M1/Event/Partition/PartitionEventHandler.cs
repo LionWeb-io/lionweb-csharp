@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1.Event.Partition;
 using M3;
 
 /// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionPublisher"/> events.
-public class PartitionEventHandler : EventHandlerBase, IPartitionPublisher, IPartitionCommander
+public class PartitionEventHandler : EventHandlerBase<IPartitionEvent>, IPartitionPublisher, IPartitionCommander
 {
     private readonly object _sender;
 
@@ -58,11 +58,15 @@ public class PartitionEventHandler : EventHandlerBase, IPartitionPublisher, IPar
     private readonly ShortCircuitEventHandler<IPartitionPublisher.PropertyAddedArgs> _propertyAdded = new();
 
     /// <inheritdoc />
-    public void AddProperty(IWritableNode node, Property property, object newValue, EventId? eventId = null) =>
-        _propertyAdded.Invoke(_sender, new(node, property, newValue, eventId ?? CreateEventId()));
+    public void AddProperty(IWritableNode node, Property property, object newValue, EventId? eventId = null)
+    {
+        var args = new IPartitionPublisher.PropertyAddedArgs(node, property, newValue, eventId ?? CreateEventId());
+        _propertyAdded.Invoke(_sender, args);
+        Raise(args);
+    }
 
     /// <inheritdoc />
-    public bool CanRaiseAddProperty => _propertyAdded.HasSubscribers;
+    public bool CanRaiseAddProperty => _propertyAdded.HasSubscribers || CanRaise(typeof(IPartitionPublisher.PropertyAddedArgs));
 
     /// <inheritdoc />
     public event EventHandler<IPartitionPublisher.PropertyDeletedArgs> PropertyDeleted

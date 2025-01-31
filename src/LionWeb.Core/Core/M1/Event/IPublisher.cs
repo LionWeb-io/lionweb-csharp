@@ -17,9 +17,11 @@
 
 namespace LionWeb.Core.M1.Event;
 
-public interface IEvent
-{
-    EventId EventId { get; }
-}
+using System.Threading.Channels;
 
-public abstract record EventArgsBase(EventId EventId) : IEvent;
+public interface IPublisher<in TWrite> where TWrite : IEvent
+{
+    ChannelReader<TRead> Subscribe<TRead>() where TRead : TWrite;
+    
+    void Unsubscribe<TRead>(ChannelReader<TRead> reader) where TRead : TWrite;
+}

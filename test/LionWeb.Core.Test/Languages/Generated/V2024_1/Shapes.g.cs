@@ -1307,7 +1307,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	public Geometry(string id) : base(id)
     {
         _eventHandler = new PartitionEventHandler(this);
-        _commander = new CallSensitivePartitionCommander(_eventHandler);
+        _commander = _eventHandler;
     }
 
 	/// <inheritdoc/>

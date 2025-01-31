@@ -17,19 +17,59 @@
 
 namespace LionWeb.Core.M1.Event;
 
+using System.Threading.Channels;
 using Utilities;
 
-public abstract class EventApplierBase : IDisposable
+public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable where TEvent : IEvent where TPublisher : IPublisher<TEvent>
 {
     protected readonly Dictionary<NodeId, IReadableNode> _nodeById;
+    private readonly Dictionary<IPublisher<TEvent>, ChannelReader<TEvent>> _channelReaders = [];
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-    protected EventApplierBase(Dictionary<NodeId, IReadableNode>? sharedNodeMap = null)
+    protected EventReplicatorBase(Dictionary<NodeId, IReadableNode>? sharedNodeMap = null)
     {
         _nodeById = sharedNodeMap ?? new();
     }
 
+    public abstract void Subscribe(TPublisher publisher);
+    
     /// <inheritdoc />
-    public abstract void Dispose();
+    public virtual void Dispose()
+    {
+        foreach (var channelReader in _channelReaders)
+        {
+            channelReader.Key.Unsubscribe(channelReader.Value);
+        }
+        
+        _cancellationTokenSource.Cancel();
+        _cancellationTokenSource.Dispose();
+    }
+
+    protected abstract void ProcessEvent(TEvent @event);
+
+    protected void SubscribeChannel(IPublisher<TEvent> publisher)
+    {
+        var channelReader = publisher.Subscribe<TEvent>();
+        _channelReaders.Add(publisher, channelReader);
+        WaitForNextEvent();
+        return;
+
+        void SwitchEvent(Task<bool> b)
+        {
+            if (_cancellationTokenSource.IsCancellationRequested)
+                return;
+            if (b.Result && channelReader.TryRead(out var item))
+                ProcessEvent(item);
+
+            WaitForNextEvent();
+        }
+
+        void WaitForNextEvent() =>
+            channelReader
+                .WaitToReadAsync(_cancellationTokenSource.Token)
+                .AsTask()
+                .ContinueWith(SwitchEvent, _cancellationTokenSource.Token);
+    }
 
     protected void RegisterNode(IReadableNode newNode)
     {
@@ -66,6 +106,4 @@ public abstract class EventApplierBase : IDisposable
         protected override string GetNewId(INode remoteNode) =>
             remoteNode.GetId();
     }
-
-    
 }

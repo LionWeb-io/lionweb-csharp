@@ -19,13 +19,13 @@ namespace LionWeb.Core.M1.Event.Forest;
 
 using Partition;
 
-public class ForestEventApplier : EventApplierBase
+public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPublisher>
 {
     private readonly IForest _localForest;
-    private readonly Dictionary<NodeId, PartitionEventApplier> _localPartitions = [];
+    private readonly Dictionary<NodeId, PartitionEventReplicator> _localPartitions = [];
     private readonly List<IForestPublisher> _listeners = [];
 
-    public ForestEventApplier(IForest localForest, Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) :
+    public ForestEventReplicator(IForest localForest, Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) :
         base(sharedNodeMap)
     {
         _localForest = localForest;
@@ -47,16 +47,36 @@ public class ForestEventApplier : EventApplierBase
         forestListener.PartitionDeleted += OnLocalPartitionDeleted;
     }
 
-    public void Subscribe(IForestPublisher publisher)
+    /// <inheritdoc />
+    public override void Subscribe(IForestPublisher publisher)
     {
+        SubscribeChannel(publisher);
         _listeners.Add(publisher);
 
         publisher.NewPartition += OnRemoteNewPartition;
         publisher.PartitionDeleted += OnRemotePartitionDeleted;
     }
 
+    /// <inheritdoc />
+    protected override void ProcessEvent(IForestEvent @event)
+    {
+        switch (@event)
+        {
+            case IForestPublisher.NewPartitionArgs a:
+                OnRemoteNewPartition(null, a);
+                break;
+            
+            case IForestPublisher.PartitionDeletedArgs a:
+                OnRemotePartitionDeleted(null, a);
+                break;
+        }
+    }
+
+    /// <inheritdoc />
     public override void Dispose()
     {
+        base.Dispose();
+        
         foreach (var listener in _listeners)
         {
             listener.NewPartition -= OnRemoteNewPartition;
@@ -78,12 +98,12 @@ public class ForestEventApplier : EventApplierBase
 
     private void RegisterPartition(IPartitionInstance partition)
     {
-        PartitionEventApplier applier = new PartitionEventApplier(partition, _nodeById);
-        if (!_localPartitions.TryAdd(partition.GetId(), applier))
+        PartitionEventReplicator replicator = new PartitionEventReplicator(partition, _nodeById);
+        if (!_localPartitions.TryAdd(partition.GetId(), replicator))
             throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
     }
 
-    private PartitionEventApplier LookupPartition(IPartitionInstance partition) => _localPartitions[partition.GetId()];
+    private PartitionEventReplicator LookupPartition(IPartitionInstance partition) => _localPartitions[partition.GetId()];
 
     private void UnregisterPartition(IPartitionInstance partition)
     {
