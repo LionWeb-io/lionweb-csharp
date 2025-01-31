@@ -19,21 +19,57 @@ namespace LionWeb.Core.M1.Event;
 
 using Utilities;
 
-public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable
+public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable, IPublisher<TEvent>
     where TEvent : IEvent where TPublisher : IPublisher<TEvent>
 {
+    private readonly TPublisher? _localPublisher;
+    private readonly ICommander<TEvent>? _localCommander;
     private readonly List<TPublisher> _publishers = [];
-    
+    private readonly HashSet<EventId> _eventIds = [];
+    private readonly Dictionary<object, EventHandler<TEvent>> _forwardingHandlers = [];
+
     protected readonly Dictionary<NodeId, IReadableNode> _nodeById;
 
-    protected EventReplicatorBase(Dictionary<NodeId, IReadableNode>? sharedNodeMap = null)
+    protected EventReplicatorBase(TPublisher? localPublisher, ICommander<TEvent>? localCommander,
+        Dictionary<NodeId, IReadableNode>? sharedNodeMap = null)
     {
+        _localPublisher = localPublisher;
+        _localCommander = localCommander;
         _nodeById = sharedNodeMap ?? new();
+    }
+
+    /// <inheritdoc />
+    public void Subscribe<TRead>(EventHandler<TRead> handler) where TRead : TEvent
+    {
+        if (_localPublisher == null)
+            return;
+        
+        EventHandler<TEvent> forwardingHandler = (sender, @event) =>
+        {
+            if (@event is TRead r && !_eventIds.Contains(@event.EventId))
+                handler(sender, r);
+        };
+
+        _forwardingHandlers.Add(handler, forwardingHandler);
+
+        _localPublisher.Subscribe(forwardingHandler);
+    }
+
+    /// <inheritdoc />
+    public void Unsubscribe<TRead>(EventHandler<TRead> handler) where TRead : TEvent
+    {
+        if (_localPublisher == null)
+            return;
+        
+        if (!_forwardingHandlers.Remove(handler, out var forwardingHandler))
+            return;
+
+        _localPublisher.Unsubscribe(forwardingHandler);
     }
 
     public virtual void Subscribe(TPublisher publisher)
     {
-        SubscribeEvent(publisher);
+        publisher.Subscribe<TEvent>(ProcessEvent);
         _publishers.Add(publisher);
     }
 
@@ -48,8 +84,11 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable
 
     protected abstract void ProcessEvent(object? sender, TEvent @event);
 
-    protected void SubscribeEvent(IPublisher<TEvent> publisher) =>
-        publisher.Subscribe<TEvent>(ProcessEvent);
+    protected void RegisterEventId(EventId eventId) =>
+        _eventIds.Add(eventId);
+
+    protected void UnregisterEventId(EventId eventId) =>
+        _eventIds.Remove(eventId);
 
     protected void RegisterNode(IReadableNode newNode)
     {
@@ -85,5 +124,28 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : IDisposable
 
         protected override string GetNewId(INode remoteNode) =>
             remoteNode.GetId();
+    }
+
+    protected void PauseCommands(Func<Action?> action)
+    {
+        EventId? eventId = null;
+        if (_localCommander != null)
+        {
+            eventId = _localCommander.CreateEventId();
+            _localCommander.RegisterEventId(eventId);
+            RegisterEventId(eventId);
+        }
+
+        Action? postAction = null;
+        try
+        {
+            postAction = action();
+        } finally
+        {
+            if (eventId != null)
+                UnregisterEventId(eventId);
+
+            postAction?.Invoke();
+        }
     }
 }

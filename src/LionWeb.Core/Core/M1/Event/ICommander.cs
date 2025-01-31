@@ -23,4 +23,5 @@ public interface ICommander<in T> where T : IEvent
     public bool CanRaise(Type eventType);
     
     public EventId CreateEventId();
+    void RegisterEventId(string eventId);
 }

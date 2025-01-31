@@ -39,8 +39,8 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
         node.Publisher.Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
@@ -65,8 +65,8 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
         node.Publisher.Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
@@ -89,8 +89,8 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
         node.Publisher.Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
@@ -114,8 +114,8 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
         node.Publisher.Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
@@ -150,8 +150,8 @@ public class EventTests_MultiPartition
         cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
         var clone = new Geometry("a") { Shapes = [cloneOrigin] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
         node.Publisher.Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedAnnotation)));
@@ -177,8 +177,8 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") {  };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
         node.Publisher.Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedAnnotation)));

@@ -20,12 +20,12 @@ namespace LionWeb.Core.M1.Event.Partition;
 using M3;
 using System.Collections;
 
-public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPartitionPublisher>
+public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPartitionPublisher>, IPartitionPublisher
 {
     private readonly IPartitionInstance _localPartition;
 
     public PartitionEventReplicator(IPartitionInstance localPartition,
-        Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(sharedNodeMap)
+        Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(localPartition.Publisher, localPartition.Commander, sharedNodeMap)
     {
         _localPartition = localPartition;
         Init();
@@ -127,44 +127,8 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         var localPublisher = _localPartition.Publisher;
         if (localPublisher == null)
             return;
-        
+
         localPublisher.Unsubscribe<IPartitionEvent>(LocalHandler);
-    }
-
-    private void PauseCommands(Func<Action?> action)
-    {
-        IPartitionCommander? previousDelegate = null;
-        Action? postAction = null;
-        try
-        {
-            previousDelegate = DisableCommands();
-
-            postAction = action();
-        } finally
-        {
-            ReenableCommands(previousDelegate);
-            postAction?.Invoke();
-        }
-    }
-
-    private IPartitionCommander? DisableCommands()
-    {
-        IPartitionCommander? previousDelegate = null;
-        if (_localPartition.Commander is IOverridableCommander<IPartitionCommander> oc)
-        {
-            previousDelegate = oc.Delegate;
-            // oc.Delegate = new NoOpPartitionCommander();
-        }
-
-        return previousDelegate;
-    }
-
-    private void ReenableCommands(IPartitionCommander? previousDelegate)
-    {
-        if (_localPartition.Commander is IOverridableCommander<IPartitionCommander> oc)
-        {
-            oc.Delegate = previousDelegate;
-        }
     }
 
     #region Local

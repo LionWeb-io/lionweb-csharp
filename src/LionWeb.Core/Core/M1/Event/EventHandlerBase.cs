@@ -36,10 +36,7 @@ public abstract class EventHandlerBase
         return baseTypes
             .SelectMany(baseType => allTypes
                 .Where(subType => subType.IsAssignableTo(baseType))
-                .SelectMany(subType => new List<(Type, Type)>{
-                    (baseType, subType),
-                    (subType, subType)
-                })
+                .SelectMany(subType => new List<(Type, Type)> { (baseType, subType), (subType, subType) })
             )
             .ToLookup(k => k.Item1, e => e.Item2);
     }
@@ -48,9 +45,13 @@ public abstract class EventHandlerBase
 public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TWrite>, IPublisher<TWrite>
     where TWrite : IEvent
 {
+    private readonly object _sender;
+
     private readonly Dictionary<Type, int> _subscribedEvents = [];
     private readonly Dictionary<object, EventHandler<TWrite>> _handlers = [];
-    protected readonly object _sender;
+
+    private readonly AsyncLocal<Queue<string>> _eventIds = new() { Value = new() };
+
     private event EventHandler<TWrite>? Event;
 
     private int _nextId = 0;
@@ -64,11 +65,29 @@ public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TW
     }
 
     /// <inheritdoc />
+    public void RegisterEventId(string eventId)
+        => _eventIds.Value!.Enqueue(eventId);
+
+    /// <inheritdoc />
     public virtual EventId CreateEventId() =>
-        _nextId++.ToString();
+        _eventIds.Value!.TryDequeue(out var r) ? r : _nextId++.ToString();
 
     /// <inheritdoc />
     public void Subscribe<TRead>(EventHandler<TRead> handler) where TRead : TWrite
+    {
+        RegisterSubscribedEvents<TRead>();
+
+        EventHandler<TWrite> writeHandler = (sender, args) =>
+        {
+            if (args is TRead r)
+                handler.Invoke(sender, r);
+        };
+        _handlers[handler] = writeHandler;
+
+        Event += writeHandler;
+    }
+
+    private void RegisterSubscribedEvents<TRead>() where TRead : TWrite
     {
         var eventType = typeof(TRead);
         var allSubtype = _allSubtypes[eventType];
@@ -82,15 +101,6 @@ public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TW
                 _subscribedEvents[subtype] = 1;
             }
         }
-
-        EventHandler<TWrite> writeHandler = (sender, args) =>
-        {
-            if (args is TRead r)
-                handler.Invoke(sender, r);
-        };
-        _handlers[handler] = writeHandler;
-        
-        Event += writeHandler;
     }
 
 
@@ -99,9 +109,14 @@ public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TW
     {
         if (!_handlers.Remove(handler, out var writeHandler))
             return;
-        
+
         Event -= writeHandler;
 
+        UnregisterSubscribedEvents<TRead>();
+    }
+
+    private void UnregisterSubscribedEvents<TRead>() where TRead : TWrite
+    {
         var eventType = typeof(TRead);
         var allSubtypes = _allSubtypes[eventType];
         foreach (var subtype in allSubtypes)

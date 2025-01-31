@@ -37,8 +37,8 @@ public class EventTests
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         circle.Name = "Hello";
 
@@ -54,8 +54,8 @@ public class EventTests
         var cloneCircle = new Circle("c") { Name = "Hello" };
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         circle.Name = "Bye";
 
@@ -71,8 +71,8 @@ public class EventTests
         var cloneDocs = new Documentation("c") { Text = "Hello" };
         var clone = new Geometry("a") { Documentation = cloneDocs };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         docs.Text = null;
 
@@ -92,8 +92,8 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new Circle("added");
         node.AddShapes([added]);
@@ -109,8 +109,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l")] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new Circle("added");
         node.InsertShapes(0, [added]);
@@ -126,8 +126,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l")] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new Circle("added");
         node.InsertShapes(1, [added]);
@@ -143,8 +143,8 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new Documentation("added");
         node.Documentation = added;
@@ -160,8 +160,8 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
         node.AddShapes([added]);
@@ -182,8 +182,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Circle("deleted")] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.RemoveShapes([deleted]);
 
@@ -198,8 +198,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Circle("deleted"), new Line("l")] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.RemoveShapes([deleted]);
 
@@ -214,8 +214,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("deleted")] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.RemoveShapes([deleted]);
 
@@ -230,8 +230,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Documentation = new Documentation("deleted") };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.Documentation = null;
 
@@ -249,8 +249,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Documentation = new Documentation("replaced") { Text = "a" } };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new Documentation("added") { Text = "added" };
         node.Documentation = added;
@@ -273,8 +273,8 @@ public class EventTests
             new BillOfMaterials("bof") { DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid } }
         ]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         bof.DefaultGroup = new MaterialGroup("replaced") { MatterState = MatterState.gas };
 
@@ -294,8 +294,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.AddShapes([moved]);
 
@@ -310,8 +310,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.Documentation = moved;
 
@@ -331,8 +331,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         origin.AddDisabledParts([moved]);
 
@@ -348,8 +348,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         origin.EvilPart = moved;
 
@@ -368,8 +368,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Circle("moved"), new Line("l")] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.AddShapes([moved]);
 
@@ -384,8 +384,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("moved")] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.InsertShapes(0, [moved]);
 
@@ -407,8 +407,8 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new BillOfMaterials("added");
         node.AddAnnotations([added]);
@@ -426,8 +426,8 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("bof")]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(0, [added]);
@@ -445,8 +445,8 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("bof")]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(1, [added]);
@@ -462,8 +462,8 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         var added = new BillOfMaterials("added")
         {
@@ -489,8 +489,8 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("deleted")]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.RemoveAnnotations([deleted]);
 
@@ -507,8 +507,8 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("deleted"), new BillOfMaterials("bof")]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.RemoveAnnotations([deleted]);
 
@@ -525,8 +525,8 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("bof"), new BillOfMaterials("deleted")]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.RemoveAnnotations([deleted]);
 
@@ -549,8 +549,8 @@ public class EventTests
         cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
         var clone = new Geometry("a") { Shapes = [cloneOrigin] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.AddAnnotations([moved]);
 
@@ -571,8 +571,8 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("moved"), new BillOfMaterials("bof")]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.AddAnnotations([moved]);
 
@@ -589,8 +589,8 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("bof"), new BillOfMaterials("moved")]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         node.InsertAnnotations(0, [moved]);
 
@@ -616,8 +616,8 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [new Line("line")] };
         clone.AddAnnotations([new BillOfMaterials("bof")]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         bof.AddMaterials([line]);
 
@@ -637,8 +637,8 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [new Line("line"), cloneCircle] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle] }]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         bof.InsertMaterials(0, [line]);
 
@@ -658,8 +658,8 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [new Line("line"), cloneCircle] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle] }]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         bof.InsertMaterials(1, [line]);
 
@@ -675,8 +675,8 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new OffsetDuplicate("od"), new Circle("circle")] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         od.Source = circle;
 
@@ -699,8 +699,8 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [cloneLine] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine] }]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         bof.RemoveMaterials([line]);
 
@@ -721,8 +721,8 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine, cloneCircle] }]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         bof.RemoveMaterials([line]);
 
@@ -743,8 +743,8 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle, cloneLine] }]);
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         bof.RemoveMaterials([line]);
 
@@ -761,8 +761,8 @@ public class EventTests
         var cloneCircle = new Circle("circle");
         var clone = new Geometry("a") { Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle] };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         od.AltSource = null;
 
@@ -787,8 +787,8 @@ public class EventTests
             Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle, new Line("line")]
         };
 
-        var applier = new PartitionEventReplicator(clone);
-        applier.Subscribe(node.Publisher);
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.Publisher);
 
         od.AltSource = line;
 

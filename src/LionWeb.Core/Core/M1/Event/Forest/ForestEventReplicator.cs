@@ -19,13 +19,13 @@ namespace LionWeb.Core.M1.Event.Forest;
 
 using Partition;
 
-public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPublisher>
+public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPublisher>, IForestPublisher
 {
     private readonly IForest _localForest;
     private readonly Dictionary<NodeId, PartitionEventReplicator> _localPartitions = [];
 
     public ForestEventReplicator(IForest localForest, Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) :
-        base(sharedNodeMap)
+        base(localForest.Publisher, localForest.Commander, sharedNodeMap)
     {
         _localForest = localForest;
         Init();
@@ -119,24 +119,30 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     #region Remote
 
-    private void OnRemoteNewPartition(object? sender, NewPartitionEvent @event)
-    {
-        var newPartition = (INode)@event.NewPartition;
+    private void OnRemoteNewPartition(object? sender, NewPartitionEvent @event) =>
+        PauseCommands(() =>
+        {
+            var newPartition = (INode)@event.NewPartition;
 
-        var clone = (IPartitionInstance)Clone(newPartition);
+            var clone = (IPartitionInstance)Clone(newPartition);
 
-        _localForest.AddPartitions([clone]);
+            _localForest.AddPartitions([clone]);
 
-        var remoteListener = @event.NewPartition.Publisher;
-        if (remoteListener != null)
-            LookupPartition(clone).Subscribe(remoteListener);
-    }
+            var remoteListener = @event.NewPartition.Publisher;
+            if (remoteListener != null)
+                LookupPartition(clone).Subscribe(remoteListener);
 
-    private void OnRemotePartitionDeleted(object? sender, PartitionDeletedEvent @event)
-    {
-        var localPartition = (IPartitionInstance)Lookup(@event.DeletedPartition.GetId());
-        _localForest.RemovePartitions([localPartition]);
-    }
+            return null;
+        });
+
+    private void OnRemotePartitionDeleted(object? sender, PartitionDeletedEvent @event) =>
+        PauseCommands(() =>
+        {
+            var localPartition = (IPartitionInstance)Lookup(@event.DeletedPartition.GetId());
+            _localForest.RemovePartitions([localPartition]);
+
+            return null;
+        });
 
     #endregion
 }
