@@ -49,10 +49,10 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     {
         switch (@event)
         {
-            case IForestPublisher.NewPartitionArgs a:
+            case NewPartitionEvent a:
                 OnLocalNewPartition(sender, a);
                 break;
-            case IForestPublisher.PartitionDeletedArgs a:
+            case PartitionDeletedEvent a:
                 OnLocalPartitionDeleted(sender, a);
                 break;
         }
@@ -63,11 +63,11 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     {
         switch (@event)
         {
-            case IForestPublisher.NewPartitionArgs a:
+            case NewPartitionEvent a:
                 OnRemoteNewPartition(null, a);
                 break;
 
-            case IForestPublisher.PartitionDeletedArgs a:
+            case PartitionDeletedEvent a:
                 OnRemotePartitionDeleted(null, a);
                 break;
         }
@@ -109,32 +109,32 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     #region Local
 
-    private void OnLocalNewPartition(object? sender, IForestPublisher.NewPartitionArgs args) =>
-        RegisterPartition(args.NewPartition);
+    private void OnLocalNewPartition(object? sender, NewPartitionEvent @event) =>
+        RegisterPartition(@event.NewPartition);
 
-    private void OnLocalPartitionDeleted(object? sender, IForestPublisher.PartitionDeletedArgs args) =>
-        UnregisterPartition(args.DeletedPartition);
+    private void OnLocalPartitionDeleted(object? sender, PartitionDeletedEvent @event) =>
+        UnregisterPartition(@event.DeletedPartition);
 
     #endregion
 
     #region Remote
 
-    private void OnRemoteNewPartition(object? sender, IForestPublisher.NewPartitionArgs args)
+    private void OnRemoteNewPartition(object? sender, NewPartitionEvent @event)
     {
-        var newPartition = (INode)args.NewPartition;
+        var newPartition = (INode)@event.NewPartition;
 
         var clone = (IPartitionInstance)Clone(newPartition);
 
         _localForest.AddPartitions([clone]);
 
-        var remoteListener = args.NewPartition.Publisher;
+        var remoteListener = @event.NewPartition.Publisher;
         if (remoteListener != null)
             LookupPartition(clone).Subscribe(remoteListener);
     }
 
-    private void OnRemotePartitionDeleted(object? sender, IForestPublisher.PartitionDeletedArgs args)
+    private void OnRemotePartitionDeleted(object? sender, PartitionDeletedEvent @event)
     {
-        var localPartition = (IPartitionInstance)Lookup(args.DeletedPartition.GetId());
+        var localPartition = (IPartitionInstance)Lookup(@event.DeletedPartition.GetId());
         _localForest.RemovePartitions([localPartition]);
     }
 

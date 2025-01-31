@@ -32,7 +32,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -53,7 +53,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -75,7 +75,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var oldParent = new CompositeShape("oldParent") { Parts = [line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -100,7 +100,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var oldParent = new CompositeShape("oldParent") { Parts = [line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -125,7 +125,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
@@ -149,7 +149,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
@@ -173,7 +173,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [line, circle] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) =>
         {
             events++;
             Assert.AreEqual(0, args.OldIndex);
@@ -196,7 +196,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [line, circle] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) =>
         {
             events++;
             Assert.AreEqual(0, args.OldIndex);
@@ -220,7 +220,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -242,7 +242,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -264,7 +264,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -286,7 +286,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -308,7 +308,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -331,7 +331,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -354,7 +354,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -377,7 +377,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -400,7 +400,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -423,7 +423,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -446,7 +446,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -470,7 +470,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var oldParent = new Geometry("g") { Shapes = [line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -497,7 +497,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var oldParent = new Geometry("g") { Shapes = [line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -524,7 +524,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
@@ -550,7 +550,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedFromOtherContainmentInSameParentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.CompositeShape_disabledParts, args.OldContainment);
@@ -580,7 +580,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         int events = 0;
         int[] oldIndices = [0, 2];
         int[] indices = [2, 3];
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) =>
         {
             Assert.AreEqual(oldIndices[events], args.OldIndex);
             Assert.AreSame(compositeShape, args.Parent);
@@ -609,7 +609,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         int events = 0;
         int[] oldIndices = [0, 2];
         int[] indices = [1, 3];
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildMovedInSameContainmentArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) =>
         {
             Assert.AreEqual(oldIndices[events], args.OldIndex);
             Assert.AreSame(compositeShape, args.Parent);
@@ -635,7 +635,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -653,7 +653,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -670,7 +670,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -691,7 +691,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -713,7 +713,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [line, circle] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -735,7 +735,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [line, circle] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -757,7 +757,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [circle, line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -779,7 +779,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [circle, line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -802,7 +802,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [circleA, line, circleB] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -825,7 +825,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var parent = new Geometry("g") { Shapes = [circleA, line, circleB] };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -852,7 +852,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
         });
@@ -869,7 +869,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
         });
@@ -886,7 +886,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             events++;
         });
@@ -903,7 +903,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -922,7 +922,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new List<Coord>();
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -949,7 +949,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -972,7 +972,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -997,7 +997,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1020,7 +1020,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1045,7 +1045,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1070,7 +1070,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1098,7 +1098,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         parent.AddShapes(values);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1122,7 +1122,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         parent.AddShapes(values);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1147,7 +1147,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -1167,7 +1167,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, circleA };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1191,7 +1191,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, circleA };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1214,7 +1214,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1237,7 +1237,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1261,7 +1261,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1285,7 +1285,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1310,7 +1310,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1335,7 +1335,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1361,7 +1361,7 @@ public class ContainmentTests_Multiple_Optional_Listener
 
         int events = 0;
         int[] indices = [0, 1];
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);
@@ -1387,7 +1387,7 @@ public class ContainmentTests_Multiple_Optional_Listener
 
         int events = 0;
         int[] indices = [0, 1];
-        parent.Publisher.Subscribe<IPartitionPublisher.ChildDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.Geometry_shapes, args.Containment);

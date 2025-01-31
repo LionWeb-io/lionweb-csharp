@@ -31,7 +31,7 @@ public class PropertyTests_Listener
         parent.Documentation = doc;
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<PropertyAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -53,7 +53,7 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<PropertyDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -75,7 +75,7 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<PropertyChangedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -85,8 +85,8 @@ public class PropertyTests_Listener
         });
 
         int badEvents = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => badEvents++);
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) => badEvents++);
+        parent.Publisher.Subscribe<PropertyAddedEvent>((sender, args) => badEvents++);
+        parent.Publisher.Subscribe<PropertyDeletedEvent>((sender, args) => badEvents++);
 
         doc.Text = "bye";
 
@@ -102,7 +102,7 @@ public class PropertyTests_Listener
         parent.AddShapes([circle]);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<PropertyAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
@@ -124,7 +124,7 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<PropertyDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
@@ -145,7 +145,7 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<PropertyChangedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
@@ -155,8 +155,8 @@ public class PropertyTests_Listener
         });
 
         int badEvents = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => badEvents++);
-        parent.Publisher.Subscribe<IPartitionPublisher.PropertyDeletedArgs>((sender, args) => badEvents++);
+        parent.Publisher.Subscribe<PropertyAddedEvent>((sender, args) => badEvents++);
+        parent.Publisher.Subscribe<PropertyDeletedEvent>((sender, args) => badEvents++);
 
         circle.Uuid = "bye";
 

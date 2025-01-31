@@ -23,15 +23,15 @@ public class ForestEventHandler(object? sender) : EventHandlerBase<IForestEvent>
 {
     /// <inheritdoc />
     public void AddPartition(IPartitionInstance newPartition, EventId? eventId = null) =>
-        Raise(new IForestPublisher.NewPartitionArgs(newPartition, eventId ?? CreateEventId()));
+        Raise(new NewPartitionEvent(newPartition, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
-    public bool CanRaiseAddPartition => CanRaise(typeof(IForestPublisher.NewPartitionArgs));
+    public bool CanRaiseAddPartition => CanRaise(typeof(NewPartitionEvent));
 
     /// <inheritdoc />
     public void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null) =>
-        Raise(new IForestPublisher.PartitionDeletedArgs(deletedPartition, eventId ?? CreateEventId()));
+        Raise(new PartitionDeletedEvent(deletedPartition, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
-    public bool CanRaiseDeletePartition => CanRaise(typeof(IForestPublisher.PartitionDeletedArgs));
+    public bool CanRaiseDeletePartition => CanRaise(typeof(PartitionDeletedEvent));
 }

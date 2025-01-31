@@ -21,5 +21,3 @@ public interface IEvent
 {
     EventId EventId { get; }
 }
-
-public abstract record EventArgsBase(EventId EventId) : IEvent;

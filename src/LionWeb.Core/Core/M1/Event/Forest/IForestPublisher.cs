@@ -20,15 +20,14 @@ namespace LionWeb.Core.M1.Event.Forest;
 /// Provides events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
 /// <seealso cref="IForestCommander"/>
 /// <seealso cref="ForestEventHandler"/>
-public interface IForestPublisher : IPublisher<IForestEvent>
-{
-    /// <param name="NewPartition">The newly added partition.</param>
-    /// <seealso cref="IForestCommander.AddPartition"/>
-    record NewPartitionArgs(IPartitionInstance NewPartition, EventId EventId) : IForestEvent;
-
-    /// <param name="DeletedPartition">The deleted partition.</param>
-    /// <seealso cref="IForestCommander.DeletePartition"/>
-    record PartitionDeletedArgs(IPartitionInstance DeletedPartition, EventId EventId) : IForestEvent;
-}
+public interface IForestPublisher : IPublisher<IForestEvent>;
 
 public interface IForestEvent : IEvent;
+
+/// <param name="DeletedPartition">The deleted partition.</param>
+/// <seealso cref="IForestCommander.DeletePartition"/>
+public record PartitionDeletedEvent(IPartitionInstance DeletedPartition, EventId EventId) : IForestEvent;
+
+/// <param name="NewPartition">The newly added partition.</param>
+/// <seealso cref="IForestCommander.AddPartition"/>
+public record NewPartitionEvent(IPartitionInstance NewPartition, EventId EventId) : IForestEvent;

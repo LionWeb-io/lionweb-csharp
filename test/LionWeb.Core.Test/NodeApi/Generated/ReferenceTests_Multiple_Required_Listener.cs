@@ -34,7 +34,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -57,7 +57,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -83,7 +83,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -107,7 +107,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -131,7 +131,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -155,7 +155,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -180,7 +180,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -205,7 +205,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -230,7 +230,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -255,7 +255,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -280,7 +280,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -305,7 +305,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -332,7 +332,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -351,7 +351,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -372,7 +372,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -391,7 +391,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -410,7 +410,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -430,7 +430,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -454,7 +454,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -478,7 +478,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -502,7 +502,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -527,7 +527,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -552,7 +552,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
             Assert.AreSame(materialGroup, args.Parent);
@@ -581,7 +581,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
         });
@@ -600,7 +600,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
         });
@@ -619,7 +619,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
         });
@@ -638,7 +638,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             events++;
         });
@@ -659,7 +659,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new List<Coord>();
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -685,7 +685,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -710,7 +710,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -737,7 +737,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -764,7 +764,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceAddedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -793,7 +793,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new List<IShape> { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -815,7 +815,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -838,7 +838,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             events++;
         });
@@ -860,7 +860,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, circleA };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -886,7 +886,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -913,7 +913,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
@@ -941,7 +941,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         int events = 0;
         int[] indexes = { 0, 1 };
-        parent.Publisher.Subscribe<IPartitionPublisher.ReferenceDeletedArgs>((sender, args) =>
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);

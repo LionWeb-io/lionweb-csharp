@@ -31,8 +31,8 @@ public class EventTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        node.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => { } );
-        node.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) => { });
+        node.Publisher.Subscribe<PropertyAddedEvent>((sender, args) => { } );
+        node.Publisher.Subscribe<PropertyChangedEvent>((sender, args) => { });
         node.Publisher.Subscribe<IPartitionEvent>((sender, args) => { });
 
         circle.Name = "Hello";
@@ -48,10 +48,10 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => addedCount++);
+        node.Publisher.Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
         
         int changedCount = 0;
-        node.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) => changedCount++);
+        node.Publisher.Subscribe<PropertyChangedEvent>((sender, args) => changedCount++);
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -68,10 +68,10 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.Publisher.Subscribe<IPartitionPublisher.PropertyAddedArgs>((sender, args) => addedCount++);
+        node.Publisher.Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
         
         int changedCount = 0;
-        node.Publisher.Subscribe<IPartitionPublisher.PropertyChangedArgs>((sender, args) => changedCount++);
+        node.Publisher.Subscribe<PropertyChangedEvent>((sender, args) => changedCount++);
 
         int allCount = 0;
         node.Publisher.Subscribe<IPartitionEvent>((sender, args) => allCount++);
