@@ -49,7 +49,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     {
         switch (@event)
         {
-            case NewPartitionEvent a:
+            case PartitionAddedEvent a:
                 OnLocalNewPartition(sender, a);
                 break;
             case PartitionDeletedEvent a:
@@ -63,7 +63,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     {
         switch (@event)
         {
-            case NewPartitionEvent a:
+            case PartitionAddedEvent a:
                 OnRemoteNewPartition(null, a);
                 break;
 
@@ -109,7 +109,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     #region Local
 
-    private void OnLocalNewPartition(object? sender, NewPartitionEvent @event) =>
+    private void OnLocalNewPartition(object? sender, PartitionAddedEvent @event) =>
         RegisterPartition(@event.NewPartition);
 
     private void OnLocalPartitionDeleted(object? sender, PartitionDeletedEvent @event) =>
@@ -119,7 +119,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     #region Remote
 
-    private void OnRemoteNewPartition(object? sender, NewPartitionEvent @event) =>
+    private void OnRemoteNewPartition(object? sender, PartitionAddedEvent @event) =>
         SuppressCommandForwarding(() =>
         {
             var newPartition = (INode)@event.NewPartition;

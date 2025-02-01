@@ -28,7 +28,7 @@ public record PartitionDeletedEvent(
 
 /// A new partition has been added to this forrest.
 /// <param name="NewPartition">The newly added partition.</param>
-public record NewPartitionEvent(
+public record PartitionAddedEvent(
     IPartitionInstance NewPartition,
     EventId EventId)
     : IForestEvent;

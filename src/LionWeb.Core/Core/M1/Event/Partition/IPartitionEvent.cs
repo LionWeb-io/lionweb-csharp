@@ -153,6 +153,54 @@ public record ChildMovedInSameContainmentEvent(
     Index OldIndex,
     EventId EventId) : IPartitionEvent;
 
+/// <param name="NewParent"></param>
+/// <param name="NewContainment"></param>
+/// <param name="NewIndex"></param>
+/// <param name="MovedChild"></param>
+/// <param name="OldParent"></param>
+/// <param name="OldContainment"></param>
+/// <param name="OldIndex"></param>
+public record ChildMovedAndReplacedFromOtherContainmentEvent(
+    IWritableNode NewParent,
+    Containment NewContainment,
+    Index NewIndex,
+    IWritableNode MovedChild,
+    IWritableNode OldParent,
+    Containment OldContainment,
+    Index OldIndex,
+    IWritableNode ReplacedChild,
+    EventId EventId) : IPartitionEvent;
+
+/// <param name="NewContainment"></param>
+/// <param name="NewIndex"></param>
+/// <param name="MovedChild"></param>
+/// <param name="Parent"></param>
+/// <param name="OldContainment"></param>
+/// <param name="OldIndex"></param>
+public record ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(
+    Containment NewContainment,
+    Index NewIndex,
+    IWritableNode MovedChild,
+    IWritableNode Parent,
+    Containment OldContainment,
+    Index OldIndex,
+    IWritableNode ReplacedChild,
+    EventId EventId) : IPartitionEvent;
+
+/// <param name="NewIndex"></param>
+/// <param name="MovedChild"></param>
+/// <param name="Parent"></param>
+/// <param name="Containment"></param>
+/// <param name="OldIndex"></param>
+public record ChildMovedAndReplacedInSameContainmentEvent(
+    Index NewIndex,
+    IWritableNode MovedChild,
+    IWritableNode Parent,
+    Containment Containment,
+    IWritableNode ReplacedChild,
+    Index OldIndex,
+    EventId EventId) : IPartitionEvent;
+
 #endregion
 
 #region Annotations
@@ -212,6 +260,32 @@ public record AnnotationMovedInSameParentEvent(
     Index OldIndex,
     EventId EventId) : IPartitionEvent;
 
+/// <param name="NewParent"></param>
+/// <param name="NewIndex"></param>
+/// <param name="MovedAnnotation"></param>
+/// <param name="OldParent"></param>
+/// <param name="OldIndex"></param>
+public record AnnotationMovedAndReplacedFromOtherParentEvent(
+    IWritableNode NewParent,
+    Index NewIndex,
+    IWritableNode MovedAnnotation,
+    IWritableNode OldParent,
+    Index OldIndex,
+    IWritableNode ReplacedAnnotation,
+    EventId EventId) : IPartitionEvent;
+
+/// <param name="NewIndex"></param>
+/// <param name="MovedAnnotation"></param>
+/// <param name="Parent"></param>
+/// <param name="OldIndex"></param>
+public record AnnotationMovedAndReplacedInSameParentEvent(
+    Index NewIndex,
+    IWritableNode MovedAnnotation,
+    IWritableNode Parent,
+    Index OldIndex,
+    IWritableNode ReplacedAnnotation,
+    EventId EventId) : IPartitionEvent;
+
 #endregion
 
 #region References
@@ -257,15 +331,15 @@ public record ReferenceChangedEvent(
 /// <param name="OldParent"></param>
 /// <param name="OldReference"></param>
 /// <param name="OldIndex"></param>
-/// <param name="Target"></param>
+/// <param name="MovedTarget"></param>
 public record EntryMovedFromOtherReferenceEvent(
     IWritableNode NewParent,
     Reference NewReference,
     Index NewIndex,
+    IReferenceTarget MovedTarget,
     IWritableNode OldParent,
     Reference OldReference,
     Index OldIndex,
-    IReferenceTarget Target,
     EventId EventId) : IPartitionEvent;
 
 /// <param name="Parent"></param>
@@ -273,14 +347,14 @@ public record EntryMovedFromOtherReferenceEvent(
 /// <param name="NewIndex"></param>
 /// <param name="OldReference"></param>
 /// <param name="OldIndex"></param>
-/// <param name="Target"></param>
+/// <param name="MovedTarget"></param>
 public record EntryMovedFromOtherReferenceInSameParentEvent(
     IWritableNode Parent,
     Reference NewReference,
     Index NewIndex,
+    IReferenceTarget MovedTarget,
     Reference OldReference,
     Index OldIndex,
-    IReferenceTarget Target,
     EventId EventId) : IPartitionEvent;
 
 /// <param name="Parent"></param>
@@ -294,6 +368,54 @@ public record EntryMovedInSameReferenceEvent(
     Index OldIndex,
     Index NewIndex,
     IReferenceTarget Target,
+    EventId EventId) : IPartitionEvent;
+
+/// <param name="NewParent"></param>
+/// <param name="NewReference"></param>
+/// <param name="NewIndex"></param>
+/// <param name="OldParent"></param>
+/// <param name="OldReference"></param>
+/// <param name="OldIndex"></param>
+/// <param name="MovedTarget"></param>
+public record EntryMovedAndReplacedFromOtherReferenceEvent(
+    IWritableNode NewParent,
+    Reference NewReference,
+    Index NewIndex,
+    IReferenceTarget MovedTarget,
+    IWritableNode OldParent,
+    Reference OldReference,
+    Index OldIndex,
+    IReferenceTarget ReplacedTarget,
+    EventId EventId) : IPartitionEvent;
+
+/// <param name="Parent"></param>
+/// <param name="NewReference"></param>
+/// <param name="NewIndex"></param>
+/// <param name="OldReference"></param>
+/// <param name="OldIndex"></param>
+/// <param name="MovedTarget"></param>
+public record EntryMovedAndReplacedFromOtherReferenceInSameParentEvent(
+    IWritableNode Parent,
+    Reference NewReference,
+    Index NewIndex,
+    IReferenceTarget MovedTarget,
+    Reference OldReference,
+    Index OldIndex,
+    IReferenceTarget ReplacedTarget,
+    EventId EventId) : IPartitionEvent;
+
+/// <param name="Parent"></param>
+/// <param name="Reference"></param>
+/// <param name="OldIndex"></param>
+/// <param name="NewIndex"></param>
+/// <param name="MovedTarget"></param>
+public record EntryMovedAndReplacedInSameReferenceEvent(
+    IWritableNode Parent,
+    Reference Reference,
+    Index NewIndex,
+    IReferenceTarget MovedTarget,
+    Index OldIndex,
+    IReferenceTarget ReplacedTarget,
     EventId EventId) : IPartitionEvent;
 
 /// <param name="Parent"></param>

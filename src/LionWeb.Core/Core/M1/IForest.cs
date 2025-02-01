@@ -52,7 +52,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _eventHandler.Raise(new NewPartitionEvent(partition, _eventHandler.CreateEventId()));
+                _eventHandler.Raise(new PartitionAddedEvent(partition, _eventHandler.CreateEventId()));
         }
     }
 
