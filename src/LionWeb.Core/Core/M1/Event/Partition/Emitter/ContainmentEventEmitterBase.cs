@@ -64,12 +64,21 @@ public abstract class ContainmentEventEmitterBase<T> : PartitionEventEmitterBase
         Index Index,
         IPartitionInstance? Partition);
 
-    protected void RaiseOldDeletionEvent(OldContainmentInfo old, EventId eventId, IWritableNode moved)
+    protected void RaiseOriginMoveEvent(OldContainmentInfo old, EventId eventId, IWritableNode moved, Index newIndex)
     {
         if (old.Partition != null && old.Partition != newPartition)
         {
             old.Partition.GetCommander()
-                ?.DeleteChild(moved, old.Parent, old.Containment, old.Index, eventId);
+                ?.MoveChildFromOtherContainment(
+                    NewParent,
+                    Containment,
+                    newIndex,
+                    moved,
+                    old.Parent,
+                    old.Containment,
+                    old.Index,
+                    eventId
+                );
         }
     }
 }

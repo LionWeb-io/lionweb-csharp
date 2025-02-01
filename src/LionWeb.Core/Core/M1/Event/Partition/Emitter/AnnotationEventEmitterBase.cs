@@ -57,13 +57,19 @@ public abstract class AnnotationEventEmitterBase : PartitionEventEmitterBase<INo
     /// <param name="Index"></param>
     protected record OldAnnotationInfo(INode Parent, Index Index, IPartitionInstance? Partition);
 
-
-    protected void RaiseOldDeletionEvent(OldAnnotationInfo old, EventId eventId, IWritableNode moved)
+    protected void RaiseOriginMoveEvent(OldAnnotationInfo old, EventId eventId, IWritableNode moved, Index newIndex)
     {
         if (old.Partition != null && old.Partition != newPartition)
         {
             old.Partition.GetCommander()
-                ?.DeleteAnnotation(moved, old.Parent, old.Index, eventId);
+                ?.MoveAnnotationFromOtherParent(
+                    NewParent,
+                    newIndex,
+                    moved,
+                    old.Parent,
+                    old.Index,
+                    eventId
+                );
         }
     }
 }

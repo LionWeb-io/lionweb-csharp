@@ -61,7 +61,7 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
 
                         case { } old when old.Parent != NewParent:
                             var eventId = PartitionCommander.CreateEventId();
-                            RaiseOldDeletionEvent(old, eventId, added.Element);
+                            RaiseOriginMoveEvent(old, eventId, added.Element, added.RightIndex);
                             PartitionCommander.MoveAnnotationFromOtherParent(
                                 NewParent,
                                 added.RightIndex,

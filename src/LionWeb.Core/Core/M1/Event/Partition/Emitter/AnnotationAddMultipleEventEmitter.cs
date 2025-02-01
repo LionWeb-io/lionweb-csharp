@@ -57,7 +57,7 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
 
                 case not null when old.Parent != NewParent:
                     var eventId = PartitionCommander.CreateEventId();
-                    RaiseOldDeletionEvent(old, eventId, added);
+                    RaiseOriginMoveEvent(old, eventId, added, _newIndex);
                     PartitionCommander.MoveAnnotationFromOtherParent(
                         NewParent,
                         _newIndex,

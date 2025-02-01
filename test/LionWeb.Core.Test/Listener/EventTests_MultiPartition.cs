@@ -45,7 +45,8 @@ public class EventTests_MultiPartition
         List<(EventId, IReadableNode)> deletions = [];
         node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
         List<(EventId, IReadableNode)> moves = [];
-        node.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
+        node.GetPublisher()
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
 
         node.AddShapes([moved]);
 
@@ -55,12 +56,12 @@ public class EventTests_MultiPartition
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_Multiple_DifferentPartition()
+    public void ChildMovedFromOtherContainment_Multiple_DifferentPartition_Add()
     {
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originPartition = new Geometry("g") { Shapes = [origin] };
-        
+
         var node = new Geometry("a") { Shapes = [] };
 
         var clone = new Geometry("a") { Shapes = [] };
@@ -68,17 +69,48 @@ public class EventTests_MultiPartition
         var replicator = new PartitionEventReplicator(clone);
         replicator.Subscribe(node.GetPublisher());
 
-        List<(EventId, IReadableNode)> deletions = [];
-        originPartition.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
-        List<(EventId, IReadableNode)> moves = [];
-        node.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
+        List<(EventId, IReadableNode)> originMoves = [];
+        originPartition.GetPublisher()
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedChild)));
+        List<(EventId, IReadableNode)> destinationMoves = [];
+        node.GetPublisher()
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId, e.MovedChild)));
 
         node.AddShapes([moved]);
 
         AssertEquals([node], [clone]);
-        CollectionAssert.Contains(deletions.Select(it => it.Item2).ToList(), moved);
-        CollectionAssert.Contains(moves.Select(it => it.Item2).ToList(), moved);
-        Assert.AreEqual(deletions[0].Item1, moves[0].Item1);
+        CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
+        CollectionAssert.Contains(destinationMoves.Select(it => it.Item2).ToList(), moved);
+        Assert.AreEqual(originMoves[0].Item1, destinationMoves[0].Item1);
+    }
+
+    [TestMethod]
+    public void ChildMovedFromOtherContainment_Multiple_DifferentPartition_Insert()
+    {
+        var moved = new Circle("moved");
+        var origin = new CompositeShape("origin") { Parts = [moved] };
+        var originPartition = new Geometry("g") { Shapes = [origin] };
+
+        var node = new Geometry("a") { Shapes = [] };
+
+        var clone = new Geometry("a") { Shapes = [] };
+
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.GetPublisher());
+
+        List<(EventId, IReadableNode)> originMoves = [];
+        originPartition.GetPublisher()
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedChild)));
+        List<(EventId, IReadableNode)> destinationMoves = [];
+        node.GetPublisher()
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId, e.MovedChild)));
+
+        node.InsertShapes(0, [moved]);
+
+        AssertEquals([node], [clone]);
+        CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
+        CollectionAssert.Contains(destinationMoves.Select(it => it.Item2).ToList(), moved);
+        Assert.AreEqual(originMoves[0].Item1, destinationMoves[0].Item1);
     }
 
     [TestMethod]
@@ -95,7 +127,8 @@ public class EventTests_MultiPartition
         List<(EventId, IReadableNode)> deletions = [];
         node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
         List<(EventId, IReadableNode)> moves = [];
-        node.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
+        node.GetPublisher()
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
 
         node.Documentation = moved;
 
@@ -109,7 +142,7 @@ public class EventTests_MultiPartition
     {
         var moved = new Documentation("moved");
         var originPartition = new Geometry("g") { Shapes = [new Line("l") { ShapeDocs = moved }] };
-        
+
         var node = new Geometry("a") { };
 
         var clone = new Geometry("a") { };
@@ -117,17 +150,19 @@ public class EventTests_MultiPartition
         var replicator = new PartitionEventReplicator(clone);
         replicator.Subscribe(node.GetPublisher());
 
-        List<(EventId, IReadableNode)> deletions = [];
-        originPartition.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
-        List<(EventId, IReadableNode)> moves = [];
-        node.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
+        List<(EventId, IReadableNode)> originMoves = [];
+        originPartition.GetPublisher()
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedChild)));
+        List<(EventId, IReadableNode)> destinationMoves = [];
+        node.GetPublisher()
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId, e.MovedChild)));
 
         node.Documentation = moved;
 
         AssertEquals([node], [clone]);
-        CollectionAssert.Contains(deletions.Select(it => it.Item2).ToList(), moved);
-        CollectionAssert.Contains(moves.Select(it => it.Item2).ToList(), moved);
-        Assert.AreEqual(deletions[0].Item1, moves[0].Item1);
+        CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
+        CollectionAssert.Contains(destinationMoves.Select(it => it.Item2).ToList(), moved);
+        Assert.AreEqual(originMoves[0].Item1, destinationMoves[0].Item1);
     }
 
     #endregion
@@ -154,9 +189,11 @@ public class EventTests_MultiPartition
         replicator.Subscribe(node.GetPublisher());
 
         List<(EventId, IReadableNode)> deletions = [];
-        node.GetPublisher().Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedAnnotation)));
+        node.GetPublisher()
+            .Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedAnnotation)));
         List<(EventId, IReadableNode)> moves = [];
-        node.GetPublisher().Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => moves.Add((e.EventId, e.MovedAnnotation)));
+        node.GetPublisher()
+            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => moves.Add((e.EventId, e.MovedAnnotation)));
 
         node.AddAnnotations([moved]);
 
@@ -166,31 +203,65 @@ public class EventTests_MultiPartition
     }
 
     [TestMethod]
-    public void AnnotationMovedFromOtherParent_Multiple_DifferentPartition()
+    public void AnnotationMovedFromOtherParent_Multiple_DifferentPartition_Add()
     {
         var moved = new BillOfMaterials("moved");
         var origin = new CompositeShape("origin");
         origin.AddAnnotations([moved]);
         var originPartition = new Geometry("g") { Shapes = [origin] };
-        
-        var node = new Geometry("a") {  };
 
-        var clone = new Geometry("a") {  };
+        var node = new Geometry("a") { };
+
+        var clone = new Geometry("a") { };
 
         var replicator = new PartitionEventReplicator(clone);
         replicator.Subscribe(node.GetPublisher());
 
-        List<(EventId, IReadableNode)> deletions = [];
-        originPartition.GetPublisher().Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedAnnotation)));
-        List<(EventId, IReadableNode)> moves = [];
-        node.GetPublisher().Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => moves.Add((e.EventId, e.MovedAnnotation)));
+        List<(EventId, IReadableNode)> originMoves = [];
+        originPartition.GetPublisher()
+            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedAnnotation)));
+        List<(EventId, IReadableNode)> destinationMoves = [];
+        node.GetPublisher()
+            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) =>
+                destinationMoves.Add((e.EventId, e.MovedAnnotation)));
 
         node.AddAnnotations([moved]);
 
         AssertEquals([node], [clone]);
-        CollectionAssert.Contains(deletions.Select(it => it.Item2).ToList(), moved);
-        CollectionAssert.Contains(moves.Select(it => it.Item2).ToList(), moved);
-        Assert.AreEqual(deletions[0].Item1, moves[0].Item1);
+        CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
+        CollectionAssert.Contains(destinationMoves.Select(it => it.Item2).ToList(), moved);
+        Assert.AreEqual(originMoves[0].Item1, destinationMoves[0].Item1);
+    }
+
+    [TestMethod]
+    public void AnnotationMovedFromOtherParent_Multiple_DifferentPartition_Insert()
+    {
+        var moved = new BillOfMaterials("moved");
+        var origin = new CompositeShape("origin");
+        origin.AddAnnotations([moved]);
+        var originPartition = new Geometry("g") { Shapes = [origin] };
+
+        var node = new Geometry("a") { };
+
+        var clone = new Geometry("a") { };
+
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.Subscribe(node.GetPublisher());
+
+        List<(EventId, IReadableNode)> originMoves = [];
+        originPartition.GetPublisher()
+            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedAnnotation)));
+        List<(EventId, IReadableNode)> destinationMoves = [];
+        node.GetPublisher()
+            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) =>
+                destinationMoves.Add((e.EventId, e.MovedAnnotation)));
+
+        node.InsertAnnotations(0, [moved]);
+
+        AssertEquals([node], [clone]);
+        CollectionAssert.Contains(originMoves.Select(it => it.Item2).ToList(), moved);
+        CollectionAssert.Contains(destinationMoves.Select(it => it.Item2).ToList(), moved);
+        Assert.AreEqual(originMoves[0].Item1, destinationMoves[0].Item1);
     }
 
     #endregion

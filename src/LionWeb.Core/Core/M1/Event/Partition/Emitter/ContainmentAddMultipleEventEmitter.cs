@@ -60,7 +60,7 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
 
                 case not null when old.Parent != NewParent:
                     var eventId = PartitionCommander.CreateEventId();
-                    RaiseOldDeletionEvent(old, eventId, added);
+                    RaiseOriginMoveEvent(old, eventId, added, _newIndex);
 
                     PartitionCommander.MoveChildFromOtherContainment(
                         NewParent,

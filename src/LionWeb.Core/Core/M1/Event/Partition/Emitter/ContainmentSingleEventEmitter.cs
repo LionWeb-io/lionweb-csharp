@@ -147,7 +147,7 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent != NewParent:
                 var eventId = PartitionCommander.CreateEventId();
-                RaiseOldDeletionEvent(_oldContainmentInfo, eventId, _newValue);
+                RaiseOriginMoveEvent(_oldContainmentInfo, eventId, _newValue, 0);
                 PartitionCommander.MoveChildFromOtherContainment(
                     NewParent,
                     Containment,
