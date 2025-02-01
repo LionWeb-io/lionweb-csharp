@@ -819,33 +819,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     #region Publisher Helpers
 
-    /// Raises either <see cref="IPartitionCommander.AddProperty"/>, <see cref="IPartitionCommander.DeleteProperty"/> or
-    /// <see cref="IPartitionCommander.ChangeProperty"/> for <paramref name="property"/>,
-    /// depending on <paramref name="oldValue"/> and <paramref name="newValue"/>.
-    protected void RaisePropertyEvent(Property property, object? oldValue, object? newValue)
-    {
-        var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null || !partitionCommander.CanRaise(
-                typeof(PropertyAddedEvent),
-                typeof(PropertyDeletedEvent),
-                typeof(PropertyChangedEvent)
-            ))
-            return;
-
-        switch (oldValue, newValue)
-        {
-            case (null, { } v):
-                partitionCommander.AddProperty(this, property, v);
-                break;
-            case ({ } o, null):
-                partitionCommander.DeleteProperty(this, property, o);
-                break;
-            case ({ } o, { } n):
-                partitionCommander.ChangeProperty(this, property, n, o);
-                break;
-        }
-    }
-
     /// Raises either <see cref="IPartitionCommander.AddReference"/>, <see cref="IPartitionCommander.DeleteReference"/> or
     /// <see cref="IPartitionCommander.ChangeReference"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
