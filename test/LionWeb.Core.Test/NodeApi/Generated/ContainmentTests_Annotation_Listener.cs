@@ -173,10 +173,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([new Documentation("doc"), bom]);
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationMovedInSameParentEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationMovedInSameParentEvent>((sender, args) => events++);
 
         line.AddAnnotations([bom]);
 
@@ -193,10 +190,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc, bom]);
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationMovedInSameParentEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationMovedInSameParentEvent>((sender, args) => events++);
 
         line.Set(null, new List<INode> { doc, bom });
 
@@ -579,10 +573,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationMovedInSameParentEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationMovedInSameParentEvent>((sender, args) => events++);
 
         line.InsertAnnotations(1, [bom]);
 
@@ -600,10 +591,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationMovedInSameParentEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationMovedInSameParentEvent>((sender, args) => events++);
 
         line.Set(null, new List<INode> { docA, bom, docB });
 
@@ -622,10 +610,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) => events++);
 
         line.RemoveAnnotations([bom]);
 
@@ -642,10 +627,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) => events++);
 
         line.RemoveAnnotations([bom]);
 
@@ -850,10 +832,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationAddedEvent>((sender, args) => events++);
 
         line.AddAnnotations(values);
 
@@ -868,10 +847,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationAddedEvent>((sender, args) => events++);
 
         line.Set(null, values);
 
@@ -886,10 +862,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationAddedEvent>((sender, args) => events++);
 
         line.InsertAnnotations(0, values);
 
@@ -904,10 +877,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) => events++);
 
         line.RemoveAnnotations(values);
 
@@ -1150,10 +1120,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) => events++);
 
         line.RemoveAnnotations(values);
 
@@ -1173,10 +1140,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<AnnotationDeletedEvent>((sender, args) => events++);
 
         line.RemoveAnnotations(values);
 

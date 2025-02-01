@@ -221,10 +221,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [circle, line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) => events++);
 
         parent.AddShapes([line]);
 
@@ -239,10 +236,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [circle, line] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) => events++);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, new List<INode> { circle, line });
 
@@ -676,10 +670,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) => events++);
 
         compositeShape.InsertParts(1, [lineA, lineB]);
 
@@ -697,10 +688,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) => events++);
 
         compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts,
             new List<INode> { circleA, lineA, lineB, circleB });
@@ -720,10 +708,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts([line]));
 
@@ -738,10 +723,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() =>
             compositeShape.Set(ShapesLanguage.Instance.CompositeShape_parts, new List<INode> { }));
@@ -758,10 +740,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         compositeShape.RemoveParts([line]);
 
@@ -776,10 +755,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts([line]));
 
@@ -940,10 +916,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.AddParts(values));
 
@@ -957,10 +930,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var parent = new Geometry("g") { Shapes = [compositeShape] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
 
         var values = new IShape[0];
         Assert.ThrowsException<InvalidValueException>(
@@ -977,10 +947,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.InsertParts(0, values));
 
@@ -1176,10 +1143,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new List<IShape> { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts(values));
 
@@ -1196,10 +1160,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => compositeShape.RemoveParts(values));
 
@@ -1218,10 +1179,7 @@ public class ContainmentTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         compositeShape.RemoveParts(values);
 

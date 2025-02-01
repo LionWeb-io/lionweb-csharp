@@ -332,10 +332,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
 
@@ -351,10 +348,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() =>
             materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { }));
@@ -372,10 +366,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         materialGroup.RemoveMaterials([line]);
 
@@ -391,10 +382,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
 
@@ -410,10 +398,7 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
 
@@ -581,10 +566,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.AddMaterials(values));
 
@@ -600,10 +582,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() =>         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
 
@@ -619,10 +598,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.InsertMaterials(0, values));
 
@@ -638,10 +614,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
@@ -659,10 +632,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new List<Coord>();
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(
             () => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, values));
@@ -793,10 +763,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new List<IShape> { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
@@ -815,10 +782,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
@@ -838,10 +802,7 @@ public class ReferenceTests_Multiple_Required_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         materialGroup.RemoveMaterials(values);
 

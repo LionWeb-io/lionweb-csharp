@@ -635,10 +635,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         parent.RemoveShapes([line]);
 
@@ -653,10 +650,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         parent.RemoveShapes([line]);
 
@@ -852,10 +846,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
 
         parent.AddShapes(values);
 
@@ -869,10 +860,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
 
         parent.Set(ShapesLanguage.Instance.Geometry_shapes, values);
 
@@ -886,10 +874,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
 
         parent.InsertShapes(0, values);
 
@@ -903,10 +888,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         parent.RemoveShapes(values);
 
@@ -1147,10 +1129,7 @@ public class ContainmentTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
 
         parent.RemoveShapes(values);
 

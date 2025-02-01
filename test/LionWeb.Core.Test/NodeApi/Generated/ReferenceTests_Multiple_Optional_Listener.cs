@@ -306,10 +306,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         parent.RemoveShapes([line]);
 
@@ -323,10 +320,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
 
@@ -341,10 +335,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         parent.RemoveShapes([line]);
 
@@ -540,10 +531,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) => events++);
 
         parent.AddShapes(values);
 
@@ -557,14 +545,8 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) => events++);
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
 
@@ -578,10 +560,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceAddedEvent>((sender, args) => events++);
 
         parent.InsertShapes(0, values);
 
@@ -595,10 +574,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         parent.RemoveShapes(values);
 
@@ -767,10 +743,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int events = 0;
-        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) =>
-        {
-            events++;
-        });
+        parent.Publisher.Subscribe<ReferenceDeletedEvent>((sender, args) => events++);
 
         parent.RemoveShapes(values);
 
