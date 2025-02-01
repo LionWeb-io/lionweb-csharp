@@ -69,7 +69,7 @@ public class EventTests_MultiPartition
         replicator.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
-        node.Publisher.Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
+        originPartition.Publisher.Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
         List<(EventId, IReadableNode)> moves = [];
         node.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
 
@@ -118,7 +118,7 @@ public class EventTests_MultiPartition
         replicator.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
-        node.Publisher.Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
+        originPartition.Publisher.Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
         List<(EventId, IReadableNode)> moves = [];
         node.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
 
@@ -181,7 +181,7 @@ public class EventTests_MultiPartition
         replicator.Subscribe(node.Publisher);
 
         List<(EventId, IReadableNode)> deletions = [];
-        node.Publisher.Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedAnnotation)));
+        originPartition.Publisher.Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedAnnotation)));
         List<(EventId, IReadableNode)> moves = [];
         node.Publisher.Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => moves.Add((e.EventId, e.MovedAnnotation)));
 

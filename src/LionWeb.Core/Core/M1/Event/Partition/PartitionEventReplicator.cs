@@ -184,7 +184,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             var newChildNode = (INode)@event.NewChild;
 
             var clone = Clone(newChildNode);
-            RegisterNode(clone);
 
             var newValue = InsertContainment(localParent, @event.Containment, @event.Index, clone);
 
@@ -204,7 +203,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 if (existingChildren is IList l)
                 {
                     var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    UnregisterNode(children[@event.Index]);
                     children.RemoveAt(@event.Index);
                     newValue = children;
                 }
@@ -230,8 +228,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                     children.Insert(@event.Index, newValueNode);
                     var removeIndex = @event.Index + 1;
                     children.RemoveAt(removeIndex);
-                    UnregisterNode(children[removeIndex]);
-                    RegisterNode(newValueNode);
                     newValue = children;
                 }
             }
@@ -316,7 +312,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         {
             var localParent = Lookup(@event.Parent.GetId());
             var clone = Clone((INode)@event.NewAnnotation);
-            RegisterNode(clone);
             localParent.InsertAnnotations(@event.Index, [clone]);
             return null;
         });
@@ -326,7 +321,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         {
             var localParent = Lookup(@event.Parent.GetId());
             var localDeleted = Lookup(@event.DeletedAnnotation.GetId());
-            UnregisterNode(localDeleted);
             localParent.RemoveAnnotations([localDeleted]);
             return null;
         });
