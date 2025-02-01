@@ -30,7 +30,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         parent.Set(Geometry_documentation, doc);
 
         int events = 0;
-        parent.Publisher.Subscribe<PropertyAddedEvent>((_, args) =>
+        parent.GetPublisher().Subscribe<PropertyAddedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -52,7 +52,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         doc.Set(Documentation_text, "hello");
 
         int events = 0;
-        parent.Publisher.Subscribe<PropertyDeletedEvent>((_, args) =>
+        parent.GetPublisher().Subscribe<PropertyDeletedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -74,7 +74,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         doc.Set(Documentation_text, "hello");
 
         int events = 0;
-        parent.Publisher.Subscribe<PropertyChangedEvent>((_, args) =>
+        parent.GetPublisher().Subscribe<PropertyChangedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -84,8 +84,8 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         });
 
         int badEvents = 0;
-        parent.Publisher.Subscribe<PropertyAddedEvent>((_, _) => badEvents++);
-        parent.Publisher.Subscribe<PropertyDeletedEvent>((_, _) => badEvents++);
+        parent.GetPublisher().Subscribe<PropertyAddedEvent>((_, _) => badEvents++);
+        parent.GetPublisher().Subscribe<PropertyDeletedEvent>((_, _) => badEvents++);
 
         doc.Set(Documentation_text, "bye");
 

@@ -116,11 +116,11 @@ public interface IPartitionInstance : IConceptInstance
 {
     /// Optional hook to listen to partition events.
     /// Not supported by every implementation. 
-    IPartitionPublisher? Publisher { get => null; }
+    IPartitionPublisher? GetPublisher() => null;
 
     /// Optional hook to raise partition events.
     /// Not supported by every implementation. 
-    IPartitionCommander? Commander { get => null; }
+    internal IPartitionCommander? GetCommander() => null;
 }
 
 /// <inheritdoc cref="IPartitionInstance" />
@@ -472,11 +472,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <summary>
-    /// Tries to retrieve the <see cref="IPartitionInstance.Commander"/> from this node's <see cref="Concept.Partition"/>.
+    /// Tries to retrieve the <see cref="IPartitionInstance.GetCommander"/> from this node's <see cref="Concept.Partition"/>.
     /// </summary>
     /// <returns>This node's <see cref="IPartitionCommander"/>, if available.</returns>
-    protected internal virtual IPartitionCommander? GetPartitionCommander() =>
-        this.GetPartition()?.Commander;
+    protected virtual IPartitionCommander? GetPartitionCommander() =>
+        this.GetPartition()?.GetCommander();
 
     #region Helpers
 

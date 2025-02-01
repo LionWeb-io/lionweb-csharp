@@ -1312,10 +1312,10 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
 	private readonly PartitionEventHandler _eventHandler;
-	public IPartitionPublisher Publisher => _eventHandler;
-	public IPartitionCommander Commander => _eventHandler;
+    public IPartitionPublisher GetPublisher() => _eventHandler;
+    public IPartitionCommander GetCommander() => _eventHandler;
 
-	/// <inheritdoc/>
+    /// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
 		if (base.GetInternal(feature, out result))
@@ -2092,10 +2092,10 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
 	private readonly PartitionEventHandler _eventHandler;
-	public IPartitionPublisher Publisher => _eventHandler;
-	public IPartitionCommander Commander => _eventHandler;
+    public IPartitionPublisher GetPublisher() => _eventHandler;
+    public IPartitionCommander GetCommander() => _eventHandler;
 
-	/// <inheritdoc/>
+    /// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
 		if (base.GetInternal(feature, out result))

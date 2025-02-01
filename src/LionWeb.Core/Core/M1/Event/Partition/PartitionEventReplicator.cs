@@ -25,7 +25,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     private readonly IPartitionInstance _localPartition;
 
     public PartitionEventReplicator(IPartitionInstance localPartition,
-        Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(localPartition.Publisher, localPartition.Commander, sharedNodeMap)
+        Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(localPartition.GetPublisher(), localPartition.GetCommander(), sharedNodeMap)
     {
         _localPartition = localPartition;
         Init();
@@ -91,7 +91,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     {
         RegisterNode(_localPartition);
 
-        var publisher = _localPartition.Publisher;
+        var publisher = _localPartition.GetPublisher();
         if (publisher == null)
             return;
 
@@ -124,7 +124,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
         UnregisterNode(_localPartition);
 
-        var localPublisher = _localPartition.Publisher;
+        var localPublisher = _localPartition.GetPublisher();
         if (localPublisher == null)
             return;
 

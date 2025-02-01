@@ -43,7 +43,7 @@ public abstract class PartitionEventBase<T> where T : IReadableNode
     {
         NewParent = newParent;
         newPartition = newParent.GetPartition();
-        PartitionCommander = newPartition?.Commander;
+        PartitionCommander = newPartition?.GetCommander();
     }
 
     /// Logic to execute <i>before</i> any changes to the underlying nodes.
@@ -109,7 +109,7 @@ public abstract class PartitionContainmentEventBase<T> : PartitionEventBase<T> w
     {
         if (old.Partition != null && old.Partition != newPartition)
         {
-            old.Partition.Commander
+            old.Partition.GetCommander()
                 ?.DeleteChild(moved, old.Parent, old.Containment, old.Index, eventId);
         }
     }
@@ -630,7 +630,7 @@ public abstract class PartitionAnnotationEventBase : PartitionEventBase<INode>
     {
         if (old.Partition != null && old.Partition != newPartition)
         {
-            old.Partition.Commander
+            old.Partition.GetCommander()
                 ?.DeleteAnnotation(moved, old.Parent, old.Index, eventId);
         }
     }

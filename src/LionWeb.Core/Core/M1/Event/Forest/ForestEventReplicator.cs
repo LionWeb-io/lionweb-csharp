@@ -128,7 +128,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
             _localForest.AddPartitions([clone]);
 
-            var remoteListener = @event.NewPartition.Publisher;
+            var remoteListener = @event.NewPartition.GetPublisher();
             if (remoteListener != null)
                 LookupPartition(clone).Subscribe(remoteListener);
 
