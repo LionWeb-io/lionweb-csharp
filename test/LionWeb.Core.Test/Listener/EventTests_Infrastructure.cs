@@ -143,7 +143,7 @@ public class EventTests_Infrastructure
 
     private static HashSet<string> ReplicatorEventIds(PartitionEventReplicator replicator)
     {
-        var type = typeof(EventReplicatorBase<IPartitionEvent, IPartitionPublisher>);
+        var type = typeof(EventIdFilteringEventForwarder<IPartitionEvent, IPartitionPublisher>);
         var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_eventIds");
         var value = fieldInfo.GetValue(replicator);
         return (HashSet<string>)value!;
