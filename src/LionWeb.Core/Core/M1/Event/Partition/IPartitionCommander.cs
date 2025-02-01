@@ -24,14 +24,6 @@ using M3;
 /// <seealso cref="PartitionEventHandler"/>
 public interface IPartitionCommander : ICommander<IPartitionEvent>
 {
-    #region Nodes
-
-    /// <seealso cref="ClassifierChangedEvent"/>
-    void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier,
-        EventId? eventId = null);
-
-    #endregion
-
     #region Properties
 
     /// <seealso cref="PropertyAddedEvent"/>

@@ -25,11 +25,6 @@ public class PartitionEventHandler(object? sender)
     : EventHandlerBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander
 {
     /// <inheritdoc />
-    public void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier,
-        EventId? eventId = null) =>
-        Raise(new ClassifierChangedEvent(node, newClassifier, oldClassifier, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
     public void AddProperty(IWritableNode node, Property property, object newValue, EventId? eventId = null) =>
         Raise(new PropertyAddedEvent(node, property, newValue, eventId ?? CreateEventId()));
 
