@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1.Event.Forest;
 
+/// All LionWeb events relating to a forest.
 public interface IForestEvent : IEvent;
 
 /// A partition has been deleted from this forest.

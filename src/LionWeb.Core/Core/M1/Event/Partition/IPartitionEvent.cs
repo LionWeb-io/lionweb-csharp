@@ -21,6 +21,7 @@ using M3;
 using TargetNode = IReadableNode;
 using SemanticPropertyValue = object;
 
+/// All LionWeb events relating to a partition.
 public interface IPartitionEvent : IEvent;
 
 #region Nodes

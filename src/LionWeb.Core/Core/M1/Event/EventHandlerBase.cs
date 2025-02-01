@@ -43,6 +43,7 @@ public abstract class EventHandlerBase
     }
 }
 
+/// Forwards <see cref="ICommander{TEvent}"/> commands to <see cref="IPublisher{TEvent}"/> events.
 public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TEvent>, IPublisher<TEvent>
     where TEvent : IEvent
 {

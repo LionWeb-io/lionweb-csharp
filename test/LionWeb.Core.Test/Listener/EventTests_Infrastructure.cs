@@ -97,8 +97,8 @@ public class EventTests_Infrastructure
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         int nodeCount = 0;
         node.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => nodeCount++);
@@ -126,8 +126,8 @@ public class EventTests_Infrastructure
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         circle.Name = "Hello";
         cloneCircle.Name = "World";

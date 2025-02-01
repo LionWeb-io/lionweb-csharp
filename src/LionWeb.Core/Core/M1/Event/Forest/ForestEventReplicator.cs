@@ -19,6 +19,8 @@ namespace LionWeb.Core.M1.Event.Forest;
 
 using Partition;
 
+/// Replicates events for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
+/// <inheritdoc cref="EventReplicatorBase{TEvent,TPublisher}"/>
 public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPublisher>, IForestPublisher
 {
     private readonly IForest _localForest;
@@ -73,7 +75,8 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         }
     }
 
-    /// <inheritdoc />
+    /// <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">Unsubscribes</see>
+    /// from the <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>. 
     public override void Dispose()
     {
         base.Dispose();
@@ -88,6 +91,8 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
             return;
 
         forestListener.Unsubscribe<IForestEvent>(LocalHandler);
+
+        GC.SuppressFinalize(this);
     }
 
     private void RegisterPartition(IPartitionInstance partition)
@@ -120,7 +125,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     #region Remote
 
     private void OnRemoteNewPartition(object? sender, PartitionAddedEvent @event) =>
-        SuppressCommandForwarding(() =>
+        SuppressEventForwarding(() =>
         {
             var newPartition = (INode)@event.NewPartition;
 
@@ -130,18 +135,14 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
             var remoteListener = @event.NewPartition.GetPublisher();
             if (remoteListener != null)
-                LookupPartition(clone).Subscribe(remoteListener);
-
-            return null;
+                LookupPartition(clone).ReplicateFrom(remoteListener);
         });
 
     private void OnRemotePartitionDeleted(object? sender, PartitionDeletedEvent @event) =>
-        SuppressCommandForwarding(() =>
+        SuppressEventForwarding(() =>
         {
             var localPartition = (IPartitionInstance)Lookup(@event.DeletedPartition.GetId());
             _localForest.RemovePartitions([localPartition]);
-
-            return null;
         });
 
     #endregion

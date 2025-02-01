@@ -17,7 +17,9 @@
 
 namespace LionWeb.Core.M1.Event;
 
+/// Any event in the LionWeb event system.
 public interface IEvent
 {
+    /// Globally unique id of this event.
     EventId EventId { get; }
 }

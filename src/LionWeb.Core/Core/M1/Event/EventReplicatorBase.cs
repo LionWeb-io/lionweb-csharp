@@ -17,8 +17,22 @@
 
 namespace LionWeb.Core.M1.Event;
 
+using Partition;
 using Utilities;
 
+/// Replicates events received from <see cref="ReplicateFrom">other publishers</see> on a <i>local</i> equivalent.
+/// 
+/// <para>
+/// Example: We receive a <see cref="PropertyAddedEvent"/> for a node that we know <i>locally</i>.
+/// This class adds the same property value to the <i>locally</i> known node.
+/// </para>
+///
+/// <para>
+/// This class is <i>also</i> a <see cref="IPublisher{TEvent}"/> itself.
+/// We <see cref="EventIdFilteringEventForwarder{TEvent,TPublisher}">forward</see> all events from our <i>local</i>,
+/// except the events that stem from replicating <see cref="ReplicateFrom">other publishers</see>.
+/// Therefore, two instances with different <i>locals</i> can replicate each other, keeping both <i>locals</i> in sync.
+/// </para>
 public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFilteringEventForwarder<TEvent, TPublisher>
     where TEvent : IEvent where TPublisher : IPublisher<TEvent>
 {
@@ -34,19 +48,22 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
         NodeById = sharedNodeMap ?? new();
     }
 
-    public virtual void Subscribe(TPublisher publisher)
+    /// Replicate events raised by <paramref name="publisher"/>. 
+    public virtual void ReplicateFrom(TPublisher publisher)
     {
         publisher.Subscribe<TEvent>(ProcessEvent);
         _publishers.Add(publisher);
     }
 
-    /// <inheritdoc />
+    /// unsubscribes from all <see cref="ReplicateFrom">replicated publishers</see>.
     public override void Dispose()
     {
         foreach (var publisher in _publishers)
         {
             publisher.Unsubscribe<TEvent>(ProcessEvent);
         }
+        
+        GC.SuppressFinalize(this);
     }
 
     protected abstract void ProcessEvent(object? sender, TEvent @event);
@@ -87,7 +104,9 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
             remoteNode.GetId();
     }
 
-    protected void SuppressCommandForwarding(Func<Action?> action)
+    /// Uses <see cref="EventIdFilteringEventForwarder{TEvent,TPublisher}"/> and <see cref="ICommander{TEvent}.RegisterEventId"/>
+    /// to suppress forwarding events raised during executing <paramref name="action"/>. 
+    protected void SuppressEventForwarding(Action action)
     {
         EventId? eventId = null;
         if (_localCommander != null)
@@ -97,16 +116,13 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
             RegisterEventId(eventId);
         }
 
-        Action? postAction = null;
         try
         {
-            postAction = action();
+            action();
         } finally
         {
             if (eventId != null)
                 UnregisterEventId(eventId);
-
-            postAction?.Invoke();
         }
     }
 }

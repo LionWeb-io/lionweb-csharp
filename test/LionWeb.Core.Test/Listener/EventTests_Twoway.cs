@@ -40,8 +40,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         circle.Name = "Hello";
         cloneCircle.Name = "World";
@@ -61,8 +61,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         docs.Text = "Bye";
         cloneDocs.Text = null;
@@ -82,8 +82,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         docs.Text = null;
         cloneDocs.Text = "Bye";
@@ -107,8 +107,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new Circle("added");
         node.AddShapes([added]);
@@ -130,8 +130,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new Circle("added");
         node.InsertShapes(0, [added]);
@@ -153,8 +153,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new Circle("added");
         node.InsertShapes(1, [added]);
@@ -176,8 +176,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new Documentation("added");
         node.Documentation = added;
@@ -199,8 +199,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
         node.AddShapes([added]);
@@ -222,8 +222,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
         node.AddShapes([added]);
@@ -247,8 +247,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.RemoveShapes([deleted]);
 
@@ -266,8 +266,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.RemoveShapes([deleted]);
 
@@ -285,8 +285,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.RemoveShapes([deleted]);
 
@@ -304,8 +304,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.Documentation = null;
 
@@ -326,8 +326,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new Documentation("added") { Text = "added" };
         node.Documentation = added;
@@ -353,8 +353,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         bof.DefaultGroup = new MaterialGroup("replaced") { MatterState = MatterState.gas };
 
@@ -377,8 +377,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.AddShapes([moved]);
 
@@ -396,8 +396,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.Documentation = moved;
 
@@ -420,8 +420,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         origin.AddDisabledParts([moved]);
 
@@ -440,8 +440,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         origin.EvilPart = moved;
 
@@ -463,8 +463,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.AddShapes([moved]);
 
@@ -482,8 +482,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.InsertShapes(0, [moved]);
 
@@ -508,8 +508,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new BillOfMaterials("added");
         node.AddAnnotations([added]);
@@ -530,8 +530,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(0, [added]);
@@ -552,8 +552,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(1, [added]);
@@ -572,8 +572,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         var added = new BillOfMaterials("added")
         {
@@ -602,8 +602,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.RemoveAnnotations([deleted]);
 
@@ -623,8 +623,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.RemoveAnnotations([deleted]);
 
@@ -644,8 +644,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.RemoveAnnotations([deleted]);
 
@@ -671,8 +671,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.AddAnnotations([moved]);
 
@@ -696,8 +696,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.AddAnnotations([moved]);
 
@@ -717,8 +717,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         node.InsertAnnotations(0, [moved]);
 
@@ -747,8 +747,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         bof.AddMaterials([line]);
 
@@ -771,8 +771,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         bof.InsertMaterials(0, [line]);
 
@@ -795,8 +795,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         bof.InsertMaterials(1, [line]);
 
@@ -815,8 +815,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         od.Source = circle;
 
@@ -842,8 +842,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         bof.RemoveMaterials([line]);
 
@@ -867,8 +867,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         bof.RemoveMaterials([line]);
 
@@ -892,8 +892,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         bof.RemoveMaterials([line]);
 
@@ -913,8 +913,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         od.AltSource = null;
 
@@ -942,8 +942,8 @@ public class EventTests_Twoway
         var replicator = new PartitionEventReplicator(clone);
         var cloneReplicator = new PartitionEventReplicator(node);
         
-        replicator.Subscribe(cloneReplicator);
-        cloneReplicator.Subscribe(replicator);
+        replicator.ReplicateFrom(cloneReplicator);
+        cloneReplicator.ReplicateFrom(replicator);
 
         od.AltSource = line;
 

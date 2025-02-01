@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.M1.Event;
 
+/// Forwards events raised by <paramref name="localPublisher"/> to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>
+/// if the event passes <see cref="Filter{TSubscribedEvent}"/>.
 public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
     : IDisposable, IPublisher<TEvent>
     where TEvent : IEvent
@@ -54,7 +56,7 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
         _localPublisher.Unsubscribe(forwardingHandler);
     }
 
-    /// <inheritdoc />
+    /// Unsubscribes all registered <see cref="Subscribe{TSubscribedEvent}">subscribers</see>.
     public virtual void Dispose()
     {
         if (_localPublisher == null)
@@ -64,20 +66,31 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
         {
             _localPublisher.Unsubscribe(handler);
         }
+        
+        GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Determines whether <paramref name="@event"/> will be forwarded to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>.
+    /// </summary>
+    /// <param name="event">Event to check.</param>
+    /// <typeparam name="TSubscribedEvent">Requested type of event.</typeparam>
+    /// <returns><c>true</c> if <paramref name="@event"/> should be forwarded to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>; <c>false</c> otherwise.</returns>
     protected abstract bool Filter<TSubscribedEvent>(TEvent @event) where TSubscribedEvent : TEvent;
 }
 
+/// Suppresses all events with <see cref="RegisterEventId">registered event ids</see>.
 public abstract class EventIdFilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
     : FilteringEventForwarder<TEvent, TPublisher>(localPublisher)
     where TEvent : IEvent where TPublisher : IPublisher<TEvent>
 {
     private readonly HashSet<EventId> _eventIds = [];
 
+    /// Suppresses future events with <paramref name="eventId"/> from <see cref="FilteringEventForwarder{TEvent,TPublisher}.Subscribe{TSubscribedEvent}">subscribers</see>.
     protected void RegisterEventId(EventId eventId) =>
         _eventIds.Add(eventId);
 
+    /// Forwards future events with <paramref name="eventId"/> to <see cref="FilteringEventForwarder{TEvent,TPublisher}.Subscribe{TSubscribedEvent}">subscribers</see>.
     protected void UnregisterEventId(EventId eventId) =>
         _eventIds.Remove(eventId);
 
