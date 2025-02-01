@@ -29,8 +29,8 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
     /// <param name="safeNodes">Targets to raise events for.</param>
     /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
-    public ReferenceAddMultipleEventEmitter(Reference reference, NodeBase newParent, List<T> safeNodes,
-        Index startIndex) : base(reference, newParent, safeNodes)
+    public ReferenceAddMultipleEventEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes,
+        Index startIndex) : base(reference, destinationParent, safeNodes)
     {
         _startIndex = startIndex;
     }
@@ -45,10 +45,10 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
             return;
 
         Index index = _startIndex;
-        foreach (var node in _safeNodes)
+        foreach (var node in SafeNodes)
         {
             IReferenceTarget newTarget = new ReferenceTarget(null, node);
-            PartitionCommander.Raise(new ReferenceAddedEvent(NewParent, _reference, index++, newTarget,
+            PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, index++, newTarget,
                 PartitionCommander.CreateEventId()));
         }
     }

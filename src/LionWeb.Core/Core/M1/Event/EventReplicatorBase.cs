@@ -25,13 +25,13 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     private readonly ICommander<TEvent>? _localCommander;
     private readonly List<TPublisher> _publishers = [];
 
-    protected readonly Dictionary<NodeId, IReadableNode> _nodeById;
+    protected readonly Dictionary<NodeId, IReadableNode> NodeById;
 
     protected EventReplicatorBase(TPublisher? localPublisher, ICommander<TEvent>? localCommander,
         Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(localPublisher)
     {
         _localCommander = localCommander;
-        _nodeById = sharedNodeMap ?? new();
+        NodeById = sharedNodeMap ?? new();
     }
 
     public virtual void Subscribe(TPublisher publisher)
@@ -55,8 +55,8 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     {
         foreach (var node in M1Extensions.Descendants(newNode, true, true))
         {
-            if (!_nodeById.TryAdd(node.GetId(), node))
-                throw new DuplicateNodeIdException(node, _nodeById[node.GetId()]);
+            if (!NodeById.TryAdd(node.GetId(), node))
+                throw new DuplicateNodeIdException(node, NodeById[node.GetId()]);
         }
     }
 
@@ -64,15 +64,15 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     {
         foreach (var node in M1Extensions.Descendants(newNode, true, true))
         {
-            _nodeById.Remove(node.GetId());
+            NodeById.Remove(node.GetId());
         }
     }
 
     protected virtual INode Lookup(NodeId remoteNodeId) =>
-        (INode)_nodeById[remoteNodeId];
+        (INode)NodeById[remoteNodeId];
 
     protected virtual INode? LookupOpt(NodeId remoteNodeId) =>
-        (INode?)_nodeById.GetValueOrDefault(remoteNodeId);
+        (INode?)NodeById.GetValueOrDefault(remoteNodeId);
 
     protected virtual INode Clone(INode remoteNode) =>
         new SameIdCloner(remoteNode.Descendants(true, true)).Clone()[remoteNode];
@@ -87,7 +87,7 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
             remoteNode.GetId();
     }
 
-    protected void PauseCommands(Func<Action?> action)
+    protected void SuppressCommandForwarding(Func<Action?> action)
     {
         EventId? eventId = null;
         if (_localCommander != null)

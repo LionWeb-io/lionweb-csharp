@@ -27,10 +27,10 @@ public abstract class ContainmentMultipleEventEmitterBase<T> : ContainmentEventE
     protected readonly Dictionary<T, OldContainmentInfo?> NewValues;
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
-    /// <param name="newParent"> Owner of the represented <paramref name="containment"/>.</param>
+    /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValues">Newly set values.</param>
-    protected ContainmentMultipleEventEmitterBase(Containment containment, NodeBase newParent, List<T>? newValues) :
-        base(containment, newParent)
+    protected ContainmentMultipleEventEmitterBase(Containment containment, NodeBase destinationParent, List<T>? newValues) :
+        base(containment, destinationParent)
     {
         NewValues = newValues?.ToDictionary<T, T, OldContainmentInfo?>(k => k, _ => null) ?? [];
     }

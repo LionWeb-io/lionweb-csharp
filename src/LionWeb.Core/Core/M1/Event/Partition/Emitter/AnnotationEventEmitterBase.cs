@@ -25,9 +25,9 @@ public abstract class AnnotationEventEmitterBase : PartitionEventEmitterBase<INo
     /// Newly set values and their previous context.
     protected readonly Dictionary<INode, OldAnnotationInfo?> NewValues;
 
-    /// <param name="newParent"> Owner of the represented <see cref="Annotation"/>s.</param>
+    /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="newValues">Newly set values.</param>
-    protected AnnotationEventEmitterBase(NodeBase newParent, List<INode>? newValues) : base(newParent)
+    protected AnnotationEventEmitterBase(NodeBase destinationParent, List<INode>? newValues) : base(destinationParent)
     {
         NewValues = newValues?.ToDictionary<INode, INode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
     }
@@ -59,7 +59,7 @@ public abstract class AnnotationEventEmitterBase : PartitionEventEmitterBase<INo
 
     protected void RaiseOriginMoveEvent(OldAnnotationInfo old, AnnotationMovedFromOtherParentEvent @event)
     {
-        if (old.Partition != null && old.Partition != newPartition)
+        if (old.Partition != null && old.Partition != DestinationPartition)
             old.Partition.GetCommander()?.Raise(@event);
     }
 }

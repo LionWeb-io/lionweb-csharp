@@ -28,8 +28,8 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
     /// Raises either <see cref="ReferenceAddedEvent"/>, <see cref="ReferenceDeletedEvent"/> or
     /// <see cref="ReferenceChangedEvent"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
-    public ReferenceSingleEventEmitter(Reference reference, NodeBase newParent, IReadableNode? newTarget,
-        IReadableNode? oldTarget) : base(reference, newParent)
+    public ReferenceSingleEventEmitter(Reference reference, NodeBase destinationParent, IReadableNode? newTarget,
+        IReadableNode? oldTarget) : base(reference, destinationParent)
     {
         _newTarget = newTarget;
         _oldTarget = oldTarget;
@@ -48,17 +48,17 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
         {
             case (null, { } v):
                 IReferenceTarget newTarget = new ReferenceTarget(null, v);
-                PartitionCommander.Raise(new ReferenceAddedEvent(NewParent, _reference, 0, newTarget,
+                PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, 0, newTarget,
                     PartitionCommander.CreateEventId()));
                 break;
             case ({ } o, null):
                 IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
-                PartitionCommander.Raise(new ReferenceDeletedEvent(NewParent, _reference, 0, deletedTarget,
+                PartitionCommander.Raise(new ReferenceDeletedEvent(DestinationParent, Reference, 0, deletedTarget,
                     PartitionCommander.CreateEventId()));
                 break;
             case ({ } o, { } n):
                 IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
-                PartitionCommander.Raise(new ReferenceChangedEvent(NewParent, _reference, 0,
+                PartitionCommander.Raise(new ReferenceChangedEvent(DestinationParent, Reference, 0,
                     new ReferenceTarget(null, n), replacedTarget,
                     PartitionCommander.CreateEventId()));
                 break;

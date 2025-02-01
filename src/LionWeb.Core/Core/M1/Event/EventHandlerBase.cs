@@ -24,7 +24,7 @@ using Utilities;
 
 public abstract class EventHandlerBase
 {
-    protected static readonly ILookup<Type, Type> _allSubtypes = InitAllSubtypes();
+    protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
 
     private static ILookup<Type, Type> InitAllSubtypes()
     {
@@ -92,7 +92,7 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     private void RegisterSubscribedEvents<TSubscribedEvent>() where TSubscribedEvent : TEvent
     {
         var eventType = typeof(TSubscribedEvent);
-        var allSubtype = _allSubtypes[eventType];
+        var allSubtype = AllSubtypes[eventType];
         foreach (var subtype in allSubtype)
         {
             if (_subscribedEvents.TryGetValue(subtype, out var count))
@@ -119,7 +119,7 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     private void UnregisterSubscribedEvents<TSubscribedEvent>() where TSubscribedEvent : TEvent
     {
         var eventType = typeof(TSubscribedEvent);
-        var allSubtypes = _allSubtypes[eventType];
+        var allSubtypes = AllSubtypes[eventType];
         foreach (var subtype in allSubtypes)
         {
             _subscribedEvents[subtype]--;

@@ -28,11 +28,11 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
     private readonly List<IListComparer<T>.IChange> _changes = [];
 
     /// <param name="reference">Represented <see cref="Reference"/>.</param>
-    /// <param name="newParent"> Owner of the represented <paramref name="reference"/>.</param>
+    /// <param name="destinationParent"> Owner of the represented <paramref name="reference"/>.</param>
     /// <param name="safeNodes">Newly added values.</param>
     /// <param name="storage">Values already present in <paramref name="reference"/>.</param>
-    public ReferenceSetEventEmitter(Reference reference, NodeBase newParent, List<T> safeNodes, List<T> storage) :
-        base(reference, newParent, safeNodes)
+    public ReferenceSetEventEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes, List<T> storage) :
+        base(reference, destinationParent, safeNodes)
     {
         if (!IsActive())
             return;
@@ -56,18 +56,18 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
             {
                 case IListComparer<T>.Added added:
                     IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
-                    PartitionCommander.Raise(new ReferenceAddedEvent(NewParent, _reference, added.RightIndex, newTarget,
+                    PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, added.RightIndex, newTarget,
                         PartitionCommander.CreateEventId()));
                     break;
                 case IListComparer<T>.Moved moved:
                     IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
-                    PartitionCommander.Raise(new EntryMovedInSameReferenceEvent(NewParent, _reference, moved.RightIndex,
+                    PartitionCommander.Raise(new EntryMovedInSameReferenceEvent(DestinationParent, Reference, moved.RightIndex,
                         moved.LeftIndex, target,
                         PartitionCommander.CreateEventId()));
                     break;
                 case IListComparer<T>.Deleted deleted:
                     IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
-                    PartitionCommander.Raise(new ReferenceDeletedEvent(NewParent, _reference, deleted.LeftIndex,
+                    PartitionCommander.Raise(new ReferenceDeletedEvent(DestinationParent, Reference, deleted.LeftIndex,
                         deletedTarget, PartitionCommander.CreateEventId()));
                     break;
             }

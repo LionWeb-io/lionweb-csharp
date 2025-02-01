@@ -21,8 +21,14 @@ public interface IForestEvent : IEvent;
 
 /// A partition has been deleted from this forest.
 /// <param name="DeletedPartition">The deleted partition.</param>
-public record PartitionDeletedEvent(IPartitionInstance DeletedPartition, EventId EventId) : IForestEvent;
+public record PartitionDeletedEvent(
+    IPartitionInstance DeletedPartition,
+    EventId EventId)
+    : IForestEvent;
 
 /// A new partition has been added to this forrest.
 /// <param name="NewPartition">The newly added partition.</param>
-public record NewPartitionEvent(IPartitionInstance NewPartition, EventId EventId) : IForestEvent;
+public record NewPartitionEvent(
+    IPartitionInstance NewPartition,
+    EventId EventId)
+    : IForestEvent;

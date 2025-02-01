@@ -21,10 +21,10 @@ using M3;
 
 public abstract class ReferenceEventEmitterBase<T> : PartitionEventEmitterBase<T> where T : IReadableNode
 {
-    protected readonly Reference _reference;
+    protected readonly Reference Reference;
 
-    protected ReferenceEventEmitterBase(Reference reference, NodeBase newParent) : base(newParent)
+    protected ReferenceEventEmitterBase(Reference reference, NodeBase destinationParent) : base(destinationParent)
     {
-        _reference = reference;
+        Reference = reference;
     }
 }

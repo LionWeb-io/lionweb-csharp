@@ -21,10 +21,10 @@ using M3;
 
 public abstract class ReferenceMultipleEventEmitterBase<T> : ReferenceEventEmitterBase<T> where T : IReadableNode
 {
-    protected readonly List<T> _safeNodes;
+    protected readonly List<T> SafeNodes;
 
-    protected ReferenceMultipleEventEmitterBase(Reference reference, NodeBase newParent, List<T> safeNodes) : base(reference, newParent)
+    protected ReferenceMultipleEventEmitterBase(Reference reference, NodeBase destinationParent, List<T> safeNodes) : base(reference, destinationParent)
     {
-        _safeNodes = safeNodes;
+        SafeNodes = safeNodes;
     }
 }

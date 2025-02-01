@@ -26,11 +26,11 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
     private readonly object? _newValue;
     private readonly object? _oldValue;
 
-    /// Raises either <see cref="IPartitionCommander.AddProperty"/>, <see cref="IPartitionCommander.DeleteProperty"/> or
-    /// <see cref="IPartitionCommander.ChangeProperty"/> for <paramref name="property"/>,
+    /// Raises either <see cref="PropertyAddedEvent"/>, <see cref="PropertyDeletedEvent"/> or
+    /// <see cref="PropertyChangedEvent"/> for <paramref name="property"/>,
     /// depending on <paramref name="oldValue"/> and <paramref name="newValue"/>.
-    public PropertyEventEmitter(Property property, NodeBase newParent, object? newValue, object? oldValue) :
-        base(newParent)
+    public PropertyEventEmitter(Property property, NodeBase destinationParent, object? newValue, object? oldValue) :
+        base(destinationParent)
     {
         _property = property;
         _newValue = newValue;
@@ -49,15 +49,15 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
         switch (_oldValue, _newValue)
         {
             case (null, { } v):
-                PartitionCommander.Raise(new PropertyAddedEvent(NewParent, _property, v,
+                PartitionCommander.Raise(new PropertyAddedEvent(DestinationParent, _property, v,
                     PartitionCommander.CreateEventId()));
                 break;
             case ({ } o, null):
-                PartitionCommander.Raise(new PropertyDeletedEvent(NewParent, _property, o,
+                PartitionCommander.Raise(new PropertyDeletedEvent(DestinationParent, _property, o,
                     PartitionCommander.CreateEventId()));
                 break;
             case ({ } o, { } n):
-                PartitionCommander.Raise(new PropertyChangedEvent(NewParent, _property, n, o,
+                PartitionCommander.Raise(new PropertyChangedEvent(DestinationParent, _property, n, o,
                     PartitionCommander.CreateEventId()));
                 break;
         }

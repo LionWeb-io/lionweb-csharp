@@ -28,8 +28,8 @@ public abstract class ContainmentEventEmitterBase<T> : PartitionEventEmitterBase
     protected readonly Containment Containment;
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
-    /// <param name="newParent"> Owner of the represented <paramref name="containment"/>.</param>
-    protected ContainmentEventEmitterBase(Containment containment, NodeBase newParent) : base(newParent)
+    /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
+    protected ContainmentEventEmitterBase(Containment containment, NodeBase destinationParent) : base(destinationParent)
     {
         Containment = containment;
     }
@@ -66,7 +66,7 @@ public abstract class ContainmentEventEmitterBase<T> : PartitionEventEmitterBase
 
     protected void RaiseOriginMoveEvent(OldContainmentInfo old, ChildMovedFromOtherContainmentEvent @event)
     {
-        if (old.Partition != null && old.Partition != newPartition)
+        if (old.Partition != null && old.Partition != DestinationPartition)
             old.Partition.GetCommander()?.Raise(@event);
     }
 }

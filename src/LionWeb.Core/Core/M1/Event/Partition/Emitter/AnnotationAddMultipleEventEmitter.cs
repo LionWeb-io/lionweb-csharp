@@ -27,16 +27,16 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
 {
     private Index _newIndex;
 
-    /// <param name="newParent"> Owner of the represented <see cref="Annotation"/>.</param>
+    /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>.</param>
     /// <param name="addedValues">Newly added values.</param>
     /// <param name="existingValues">Values already present in <see cref="IReadableNode.GetAnnotations"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <see cref="Annotation"/>s.</param>
     public AnnotationAddMultipleEventEmitter(
-        NodeBase newParent,
+        NodeBase destinationParent,
         List<INode>? addedValues,
         List<INode> existingValues,
         Index? startIndex = null
-    ) : base(newParent, addedValues)
+    ) : base(destinationParent, addedValues)
     {
         _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
     }
@@ -52,25 +52,25 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
             switch (old)
             {
                 case null:
-                    PartitionCommander.Raise(new AnnotationAddedEvent(NewParent, added, _newIndex,
+                    PartitionCommander.Raise(new AnnotationAddedEvent(DestinationParent, added, _newIndex,
                         PartitionCommander.CreateEventId()));
                     break;
 
-                case not null when old.Parent != NewParent:
+                case not null when old.Parent != DestinationParent:
                     var eventId = PartitionCommander.CreateEventId();
-                    var @event = new AnnotationMovedFromOtherParentEvent(NewParent, _newIndex, added, old.Parent,
+                    var @event = new AnnotationMovedFromOtherParentEvent(DestinationParent, _newIndex, added, old.Parent,
                         old.Index, eventId);
                     RaiseOriginMoveEvent(old, @event);
                     PartitionCommander.Raise(@event);
                     break;
 
 
-                case not null when old.Parent == NewParent && old.Index == _newIndex:
+                case not null when old.Parent == DestinationParent && old.Index == _newIndex:
                     // no-op
                     break;
 
-                case not null when old.Parent == NewParent:
-                    PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(_newIndex, added, NewParent,
+                case not null when old.Parent == DestinationParent:
+                    PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(_newIndex, added, DestinationParent,
                         old.Index, PartitionCommander.CreateEventId()));
                     break;
 

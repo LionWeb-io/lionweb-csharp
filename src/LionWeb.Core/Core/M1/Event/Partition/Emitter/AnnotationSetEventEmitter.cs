@@ -26,14 +26,14 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
 {
     private readonly List<IListComparer<INode>.IChange> _changes = [];
 
-    /// <param name="newParent"> Owner of the represented <see cref="Annotation"/>s.</param>
+    /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <see cref="IReadableNode.GetAnnotations"/>.</param>
     public AnnotationSetEventEmitter(
-        NodeBase newParent,
+        NodeBase destinationParent,
         List<INode>? setValues,
         List<INode> existingValues
-    ) : base(newParent, setValues)
+    ) : base(destinationParent, setValues)
     {
         if (!IsActive() || setValues == null)
             return;
@@ -56,13 +56,13 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            PartitionCommander.Raise(new AnnotationAddedEvent(NewParent, added.Element,
+                            PartitionCommander.Raise(new AnnotationAddedEvent(DestinationParent, added.Element,
                                 added.RightIndex, PartitionCommander.CreateEventId()));
                             break;
 
-                        case { } old when old.Parent != NewParent:
+                        case { } old when old.Parent != DestinationParent:
                             var eventId = PartitionCommander.CreateEventId();
-                            var @event = new AnnotationMovedFromOtherParentEvent(NewParent, added.RightIndex,
+                            var @event = new AnnotationMovedFromOtherParentEvent(DestinationParent, added.RightIndex,
                                 added.Element, old.Parent, old.Index, eventId);
                             RaiseOriginMoveEvent(old, @event);
                             PartitionCommander.Raise(@event);
@@ -77,11 +77,11 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
 
                 case IListComparer<INode>.Moved moved:
                     PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(moved.RightIndex, moved.LeftElement,
-                        NewParent, moved.LeftIndex, PartitionCommander.CreateEventId()));
+                        DestinationParent, moved.LeftIndex, PartitionCommander.CreateEventId()));
                     break;
 
                 case IListComparer<INode>.Deleted deleted:
-                    PartitionCommander.Raise(new AnnotationDeletedEvent(deleted.Element, NewParent, deleted.LeftIndex,
+                    PartitionCommander.Raise(new AnnotationDeletedEvent(deleted.Element, DestinationParent, deleted.LeftIndex,
                         PartitionCommander.CreateEventId()));
                     break;
             }

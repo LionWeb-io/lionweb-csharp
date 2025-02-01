@@ -26,20 +26,20 @@ using System.Diagnostics.CodeAnalysis;
 /// <typeparam name="T">Type of nodes of the represented <see cref="Feature"/>.</typeparam>
 public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
 {
-    protected readonly IPartitionInstance? newPartition;
+    protected readonly IPartitionInstance? DestinationPartition;
 
     /// <see cref="IPartitionCommander"/> to use for our events, if any.
     protected readonly IPartitionCommander? PartitionCommander;
 
     /// Owner of the represented <see cref="Feature"/>.
-    protected readonly NodeBase NewParent;
+    protected readonly NodeBase DestinationParent;
 
-    /// <param name="newParent"> Owner of the represented <see cref="Feature"/>.</param>
-    protected PartitionEventEmitterBase(NodeBase newParent)
+    /// <param name="destinationParent"> Owner of the represented <see cref="Feature"/>.</param>
+    protected PartitionEventEmitterBase(NodeBase destinationParent)
     {
-        NewParent = newParent;
-        newPartition = newParent.GetPartition();
-        PartitionCommander = newPartition?.GetCommander();
+        DestinationParent = destinationParent;
+        DestinationPartition = destinationParent.GetPartition();
+        PartitionCommander = DestinationPartition?.GetCommander();
     }
 
     /// Logic to execute <i>before</i> any changes to the underlying nodes.

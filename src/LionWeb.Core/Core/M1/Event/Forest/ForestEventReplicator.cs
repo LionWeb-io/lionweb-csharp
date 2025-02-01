@@ -92,7 +92,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     private void RegisterPartition(IPartitionInstance partition)
     {
-        PartitionEventReplicator replicator = new PartitionEventReplicator(partition, _nodeById);
+        PartitionEventReplicator replicator = new PartitionEventReplicator(partition, NodeById);
         if (!_localPartitions.TryAdd(partition.GetId(), replicator))
             throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
     }
@@ -120,7 +120,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     #region Remote
 
     private void OnRemoteNewPartition(object? sender, NewPartitionEvent @event) =>
-        PauseCommands(() =>
+        SuppressCommandForwarding(() =>
         {
             var newPartition = (INode)@event.NewPartition;
 
@@ -136,7 +136,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         });
 
     private void OnRemotePartitionDeleted(object? sender, PartitionDeletedEvent @event) =>
-        PauseCommands(() =>
+        SuppressCommandForwarding(() =>
         {
             var localPartition = (IPartitionInstance)Lookup(@event.DeletedPartition.GetId());
             _localForest.RemovePartitions([localPartition]);
