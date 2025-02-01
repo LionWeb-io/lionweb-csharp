@@ -10,6 +10,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
+using M1.Event.Partition.Emitter;
 using System;
 using System.Collections.Generic;
 
@@ -437,7 +438,7 @@ public partial class Library : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		AddMultipleContainmentsEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null);
+		ContainmentAddMultipleEventEmitter<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null);
 		evt.CollectOldData();
 		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
 		evt.RaiseEvent();
@@ -453,7 +454,7 @@ public partial class Library : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
 		AssureNoSelfMove(index, safeNodes, _books);
-		AddMultipleContainmentsEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, index);
+		ContainmentAddMultipleEventEmitter<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, index);
 		evt.CollectOldData();
 		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
 		evt.RaiseEvent();
@@ -525,7 +526,7 @@ public partial class Library : ConceptInstanceBase
 		{
 			var safeNodes = LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value).ToList();
 			AssureNonEmpty(safeNodes, LibraryLanguage.Instance.Library_books);
-			SetContainmentEvent<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books);
+			ContainmentSetEventEmitter<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books);
 			evt.CollectOldData();
 			RemoveSelfParent(_books.ToList(), _books, LibraryLanguage.Instance.Library_books);
 			_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));

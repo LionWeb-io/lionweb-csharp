@@ -6,6 +6,7 @@
 #nullable enable
 namespace @namespace.@int.@public;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -286,7 +287,7 @@ public partial class @record : AnnotationInstanceBase, @interface
         public @record SetDouble(@interface value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.record_double);
-		SingleContainmentEvent<@interface> evt = new(ClassLanguage.Instance.record_double, this, value, _double);
+		ContainmentSingleEventEmitter<@interface> evt = new(ClassLanguage.Instance.record_double, this, value, _double);
 		evt.CollectOldData();
 		SetParentNull(_double);
 		AttachChild(value);

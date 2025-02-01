@@ -10,6 +10,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
+using M1.Event.Partition.Emitter;
 using System;
 using System.Collections.Generic;
 
@@ -193,7 +194,7 @@ public partial class MyConcept : ConceptInstanceBase
 		{
 			var safeNodes = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TinyRefLang.MyConcept>(value).ToList();
 			AssureNonEmpty(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-			SetReferenceEvent<MyConcept> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef);
+			ReferenceSetEventEmitter<MyConcept> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef);
 			evt.CollectOldData();
 			_multivaluedRef.Clear();
 			_multivaluedRef.AddRange(safeNodes);

@@ -18,6 +18,7 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
+using Core.M1.Event.Partition.Emitter;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
@@ -166,7 +167,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private LocalDeclarationStatementSyntax SingleContainmentEventVariable() =>
         Variable(
             "evt",
-            AsType(typeof(SingleContainmentEvent<>), AsType(feature.GetFeatureType())),
+            AsType(typeof(ContainmentSingleEventEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
         );
 
@@ -303,7 +304,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(ExpressionSyntax index) =>
         Variable(
             "evt",
-            AsType(typeof(AddMultipleContainmentsEvent<>), AsType(feature.GetFeatureType())),
+            AsType(typeof(ContainmentAddMultipleEventEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([
                 MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index
             ])

@@ -18,6 +18,7 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
+using Core.M1.Event.Partition.Emitter;
 using Core.M2;
 using Core.M3;
 using Microsoft.CodeAnalysis.CSharp;
@@ -226,7 +227,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private LocalDeclarationStatementSyntax SetContainmentEventVariable(Containment containment) =>
         Variable(
             "evt",
-            AsType(typeof(SetContainmentEvent<>), AsType(containment.GetFeatureType())),
+            AsType(typeof(ContainmentSetEventEmitter<>), AsType(containment.GetFeatureType())),
             NewCall([
                 MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment)
             ])
@@ -235,7 +236,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private LocalDeclarationStatementSyntax SetReferenceEventVariable(Reference reference) =>
         Variable(
             "evt",
-            AsType(typeof(SetReferenceEvent<>), AsType(reference.GetFeatureType())),
+            AsType(typeof(ReferenceSetEventEmitter<>), AsType(reference.GetFeatureType())),
             NewCall([
                 MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference)
             ])

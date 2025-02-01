@@ -19,6 +19,7 @@ namespace LionWeb.Core;
 
 using M1;
 using M1.Event.Partition;
+using M1.Event.Partition.Emitter;
 using M2;
 using M3;
 using System.Collections;
@@ -392,7 +393,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     {
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AddMultipleAnnotationsEvent evt = new(this, safeAnnotations, _annotations, null);
+        AnnotationAddMultipleEventEmitter evt = new(this, safeAnnotations, _annotations, null);
         evt.CollectOldData();
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
         evt.RaiseEvent();
@@ -404,7 +405,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AddMultipleAnnotationsEvent evt = new(this, safeAnnotations, _annotations, index);
+        AnnotationAddMultipleEventEmitter evt = new(this, safeAnnotations, _annotations, index);
         evt.CollectOldData();
         _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
         evt.RaiseEvent();
@@ -460,7 +461,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 throw new InvalidValueException(feature, value);
             var safeNodes = M2Extensions.AsNodes<INode>(value).ToList();
             AssureAnnotations(safeNodes);
-            SetAnnotationEvent evt = new(this, safeNodes, _annotations);
+            AnnotationSetEventEmitter evt = new(this, safeNodes, _annotations);
             evt.CollectOldData();
             RemoveSelfParent(_annotations.ToList(), _annotations, null);
             _annotations.AddRange(SetSelfParent(safeNodes, null));
@@ -808,8 +809,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// Raises <see cref="IPartitionCommander.DeleteChild"/> for <paramref name="containment"/>.
     protected Action<IPartitionCommander, Index, T> ContainmentRemover<T>(Containment containment)
         where T : INode =>
-        (commander, index, node) =>
-            commander.DeleteChild(node, this, containment, index);
+        (commander, index, node) => commander.DeleteChild(node, this, containment, index);
 
     /// Raises <see cref="IPartitionCommander.DeleteAnnotation"/>.
     private Action<IPartitionCommander, Index, INode> AnnotationRemover() =>

@@ -10,6 +10,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
+using M1.Event.Partition.Emitter;
 using System;
 using System.Collections.Generic;
 using DeprDatatype = string;
@@ -188,7 +189,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		AddMultipleContainmentsEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, null);
+		ContainmentAddMultipleEventEmitter<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, null);
 		evt.CollectOldData();
 		_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
 		evt.RaiseEvent();
@@ -204,7 +205,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNoSelfMove(index, safeNodes, _deprChild);
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		AddMultipleContainmentsEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, index);
+		ContainmentAddMultipleEventEmitter<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, index);
 		evt.CollectOldData();
 		_deprChild.InsertRange(index, SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
 		evt.RaiseEvent();
@@ -297,7 +298,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
 		{
 			var safeNodes = DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang.DeprIface>(value).ToList();
-			SetContainmentEvent<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild);
+			ContainmentSetEventEmitter<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild);
 			evt.CollectOldData();
 			RemoveSelfParent(_deprChild.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 			_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
