@@ -78,34 +78,6 @@ public class PartitionEventHandler(object? sender)
             eventId ?? CreateEventId()));
 
     /// <inheritdoc />
-    public void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index,
-        EventId? eventId = null) =>
-        Raise(new AnnotationAddedEvent(parent, newAnnotation, index, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index,
-        EventId? eventId = null) =>
-        Raise(new AnnotationDeletedEvent(deletedAnnotation, parent, index, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
-        Index index, EventId? eventId = null) =>
-        Raise(new AnnotationReplacedEvent(newAnnotation, replacedAnnotation, parent, index,
-            eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void MoveAnnotationFromOtherParent(IWritableNode newParent, Index newIndex, IWritableNode movedAnnotation,
-        IWritableNode oldParent, Index oldIndex, EventId? eventId = null) =>
-        Raise(new AnnotationMovedFromOtherParentEvent(newParent, newIndex, movedAnnotation, oldParent, oldIndex,
-            eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void MoveAnnotationInSameParent(Index newIndex, IWritableNode movedAnnotation, IWritableNode parent,
-        Index oldIndex, EventId? eventId = null) =>
-        Raise(new AnnotationMovedInSameParentEvent(newIndex, movedAnnotation, parent, oldIndex,
-            eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
     public void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
         EventId? eventId = null) =>
         Raise(new ReferenceAddedEvent(parent, reference, index, newTarget, eventId ?? CreateEventId()));

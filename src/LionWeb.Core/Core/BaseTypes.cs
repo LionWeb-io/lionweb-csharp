@@ -413,7 +413,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     /// <inheritdoc />
     public virtual bool RemoveAnnotations(IEnumerable<INode> annotations) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover());
+        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover);
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() => [];
@@ -812,8 +812,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         (commander, index, node) => commander.DeleteChild(node, this, containment, index);
 
     /// Raises <see cref="IPartitionCommander.DeleteAnnotation"/>.
-    private Action<IPartitionCommander, Index, INode> AnnotationRemover() =>
-        (commander, index, node) => commander.DeleteAnnotation(node, this, index);
+    private void AnnotationRemover(IPartitionCommander commander, Index index, INode node) =>
+        commander.Raise(new AnnotationDeletedEvent(node, this, index, commander.CreateEventId()));
 
     #endregion
 }

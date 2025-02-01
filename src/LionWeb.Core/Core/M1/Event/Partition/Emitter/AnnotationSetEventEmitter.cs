@@ -56,20 +56,16 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            PartitionCommander.AddAnnotation(NewParent, added.Element, added.RightIndex);
+                            PartitionCommander.Raise(new AnnotationAddedEvent(NewParent, added.Element,
+                                added.RightIndex, PartitionCommander.CreateEventId()));
                             break;
 
                         case { } old when old.Parent != NewParent:
                             var eventId = PartitionCommander.CreateEventId();
-                            RaiseOriginMoveEvent(old, eventId, added.Element, added.RightIndex);
-                            PartitionCommander.MoveAnnotationFromOtherParent(
-                                NewParent,
-                                added.RightIndex,
-                                added.Element,
-                                old.Parent,
-                                old.Index,
-                                eventId
-                            );
+                            var @event = new AnnotationMovedFromOtherParentEvent(NewParent, added.RightIndex,
+                                added.Element, old.Parent, old.Index, eventId);
+                            RaiseOriginMoveEvent(old, @event);
+                            PartitionCommander.Raise(@event);
                             break;
 
 
@@ -80,16 +76,13 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                     break;
 
                 case IListComparer<INode>.Moved moved:
-                    PartitionCommander.MoveAnnotationInSameParent(
-                        moved.RightIndex,
-                        moved.LeftElement,
-                        NewParent,
-                        moved.LeftIndex
-                    );
+                    PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(moved.RightIndex, moved.LeftElement,
+                        NewParent, moved.LeftIndex, PartitionCommander.CreateEventId()));
                     break;
 
                 case IListComparer<INode>.Deleted deleted:
-                    PartitionCommander.DeleteAnnotation(deleted.Element, NewParent, deleted.LeftIndex);
+                    PartitionCommander.Raise(new AnnotationDeletedEvent(deleted.Element, NewParent, deleted.LeftIndex,
+                        PartitionCommander.CreateEventId()));
                     break;
             }
         }

@@ -52,20 +52,16 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
             switch (old)
             {
                 case null:
-                    PartitionCommander.AddAnnotation(NewParent, added, _newIndex);
+                    PartitionCommander.Raise(new AnnotationAddedEvent(NewParent, added, _newIndex,
+                        PartitionCommander.CreateEventId()));
                     break;
 
                 case not null when old.Parent != NewParent:
                     var eventId = PartitionCommander.CreateEventId();
-                    RaiseOriginMoveEvent(old, eventId, added, _newIndex);
-                    PartitionCommander.MoveAnnotationFromOtherParent(
-                        NewParent,
-                        _newIndex,
-                        added,
-                        old.Parent,
-                        old.Index,
-                        eventId
-                    );
+                    var @event = new AnnotationMovedFromOtherParentEvent(NewParent, _newIndex, added, old.Parent,
+                        old.Index, eventId);
+                    RaiseOriginMoveEvent(old, @event);
+                    PartitionCommander.Raise(@event);
                     break;
 
 
@@ -74,12 +70,8 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
                     break;
 
                 case not null when old.Parent == NewParent:
-                    PartitionCommander.MoveAnnotationInSameParent(
-                        _newIndex,
-                        added,
-                        NewParent,
-                        old.Index
-                    );
+                    PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(_newIndex, added, NewParent,
+                        old.Index, PartitionCommander.CreateEventId()));
                     break;
 
                 default:

@@ -75,28 +75,6 @@ public interface IPartitionCommander : ICommander<IPartitionEvent>
 
     #endregion
 
-    #region Annotations
-
-    /// <seealso cref="AnnotationAddedEvent"/>
-    void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index, EventId? eventId = null);
-
-    /// <seealso cref="AnnotationDeletedEvent"/>
-    void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index, EventId? eventId = null);
-
-    /// <seealso cref="AnnotationReplacedEvent"/>
-    void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
-        Index index, EventId? eventId = null);
-
-    /// <seealso cref="AnnotationMovedFromOtherParentEvent"/>
-    void MoveAnnotationFromOtherParent(IWritableNode newParent, Index newIndex, IWritableNode movedAnnotation,
-        IWritableNode oldParent, Index oldIndex, EventId? eventId = null);
-
-    /// <seealso cref="AnnotationMovedInSameParentEvent"/>
-    void MoveAnnotationInSameParent(Index newIndex, IWritableNode movedAnnotation, IWritableNode parent,
-        Index oldIndex, EventId? eventId = null);
-
-    #endregion
-
     #region References
 
     /// <seealso cref="ReferenceAddedEvent"/>
