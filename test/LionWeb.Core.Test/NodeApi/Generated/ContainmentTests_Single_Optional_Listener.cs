@@ -32,7 +32,7 @@ public class ContainmentTests_Single_Optional_Listener
         var doc = new Documentation("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -53,7 +53,7 @@ public class ContainmentTests_Single_Optional_Listener
         var doc = new Documentation("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -74,7 +74,7 @@ public class ContainmentTests_Single_Optional_Listener
         var doc = new Documentation("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildAddedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -97,7 +97,7 @@ public class ContainmentTests_Single_Optional_Listener
         var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -123,7 +123,7 @@ public class ContainmentTests_Single_Optional_Listener
         var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -150,7 +150,7 @@ public class ContainmentTests_Single_Optional_Listener
         var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -161,7 +161,7 @@ public class ContainmentTests_Single_Optional_Listener
             Assert.AreEqual(0, args.NewIndex);
             Assert.AreEqual(doc, args.MovedChild);
         });
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -185,7 +185,7 @@ public class ContainmentTests_Single_Optional_Listener
         var oldParent = new OffsetDuplicate("oldParent") { Docs = doc };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -196,7 +196,7 @@ public class ContainmentTests_Single_Optional_Listener
             Assert.AreEqual(0, args.NewIndex);
             Assert.AreEqual(doc, args.MovedChild);
         });
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -218,7 +218,7 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
@@ -242,7 +242,7 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
@@ -267,7 +267,7 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
@@ -277,7 +277,7 @@ public class ContainmentTests_Single_Optional_Listener
             Assert.AreEqual(0, args.NewIndex);
             Assert.AreEqual(doc, args.MovedChild);
         });
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -300,7 +300,7 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, args.OldContainment);
@@ -310,7 +310,7 @@ public class ContainmentTests_Single_Optional_Listener
             Assert.AreEqual(0, args.NewIndex);
             Assert.AreEqual(doc, args.MovedChild);
         });
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -334,7 +334,7 @@ public class ContainmentTests_Single_Optional_Listener
         var doc = new Documentation("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildReplacedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildReplacedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -357,7 +357,7 @@ public class ContainmentTests_Single_Optional_Listener
         var doc = new Documentation("myId");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildReplacedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildReplacedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -379,12 +379,12 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g") { Documentation = oldDoc };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildReplacedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) => events++);
+        parent.Publisher.Subscribe<ChildReplacedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildAddedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, _) => events++);
 
         parent.Documentation = oldDoc;
 
@@ -398,12 +398,12 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g") { Documentation = oldDoc };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildReplacedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) => events++);
+        parent.Publisher.Subscribe<ChildReplacedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildAddedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, _) => events++);
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, oldDoc);
 
@@ -422,12 +422,12 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildReplacedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) => events++);
+        parent.Publisher.Subscribe<ChildReplacedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildAddedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, _) => events++);
 
         parent.Documentation = null;
 
@@ -440,12 +440,12 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g");
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildReplacedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildAddedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((sender, args) => events++);
-        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((sender, args) => events++);
+        parent.Publisher.Subscribe<ChildReplacedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildAddedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedInSameContainmentEvent>((_, _) => events++);
+        parent.Publisher.Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, _) => events++);
 
         parent.Set(ShapesLanguage.Instance.Geometry_documentation, null);
 
@@ -459,7 +459,7 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g") { Documentation = oldDoc };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
@@ -480,7 +480,7 @@ public class ContainmentTests_Single_Optional_Listener
         var parent = new Geometry("g") { Documentation = oldDoc };
 
         int events = 0;
-        parent.Publisher.Subscribe<ChildDeletedEvent>((sender, args) =>
+        parent.Publisher.Subscribe<ChildDeletedEvent>((_, args) =>
         {
             events++;
             Assert.AreSame(parent, args.Parent);
