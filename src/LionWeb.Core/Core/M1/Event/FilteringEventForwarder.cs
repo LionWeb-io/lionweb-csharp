@@ -26,14 +26,14 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
     private readonly Dictionary<object, EventHandler<TEvent>> _forwardingHandlers = [];
 
     /// <inheritdoc />
-    public void Subscribe<TRead>(EventHandler<TRead> handler) where TRead : TEvent
+    public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent
     {
         if (_localPublisher == null)
             return;
 
         EventHandler<TEvent> forwardingHandler = (sender, @event) =>
         {
-            if (@event is TRead r && Filter<TRead>(@event))
+            if (@event is TSubscribedEvent r && Filter<TSubscribedEvent>(@event))
                 handler(sender, r);
         };
 
@@ -43,7 +43,7 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
     }
 
     /// <inheritdoc />
-    public void Unsubscribe<TRead>(EventHandler<TRead> handler) where TRead : TEvent
+    public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent
     {
         if (_localPublisher == null)
             return;
@@ -66,7 +66,7 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
         }
     }
 
-    protected abstract bool Filter<TRead>(TEvent @event) where TRead : TEvent;
+    protected abstract bool Filter<TSubscribedEvent>(TEvent @event) where TSubscribedEvent : TEvent;
 }
 
 public abstract class EventIdFilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
@@ -82,6 +82,6 @@ public abstract class EventIdFilteringEventForwarder<TEvent, TPublisher>(TPublis
         _eventIds.Remove(eventId);
 
     /// <inheritdoc />
-    protected override bool Filter<TRead>(TEvent @event) =>
+    protected override bool Filter<TSubscribedEvent>(TEvent @event) =>
         !_eventIds.Contains(@event.EventId);
 }

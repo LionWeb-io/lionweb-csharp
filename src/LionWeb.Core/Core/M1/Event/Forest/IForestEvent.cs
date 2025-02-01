@@ -15,11 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event;
+namespace LionWeb.Core.M1.Event.Forest;
 
-public interface IPublisher<in TEvent> where TEvent : IEvent
-{
-    void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent;
-    
-    void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent;
-}
+public interface IForestEvent : IEvent;
+
+/// <param name="DeletedPartition">The deleted partition.</param>
+/// <seealso cref="IForestCommander.DeletePartition"/>
+public record PartitionDeletedEvent(IPartitionInstance DeletedPartition, EventId EventId) : IForestEvent;
+
+/// <param name="NewPartition">The newly added partition.</param>
+/// <seealso cref="IForestCommander.AddPartition"/>
+public record NewPartitionEvent(IPartitionInstance NewPartition, EventId EventId) : IForestEvent;

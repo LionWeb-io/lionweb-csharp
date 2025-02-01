@@ -17,9 +17,9 @@
 
 namespace LionWeb.Core.M1.Event;
 
-public interface ICommander<in T> where T : IEvent
+public interface ICommander<in TEvent> where TEvent : IEvent
 {
-    public void Raise(T @event);
+    public void Raise(TEvent @event);
 
     /// Whether anybody would receive any of the <paramref name="eventTypes"/> events.
     /// <value>
