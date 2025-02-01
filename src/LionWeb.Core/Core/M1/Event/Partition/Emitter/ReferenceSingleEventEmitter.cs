@@ -25,39 +25,42 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
     private readonly IReadableNode? _newTarget;
     private readonly IReadableNode? _oldTarget;
 
-    /// Raises either <see cref="IPartitionCommander.AddReference"/>, <see cref="IPartitionCommander.DeleteReference"/> or
-    /// <see cref="IPartitionCommander.ChangeReference"/> for <paramref name="reference"/>,
+    /// Raises either <see cref="ReferenceAddedEvent"/>, <see cref="ReferenceDeletedEvent"/> or
+    /// <see cref="ReferenceChangedEvent"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
-    public ReferenceSingleEventEmitter(Reference reference, NodeBase newParent, IReadableNode? newTarget, IReadableNode? oldTarget) : base(reference, newParent)
+    public ReferenceSingleEventEmitter(Reference reference, NodeBase newParent, IReadableNode? newTarget,
+        IReadableNode? oldTarget) : base(reference, newParent)
     {
         _newTarget = newTarget;
         _oldTarget = oldTarget;
     }
 
     /// <inheritdoc />
-    public override void CollectOldData() {}
+    public override void CollectOldData() { }
 
     /// <inheritdoc />
     public override void RaiseEvent()
     {
         if (!IsActive())
             return;
-        
+
         switch (_oldTarget, _newTarget)
         {
             case (null, { } v):
-                PartitionCommander.AddReference(NewParent, _reference, 0, new ReferenceTarget(null, v));
+                IReferenceTarget newTarget = new ReferenceTarget(null, v);
+                PartitionCommander.Raise(new ReferenceAddedEvent(NewParent, _reference, 0, newTarget,
+                    PartitionCommander.CreateEventId()));
                 break;
             case ({ } o, null):
-                PartitionCommander.DeleteReference(NewParent, _reference, 0, new ReferenceTarget(null, o));
+                IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
+                PartitionCommander.Raise(new ReferenceDeletedEvent(NewParent, _reference, 0, deletedTarget,
+                    PartitionCommander.CreateEventId()));
                 break;
             case ({ } o, { } n):
-                PartitionCommander.ChangeReference(NewParent,
-                    _reference,
-                    0,
-                    new ReferenceTarget(null, n),
-                    new ReferenceTarget(null, o)
-                );
+                IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
+                PartitionCommander.Raise(new ReferenceChangedEvent(NewParent, _reference, 0,
+                    new ReferenceTarget(null, n), replacedTarget,
+                    PartitionCommander.CreateEventId()));
                 break;
         }
     }

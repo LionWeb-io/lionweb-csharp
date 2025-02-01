@@ -55,17 +55,20 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
             switch (change)
             {
                 case IListComparer<T>.Added added:
-                    PartitionCommander.AddReference(NewParent, _reference, added.RightIndex,
-                        new ReferenceTarget(null, added.Element));
+                    IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
+                    PartitionCommander.Raise(new ReferenceAddedEvent(NewParent, _reference, added.RightIndex, newTarget,
+                        PartitionCommander.CreateEventId()));
                     break;
                 case IListComparer<T>.Moved moved:
-                    PartitionCommander.MoveEntryInSameReference(NewParent, _reference, moved.LeftIndex,
-                        moved.RightIndex,
-                        new ReferenceTarget(null, moved.LeftElement));
+                    IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
+                    PartitionCommander.Raise(new EntryMovedInSameReferenceEvent(NewParent, _reference, moved.RightIndex,
+                        moved.LeftIndex, target,
+                        PartitionCommander.CreateEventId()));
                     break;
                 case IListComparer<T>.Deleted deleted:
-                    PartitionCommander.DeleteReference(NewParent, _reference, deleted.LeftIndex,
-                        new ReferenceTarget(null, deleted.Element));
+                    IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
+                    PartitionCommander.Raise(new ReferenceDeletedEvent(NewParent, _reference, deleted.LeftIndex,
+                        deletedTarget, PartitionCommander.CreateEventId()));
                     break;
             }
         }

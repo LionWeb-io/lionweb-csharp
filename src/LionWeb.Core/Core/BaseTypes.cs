@@ -801,10 +801,13 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         }
     }
 
-    /// Raises <see cref="IPartitionCommander.DeleteReference"/> for <paramref name="reference"/>.
+    /// Raises <see cref="ReferenceDeletedEvent"/> for <paramref name="reference"/>.
     protected Action<IPartitionCommander, Index, T> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
         (commander, index, node) =>
-            commander.DeleteReference(this, reference, index, new ReferenceTarget(null, node));
+        {
+            IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
+            commander.Raise(new ReferenceDeletedEvent(this, reference, index, deletedTarget, commander.CreateEventId()));
+        };
 
     /// Raises <see cref="ChildDeletedEvent"/> for <paramref name="containment"/>.
     protected Action<IPartitionCommander, Index, T> ContainmentRemover<T>(Containment containment) where T : INode =>

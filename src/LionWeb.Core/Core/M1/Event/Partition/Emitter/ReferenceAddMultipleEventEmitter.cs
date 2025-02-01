@@ -24,12 +24,13 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
 {
     private readonly Index _startIndex;
 
-    /// Raises <see cref="IPartitionCommander.AddReference"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
+    /// Raises <see cref="ReferenceAddedEvent"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
     /// <param name="reference">Reference to raise events for.</param>
     /// <param name="safeNodes">Targets to raise events for.</param>
     /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
     /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
-    public ReferenceAddMultipleEventEmitter(Reference reference, NodeBase newParent, List<T> safeNodes, Index startIndex) : base(reference, newParent, safeNodes)
+    public ReferenceAddMultipleEventEmitter(Reference reference, NodeBase newParent, List<T> safeNodes,
+        Index startIndex) : base(reference, newParent, safeNodes)
     {
         _startIndex = startIndex;
     }
@@ -42,11 +43,13 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
     {
         if (!IsActive())
             return;
-        
+
         Index index = _startIndex;
         foreach (var node in _safeNodes)
         {
-            PartitionCommander.AddReference(NewParent, _reference, index++, new ReferenceTarget(null, node));
+            IReferenceTarget newTarget = new ReferenceTarget(null, node);
+            PartitionCommander.Raise(new ReferenceAddedEvent(NewParent, _reference, index++, newTarget,
+                PartitionCommander.CreateEventId()));
         }
     }
 
