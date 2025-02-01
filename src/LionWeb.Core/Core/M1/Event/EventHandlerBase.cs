@@ -20,6 +20,7 @@ namespace LionWeb.Core.M1.Event;
 using Forest;
 using Partition;
 using System.Reflection;
+using Utilities;
 
 public abstract class EventHandlerBase
 {
@@ -54,8 +55,9 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
 
     private event EventHandler<TEvent>? Event;
 
+    // Unique per instance
+    private readonly string _eventIdPrefix = IdUtils.NewId() + "-";
     private int _nextId = 0;
-
 
     /// <inheritdoc cref="EventHandlerBase"/>
     /// <param name="sender">Optional sender of the events.</param>
@@ -70,7 +72,7 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
 
     /// <inheritdoc />
     public virtual EventId CreateEventId() =>
-        _eventIds.Value!.TryDequeue(out var r) ? r : _nextId++.ToString();
+        _eventIds.Value!.TryDequeue(out var registeredEventId) ? registeredEventId : (_eventIdPrefix + _nextId++);
 
     /// <inheritdoc />
     public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent
@@ -102,7 +104,6 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
             }
         }
     }
-
 
     /// <inheritdoc />
     public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent

@@ -23,9 +23,13 @@ namespace LionWeb.Core.Utilities;
 public static class IdUtils
 {
     /// <returns>A generated, unique ID in base64url-format.</returns>
-    public static NodeId NewId()
-        => Convert.ToBase64String(Guid.NewGuid().ToByteArray())
+    public static NodeId NewId() =>
+        EncodeBase64Url(Guid.NewGuid().ToByteArray());
+
+    /// Encodes <paramref name="bytes"/> in base64url-format.
+    public static NodeId EncodeBase64Url(byte[] bytes) =>
+        Convert.ToBase64String(bytes)
+            .TrimEnd('=') // padding ='s can be safely removed
             .Replace("+", "-")
-            .Replace("/", "_")
-            .Replace("=", "");  // padding ='s can be safely removed
+            .Replace("/", "_");
 }
