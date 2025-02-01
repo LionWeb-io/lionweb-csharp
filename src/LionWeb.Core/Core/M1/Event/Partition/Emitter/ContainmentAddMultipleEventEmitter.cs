@@ -81,13 +81,17 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
                 case not null when old.Parent == NewParent && old.Containment == Containment:
                     if (old.Index < _newIndex)
                         _newIndex--;
-                    PartitionCommander.MoveChildInSameContainment(
-                        _newIndex,
-                        added,
-                        NewParent,
-                        old.Containment,
-                        old.Index
-                    );
+                    if (old.Index != _newIndex)
+                    {
+                        PartitionCommander.MoveChildInSameContainment(
+                            _newIndex,
+                            added,
+                            NewParent,
+                            old.Containment,
+                            old.Index
+                        );
+                    }
+
                     break;
 
                 case not null when old.Parent == NewParent && old.Containment != Containment:
