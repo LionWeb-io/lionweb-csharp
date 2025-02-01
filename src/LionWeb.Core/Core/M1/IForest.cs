@@ -28,8 +28,8 @@ public interface IForest
 
     public void RemovePartitions(IEnumerable<IPartitionInstance> partitions);
 
-    IForestPublisher? Publisher { get; }
-    IForestCommander? Commander { get; }
+    IForestPublisher? GetPublisher();
+    IForestCommander? GetCommander();
 }
 
 public class Forest : IForest
@@ -67,8 +67,8 @@ public class Forest : IForest
     }
 
     /// <inheritdoc />
-    public IForestPublisher Publisher => _eventHandler;
+    public IForestPublisher GetPublisher() => _eventHandler;
 
     /// <inheritdoc />
-    public IForestCommander Commander => _eventHandler;
+    public IForestCommander GetCommander() => _eventHandler;
 }

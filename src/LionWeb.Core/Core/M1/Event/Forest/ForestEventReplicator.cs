@@ -25,7 +25,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     private readonly Dictionary<NodeId, PartitionEventReplicator> _localPartitions = [];
 
     public ForestEventReplicator(IForest localForest, Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) :
-        base(localForest.Publisher, localForest.Commander, sharedNodeMap)
+        base(localForest.GetPublisher(), localForest.GetCommander(), sharedNodeMap)
     {
         _localForest = localForest;
         Init();
@@ -38,7 +38,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
             RegisterPartition(partition);
         }
 
-        var forestPublisher = _localForest.Publisher;
+        var forestPublisher = _localForest.GetPublisher();
         if (forestPublisher == null)
             return;
 
@@ -83,7 +83,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
             localPartition.Dispose();
         }
 
-        var forestListener = _localForest.Publisher;
+        var forestListener = _localForest.GetPublisher();
         if (forestListener == null)
             return;
 
