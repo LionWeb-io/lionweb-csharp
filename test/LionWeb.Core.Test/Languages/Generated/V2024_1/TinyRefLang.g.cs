@@ -153,9 +153,10 @@ public partial class MyConcept : ConceptInstanceBase
         public MyConcept SetSingularRef(MyConcept value)
 	{
 		AssureNotNull(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
-		MyConcept? oldValue = _singularRef;
+		ReferenceSingleEventEmitter evt = new(TinyRefLangLanguage.Instance.MyConcept_singularRef, this, value, _singularRef);
+		evt.CollectOldData();
 		_singularRef = value;
-		RaiseSingleReferenceEvent(TinyRefLangLanguage.Instance.MyConcept_singularRef, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 

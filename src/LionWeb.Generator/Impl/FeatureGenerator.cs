@@ -119,7 +119,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
         );
 
-
     private IEnumerable<MemberDeclarationSyntax> OptionalProperty(Property property) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
             .Concat(
@@ -131,14 +130,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     ReturnStatement(This())
                 ])
             );
-
-    private LocalDeclarationStatementSyntax OldValueVariable() =>
-        Variable("oldValue", NullableType(AsType(feature.GetFeatureType())), FeatureField(feature));
-
-    private ExpressionStatementSyntax RaisePropertyEventCall() =>
-        ExpressionStatement(
-            Call("RaisePropertyEvent", MetaProperty(feature), IdentifierName("oldValue"), IdentifierName("value"))
-        );
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
@@ -190,28 +181,31 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             }
             .Concat(RequiredFeatureSetter([
                     AsureNotNullCall(),
-                    OldValueVariable(),
+                    ReferenceEventVariable(),
+                    EventCollectOldDataCall(),
                     AssignFeatureField(),
-                    RaiseSingleReferenceEventCall(),
+                    EventRaiseEventCall(),
                     ReturnStatement(This())
                 ])
                 .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
             );
 
+    private LocalDeclarationStatementSyntax ReferenceEventVariable() =>
+        Variable(
+            "evt",
+            AsType(typeof(ReferenceSingleEventEmitter)),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
+        );
+    
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
             .Concat(OptionalFeatureSetter([
-                OldValueVariable(),
+                ReferenceEventVariable(),
+                EventCollectOldDataCall(),
                 AssignFeatureField(),
-                RaiseSingleReferenceEventCall(),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ]));
-
-    private ExpressionStatementSyntax RaiseSingleReferenceEventCall() =>
-        ExpressionStatement(
-            Call("RaiseSingleReferenceEvent", MetaProperty(feature), IdentifierName("oldValue"),
-                IdentifierName("value"))
-        );
 
     private IEnumerable<MemberDeclarationSyntax> RequiredMultiContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>

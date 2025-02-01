@@ -189,9 +189,10 @@ public partial class Book : ConceptInstanceBase
         public Book SetAuthor(Writer value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
-		Writer? oldValue = _author;
+		ReferenceSingleEventEmitter evt = new(LibraryLanguage.Instance.Book_author, this, value, _author);
+		evt.CollectOldData();
 		_author = value;
-		RaiseSingleReferenceEvent(LibraryLanguage.Instance.Book_author, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 

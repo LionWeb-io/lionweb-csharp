@@ -1797,9 +1797,10 @@ public partial class OffsetDuplicate : Shape
 	/// <remarks>Optional Single Reference</remarks>
         public OffsetDuplicate SetAltSource(Shape? value)
 	{
-		Shape? oldValue = _altSource;
+		ReferenceSingleEventEmitter evt = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource);
+		evt.CollectOldData();
 		_altSource = value;
-		RaiseSingleReferenceEvent(ShapesLanguage.Instance.OffsetDuplicate_altSource, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1874,9 +1875,10 @@ public partial class OffsetDuplicate : Shape
         public OffsetDuplicate SetSource(Shape value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_source);
-		Shape? oldValue = _source;
+		ReferenceSingleEventEmitter evt = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, value, _source);
+		evt.CollectOldData();
 		_source = value;
-		RaiseSingleReferenceEvent(ShapesLanguage.Instance.OffsetDuplicate_source, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 

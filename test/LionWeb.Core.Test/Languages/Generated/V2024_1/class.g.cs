@@ -430,9 +430,10 @@ public partial class @struct : ConceptInstanceBase, @interface
         public @struct SetRef(@record value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
-		@record? oldValue = _ref;
+		ReferenceSingleEventEmitter evt = new(ClassLanguage.Instance.struct_ref, this, value, _ref);
+		evt.CollectOldData();
 		_ref = value;
-		RaiseSingleReferenceEvent(ClassLanguage.Instance.struct_ref, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 

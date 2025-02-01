@@ -819,38 +819,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     #region Publisher Helpers
 
-    /// Raises either <see cref="IPartitionCommander.AddReference"/>, <see cref="IPartitionCommander.DeleteReference"/> or
-    /// <see cref="IPartitionCommander.ChangeReference"/> for <paramref name="reference"/>,
-    /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
-    protected void RaiseSingleReferenceEvent(Reference reference, IReadableNode? oldTarget, IReadableNode? newTarget)
-    {
-        var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null || !partitionCommander.CanRaise(
-                typeof(ReferenceAddedEvent),
-                typeof(ReferenceDeletedEvent),
-                typeof(ReferenceChangedEvent)
-            ))
-            return;
-
-        switch (oldTarget, newTarget)
-        {
-            case (null, { } v):
-                partitionCommander.AddReference(this, reference, 0, new ReferenceTarget(null, v));
-                break;
-            case ({ } o, null):
-                partitionCommander.DeleteReference(this, reference, 0, new ReferenceTarget(null, o));
-                break;
-            case ({ } o, { } n):
-                partitionCommander.ChangeReference(this,
-                    reference,
-                    0,
-                    new ReferenceTarget(null, n),
-                    new ReferenceTarget(null, o)
-                );
-                break;
-        }
-    }
-
     /// Raises <see cref="IPartitionCommander.AddReference"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
     /// <param name="reference">Reference to raise events for.</param>
     /// <param name="safeNodes">Targets to raise events for.</param>
