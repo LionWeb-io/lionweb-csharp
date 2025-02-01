@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core;
 
-using M1;
 using M1.Event.Partition;
 using M2;
 using M3;
@@ -124,13 +123,14 @@ public class DynamicNode : NodeBase
 
     private bool SetProperty(Property property, object? value)
     {
+        var commander = GetPartitionCommander();
         _settings.TryGetValue(property, out var oldValue);
         if (value == null && property.Optional)
         {
             _settings.Remove(property);
             if (oldValue != null)
             {
-                GetPartitionCommander()?.DeleteProperty(this, property, oldValue);
+                commander?.Raise(new PropertyDeletedEvent(this, property, oldValue, commander.CreateEventId()));
             }
 
             return true;
@@ -139,10 +139,10 @@ public class DynamicNode : NodeBase
         var newValue = VersionSpecifics.PrepareSetProperty(property, value);
         if (oldValue != null)
         {
-            GetPartitionCommander()?.ChangeProperty(this, property, newValue, oldValue);
+            commander?.Raise(new PropertyChangedEvent(this, property, newValue, oldValue, commander.CreateEventId()));
         } else
         {
-            GetPartitionCommander()?.AddProperty(this, property, newValue);
+            commander?.Raise(new PropertyAddedEvent(this, property, newValue, commander.CreateEventId()));
         }
 
         _settings[property] = newValue;
@@ -271,9 +271,10 @@ public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
 {
     private readonly PartitionEventHandler _eventHandler;
-    
+
     /// <inheritdoc />
-    public DynamicPartitionInstance(NodeId id, Concept concept) : base(id, concept) {
+    public DynamicPartitionInstance(NodeId id, Concept concept) : base(id, concept)
+    {
         _eventHandler = new PartitionEventHandler(this);
     }
 

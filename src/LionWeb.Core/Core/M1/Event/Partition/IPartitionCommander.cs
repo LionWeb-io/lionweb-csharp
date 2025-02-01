@@ -24,20 +24,6 @@ using M3;
 /// <seealso cref="PartitionEventHandler"/>
 public interface IPartitionCommander : ICommander<IPartitionEvent>
 {
-    #region Properties
-
-    /// <seealso cref="PropertyAddedEvent"/>
-    void AddProperty(IWritableNode node, Property property, Object newValue, EventId? eventId = null);
-
-    /// <seealso cref="PropertyDeletedEvent"/>
-    void DeleteProperty(IWritableNode node, Property property, Object oldValue, EventId? eventId = null);
-
-    /// <seealso cref="PropertyChangedEvent"/>
-    void ChangeProperty(IWritableNode node, Property property, Object newValue, Object oldValue,
-        EventId? eventId = null);
-
-    #endregion
-
     #region Children
 
     /// <seealso cref="ChildAddedEvent"/>

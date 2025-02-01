@@ -49,13 +49,16 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
         switch (_oldValue, _newValue)
         {
             case (null, { } v):
-                PartitionCommander.AddProperty(NewParent, _property, v);
+                PartitionCommander.Raise(new PropertyAddedEvent(NewParent, _property, v,
+                    PartitionCommander.CreateEventId()));
                 break;
             case ({ } o, null):
-                PartitionCommander.DeleteProperty(NewParent, _property, o);
+                PartitionCommander.Raise(new PropertyDeletedEvent(NewParent, _property, o,
+                    PartitionCommander.CreateEventId()));
                 break;
             case ({ } o, { } n):
-                PartitionCommander.ChangeProperty(NewParent, _property, n, o);
+                PartitionCommander.Raise(new PropertyChangedEvent(NewParent, _property, n, o,
+                    PartitionCommander.CreateEventId()));
                 break;
         }
     }

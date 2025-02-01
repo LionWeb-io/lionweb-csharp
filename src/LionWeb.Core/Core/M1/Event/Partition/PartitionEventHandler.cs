@@ -25,19 +25,6 @@ public class PartitionEventHandler(object? sender)
     : EventHandlerBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander
 {
     /// <inheritdoc />
-    public void AddProperty(IWritableNode node, Property property, object newValue, EventId? eventId = null) =>
-        Raise(new PropertyAddedEvent(node, property, newValue, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void DeleteProperty(IWritableNode node, Property property, object oldValue, EventId? eventId = null) =>
-        Raise(new PropertyDeletedEvent(node, property, oldValue, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void ChangeProperty(IWritableNode node, Property property, object newValue, object oldValue,
-        EventId? eventId = null) =>
-        Raise(new PropertyChangedEvent(node, property, newValue, oldValue, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
     public void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index,
         EventId? eventId = null) =>
         Raise(new ChildAddedEvent(parent, newChild, containment, index, eventId ?? CreateEventId()));
