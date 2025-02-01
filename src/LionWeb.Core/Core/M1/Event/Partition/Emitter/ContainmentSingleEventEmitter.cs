@@ -91,19 +91,16 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                PartitionCommander.Raise(new ChildDeletedEvent(_oldValue, DestinationParent, Containment, 0,
-                    PartitionCommander.CreateEventId()));
-                PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentEvent(Containment, 0, _newValue,
-                    DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index,
+                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(Containment, 0,
+                    _newValue, DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, _oldValue,
                     PartitionCommander.CreateEventId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent != DestinationParent:
-                PartitionCommander.Raise(new ChildDeletedEvent(_oldValue, DestinationParent, Containment, 0,
-                    PartitionCommander.CreateEventId()));
-                PartitionCommander.Raise(new ChildMovedFromOtherContainmentEvent(DestinationParent, Containment, 0, _newValue,
-                    _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index,
+                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentEvent(DestinationParent,
+                    Containment, 0, _newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment,
+                    _oldContainmentInfo.Index, _oldValue,
                     PartitionCommander.CreateEventId()));
                 break;
 
@@ -131,6 +128,8 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
             typeof(ChildReplacedEvent),
             typeof(ChildMovedFromOtherContainmentEvent),
             typeof(ChildMovedFromOtherContainmentInSameParentEvent),
-            typeof(ChildMovedInSameContainmentEvent)
+            typeof(ChildMovedInSameContainmentEvent),
+            typeof(ChildMovedAndReplacedFromOtherContainmentEvent),
+            typeof(ChildMovedAndReplacedFromOtherContainmentInSameParentEvent)
         );
 }
