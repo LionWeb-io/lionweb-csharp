@@ -19,19 +19,14 @@ namespace LionWeb.Core.M1.Event.Forest;
 
 /// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestPublisher"/> events.
 /// <param name="sender">Optional sender of the events.</param>
-public class ForestEventHandler(object? sender) : EventHandlerBase<IForestEvent>(sender), IForestPublisher, IForestCommander
+public class ForestEventHandler(object? sender)
+    : EventHandlerBase<IForestEvent>(sender), IForestPublisher, IForestCommander
 {
     /// <inheritdoc />
     public void AddPartition(IPartitionInstance newPartition, EventId? eventId = null) =>
         Raise(new NewPartitionEvent(newPartition, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
-    public bool CanRaiseAddPartition => CanRaise(typeof(NewPartitionEvent));
-
-    /// <inheritdoc />
     public void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null) =>
         Raise(new PartitionDeletedEvent(deletedPartition, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public bool CanRaiseDeletePartition => CanRaise(typeof(PartitionDeletedEvent));
 }

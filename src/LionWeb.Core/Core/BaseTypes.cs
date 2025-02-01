@@ -117,7 +117,7 @@ public interface IPartitionInstance : IConceptInstance
     /// Optional hook to listen to partition events.
     /// Not supported by every implementation. 
     IPartitionPublisher? Publisher { get => null; }
-    
+
     /// Optional hook to raise partition events.
     /// Not supported by every implementation. 
     IPartitionCommander? Commander { get => null; }
@@ -825,9 +825,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     protected void RaisePropertyEvent(Property property, object? oldValue, object? newValue)
     {
         var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null || !(partitionCommander.CanRaiseAddProperty ||
-                                            partitionCommander.CanRaiseDeleteProperty ||
-                                            partitionCommander.CanRaiseChangeProperty))
+        if (partitionCommander == null || !partitionCommander.CanRaise(
+                typeof(PropertyAddedEvent),
+                typeof(PropertyDeletedEvent),
+                typeof(PropertyChangedEvent)
+            ))
             return;
 
         switch (oldValue, newValue)
@@ -850,10 +852,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     protected void RaiseSingleReferenceEvent(Reference reference, IReadableNode? oldTarget, IReadableNode? newTarget)
     {
         var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null || !(partitionCommander.CanRaiseAddReference ||
-                                            partitionCommander.CanRaiseDeleteReference ||
-                                            partitionCommander.CanRaiseChangeReference)
-           )
+        if (partitionCommander == null || !partitionCommander.CanRaise(
+                typeof(ReferenceAddedEvent),
+                typeof(ReferenceDeletedEvent),
+                typeof(ReferenceChangedEvent)
+            ))
             return;
 
         switch (oldTarget, newTarget)
@@ -884,7 +887,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         where T : IReadableNode
     {
         var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null || !partitionCommander.CanRaiseAddReference)
+        if (partitionCommander == null || !partitionCommander.CanRaise(typeof(ReferenceAddedEvent)))
             return;
 
         Index index = startIndex;

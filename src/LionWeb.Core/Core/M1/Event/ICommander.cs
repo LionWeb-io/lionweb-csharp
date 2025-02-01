@@ -20,8 +20,13 @@ namespace LionWeb.Core.M1.Event;
 public interface ICommander<in T> where T : IEvent
 {
     public void Raise(T @event);
-    public bool CanRaise(Type eventType);
-    
+
+    /// Whether anybody would receive any of the <paramref name="eventTypes"/> events.
+    /// <value>
+    ///     <c>true</c> if someone would receive any of the <paramref name="eventTypes"/> events; <c>false</c> otherwise.
+    /// </value>
+    public bool CanRaise(params Type[] eventTypes);
+
     public EventId CreateEventId();
     void RegisterEventId(string eventId);
 }

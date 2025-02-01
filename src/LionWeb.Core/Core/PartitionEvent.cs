@@ -248,11 +248,13 @@ public class SetContainmentEvent<T> : PartitionMultipleContainmentEventBase<T> w
     /// <inheritdoc />
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
-        PartitionCommander != null && (PartitionCommander.CanRaiseAddChild ||
-                                       PartitionCommander.CanRaiseDeleteChild ||
-                                       PartitionCommander.CanRaiseMoveChildFromOtherContainment ||
-                                       PartitionCommander.CanRaiseMoveChildFromOtherContainmentInSameParent ||
-                                       PartitionCommander.CanRaiseMoveChildInSameContainment);
+        PartitionCommander != null && PartitionCommander.CanRaise(
+            typeof(ChildAddedEvent),
+            typeof(ChildDeletedEvent),
+            typeof(ChildMovedFromOtherContainmentEvent),
+            typeof(ChildMovedFromOtherContainmentInSameParentEvent),
+            typeof(ChildMovedInSameContainmentEvent)
+        );
 }
 
 /// Encapsulates event-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Containment"/>s.
@@ -296,7 +298,7 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
                 case not null when old.Parent != NewParent:
                     var eventId = PartitionCommander.CreateEventId();
                     RaiseOldDeletionEvent(old, eventId, added);
-                    
+
                     PartitionCommander.MoveChildFromOtherContainment(
                         NewParent,
                         Containment,
@@ -347,10 +349,12 @@ public class AddMultipleContainmentsEvent<T> : PartitionMultipleContainmentEvent
     /// <inheritdoc />
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
-        PartitionCommander != null && (PartitionCommander.CanRaiseAddChild ||
-                                       PartitionCommander.CanRaiseMoveChildFromOtherContainment ||
-                                       PartitionCommander.CanRaiseMoveChildFromOtherContainmentInSameParent ||
-                                       PartitionCommander.CanRaiseMoveChildInSameContainment);
+        PartitionCommander != null && PartitionCommander.CanRaise(
+            typeof(ChildAddedEvent),
+            typeof(ChildMovedFromOtherContainmentEvent),
+            typeof(ChildMovedFromOtherContainmentInSameParentEvent),
+            typeof(ChildMovedInSameContainmentEvent)
+        );
 }
 
 /// Encapsulates event-related logic and data for changing <i>single</i> <see cref="Containment"/>s.
@@ -502,12 +506,14 @@ public class SingleContainmentEvent<T> : PartitionContainmentEventBase<T> where 
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     [MemberNotNullWhen(true, nameof(_oldContainmentInfo))]
     protected override bool IsActive() =>
-        PartitionCommander != null && (PartitionCommander.CanRaiseAddChild ||
-                                       PartitionCommander.CanRaiseDeleteChild ||
-                                       PartitionCommander.CanRaiseReplaceChild ||
-                                       PartitionCommander.CanRaiseMoveChildFromOtherContainment ||
-                                       PartitionCommander.CanRaiseMoveChildFromOtherContainmentInSameParent ||
-                                       PartitionCommander.CanRaiseMoveChildInSameContainment);
+        PartitionCommander != null && PartitionCommander.CanRaise(
+            typeof(ChildAddedEvent),
+            typeof(ChildDeletedEvent),
+            typeof(ChildReplacedEvent),
+            typeof(ChildMovedFromOtherContainmentEvent),
+            typeof(ChildMovedFromOtherContainmentInSameParentEvent),
+            typeof(ChildMovedInSameContainmentEvent)
+        );
 }
 
 #endregion
@@ -570,9 +576,11 @@ public class SetReferenceEvent<T> : PartitionEventBase<T> where T : IReadableNod
     /// <inheritdoc />
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
-        PartitionCommander != null && (PartitionCommander.CanRaiseAddReference ||
-                                       PartitionCommander.CanRaiseMoveEntryInSameReference ||
-                                       PartitionCommander.CanRaiseDeleteReference);
+        PartitionCommander != null && PartitionCommander.CanRaise(
+            typeof(ReferenceAddedEvent),
+            typeof(EntryMovedInSameReferenceEvent),
+            typeof(ReferenceDeletedEvent)
+        );
 }
 
 #endregion
@@ -605,7 +613,7 @@ public abstract class PartitionAnnotationEventBase : PartitionEventBase<INode>
                 continue;
 
             var oldIndex = oldParent.GetAnnotations().ToList().IndexOf(newValue);
-            
+
             var oldPartition = newValue.GetPartition();
 
             NewValues[newValue] = new(oldParent, oldIndex, oldPartition);
@@ -616,8 +624,8 @@ public abstract class PartitionAnnotationEventBase : PartitionEventBase<INode>
     /// <param name="Parent"></param>
     /// <param name="Index"></param>
     protected record OldAnnotationInfo(INode Parent, Index Index, IPartitionInstance? Partition);
-    
-    
+
+
     protected void RaiseOldDeletionEvent(OldAnnotationInfo old, EventId eventId, IWritableNode moved)
     {
         if (old.Partition != null && old.Partition != newPartition)
@@ -626,7 +634,6 @@ public abstract class PartitionAnnotationEventBase : PartitionEventBase<INode>
                 ?.DeleteAnnotation(moved, old.Parent, old.Index, eventId);
         }
     }
-
 }
 
 /// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
@@ -706,10 +713,12 @@ public class SetAnnotationEvent : PartitionAnnotationEventBase
     /// <inheritdoc />
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
-        PartitionCommander != null && (PartitionCommander.CanRaiseAddAnnotation ||
-                                       PartitionCommander.CanRaiseDeleteAnnotation ||
-                                       PartitionCommander.CanRaiseMoveAnnotationFromOtherParent ||
-                                       PartitionCommander.CanRaiseMoveAnnotationInSameParent);
+        PartitionCommander != null && PartitionCommander.CanRaise(
+            typeof(AnnotationAddedEvent),
+            typeof(AnnotationDeletedEvent),
+            typeof(AnnotationMovedFromOtherParentEvent),
+            typeof(AnnotationMovedInSameParentEvent)
+        );
 }
 
 /// Encapsulates event-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Annotation"/>s.
@@ -783,9 +792,11 @@ public class AddMultipleAnnotationsEvent : PartitionAnnotationEventBase
     /// <inheritdoc />
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
-        PartitionCommander != null && (PartitionCommander.CanRaiseAddAnnotation ||
-                                       PartitionCommander.CanRaiseMoveAnnotationFromOtherParent ||
-                                       PartitionCommander.CanRaiseMoveAnnotationInSameParent);
+        PartitionCommander != null && PartitionCommander.CanRaise(
+            typeof(AnnotationAddedEvent),
+            typeof(AnnotationMovedFromOtherParentEvent),
+            typeof(AnnotationMovedInSameParentEvent)
+        );
 }
 
 #endregion

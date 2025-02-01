@@ -20,6 +20,7 @@ namespace LionWeb.Core.M1.Event.Forest;
 /// Provides events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
 /// <seealso cref="IForestCommander"/>
 /// <seealso cref="ForestEventHandler"/>
+/// <seealso cref="IForestEvent"/>
 public interface IForestPublisher : IPublisher<IForestEvent>;
 
 public interface IForestEvent : IEvent;

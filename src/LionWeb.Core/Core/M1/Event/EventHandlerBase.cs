@@ -130,6 +130,7 @@ public abstract class EventHandlerBase<TWrite> : EventHandlerBase, ICommander<TW
         Event?.Invoke(_sender, @event);
 
     /// <inheritdoc />
-    public bool CanRaise(Type eventType) =>
-        Event != null && _subscribedEvents.TryGetValue(eventType, out var count) && count > 0;
+    public bool CanRaise(params Type[] eventTypes) =>
+        Event != null &&
+        eventTypes.Any(eventType => _subscribedEvents.TryGetValue(eventType, out var count) && count > 0);
 }

@@ -28,21 +28,9 @@ public interface IForestCommander : ICommander<IForestEvent>
     /// <seealso cref="IForestPublisher.NewPartition"/>
     void AddPartition(IPartitionInstance newPartition, EventId? eventId = null);
 
-    /// Whether anybody would receive the <see cref="AddPartition"/> event.
-    /// <value>
-    ///     <c>true</c> if someone would receive the <see cref="AddPartition"/> event; <c>false</c> otherwise.
-    /// </value>
-    bool CanRaiseAddPartition { get; }
-
     /// A partition has been deleted from this forest.
     /// <param name="deletedPartition">The deleted partition.</param>
     /// <param name="eventId"></param>
     /// <seealso cref="IForestPublisher.PartitionDeleted"/>
     void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null);
-
-    /// Whether anybody would receive the <see cref="DeletePartition"/> event.
-    /// <value>
-    ///     <c>true</c> if someone would receive the <see cref="DeletePartition"/> event; <c>false</c> otherwise.
-    /// </value>
-    bool CanRaiseDeletePartition { get; }
 }
