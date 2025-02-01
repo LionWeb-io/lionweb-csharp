@@ -6,11 +6,11 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.DeprecatedLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
-using M1.Event.Partition.Emitter;
 using System;
 using System.Collections.Generic;
 using DeprDatatype = string;
@@ -231,9 +231,10 @@ public partial class DeprConcept : ConceptInstanceBase
         [Obsolete("deprProp comment")]
 	public DeprConcept SetDeprProp(string? value)
 	{
-		string? oldValue = _deprProp;
+		PropertyEventEmitter evt = new(DeprecatedLanguage.Instance.DeprConcept_deprProp, this, value, _deprProp);
+		evt.CollectOldData();
 		_deprProp = value;
-		RaisePropertyEvent(DeprecatedLanguage.Instance.DeprConcept_deprProp, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 

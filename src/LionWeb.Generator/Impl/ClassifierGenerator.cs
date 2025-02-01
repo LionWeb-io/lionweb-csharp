@@ -18,7 +18,6 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
-using Core.M1;
 using Core.M1.Event.Partition;
 using Core.M2;
 using Core.M3;
@@ -81,26 +80,29 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
         bases.AddRange(Interfaces.Select(i => AsType(i)));
 
         List<MemberDeclarationSyntax> additionalMembers = [GenGetClassifier("GetConcept", typeof(Concept))];
+        List<StatementSyntax>? additionalConstructorStatements = [];
 
         if (concept.Partition)
         {
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
             additionalMembers.AddRange([
-                Field("_eventHandler", AsType(typeof(PartitionEventHandler)), NewCall([]))
+                Field("_eventHandler", AsType(typeof(PartitionEventHandler)))
                     .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
-                ReadOnlyProperty("Publisher", AsType(typeof(IPartitionPublisher)), IdentifierName("_eventHandler"))
+                Method("GetPublisher", NullableType(AsType(typeof(IPartitionPublisher))), exprBody: IdentifierName("_eventHandler"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword)),
-                ReadOnlyProperty("Commander", AsType(typeof(IPartitionCommander)), IdentifierName("_eventHandler"))
+                Method("GetCommander", NullableType(AsType(typeof(IPartitionCommander))), exprBody: IdentifierName("_eventHandler"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             ]);
+            
+            additionalConstructorStatements.Add(Assignment("_eventHandler", NewCall([This()])));
         }
 
-        return ClassifierClass(bases, additionalMembers);
+        return ClassifierClass(bases, additionalMembers, additionalConstructorStatements);
     }
 
     private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases,
-        List<MemberDeclarationSyntax> additionalMembers)
+        List<MemberDeclarationSyntax> additionalMembers, List<StatementSyntax>? additionalConstructorStatements = null)
     {
         List<SyntaxKind> modifiers = [SyntaxKind.PublicKeyword];
         if (classifier is Concept { Abstract: true })
@@ -117,7 +119,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithMembers(List(
                 FeaturesToImplement(classifier)
                     .SelectMany(f => new FeatureGenerator(classifier, f, _names, _lionWebVersion).Members())
-                    .Append(GenConstructor())
+                    .Append(GenConstructor(additionalConstructorStatements ?? []))
                     .Concat(additionalMembers)
                     .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion).FeatureMethods())
                     .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion).ContainmentMethods())
@@ -139,10 +141,10 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .Ordered();
 
 
-    private ConstructorDeclarationSyntax GenConstructor() =>
+    private ConstructorDeclarationSyntax GenConstructor(IEnumerable<StatementSyntax> statements) =>
         Constructor(ClassifierName, Param("id", AsType(typeof(string))))
             .WithInitializer(Initializer("id"))
-            .WithBody(AsStatements([]));
+            .WithBody(AsStatements(statements));
 
     private MethodDeclarationSyntax GenGetClassifier(string methodName, Type returnType) =>
         Method(methodName, AsType(returnType), exprBody: MetaProperty())

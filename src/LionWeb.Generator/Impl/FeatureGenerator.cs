@@ -93,9 +93,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     {
         List<StatementSyntax> setterBody =
         [
-            OldValueVariable(),
+            PropertyEventVariable(),
+            EventCollectOldDataCall(),
             AssignFeatureField(),
-            RaisePropertyEventCall(),
+            EventRaiseEventCall(),
             ReturnStatement(This())
         ];
         if (IsReferenceType(property))
@@ -110,14 +111,23 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
         return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
     }
+    
+    private LocalDeclarationStatementSyntax PropertyEventVariable() =>
+        Variable(
+            "evt",
+            AsType(typeof(PropertyEventEmitter)),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
+        );
+
 
     private IEnumerable<MemberDeclarationSyntax> OptionalProperty(Property property) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
             .Concat(
                 OptionalFeatureSetter([
-                    OldValueVariable(),
+                    PropertyEventVariable(),
+                    EventCollectOldDataCall(),
                     AssignFeatureField(),
-                    RaisePropertyEventCall(),
+                    EventRaiseEventCall(),
                     ReturnStatement(This())
                 ])
             );

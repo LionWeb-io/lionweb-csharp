@@ -6,13 +6,12 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using LionWeb.Core;
-using LionWeb.Core.M1;
+using LionWeb.Core.M1.Event.Partition;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
-using M1.Event.Partition;
-using M1.Event.Partition.Emitter;
 using System;
 using System.Collections.Generic;
 using Time = string;
@@ -654,9 +653,10 @@ public partial class Circle : Shape
 	/// <remarks>Required Property</remarks>
         public Circle SetR(int value)
 	{
-		int? oldValue = _r;
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Circle_r, this, value, _r);
+		evt.CollectOldData();
 		_r = value;
-		RaisePropertyEvent(ShapesLanguage.Instance.Circle_r, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1017,9 +1017,10 @@ public partial class Coord : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Coord SetX(int value)
 	{
-		int? oldValue = _x;
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_x, this, value, _x);
+		evt.CollectOldData();
 		_x = value;
-		RaisePropertyEvent(ShapesLanguage.Instance.Coord_x, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1033,9 +1034,10 @@ public partial class Coord : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Coord SetY(int value)
 	{
-		int? oldValue = _y;
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_y, this, value, _y);
+		evt.CollectOldData();
 		_y = value;
-		RaisePropertyEvent(ShapesLanguage.Instance.Coord_y, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1049,9 +1051,10 @@ public partial class Coord : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Coord SetZ(int value)
 	{
-		int? oldValue = _z;
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_z, this, value, _z);
+		evt.CollectOldData();
 		_z = value;
-		RaisePropertyEvent(ShapesLanguage.Instance.Coord_z, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1154,9 +1157,10 @@ public partial class Documentation : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Documentation SetTechnical(bool? value)
 	{
-		bool? oldValue = _technical;
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Documentation_technical, this, value, _technical);
+		evt.CollectOldData();
 		_technical = value;
-		RaisePropertyEvent(ShapesLanguage.Instance.Documentation_technical, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1169,9 +1173,10 @@ public partial class Documentation : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Documentation SetText(string? value)
 	{
-		string? oldValue = _text;
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Documentation_text, this, value, _text);
+		evt.CollectOldData();
 		_text = value;
-		RaisePropertyEvent(ShapesLanguage.Instance.Documentation_text, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1306,17 +1311,16 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	public Geometry(string id) : base(id)
-    {
-        _eventHandler = new PartitionEventHandler(this);
-    }
+	{
+		_eventHandler = new(this);
+	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
 	private readonly PartitionEventHandler _eventHandler;
-    public IPartitionPublisher GetPublisher() => _eventHandler;
-    public IPartitionCommander GetCommander() => _eventHandler;
-
-    /// <inheritdoc/>
+	public IPartitionPublisher? GetPublisher() => _eventHandler;
+	public IPartitionCommander? GetCommander() => _eventHandler;
+	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
 		if (base.GetInternal(feature, out result))
@@ -1660,9 +1664,10 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         public MaterialGroup SetMatterState(MatterState? value)
 	{
-		MatterState? oldValue = _matterState;
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.MaterialGroup_matterState, this, value, _matterState);
+		evt.CollectOldData();
 		_matterState = value;
-		RaisePropertyEvent(ShapesLanguage.Instance.MaterialGroup_matterState, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2086,17 +2091,16 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	public ReferenceGeometry(string id) : base(id)
-    {
-        _eventHandler = new PartitionEventHandler(this);
-    }
+	{
+		_eventHandler = new(this);
+	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
 	private readonly PartitionEventHandler _eventHandler;
-    public IPartitionPublisher GetPublisher() => _eventHandler;
-    public IPartitionCommander GetCommander() => _eventHandler;
-
-    /// <inheritdoc/>
+	public IPartitionPublisher? GetPublisher() => _eventHandler;
+	public IPartitionCommander? GetCommander() => _eventHandler;
+	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
 		if (base.GetInternal(feature, out result))
@@ -2159,9 +2163,10 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public Shape SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		string? oldValue = _name;
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		evt.CollectOldData();
 		_name = value;
-		RaisePropertyEvent(_builtIns.INamed_name, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2224,9 +2229,10 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public Shape SetUuid(string value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.IShape_uuid);
-		string? oldValue = _uuid;
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.IShape_uuid, this, value, _uuid);
+		evt.CollectOldData();
 		_uuid = value;
-		RaisePropertyEvent(ShapesLanguage.Instance.IShape_uuid, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 

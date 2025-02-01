@@ -6,11 +6,11 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseConceptLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
-using M1.Event.Partition.Emitter;
 using System;
 using System.Collections.Generic;
 
@@ -100,9 +100,10 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetEnumProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum value)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp);
-		LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum? oldValue = _enumProp;
+		PropertyEventEmitter evt = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp, this, value, _enumProp);
+		evt.CollectOldData();
 		_enumProp = value;
-		RaisePropertyEvent(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -119,9 +120,10 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetSdtProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt value)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp);
-		LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt? oldValue = _sdtProp;
+		PropertyEventEmitter evt = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp, this, value, _sdtProp);
+		evt.CollectOldData();
 		_sdtProp = value;
-		RaisePropertyEvent(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -164,9 +166,10 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetProp(string value)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop);
-		string? oldValue = _prop;
+		PropertyEventEmitter evt = new(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop, this, value, _prop);
+		evt.CollectOldData();
 		_prop = value;
-		RaisePropertyEvent(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop, oldValue, value);
+		evt.RaiseEvent();
 		return this;
 	}
 
