@@ -806,12 +806,12 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         (commander, index, node) =>
             commander.DeleteReference(this, reference, index, new ReferenceTarget(null, node));
 
-    /// Raises <see cref="IPartitionCommander.DeleteChild"/> for <paramref name="containment"/>.
-    protected Action<IPartitionCommander, Index, T> ContainmentRemover<T>(Containment containment)
-        where T : INode =>
-        (commander, index, node) => commander.DeleteChild(node, this, containment, index);
+    /// Raises <see cref="ChildDeletedEvent"/> for <paramref name="containment"/>.
+    protected Action<IPartitionCommander, Index, T> ContainmentRemover<T>(Containment containment) where T : INode =>
+        (commander, index, node) =>
+            commander.Raise(new ChildDeletedEvent(node, this, containment, index, commander.CreateEventId()));
 
-    /// Raises <see cref="IPartitionCommander.DeleteAnnotation"/>.
+    /// Raises <see cref="AnnotationDeletedEvent"/>.
     private void AnnotationRemover(IPartitionCommander commander, Index index, INode node) =>
         commander.Raise(new AnnotationDeletedEvent(node, this, index, commander.CreateEventId()));
 

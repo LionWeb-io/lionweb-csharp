@@ -25,41 +25,6 @@ public class PartitionEventHandler(object? sender)
     : EventHandlerBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander
 {
     /// <inheritdoc />
-    public void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index,
-        EventId? eventId = null) =>
-        Raise(new ChildAddedEvent(parent, newChild, containment, index, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index,
-        EventId? eventId = null) =>
-        Raise(new ChildDeletedEvent(deletedChild, parent, containment, index, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
-        Containment containment, Index index, EventId? eventId = null) =>
-        Raise(new ChildReplacedEvent(newChild, replacedChild, parent, containment, index, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
-        IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex,
-        EventId? eventId = null) =>
-        Raise(new ChildMovedFromOtherContainmentEvent(newParent, newContainment, newIndex, movedChild, oldParent,
-            oldContainment, oldIndex, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex,
-        IWritableNode movedChild,
-        IWritableNode parent, Containment oldContainment, Index oldIndex, EventId? eventId = null) =>
-        Raise(new ChildMovedFromOtherContainmentInSameParentEvent(newContainment, newIndex, movedChild, parent,
-            oldContainment, oldIndex, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
-        Containment containment, Index oldIndex, EventId? eventId = null) =>
-        Raise(new ChildMovedInSameContainmentEvent(newIndex, movedChild, parent, containment, oldIndex,
-            eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
     public void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
         EventId? eventId = null) =>
         Raise(new ReferenceAddedEvent(parent, reference, index, newTarget, eventId ?? CreateEventId()));

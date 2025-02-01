@@ -24,35 +24,6 @@ using M3;
 /// <seealso cref="PartitionEventHandler"/>
 public interface IPartitionCommander : ICommander<IPartitionEvent>
 {
-    #region Children
-
-    /// <seealso cref="ChildAddedEvent"/>
-    void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index,
-        EventId? eventId = null);
-
-    /// <seealso cref="ChildDeletedEvent"/>
-    void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index,
-        EventId? eventId = null);
-
-    /// <seealso cref="ChildReplacedEvent"/>
-    void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
-        Containment containment, Index index, EventId? eventId = null);
-
-    /// <seealso cref="ChildMovedFromOtherContainmentEvent"/>
-    void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
-        IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex,
-        EventId? eventId = null);
-
-    /// <seealso cref="ChildMovedFromOtherContainmentInSameParentEvent"/>
-    void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex, IWritableNode movedChild,
-        IWritableNode parent, Containment oldContainment, Index oldIndex, EventId? eventId = null);
-
-    /// <seealso cref="ChildMovedInSameContainmentEvent"/>
-    void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
-        Containment containment, Index oldIndex, EventId? eventId = null);
-
-    #endregion
-
     #region References
 
     /// <seealso cref="ReferenceAddedEvent"/>

@@ -59,40 +59,23 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            PartitionCommander.AddChild(
-                                NewParent,
-                                added.Element,
-                                Containment,
-                                added.RightIndex
-                            );
+                            PartitionCommander.Raise(new ChildAddedEvent(NewParent, added.Element, Containment,
+                                added.RightIndex, PartitionCommander.CreateEventId()));
                             break;
 
                         case { } old when old.Parent != NewParent:
                             var eventId = PartitionCommander.CreateEventId();
-                            RaiseOriginMoveEvent(old, eventId, added.Element, added.RightIndex);
-
-                            PartitionCommander.MoveChildFromOtherContainment(
-                                NewParent,
-                                Containment,
-                                added.RightIndex,
-                                added.Element,
-                                old.Parent,
-                                old.Containment,
-                                old.Index,
-                                eventId
-                            );
+                            var @event = new ChildMovedFromOtherContainmentEvent(NewParent, Containment,
+                                added.RightIndex, added.Element, old.Parent, old.Containment, old.Index, eventId);
+                            RaiseOriginMoveEvent(old, @event);
+                            PartitionCommander.Raise(@event);
                             break;
 
 
                         case { } old when old.Parent == NewParent && old.Containment != Containment:
-                            PartitionCommander.MoveChildFromOtherContainmentInSameParent(
-                                Containment,
-                                added.RightIndex,
-                                added.Element,
-                                NewParent,
-                                old.Containment,
-                                old.Index
-                            );
+                            PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentEvent(Containment,
+                                added.RightIndex, added.Element, NewParent, old.Containment, old.Index,
+                                PartitionCommander.CreateEventId()));
                             break;
 
                         default:
@@ -102,21 +85,12 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
                     break;
 
                 case IListComparer<T>.Moved moved:
-                    PartitionCommander.MoveChildInSameContainment(
-                        moved.RightIndex,
-                        moved.LeftElement,
-                        NewParent,
-                        Containment,
-                        moved.LeftIndex
-                    );
+                    PartitionCommander.Raise(new ChildMovedInSameContainmentEvent(moved.RightIndex, moved.LeftElement,
+                        NewParent, Containment, moved.LeftIndex, PartitionCommander.CreateEventId()));
                     break;
                 case IListComparer<T>.Deleted deleted:
-                    PartitionCommander.DeleteChild(
-                        deleted.Element,
-                        NewParent,
-                        Containment,
-                        deleted.LeftIndex
-                    );
+                    PartitionCommander.Raise(new ChildDeletedEvent(deleted.Element, NewParent, Containment,
+                        deleted.LeftIndex, PartitionCommander.CreateEventId()));
                     break;
             }
         }
