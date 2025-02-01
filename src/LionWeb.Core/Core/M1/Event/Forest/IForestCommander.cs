@@ -25,12 +25,12 @@ public interface IForestCommander : ICommander<IForestEvent>
     /// A new partition is being added to this forrest.
     /// <param name="newPartition">The newly added partition.</param>
     /// <param name="eventId"></param>
-    /// <seealso cref="IForestPublisher.NewPartition"/>
+    /// <seealso cref="NewPartitionEvent"/>
     void AddPartition(IPartitionInstance newPartition, EventId? eventId = null);
 
     /// A partition has been deleted from this forest.
     /// <param name="deletedPartition">The deleted partition.</param>
     /// <param name="eventId"></param>
-    /// <seealso cref="IForestPublisher.PartitionDeleted"/>
+    /// <seealso cref="PartitionDeletedEvent"/>
     void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null);
 }

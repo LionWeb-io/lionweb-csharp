@@ -26,7 +26,7 @@ public interface IPartitionCommander : ICommander<IPartitionEvent>
 {
     #region Nodes
 
-    /// <seealso cref="IPartitionPublisher.ClassifierChanged"/>
+    /// <seealso cref="ClassifierChangedEvent"/>
     void ChangeClassifier(IWritableNode node, Classifier newClassifier, Classifier oldClassifier,
         EventId? eventId = null);
 
@@ -34,13 +34,13 @@ public interface IPartitionCommander : ICommander<IPartitionEvent>
 
     #region Properties
 
-    /// <seealso cref="IPartitionPublisher.PropertyAdded"/>
+    /// <seealso cref="PropertyAddedEvent"/>
     void AddProperty(IWritableNode node, Property property, Object newValue, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.PropertyDeleted"/>
+    /// <seealso cref="PropertyDeletedEvent"/>
     void DeleteProperty(IWritableNode node, Property property, Object oldValue, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.PropertyChanged"/>
+    /// <seealso cref="PropertyChangedEvent"/>
     void ChangeProperty(IWritableNode node, Property property, Object newValue, Object oldValue,
         EventId? eventId = null);
 
@@ -48,28 +48,28 @@ public interface IPartitionCommander : ICommander<IPartitionEvent>
 
     #region Children
 
-    /// <seealso cref="IPartitionPublisher.ChildAdded"/>
+    /// <seealso cref="ChildAddedEvent"/>
     void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index,
         EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ChildDeleted"/>
+    /// <seealso cref="ChildDeletedEvent"/>
     void DeleteChild(IWritableNode deletedChild, IWritableNode parent, Containment containment, Index index,
         EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ChildReplaced"/>
+    /// <seealso cref="ChildReplacedEvent"/>
     void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
         Containment containment, Index index, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ChildMovedFromOtherContainment"/>
+    /// <seealso cref="ChildMovedFromOtherContainmentEvent"/>
     void MoveChildFromOtherContainment(IWritableNode newParent, Containment newContainment, Index newIndex,
         IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex,
         EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ChildMovedFromOtherContainmentInSameParent"/>
+    /// <seealso cref="ChildMovedFromOtherContainmentInSameParentEvent"/>
     void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex, IWritableNode movedChild,
         IWritableNode parent, Containment oldContainment, Index oldIndex, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ChildMovedInSameContainment"/>
+    /// <seealso cref="ChildMovedInSameContainmentEvent"/>
     void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
         Containment containment, Index oldIndex, EventId? eventId = null);
 
@@ -77,21 +77,21 @@ public interface IPartitionCommander : ICommander<IPartitionEvent>
 
     #region Annotations
 
-    /// <seealso cref="IPartitionPublisher.AnnotationAdded"/>
+    /// <seealso cref="AnnotationAddedEvent"/>
     void AddAnnotation(IWritableNode parent, IWritableNode newAnnotation, Index index, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.AnnotationDeleted"/>
+    /// <seealso cref="AnnotationDeletedEvent"/>
     void DeleteAnnotation(IWritableNode deletedAnnotation, IWritableNode parent, Index index, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.AnnotationReplaced"/>
+    /// <seealso cref="AnnotationReplacedEvent"/>
     void ReplaceAnnotation(IWritableNode newAnnotation, IWritableNode replacedAnnotation, IWritableNode parent,
         Index index, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.AnnotationMovedFromOtherParent"/>
+    /// <seealso cref="AnnotationMovedFromOtherParentEvent"/>
     void MoveAnnotationFromOtherParent(IWritableNode newParent, Index newIndex, IWritableNode movedAnnotation,
         IWritableNode oldParent, Index oldIndex, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.AnnotationMovedInSameParent"/>
+    /// <seealso cref="AnnotationMovedInSameParentEvent"/>
     void MoveAnnotationInSameParent(Index newIndex, IWritableNode movedAnnotation, IWritableNode parent,
         Index oldIndex, EventId? eventId = null);
 
@@ -99,52 +99,52 @@ public interface IPartitionCommander : ICommander<IPartitionEvent>
 
     #region References
 
-    /// <seealso cref="IPartitionPublisher.ReferenceAdded"/>
+    /// <seealso cref="ReferenceAddedEvent"/>
     void AddReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
         EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ReferenceDeleted"/>
+    /// <seealso cref="ReferenceDeletedEvent"/>
     void DeleteReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget deletedTarget,
         EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ReferenceChanged"/>
+    /// <seealso cref="ReferenceChangedEvent"/>
     void ChangeReference(IWritableNode parent, Reference reference, Index index, IReferenceTarget newTarget,
         IReferenceTarget replacedTarget, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.EntryMovedFromOtherReference"/>
+    /// <seealso cref="EntryMovedFromOtherReferenceEvent"/>
     void MoveEntryFromOtherReference(IWritableNode newParent, Reference newReference, Index newIndex,
         IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target,
         EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.EntryMovedFromOtherReferenceInSameParent"/>
+    /// <seealso cref="EntryMovedFromOtherReferenceInSameParentEvent"/>
     void MoveEntryFromOtherReferenceInSameParent(IWritableNode parent, Reference newReference, Index newIndex,
         Reference oldReference, Index oldIndex, IReferenceTarget target, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.EntryMovedInSameReference"/>
+    /// <seealso cref="EntryMovedInSameReferenceEvent"/>
     void MoveEntryInSameReference(IWritableNode parent, Reference reference, Index oldIndex, Index newIndex,
         IReferenceTarget target, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ReferenceResolveInfoAdded"/>
+    /// <seealso cref="ReferenceResolveInfoAddedEvent"/>
     void AddReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, ResolveInfo newResolveInfo,
         IReadableNode target, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ReferenceResolveInfoDeleted"/>
+    /// <seealso cref="ReferenceResolveInfoDeletedEvent"/>
     void DeleteReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, IReadableNode target,
         ResolveInfo deletedResolveInfo, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ReferenceResolveInfoChanged"/>
+    /// <seealso cref="ReferenceResolveInfoChangedEvent"/>
     void ChangeReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, ResolveInfo newResolveInfo,
         IReadableNode? target, ResolveInfo replacedResolveInfo, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ReferenceTargetAdded"/>
+    /// <seealso cref="ReferenceTargetAddedEvent"/>
     void AddReferenceTarget(IWritableNode parent, Reference reference, Index index, IReadableNode newTarget,
         ResolveInfo resolveInfo, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ReferenceTargetDeleted"/>
+    /// <seealso cref="ReferenceTargetDeletedEvent"/>
     void DeleteReferenceTarget(IWritableNode parent, Reference reference, Index index, ResolveInfo resolveInfo,
         IReadableNode deletedTarget, EventId? eventId = null);
 
-    /// <seealso cref="IPartitionPublisher.ReferenceTargetChanged"/>
+    /// <seealso cref="ReferenceTargetChangedEvent"/>
     void ChangeReferenceTarget(IWritableNode parent, Reference reference, Index index, IReadableNode newTarget,
         ResolveInfo? resolveInfo, IReadableNode oldTarget, EventId? eventId = null);
 

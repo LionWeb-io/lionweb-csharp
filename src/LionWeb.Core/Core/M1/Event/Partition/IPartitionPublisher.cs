@@ -136,7 +136,7 @@ public record ChildMovedFromOtherContainmentEvent(
 /// <param name="Parent"></param>
 /// <param name="OldContainment"></param>
 /// <param name="OldIndex"></param>
-/// <seealso cref="IPartitionCommander.CanRaiseMoveChildFromOtherContainmentInSameParent"/>
+/// <seealso cref="IPartitionCommander.MoveChildFromOtherContainmentInSameParent"/>
 public record ChildMovedFromOtherContainmentInSameParentEvent(
     Containment NewContainment,
     Index NewIndex,

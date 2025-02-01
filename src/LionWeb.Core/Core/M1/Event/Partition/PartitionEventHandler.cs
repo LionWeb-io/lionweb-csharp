@@ -30,10 +30,8 @@ public class PartitionEventHandler(object? sender)
         Raise(new ClassifierChangedEvent(node, newClassifier, oldClassifier, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
-    public void AddProperty(IWritableNode node, Property property, object newValue, EventId? eventId = null)
-    {
+    public void AddProperty(IWritableNode node, Property property, object newValue, EventId? eventId = null) =>
         Raise(new PropertyAddedEvent(node, property, newValue, eventId ?? CreateEventId()));
-    }
 
     /// <inheritdoc />
     public void DeleteProperty(IWritableNode node, Property property, object oldValue, EventId? eventId = null) =>
@@ -41,10 +39,8 @@ public class PartitionEventHandler(object? sender)
 
     /// <inheritdoc />
     public void ChangeProperty(IWritableNode node, Property property, object newValue, object oldValue,
-        EventId? eventId = null)
-    {
+        EventId? eventId = null) =>
         Raise(new PropertyChangedEvent(node, property, newValue, oldValue, eventId ?? CreateEventId()));
-    }
 
     /// <inheritdoc />
     public void AddChild(IWritableNode parent, IWritableNode newChild, Containment containment, Index index,
@@ -58,8 +54,7 @@ public class PartitionEventHandler(object? sender)
 
     /// <inheritdoc />
     public void ReplaceChild(IWritableNode newChild, IWritableNode replacedChild, IWritableNode parent,
-        Containment containment,
-        Index index, EventId? eventId = null) =>
+        Containment containment, Index index, EventId? eventId = null) =>
         Raise(new ChildReplacedEvent(newChild, replacedChild, parent, containment, index, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
@@ -67,8 +62,7 @@ public class PartitionEventHandler(object? sender)
         IWritableNode movedChild, IWritableNode oldParent, Containment oldContainment, Index oldIndex,
         EventId? eventId = null) =>
         Raise(new ChildMovedFromOtherContainmentEvent(newParent, newContainment, newIndex, movedChild, oldParent,
-            oldContainment, oldIndex,
-            eventId ?? CreateEventId()));
+            oldContainment, oldIndex, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public void MoveChildFromOtherContainmentInSameParent(Containment newContainment, Index newIndex,
@@ -79,8 +73,7 @@ public class PartitionEventHandler(object? sender)
 
     /// <inheritdoc />
     public void MoveChildInSameContainment(Index newIndex, IWritableNode movedChild, IWritableNode parent,
-        Containment containment,
-        Index oldIndex, EventId? eventId = null) =>
+        Containment containment, Index oldIndex, EventId? eventId = null) =>
         Raise(new ChildMovedInSameContainmentEvent(newIndex, movedChild, parent, containment, oldIndex,
             eventId ?? CreateEventId()));
 
@@ -133,8 +126,7 @@ public class PartitionEventHandler(object? sender)
         IWritableNode oldParent, Reference oldReference, Index oldIndex, IReferenceTarget target,
         EventId? eventId = null) =>
         Raise(new EntryMovedFromOtherReferenceEvent(newParent, newReference, newIndex, oldParent, oldReference,
-            oldIndex, target,
-            eventId ?? CreateEventId()));
+            oldIndex, target, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public void MoveEntryFromOtherReferenceInSameParent(IWritableNode parent, Reference newReference, Index newIndex,
@@ -150,45 +142,38 @@ public class PartitionEventHandler(object? sender)
 
     /// <inheritdoc />
     public void AddReferenceResolveInfo(IWritableNode parent, Reference reference, Index index,
-        ResolveInfo newResolveInfo,
-        IReadableNode target, EventId? eventId = null) =>
-        Raise(
-            new ReferenceResolveInfoAddedEvent(parent, reference, index, newResolveInfo, target,
-                eventId ?? CreateEventId()));
+        ResolveInfo newResolveInfo, IReadableNode target, EventId? eventId = null) =>
+        Raise(new ReferenceResolveInfoAddedEvent(parent, reference, index, newResolveInfo, target,
+            eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public void DeleteReferenceResolveInfo(IWritableNode parent, Reference reference, Index index, IReadableNode target,
         ResolveInfo deletedResolveInfo, EventId? eventId = null) =>
-        Raise(
-            new ReferenceResolveInfoDeletedEvent(parent, reference, index, target, deletedResolveInfo,
-                eventId ?? CreateEventId()));
+        Raise(new ReferenceResolveInfoDeletedEvent(parent, reference, index, target, deletedResolveInfo,
+            eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public void ChangeReferenceResolveInfo(IWritableNode parent, Reference reference, Index index,
         ResolveInfo newResolveInfo,
         IReadableNode? target, ResolveInfo replacedResolveInfo, EventId? eventId = null) =>
-        Raise(
-            new ReferenceResolveInfoChangedEvent(parent, reference, index, newResolveInfo, target, replacedResolveInfo,
-                eventId ?? CreateEventId()));
+        Raise(new ReferenceResolveInfoChangedEvent(parent, reference, index, newResolveInfo, target,
+            replacedResolveInfo, eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public void AddReferenceTarget(IWritableNode parent, Reference reference, Index index, IReadableNode newTarget,
         ResolveInfo resolveInfo, EventId? eventId = null) =>
-        Raise(
-            new ReferenceTargetAddedEvent(parent, reference, index, newTarget, resolveInfo,
-                eventId ?? CreateEventId()));
+        Raise(new ReferenceTargetAddedEvent(parent, reference, index, newTarget, resolveInfo,
+            eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public void DeleteReferenceTarget(IWritableNode parent, Reference reference, Index index, ResolveInfo resolveInfo,
         IReadableNode deletedTarget, EventId? eventId = null) =>
-        Raise(
-            new ReferenceTargetDeletedEvent(parent, reference, index, resolveInfo, deletedTarget,
-                eventId ?? CreateEventId()));
+        Raise(new ReferenceTargetDeletedEvent(parent, reference, index, resolveInfo, deletedTarget,
+            eventId ?? CreateEventId()));
 
     /// <inheritdoc />
     public void ChangeReferenceTarget(IWritableNode parent, Reference reference, Index index, IReadableNode newTarget,
         ResolveInfo? resolveInfo, IReadableNode oldTarget, EventId? eventId = null) =>
-        Raise(
-            new ReferenceTargetChangedEvent(parent, reference, index, newTarget, resolveInfo, oldTarget,
-                eventId ?? CreateEventId()));
+        Raise(new ReferenceTargetChangedEvent(parent, reference, index, newTarget, resolveInfo, oldTarget,
+            eventId ?? CreateEventId()));
 }
