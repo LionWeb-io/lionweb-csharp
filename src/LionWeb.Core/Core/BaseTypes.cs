@@ -816,30 +816,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         (commander, index, node) => commander.DeleteAnnotation(node, this, index);
 
     #endregion
-
-    #region Publisher Helpers
-
-    /// Raises <see cref="IPartitionCommander.AddReference"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
-    /// <param name="reference">Reference to raise events for.</param>
-    /// <param name="safeNodes">Targets to raise events for.</param>
-    /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
-    /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
-    protected void RaiseReferenceAddEvent<T>(Reference reference, List<T> safeNodes, Index startIndex)
-        where T : IReadableNode
-    {
-        var partitionCommander = GetPartitionCommander();
-        if (partitionCommander == null || !partitionCommander.CanRaise(typeof(ReferenceAddedEvent)))
-            return;
-
-        Index index = startIndex;
-        foreach (var node in safeNodes)
-        {
-            partitionCommander.AddReference(this, reference, index++, new ReferenceTarget(null, node)
-            );
-        }
-    }
-
-    #endregion
 }
 
 /// Base implementation of <see cref="IAnnotationInstance{T}"/>.

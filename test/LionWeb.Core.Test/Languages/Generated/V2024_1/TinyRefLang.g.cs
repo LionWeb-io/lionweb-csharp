@@ -108,9 +108,10 @@ public partial class MyConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		int previousCount = _multivaluedRef.Count;
+		ReferenceAddMultipleEventEmitter<MyConcept> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef.Count);
+		evt.CollectOldData();
 		_multivaluedRef.AddRange(safeNodes);
-		RaiseReferenceAddEvent(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, safeNodes, previousCount);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -123,8 +124,10 @@ public partial class MyConcept : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		ReferenceAddMultipleEventEmitter<MyConcept> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, index);
+		evt.CollectOldData();
 		_multivaluedRef.InsertRange(index, safeNodes);
-		RaiseReferenceAddEvent(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, safeNodes, index);
+		evt.RaiseEvent();
 		return this;
 	}
 

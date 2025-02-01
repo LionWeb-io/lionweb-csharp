@@ -23,7 +23,7 @@ using Utilities;
 
 /// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Reference"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Reference"/>.</typeparam>
-public class ReferenceSetEventEmitter<T> : ReferenceEventEmitterBase<T> where T : IReadableNode
+public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> where T : IReadableNode
 {
     private readonly List<IListComparer<T>.IChange> _changes = [];
 
@@ -32,7 +32,7 @@ public class ReferenceSetEventEmitter<T> : ReferenceEventEmitterBase<T> where T 
     /// <param name="safeNodes">Newly added values.</param>
     /// <param name="storage">Values already present in <paramref name="reference"/>.</param>
     public ReferenceSetEventEmitter(Reference reference, NodeBase newParent, List<T> safeNodes, List<T> storage) :
-        base(reference, newParent)
+        base(reference, newParent, safeNodes)
     {
         if (!IsActive())
             return;

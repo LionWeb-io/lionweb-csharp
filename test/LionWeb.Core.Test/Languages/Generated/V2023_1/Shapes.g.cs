@@ -440,9 +440,10 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		int previousCount = _materials.Count;
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials.Count);
+		evt.CollectOldData();
 		_materials.AddRange(safeNodes);
-		RaiseReferenceAddEvent(ShapesLanguage.Instance.BillOfMaterials_materials, safeNodes, previousCount);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -453,8 +454,10 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, index);
+		evt.CollectOldData();
 		_materials.InsertRange(index, safeNodes);
-		RaiseReferenceAddEvent(ShapesLanguage.Instance.BillOfMaterials_materials, safeNodes, index);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1623,9 +1626,10 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		int previousCount = _materials.Count;
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials.Count);
+		evt.CollectOldData();
 		_materials.AddRange(safeNodes);
-		RaiseReferenceAddEvent(ShapesLanguage.Instance.MaterialGroup_materials, safeNodes, previousCount);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1638,8 +1642,10 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, index);
+		evt.CollectOldData();
 		_materials.InsertRange(index, safeNodes);
-		RaiseReferenceAddEvent(ShapesLanguage.Instance.MaterialGroup_materials, safeNodes, index);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2064,9 +2070,10 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		int previousCount = _shapes.Count;
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes.Count);
+		evt.CollectOldData();
 		_shapes.AddRange(safeNodes);
-		RaiseReferenceAddEvent(ShapesLanguage.Instance.ReferenceGeometry_shapes, safeNodes, previousCount);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2077,8 +2084,10 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, index);
+		evt.CollectOldData();
 		_shapes.InsertRange(index, safeNodes);
-		RaiseReferenceAddEvent(ShapesLanguage.Instance.ReferenceGeometry_shapes, safeNodes, index);
+		evt.RaiseEvent();
 		return this;
 	}
 

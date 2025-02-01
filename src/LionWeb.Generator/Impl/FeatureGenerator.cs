@@ -111,7 +111,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
         return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
     }
-    
+
     private LocalDeclarationStatementSyntax PropertyEventVariable() =>
         Variable(
             "evt",
@@ -196,7 +196,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             AsType(typeof(ReferenceSingleEventEmitter)),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
         );
-    
+
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
             .Concat(OptionalFeatureSetter([
@@ -325,9 +325,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
-                    PreviousCountVariable(reference),
+                    AddMultipleReferenceEventVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
+                    EventCollectOldDataCall(),
                     SimpleAddRangeCall(reference),
-                    RaiseReferenceAddEventCall("previousCount"),
+                    EventRaiseEventCall(),
                     ReturnStatement(This())
                 ])
                 .Select(a => XdocRequiredAdder(a, reference))
@@ -337,8 +338,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
+                    AddMultipleReferenceEventVariable(IdentifierName("index")),
+                    EventCollectOldDataCall(),
                     SimpleInsertRangeCall(reference),
-                    RaiseReferenceAddEventCall("index"),
+                    EventRaiseEventCall(),
                     ReturnStatement(This())
                 ])
                 .Select(i => XdocRequiredInserter(i, reference))
@@ -354,6 +357,15 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 .Select(r => XdocRequiredRemover(r, reference))
         );
 
+    private LocalDeclarationStatementSyntax AddMultipleReferenceEventVariable(ExpressionSyntax index) =>
+        Variable(
+            "evt",
+            AsType(typeof(ReferenceAddMultipleEventEmitter<>), AsType(feature.GetFeatureType())),
+            NewCall([
+                MetaProperty(feature), This(), IdentifierName("safeNodes"), index
+            ])
+        );
+
     private IEnumerable<MemberDeclarationSyntax> OptionalMultiReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
         {
@@ -363,9 +375,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
-                PreviousCountVariable(reference),
+                AddMultipleReferenceEventVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
+                EventCollectOldDataCall(),
                 SimpleAddRangeCall(reference),
-                RaiseReferenceAddEventCall("previousCount"),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -374,8 +387,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
+                AddMultipleReferenceEventVariable(IdentifierName("index")),
+                EventCollectOldDataCall(),
                 SimpleInsertRangeCall(reference),
-                RaiseReferenceAddEventCall("index"),
+                EventRaiseEventCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -386,16 +401,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 RemoveAllCall(reference),
                 ReturnStatement(This())
             ])
-        );
-
-    private ExpressionStatementSyntax RaiseReferenceAddEventCall(string index) =>
-        ExpressionStatement(Call("RaiseReferenceAddEvent",
-            [MetaProperty(feature), IdentifierName("safeNodes"), IdentifierName(index)])
-        );
-
-    private LocalDeclarationStatementSyntax PreviousCountVariable(Reference reference) =>
-        Variable("previousCount", AsType(typeof(int)),
-            MemberAccess(FeatureField(reference), IdentifierName("Count"))
         );
 
     private bool IsReferenceType(Property property) =>
