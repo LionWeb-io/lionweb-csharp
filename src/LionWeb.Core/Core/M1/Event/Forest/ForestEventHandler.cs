@@ -22,11 +22,4 @@ namespace LionWeb.Core.M1.Event.Forest;
 public class ForestEventHandler(object? sender)
     : EventHandlerBase<IForestEvent>(sender), IForestPublisher, IForestCommander
 {
-    /// <inheritdoc />
-    public void AddPartition(IPartitionInstance newPartition, EventId? eventId = null) =>
-        Raise(new NewPartitionEvent(newPartition, eventId ?? CreateEventId()));
-
-    /// <inheritdoc />
-    public void DeletePartition(IPartitionInstance deletedPartition, EventId? eventId = null) =>
-        Raise(new PartitionDeletedEvent(deletedPartition, eventId ?? CreateEventId()));
 }

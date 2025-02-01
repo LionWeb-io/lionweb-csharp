@@ -25,9 +25,9 @@ public interface IForest
     public IReadOnlySet<IPartitionInstance> Partitions { get; }
 
     public void AddPartitions(IEnumerable<IPartitionInstance> partitions);
-    
+
     public void RemovePartitions(IEnumerable<IPartitionInstance> partitions);
-    
+
     IForestPublisher? Publisher { get; }
     IForestCommander? Commander { get; }
 }
@@ -52,7 +52,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _eventHandler.AddPartition(partition);
+                _eventHandler.Raise(new NewPartitionEvent(partition, _eventHandler.CreateEventId()));
         }
     }
 
@@ -62,7 +62,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _eventHandler.DeletePartition(partition);
+                _eventHandler.Raise(new PartitionDeletedEvent(partition, _eventHandler.CreateEventId()));
         }
     }
 
