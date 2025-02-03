@@ -24,12 +24,12 @@ internal class SerializerVersionSpecifics_2023_1 : SerializerVersionSpecificsBas
 {
     public override LionWebVersions Version => LionWebVersions.v2023_1;
 
-    protected override string? ConvertDatatype(IReadableNode node, Feature feature, object? value) =>
+    public override string? ConvertDatatype(IReadableNode node, Feature property, object? value) =>
         value switch
         {
             null => null,
             Enum e => ConvertEnumeration(e),
             int or bool or string => ConvertPrimitiveType(value),
-            _ => _handler.UnknownDatatype(node, feature, value)
+            _ => _handler?.UnknownDatatype(node, property, value)
         };
 }
