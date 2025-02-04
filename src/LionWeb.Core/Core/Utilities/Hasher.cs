@@ -222,8 +222,12 @@ public class Hasher
     #endregion
 }
 
+/// A small piece of data representing the state of an ordered set of nodes.
+/// Any change to the underlying nodes results in a different hash.
+/// <seealso cref="Hasher"/>.
 public interface IHash : IEquatable<IHash>;
 
+/// <inheritdoc cref="IHash" />
 public readonly record struct ByteArrayHash(byte[] Hash) : IHash
 {
     /// <inheritdoc />
