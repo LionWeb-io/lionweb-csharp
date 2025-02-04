@@ -48,7 +48,7 @@ public class EventTests_Forest
 
         node.AddShapes([moved]);
 
-        AssertEquals([node], cloneForest.Partitions.OfType<INode>().ToList());
+        AssertEquals([node], cloneForest.Partitions);
     }
 
     [TestMethod]
@@ -72,7 +72,7 @@ public class EventTests_Forest
 
         node.AddShapes([moved]);
 
-        AssertEquals([node], cloneForest.Partitions.OfType<INode>().OrderBy(p => p.GetId()).ToList());
+        AssertEquals([node], cloneForest.Partitions);
     }
 
     [TestMethod]
@@ -117,14 +117,14 @@ public class EventTests_Forest
 
         node.Documentation = moved;
 
-        AssertEquals([node, originPartition], cloneForest.Partitions.OfType<INode>().OrderBy(p => p.GetId()).ToList());
+        AssertEquals([node, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
     }
 
     #endregion
 
     #endregion
 
-    private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
+    private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
     {
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
