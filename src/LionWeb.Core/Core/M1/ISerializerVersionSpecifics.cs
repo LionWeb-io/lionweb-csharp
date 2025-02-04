@@ -44,12 +44,15 @@ internal interface ISerializerVersionSpecifics : IVersionSpecifics
 
     /// Converts <paramref name="value"/> from <paramref name="node"/>'s <paramref name="property"/> to a <see cref="SerializeProperty"/>.
     SerializedProperty SerializeProperty(IReadableNode node, Feature property, object? value);
+    
+    /// Converts <paramref name="value"/> from <paramref name="node"/>'s <paramref name="property"/> to the string representation as used in a <see cref="SerializeProperty"/>.
+    public string? ConvertDatatype(IReadableNode node, Feature property, object? value);
 }
 
 internal abstract class SerializerVersionSpecificsBase : ISerializerVersionSpecifics
 {
-    protected Serializer _serializer;
-    protected ISerializerHandler _handler;
+    protected Serializer? _serializer;
+    protected ISerializerHandler? _handler;
 
     public abstract LionWebVersions Version { get; }
 
@@ -62,7 +65,7 @@ internal abstract class SerializerVersionSpecificsBase : ISerializerVersionSpeci
     public SerializedProperty SerializeProperty(IReadableNode node, Feature property, object? value) =>
         new SerializedProperty { Property = property.ToMetaPointer(), Value = ConvertDatatype(node, property, value) };
 
-    protected abstract string? ConvertDatatype(IReadableNode node, Feature feature, object? value);
+    public abstract string? ConvertDatatype(IReadableNode node, Feature property, object? value);
 
     protected string? ConvertEnumeration(Enum e)
     {
@@ -77,7 +80,7 @@ internal abstract class SerializerVersionSpecificsBase : ISerializerVersionSpeci
             var languageInstance = languageInstanceField.GetValue(null);
             if (languageInstance is Language language)
             {
-                _serializer.RegisterUsedLanguage(language);
+                _serializer?.RegisterUsedLanguage(language);
             }
         }
 

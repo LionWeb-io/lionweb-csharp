@@ -26,14 +26,14 @@ internal class SerializerVersionSpecifics_2024_1 : SerializerVersionSpecificsBas
 {
     public override LionWebVersions Version => LionWebVersions.v2024_1;
 
-    protected override string? ConvertDatatype(IReadableNode node, Feature feature, object? value) =>
+    public override string? ConvertDatatype(IReadableNode node, Feature property, object? value) =>
         value switch
         {
             null => null,
             Enum e => ConvertEnumeration(e),
             int or bool or string => ConvertPrimitiveType(value),
-            IStructuredDataTypeInstance s => ConvertStructuredDataType(node, feature, s),
-            _ => _handler.UnknownDatatype(node, feature, value)
+            IStructuredDataTypeInstance s => ConvertStructuredDataType(node, property, s),
+            _ => _handler?.UnknownDatatype(node, property, value)
         };
 
     private string ConvertStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
@@ -41,7 +41,7 @@ internal class SerializerVersionSpecifics_2024_1 : SerializerVersionSpecificsBas
 
     private JsonObject SerializeStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt)
     {
-        _serializer.RegisterUsedLanguage(sdt.GetStructuredDataType().GetLanguage());
+        _serializer?.RegisterUsedLanguage(sdt.GetStructuredDataType().GetLanguage());
 
         return new JsonObject(
             sdt

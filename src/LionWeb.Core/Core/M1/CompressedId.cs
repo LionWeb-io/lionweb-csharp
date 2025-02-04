@@ -21,7 +21,7 @@ namespace LionWeb.Core.M1;
 
 using Serialization;
 using System.Security.Cryptography;
-using System.Text;
+using Utilities;
 
 /// Checks for duplicate node ids in an efficient manner.
 public class DuplicateIdChecker
@@ -53,7 +53,7 @@ public interface ICompressedId
         if (config.Compress)
         {
             var sha1 = SHA1.Create();
-            var idHash = sha1.ComputeHash(CompressedElement.AsBytes(id));
+            var idHash = sha1.ComputeHash(ByteExtensions.AsAsciiBytes(id));
             return new CompressedId(idHash, config.KeepOriginal ? id : null);
         }
 
@@ -179,7 +179,7 @@ public readonly struct CompressedId : ICompressedId, IEquatable<CompressedId>
 
     /// <inheritdoc />
     public bool Equals(CompressedId other) =>
-        CompressedElement.Equals(Identifier, other.Identifier);
+        ByteExtensions.Equals(Identifier, other.Identifier);
 
     /// <inheritdoc cref="Equals(CompressedId)"/>
     public static bool operator ==(CompressedId left, CompressedId right) =>
@@ -264,14 +264,4 @@ public readonly struct CompressedMetaPointer : IEquatable<CompressedMetaPointer>
     /// <inheritdoc cref="Equals(LionWeb.Core.M1.CompressedMetaPointer)"/>
     public static bool operator !=(CompressedMetaPointer left, CompressedMetaPointer right) =>
         !(left == right);
-}
-
-/// Convenience methods to deal with byte arrays.
-internal static class CompressedElement
-{
-    internal static byte[] AsBytes(string str) =>
-        Encoding.ASCII.GetBytes(str);
-
-    internal static bool Equals(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right) =>
-        left.SequenceEqual(right);
 }

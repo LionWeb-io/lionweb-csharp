@@ -21,6 +21,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Added
 * Introduced optionally compressed ids during deserialization.
 * Added option to skip serialization of unset features.
+* Added Hasher to calculate the hash of a subtree.
 ### Fixed
 ### Changed
 * Added explicit LionWebVersions parameter to DynamicIKeyed.
