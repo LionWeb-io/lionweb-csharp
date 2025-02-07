@@ -105,7 +105,12 @@ public class Hasher
         RegisterNode(node);
         Classifier(node.GetClassifier());
 
-        foreach (var feature in node.CollectAllSetFeatures().OrderBy(f => f.Key))
+        foreach (var feature in node
+                     .CollectAllSetFeatures()
+                     .OrderBy(f => f.Key)
+                     .ThenBy(f => f.GetLanguage().Key)
+                     .ThenBy(f => f.GetLanguage().Version)
+                )
         {
             Feature(node, feature);
         }
