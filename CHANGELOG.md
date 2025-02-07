@@ -23,6 +23,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added option to skip serialization of unset features.
 * Added Hasher to calculate the hash of a subtree.
 ### Fixed
+* Generator flaw when inheriting an interface both directly and through an intermediate classifier
 ### Changed
 * Added explicit LionWebVersions parameter to DynamicIKeyed.
 * Separated `Io.Lionweb.Mps.Specific.ISpecificLanguage` into its own project.
