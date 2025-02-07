@@ -1,0 +1,1 @@
+This package contains a LionWeb language to express specifics of JetBrains MPS in C#.

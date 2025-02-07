@@ -67,7 +67,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(deprecatedLang, $"{prefix}.DeprecatedLang"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
-        // new(specificLanguage, $"LionWeb.Generator.VersionSpecific.V{lionWebVersion.VersionString.Replace('.', '_')}")
+        // new(specificLanguage, $"Io.Lionweb.Mps.Specific.V{lionWebVersion.VersionString.Replace('.', '_')}")
     ];
 
     if (sdtLang != null)
