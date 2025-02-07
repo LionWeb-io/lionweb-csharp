@@ -1,11 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
+        <AssemblyName>LionWeb-CSharp-Generator-MpsSpecific</AssemblyName>
         <Title>LionWeb-CSharp-Generator-MpsSpecific</Title>
+        <Description>This package contains a LionWeb language to express specifics of JetBrains MPS in C#</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>LionWeb</PackageTags>
+        <RootNamespace>Io.Lionweb.Mps.Specific</RootNamespace>
     </PropertyGroup>
+
+    <PropertyGroup>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="LICENSE" Pack="true" PackagePath="\" />
+    </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\LionWeb.Core\LionWeb.Core.csproj" />

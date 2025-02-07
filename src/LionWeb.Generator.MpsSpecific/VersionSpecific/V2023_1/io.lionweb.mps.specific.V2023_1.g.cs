@@ -4,7 +4,7 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace LionWeb.Generator.VersionSpecific.V2023_1;
+namespace Io.Lionweb.Mps.Specific.V2023_1;
 
 using Io.Lionweb.Mps.Specific;
 using LionWeb.Core;

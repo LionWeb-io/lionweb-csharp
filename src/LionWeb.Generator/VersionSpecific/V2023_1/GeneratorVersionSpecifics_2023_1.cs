@@ -24,6 +24,7 @@ using Core.M2;
 using Core.M3;
 using Core.Utilities;
 using Core.VersionSpecific.V2023_1;
+using Io.Lionweb.Mps.Specific.V2023_1;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
