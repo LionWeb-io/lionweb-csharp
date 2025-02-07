@@ -20,6 +20,7 @@
 namespace LionWeb.Core.M2;
 
 using M3;
+using System.Diagnostics.CodeAnalysis;
 
 /// The definition of the LionCore language containing the built-ins:
 /// primitive types, <see cref="INamed"/> and <see cref="Node"/>.
@@ -68,6 +69,13 @@ public interface INamed : IReadableNode
 {
     /// The human-readable name.
     public string Name { get; }
+
+    /// <summary>
+    /// Gets the <see cref="Name"/>.
+    /// </summary>
+    /// <param name="name">Value of <see cref="Name"/> if set, or <c>null</c>.</param>
+    /// <returns><c>true</c> if <see cref="Name"/> is set; <c>false</c> otherwise.</returns>
+    public bool TryGetName([MaybeNullWhen(false)] out string? name);
 }
 
 /// Writable variant of <see cref="INamed"/>.

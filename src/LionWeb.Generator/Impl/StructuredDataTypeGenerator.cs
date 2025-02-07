@@ -80,14 +80,14 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
         Constructor(
                 SdtName,
                 Fields
-                    .Select(f => Param(_names.ParamField(f), NullableType(AsType(f.Type))))
+                    .Select(f => Param(_names.FieldParam(f), NullableType(AsType(f.Type))))
                     .ToArray()
             )
             .WithModifiers(AsModifiers(SyntaxKind.InternalKeyword))
             .WithBody(AsStatements(Fields.Select(InternalFieldInitializer)));
 
     private StatementSyntax InternalFieldInitializer(Field field) =>
-        Assignment(FieldField(field).ToString(), IdentifierName(_names.ParamField(field)));
+        Assignment(FieldField(field).ToString(), IdentifierName(_names.FieldParam(field)));
 
     #endregion
 

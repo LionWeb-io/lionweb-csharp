@@ -37,13 +37,6 @@ public interface IKeyed : INamed
     /// <param name="key">Value of <see cref="Key"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Key"/> is set; <c>false</c> otherwise.</returns>
     bool TryGetKey([MaybeNullWhen(false)] out string? key);
-
-    /// <summary>
-    /// Gets the <see cref="INamed.Name"/>.
-    /// </summary>
-    /// <param name="name">Value of <see cref="INamed.Name"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="INamed.Name"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetName([MaybeNullWhen(false)] out string? name);
 }
 
 /// A Feature represents a characteristic or some form of data associated with a particular <see cref="Classifier"/>.

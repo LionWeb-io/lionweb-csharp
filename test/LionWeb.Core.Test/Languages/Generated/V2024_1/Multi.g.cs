@@ -12,6 +12,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "multi", Version = "1")]
 public partial class MultiLanguage : LanguageBase<IMultiFactory>
@@ -97,6 +98,13 @@ public partial class Container : ConceptInstanceBase
 	public IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> Libraries { get => AsNonEmptyReadOnly(_libraries, MultiLanguage.Instance.Container_libraries); init => AddLibraries(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
+        public bool TryGetLibraries([MaybeNullWhenAttribute(false)] out IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> libraries)
+	{
+		libraries = _libraries;
+		return _libraries.Count != 0;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
         public Container AddLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> nodes)
 	{
@@ -171,7 +179,7 @@ public partial class Container : ConceptInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_libraries.Count != 0)
+		if (TryGetLibraries(out _))
 			result.Add(MultiLanguage.Instance.Container_libraries);
 		return result;
 	}

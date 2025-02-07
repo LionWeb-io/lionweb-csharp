@@ -72,6 +72,15 @@ public class ReferenceTests_Single_Required
         Assert.AreSame(reference, parent.Get(ShapesLanguage.Instance.OffsetDuplicate_source));
     }
 
+    [TestMethod]
+    public void Single_TryGet()
+    {
+        var reference = new Line("myId");
+        var parent = new OffsetDuplicate("od") { Source = reference };
+        Assert.IsTrue(parent.TryGetSource(out var o));
+        Assert.AreSame(reference, o);
+    }
+
     #region existing
 
     [TestMethod]
@@ -146,6 +155,14 @@ public class ReferenceTests_Single_Required
     {
         Assert.ThrowsException<InvalidValueException>(
             () => new OffsetDuplicate("od") { Source = null });
+    }
+
+    [TestMethod]
+    public void Null_TryGet()
+    {
+        var parent = new OffsetDuplicate("od");
+        Assert.IsFalse(parent.TryGetSource(out var o));
+        Assert.IsNull(o);
     }
 
     #endregion

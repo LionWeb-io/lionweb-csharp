@@ -14,6 +14,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "io-lionweb-mps-specific", Version = "0")]
 public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecificLanguage
@@ -144,6 +145,13 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	public string? ConceptAlias { get => _conceptAlias; set => SetConceptAlias(value); }
 
 	/// <remarks>Optional Property</remarks>
+        public bool TryGetConceptAlias([MaybeNullWhenAttribute(false)] out string? conceptAlias)
+	{
+		conceptAlias = _conceptAlias;
+		return _conceptAlias != null;
+	}
+
+	/// <remarks>Optional Property</remarks>
         public ConceptDescription SetConceptAlias(string? value)
 	{
 		_conceptAlias = value;
@@ -155,6 +163,13 @@ public partial class ConceptDescription : AnnotationInstanceBase
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "ConceptDescription-conceptShortDescription")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
 	public string? ConceptShortDescription { get => _conceptShortDescription; set => SetConceptShortDescription(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public bool TryGetConceptShortDescription([MaybeNullWhenAttribute(false)] out string? conceptShortDescription)
+	{
+		conceptShortDescription = _conceptShortDescription;
+		return _conceptShortDescription != null;
+	}
 
 	/// <remarks>Optional Property</remarks>
         public ConceptDescription SetConceptShortDescription(string? value)
@@ -223,9 +238,9 @@ public partial class ConceptDescription : AnnotationInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_conceptAlias != default)
+		if (TryGetConceptAlias(out _))
 			result.Add(SpecificLanguage.Instance.ConceptDescription_conceptAlias);
-		if (_conceptShortDescription != default)
+		if (TryGetConceptShortDescription(out _))
 			result.Add(SpecificLanguage.Instance.ConceptDescription_conceptShortDescription);
 		return result;
 	}
@@ -241,6 +256,13 @@ public partial class Deprecated : AnnotationInstanceBase
 	public string? Build { get => _build; set => SetBuild(value); }
 
 	/// <remarks>Optional Property</remarks>
+        public bool TryGetBuild([MaybeNullWhenAttribute(false)] out string? build)
+	{
+		build = _build;
+		return _build != null;
+	}
+
+	/// <remarks>Optional Property</remarks>
         public Deprecated SetBuild(string? value)
 	{
 		_build = value;
@@ -252,6 +274,13 @@ public partial class Deprecated : AnnotationInstanceBase
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "Deprecated-comment")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
 	public string? Comment { get => _comment; set => SetComment(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public bool TryGetComment([MaybeNullWhenAttribute(false)] out string? comment)
+	{
+		comment = _comment;
+		return _comment != null;
+	}
 
 	/// <remarks>Optional Property</remarks>
         public Deprecated SetComment(string? value)
@@ -320,9 +349,9 @@ public partial class Deprecated : AnnotationInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_build != default)
+		if (TryGetBuild(out _))
 			result.Add(SpecificLanguage.Instance.Deprecated_build);
-		if (_comment != default)
+		if (TryGetComment(out _))
 			result.Add(SpecificLanguage.Instance.Deprecated_comment);
 		return result;
 	}
@@ -336,6 +365,13 @@ public partial class ShortDescription : AnnotationInstanceBase
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "ShortDescription-description")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
 	public string? Description { get => _description; set => SetDescription(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public bool TryGetDescription([MaybeNullWhenAttribute(false)] out string? description)
+	{
+		description = _description;
+		return _description != null;
+	}
 
 	/// <remarks>Optional Property</remarks>
         public ShortDescription SetDescription(string? value)
@@ -387,7 +423,7 @@ public partial class ShortDescription : AnnotationInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_description != default)
+		if (TryGetDescription(out _))
 			result.Add(SpecificLanguage.Instance.ShortDescription_description);
 		return result;
 	}
@@ -403,6 +439,14 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
         [LionCoreMetaPointer(Language = typeof(LionWeb.Core.VersionSpecific.V2023_1.BuiltInsLanguage_2023_1), Key = "LionCore-builtins-INamed-name")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public string Name { get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetName([MaybeNullWhenAttribute(false)] out string? name)
+	{
+		name = _name;
+		return _name != null;
+	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  INamedWritable INamedWritable.SetName(string value) => SetName(value);
@@ -458,7 +502,7 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_name != default)
+		if (TryGetName(out _))
 			result.Add(_builtIns.INamed_name);
 		return result;
 	}

@@ -12,6 +12,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-tinyRefLang", Version = "0")]
 public partial class TinyRefLangLanguage : LanguageBase<ITinyRefLangFactory>
@@ -101,6 +102,13 @@ public partial class MyConcept : ConceptInstanceBase
 	public IReadOnlyList<MyConcept> MultivaluedRef { get => AsNonEmptyReadOnly(_multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef); init => AddMultivaluedRef(value); }
 
 	/// <remarks>Required Multiple Reference</remarks>
+        public bool TryGetMultivaluedRef([MaybeNullWhenAttribute(false)] out IReadOnlyList<MyConcept> multivaluedRef)
+	{
+		multivaluedRef = _multivaluedRef;
+		return _multivaluedRef.Count != 0;
+	}
+
+	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both MultivaluedRef and nodes are empty</exception>
         public MyConcept AddMultivaluedRef(IEnumerable<MyConcept> nodes)
 	{
@@ -143,6 +151,13 @@ public partial class MyConcept : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(TinyRefLangLanguage), Key = "key-MyConcept-singularRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public MyConcept SingularRef { get => _singularRef ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+        public bool TryGetSingularRef([MaybeNullWhenAttribute(false)] out MyConcept? singularRef)
+	{
+		singularRef = _singularRef;
+		return _singularRef != null;
+	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -211,9 +226,9 @@ public partial class MyConcept : ConceptInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_multivaluedRef.Count != 0)
+		if (TryGetMultivaluedRef(out _))
 			result.Add(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		if (_singularRef != default)
+		if (TryGetSingularRef(out _))
 			result.Add(TinyRefLangLanguage.Instance.MyConcept_singularRef);
 		return result;
 	}

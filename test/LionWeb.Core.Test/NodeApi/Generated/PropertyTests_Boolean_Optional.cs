@@ -94,6 +94,14 @@ public class PropertyTests_Boolean_Optional
         Assert.AreEqual(true, parent.Technical);
     }
 
+    [TestMethod]
+    public void TryGet()
+    {
+        var parent = new Documentation("myId") { Technical = true };
+        Assert.IsTrue(parent.TryGetTechnical(out var o));
+        Assert.AreEqual(true, o);
+    }
+
     #endregion
 
     #region Null
@@ -145,6 +153,14 @@ public class PropertyTests_Boolean_Optional
         object value = null;
         var parent = new Documentation("od") { Technical = (bool?)value };
         Assert.AreEqual(null, parent.Text);
+    }
+
+    [TestMethod]
+    public void Null_TryGet()
+    {
+        var parent = new Documentation("od");
+        Assert.IsFalse(parent.TryGetTechnical(out var o));
+        Assert.IsNull(o);
     }
 
     #endregion

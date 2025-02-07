@@ -72,6 +72,15 @@ public class ContainmentTests_Single_Optional
         Assert.AreSame(doc, parent.Get(ShapesLanguage.Instance.Geometry_documentation));
     }
 
+    [TestMethod]
+    public void Single_TryGet()
+    {
+        var doc = new Documentation("myId");
+        var parent = new Geometry("g") { Documentation = doc };
+        Assert.IsTrue(parent.TryGetDocumentation(out var o));
+        Assert.AreSame(doc, o);
+    }
+
     #region existing
 
     [TestMethod]
@@ -145,6 +154,14 @@ public class ContainmentTests_Single_Optional
     {
         var parent = new Geometry("g") { Documentation = null };
         Assert.IsNull(parent.Documentation);
+    }
+
+    [TestMethod]
+    public void Null_TryGet()
+    {
+        var parent = new Geometry("g");
+        Assert.IsFalse(parent.TryGetDocumentation(out var o));
+        Assert.IsNull(o);
     }
 
     #endregion

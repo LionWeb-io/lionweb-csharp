@@ -20,6 +20,7 @@ namespace LionWeb.Core.Test;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
+using M2;
 
 [TestClass]
 public class ModelAccessTests
@@ -35,6 +36,9 @@ public class ModelAccessTests
         Assert.IsInstanceOfType<Line>(shape);
         var line = shape as Line;
         Assert.AreEqual("line1", line.Name);
+        var named = line as INamed;
+        Assert.IsTrue(named.TryGetName(out var n));
+        Assert.AreEqual("line1", n);
         Assert.AreEqual(geometry, line.GetParent());
         var start = line.Start;
         Assert.AreEqual(line, start.GetParent());

@@ -439,9 +439,31 @@ public static class AstExtensions
             TriviaList()
         ));
 
+    /// <returns><c>true</c></returns>
+    public static LiteralExpressionSyntax True() =>
+        LiteralExpression(SyntaxKind.TrueLiteralExpression);
+
+    /// <returns><c>false</c></returns>
+    public static LiteralExpressionSyntax False() =>
+        LiteralExpression(SyntaxKind.FalseLiteralExpression);
+
     /// <returns><c>null</c></returns>
     public static LiteralExpressionSyntax Null() =>
         LiteralExpression(SyntaxKind.NullLiteralExpression);
+
+    /// <returns><c>_</c></returns>
+    public static IdentifierNameSyntax Underscore() =>
+        IdentifierName
+        (
+            Identifier
+            (
+                TriviaList(),
+                SyntaxKind.UnderscoreToken,
+                "_",
+                "_",
+                TriviaList()
+            )
+        );
 
     /// <returns><c>default</c></returns>
     public static LiteralExpressionSyntax Default() =>

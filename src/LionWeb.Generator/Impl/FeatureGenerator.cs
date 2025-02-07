@@ -24,6 +24,7 @@ using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using static AstExtensions;
@@ -39,7 +40,8 @@ using Property = Core.M3.Property;
 /// - InsertFeature()
 /// - RemoveFeature()
 /// </summary>
-public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
+public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion)
+    : GeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="FeatureGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> Members() =>
@@ -100,15 +102,63 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         var prop = SingleRequiredFeatureProperty();
         var setter = RequiredFeatureSetter(setterBody);
 
-        var members = new List<MemberDeclarationSyntax> { prop }.Concat(setter);
+        var members = new List<MemberDeclarationSyntax> { prop, TryGet() }.Concat(setter);
         if (IsReferenceType(property))
             members = members.Select(member => member.Xdoc(XdocThrowsIfSetToNull()));
 
         return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
     }
 
+    private MethodDeclarationSyntax TryGet() =>
+        Method(FeatureTryGet(feature), AsType(typeof(bool)),
+                [
+                    OutParam(Param(FeatureTryGetParam(), NullableType(AsType(feature.GetFeatureType()))))
+                        .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
+                ]
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
+            .Xdoc(XdocRemarks(feature))
+            .WithBody(AsStatements([
+                Assignment(FeatureTryGetParam(), FeatureField(feature)),
+                ReturnStatement(NotEquals(FeatureField(feature), Null()))
+            ]));
+
+
+    private MethodDeclarationSyntax TryGetMultiple() =>
+        Method(FeatureTryGet(feature), AsType(typeof(bool)),
+                [
+                    OutParam(Param(
+                            FeatureTryGetParam(),
+                            AsType(typeof(IReadOnlyList<>), AsType(feature.GetFeatureType()))
+                        ))
+                        .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
+                ]
+            )
+            .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
+            .Xdoc(XdocRemarks(feature))
+            .WithBody(AsStatements([
+                Assignment(FeatureTryGetParam(), FeatureField(feature)),
+                ReturnStatement(
+                    NotEquals(
+                        MemberAccess(FeatureField(feature), IdentifierName("Count")),
+                        0.AsLiteral()
+                    )
+                )
+            ]));
+
+    private ParameterSyntax OutParam(ParameterSyntax parameterSyntax) =>
+        parameterSyntax
+            .WithAttributeLists(AsAttributes([
+                Attribute(IdentifierName(AsType(typeof(MaybeNullWhenAttribute)).ToString()))
+                    .WithArgumentList(
+                        AttributeArgumentList(SingletonSeparatedList(AttributeArgument(False())))
+                    )
+            ]));
+
     private IEnumerable<MemberDeclarationSyntax> OptionalProperty(Property property) =>
-        new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
+        new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }
             .Concat(
                 OptionalFeatureSetter([
                     AssignFeatureField(),
@@ -121,7 +171,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         {
             SingleFeatureField(),
             SingleRequiredFeatureProperty()
-                .Xdoc(XdocThrowsIfSetToNull())
+                .Xdoc(XdocThrowsIfSetToNull()),
+            TryGet()
         }.Concat(RequiredFeatureSetter([
                 AsureNotNullCall(),
                 SetParentNullCall(containment),
@@ -136,22 +187,21 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
-        new List<MemberDeclarationSyntax>
-        {
-            SingleFeatureField(), SingleOptionalFeatureProperty()
-        }.Concat(OptionalFeatureSetter([
-            SetParentNullCall(containment),
-            AttachChildCall(),
-            AssignFeatureField(),
-            ReturnStatement(This())
-        ]));
+        new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }.Concat(
+            OptionalFeatureSetter([
+                SetParentNullCall(containment),
+                AttachChildCall(),
+                AssignFeatureField(),
+                ReturnStatement(This())
+            ]));
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
             {
                 SingleFeatureField(),
                 SingleRequiredFeatureProperty()
-                    .Xdoc(XdocThrowsIfSetToNull())
+                    .Xdoc(XdocThrowsIfSetToNull()),
+                TryGet()
             }
             .Concat(RequiredFeatureSetter([
                     AsureNotNullCall(),
@@ -162,7 +212,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             );
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
-        new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty() }
+        new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }
             .Concat(OptionalFeatureSetter([
                 AssignFeatureField(),
                 ReturnStatement(This())
@@ -173,7 +223,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         {
             MultipleLinkField(containment),
             MultipleLinkProperty(containment, AsNonEmptyReadOnlyCall(containment))
-                .Xdoc(XdocRequiredMultipleLink(containment))
+                .Xdoc(XdocRequiredMultipleLink(containment)),
+            TryGetMultiple()
         }.Concat(
             LinkAdder(containment, [
                     SafeNodesVariable(),
@@ -228,7 +279,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalMultiContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleLinkField(containment), MultipleLinkProperty(containment, AsReadOnlyCall(containment))
+            MultipleLinkField(containment),
+            MultipleLinkProperty(containment, AsReadOnlyCall(containment)),
+            TryGetMultiple()
         }.Concat(
             LinkAdder(containment, [
                 OptionalAddRangeCall(containment),
@@ -255,7 +308,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         {
             MultipleLinkField(reference),
             MultipleLinkProperty(reference, AsNonEmptyReadOnlyCall(reference))
-                .Xdoc(XdocRequiredMultipleLink(reference))
+                .Xdoc(XdocRequiredMultipleLink(reference)),
+            TryGetMultiple()
         }.Concat(
             LinkAdder(reference, [
                     SafeNodesVariable(),
@@ -290,7 +344,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalMultiReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleLinkField(reference), MultipleLinkProperty(reference, AsReadOnlyCall(reference))
+            MultipleLinkField(reference),
+            MultipleLinkProperty(reference, AsReadOnlyCall(reference)),
+            TryGetMultiple()
         }.Concat(
             LinkAdder(reference, [
                 SafeNodesVariable(),
@@ -778,4 +834,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private ExpressionSyntax FeatureSet() =>
         IdentifierName($"Set{feature.Name.ToFirstUpper()}");
+
+    private string FeatureTryGetParam() =>
+        _names.FeatureParam(feature);
 }

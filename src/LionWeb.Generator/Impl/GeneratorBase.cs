@@ -148,4 +148,8 @@ public abstract class GeneratorBase
                 AttributeArgument(s.AsLiteral())
             )));
     }
+    
+    /// <returns><c>TryGetMyFeature</c></returns>
+    protected string FeatureTryGet(Feature feature) =>
+        $"TryGet{feature.Name.ToFirstUpper()}";
 }

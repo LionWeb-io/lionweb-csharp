@@ -34,7 +34,8 @@ using Property = Core.M3.Property;
 /// - SetInternal()
 /// - CollectAllSetFeatures()
 /// </summary>
-public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion) : ClassifierGeneratorBase(names, lionWebVersion)
+public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion)
+    : ClassifierGeneratorBase(names, lionWebVersion)
 {
     /// <inheritdoc cref="FeatureMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> FeatureMethods()
@@ -270,35 +271,26 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(
-                new List<StatementSyntax> { ParseStatement("List<Feature> result = base.CollectAllSetFeatures().ToList();") }
+                new List<StatementSyntax>
+                    {
+                        ParseStatement("List<Feature> result = base.CollectAllSetFeatures().ToList();")
+                    }
                     .Concat(FeaturesToImplement(classifier).Select(GenCollectAllSetFeatures))
                     .Append(ReturnStatement(IdentifierName("result")))
             ));
 
-    private StatementSyntax GenCollectAllSetFeatures(Feature feature)
-    {
-        ExpressionSyntax cond = feature switch
-        {
-            Property p => NotEquals(
-                FeatureField(p),
-                Default()
-            ),
-            Link { Multiple: false } singleLink => NotEquals(
-                FeatureField(singleLink),
-                Default()
-            ),
-            Link { Multiple: true } multiLink => NotEquals(
-                MemberAccess(FeatureField(multiLink), IdentifierName("Count")),
-                0.AsLiteral()
-            ),
-            _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
-        };
-
-        return IfStatement(cond, ExpressionStatement(InvocationExpression(
-            MemberAccess(IdentifierName("result"), IdentifierName("Add")),
-            AsArguments([MetaProperty(feature)])
-        )));
-    }
+    private StatementSyntax GenCollectAllSetFeatures(Feature feature) =>
+        IfStatement(
+            InvocationExpression(IdentifierName(FeatureTryGet(feature)))
+                .WithArgumentList(ArgumentList(SingletonSeparatedList(
+                    Argument(Underscore())
+                        .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword))
+                ))),
+            ExpressionStatement(InvocationExpression(
+                MemberAccess(IdentifierName("result"), IdentifierName("Add")),
+                AsArguments([MetaProperty(feature)])
+            ))
+        );
 
     #endregion
 

@@ -54,6 +54,15 @@ public class ContainmentTests_Multiple_Required
         Assert.IsTrue(parent.Parts.Contains(line));
     }
 
+    [TestMethod]
+    public void Single_TryGet()
+    {
+        var line = new Line("myId");
+        var parent = new CompositeShape("cs") { Parts = [line] };
+        Assert.IsTrue(parent.TryGetParts(out var o));
+        Assert.AreSame(line, o.FirstOrDefault());
+    }
+
     #region Insert
 
     [TestMethod]
@@ -276,6 +285,14 @@ public class ContainmentTests_Multiple_Required
     {
         var parent = new CompositeShape("cs");
         Assert.ThrowsException<InvalidValueException>(() => parent.RemoveParts(null));
+    }
+
+    [TestMethod]
+    public void Null_TryGet()
+    {
+        var parent = new CompositeShape("cs");
+        Assert.IsFalse(parent.TryGetParts(out var o));
+        Assert.IsFalse(o.Any());
     }
 
     #endregion

@@ -54,6 +54,15 @@ public class ContainmentTests_Multiple_Optional
         Assert.IsTrue(parent.Shapes.Contains(line));
     }
 
+    [TestMethod]
+    public void Single_TryGet()
+    {
+        var line = new Line("myId");
+        var parent = new Geometry("g") { Shapes = [line] };
+        Assert.IsTrue(parent.TryGetShapes(out var o));
+        Assert.AreSame(line, o.FirstOrDefault());
+    }
+
     #region Insert
 
     [TestMethod]
@@ -276,6 +285,14 @@ public class ContainmentTests_Multiple_Optional
     {
         var parent = new Geometry("g");
         Assert.ThrowsException<InvalidValueException>(() => parent.RemoveShapes(null));
+    }
+
+    [TestMethod]
+    public void Null_TryGet()
+    {
+        var parent = new Geometry("g");
+        Assert.IsFalse(parent.TryGetShapes(out var o));
+        Assert.IsFalse(o.Any());
     }
 
     #endregion
