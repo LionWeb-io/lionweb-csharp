@@ -53,6 +53,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var bLang = testLanguagesDefinitions.BLang;
     var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
     var keywordLang = testLanguagesDefinitions.KeywordLang;
+    var multiInheritLang = testLanguagesDefinitions.MultiInheritLang;
 
     string prefix = $"LionWeb.Core.Test.Languages.Generated.V{lionWebVersion.VersionString.Replace('.', '_')}";
     List<Names> names =
@@ -65,6 +66,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(bLang, $"{prefix}.Circular.B") { NamespaceMappings = { [aLang] = $"{prefix}.Circular.A" } },
         new(tinyRefLang, $"{prefix}.TinyRefLang"),
         new(deprecatedLang, $"{prefix}.DeprecatedLang"),
+        new(multiInheritLang, $"{prefix}.MultiInheritLang"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
         // new(specificLanguage, $"Io.Lionweb.Mps.Specific.V{lionWebVersion.VersionString.Replace('.', '_')}")

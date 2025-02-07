@@ -48,7 +48,7 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
             .SelectMany(i => i.Features)
             .Distinct(new FeatureIdentityComparer())
             .Except(classifier
-                .DirectGeneralizations()
+                .AllGeneralizations()
                 .Where(c => c is Concept or Annotation)
                 .SelectMany(InterfaceFeatures)
             );
