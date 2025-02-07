@@ -85,7 +85,7 @@ public class Hasher
             AppendExternalReferenceTargets();
 
             _hash.TransformFinalBlock([], 0, 0);
-            return new ByteArrayHash(_hash.Hash!);
+            return new ByteArrayHash(nameof(SHA256), _hash.Hash!);
         } finally
         {
             _hash.Dispose();
@@ -233,17 +233,39 @@ public class Hasher
 public interface IHash : IEquatable<IHash>;
 
 /// <inheritdoc cref="IHash" />
-public readonly record struct ByteArrayHash(byte[] Hash) : IHash
+public readonly record struct ByteArrayHash : IHash
 {
+    /// <inheritdoc cref="IHash" />
+    /// <param name="Algorithm">Algorithm used to create the hash. Used as prefix in <see cref="ToString"/>.</param>
+    /// <param name="Hash">Hash code.</param>
+    public ByteArrayHash(string Algorithm, byte[] Hash)
+    {
+        if(Hash.Length < 4)
+            throw new ArgumentException("Hash must contain at least 4 bytes.");
+        
+        this.Algorithm = Algorithm;
+        this.Hash = Hash;
+    }
+
     /// <inheritdoc />
     public override string ToString() =>
-        BitConverter.ToString(Hash);
+        Algorithm + "_" + BitConverter.ToString(Hash);
 
     /// <inheritdoc />
     public override int GetHashCode() =>
-        BitConverter.ToInt32(Hash, 0);
+        HashCode.Combine(Algorithm, BitConverter.ToInt32(Hash, 0));
 
     /// <inheritdoc />
     public bool Equals(IHash? other) =>
-        other is ByteArrayHash b && ByteExtensions.Equals(Hash, b.Hash);
+        other is ByteArrayHash b && Equals(b);
+
+    /// <inheritdoc />
+    public bool Equals(ByteArrayHash other) =>
+        Algorithm.Equals(other.Algorithm) && ByteExtensions.Equals(Hash, other.Hash);
+
+    /// Algorithm used to create the hash. Used as prefix in <see cref="ToString"/>.
+    public string Algorithm { get; init; }
+
+    /// Hash code.
+    public byte[] Hash { get; init; }
 }
