@@ -32,6 +32,7 @@ public class TestLanguagesDefinitions
     public Language TinyRefLang { get; private set; }
     public Language? SdtLang { get; private set; }
     public Language? KeywordLang { get; private set; }
+    public Language MultiInheritLang { get; private set; }
 
     public List<Language> MixedLangs { get; private set; } = [];
 
@@ -41,6 +42,7 @@ public class TestLanguagesDefinitions
 
         CreateALangBLang();
         CreateTinyRefLang();
+        CreateMultiInheritLang();
         if (lionWebVersion.LionCore is ILionCoreLanguageWithStructuredDataType)
         {
             CreateSdtLang();
@@ -108,7 +110,11 @@ public class TestLanguagesDefinitions
             {
                 Key = "key-tinyRefLang", Name = "TinyRefLang", Version = "0"
             };
-        var myConcept = new DynamicConcept("id-Concept", _lionWebVersion, tinyRefLang) { Key = "key-MyConcept", Name = "MyConcept" };
+        var myConcept =
+            new DynamicConcept("id-Concept", _lionWebVersion, tinyRefLang)
+            {
+                Key = "key-MyConcept", Name = "MyConcept"
+            };
         tinyRefLang.AddEntities([myConcept]);
 
         var singularRef =
@@ -123,6 +129,33 @@ public class TestLanguagesDefinitions
         myConcept.AddFeatures([singularRef, multivalueRef]);
 
         TinyRefLang = tinyRefLang;
+    }
+
+    private void CreateMultiInheritLang()
+    {
+        var lang = new DynamicLanguage("id-MultiInheritLang", _lionWebVersion)
+        {
+            Key = "key-MultiInheritLang", Name = "MultiInheritLang", Version = "1"
+        };
+
+        var baseIface = lang.Interface("id-BaseIface", "key-BaseIface", "BaseIface");
+
+        var abstractConcept = lang.Concept("id-AbstractConcept", "key-AbstractConcept", "AbstractConcept")
+            .Implementing(baseIface)
+            .IsAbstract();
+
+        var intermediateConcept = lang
+            .Concept("id-IntermediateConcept", "key-IntermediateConcept", "IntermediateConcept")
+            .Extending(abstractConcept);
+
+        var combinedConcept = lang.Concept("id-CombinedConcept", "key-CombinedConcept", "CombinedConcept")
+            .Extending(intermediateConcept)
+            .Implementing(baseIface);
+
+        baseIface.Containment("id-ifaceContainment", "key-ifaceContainment", "ifaceContainment")
+            .OfType(_lionWebVersion.BuiltIns.Node);
+        
+        MultiInheritLang = lang;
     }
 
     private void CreateSdtLang()
@@ -281,40 +314,38 @@ public class TestLanguagesDefinitions
     {
         var keywordLang = new DynamicLanguage("id-keyword-lang", _lionWebVersion)
         {
-            Name = "class",
-            Key = "class",
-            Version = "struct"
+            Name = "class", Key = "class", Version = "struct"
         };
-        
+
         var iface = keywordLang.Interface("id-keyword-iface", "key-keyword-iface", "interface");
         var iface2 = keywordLang.Interface("id-keyword-iface2", "key-keyword-iface2", "partial")
             .Extending(iface);
-        
+
         var concept = keywordLang.Concept("id-keyword-concept", "key-keyword-concept", "struct")
-                .Implementing(iface);
+            .Implementing(iface);
         var concept2 = keywordLang.Concept("id-keyword-concept2", "key-keyword-concept2", "out")
             .Extending(concept);
-        
+
         var ann = keywordLang.Annotation("id-keyword-ann", "key-keyword-ann", "record")
-                .Implementing(iface);
+            .Implementing(iface);
         var ann2 = keywordLang.Annotation("id-keyword-ann2", "key-keyword-ann2", "var")
             .Extending(ann);
 
         var enm = keywordLang.Enumeration("id-keyword-enm", "key-keyword-enm", "enum");
         var lit = enm.EnumerationLiteral("id-keyword-enmA", "key-keyword-enmA", "internal");
-        
+
         var prim = keywordLang.PrimitiveType("id-keyword-prim", "key-keyword-prim", "base");
-        
+
         var sdt = keywordLang.StructuredDataType("id-keyword-sdt", "key-keyword-sdt", "if");
         var field = sdt.Field("id-keyword-field", "key-keyword-field", "namespace")
-                .OfType(_lionWebVersion.BuiltIns.String);
-        
+            .OfType(_lionWebVersion.BuiltIns.String);
+
         var reference = concept.Reference("id-keyword-reference", "key-keyword-reference", "ref")
             .OfType(ann);
 
         var cont = ann.Containment("id-keyword-cont", "key-keyword-cont", "double")
             .OfType(iface);
-        
+
         var prop = iface.Property("id-keyword-prop", "key-keyword-prop", "string")
             .OfType(enm);
 
@@ -323,6 +354,4 @@ public class TestLanguagesDefinitions
 
         KeywordLang = keywordLang;
     }
-
-
 }
