@@ -96,8 +96,7 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
     private bool SelectVersion<T>(CompressedMetaPointer compressedMetaPointer, [MaybeNullWhen(false)] out T result)
         where T : class, IKeyed
     {
-        var languages = _languagesByKey[compressedMetaPointer.Language];
-        if (languages.Count == 0)
+        if (!_languagesByKey.TryGetValue(compressedMetaPointer.Language, out var languages))
         {
             result = default;
             return false;
