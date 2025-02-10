@@ -20,15 +20,15 @@ namespace LionWeb.Core.Serialization;
 using TargetNode = M1.CompressedId;
 using CommandId = M1.CompressedId;
 using QueryId = M1.CompressedId;
-using FreeId = string;
-using MessageKind = string;
-using MessageDataKey = string;
+using FreeId = NodeId;
+using MessageKind = NodeId;
+using MessageDataKey = NodeId;
 
-public record CommandSource();
+public record CommandSource(NodeId Source);
 
 public record DeltaSerializationChunk(SerializedNode[] Nodes);
 
-public record ProtocolMessage(MessageKind Kind, string message, ProtocolMessageData[] Data);
+public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageData[] Data);
 
 public record ProtocolMessageData(MessageDataKey Key, string Value);
 
