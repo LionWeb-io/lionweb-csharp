@@ -26,9 +26,9 @@ using MessageDataKey = string;
 
 public record CommandSource();
 
-public record DeltaSerializationChunk(List<SerializedNode> Nodes);
+public record DeltaSerializationChunk(SerializedNode[] Nodes);
 
-public record ProtocolMessage(MessageKind Kind, string message, List<ProtocolMessageData> Data);
+public record ProtocolMessage(MessageKind Kind, string message, ProtocolMessageData[] Data);
 
 public record ProtocolMessageData(MessageDataKey Key, string Value);
 
@@ -83,7 +83,7 @@ public record UnsubscribePartitionResponse(QueryId QueryId, ProtocolMessage? Mes
 public record GetAvailableIdsRequest(int count, QueryId QueryId, ProtocolMessage? Message)
     : DeltaQueryBase(QueryId, Message), IDeltaQueryRequest;
 
-public record GetAvailableIdsResponse(List<FreeId> Ids, QueryId QueryId, ProtocolMessage? Message)
+public record GetAvailableIdsResponse(FreeId[] Ids, QueryId QueryId, ProtocolMessage? Message)
     : DeltaQueryBase(QueryId, Message), IDeltaQueryResponse;
 
 #endregion
