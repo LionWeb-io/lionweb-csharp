@@ -70,12 +70,17 @@ public class GeneratorFacade
                 value: FormattingOptions.IndentStyle.Smart)
             .WithChangedOption(CSharpFormattingOptions.WrappingKeepStatementsOnSingleLine, value: false)
             .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInAnonymousTypes, value: true)
-            .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInObjectInit, value: true)
-            .WithChangedOption(FormattingOptions.NewLine, LanguageNames.CSharp, value: "\r\n");
+            .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInObjectInit, value: true);
         var compilationUnit = (CompilationUnitSyntax)Formatter.Format(Generate(), workspace, options);
 
         using var streamWriter = new StreamWriter(path, false);
-        compilationUnit.WriteTo(streamWriter);
+        streamWriter.Write(compilationUnit.GetText().ToString().ReplaceLineEndings());
+        /*
+         * Note: .GextText().ToString() probably nullifies any optimization gains through streaming,
+         * but it's the only way (that I found) to actually replace line endings.
+         * (E.g., setting the option (FormattingOptions.NewLine, LanguageNames.CSharp, value: "\n"))
+         *  – or any variation of that – does nothing!)
+         */
     }
 
     /// Compiles the output of <see cref="Generate"/> and returns all diagnostic messages.
