@@ -34,9 +34,9 @@ public class HasherTests
         Assert.IsNotNull(hash);
 
         Assert.AreEqual(
-            "09-CE-E9-A6-FF-28-72-80-CC-5A-33-B6-1C-13-46-AE-F8-43-13-29-DD-58-FC-D1-78-91-67-23-AC-2F-7C-D6",
-            hash.ToString());
-        Assert.AreEqual(-1494626807, hash.GetHashCode());
+            "SHA256_09-CE-E9-A6-FF-28-72-80-CC-5A-33-B6-1C-13-46-AE-F8-43-13-29-DD-58-FC-D1-78-91-67-23-AC-2F-7C-D6",
+            hash.ToString()
+        );
     }
 
     [TestMethod]
@@ -466,11 +466,12 @@ public class HasherTests
     public void Reference_External_SpoofSeparatorId()
     {
         var hashA = new Hasher([new ReferenceGeometry("A") { Shapes = [new SpoofNode("T\0TT")] }]).Hash();
-        var hashB = new Hasher([new ReferenceGeometry("B") { Shapes = [new SpoofNode("T"), new SpoofNode("TT")] }]).Hash();
+        var hashB =
+            new Hasher([new ReferenceGeometry("B") { Shapes = [new SpoofNode("T"), new SpoofNode("TT")] }]).Hash();
 
         Assert.AreNotEqual(hashA, hashB);
     }
-    
+
     class SpoofNode(string id) : IShape
     {
         public string GetId() => id;
@@ -509,7 +510,7 @@ public class HasherTests
 
         public IShape RemoveFixpoints(IEnumerable<Coord> nodes) => this;
 
-        public string Uuid { get => null; set  { } }
+        public string Uuid { get => null; set { } }
 
         public IShape SetUuid(string value) => this;
     }
@@ -577,6 +578,44 @@ public class HasherTests
     }
 
     #endregion
+
+    [TestMethod]
+    public void ByteArrayHash_Short()
+    {
+        Assert.ThrowsException<ArgumentException>(() => new ByteArrayHash("a", [1]));
+    }
+
+    [TestMethod]
+    public void ByteArrayHash_Same()
+    {
+        var a = new ByteArrayHash("aaa", [1, 2, 3, 4]);
+        var b = new ByteArrayHash("aaa", [1, 2, 3, 4]);
+
+        Assert.AreEqual(a, b);
+        Assert.AreEqual(a.ToString(), b.ToString());
+    }
+
+    [TestMethod]
+    public void ByteArrayHash_DifferentAlgorithm()
+    {
+        var a = new ByteArrayHash("aaa", [1, 2, 3, 4]);
+        var b = new ByteArrayHash("bbb", [1, 2, 3, 4]);
+
+        Assert.AreNotEqual(a, b);
+        Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
+        Assert.AreNotEqual(a.ToString(), b.ToString());
+    }
+
+    [TestMethod]
+    public void ByteArrayHash_DifferentHash()
+    {
+        var a = new ByteArrayHash("aaa", [1, 2, 3, 4]);
+        var b = new ByteArrayHash("aaa", [4, 3, 2, 1]);
+
+        Assert.AreNotEqual(a, b);
+        Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
+        Assert.AreNotEqual(a.ToString(), b.ToString());
+    }
 }
 
 internal class TestHasher(IList<IReadableNode> nodes, LionWebVersions? lionWebVersion = null)
