@@ -76,7 +76,7 @@ public class GeneratorFacade
         using var streamWriter = new StreamWriter(path, false);
         streamWriter.Write(compilationUnit.GetText().ToString().ReplaceLineEndings());
         /*
-         * Note: .GextText().ToString() probably nullifies any optimization gains through streaming,
+         * Note: .GetText().ToString() probably nullifies any optimization gains through streaming,
          * but it's the only way (that I found) to actually replace line endings.
          * (E.g., setting the option (FormattingOptions.NewLine, LanguageNames.CSharp, value: "\n"))
          *  – or any variation of that – does nothing!)
