@@ -12,6 +12,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-mixedBaseConceptLang", Version = "1")]
 public partial class MixedBaseConceptLangLanguage : LanguageBase<IMixedBaseConceptLangFactory>
@@ -96,6 +97,14 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetEnumProp([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum? enumProp)
+	{
+		enumProp = _enumProp;
+		return _enumProp != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
         public BaseConcept SetEnumProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum value)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp);
@@ -113,6 +122,14 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetSdtProp([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt? sdtProp)
+	{
+		sdtProp = _sdtProp;
+		return _sdtProp != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
         public BaseConcept SetSdtProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt value)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp);
@@ -127,6 +144,13 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         [LionCoreMetaPointer(Language = typeof(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage), Key = "key-baseContainmentIface-cont")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
 	public NodeBase Cont { get => _cont ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont); set => SetCont(value); }
+
+	/// <remarks>Required Single Containment</remarks>
+        public bool TryGetCont([MaybeNullWhenAttribute(false)] out NodeBase? cont)
+	{
+		cont = _cont;
+		return _cont != null;
+	}
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface.SetCont(NodeBase value) => SetCont(value);
@@ -148,6 +172,14 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         [LionCoreMetaPointer(Language = typeof(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage), Key = "key-basePropertyIface-prop")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public string Prop { get => _prop ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop); set => SetProp(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetProp([MaybeNullWhenAttribute(false)] out string? prop)
+	{
+		prop = _prop;
+		return _prop != null;
+	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.BasePropertyIface LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.BasePropertyIface.SetProp(string value) => SetProp(value);
@@ -167,6 +199,13 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         [LionCoreMetaPointer(Language = typeof(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage), Key = "key-baseReferenceIface-ref")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public NodeBase Ref { get => _ref ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref); set => SetRef(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+        public bool TryGetRef([MaybeNullWhenAttribute(false)] out NodeBase? @ref)
+	{
+		@ref = _ref;
+		return _ref != null;
+	}
 /// <remarks>Required Single Reference</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface.SetRef(NodeBase value) => SetRef(value);
@@ -290,15 +329,15 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_enumProp != default)
+		if (TryGetEnumProp(out _))
 			result.Add(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp);
-		if (_sdtProp != default)
+		if (TryGetSdtProp(out _))
 			result.Add(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp);
-		if (_cont != default)
+		if (TryGetCont(out _))
 			result.Add(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
-		if (_prop != default)
+		if (TryGetProp(out _))
 			result.Add(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop);
-		if (_ref != default)
+		if (TryGetRef(out _))
 			result.Add(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
 		return result;
 	}

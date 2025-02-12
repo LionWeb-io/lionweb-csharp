@@ -12,6 +12,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-MultiInheritLang", Version = "1")]
 public partial class MultiInheritLangLanguage : LanguageBase<IMultiInheritLangFactory>
@@ -114,6 +115,13 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
         [LionCoreMetaPointer(Language = typeof(MultiInheritLangLanguage), Key = "key-ifaceContainment")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
 	public NodeBase IfaceContainment { get => _ifaceContainment ?? throw new UnsetFeatureException(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment); set => SetIfaceContainment(value); }
+
+	/// <remarks>Required Single Containment</remarks>
+        public bool TryGetIfaceContainment([MaybeNullWhenAttribute(false)] out NodeBase? ifaceContainment)
+	{
+		ifaceContainment = _ifaceContainment;
+		return _ifaceContainment != null;
+	}
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  BaseIface BaseIface.SetIfaceContainment(NodeBase value) => SetIfaceContainment(value);
@@ -171,7 +179,7 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_ifaceContainment != default)
+		if (TryGetIfaceContainment(out _))
 			result.Add(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
 		return result;
 	}

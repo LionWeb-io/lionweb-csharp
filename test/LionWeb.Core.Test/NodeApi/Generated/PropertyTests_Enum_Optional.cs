@@ -129,6 +129,14 @@ public class PropertyTests_Enum_Optional
         Assert.AreEqual(MatterState.liquid, parent.MatterState);
     }
 
+    [TestMethod]
+    public void TryGet()
+    {
+        var parent = new MaterialGroup("myId") { MatterState = MatterState.liquid };
+        Assert.IsTrue(parent.TryGetMatterState(out var o));
+        Assert.AreEqual(MatterState.liquid, o);
+    }
+
     #endregion
 
     #region Null
@@ -180,6 +188,14 @@ public class PropertyTests_Enum_Optional
         object value = null;
         var parent = new MaterialGroup("od") { MatterState = (MatterState?)value };
         Assert.AreEqual(null, parent.MatterState);
+    }
+
+    [TestMethod]
+    public void Null_TryGet()
+    {
+        var parent = new MaterialGroup("od");
+        Assert.IsFalse(parent.TryGetMatterState(out var o));
+        Assert.IsNull(o);
     }
 
     #endregion

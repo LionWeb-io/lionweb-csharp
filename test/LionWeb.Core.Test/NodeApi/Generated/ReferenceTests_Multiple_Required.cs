@@ -55,6 +55,15 @@ public class ReferenceTests_Multiple_Required
         Assert.IsTrue(parent.Materials.Contains(line));
     }
 
+    [TestMethod]
+    public void Single_TryGet()
+    {
+        var line = new Line("myId");
+        var parent = new MaterialGroup("cs") { Materials = [line] };
+        Assert.IsTrue(parent.TryGetMaterials(out var o));
+        Assert.AreSame(line, o.FirstOrDefault());
+    }
+
     #region Insert
 
     [TestMethod]
@@ -278,6 +287,14 @@ public class ReferenceTests_Multiple_Required
     {
         var parent = new MaterialGroup("cs");
         Assert.ThrowsException<InvalidValueException>(() => parent.RemoveMaterials(null));
+    }
+
+    [TestMethod]
+    public void Null_TryGet()
+    {
+        var parent = new MaterialGroup("cs");
+        Assert.IsFalse(parent.TryGetMaterials(out var o));
+        Assert.IsFalse(o.Any());
     }
 
     #endregion

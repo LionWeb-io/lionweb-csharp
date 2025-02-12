@@ -21,6 +21,7 @@ using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M2;
 using M3;
+using System.Diagnostics.CodeAnalysis;
 
 /// Example of a node that implements <see cref="IReadableNode"/>,
 /// but neither <see cref="IWritableNode"/> nor <see cref="INode"/>.
@@ -67,6 +68,12 @@ public class ReadOnlyLine(string id, IReadableNode? parent)
 
     /// <see cref="INamed"/>
     public required string Name { get; init; }
+
+    public bool TryGetName([MaybeNullWhen(false)] out string? name)
+    {
+        name = Name;
+        return name != null;
+    }
 
     /// <see cref="IShape"/>
     public required string Uuid { get; init; }

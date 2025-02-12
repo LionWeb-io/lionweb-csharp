@@ -12,6 +12,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using DeprDatatype = string;
 
 [LionCoreLanguage(Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh", Version = "0")]
@@ -183,6 +184,14 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Multiple Containment</remarks>
         [Obsolete("deprChild comment")]
+	public bool TryGetDeprChild([MaybeNullWhenAttribute(false)] out IReadOnlyList<DeprIface> deprChild)
+	{
+		deprChild = _deprChild;
+		return _deprChild.Count != 0;
+	}
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        [Obsolete("deprChild comment")]
 	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes)
 	{
 		_deprChild.AddRange(SetSelfParent(nodes?.ToList(), DeprecatedLanguage.Instance.DeprConcept_deprChild));
@@ -218,6 +227,14 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Property</remarks>
         [Obsolete("deprProp comment")]
+	public bool TryGetDeprProp([MaybeNullWhenAttribute(false)] out string? deprProp)
+	{
+		deprProp = _deprProp;
+		return _deprProp != null;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        [Obsolete("deprProp comment")]
 	public DeprConcept SetDeprProp(string? value)
 	{
 		_deprProp = value;
@@ -232,6 +249,14 @@ public partial class DeprConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	[Obsolete("deprRef comment")]
 	public DeprAnnotation DeprRef { get => _deprRef ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+        [Obsolete("deprRef comment")]
+	public bool TryGetDeprRef([MaybeNullWhenAttribute(false)] out DeprAnnotation? deprRef)
+	{
+		deprRef = _deprRef;
+		return _deprRef != null;
+	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -317,11 +342,11 @@ public partial class DeprConcept : ConceptInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_deprChild.Count != 0)
+		if (TryGetDeprChild(out _))
 			result.Add(DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		if (_deprProp != default)
+		if (TryGetDeprProp(out _))
 			result.Add(DeprecatedLanguage.Instance.DeprConcept_deprProp);
-		if (_deprRef != default)
+		if (TryGetDeprRef(out _))
 			result.Add(DeprecatedLanguage.Instance.DeprConcept_deprRef);
 		return result;
 	}

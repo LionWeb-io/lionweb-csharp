@@ -12,6 +12,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-BLang", Version = "2")]
 public partial class BLangLanguage : LanguageBase<IBLangFactory>
@@ -104,6 +105,14 @@ public partial class BConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetAEnumProp([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum? aEnumProp)
+	{
+		aEnumProp = _aEnumProp;
+		return _aEnumProp != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
         public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum value)
 	{
 		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
@@ -116,6 +125,13 @@ public partial class BConcept : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
+
+	/// <remarks>Optional Single Reference</remarks>
+        public bool TryGetARef([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? aRef)
+	{
+		aRef = _aRef;
+		return _aRef != null;
+	}
 
 	/// <remarks>Optional Single Reference</remarks>
         public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept? value)
@@ -184,9 +200,9 @@ public partial class BConcept : ConceptInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (_aEnumProp != default)
+		if (TryGetAEnumProp(out _))
 			result.Add(BLangLanguage.Instance.BConcept_AEnumProp);
-		if (_aRef != default)
+		if (TryGetARef(out _))
 			result.Add(BLangLanguage.Instance.BConcept_ARef);
 		return result;
 	}

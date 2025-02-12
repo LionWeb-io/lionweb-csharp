@@ -72,6 +72,14 @@ public class ContainmentTests_Single_Required
         Assert.AreSame(coord, parent.Get(ShapesLanguage.Instance.OffsetDuplicate_offset));
     }
 
+    [TestMethod]
+    public void Single_TryGet()
+    {
+        var coord = new Coord("myId");
+        var parent = new OffsetDuplicate("od") { Offset = coord };
+        Assert.IsTrue(parent.TryGetOffset(out var o));
+        Assert.AreSame(coord, o);
+    }
 
     #region existing
 
@@ -147,6 +155,14 @@ public class ContainmentTests_Single_Required
     {
         Assert.ThrowsException<InvalidValueException>(
             () => new OffsetDuplicate("od") { Offset = null });
+    }
+
+    [TestMethod]
+    public void Null_TryGet()
+    {
+        var parent = new OffsetDuplicate("od");
+        Assert.IsFalse(parent.TryGetOffset(out var o));
+        Assert.IsNull(o);
     }
 
     #endregion

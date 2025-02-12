@@ -110,6 +110,9 @@ public interface INames
     /// <returns><c>MyFeature</c></returns>
     IdentifierNameSyntax FeatureProperty(Feature feature);
 
+    /// <returns><c>myFeature</c></returns>
+    string FeatureParam(Feature feature);
+
     /// <returns><c>_myField</c></returns>
     IdentifierNameSyntax FieldField(Field field);
 
@@ -117,5 +120,5 @@ public interface INames
     IdentifierNameSyntax FieldProperty(Field field);
     
     /// <returns><c>myField</c></returns>
-    string ParamField(Field field);
+    string FieldParam(Field field);
 }

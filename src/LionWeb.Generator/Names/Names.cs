@@ -225,6 +225,10 @@ public partial class Names : INames
         IdentifierName(feature.Name.ToFirstUpper().PrefixKeyword());
 
     /// <inheritdoc />
+    public string FeatureParam(Feature feature) =>
+        feature.Name.ToFirstLower().PrefixKeyword();
+
+    /// <inheritdoc />
     public IdentifierNameSyntax FieldField(Field field) =>
         IdentifierName($"_{field.Name.ToFirstLower()}".PrefixKeyword());
 
@@ -233,7 +237,7 @@ public partial class Names : INames
         IdentifierName(field.Name.ToFirstUpper().PrefixKeyword());
 
     /// <inheritdoc />
-    public string ParamField(Field field) =>
+    public string FieldParam(Field field) =>
         FieldProperty(field).ToString().ToFirstLower().PrefixKeyword();
 
     [GeneratedRegex("`.*$")]

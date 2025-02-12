@@ -92,6 +92,14 @@ public class PropertyTests_Integer_Required
         Assert.AreEqual(10, parent.R);
     }
 
+    [TestMethod]
+    public void TryGet()
+    {
+        var parent = new Circle("myId") { R = 10 };
+        Assert.IsTrue(parent.TryGetR(out var o));
+        Assert.AreEqual(10, o);
+    }
+
     #endregion
 
     #region Null
@@ -145,6 +153,14 @@ public class PropertyTests_Integer_Required
         object value = null;
         Assert.ThrowsException<NullReferenceException>(
             () => new Circle("od") { R = (int)value });
+    }
+
+    [TestMethod]
+    public void Null_TryGet()
+    {
+        var parent = new Circle("od");
+        Assert.IsFalse(parent.TryGetR(out var o));
+        Assert.IsNull(o);
     }
 
     #endregion
