@@ -17,13 +17,17 @@
 
 namespace LionWeb.Core.Test.Listener;
 
+using Core.Serialization;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1;
 using M1.Event.Partition;
+using M2;
+using M3;
 using Comparer = Core.Utilities.Comparer;
+using NodeId = string;
 
-[TestClass]
-public class EventTests
+public abstract class EventTestsBase
 {
     #region Properties
 
@@ -36,13 +40,14 @@ public class EventTests
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         circle.Name = "Hello";
 
         AssertEquals([node], [clone]);
     }
+
+    protected abstract void CreateReplicator(Geometry clone, Geometry node);
 
     [TestMethod]
     public void PropertyChanged()
@@ -53,8 +58,7 @@ public class EventTests
         var cloneCircle = new Circle("c") { Name = "Hello" };
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         circle.Name = "Bye";
 
@@ -70,8 +74,7 @@ public class EventTests
         var cloneDocs = new Documentation("c") { Text = "Hello" };
         var clone = new Geometry("a") { Documentation = cloneDocs };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         docs.Text = null;
 
@@ -91,8 +94,7 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new Circle("added");
         node.AddShapes([added]);
@@ -108,8 +110,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l")] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new Circle("added");
         node.InsertShapes(0, [added]);
@@ -125,8 +126,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l")] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new Circle("added");
         node.InsertShapes(1, [added]);
@@ -142,8 +142,7 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new Documentation("added");
         node.Documentation = added;
@@ -159,8 +158,7 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
         node.AddShapes([added]);
@@ -181,8 +179,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Circle("deleted")] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.RemoveShapes([deleted]);
 
@@ -197,8 +194,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Circle("deleted"), new Line("l")] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.RemoveShapes([deleted]);
 
@@ -213,8 +209,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("deleted")] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.RemoveShapes([deleted]);
 
@@ -229,8 +224,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Documentation = new Documentation("deleted") };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.Documentation = null;
 
@@ -248,8 +242,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Documentation = new Documentation("replaced") { Text = "a" } };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new Documentation("added") { Text = "added" };
         node.Documentation = added;
@@ -272,8 +265,7 @@ public class EventTests
             new BillOfMaterials("bof") { DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid } }
         ]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         bof.DefaultGroup = new MaterialGroup("replaced") { MatterState = MatterState.gas };
 
@@ -293,8 +285,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.AddShapes([moved]);
 
@@ -309,8 +300,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.Documentation = moved;
 
@@ -330,8 +320,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         origin.AddDisabledParts([moved]);
 
@@ -347,8 +336,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         origin.EvilPart = moved;
 
@@ -367,8 +355,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Circle("moved"), new Line("l")] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.AddShapes([moved]);
 
@@ -383,8 +370,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("moved")] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.InsertShapes(0, [moved]);
 
@@ -406,8 +392,7 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new BillOfMaterials("added");
         node.AddAnnotations([added]);
@@ -425,8 +410,7 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("bof")]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(0, [added]);
@@ -444,8 +428,7 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("bof")]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(1, [added]);
@@ -461,8 +444,7 @@ public class EventTests
 
         var clone = new Geometry("a");
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         var added = new BillOfMaterials("added")
         {
@@ -488,8 +470,7 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("deleted")]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.RemoveAnnotations([deleted]);
 
@@ -506,8 +487,7 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("deleted"), new BillOfMaterials("bof")]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.RemoveAnnotations([deleted]);
 
@@ -524,8 +504,7 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("bof"), new BillOfMaterials("deleted")]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.RemoveAnnotations([deleted]);
 
@@ -548,8 +527,7 @@ public class EventTests
         cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
         var clone = new Geometry("a") { Shapes = [cloneOrigin] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.AddAnnotations([moved]);
 
@@ -570,8 +548,7 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("moved"), new BillOfMaterials("bof")]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.AddAnnotations([moved]);
 
@@ -588,8 +565,7 @@ public class EventTests
         var clone = new Geometry("a");
         clone.AddAnnotations([new BillOfMaterials("bof"), new BillOfMaterials("moved")]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         node.InsertAnnotations(0, [moved]);
 
@@ -615,8 +591,7 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [new Line("line")] };
         clone.AddAnnotations([new BillOfMaterials("bof")]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         bof.AddMaterials([line]);
 
@@ -636,8 +611,7 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [new Line("line"), cloneCircle] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle] }]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         bof.InsertMaterials(0, [line]);
 
@@ -657,8 +631,7 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [new Line("line"), cloneCircle] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle] }]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         bof.InsertMaterials(1, [line]);
 
@@ -674,8 +647,7 @@ public class EventTests
 
         var clone = new Geometry("a") { Shapes = [new OffsetDuplicate("od"), new Circle("circle")] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         od.Source = circle;
 
@@ -698,8 +670,7 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [cloneLine] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine] }]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         bof.RemoveMaterials([line]);
 
@@ -720,8 +691,7 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine, cloneCircle] }]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         bof.RemoveMaterials([line]);
 
@@ -742,8 +712,7 @@ public class EventTests
         var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
         clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle, cloneLine] }]);
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         bof.RemoveMaterials([line]);
 
@@ -760,8 +729,7 @@ public class EventTests
         var cloneCircle = new Circle("circle");
         var clone = new Geometry("a") { Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         od.AltSource = null;
 
@@ -786,8 +754,7 @@ public class EventTests
             Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle, new Line("line")]
         };
 
-        var replicator = new PartitionEventReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        CreateReplicator(clone, node);
 
         od.AltSource = line;
 
@@ -803,4 +770,132 @@ public class EventTests
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
+}
+
+[TestClass]
+public class EventsTest : EventTestsBase
+{
+    protected override void CreateReplicator(Geometry clone, Geometry node)
+    {
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.ReplicateFrom(node.GetPublisher());
+    }
+}
+
+[TestClass]
+public class EventsTestSerialized : EventTestsBase
+{
+    protected override void CreateReplicator(Geometry clone, Geometry node)
+    {
+        var lionWebVersion = LionWebVersions.v2024_1;
+        List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
+
+        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = [];
+        foreach (IKeyed keyed in languages.SelectMany(l => M1Extensions.Descendants<IKeyed>(l)))
+        {
+            var metaPointer = keyed switch
+            {
+                LanguageEntity l => l.ToMetaPointer(),
+                Feature feat => feat.ToMetaPointer(),
+                EnumerationLiteral l => l.GetEnumeration().ToMetaPointer(),
+                _ => throw new NotImplementedException(keyed.GetType().Name)
+            };
+
+            sharedKeyedMap[CompressedMetaPointer.Create(metaPointer, true)] = keyed;
+        }
+
+        Dictionary<NodeId, IReadableNode> sharedNodeMap = [];
+
+        var commandSender =
+            new DeltaProtocolPartitionCommandSender(node.GetPublisher(), new CommandIdProvider(), lionWebVersion);
+
+        var partitionEventHandler = new PartitionEventHandler(null);
+
+        var deserializerBuilder = new DeserializerBuilder()
+                .WithLionWebVersion(lionWebVersion)
+                .WithLanguages(languages)
+            ;
+
+        var eventReceiver = new DeltaProtocolPartitionEventReceiver(
+            partitionEventHandler,
+            sharedNodeMap,
+            sharedKeyedMap,
+            deserializerBuilder
+        );
+
+        commandSender.DeltaCommand += (sender, deltaCommand) => eventReceiver.Receive(deltaCommand switch
+            {
+                AddProperty a =>
+                    new PropertyAdded(a.Property, a.NewValue, OriginCommands(a), null),
+                DeleteProperty a =>
+                    new PropertyDeleted(a.Property, null, OriginCommands(a), null),
+                ChangeProperty a =>
+                    new PropertyChanged(a.Property, a.NewValue, null, OriginCommands(a), null),
+                AddChild a =>
+                    new ChildAdded(a.Containment, a.NewChild, OriginCommands(a), null),
+                DeleteChild a =>
+                    new ChildDeleted(a.Containment, new([]), OriginCommands(a), null),
+                ReplaceChild a =>
+                    new ChildReplaced(a.Containment, a.NewChild, new([]), OriginCommands(a), null),
+                MoveChildFromOtherContainment a =>
+                    new ChildMovedFromOtherContainment(a.NewContainment, a.MovedChild, ContainmentParent(a.MovedChild),
+                        OriginCommands(a), null),
+                MoveChildFromOtherContainmentInSameParent a =>
+                    new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild,
+                        ContainmentParent(a.MovedChild).Parent, ContainmentParent(a.MovedChild).Containment,
+                        ContainmentParent(a.MovedChild).Index, OriginCommands(a), null),
+                MoveChildInSameContainment a =>
+                    new ChildMovedInSameContainment(a.NewIndex, a.MovedChild, ContainmentParent(a.MovedChild).Parent,
+                        ContainmentParent(a.MovedChild).Containment, ContainmentParent(a.MovedChild).Index,
+                        OriginCommands(a), null),
+                AddAnnotation a =>
+                    new AnnotationAdded(a.Parent, a.NewAnnotation, OriginCommands(a), null),
+                DeleteAnnotation a =>
+                    new AnnotationDeleted(a.Parent, new([]), OriginCommands(a), null),
+                ReplaceAnnotation a =>
+                    new AnnotationReplaced(a.Parent, a.NewAnnotation, new([]), OriginCommands(a), null),
+                MoveAnnotationFromOtherParent a =>
+                    new AnnotationMovedFromOtherParent(a.NewParent, a.MovedAnnotation,
+                        AnnotationParent(a.MovedAnnotation), OriginCommands(a), null),
+                MoveAnnotationInSameParent a =>
+                    new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation,
+                        AnnotationParent(a.MovedAnnotation).Parent, AnnotationParent(a.MovedAnnotation).Index,
+                        OriginCommands(a), null),
+                AddReference a =>
+                    new ReferenceAdded(a.Reference, a.NewTarget, OriginCommands(a), null),
+                DeleteReference a =>
+                    new ReferenceDeleted(a.Reference, new(), OriginCommands(a), null),
+                ChangeReference a =>
+                    new ReferenceChanged(a.Reference, a.NewTarget, new(), OriginCommands(a), null),
+            }
+        );
+
+        var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
+        replicator.ReplicateFrom(node.GetPublisher());
+        return;
+
+        DeltaContainment ContainmentParent(NodeId childId)
+        {
+            var child = (IWritableNode)sharedNodeMap[childId];
+            var parent = (IWritableNode)child.GetParent();
+            var containment = parent.GetContainmentOf(child);
+            return new DeltaContainment(parent.GetId(), containment.ToMetaPointer(),
+                M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList().IndexOf(child));
+        }
+
+        DeltaAnnotation AnnotationParent(NodeId annotationId)
+        {
+            var annotation = sharedNodeMap[annotationId];
+            var parent = annotation.GetParent();
+            return new DeltaAnnotation(parent.GetId(), parent.GetAnnotations().ToList().IndexOf(annotation));
+        }
+
+        CommandSource[] OriginCommands(ISingleDeltaCommand a) => [new CommandSource(a.CommandId)];
+    }
+}
+
+internal class CommandIdProvider : ICommandIdProvider
+{
+    private int nextId = 0;
+    public string Create() => (++nextId).ToString();
 }
