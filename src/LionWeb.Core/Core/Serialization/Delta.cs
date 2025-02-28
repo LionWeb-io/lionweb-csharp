@@ -17,9 +17,9 @@
 
 namespace LionWeb.Core.Serialization;
 
-using TargetNode = M1.CompressedId;
-using CommandId = M1.CompressedId;
-using QueryId = M1.CompressedId;
+using TargetNode = NodeId;
+using CommandId = NodeId;
+using QueryId = NodeId;
 using FreeId = NodeId;
 using MessageKind = NodeId;
 using MessageDataKey = NodeId;
