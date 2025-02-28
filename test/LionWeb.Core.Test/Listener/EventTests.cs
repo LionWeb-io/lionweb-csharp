@@ -21,6 +21,7 @@ using Core.Serialization;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
+using M1.Event;
 using M1.Event.Partition;
 using M2;
 using M3;
@@ -29,6 +30,10 @@ using NodeId = string;
 
 public abstract class EventTestsBase
 {
+    protected abstract Geometry CreateReplicator(Geometry node);
+
+    protected Geometry Clone(Geometry node) => (Geometry)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
+
     #region Properties
 
     [TestMethod]
@@ -37,17 +42,12 @@ public abstract class EventTestsBase
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        var cloneCircle = new Circle("c");
-        var clone = new Geometry("a") { Shapes = [cloneCircle] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         circle.Name = "Hello";
 
         AssertEquals([node], [clone]);
     }
-
-    protected abstract void CreateReplicator(Geometry clone, Geometry node);
 
     [TestMethod]
     public void PropertyChanged()
@@ -55,10 +55,7 @@ public abstract class EventTestsBase
         var circle = new Circle("c") { Name = "Hello" };
         var node = new Geometry("a") { Shapes = [circle] };
 
-        var cloneCircle = new Circle("c") { Name = "Hello" };
-        var clone = new Geometry("a") { Shapes = [cloneCircle] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         circle.Name = "Bye";
 
@@ -71,10 +68,7 @@ public abstract class EventTestsBase
         var docs = new Documentation("c") { Text = "Hello" };
         var node = new Geometry("a") { Documentation = docs };
 
-        var cloneDocs = new Documentation("c") { Text = "Hello" };
-        var clone = new Geometry("a") { Documentation = cloneDocs };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         docs.Text = null;
 
@@ -92,9 +86,7 @@ public abstract class EventTestsBase
     {
         var node = new Geometry("a");
 
-        var clone = new Geometry("a");
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new Circle("added");
         node.AddShapes([added]);
@@ -108,9 +100,7 @@ public abstract class EventTestsBase
     {
         var node = new Geometry("a") { Shapes = [new Line("l")] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l")] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new Circle("added");
         node.InsertShapes(0, [added]);
@@ -124,9 +114,7 @@ public abstract class EventTestsBase
     {
         var node = new Geometry("a") { Shapes = [new Line("l")] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l")] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new Circle("added");
         node.InsertShapes(1, [added]);
@@ -140,9 +128,7 @@ public abstract class EventTestsBase
     {
         var node = new Geometry("a");
 
-        var clone = new Geometry("a");
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new Documentation("added");
         node.Documentation = added;
@@ -156,9 +142,7 @@ public abstract class EventTestsBase
     {
         var node = new Geometry("a");
 
-        var clone = new Geometry("a");
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
         node.AddShapes([added]);
@@ -177,9 +161,7 @@ public abstract class EventTestsBase
         var deleted = new Circle("deleted");
         var node = new Geometry("a") { Shapes = [deleted] };
 
-        var clone = new Geometry("a") { Shapes = [new Circle("deleted")] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.RemoveShapes([deleted]);
 
@@ -192,9 +174,7 @@ public abstract class EventTestsBase
         var deleted = new Circle("deleted");
         var node = new Geometry("a") { Shapes = [deleted, new Line("l")] };
 
-        var clone = new Geometry("a") { Shapes = [new Circle("deleted"), new Line("l")] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.RemoveShapes([deleted]);
 
@@ -207,9 +187,7 @@ public abstract class EventTestsBase
         var deleted = new Circle("deleted");
         var node = new Geometry("a") { Shapes = [new Line("l"), deleted] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("deleted")] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.RemoveShapes([deleted]);
 
@@ -222,9 +200,7 @@ public abstract class EventTestsBase
         var deleted = new Documentation("deleted");
         var node = new Geometry("a") { Documentation = deleted };
 
-        var clone = new Geometry("a") { Documentation = new Documentation("deleted") };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.Documentation = null;
 
@@ -240,9 +216,7 @@ public abstract class EventTestsBase
     {
         var node = new Geometry("a") { Documentation = new Documentation("replaced") { Text = "a" } };
 
-        var clone = new Geometry("a") { Documentation = new Documentation("replaced") { Text = "a" } };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new Documentation("added") { Text = "added" };
         node.Documentation = added;
@@ -260,12 +234,7 @@ public abstract class EventTestsBase
         };
         node.AddAnnotations([bof]);
 
-        var clone = new Geometry("a");
-        clone.AddAnnotations([
-            new BillOfMaterials("bof") { DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid } }
-        ]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         bof.DefaultGroup = new MaterialGroup("replaced") { MatterState = MatterState.gas };
 
@@ -283,9 +252,7 @@ public abstract class EventTestsBase
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var node = new Geometry("a") { Shapes = [origin] };
 
-        var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.AddShapes([moved]);
 
@@ -298,9 +265,7 @@ public abstract class EventTestsBase
         var moved = new Documentation("moved");
         var node = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = moved }] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.Documentation = moved;
 
@@ -318,9 +283,7 @@ public abstract class EventTestsBase
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var node = new Geometry("a") { Shapes = [origin] };
 
-        var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         origin.AddDisabledParts([moved]);
 
@@ -334,9 +297,7 @@ public abstract class EventTestsBase
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var node = new Geometry("a") { Shapes = [origin] };
 
-        var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         origin.EvilPart = moved;
 
@@ -353,9 +314,7 @@ public abstract class EventTestsBase
         var moved = new Circle("moved");
         var node = new Geometry("a") { Shapes = [moved, new Line("l")] };
 
-        var clone = new Geometry("a") { Shapes = [new Circle("moved"), new Line("l")] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.AddShapes([moved]);
 
@@ -368,9 +327,7 @@ public abstract class EventTestsBase
         var moved = new Circle("moved");
         var node = new Geometry("a") { Shapes = [new Line("l"), moved] };
 
-        var clone = new Geometry("a") { Shapes = [new Line("l"), new Circle("moved")] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.InsertShapes(0, [moved]);
 
@@ -390,9 +347,7 @@ public abstract class EventTestsBase
     {
         var node = new Geometry("a");
 
-        var clone = new Geometry("a");
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new BillOfMaterials("added");
         node.AddAnnotations([added]);
@@ -407,10 +362,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a");
         node.AddAnnotations([new BillOfMaterials("bof")]);
 
-        var clone = new Geometry("a");
-        clone.AddAnnotations([new BillOfMaterials("bof")]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(0, [added]);
@@ -425,10 +377,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a");
         node.AddAnnotations([new BillOfMaterials("bof")]);
 
-        var clone = new Geometry("a");
-        clone.AddAnnotations([new BillOfMaterials("bof")]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(1, [added]);
@@ -442,9 +391,7 @@ public abstract class EventTestsBase
     {
         var node = new Geometry("a");
 
-        var clone = new Geometry("a");
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         var added = new BillOfMaterials("added")
         {
@@ -467,10 +414,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a");
         node.AddAnnotations([deleted]);
 
-        var clone = new Geometry("a");
-        clone.AddAnnotations([new BillOfMaterials("deleted")]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.RemoveAnnotations([deleted]);
 
@@ -484,10 +428,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a");
         node.AddAnnotations([deleted, new BillOfMaterials("bof")]);
 
-        var clone = new Geometry("a");
-        clone.AddAnnotations([new BillOfMaterials("deleted"), new BillOfMaterials("bof")]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.RemoveAnnotations([deleted]);
 
@@ -501,10 +442,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a");
         node.AddAnnotations([new BillOfMaterials("bof"), deleted]);
 
-        var clone = new Geometry("a");
-        clone.AddAnnotations([new BillOfMaterials("bof"), new BillOfMaterials("deleted")]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.RemoveAnnotations([deleted]);
 
@@ -523,11 +461,7 @@ public abstract class EventTestsBase
         origin.AddAnnotations([moved]);
         var node = new Geometry("a") { Shapes = [origin] };
 
-        var cloneOrigin = new CompositeShape("origin");
-        cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
-        var clone = new Geometry("a") { Shapes = [cloneOrigin] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.AddAnnotations([moved]);
 
@@ -545,10 +479,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a");
         node.AddAnnotations([moved, new BillOfMaterials("bof")]);
 
-        var clone = new Geometry("a");
-        clone.AddAnnotations([new BillOfMaterials("moved"), new BillOfMaterials("bof")]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.AddAnnotations([moved]);
 
@@ -562,10 +493,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a");
         node.AddAnnotations([new BillOfMaterials("bof"), moved]);
 
-        var clone = new Geometry("a");
-        clone.AddAnnotations([new BillOfMaterials("bof"), new BillOfMaterials("moved")]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         node.InsertAnnotations(0, [moved]);
 
@@ -588,10 +516,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a") { Shapes = [line] };
         node.AddAnnotations([bof]);
 
-        var clone = new Geometry("a") { Shapes = [new Line("line")] };
-        clone.AddAnnotations([new BillOfMaterials("bof")]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         bof.AddMaterials([line]);
 
@@ -607,11 +532,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a") { Shapes = [line, circle] };
         node.AddAnnotations([bof]);
 
-        var cloneCircle = new Circle("circle");
-        var clone = new Geometry("a") { Shapes = [new Line("line"), cloneCircle] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle] }]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         bof.InsertMaterials(0, [line]);
 
@@ -627,11 +548,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a") { Shapes = [line, circle] };
         node.AddAnnotations([bof]);
 
-        var cloneCircle = new Circle("circle");
-        var clone = new Geometry("a") { Shapes = [new Line("line"), cloneCircle] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle] }]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         bof.InsertMaterials(1, [line]);
 
@@ -645,9 +562,7 @@ public abstract class EventTestsBase
         var od = new OffsetDuplicate("od");
         var node = new Geometry("a") { Shapes = [od, circle] };
 
-        var clone = new Geometry("a") { Shapes = [new OffsetDuplicate("od"), new Circle("circle")] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         od.Source = circle;
 
@@ -666,11 +581,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a") { Shapes = [line] };
         node.AddAnnotations([bof]);
 
-        var cloneLine = new Line("line");
-        var clone = new Geometry("a") { Shapes = [cloneLine] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine] }]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         bof.RemoveMaterials([line]);
 
@@ -686,12 +597,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a") { Shapes = [line, circle] };
         node.AddAnnotations([bof]);
 
-        var cloneCircle = new Circle("circle");
-        var cloneLine = new Line("line");
-        var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneLine, cloneCircle] }]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         bof.RemoveMaterials([line]);
 
@@ -707,12 +613,7 @@ public abstract class EventTestsBase
         var node = new Geometry("a") { Shapes = [line, circle] };
         node.AddAnnotations([bof]);
 
-        var cloneCircle = new Circle("circle");
-        var cloneLine = new Line("line");
-        var clone = new Geometry("a") { Shapes = [cloneLine, cloneCircle] };
-        clone.AddAnnotations([new BillOfMaterials("bof") { Materials = [cloneCircle, cloneLine] }]);
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         bof.RemoveMaterials([line]);
 
@@ -726,10 +627,7 @@ public abstract class EventTestsBase
         var od = new OffsetDuplicate("od") { AltSource = circle };
         var node = new Geometry("a") { Shapes = [od, circle] };
 
-        var cloneCircle = new Circle("circle");
-        var clone = new Geometry("a") { Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle] };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         od.AltSource = null;
 
@@ -748,13 +646,7 @@ public abstract class EventTestsBase
         var od = new OffsetDuplicate("od") { AltSource = circle };
         var node = new Geometry("a") { Shapes = [od, circle, line] };
 
-        var cloneCircle = new Circle("circle");
-        var clone = new Geometry("a")
-        {
-            Shapes = [new OffsetDuplicate("od") { AltSource = cloneCircle }, cloneCircle, new Line("line")]
-        };
-
-        CreateReplicator(clone, node);
+        var clone = CreateReplicator(node);
 
         od.AltSource = line;
 
@@ -775,18 +667,24 @@ public abstract class EventTestsBase
 [TestClass]
 public class EventsTest : EventTestsBase
 {
-    protected override void CreateReplicator(Geometry clone, Geometry node)
+    protected override Geometry CreateReplicator(Geometry node)
     {
+        var clone = Clone(node);
+        
         var replicator = new PartitionEventReplicator(clone);
         replicator.ReplicateFrom(node.GetPublisher());
+
+        return clone;
     }
 }
 
 [TestClass]
 public class EventsTestSerialized : EventTestsBase
 {
-    protected override void CreateReplicator(Geometry clone, Geometry node)
+    protected override Geometry CreateReplicator(Geometry node)
     {
+        var clone = Clone(node);
+        
         var lionWebVersion = LionWebVersions.v2024_1;
         List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
@@ -872,7 +770,7 @@ public class EventsTestSerialized : EventTestsBase
 
         var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
         replicator.ReplicateFrom(node.GetPublisher());
-        return;
+        return clone;
 
         DeltaContainment ContainmentParent(NodeId childId)
         {
