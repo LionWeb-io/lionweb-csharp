@@ -90,14 +90,18 @@ public record GetAvailableIdsResponse(FreeId[] Ids, QueryId QueryId, ProtocolMes
 
 #region Command
 
-public interface IDeltaCommand : IDeltaContent
+public interface IDeltaCommand : IDeltaContent;
+
+public interface ISingleDeltaCommand : IDeltaCommand
 {
     CommandId CommandId { get; }
 }
 
+public record CommandResponse(CommandId CommandId, ProtocolMessage? Message) : IDeltaContent;
+
 #region Partitions
 
-public interface IPartitionCommand : IDeltaCommand;
+public interface IPartitionCommand : ISingleDeltaCommand;
 
 public record AddPartition(DeltaSerializationChunk NewPartition, CommandId CommandId, ProtocolMessage? Message)
     : IPartitionCommand;
@@ -109,7 +113,7 @@ public record DeletePartition(TargetNode DeletedPartition, CommandId CommandId, 
 
 #region Nodes
 
-public interface INodeCommand : IDeltaCommand;
+public interface INodeCommand : ISingleDeltaCommand;
 
 public record ChangeClassifier(
     TargetNode Node,
@@ -119,7 +123,7 @@ public record ChangeClassifier(
 
 #endregion
 
-public interface IFeatureCommand : IDeltaCommand;
+public interface IFeatureCommand : ISingleDeltaCommand;
 
 #region Properties
 
@@ -204,7 +208,7 @@ public record MoveAndReplaceChildInSameContainment(
 
 #region Annotations
 
-public interface IAnnotationCommand : IDeltaCommand;
+public interface IAnnotationCommand : ISingleDeltaCommand;
 
 public record AddAnnotation(
     DeltaAnnotation Parent,
@@ -344,21 +348,23 @@ public record ChangeReferenceTarget(
 
 #endregion
 
-public record CompositeCommand(IDeltaCommand[] Commands, CommandId CommandId, ProtocolMessage? Message)
-    : IReferenceCommand;
+public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage? Message)
+    : IDeltaCommand;
 
 #endregion
 
 #region Event
 
-public interface IDeltaEvent : IDeltaContent
+public interface IDeltaEvent : IDeltaContent;
+
+public interface ISingleDeltaEvent : IDeltaEvent
 {
     CommandSource[] OriginCommands { get; }
 };
 
 #region Partitions
 
-public interface IPartitionEvent : IDeltaEvent;
+public interface IPartitionEvent : ISingleDeltaEvent;
 
 public record PartitionAdded(
     DeltaSerializationChunk NewPartition,
@@ -374,7 +380,7 @@ public record PartitionDeleted(
 
 #region Nodes
 
-public interface INodeEvent : IDeltaEvent;
+public interface INodeEvent : ISingleDeltaEvent;
 
 public record ClassifierChanged(
     TargetNode Node,
@@ -385,7 +391,7 @@ public record ClassifierChanged(
 
 #endregion
 
-public interface IFeatureEvent : IDeltaEvent
+public interface IFeatureEvent : ISingleDeltaEvent
 {
     TargetNode Parent { get; }
     MetaPointer Feature { get; }
@@ -541,7 +547,7 @@ public record ChildMovedAndReplacedInSameContainment(
 
 #region Annotations
 
-public interface IAnnotationEvent : IDeltaEvent
+public interface IAnnotationEvent : ISingleDeltaEvent
 {
     TargetNode Parent { get; }
 };
@@ -806,12 +812,12 @@ public record ReferenceTargetChanged(
 
 #region Miscellaneous
 
-public record CompositeEvent(IDeltaEvent[] Events, CommandSource[] OriginCommands, ProtocolMessage? Message)
+public record CompositeEvent(ISingleDeltaEvent[] Events, ProtocolMessage? Message)
     : IDeltaEvent;
 
-public record NoOpEvent(CommandSource[] OriginCommands, ProtocolMessage? Message) : IDeltaEvent;
+public record NoOpEvent(CommandSource[] OriginCommands, ProtocolMessage? Message) : ISingleDeltaEvent;
 
-public record Error(string ErrorCode, CommandSource[] OriginCommands, ProtocolMessage Message) : IDeltaEvent;
+public record Error(string ErrorCode, CommandSource[] OriginCommands, ProtocolMessage Message) : ISingleDeltaEvent;
 
 #endregion
 
