@@ -44,20 +44,20 @@ public interface IDeserializer
     /// <param name="language">Language to make known to this deserializer.</param>
     /// <param name="factory">Special factory to use for instantiating entities of <paramref name="language"/>.</param>
     /// <exception cref="VersionMismatchException">If <paramref name="language"/>'s LionWeb version is not compatible with <see cref="LionWebVersion"/>.</exception>
-    void RegisterInstantiatedLanguage(Language language, INodeFactory? factory = null);
+    public void RegisterInstantiatedLanguage(Language language, INodeFactory? factory = null);
 
     /// <summary>
     /// Enables this deserializer to create references to <paramref name="dependentNodes"/>.
     /// </summary>
     /// <param name="dependentNodes">Nodes that should be referenceable by deserialized nodes.</param>
-    void RegisterDependentNodes(IEnumerable<IReadableNode> dependentNodes);
+    public void RegisterDependentNodes(IEnumerable<IReadableNode> dependentNodes);
 
     /// <summary>
     /// Starts internal processing of <paramref name="serializedNode"/>.
     /// </summary>
     /// <param name="serializedNode">Node to process.</param>
     /// <remarks>We separate processing single nodes from <see cref="Finish">finishing</see> to enable streaming.</remarks>
-    void Process(SerializedNode serializedNode);
+    public void Process(SerializedNode serializedNode);
 
     /// <summary>
     /// Takes all <see cref="Process">processed</see> nodes, shapes them into a (forest of) trees, and establishes references. 
@@ -67,10 +67,12 @@ public interface IDeserializer
     /// References to any of the given dependent nodes are resolved as well.
     /// </returns>
     /// <exception cref="DeserializerException"/>
-    IEnumerable<IReadableNode> Finish();
+    public IEnumerable<IReadableNode> Finish();
 
     /// Version of LionWeb standard to use.
-    LionWebVersions LionWebVersion { get; }
+    public LionWebVersions LionWebVersion { get; }
+    
+    internal IDeserializerVersionSpecifics VersionSpecifics { get; }
 }
 
 /// <inheritdoc />

@@ -66,6 +66,8 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get => _versionSpecifics.Version; }
 
+    IDeserializerVersionSpecifics IDeserializer.VersionSpecifics => _versionSpecifics;
+
     /// Whether we store uncompressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
     /// Uses more memory, but very helpful for debugging. 
     public bool StoreUncompressedIds

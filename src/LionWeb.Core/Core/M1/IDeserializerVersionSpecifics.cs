@@ -43,7 +43,7 @@ internal interface IDeserializerVersionSpecifics : IVersionSpecifics
 
     /// Converts the low-level string representation <paramref name="value"/> of <paramref name="property"/> into the internal LionWeb-C# representation.
     /// <seealso cref="Deserializer.DeserializeProperties"/>
-    object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype, PropertyValue? value);
+    object? ConvertDatatype(IReadableNode node, Feature property, LanguageEntity datatype, PropertyValue? value);
 }
 
 internal abstract class DeserializerVersionSpecificsBase<T, H>(
@@ -61,7 +61,7 @@ internal abstract class DeserializerVersionSpecificsBase<T, H>(
 
     public abstract void RegisterBuiltins();
 
-    public abstract object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype,
+    public abstract object? ConvertDatatype(IReadableNode node, Feature property, LanguageEntity datatype,
         PropertyValue? value);
 
     protected void RegisterLanguage(Language language)
@@ -77,7 +77,7 @@ internal abstract class DeserializerVersionSpecificsBase<T, H>(
         }
     }
 
-    protected Enum? ConvertEnumeration(IWritableNode nodeId, Feature property, Enumeration enumeration, PropertyValue value)
+    protected Enum? ConvertEnumeration(IReadableNode nodeId, Feature property, Enumeration enumeration, PropertyValue value)
     {
         var literal = enumeration.Literals.FirstOrDefault(literal => literal.Key == value);
 

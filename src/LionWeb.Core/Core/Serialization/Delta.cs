@@ -460,7 +460,7 @@ public record ChildDeleted(
     MetaPointer IContainmentEvent.Containment => Containment.Containment;
 }
 
-public record RhildReplaced(
+public record ChildReplaced(
     DeltaContainment Containment,
     DeltaSerializationChunk NewChild,
     DeltaSerializationChunk ReplacedChild,
