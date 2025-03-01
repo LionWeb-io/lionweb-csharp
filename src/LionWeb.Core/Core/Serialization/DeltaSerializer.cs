@@ -86,6 +86,10 @@ internal class DeltaProtocolTypeResolver : DefaultJsonTypeInfoResolver
             {
                 FillDerived(jsonPolymorphismOptions, _singleCommands);
                 jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
+            } else if (jsonTypeInfo.Type == typeof(IDeltaEvent))
+            {
+                FillDerived(jsonPolymorphismOptions, _events);
+                jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
             } else if (jsonTypeInfo.Type == typeof(ISingleDeltaEvent))
             {
                 FillDerived(jsonPolymorphismOptions, _singleEvents);
