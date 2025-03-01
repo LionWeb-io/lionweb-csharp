@@ -688,19 +688,7 @@ public class EventsTestSerialized : EventTestsBase
         var lionWebVersion = LionWebVersions.v2024_1;
         List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = [];
-        foreach (IKeyed keyed in languages.SelectMany(l => M1Extensions.Descendants<IKeyed>(l)))
-        {
-            var metaPointer = keyed switch
-            {
-                LanguageEntity l => l.ToMetaPointer(),
-                Feature feat => feat.ToMetaPointer(),
-                EnumerationLiteral l => l.GetEnumeration().ToMetaPointer(),
-                _ => throw new NotImplementedException(keyed.GetType().Name)
-            };
-
-            sharedKeyedMap[CompressedMetaPointer.Create(metaPointer, true)] = keyed;
-        }
+        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = CommandToEventMapper.BuildSharedKeyMap(languages);
 
         Dictionary<NodeId, IReadableNode> sharedNodeMap = [];
 
@@ -721,75 +709,130 @@ public class EventsTestSerialized : EventTestsBase
             deserializerBuilder
         );
 
-        commandSender.DeltaCommand += (sender, deltaCommand) => eventReceiver.Receive(deltaCommand switch
-            {
-                AddProperty a =>
-                    new PropertyAdded(a.Property, a.NewValue, OriginCommands(a), null),
-                DeleteProperty a =>
-                    new PropertyDeleted(a.Property, null, OriginCommands(a), null),
-                ChangeProperty a =>
-                    new PropertyChanged(a.Property, a.NewValue, null, OriginCommands(a), null),
-                AddChild a =>
-                    new ChildAdded(a.Containment, a.NewChild, OriginCommands(a), null),
-                DeleteChild a =>
-                    new ChildDeleted(a.Containment, new([]), OriginCommands(a), null),
-                ReplaceChild a =>
-                    new ChildReplaced(a.Containment, a.NewChild, new([]), OriginCommands(a), null),
-                MoveChildFromOtherContainment a =>
-                    new ChildMovedFromOtherContainment(a.NewContainment, a.MovedChild, ContainmentParent(a.MovedChild),
-                        OriginCommands(a), null),
-                MoveChildFromOtherContainmentInSameParent a =>
-                    new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild,
-                        ContainmentParent(a.MovedChild).Parent, ContainmentParent(a.MovedChild).Containment,
-                        ContainmentParent(a.MovedChild).Index, OriginCommands(a), null),
-                MoveChildInSameContainment a =>
-                    new ChildMovedInSameContainment(a.NewIndex, a.MovedChild, ContainmentParent(a.MovedChild).Parent,
-                        ContainmentParent(a.MovedChild).Containment, ContainmentParent(a.MovedChild).Index,
-                        OriginCommands(a), null),
-                AddAnnotation a =>
-                    new AnnotationAdded(a.Parent, a.NewAnnotation, OriginCommands(a), null),
-                DeleteAnnotation a =>
-                    new AnnotationDeleted(a.Parent, new([]), OriginCommands(a), null),
-                ReplaceAnnotation a =>
-                    new AnnotationReplaced(a.Parent, a.NewAnnotation, new([]), OriginCommands(a), null),
-                MoveAnnotationFromOtherParent a =>
-                    new AnnotationMovedFromOtherParent(a.NewParent, a.MovedAnnotation,
-                        AnnotationParent(a.MovedAnnotation), OriginCommands(a), null),
-                MoveAnnotationInSameParent a =>
-                    new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation,
-                        AnnotationParent(a.MovedAnnotation).Parent, AnnotationParent(a.MovedAnnotation).Index,
-                        OriginCommands(a), null),
-                AddReference a =>
-                    new ReferenceAdded(a.Reference, a.NewTarget, OriginCommands(a), null),
-                DeleteReference a =>
-                    new ReferenceDeleted(a.Reference, new(), OriginCommands(a), null),
-                ChangeReference a =>
-                    new ReferenceChanged(a.Reference, a.NewTarget, new(), OriginCommands(a), null),
-            }
-        );
+        var commandToEventMapper = new CommandToEventMapper(sharedNodeMap);
+        commandSender.DeltaCommand += (sender, command) => eventReceiver.Receive(commandToEventMapper.Map(command));
 
         var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
-        replicator.ReplicateFrom(node.GetPublisher());
+        replicator.ReplicateFrom(partitionEventHandler);
         return clone;
-
-        DeltaContainment ContainmentParent(NodeId childId)
-        {
-            var child = (IWritableNode)sharedNodeMap[childId];
-            var parent = (IWritableNode)child.GetParent();
-            var containment = parent.GetContainmentOf(child);
-            return new DeltaContainment(parent.GetId(), containment.ToMetaPointer(),
-                M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList().IndexOf(child));
-        }
-
-        DeltaAnnotation AnnotationParent(NodeId annotationId)
-        {
-            var annotation = sharedNodeMap[annotationId];
-            var parent = annotation.GetParent();
-            return new DeltaAnnotation(parent.GetId(), parent.GetAnnotations().ToList().IndexOf(annotation));
-        }
-
-        CommandSource[] OriginCommands(ISingleDeltaCommand a) => [new CommandSource(a.CommandId)];
     }
+}
+
+[TestClass]
+public class EventsTestJson : EventTestsBase
+{
+    protected override Geometry CreateReplicator(Geometry node)
+    {
+        var clone = Clone(node);
+        
+        var lionWebVersion = LionWebVersions.v2024_1;
+        List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
+
+        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = CommandToEventMapper.BuildSharedKeyMap(languages);
+
+        Dictionary<NodeId, IReadableNode> sharedNodeMap = [];
+
+        var commandSender =
+            new DeltaProtocolPartitionCommandSender(node.GetPublisher(), new CommandIdProvider(), lionWebVersion);
+
+        var partitionEventHandler = new PartitionEventHandler(null);
+
+        var deserializerBuilder = new DeserializerBuilder()
+                .WithLionWebVersion(lionWebVersion)
+                .WithLanguages(languages)
+            ;
+
+        var eventReceiver = new DeltaProtocolPartitionEventReceiver(
+            partitionEventHandler,
+            sharedNodeMap,
+            sharedKeyedMap,
+            deserializerBuilder
+        );
+
+        var deltaSerializer = new DeltaSerializer();
+
+        var commandToEventMapper = new CommandToEventMapper(sharedNodeMap);
+        commandSender.DeltaCommand += (sender, command) =>
+        {
+            var json = deltaSerializer.Serialize(command);
+            var deserialized = deltaSerializer.Deserialize<IDeltaCommand>(json);
+            eventReceiver.Receive(commandToEventMapper.Map(deserialized));
+        };
+
+        var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
+        replicator.ReplicateFrom(partitionEventHandler);
+        return clone;
+    }
+}
+
+internal class CommandToEventMapper
+{
+    private readonly Dictionary<NodeId, IReadableNode> _sharedNodeMap;
+
+    public CommandToEventMapper(Dictionary<NodeId, IReadableNode> sharedNodeMap)
+    {
+        _sharedNodeMap = sharedNodeMap;
+    }
+
+    public static Dictionary<CompressedMetaPointer, IKeyed> BuildSharedKeyMap(IEnumerable<Language> languages)
+    {
+        Dictionary<CompressedMetaPointer, IKeyed>  sharedKeyedMap = [];
+        
+        foreach (IKeyed keyed in languages.SelectMany(l => M1Extensions.Descendants<IKeyed>(l)))
+        {
+            var metaPointer = keyed switch
+            {
+                LanguageEntity l => l.ToMetaPointer(),
+                Feature feat => feat.ToMetaPointer(),
+                EnumerationLiteral l => l.GetEnumeration().ToMetaPointer(),
+                _ => throw new NotImplementedException(keyed.GetType().Name)
+            };
+
+            sharedKeyedMap[CompressedMetaPointer.Create(metaPointer, true)] = keyed;
+        }
+        
+        return sharedKeyedMap;
+    }
+    
+    public IDeltaEvent Map(IDeltaCommand deltaCommand) =>
+        deltaCommand switch
+        {
+            AddProperty a => new PropertyAdded(a.Property, a.NewValue, OriginCommands(a), null),
+            DeleteProperty a => new PropertyDeleted(a.Property, null, OriginCommands(a), null),
+            ChangeProperty a => new PropertyChanged(a.Property, a.NewValue, null, OriginCommands(a), null),
+            AddChild a => new ChildAdded(a.Containment, a.NewChild, OriginCommands(a), null),
+            DeleteChild a => new ChildDeleted(a.Containment, new([]), OriginCommands(a), null),
+            ReplaceChild a => new ChildReplaced(a.Containment, a.NewChild, new([]), OriginCommands(a), null),
+            MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewContainment, a.MovedChild, ContainmentParent(a.MovedChild), OriginCommands(a), null),
+            MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, ContainmentParent(a.MovedChild).Parent, ContainmentParent(a.MovedChild).Containment, ContainmentParent(a.MovedChild).Index, OriginCommands(a), null),
+            MoveChildInSameContainment a => new ChildMovedInSameContainment(a.NewIndex, a.MovedChild, ContainmentParent(a.MovedChild).Parent, ContainmentParent(a.MovedChild).Containment, ContainmentParent(a.MovedChild).Index, OriginCommands(a), null),
+            AddAnnotation a => new AnnotationAdded(a.Parent, a.NewAnnotation, OriginCommands(a), null),
+            DeleteAnnotation a => new AnnotationDeleted(a.Parent, new([]), OriginCommands(a), null),
+            ReplaceAnnotation a => new AnnotationReplaced(a.Parent, a.NewAnnotation, new([]), OriginCommands(a), null),
+            MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.MovedAnnotation, AnnotationParent(a.MovedAnnotation), OriginCommands(a), null),
+            MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation, AnnotationParent(a.MovedAnnotation).Parent, AnnotationParent(a.MovedAnnotation).Index, OriginCommands(a), null),
+            AddReference a => new ReferenceAdded(a.Reference, a.NewTarget, OriginCommands(a), null),
+            DeleteReference a => new ReferenceDeleted(a.Reference, new(), OriginCommands(a), null),
+            ChangeReference a => new ReferenceChanged(a.Reference, a.NewTarget, new(), OriginCommands(a), null),
+        };
+
+    private DeltaContainment ContainmentParent(NodeId childId)
+    {
+        var child = (IWritableNode)_sharedNodeMap[childId];
+        var parent = (IWritableNode)child.GetParent();
+        var containment = parent.GetContainmentOf(child);
+        return new DeltaContainment(parent.GetId(), containment.ToMetaPointer(),
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList().IndexOf(child));
+    }
+
+    private DeltaAnnotation AnnotationParent(NodeId annotationId)
+    {
+        var annotation = _sharedNodeMap[annotationId];
+        var parent = annotation.GetParent();
+        return new DeltaAnnotation(parent.GetId(), parent.GetAnnotations().ToList().IndexOf(annotation));
+    }
+
+    private CommandSource[] OriginCommands(ISingleDeltaCommand a) => [new CommandSource(a.CommandId)];
 }
 
 internal class CommandIdProvider : ICommandIdProvider

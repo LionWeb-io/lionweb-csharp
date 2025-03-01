@@ -38,83 +38,11 @@ public abstract class JsonSerializationTestsBase
 
     protected void AssertSerialization(IDeltaContent input)
     {
-        var jsonSerializerOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = true,
-            TypeInfoResolver = new DeltaProtocolTypeResolver()
-        };
-        var serialized = JsonSerializer.Serialize(input, jsonSerializerOptions);
-        var deserialized = JsonSerializer.Deserialize<IDeltaContent>(serialized, jsonSerializerOptions);
+        var deltaSerializer = new DeltaSerializer();
+        var serialized = deltaSerializer.Serialize(input);
+        var deserialized = deltaSerializer.Deserialize<IDeltaContent>(serialized);
 
         Assert.AreEqual(input, deserialized);
-    }
-
-    private class DeltaProtocolTypeResolver : DefaultJsonTypeInfoResolver
-    {
-        private static readonly List<JsonDerivedType> _queries = [];
-        private static readonly List<JsonDerivedType> _commands = [];
-        private static readonly List<JsonDerivedType> _singleCommands = [];
-        private static readonly List<JsonDerivedType> _events = [];
-        private static readonly List<JsonDerivedType> _singleEvents = [];
-        private static readonly List<JsonDerivedType> _all = [];
-
-        static DeltaProtocolTypeResolver()
-        {
-            Fill(_queries, typeof(IDeltaQuery));
-            Fill(_commands, typeof(IDeltaCommand));
-            Fill(_singleCommands, typeof(ISingleDeltaCommand));
-            Fill(_events, typeof(IDeltaEvent));
-            Fill(_singleEvents, typeof(ISingleDeltaEvent));
-            Fill(_all, typeof(IDeltaContent));
-        }
-
-        private static void Fill(List<JsonDerivedType> container, Type baseType) =>
-            container.AddRange(GetDerivedTypes(baseType).Select(t => new JsonDerivedType(t, t.Name)));
-
-        private static IEnumerable<Type> GetDerivedTypes(Type type) =>
-            type.Assembly.GetTypes()
-                .Where(t => type.IsAssignableFrom(t) && !t.IsAbstract);
-
-        public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
-        {
-            JsonTypeInfo jsonTypeInfo = base.GetTypeInfo(type, options);
-
-            var jsonPolymorphismOptions = new JsonPolymorphismOptions
-            {
-                TypeDiscriminatorPropertyName = "messageKind",
-                IgnoreUnrecognizedTypeDiscriminators = false,
-                UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization
-            };
-
-            if (jsonTypeInfo.Type == typeof(IDeltaContent))
-            {
-                foreach (var derivedType in _all)
-                {
-                    jsonPolymorphismOptions.DerivedTypes.Add(derivedType);
-                }
-
-                jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
-            } else if (jsonTypeInfo.Type == typeof(ISingleDeltaCommand))
-            {
-                foreach (var derivedType in _singleCommands)
-                {
-                    jsonPolymorphismOptions.DerivedTypes.Add(derivedType);
-                }
-
-                jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
-            } else if (jsonTypeInfo.Type == typeof(ISingleDeltaEvent))
-            {
-                foreach (var derivedType in _singleEvents)
-                {
-                    jsonPolymorphismOptions.DerivedTypes.Add(derivedType);
-                }
-
-                jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
-            }
-
-            return jsonTypeInfo;
-        }
     }
 
     protected TargetNode CreateTargetNode() =>
