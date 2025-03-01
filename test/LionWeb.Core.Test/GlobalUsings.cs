@@ -16,3 +16,4 @@
 // SPDX-License-Identifier: Apache-2.0
 
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
+global using NodeId = string;

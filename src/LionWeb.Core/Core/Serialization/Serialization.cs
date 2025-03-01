@@ -23,6 +23,43 @@ namespace LionWeb.Core.Serialization;
 /// </summary>
 public record SerializationChunk
 {
+    /// <inheritdoc />
+    public virtual bool Equals(SerializationChunk? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return string.Equals(SerializationFormatVersion, other.SerializationFormatVersion,
+                   StringComparison.InvariantCulture) &&
+               Languages.SequenceEqual(other.Languages) &&
+               Nodes.SequenceEqual(other.Nodes);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(SerializationFormatVersion, StringComparer.InvariantCulture);
+        foreach (var language in Languages)
+        {
+            hashCode.Add(language);
+        }
+
+        foreach (var node in Nodes)
+        {
+            hashCode.Add(node);
+        }
+
+        return hashCode.ToHashCode();
+    }
+
     public required string SerializationFormatVersion { get; init; }
     public required SerializedLanguageReference[] Languages { get; init; }
     public required SerializedNode[] Nodes { get; init; }
@@ -36,6 +73,58 @@ public record SerializedLanguageReference
 
 public record SerializedNode
 {
+    /// <inheritdoc />
+    public virtual bool Equals(SerializedNode? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return string.Equals(Id, other.Id, StringComparison.InvariantCulture) &&
+               Classifier.Equals(other.Classifier) &&
+               Properties.SequenceEqual(other.Properties) &&
+               Containments.SequenceEqual(other.Containments) &&
+               References.SequenceEqual(other.References) &&
+               Annotations.SequenceEqual(other.Annotations) &&
+               string.Equals(Parent, other.Parent, StringComparison.InvariantCulture);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(Id, StringComparer.InvariantCulture);
+        hashCode.Add(Classifier);
+        foreach (var property in Properties)
+        {
+            hashCode.Add(property);
+        }
+
+        foreach (var containment in Containments)
+        {
+            hashCode.Add(containment);
+        }
+
+        foreach (var reference in References)
+        {
+            hashCode.Add(reference);
+        }
+
+        foreach (var annotation in Annotations)
+        {
+            hashCode.Add(annotation);
+        }
+
+        hashCode.Add(Parent, StringComparer.InvariantCulture);
+        return hashCode.ToHashCode();
+    }
+
     public required string Id { get; init; }
     public required MetaPointer Classifier { get; init; }
     public required SerializedProperty[] Properties { get; init; }
@@ -55,6 +144,36 @@ public record SerializedProperty
 
 public record SerializedContainment
 {
+    /// <inheritdoc />
+    public virtual bool Equals(SerializedContainment? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return Containment.Equals(other.Containment) &&
+               Children.SequenceEqual(other.Children);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(Containment);
+        foreach (var child in Children)
+        {
+            hashCode.Add(child);
+        }
+
+        return hashCode.ToHashCode();
+    }
+
     public required MetaPointer Containment { get; init; }
     public required string[] Children { get; init; }
 }
@@ -67,6 +186,35 @@ public record SerializedReferenceTarget
 
 public record SerializedReference
 {
+    /// <inheritdoc />
+    public virtual bool Equals(SerializedReference? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return Reference.Equals(other.Reference) && Targets.SequenceEqual(other.Targets);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(Reference);
+        foreach (var target in Targets)
+        {
+            hashCode.Add(target);
+        }
+
+        return hashCode.ToHashCode();
+    }
+
     public required MetaPointer Reference { get; init; }
     public required SerializedReferenceTarget[] Targets { get; init; }
 }
