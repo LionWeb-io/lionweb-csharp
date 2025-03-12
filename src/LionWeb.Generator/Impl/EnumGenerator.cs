@@ -40,9 +40,11 @@ public class EnumGenerator(Enumeration enumeration, INames names, LionWebVersion
                 ObsoleteAttribute(enumeration)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .WithMembers(SeparatedList(enumeration.Literals.Ordered().Select(Literal)));
+            .WithMembers(SeparatedList(enumeration.Literals.Ordered().Select(Literal)))
+            .Xdoc(XdocKeyed(enumeration));
 
     private EnumMemberDeclarationSyntax Literal(EnumerationLiteral literal) =>
         EnumMember(literal.Name)
-            .WithAttributeLists(AsAttributes([MetaPointerAttribute(literal)]));
+            .WithAttributeLists(AsAttributes([MetaPointerAttribute(literal)]))
+            .Xdoc(XdocKeyed(literal));
 }

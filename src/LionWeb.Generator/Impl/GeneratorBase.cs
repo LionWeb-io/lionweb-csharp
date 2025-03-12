@@ -109,6 +109,25 @@ public abstract class GeneratorBase
     protected MemberAccessExpressionSyntax MetaProperty(Field field) =>
         MemberAccess(_names.MetaProperty(field.GetLanguage()), _names.AsProperty(field));
 
+    /// <returns><code>
+    /// /// keyed.@KeyedDescription.documentation
+    /// /// &lt;seealso cref="keyed.@KeyedDescription.seeAlso"/&gt;
+    /// </code></returns>
+    protected List<XmlNodeSyntax> XdocKeyed(IKeyed keyed)
+    {
+        List<XmlNodeSyntax> result = [];
+        
+        var keyedDocumentation = VersionSpecifics.GetKeyedDocumentation(keyed);
+        if (keyedDocumentation != null)
+            result.AddRange(XdocLine(keyedDocumentation));
+
+        var keyedSeeAlso = VersionSpecifics.GetKeyedSeeAlso(keyed).OfType<IKeyed>().ToList();
+        if (keyedSeeAlso.Count != 0)
+            result.AddRange(keyedSeeAlso.Select(k => _names.AsName(k)).SelectMany(XdocSeeAlso));
+
+        return result;
+    }
+
     /// <returns><c>[LionCoreMetaPointer(Language = typeof(MyLangNameLanguage), Key = "keyedKey")]</c></returns>
     protected AttributeSyntax MetaPointerAttribute(IKeyed keyed)
     {

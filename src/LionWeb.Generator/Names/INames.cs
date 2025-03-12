@@ -81,6 +81,10 @@ public interface INames
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
     TypeSyntax AsType(Datatype datatype, bool disambiguate = false);
 
+    /// Roslyn type of <paramref name="keyed"/> (also registered with <see cref="UsedTypes"/>).
+    /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
+    NameSyntax AsName(IKeyed keyed, bool disambiguate = false);
+
     /// Roslyn type of <paramref name="lang"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="lang"/> is mentioned in <see cref="NamespaceMappings"/>.
     /// <returns><c>MyLangNameLanguage</c></returns>
@@ -118,7 +122,7 @@ public interface INames
 
     /// <returns><c>MyField</c></returns>
     IdentifierNameSyntax FieldProperty(Field field);
-    
+
     /// <returns><c>myField</c></returns>
     string FieldParam(Field field);
 }

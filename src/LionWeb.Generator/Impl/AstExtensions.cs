@@ -342,13 +342,38 @@ public static class AstExtensions
     /// <returns><c>///&lt;tag&gt;text&lt;/tag&gt;</c></returns>
     public static IEnumerable<XmlNodeSyntax> XdocLine(string text, string? tag = null)
     {
-        var body = XdocText(text);
+        XmlNodeSyntax body = XdocText(text);
         if (tag != null)
         {
-            body = body
-                .WithStartTag(XmlElementStartTag(XmlName(Identifier(tag))))
-                .WithEndTag(XmlElementEndTag(XmlName(Identifier(tag))));
+            body = XmlElement(tag, SingletonList(body));
         }
+
+        return
+        [
+            XdocSlashes(),
+            body,
+            XdocNewline()
+        ];
+    }
+
+    /// <returns><c>///&lt;seealso cref="target"/&gt;</c></returns>
+    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(TypeSyntax target)
+    {
+        var body = XmlSeeAlsoElement(NameMemberCref(target));
+
+        return
+        [
+            XdocSlashes(),
+            body,
+            XdocNewline()
+        ];
+    }
+
+    /// <returns><c>///&lt;seealso href="uri"/&gt;</c></returns>
+    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(string uri)
+    {
+        var body = XmlEmptyElement("seealso")
+            .AddAttributes(XmlTextAttribute("href", XmlTextLiteral(TriviaList(), uri, uri, TriviaList())));
 
         return
         [
@@ -368,7 +393,7 @@ public static class AstExtensions
 
     /// <summary>Takes care of properly wrapping multi-line text with `///` prefix</summary>
     /// <returns><c>text</c></returns>
-    public static XmlElementSyntax XdocText(string text)
+    public static XmlTextSyntax XdocText(string text)
     {
         using var reader = new StringReader(text);
         bool first = true;
@@ -387,14 +412,10 @@ public static class AstExtensions
             }
         }
 
-        return XmlExampleElement(
-            SingletonList<XmlNodeSyntax>(
-                XmlText()
-                    .WithTextTokens(
-                        TokenList(texts)
-                    )
-            )
-        );
+        return XmlText()
+            .WithTextTokens(
+                TokenList(texts)
+            );
     }
 
     /// <returns><c>/// </c></returns>
@@ -476,7 +497,7 @@ public static class AstExtensions
     /// <returns><c>this</c></returns>
     public static ThisExpressionSyntax This() =>
         ThisExpression();
-    
+
     /// Adds <paramref name="element"/> between any two elements of <paramref name="source"/>.
     public static IEnumerable<T> Intersperse<T>(this IEnumerable<T> source, T element)
     {
@@ -489,5 +510,4 @@ public static class AstExtensions
             first = false;
         }
     }
-
 }

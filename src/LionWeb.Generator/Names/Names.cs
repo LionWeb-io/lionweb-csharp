@@ -44,7 +44,7 @@ public partial class Names : INames
     private readonly string _namespaceName;
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
-    
+
     private readonly Dictionary<Language, string> _namespaceMappings = new();
 
     /// <summary>
@@ -57,7 +57,7 @@ public partial class Names : INames
     {
         _language = language;
         _namespaceName = namespaceName.PrefixKeyword();
-        
+
         _m3 = language.LionWebVersion.LionCore;
         _builtIns = language.LionWebVersion.BuiltIns;
     }
@@ -92,12 +92,16 @@ public partial class Names : INames
 
     /// <inheritdoc />
     public string FactoryName => $"{LanguageBaseName(_language)}Factory".PrefixKeyword();
+
     /// <inheritdoc />
     public IdentifierNameSyntax FactoryInterfaceType => IdentifierName(FactoryInterfaceName);
+
     /// <inheritdoc />
     public IdentifierNameSyntax FactoryType => IdentifierName(FactoryName);
+
     /// <inheritdoc />
     public Language Language => _language;
+
     /// <inheritdoc />
     public string NamespaceName => _namespaceName;
 
@@ -169,17 +173,38 @@ public partial class Names : INames
 
         return QualifiedName(ParseName(NamespaceName), type);
     }
-    
+
+    /// <inheritdoc />
+    public NameSyntax AsName(IKeyed keyed, bool disambiguate = false) => keyed switch
+    {
+        Language l => AsType(l),
+        Classifier c => ToName(AsType(c, disambiguate)),
+        Datatype d => ToName(AsType(d, disambiguate)),
+        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)),
+            IdentifierName(f.Name.PrefixKeyword())),
+        Field f => QualifiedName(ToName(AsType(f.GetStructuredDataType(), disambiguate)),
+            IdentifierName(f.Name.PrefixKeyword())),
+        EnumerationLiteral f => QualifiedName(ToName(AsType(f.GetEnumeration(), disambiguate)),
+            IdentifierName(f.Name.PrefixKeyword()))
+    };
+
+    private NameSyntax ToName(TypeSyntax type) => type switch
+    {
+        NameSyntax n => n,
+        NullableTypeSyntax n => ToName(n.ElementType),
+        PredefinedTypeSyntax p => IdentifierName(p.Keyword)
+    };
+
     /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
     internal IGeneratorVersionSpecifics VersionSpecifics =>
         new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_language.LionWebVersion)).Value;
-    
+
 
     /// <inheritdoc />
     public NameSyntax AsType(Language lang)
     {
         var typeName = IdentifierName(LanguageBaseName(lang) + "Language");
-        
+
         if (_namespaceMappings.TryGetValue(lang, out var ns))
         {
             return QualifiedName(

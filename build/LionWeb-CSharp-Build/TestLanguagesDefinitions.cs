@@ -64,32 +64,48 @@ public class TestLanguagesDefinitions
                                                                      Des
                                                                    crip
                                                                       tion
-                                                                   """)
+                                                                   """, "https://example.com/abc?u=i#x"),
+            CreateKeyedDescription("aaa-keyedDesc", "keyed description", [aLang])
         ]);
         var aEnum = aLang.Enumeration("id-aEnum", "key-AEnum", "AEnum");
+        aEnum.AddAnnotations([
+            CreateKeyedDescription("aaa-enumDesc", "enum description", [aLang, aConcept])
+        ]);
 
         var bLang = new DynamicLanguage("id-BLang", _lionWebVersion)
         {
             Key = "key-BLang", Name = "BLang", Version = "2"
         };
+        bLang.AddAnnotations([
+            CreateKeyedDescription("aaa-bLangDesc", "bLang desc", [aLang])
+        ]);
         var bConcept = bLang.Concept("id-BConcept", "key-BConcept", "BConcept");
-        bConcept.AddAnnotations([CreateConceptDescription("xxx", null, "Some enum")]);
+        bConcept.AddAnnotations([CreateConceptDescription("xxx", null, "Some enum", null)]);
 
         aLang.AddDependsOn([bLang]);
         bLang.AddDependsOn([aLang]);
 
-        aEnum.EnumerationLiteral("id-left", "key-left", "left");
+        var literalLeft = aEnum.EnumerationLiteral("id-left", "key-left", "left");
+        literalLeft.AddAnnotations([
+            CreateKeyedDescription("aaa-leftDesc", "left desc", [aEnum])
+        ]);
         aEnum.EnumerationLiteral("id-right", "key-right", "right");
 
-        aConcept.Reference("id-AConcept-BRef", "key-BRef", "BRef").IsOptional().OfType(bConcept);
+        var bRef = aConcept.Reference("id-AConcept-BRef", "key-BRef", "BRef").IsOptional().OfType(bConcept);
+        bRef.AddAnnotations([
+            CreateKeyedDescription("aaa-bRefDesc", "bRef desc", [literalLeft, bRef])
+        ]);
         bConcept.Reference("id-BConcept-ARef", "key-ARef", "ARef").IsOptional().OfType(aConcept);
-        bConcept.Property("id-BConcept-AEnumProp", "key-AEnumProp", "AEnumProp").OfType(aEnum);
+        var aEnumProp = bConcept.Property("id-BConcept-AEnumProp", "key-AEnumProp", "AEnumProp").OfType(aEnum);
+        aEnumProp.AddAnnotations([
+            CreateKeyedDescription("aaa-enumPropDesc", "enum desc", [aLang, bRef])
+        ]);
 
         ALang = aLang;
         BLang = bLang;
     }
 
-    private INode CreateConceptDescription(string id, string? alias, string? description)
+    private INode CreateConceptDescription(string id, string? alias, string? description, string? helpUrl)
     {
         ISpecificLanguage specificLanguage = ISpecificLanguage.Get(_lionWebVersion);
         INode conceptDescrption = specificLanguage.GetFactory().CreateNode(id, specificLanguage.ConceptDescription);
@@ -99,8 +115,24 @@ public class TestLanguagesDefinitions
 
         if (description != null)
             conceptDescrption.Set(specificLanguage.ConceptDescription_conceptShortDescription, description);
+        
+        if (helpUrl != null)
+            conceptDescrption.Set(specificLanguage.ConceptDescription_helpUrl, helpUrl);
 
         return conceptDescrption;
+    }
+
+    private INode CreateKeyedDescription(string id, string? documentation, IEnumerable<IReadableNode> seeAlso)
+    {
+        ISpecificLanguage specificLanguage = ISpecificLanguage.Get(_lionWebVersion);
+        INode keyedDescription = specificLanguage.GetFactory().CreateNode(id, specificLanguage.KeyedDescription);
+        
+        if(documentation != null)
+            keyedDescription.Set(specificLanguage.KeyedDescription_documentation, documentation);
+        
+        keyedDescription.Set(specificLanguage.KeyedDescription_seeAlso, seeAlso);
+        
+        return keyedDescription;
     }
 
     private void CreateTinyRefLang()

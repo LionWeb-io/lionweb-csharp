@@ -105,23 +105,35 @@ public class ALangFactory : AbstractBaseNodeFactory, IALangFactory
 ///   Des
 /// crip
 ///    tion</summary>
+/// <seealso href="https://example.com/abc?u=i#x"/>
+/// keyed description
+/// <seealso cref = "ALangLanguage"/>
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AConcept")]
 public partial class AConcept : ConceptInstanceBase
 {
 	private LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? _bRef = null;
-	/// <remarks>Optional Single Reference</remarks>
+	/// bRef desc
+    	/// <seealso cref = "AEnum.left"/>
+    	/// <seealso cref = "AConcept.BRef"/>
+    	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-BRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? BRef { get => _bRef; set => SetBRef(value); }
 
-	/// <remarks>Optional Single Reference</remarks>
+	/// bRef desc
+    	/// <seealso cref = "AEnum.left"/>
+    	/// <seealso cref = "AConcept.BRef"/>
+    	/// <remarks>Optional Single Reference</remarks>
         public bool TryGetBRef([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? bRef)
 	{
 		bRef = _bRef;
 		return _bRef != null;
 	}
 
-	/// <remarks>Optional Single Reference</remarks>
+	/// bRef desc
+    	/// <seealso cref = "AEnum.left"/>
+    	/// <seealso cref = "AConcept.BRef"/>
+    	/// <remarks>Optional Single Reference</remarks>
         public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? value)
 	{
 		_bRef = value;
@@ -177,10 +189,15 @@ public partial class AConcept : ConceptInstanceBase
 	}
 }
 
+/// enum description
+/// <seealso cref = "ALangLanguage"/>
+/// <seealso cref = "AConcept"/>
 [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-AEnum")]
 public enum AEnum
 {
-	[LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-left")]
+	/// left desc
+    	/// <seealso cref = "AEnum"/>
+        [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-left")]
 	left,
 	[LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-right")]
 	right

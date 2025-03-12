@@ -14,6 +14,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
+/// bLang desc
+/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.ALangLanguage"/>
 [LionCoreLanguage(Key = "key-BLang", Version = "2")]
 public partial class BLangLanguage : LanguageBase<IBLangFactory>
 {
@@ -96,14 +98,20 @@ public class BLangFactory : AbstractBaseNodeFactory, IBLangFactory
 public partial class BConcept : ConceptInstanceBase
 {
 	private LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum? _aEnumProp = null;
-	/// <remarks>Required Property</remarks>
+	/// enum desc
+    	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.ALangLanguage"/>
+    	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept.BRef"/>
+    	/// <remarks>Required Property</remarks>
     	/// <exception cref = "UnsetFeatureException">If AEnumProp has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-AEnumProp")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum AEnumProp { get => _aEnumProp ?? throw new UnsetFeatureException(BLangLanguage.Instance.BConcept_AEnumProp); set => SetAEnumProp(value); }
 
-	/// <remarks>Required Property</remarks>
+	/// enum desc
+    	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.ALangLanguage"/>
+    	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept.BRef"/>
+    	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public bool TryGetAEnumProp([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum? aEnumProp)
 	{
@@ -111,7 +119,10 @@ public partial class BConcept : ConceptInstanceBase
 		return _aEnumProp != null;
 	}
 
-	/// <remarks>Required Property</remarks>
+	/// enum desc
+    	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.ALangLanguage"/>
+    	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AConcept.BRef"/>
+    	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.A.AEnum value)
 	{

@@ -77,6 +77,9 @@ public class UniqueFeatureNames(INames parent) : INames
     public TypeSyntax AsType(Datatype datatype, bool disambiguate = false) => parent.AsType(datatype, disambiguate);
 
     /// <inheritdoc />
+    public NameSyntax AsName(IKeyed keyed, bool disambiguate = false) => parent.AsName(keyed, disambiguate);
+
+    /// <inheritdoc />
     public NameSyntax AsType(Language lang) => parent.AsType(lang);
 
     /// <inheritdoc />

@@ -21,6 +21,7 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -36,6 +37,7 @@ using Property = Core.M3.Property;
 /// - feature field
 /// - feature property
 /// - SetFeature()
+/// - TryGetFeature()
 /// - AddFeature()
 /// - InsertFeature()
 /// - RemoveFeature()
@@ -119,7 +121,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(feature))
+            .Xdoc(XdocDefault(feature))
             .WithBody(AsStatements([
                 Assignment(FeatureTryGetParam(), FeatureField(feature)),
                 ReturnStatement(NotEquals(FeatureField(feature), Null()))
@@ -138,7 +140,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(feature))
+            .Xdoc(XdocDefault(feature))
             .WithBody(AsStatements([
                 Assignment(FeatureTryGetParam(), FeatureField(feature)),
                 ReturnStatement(
@@ -188,7 +190,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
-        new List<MemberDeclarationSyntax> { SingleFeatureField(true), SingleOptionalFeatureProperty(true), TryGet(true) }
+        new List<MemberDeclarationSyntax>
+            {
+                SingleFeatureField(true), SingleOptionalFeatureProperty(true), TryGet(true)
+            }
             .Concat(
                 OptionalFeatureSetter([
                     SetParentNullCall(containment),
@@ -540,7 +545,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(feature)
+            .Xdoc(XdocDefault(feature)
                 .Concat(XdocThrows($"If {FeatureProperty(feature)} has not been set",
                     AsType(typeof(UnsetFeatureException))))
             );
@@ -581,7 +586,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
     }
 
     private PropertyDeclarationSyntax SingleOptionalFeatureProperty(bool writeable = false) =>
@@ -596,7 +601,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
 
     private PropertyDeclarationSyntax AbstractSingleOptionalFeatureProperty() =>
         PropertyDeclaration(NullableType(AsType(feature.GetFeatureType())),
@@ -613,7 +618,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
 
     private PropertyDeclarationSyntax MultipleLinkProperty(Link link, InvocationExpressionSyntax getter) =>
         PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(link.Type)),
@@ -634,7 +639,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
     private PropertyDeclarationSyntax AbstractMultipleLinkProperty(Link link) =>
         PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(link.Type)),
@@ -652,7 +657,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
     private List<MethodDeclarationSyntax> RequiredFeatureSetter(List<StatementSyntax> body, bool writeable = false)
     {
@@ -680,7 +685,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
 
     private IEnumerable<MethodDeclarationSyntax> OptionalFeatureSetter(List<StatementSyntax> body,
         bool writeable = false)
@@ -698,6 +703,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
         return result;
     }
+    
+    private IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
+        XdocKeyed(ffeature)
+            .Concat(XdocRemarks(ffeature));
 
     private static IEnumerable<XmlNodeSyntax> XdocRemarks(Feature feature)
     {
@@ -721,12 +730,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private static IEnumerable<XmlNodeSyntax> XdocThrows(string text, TypeSyntax exception) =>
     [
         XdocSlashes(),
-        XdocText(text)
-            .WithStartTag(
-                XmlElementStartTag(XmlName(Identifier("exception")))
-                    .WithAttributes(SingletonList<XmlAttributeSyntax>(XmlCrefAttribute(NameMemberCref(exception))))
-            )
-            .WithEndTag(XmlElementEndTag(XmlName(Identifier("exception")))),
+        XmlElement("exception", new SyntaxList<XmlNodeSyntax>(XdocText(text)))
+            .AddStartTagAttributes(XmlCrefAttribute(NameMemberCref(exception))),
         XdocNewline()
     ];
 
@@ -738,7 +743,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     {
         var modifiers = impl.Modifiers;
         return impl
-            .WithReturnType(AsType(feature.GetFeatureClassifier(), writeable:true))
+            .WithReturnType(AsType(feature.GetFeatureClassifier(), writeable: true))
             .WithModifiers(AsModifiers())
             .AppendXdoc(modifiers, SyntaxKind.None, [])
             .WithExplicitInterfaceSpecifier(
@@ -755,7 +760,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
 
     private IEnumerable<MethodDeclarationSyntax> LinkRemover(Link link, List<StatementSyntax> body)
     {
@@ -781,7 +786,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
     private IEnumerable<MethodDeclarationSyntax> LinkInserter(Link link, List<StatementSyntax> body)
     {
@@ -808,7 +813,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
     private IEnumerable<MethodDeclarationSyntax> LinkAdder(Link link, List<StatementSyntax> body)
     {
@@ -833,7 +838,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
 
     private ExpressionSyntax LinkInsert(Link link) =>
