@@ -75,6 +75,22 @@ public interface INames
 
     /// Roslyn type of <paramref name="classifier"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
+    /// Returns writable variants of built-in types if <paramref name="writeable"/> is <c>true</c>:
+    /// <list type="table">
+    /// <listheader>
+    ///     <term>Readable</term>
+    ///     <description>Writable</description>
+    /// </listheader>
+    /// <item>
+    ///     <term><see cref="LionWeb.Core.IReadableNode"/></term>
+    ///     <description><see cref="LionWeb.Core.INode"/></description>
+    /// </item>
+    /// <item>
+    ///     <term><see cref="LionWeb.Core.M2.INamed"/></term>
+    ///     <description><see cref="LionWeb.Core.M2.INamedWritable"/></description>
+    /// </item>
+    /// </list>
+    /// 
     TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false);
 
     /// Roslyn type of <paramref name="datatype"/> (also registered with <see cref="UsedTypes"/>).
