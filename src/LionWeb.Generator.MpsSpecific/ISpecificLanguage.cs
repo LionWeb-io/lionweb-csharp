@@ -40,6 +40,10 @@ public interface ISpecificLanguage : Language
     Annotation ConceptDescription { get; }
     Property ConceptDescription_conceptAlias { get; }
     Property ConceptDescription_conceptShortDescription { get; }
+    Property ConceptDescription_helpUrl { get; }
+    Annotation KeyedDescription { get; }
+    Property KeyedDescription_documentation { get; }
+    Reference KeyedDescription_seeAlso { get; }
     Annotation Deprecated { get; }
     Property Deprecated_build { get; }
     Property Deprecated_comment { get; }

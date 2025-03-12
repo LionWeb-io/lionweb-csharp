@@ -5,8 +5,6 @@
 #pragma warning disable 1591
 #nullable enable
 namespace Io.Lionweb.Mps.Specific.V2024_1;
-
-using Io.Lionweb.Mps.Specific;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -22,12 +20,16 @@ public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecifi
 	public static readonly SpecificLanguage Instance = new Lazy<SpecificLanguage>(() => new("io-lionweb-mps-specific")).Value;
 	public SpecificLanguage(string id) : base(id, LionWebVersions.v2024_1)
 	{
-		_conceptDescription = new(() => new AnnotationBase<SpecificLanguage>("ConceptDescription", this) { Key = "ConceptDescription", Name = "ConceptDescription", AnnotatesLazy = new(() => _m3.Classifier), FeaturesLazy = new(() => [ConceptDescription_conceptAlias, ConceptDescription_conceptShortDescription]) });
+		_conceptDescription = new(() => new AnnotationBase<SpecificLanguage>("ConceptDescription", this) { Key = "ConceptDescription", Name = "ConceptDescription", AnnotatesLazy = new(() => _m3.Classifier), FeaturesLazy = new(() => [ConceptDescription_conceptAlias, ConceptDescription_conceptShortDescription, ConceptDescription_helpUrl]) });
 		_conceptDescription_conceptAlias = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptAlias", ConceptDescription, this) { Key = "ConceptDescription-conceptAlias", Name = "conceptAlias", Optional = true, Type = _builtIns.String });
 		_conceptDescription_conceptShortDescription = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-conceptShortDescription", ConceptDescription, this) { Key = "ConceptDescription-conceptShortDescription", Name = "conceptShortDescription", Optional = true, Type = _builtIns.String });
+		_conceptDescription_helpUrl = new(() => new PropertyBase<SpecificLanguage>("ConceptDescription-helpUrl", ConceptDescription, this) { Key = "ConceptDescription-helpUrl", Name = "helpUrl", Optional = true, Type = _builtIns.String });
 		_deprecated = new(() => new AnnotationBase<SpecificLanguage>("Deprecated", this) { Key = "Deprecated", Name = "Deprecated", AnnotatesLazy = new(() => _m3.IKeyed), FeaturesLazy = new(() => [Deprecated_build, Deprecated_comment]) });
 		_deprecated_build = new(() => new PropertyBase<SpecificLanguage>("Deprecated-build", Deprecated, this) { Key = "Deprecated-build", Name = "build", Optional = true, Type = _builtIns.String });
 		_deprecated_comment = new(() => new PropertyBase<SpecificLanguage>("Deprecated-comment", Deprecated, this) { Key = "Deprecated-comment", Name = "comment", Optional = true, Type = _builtIns.String });
+		_keyedDescription = new(() => new AnnotationBase<SpecificLanguage>("KeyedDescription", this) { Key = "KeyedDescription", Name = "KeyedDescription", AnnotatesLazy = new(() => _m3.IKeyed), FeaturesLazy = new(() => [KeyedDescription_documentation, KeyedDescription_seeAlso]) });
+		_keyedDescription_documentation = new(() => new PropertyBase<SpecificLanguage>("KeyedDescription-documentation", KeyedDescription, this) { Key = "KeyedDescription-documentation", Name = "documentation", Optional = true, Type = _builtIns.String });
+		_keyedDescription_seeAlso = new(() => new ReferenceBase<SpecificLanguage>("KeyedDescription-seeAlso", KeyedDescription, this) { Key = "KeyedDescription-seeAlso", Name = "seeAlso", Optional = true, Multiple = true, Type = _builtIns.Node });
 		_shortDescription = new(() => new AnnotationBase<SpecificLanguage>("ShortDescription", this) { Key = "ShortDescription", Name = "ShortDescription", AnnotatesLazy = new(() => _builtIns.Node), FeaturesLazy = new(() => [ShortDescription_description]) });
 		_shortDescription_description = new(() => new PropertyBase<SpecificLanguage>("ShortDescription-description", ShortDescription, this) { Key = "ShortDescription-description", Name = "description", Optional = true, Type = _builtIns.String });
 		_virtualPackage = new(() => new AnnotationBase<SpecificLanguage>("VirtualPackage", this) { Key = "VirtualPackage", Name = "VirtualPackage", AnnotatesLazy = new(() => _builtIns.Node), ImplementsLazy = new(() => [_builtIns.INamed]) });
@@ -35,7 +37,7 @@ public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecifi
 	}
 
 	/// <inheritdoc/>
-        public override IReadOnlyList<LanguageEntity> Entities => [ConceptDescription, Deprecated, ShortDescription, VirtualPackage];
+        public override IReadOnlyList<LanguageEntity> Entities => [ConceptDescription, Deprecated, KeyedDescription, ShortDescription, VirtualPackage];
 	/// <inheritdoc/>
         public override IReadOnlyList<Language> DependsOn => [];
 
@@ -60,6 +62,9 @@ public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecifi
 	private readonly Lazy<Property> _conceptDescription_conceptShortDescription;
 	public Property ConceptDescription_conceptShortDescription => _conceptDescription_conceptShortDescription.Value;
 
+	private readonly Lazy<Property> _conceptDescription_helpUrl;
+	public Property ConceptDescription_helpUrl => _conceptDescription_helpUrl.Value;
+
 	private readonly Lazy<Annotation> _deprecated;
 	public Annotation Deprecated => _deprecated.Value;
 
@@ -68,6 +73,15 @@ public partial class SpecificLanguage : LanguageBase<ISpecificFactory>, ISpecifi
 
 	private readonly Lazy<Property> _deprecated_comment;
 	public Property Deprecated_comment => _deprecated_comment.Value;
+
+	private readonly Lazy<Annotation> _keyedDescription;
+	public Annotation KeyedDescription => _keyedDescription.Value;
+
+	private readonly Lazy<Property> _keyedDescription_documentation;
+	public Property KeyedDescription_documentation => _keyedDescription_documentation.Value;
+
+	private readonly Lazy<Reference> _keyedDescription_seeAlso;
+	public Reference KeyedDescription_seeAlso => _keyedDescription_seeAlso.Value;
 
 	private readonly Lazy<Annotation> _shortDescription;
 	public Annotation ShortDescription => _shortDescription.Value;
@@ -85,6 +99,8 @@ public partial interface ISpecificFactory : INodeFactory
 	public ConceptDescription CreateConceptDescription();
 	public Deprecated NewDeprecated(string id);
 	public Deprecated CreateDeprecated();
+	public KeyedDescription NewKeyedDescription(string id);
+	public KeyedDescription CreateKeyedDescription();
 	public ShortDescription NewShortDescription(string id);
 	public ShortDescription CreateShortDescription();
 	public VirtualPackage NewVirtualPackage(string id);
@@ -106,6 +122,8 @@ public class SpecificFactory : AbstractBaseNodeFactory, ISpecificFactory
 			return NewConceptDescription(id);
 		if (_language.Deprecated.EqualsIdentity(classifier))
 			return NewDeprecated(id);
+		if (_language.KeyedDescription.EqualsIdentity(classifier))
+			return NewKeyedDescription(id);
 		if (_language.ShortDescription.EqualsIdentity(classifier))
 			return NewShortDescription(id);
 		if (_language.VirtualPackage.EqualsIdentity(classifier))
@@ -129,6 +147,8 @@ public class SpecificFactory : AbstractBaseNodeFactory, ISpecificFactory
 	public virtual ConceptDescription CreateConceptDescription() => NewConceptDescription(GetNewId());
 	public virtual Deprecated NewDeprecated(string id) => new(id);
 	public virtual Deprecated CreateDeprecated() => NewDeprecated(GetNewId());
+	public virtual KeyedDescription NewKeyedDescription(string id) => new(id);
+	public virtual KeyedDescription CreateKeyedDescription() => NewKeyedDescription(GetNewId());
 	public virtual ShortDescription NewShortDescription(string id) => new(id);
 	public virtual ShortDescription CreateShortDescription() => NewShortDescription(GetNewId());
 	public virtual VirtualPackage NewVirtualPackage(string id) => new(id);
@@ -178,6 +198,26 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		return this;
 	}
 
+	private string? _helpUrl = null;
+	/// <remarks>Optional Property</remarks>
+        [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "ConceptDescription-helpUrl")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
+	public string? HelpUrl { get => _helpUrl; set => SetHelpUrl(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public bool TryGetHelpUrl([MaybeNullWhenAttribute(false)] out string? helpUrl)
+	{
+		helpUrl = _helpUrl;
+		return _helpUrl != null;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public ConceptDescription SetHelpUrl(string? value)
+	{
+		_helpUrl = value;
+		return this;
+	}
+
 	public ConceptDescription(string id) : base(id)
 	{
 	}
@@ -198,6 +238,12 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		if (SpecificLanguage.Instance.ConceptDescription_conceptShortDescription.EqualsIdentity(feature))
 		{
 			result = ConceptShortDescription;
+			return true;
+		}
+
+		if (SpecificLanguage.Instance.ConceptDescription_helpUrl.EqualsIdentity(feature))
+		{
+			result = HelpUrl;
 			return true;
 		}
 
@@ -231,6 +277,17 @@ public partial class ConceptDescription : AnnotationInstanceBase
 			throw new InvalidValueException(feature, value);
 		}
 
+		if (SpecificLanguage.Instance.ConceptDescription_helpUrl.EqualsIdentity(feature))
+		{
+			if (value is null or string)
+			{
+				HelpUrl = (string?)value;
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
 		return false;
 	}
 
@@ -242,6 +299,8 @@ public partial class ConceptDescription : AnnotationInstanceBase
 			result.Add(SpecificLanguage.Instance.ConceptDescription_conceptAlias);
 		if (TryGetConceptShortDescription(out _))
 			result.Add(SpecificLanguage.Instance.ConceptDescription_conceptShortDescription);
+		if (TryGetHelpUrl(out _))
+			result.Add(SpecificLanguage.Instance.ConceptDescription_helpUrl);
 		return result;
 	}
 }
@@ -353,6 +412,138 @@ public partial class Deprecated : AnnotationInstanceBase
 			result.Add(SpecificLanguage.Instance.Deprecated_build);
 		if (TryGetComment(out _))
 			result.Add(SpecificLanguage.Instance.Deprecated_comment);
+		return result;
+	}
+}
+
+[LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription")]
+public partial class KeyedDescription : AnnotationInstanceBase
+{
+	private string? _documentation = null;
+	/// <remarks>Optional Property</remarks>
+        [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription-documentation")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
+	public string? Documentation { get => _documentation; set => SetDocumentation(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public bool TryGetDocumentation([MaybeNullWhenAttribute(false)] out string? documentation)
+	{
+		documentation = _documentation;
+		return _documentation != null;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        public KeyedDescription SetDocumentation(string? value)
+	{
+		_documentation = value;
+		return this;
+	}
+
+	private readonly List<NodeBase> _seeAlso = [];
+	/// <remarks>Optional Multiple Reference</remarks>
+        [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription-seeAlso")]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	public IReadOnlyList<NodeBase> SeeAlso { get => _seeAlso.AsReadOnly(); init => AddSeeAlso(value); }
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public bool TryGetSeeAlso([MaybeNullWhenAttribute(false)] out IReadOnlyList<NodeBase> seeAlso)
+	{
+		seeAlso = _seeAlso;
+		return _seeAlso.Count != 0;
+	}
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public KeyedDescription AddSeeAlso(IEnumerable<NodeBase> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+		_seeAlso.AddRange(safeNodes);
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public KeyedDescription InsertSeeAlso(int index, IEnumerable<NodeBase> nodes)
+	{
+		AssureInRange(index, _seeAlso);
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+		_seeAlso.InsertRange(index, safeNodes);
+		return this;
+	}
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public KeyedDescription RemoveSeeAlso(IEnumerable<NodeBase> nodes)
+	{
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+		RemoveAll(safeNodes, _seeAlso);
+		return this;
+	}
+
+	public KeyedDescription(string id) : base(id)
+	{
+	}
+
+	/// <inheritdoc/>
+        public override Annotation GetAnnotation() => SpecificLanguage.Instance.KeyedDescription;
+	/// <inheritdoc/>
+        protected override bool GetInternal(Feature? feature, out Object? result)
+	{
+		if (base.GetInternal(feature, out result))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_documentation.EqualsIdentity(feature))
+		{
+			result = Documentation;
+			return true;
+		}
+
+		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
+		{
+			result = SeeAlso;
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        protected override bool SetInternal(Feature? feature, Object? value)
+	{
+		if (base.SetInternal(feature, value))
+			return true;
+		if (SpecificLanguage.Instance.KeyedDescription_documentation.EqualsIdentity(feature))
+		{
+			if (value is null or string)
+			{
+				Documentation = (string?)value;
+				return true;
+			}
+
+			throw new InvalidValueException(feature, value);
+		}
+
+		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
+		{
+			var enumerable = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<NodeBase>(value);
+			_seeAlso.Clear();
+			AddSeeAlso(enumerable);
+			return true;
+		}
+
+		return false;
+	}
+
+	/// <inheritdoc/>
+        public override IEnumerable<Feature> CollectAllSetFeatures()
+	{
+		List<Feature> result = base.CollectAllSetFeatures().ToList();
+		if (TryGetDocumentation(out _))
+			result.Add(SpecificLanguage.Instance.KeyedDescription_documentation);
+		if (TryGetSeeAlso(out _))
+			result.Add(SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		return result;
 	}
 }
