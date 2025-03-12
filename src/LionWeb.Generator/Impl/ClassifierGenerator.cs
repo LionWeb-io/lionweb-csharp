@@ -60,7 +60,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             bases.Add(AsType(typeof(AnnotationInstanceBase)));
         }
 
-        bases.AddRange(Interfaces.Select(i => AsType(i)));
+        bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
 
         return ClassifierClass(bases, GenGetClassifier("GetAnnotation", typeof(Annotation)));
     }
@@ -77,7 +77,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             bases.Add(AsType(typeof(ConceptInstanceBase)));
         }
 
-        bases.AddRange(Interfaces.Select(i => AsType(i)));
+        bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
 
         if (concept.Partition)
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));

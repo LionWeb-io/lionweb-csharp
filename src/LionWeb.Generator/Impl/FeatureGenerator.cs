@@ -77,13 +77,13 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             { Optional: false } =>
             [
                 AbstractSingleRequiredFeatureProperty(),
-                AbstractRequiredFeatureSetter()
+                AbstractRequiredFeatureSetter(feature is Containment)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ],
             { Optional: true } =>
             [
                 AbstractSingleOptionalFeatureProperty(),
-                AbstractOptionalFeatureSetter()
+                AbstractOptionalFeatureSetter(feature is Containment)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ],
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
@@ -109,10 +109,11 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
     }
 
-    private MethodDeclarationSyntax TryGet() =>
+    private MethodDeclarationSyntax TryGet(bool writeable = false) =>
         Method(FeatureTryGet(feature), AsType(typeof(bool)),
                 [
-                    OutParam(Param(FeatureTryGetParam(), NullableType(AsType(feature.GetFeatureType()))))
+                    OutParam(Param(FeatureTryGetParam(),
+                            NullableType(AsType(feature.GetFeatureType(), writeable: writeable))))
                         .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
                 ]
             )
@@ -169,17 +170,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
         {
-            SingleFeatureField(),
-            SingleRequiredFeatureProperty()
+            SingleFeatureField(true),
+            SingleRequiredFeatureProperty(true)
                 .Xdoc(XdocThrowsIfSetToNull()),
-            TryGet()
+            TryGet(true)
         }.Concat(RequiredFeatureSetter([
                 AsureNotNullCall(),
                 SetParentNullCall(containment),
                 AttachChildCall(),
                 AssignFeatureField(),
                 ReturnStatement(This())
-            ])
+            ], true)
             .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
         );
 
@@ -187,13 +188,14 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
-        new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }.Concat(
-            OptionalFeatureSetter([
-                SetParentNullCall(containment),
-                AttachChildCall(),
-                AssignFeatureField(),
-                ReturnStatement(This())
-            ]));
+        new List<MemberDeclarationSyntax> { SingleFeatureField(true), SingleOptionalFeatureProperty(true), TryGet(true) }
+            .Concat(
+                OptionalFeatureSetter([
+                    SetParentNullCall(containment),
+                    AttachChildCall(),
+                    AssignFeatureField(),
+                    ReturnStatement(This())
+                ], true));
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
@@ -512,8 +514,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private ExpressionStatementSyntax AssignFeatureField() =>
         Assignment(FeatureField(feature).ToString(), IdentifierName("value"));
 
-    private FieldDeclarationSyntax SingleFeatureField() =>
-        Field(FeatureField(feature).ToString(), NullableType(AsType(feature.GetFeatureType())), Null())
+    private FieldDeclarationSyntax SingleFeatureField(bool writable = false) =>
+        Field(FeatureField(feature).ToString(), NullableType(AsType(feature.GetFeatureType(), writeable: writable)),
+                Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
     private FieldDeclarationSyntax MultipleLinkField(Link link) =>
@@ -522,8 +525,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
-    private PropertyDeclarationSyntax SingleRequiredFeatureProperty() =>
-        Property(FeatureProperty(feature).ToString(), AsType(feature.GetFeatureType()),
+    private PropertyDeclarationSyntax SingleRequiredFeatureProperty(bool writeable = false) =>
+        Property(FeatureProperty(feature).ToString(), AsType(feature.GetFeatureType(), writeable: writeable),
                 BinaryExpression(
                     SyntaxKind.CoalesceExpression,
                     FeatureField(feature),
@@ -561,8 +564,11 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ("Multiple", (feature is Link { Optional: true }).AsLiteral())
         ]);
 
-    private PropertyDeclarationSyntax AbstractSingleRequiredFeatureProperty() =>
-        PropertyDeclaration(AsType(feature.GetFeatureType()), Identifier(FeatureProperty(feature).ToString()))
+    private PropertyDeclarationSyntax AbstractSingleRequiredFeatureProperty()
+    {
+        var writable = feature is Containment;
+        return PropertyDeclaration(AsType(feature.GetFeatureType(), writeable: writable),
+                Identifier(FeatureProperty(feature).ToString()))
             .WithAccessorList(AccessorList(List([
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
@@ -576,9 +582,11 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocRemarks(feature));
+    }
 
-    private PropertyDeclarationSyntax SingleOptionalFeatureProperty() =>
-        Property(FeatureProperty(feature).ToString(), NullableType(AsType(feature.GetFeatureType())),
+    private PropertyDeclarationSyntax SingleOptionalFeatureProperty(bool writeable = false) =>
+        Property(FeatureProperty(feature).ToString(),
+                NullableType(AsType(feature.GetFeatureType(), writeable: writeable)),
                 FeatureField(feature),
                 InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]))
             )
@@ -646,17 +654,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocRemarks(link));
 
-    private List<MethodDeclarationSyntax> RequiredFeatureSetter(List<StatementSyntax> body)
+    private List<MethodDeclarationSyntax> RequiredFeatureSetter(List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractRequiredFeatureSetter()
+            AbstractRequiredFeatureSetter(writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractRequiredFeatureSetter(),
+                InterfaceDelegator(AbstractRequiredFeatureSetter(writeable),
                     SetCall())
             );
 
@@ -666,25 +674,26 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private InvocationExpressionSyntax SetCall() =>
         Call(FeatureSet().ToString(), IdentifierName("value"));
 
-    private MethodDeclarationSyntax AbstractRequiredFeatureSetter() =>
+    private MethodDeclarationSyntax AbstractRequiredFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier),
-                [Param("value", AsType(feature.GetFeatureType()))]
+                [Param("value", AsType(feature.GetFeatureType(), writeable: writeable))]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocRemarks(feature));
 
-    private IEnumerable<MethodDeclarationSyntax> OptionalFeatureSetter(List<StatementSyntax> body)
+    private IEnumerable<MethodDeclarationSyntax> OptionalFeatureSetter(List<StatementSyntax> body,
+        bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractOptionalFeatureSetter()
+            AbstractOptionalFeatureSetter(writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractOptionalFeatureSetter(), SetCall())
+                InterfaceDelegator(AbstractOptionalFeatureSetter(writeable), SetCall())
             );
 
         return result;
@@ -729,19 +738,20 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     {
         var modifiers = impl.Modifiers;
         return impl
-            .WithReturnType(AsType(feature.GetFeatureClassifier()))
+            .WithReturnType(AsType(feature.GetFeatureClassifier(), writeable:true))
             .WithModifiers(AsModifiers())
             .AppendXdoc(modifiers, SyntaxKind.None, [])
             .WithExplicitInterfaceSpecifier(
-                ExplicitInterfaceSpecifier(IdentifierName(AsType(feature.GetFeatureClassifier()).ToString()))
+                ExplicitInterfaceSpecifier(IdentifierName(AsType(feature.GetFeatureClassifier(), writeable: true)
+                    .ToString()))
             )
             .WithExpressionBody(ArrowExpressionClause(expression))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
 
-    private MethodDeclarationSyntax AbstractOptionalFeatureSetter() =>
+    private MethodDeclarationSyntax AbstractOptionalFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier), [
-                Param("value", NullableType(AsType(feature.GetFeatureType())))
+                Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))

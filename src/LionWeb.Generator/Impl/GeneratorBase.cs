@@ -64,17 +64,17 @@ public abstract class GeneratorBase
 
     /// Roslyn type of <paramref name="entity"/> (also registered with <see cref="INames.UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
-    protected TypeSyntax AsType(LanguageEntity entity, bool disambiguate = false) =>
+    protected TypeSyntax AsType(LanguageEntity entity, bool disambiguate = false, bool writeable = false) =>
         entity switch
         {
-            Classifier c => AsType(c, disambiguate),
+            Classifier c => AsType(c, disambiguate, writeable),
             Datatype d => _names.AsType(d, disambiguate),
             _ => throw new ArgumentException($"unsupported entity: {entity}", nameof(entity))
         };
 
-    /// <inheritdoc cref="INames.AsType(Classifier, bool)"/>
-    protected TypeSyntax AsType(Classifier classifier, bool disambiguate = false) =>
-        _names.AsType(classifier, disambiguate);
+    /// <inheritdoc cref="INames.AsType(Classifier, bool, bool)"/>
+    protected TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false) =>
+        _names.AsType(classifier, disambiguate, writeable);
 
     /// <returns><c>AddMyLink</c></returns>
     protected ExpressionSyntax LinkAdd(Link link) =>

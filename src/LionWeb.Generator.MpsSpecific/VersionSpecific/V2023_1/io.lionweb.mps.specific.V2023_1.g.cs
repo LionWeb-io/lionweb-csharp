@@ -439,21 +439,21 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		return this;
 	}
 
-	private readonly List<NodeBase> _seeAlso = [];
+	private readonly List<IReadableNode> _seeAlso = [];
 	/// <remarks>Optional Multiple Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(SpecificLanguage), Key = "KeyedDescription-seeAlso")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
-	public IReadOnlyList<NodeBase> SeeAlso { get => _seeAlso.AsReadOnly(); init => AddSeeAlso(value); }
+	public IReadOnlyList<IReadableNode> SeeAlso { get => _seeAlso.AsReadOnly(); init => AddSeeAlso(value); }
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetSeeAlso([MaybeNullWhenAttribute(false)] out IReadOnlyList<NodeBase> seeAlso)
+        public bool TryGetSeeAlso([MaybeNullWhenAttribute(false)] out IReadOnlyList<IReadableNode> seeAlso)
 	{
 		seeAlso = _seeAlso;
 		return _seeAlso.Count != 0;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public KeyedDescription AddSeeAlso(IEnumerable<NodeBase> nodes)
+        public KeyedDescription AddSeeAlso(IEnumerable<IReadableNode> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
@@ -463,7 +463,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public KeyedDescription InsertSeeAlso(int index, IEnumerable<NodeBase> nodes)
+        public KeyedDescription InsertSeeAlso(int index, IEnumerable<IReadableNode> nodes)
 	{
 		AssureInRange(index, _seeAlso);
 		var safeNodes = nodes?.ToList();
@@ -474,7 +474,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public KeyedDescription RemoveSeeAlso(IEnumerable<NodeBase> nodes)
+        public KeyedDescription RemoveSeeAlso(IEnumerable<IReadableNode> nodes)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
@@ -527,7 +527,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 
 		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
 		{
-			var enumerable = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<NodeBase>(value);
+			var enumerable = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value);
 			_seeAlso.Clear();
 			AddSeeAlso(enumerable);
 			return true;

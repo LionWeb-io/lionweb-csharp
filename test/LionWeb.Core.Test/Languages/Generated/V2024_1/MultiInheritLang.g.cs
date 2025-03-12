@@ -108,26 +108,26 @@ public class MultiInheritLangFactory : AbstractBaseNodeFactory, IMultiInheritLan
 [LionCoreMetaPointer(Language = typeof(MultiInheritLangLanguage), Key = "key-AbstractConcept")]
 public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 {
-	private NodeBase? _ifaceContainment = null;
+	private INode? _ifaceContainment = null;
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If IfaceContainment has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(MultiInheritLangLanguage), Key = "key-ifaceContainment")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public NodeBase IfaceContainment { get => _ifaceContainment ?? throw new UnsetFeatureException(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment); set => SetIfaceContainment(value); }
+	public INode IfaceContainment { get => _ifaceContainment ?? throw new UnsetFeatureException(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment); set => SetIfaceContainment(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetIfaceContainment([MaybeNullWhenAttribute(false)] out NodeBase? ifaceContainment)
+        public bool TryGetIfaceContainment([MaybeNullWhenAttribute(false)] out INode? ifaceContainment)
 	{
 		ifaceContainment = _ifaceContainment;
 		return _ifaceContainment != null;
 	}
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- BaseIface BaseIface.SetIfaceContainment(NodeBase value) => SetIfaceContainment(value);
+ BaseIface BaseIface.SetIfaceContainment(INode value) => SetIfaceContainment(value);
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public AbstractConcept SetIfaceContainment(NodeBase value)
+        public AbstractConcept SetIfaceContainment(INode value)
 	{
 		AssureNotNull(value, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
 		SetParentNull(_ifaceContainment);
@@ -163,7 +163,7 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 			return true;
 		if (MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment.EqualsIdentity(feature))
 		{
-			if (value is NodeBase v)
+			if (value is INode v)
 			{
 				IfaceContainment = v;
 				return true;
@@ -217,10 +217,10 @@ public partial interface BaseIface : INode
 	/// <remarks>Required Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(MultiInheritLangLanguage), Key = "key-ifaceContainment")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public NodeBase IfaceContainment { get; set; }
+	public INode IfaceContainment { get; set; }
 
 	/// <remarks>Required Single Containment</remarks>
-        public BaseIface SetIfaceContainment(NodeBase value);
+        public BaseIface SetIfaceContainment(INode value);
 }
 
 [LionCoreMetaPointer(Language = typeof(MultiInheritLangLanguage), Key = "key-CombinedConcept")]

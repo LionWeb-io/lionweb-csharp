@@ -137,26 +137,26 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 		return this;
 	}
 
-	private NodeBase? _cont = null;
+	private INode? _cont = null;
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Cont has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage), Key = "key-baseContainmentIface-cont")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public NodeBase Cont { get => _cont ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont); set => SetCont(value); }
+	public INode Cont { get => _cont ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont); set => SetCont(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetCont([MaybeNullWhenAttribute(false)] out NodeBase? cont)
+        public bool TryGetCont([MaybeNullWhenAttribute(false)] out INode? cont)
 	{
 		cont = _cont;
 		return _cont != null;
 	}
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface.SetCont(NodeBase value) => SetCont(value);
+ LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface.SetCont(INode value) => SetCont(value);
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BaseConcept SetCont(NodeBase value)
+        public BaseConcept SetCont(INode value)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
 		SetParentNull(_cont);
@@ -192,26 +192,26 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 		return this;
 	}
 
-	private NodeBase? _ref = null;
+	private IReadableNode? _ref = null;
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Ref has not been set</exception>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [LionCoreMetaPointer(Language = typeof(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage), Key = "key-baseReferenceIface-ref")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public NodeBase Ref { get => _ref ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref); set => SetRef(value); }
+	public IReadableNode Ref { get => _ref ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref); set => SetRef(value); }
 
 	/// <remarks>Required Single Reference</remarks>
-        public bool TryGetRef([MaybeNullWhenAttribute(false)] out NodeBase? @ref)
+        public bool TryGetRef([MaybeNullWhenAttribute(false)] out IReadableNode? @ref)
 	{
 		@ref = _ref;
 		return _ref != null;
 	}
 /// <remarks>Required Single Reference</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface.SetRef(NodeBase value) => SetRef(value);
+ LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface.SetRef(IReadableNode value) => SetRef(value);
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BaseConcept SetRef(NodeBase value)
+        public BaseConcept SetRef(IReadableNode value)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
 		_ref = value;
@@ -291,7 +291,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 		if (LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont.EqualsIdentity(feature))
 		{
-			if (value is NodeBase v)
+			if (value is INode v)
 			{
 				Cont = v;
 				return true;
@@ -313,7 +313,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 		if (LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref.EqualsIdentity(feature))
 		{
-			if (value is NodeBase v)
+			if (value is IReadableNode v)
 			{
 				Ref = v;
 				return true;

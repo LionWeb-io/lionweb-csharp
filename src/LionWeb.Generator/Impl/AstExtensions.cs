@@ -47,7 +47,7 @@ public static class AstExtensions
 
     /// <paramref name="bases"/> ready to be fed to <see cref="TypeDeclarationSyntax.WithBaseList"/>.
     public static BaseListSyntax AsBase(params TypeSyntax?[] bases) =>
-        BaseList(SeparatedList<BaseTypeSyntax>(bases.Select(SimpleBaseType)));
+        BaseList(SeparatedList<BaseTypeSyntax>(bases.Where(b => b != null).Select(SimpleBaseType!)));
 
     /// <paramref name="attributes"/> ready to be fed to <see cref="BaseTypeDeclarationSyntax.WithAttributeLists"/>.
     public static SyntaxList<AttributeListSyntax> AsAttributes(IEnumerable<AttributeSyntax?> attributes) =>
@@ -73,7 +73,7 @@ public static class AstExtensions
         Block(List(statements));
 
     /// <returns><c>public type name => expression;</c></returns>
-    public static PropertyDeclarationSyntax ReadOnlyProperty(string name, TypeSyntax? type, ExpressionSyntax expression)
+    public static PropertyDeclarationSyntax ReadOnlyProperty(string name, TypeSyntax type, ExpressionSyntax expression)
         => PropertyDeclaration(type, Identifier(name))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithExpressionBody(ArrowExpressionClause(expression))
@@ -93,7 +93,7 @@ public static class AstExtensions
             ])));
 
     /// <returns><c>type name = init;</c></returns>
-    public static FieldDeclarationSyntax Field(string name, TypeSyntax? type, ExpressionSyntax? init = null)
+    public static FieldDeclarationSyntax Field(string name, TypeSyntax type, ExpressionSyntax? init = null)
     {
         var declarator = VariableDeclarator(Identifier(name));
         if (init != null)

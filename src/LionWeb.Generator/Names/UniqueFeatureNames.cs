@@ -70,8 +70,8 @@ public class UniqueFeatureNames(INames parent) : INames
     public TypeSyntax AsType(Type type, params TypeSyntax?[] generics) => parent.AsType(type, generics);
 
     /// <inheritdoc />
-    public TypeSyntax AsType(Classifier classifier, bool disambiguate = false) =>
-        parent.AsType(classifier, disambiguate);
+    public TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false) =>
+        parent.AsType(classifier, disambiguate, writeable);
 
     /// <inheritdoc />
     public TypeSyntax AsType(Datatype datatype, bool disambiguate = false) => parent.AsType(datatype, disambiguate);

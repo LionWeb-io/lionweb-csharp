@@ -132,12 +132,17 @@ public partial class Names : INames
     }
 
     /// <inheritdoc />
-    public TypeSyntax AsType(Classifier classifier, bool disambiguate = false)
+    public TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false)
     {
-        if (_builtIns.Node.EqualsIdentity(classifier))
-            return AsType(typeof(NodeBase));
-        if (_builtIns.INamed.EqualsIdentity(classifier))
-            return AsType(typeof(INamedWritable));
+        var isNodeType = _builtIns.Node.EqualsIdentity(classifier);
+        var isNamedType = _builtIns.INamed.EqualsIdentity(classifier);
+        switch (writeable)
+        {
+            case false when isNodeType: return AsType(typeof(IReadableNode));
+            case false when isNamedType: return AsType(typeof(INamed));
+            case true when isNodeType: return AsType(typeof(INode));
+            case true when isNamedType: return AsType(typeof(INamedWritable));
+        }
 
         if (_namespaceMappings.TryGetValue(classifier.GetLanguage(), out var ns))
         {

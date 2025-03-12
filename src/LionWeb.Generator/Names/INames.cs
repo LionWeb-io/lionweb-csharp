@@ -70,12 +70,12 @@ public interface INames
     /// Converts <paramref name="type"/> to Roslyn type and registers it with <see cref="UsedTypes"/>.
     /// If <paramref name="type"/> includes generic type parameters and <paramref name="generics"/> is unset,
     /// <paramref name="type">type's</paramref> generic type parameters are used.
-    /// If <paramref name="generics"/> is set, it overrides any generic type paramerters of <paramref name="type"/>. 
+    /// If <paramref name="generics"/> is set, it overrides any generic type parameters of <paramref name="type"/>. 
     TypeSyntax AsType(Type type, params TypeSyntax?[] generics);
 
     /// Roslyn type of <paramref name="classifier"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
-    TypeSyntax AsType(Classifier classifier, bool disambiguate = false);
+    TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false);
 
     /// Roslyn type of <paramref name="datatype"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.

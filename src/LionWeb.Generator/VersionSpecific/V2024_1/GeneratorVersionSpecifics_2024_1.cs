@@ -62,12 +62,33 @@ internal class GeneratorVersionSpecifics_2024_1 : IGeneratorVersionSpecifics
         _ => null
     };
     
+    public string? GetConceptShortDescription(Classifier classifier) => 
+        GetConceptDescription(classifier)
+            ?.ConceptShortDescription;
 
-    public string? GetConceptShortDescription(Classifier classifier) => classifier
-        .GetAnnotations()
-        .OfType<ConceptDescription>()
-        .FirstOrDefault(cd => cd.ConceptShortDescription != null)
-        ?.ConceptShortDescription;
+    public string? GetConceptHelpUrl(Classifier classifier) =>
+        GetConceptDescription(classifier)
+            ?.HelpUrl;
+
+    public string? GetKeyedDocumentation(IKeyed keyed) =>
+        GetKeyedDescription(keyed)
+            ?.Documentation;
+
+    public IReadOnlyList<IReadableNode> GetKeyedSeeAlso(IKeyed keyed) =>
+        GetKeyedDescription(keyed)
+            ?.SeeAlso ?? [];
+
+    private static ConceptDescription? GetConceptDescription(Classifier classifier) =>
+        classifier
+            .GetAnnotations()
+            .OfType<ConceptDescription>()
+            .FirstOrDefault();
+
+    private static KeyedDescription? GetKeyedDescription(IKeyed keyed) =>
+        keyed
+            .GetAnnotations()
+            .OfType<KeyedDescription>()
+            .FirstOrDefault();
 
     public bool IsDeprecated(Classifier classifier) =>
         classifier.EqualsIdentity(SpecificLanguage.Instance.Deprecated);

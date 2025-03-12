@@ -85,8 +85,8 @@ public partial interface BaseReferenceIface : INode
 	/// <remarks>Required Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(MixedBaseReferenceLangLanguage), Key = "key-baseReferenceIface-ref")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
-	public NodeBase Ref { get; set; }
+	public IReadableNode Ref { get; set; }
 
 	/// <remarks>Required Single Reference</remarks>
-        public BaseReferenceIface SetRef(NodeBase value);
+        public BaseReferenceIface SetRef(IReadableNode value);
 }
