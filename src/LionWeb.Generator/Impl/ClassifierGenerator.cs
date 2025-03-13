@@ -60,7 +60,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             bases.Add(AsType(typeof(AnnotationInstanceBase)));
         }
 
-        bases.AddRange(Interfaces.Select(i => AsType(i)));
+        bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
 
         return ClassifierClass(bases, GenGetClassifier("GetAnnotation", typeof(Annotation)));
     }
@@ -77,7 +77,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             bases.Add(AsType(typeof(ConceptInstanceBase)));
         }
 
-        bases.AddRange(Interfaces.Select(i => AsType(i)));
+        bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
 
         if (concept.Partition)
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
@@ -92,7 +92,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             modifiers.Add(SyntaxKind.AbstractKeyword);
         modifiers.Add(SyntaxKind.PartialKeyword);
 
-        var decl = ClassDeclaration(ClassifierName)
+        return ClassDeclaration(ClassifierName)
             .WithAttributeLists(AsAttributes([
                 MetaPointerAttribute(classifier),
                 ObsoleteAttribute(classifier)
@@ -105,15 +105,25 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
                     .Concat(new List<MemberDeclarationSyntax> { GenConstructor(), genGetClassifier })
                     .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion).FeatureMethods())
                     .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion).ContainmentMethods())
-            ));
-
-        return AttachConceptDescription(decl);
+            ))
+            .Xdoc(XdocDefault());
     }
 
-    private T AttachConceptDescription<T>(T decl) where T : TypeDeclarationSyntax
+    private IEnumerable<XmlNodeSyntax> XdocDefault()
     {
+        List<XmlNodeSyntax> result = [];
+
         var conceptShortDescription = VersionSpecifics.GetConceptShortDescription(classifier);
-        return conceptShortDescription != null ? decl.Xdoc(XdocLine(conceptShortDescription, "summary")) : decl;
+        if (conceptShortDescription != null)
+            result.AddRange(XdocLine(conceptShortDescription, "summary"));
+
+        var conceptHelpUrl = VersionSpecifics.GetConceptHelpUrl(classifier);
+        if (conceptHelpUrl != null)
+            result.AddRange(XdocSeeAlso(conceptHelpUrl));
+
+        result.AddRange(XdocKeyed(classifier));
+
+        return result;
     }
 
     private IEnumerable<Interface> Interfaces =>
@@ -142,7 +152,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
         if (bases.Count == 0)
             bases = [AsType(typeof(INode))];
 
-        var decl = InterfaceDeclaration(ClassifierName)
+        return InterfaceDeclaration(ClassifierName)
             .WithAttributeLists(AsAttributes(
             [
                 MetaPointerAttribute(classifier),
@@ -151,8 +161,8 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.Ordered().SelectMany(f =>
-                new FeatureGenerator(classifier, f, _names, _lionWebVersion).AbstractMembers())));
-        return AttachConceptDescription(decl);
+                new FeatureGenerator(classifier, f, _names, _lionWebVersion).AbstractMembers())))
+            .Xdoc(XdocDefault());
     }
 
     private string ClassifierName =>

@@ -70,16 +70,36 @@ public interface INames
     /// Converts <paramref name="type"/> to Roslyn type and registers it with <see cref="UsedTypes"/>.
     /// If <paramref name="type"/> includes generic type parameters and <paramref name="generics"/> is unset,
     /// <paramref name="type">type's</paramref> generic type parameters are used.
-    /// If <paramref name="generics"/> is set, it overrides any generic type paramerters of <paramref name="type"/>. 
+    /// If <paramref name="generics"/> is set, it overrides any generic type parameters of <paramref name="type"/>. 
     TypeSyntax AsType(Type type, params TypeSyntax?[] generics);
 
     /// Roslyn type of <paramref name="classifier"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
-    TypeSyntax AsType(Classifier classifier, bool disambiguate = false);
+    /// Returns writable variants of built-in types if <paramref name="writeable"/> is <c>true</c>:
+    /// <list type="table">
+    /// <listheader>
+    ///     <term>Readable</term>
+    ///     <description>Writable</description>
+    /// </listheader>
+    /// <item>
+    ///     <term><see cref="LionWeb.Core.IReadableNode"/></term>
+    ///     <description><see cref="LionWeb.Core.INode"/></description>
+    /// </item>
+    /// <item>
+    ///     <term><see cref="LionWeb.Core.M2.INamed"/></term>
+    ///     <description><see cref="LionWeb.Core.M2.INamedWritable"/></description>
+    /// </item>
+    /// </list>
+    /// 
+    TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false);
 
     /// Roslyn type of <paramref name="datatype"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
     TypeSyntax AsType(Datatype datatype, bool disambiguate = false);
+
+    /// Roslyn type of <paramref name="keyed"/> (also registered with <see cref="UsedTypes"/>).
+    /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
+    NameSyntax AsName(IKeyed keyed, bool disambiguate = false);
 
     /// Roslyn type of <paramref name="lang"/> (also registered with <see cref="UsedTypes"/>).
     /// Returns FQN if <paramref name="lang"/> is mentioned in <see cref="NamespaceMappings"/>.
@@ -118,7 +138,7 @@ public interface INames
 
     /// <returns><c>MyField</c></returns>
     IdentifierNameSyntax FieldProperty(Field field);
-    
+
     /// <returns><c>myField</c></returns>
     string FieldParam(Field field);
 }

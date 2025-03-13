@@ -21,6 +21,7 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -36,6 +37,7 @@ using Property = Core.M3.Property;
 /// - feature field
 /// - feature property
 /// - SetFeature()
+/// - TryGetFeature()
 /// - AddFeature()
 /// - InsertFeature()
 /// - RemoveFeature()
@@ -77,13 +79,13 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             { Optional: false } =>
             [
                 AbstractSingleRequiredFeatureProperty(),
-                AbstractRequiredFeatureSetter()
+                AbstractRequiredFeatureSetter(feature is Containment)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ],
             { Optional: true } =>
             [
                 AbstractSingleOptionalFeatureProperty(),
-                AbstractOptionalFeatureSetter()
+                AbstractOptionalFeatureSetter(feature is Containment)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ],
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
@@ -109,16 +111,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
     }
 
-    private MethodDeclarationSyntax TryGet() =>
+    private MethodDeclarationSyntax TryGet(bool writeable = false) =>
         Method(FeatureTryGet(feature), AsType(typeof(bool)),
                 [
-                    OutParam(Param(FeatureTryGetParam(), NullableType(AsType(feature.GetFeatureType()))))
+                    OutParam(Param(FeatureTryGetParam(),
+                            NullableType(AsType(feature.GetFeatureType(), writeable: writeable))))
                         .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(feature))
+            .Xdoc(XdocDefault(feature))
             .WithBody(AsStatements([
                 Assignment(FeatureTryGetParam(), FeatureField(feature)),
                 ReturnStatement(NotEquals(FeatureField(feature), Null()))
@@ -137,7 +140,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(feature))
+            .Xdoc(XdocDefault(feature))
             .WithBody(AsStatements([
                 Assignment(FeatureTryGetParam(), FeatureField(feature)),
                 ReturnStatement(
@@ -169,17 +172,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
         {
-            SingleFeatureField(),
-            SingleRequiredFeatureProperty()
+            SingleFeatureField(true),
+            SingleRequiredFeatureProperty(true)
                 .Xdoc(XdocThrowsIfSetToNull()),
-            TryGet()
+            TryGet(true)
         }.Concat(RequiredFeatureSetter([
                 AsureNotNullCall(),
                 SetParentNullCall(containment),
                 AttachChildCall(),
                 AssignFeatureField(),
                 ReturnStatement(This())
-            ])
+            ], true)
             .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
         );
 
@@ -187,13 +190,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
-        new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }.Concat(
-            OptionalFeatureSetter([
-                SetParentNullCall(containment),
-                AttachChildCall(),
-                AssignFeatureField(),
-                ReturnStatement(This())
-            ]));
+        new List<MemberDeclarationSyntax>
+            {
+                SingleFeatureField(true), SingleOptionalFeatureProperty(true), TryGet(true)
+            }
+            .Concat(
+                OptionalFeatureSetter([
+                    SetParentNullCall(containment),
+                    AttachChildCall(),
+                    AssignFeatureField(),
+                    ReturnStatement(This())
+                ], true));
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
@@ -512,8 +519,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private ExpressionStatementSyntax AssignFeatureField() =>
         Assignment(FeatureField(feature).ToString(), IdentifierName("value"));
 
-    private FieldDeclarationSyntax SingleFeatureField() =>
-        Field(FeatureField(feature).ToString(), NullableType(AsType(feature.GetFeatureType())), Null())
+    private FieldDeclarationSyntax SingleFeatureField(bool writable = false) =>
+        Field(FeatureField(feature).ToString(), NullableType(AsType(feature.GetFeatureType(), writeable: writable)),
+                Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
     private FieldDeclarationSyntax MultipleLinkField(Link link) =>
@@ -522,8 +530,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
-    private PropertyDeclarationSyntax SingleRequiredFeatureProperty() =>
-        Property(FeatureProperty(feature).ToString(), AsType(feature.GetFeatureType()),
+    private PropertyDeclarationSyntax SingleRequiredFeatureProperty(bool writeable = false) =>
+        Property(FeatureProperty(feature).ToString(), AsType(feature.GetFeatureType(), writeable: writeable),
                 BinaryExpression(
                     SyntaxKind.CoalesceExpression,
                     FeatureField(feature),
@@ -537,7 +545,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(feature)
+            .Xdoc(XdocDefault(feature)
                 .Concat(XdocThrows($"If {FeatureProperty(feature)} has not been set",
                     AsType(typeof(UnsetFeatureException))))
             );
@@ -561,8 +569,11 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ("Multiple", (feature is Link { Optional: true }).AsLiteral())
         ]);
 
-    private PropertyDeclarationSyntax AbstractSingleRequiredFeatureProperty() =>
-        PropertyDeclaration(AsType(feature.GetFeatureType()), Identifier(FeatureProperty(feature).ToString()))
+    private PropertyDeclarationSyntax AbstractSingleRequiredFeatureProperty()
+    {
+        var writable = feature is Containment;
+        return PropertyDeclaration(AsType(feature.GetFeatureType(), writeable: writable),
+                Identifier(FeatureProperty(feature).ToString()))
             .WithAccessorList(AccessorList(List([
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
@@ -575,10 +586,12 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
+    }
 
-    private PropertyDeclarationSyntax SingleOptionalFeatureProperty() =>
-        Property(FeatureProperty(feature).ToString(), NullableType(AsType(feature.GetFeatureType())),
+    private PropertyDeclarationSyntax SingleOptionalFeatureProperty(bool writeable = false) =>
+        Property(FeatureProperty(feature).ToString(),
+                NullableType(AsType(feature.GetFeatureType(), writeable: writeable)),
                 FeatureField(feature),
                 InvocationExpression(FeatureSet(), AsArguments([IdentifierName("value")]))
             )
@@ -588,7 +601,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
 
     private PropertyDeclarationSyntax AbstractSingleOptionalFeatureProperty() =>
         PropertyDeclaration(NullableType(AsType(feature.GetFeatureType())),
@@ -605,7 +618,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
 
     private PropertyDeclarationSyntax MultipleLinkProperty(Link link, InvocationExpressionSyntax getter) =>
         PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(link.Type)),
@@ -626,7 +639,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
     private PropertyDeclarationSyntax AbstractMultipleLinkProperty(Link link) =>
         PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(link.Type)),
@@ -644,19 +657,19 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 ObsoleteAttribute(feature)
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
-    private List<MethodDeclarationSyntax> RequiredFeatureSetter(List<StatementSyntax> body)
+    private List<MethodDeclarationSyntax> RequiredFeatureSetter(List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractRequiredFeatureSetter()
+            AbstractRequiredFeatureSetter(writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractRequiredFeatureSetter(),
+                InterfaceDelegator(AbstractRequiredFeatureSetter(writeable),
                     SetCall())
             );
 
@@ -666,29 +679,34 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private InvocationExpressionSyntax SetCall() =>
         Call(FeatureSet().ToString(), IdentifierName("value"));
 
-    private MethodDeclarationSyntax AbstractRequiredFeatureSetter() =>
+    private MethodDeclarationSyntax AbstractRequiredFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier),
-                [Param("value", AsType(feature.GetFeatureType()))]
+                [Param("value", AsType(feature.GetFeatureType(), writeable: writeable))]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
 
-    private IEnumerable<MethodDeclarationSyntax> OptionalFeatureSetter(List<StatementSyntax> body)
+    private IEnumerable<MethodDeclarationSyntax> OptionalFeatureSetter(List<StatementSyntax> body,
+        bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractOptionalFeatureSetter()
+            AbstractOptionalFeatureSetter(writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractOptionalFeatureSetter(), SetCall())
+                InterfaceDelegator(AbstractOptionalFeatureSetter(writeable), SetCall())
             );
 
         return result;
     }
+    
+    private IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
+        XdocKeyed(ffeature)
+            .Concat(XdocRemarks(ffeature));
 
     private static IEnumerable<XmlNodeSyntax> XdocRemarks(Feature feature)
     {
@@ -712,12 +730,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private static IEnumerable<XmlNodeSyntax> XdocThrows(string text, TypeSyntax exception) =>
     [
         XdocSlashes(),
-        XdocText(text)
-            .WithStartTag(
-                XmlElementStartTag(XmlName(Identifier("exception")))
-                    .WithAttributes(SingletonList<XmlAttributeSyntax>(XmlCrefAttribute(NameMemberCref(exception))))
-            )
-            .WithEndTag(XmlElementEndTag(XmlName(Identifier("exception")))),
+        XmlElement("exception", new SyntaxList<XmlNodeSyntax>(XdocText(text)))
+            .AddStartTagAttributes(XmlCrefAttribute(NameMemberCref(exception))),
         XdocNewline()
     ];
 
@@ -729,23 +743,24 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     {
         var modifiers = impl.Modifiers;
         return impl
-            .WithReturnType(AsType(feature.GetFeatureClassifier()))
+            .WithReturnType(AsType(feature.GetFeatureClassifier(), writeable: true))
             .WithModifiers(AsModifiers())
             .AppendXdoc(modifiers, SyntaxKind.None, [])
             .WithExplicitInterfaceSpecifier(
-                ExplicitInterfaceSpecifier(IdentifierName(AsType(feature.GetFeatureClassifier()).ToString()))
+                ExplicitInterfaceSpecifier(IdentifierName(AsType(feature.GetFeatureClassifier(), writeable: true)
+                    .ToString()))
             )
             .WithExpressionBody(ArrowExpressionClause(expression))
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken));
     }
 
-    private MethodDeclarationSyntax AbstractOptionalFeatureSetter() =>
+    private MethodDeclarationSyntax AbstractOptionalFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier), [
-                Param("value", NullableType(AsType(feature.GetFeatureType())))
+                Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(feature));
+            .Xdoc(XdocDefault(feature));
 
     private IEnumerable<MethodDeclarationSyntax> LinkRemover(Link link, List<StatementSyntax> body)
     {
@@ -771,7 +786,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
     private IEnumerable<MethodDeclarationSyntax> LinkInserter(Link link, List<StatementSyntax> body)
     {
@@ -798,7 +813,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
     private IEnumerable<MethodDeclarationSyntax> LinkAdder(Link link, List<StatementSyntax> body)
     {
@@ -823,7 +838,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
-            .Xdoc(XdocRemarks(link));
+            .Xdoc(XdocDefault(link));
 
 
     private ExpressionSyntax LinkInsert(Link link) =>

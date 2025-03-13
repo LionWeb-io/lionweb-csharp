@@ -211,7 +211,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private DeclarationPatternSyntax AsTypePattern(Feature feature) =>
         DeclarationPattern(
-            AsType(feature.GetFeatureType(), true),
+            AsType(feature.GetFeatureType(), true, feature is Containment),
             SingleVariableDesignation(Identifier("v"))
         );
 

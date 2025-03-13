@@ -44,7 +44,7 @@ public partial class Names : INames
     private readonly string _namespaceName;
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
-    
+
     private readonly Dictionary<Language, string> _namespaceMappings = new();
 
     /// <summary>
@@ -57,7 +57,7 @@ public partial class Names : INames
     {
         _language = language;
         _namespaceName = namespaceName.PrefixKeyword();
-        
+
         _m3 = language.LionWebVersion.LionCore;
         _builtIns = language.LionWebVersion.BuiltIns;
     }
@@ -92,12 +92,16 @@ public partial class Names : INames
 
     /// <inheritdoc />
     public string FactoryName => $"{LanguageBaseName(_language)}Factory".PrefixKeyword();
+
     /// <inheritdoc />
     public IdentifierNameSyntax FactoryInterfaceType => IdentifierName(FactoryInterfaceName);
+
     /// <inheritdoc />
     public IdentifierNameSyntax FactoryType => IdentifierName(FactoryName);
+
     /// <inheritdoc />
     public Language Language => _language;
+
     /// <inheritdoc />
     public string NamespaceName => _namespaceName;
 
@@ -132,12 +136,17 @@ public partial class Names : INames
     }
 
     /// <inheritdoc />
-    public TypeSyntax AsType(Classifier classifier, bool disambiguate = false)
+    public TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false)
     {
-        if (_builtIns.Node.EqualsIdentity(classifier))
-            return AsType(typeof(NodeBase));
-        if (_builtIns.INamed.EqualsIdentity(classifier))
-            return AsType(typeof(INamedWritable));
+        var isNodeType = _builtIns.Node.EqualsIdentity(classifier);
+        var isNamedType = _builtIns.INamed.EqualsIdentity(classifier);
+        switch (writeable)
+        {
+            case false when isNodeType: return AsType(typeof(IReadableNode));
+            case false when isNamedType: return AsType(typeof(INamed));
+            case true when isNodeType: return AsType(typeof(INode));
+            case true when isNamedType: return AsType(typeof(INamedWritable));
+        }
 
         if (_namespaceMappings.TryGetValue(classifier.GetLanguage(), out var ns))
         {
@@ -164,17 +173,38 @@ public partial class Names : INames
 
         return QualifiedName(ParseName(NamespaceName), type);
     }
-    
+
+    /// <inheritdoc />
+    public NameSyntax AsName(IKeyed keyed, bool disambiguate = false) => keyed switch
+    {
+        Language l => AsType(l),
+        Classifier c => ToName(AsType(c, disambiguate)),
+        Datatype d => ToName(AsType(d, disambiguate)),
+        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)),
+            IdentifierName(f.Name.PrefixKeyword())),
+        Field f => QualifiedName(ToName(AsType(f.GetStructuredDataType(), disambiguate)),
+            IdentifierName(f.Name.PrefixKeyword())),
+        EnumerationLiteral f => QualifiedName(ToName(AsType(f.GetEnumeration(), disambiguate)),
+            IdentifierName(f.Name.PrefixKeyword()))
+    };
+
+    private NameSyntax ToName(TypeSyntax type) => type switch
+    {
+        NameSyntax n => n,
+        NullableTypeSyntax n => ToName(n.ElementType),
+        PredefinedTypeSyntax p => IdentifierName(p.Keyword)
+    };
+
     /// <inheritdoc cref="IGeneratorVersionSpecifics"/>
     internal IGeneratorVersionSpecifics VersionSpecifics =>
         new Lazy<IGeneratorVersionSpecifics>(() => IGeneratorVersionSpecifics.Create(_language.LionWebVersion)).Value;
-    
+
 
     /// <inheritdoc />
     public NameSyntax AsType(Language lang)
     {
         var typeName = IdentifierName(LanguageBaseName(lang) + "Language");
-        
+
         if (_namespaceMappings.TryGetValue(lang, out var ns))
         {
             return QualifiedName(

@@ -47,7 +47,7 @@ public static class AstExtensions
 
     /// <paramref name="bases"/> ready to be fed to <see cref="TypeDeclarationSyntax.WithBaseList"/>.
     public static BaseListSyntax AsBase(params TypeSyntax?[] bases) =>
-        BaseList(SeparatedList<BaseTypeSyntax>(bases.Select(SimpleBaseType)));
+        BaseList(SeparatedList<BaseTypeSyntax>(bases.Where(b => b != null).Select(SimpleBaseType!)));
 
     /// <paramref name="attributes"/> ready to be fed to <see cref="BaseTypeDeclarationSyntax.WithAttributeLists"/>.
     public static SyntaxList<AttributeListSyntax> AsAttributes(IEnumerable<AttributeSyntax?> attributes) =>
@@ -73,7 +73,7 @@ public static class AstExtensions
         Block(List(statements));
 
     /// <returns><c>public type name => expression;</c></returns>
-    public static PropertyDeclarationSyntax ReadOnlyProperty(string name, TypeSyntax? type, ExpressionSyntax expression)
+    public static PropertyDeclarationSyntax ReadOnlyProperty(string name, TypeSyntax type, ExpressionSyntax expression)
         => PropertyDeclaration(type, Identifier(name))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithExpressionBody(ArrowExpressionClause(expression))
@@ -93,7 +93,7 @@ public static class AstExtensions
             ])));
 
     /// <returns><c>type name = init;</c></returns>
-    public static FieldDeclarationSyntax Field(string name, TypeSyntax? type, ExpressionSyntax? init = null)
+    public static FieldDeclarationSyntax Field(string name, TypeSyntax type, ExpressionSyntax? init = null)
     {
         var declarator = VariableDeclarator(Identifier(name));
         if (init != null)
@@ -342,12 +342,10 @@ public static class AstExtensions
     /// <returns><c>///&lt;tag&gt;text&lt;/tag&gt;</c></returns>
     public static IEnumerable<XmlNodeSyntax> XdocLine(string text, string? tag = null)
     {
-        var body = XdocText(text);
+        XmlNodeSyntax body = XdocText(text);
         if (tag != null)
         {
-            body = body
-                .WithStartTag(XmlElementStartTag(XmlName(Identifier(tag))))
-                .WithEndTag(XmlElementEndTag(XmlName(Identifier(tag))));
+            body = XmlElement(tag, SingletonList(body));
         }
 
         return
@@ -357,6 +355,23 @@ public static class AstExtensions
             XdocNewline()
         ];
     }
+
+    /// <returns><c>///&lt;seealso cref="target"/&gt;</c></returns>
+    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(TypeSyntax target) =>
+    [
+        XdocSlashes(),
+        XmlSeeAlsoElement(NameMemberCref(target)),
+        XdocNewline()
+    ];
+
+    /// <returns><c>///&lt;seealso href="uri"/&gt;</c></returns>
+    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(string uri) =>
+    [
+        XdocSlashes(),
+        XmlEmptyElement("seealso")
+            .AddAttributes(XmlTextAttribute("href", XmlTextLiteral(TriviaList(), uri, uri, TriviaList()))),
+        XdocNewline()
+    ];
 
     /// <returns><c>&lt;inheritdoc/&gt;</c></returns>
     public static IEnumerable<XmlNodeSyntax> XdocInheritDoc() =>
@@ -368,7 +383,7 @@ public static class AstExtensions
 
     /// <summary>Takes care of properly wrapping multi-line text with `///` prefix</summary>
     /// <returns><c>text</c></returns>
-    public static XmlElementSyntax XdocText(string text)
+    public static XmlTextSyntax XdocText(string text)
     {
         using var reader = new StringReader(text);
         bool first = true;
@@ -387,14 +402,10 @@ public static class AstExtensions
             }
         }
 
-        return XmlExampleElement(
-            SingletonList<XmlNodeSyntax>(
-                XmlText()
-                    .WithTextTokens(
-                        TokenList(texts)
-                    )
-            )
-        );
+        return XmlText()
+            .WithTextTokens(
+                TokenList(texts)
+            );
     }
 
     /// <returns><c>/// </c></returns>
@@ -476,7 +487,7 @@ public static class AstExtensions
     /// <returns><c>this</c></returns>
     public static ThisExpressionSyntax This() =>
         ThisExpression();
-    
+
     /// Adds <paramref name="element"/> between any two elements of <paramref name="source"/>.
     public static IEnumerable<T> Intersperse<T>(this IEnumerable<T> source, T element)
     {
@@ -489,5 +500,4 @@ public static class AstExtensions
             first = false;
         }
     }
-
 }
