@@ -357,31 +357,21 @@ public static class AstExtensions
     }
 
     /// <returns><c>///&lt;seealso cref="target"/&gt;</c></returns>
-    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(TypeSyntax target)
-    {
-        var body = XmlSeeAlsoElement(NameMemberCref(target));
-
-        return
-        [
-            XdocSlashes(),
-            body,
-            XdocNewline()
-        ];
-    }
+    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(TypeSyntax target) =>
+    [
+        XdocSlashes(),
+        XmlSeeAlsoElement(NameMemberCref(target)),
+        XdocNewline()
+    ];
 
     /// <returns><c>///&lt;seealso href="uri"/&gt;</c></returns>
-    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(string uri)
-    {
-        var body = XmlEmptyElement("seealso")
-            .AddAttributes(XmlTextAttribute("href", XmlTextLiteral(TriviaList(), uri, uri, TriviaList())));
-
-        return
-        [
-            XdocSlashes(),
-            body,
-            XdocNewline()
-        ];
-    }
+    public static IEnumerable<XmlNodeSyntax> XdocSeeAlso(string uri) =>
+    [
+        XdocSlashes(),
+        XmlEmptyElement("seealso")
+            .AddAttributes(XmlTextAttribute("href", XmlTextLiteral(TriviaList(), uri, uri, TriviaList()))),
+        XdocNewline()
+    ];
 
     /// <returns><c>&lt;inheritdoc/&gt;</c></returns>
     public static IEnumerable<XmlNodeSyntax> XdocInheritDoc() =>
