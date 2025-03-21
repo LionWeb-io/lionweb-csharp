@@ -24,6 +24,7 @@ using QueryId = NodeId;
 using FreeId = NodeId;
 using MessageKind = NodeId;
 using MessageDataKey = NodeId;
+using EventSequenceNumber = long;
 
 public record CommandSource(ParticipationId ParticipationId, CommandId CommandId);
 
@@ -527,14 +528,20 @@ public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage? 
 
 #region Event
 
-public interface IDeltaEvent : IDeltaContent;
+public interface IDeltaEvent : IDeltaContent
+{
+    EventSequenceNumber EventSequenceNumber { get; }
+}
 
 public interface ISingleDeltaEvent : IDeltaEvent
 {
     CommandSource[] OriginCommands { get; }
 }
 
-public abstract record SingleDeltaEventBase(CommandSource[] OriginCommands, ProtocolMessage? Message)
+public abstract record SingleDeltaEventBase(
+    EventSequenceNumber EventSequenceNumber,
+    CommandSource[] OriginCommands,
+    ProtocolMessage? Message)
     : ISingleDeltaEvent
 {
     public virtual bool Equals(SingleDeltaEventBase? other)
@@ -572,13 +579,15 @@ public interface IPartitionEvent : ISingleDeltaEvent;
 
 public record PartitionAdded(
     DeltaSerializationChunk NewPartition,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IPartitionEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionEvent;
 
 public record PartitionDeleted(
     DeltaSerializationChunk DeletedPartition,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IPartitionEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionEvent;
 
 #endregion
 
@@ -590,8 +599,9 @@ public record ClassifierChanged(
     TargetNode Node,
     MetaPointer NewClassifier,
     MetaPointer OldClassifier,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), INodeEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), INodeEvent;
 
 #endregion
 
@@ -615,23 +625,26 @@ public record PropertyAdded(
     TargetNode Parent,
     MetaPointer Property,
     PropertyValue NewValue,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IPropertyEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPropertyEvent;
 
 public record PropertyDeleted(
     TargetNode Parent,
     MetaPointer Property,
     PropertyValue OldValue,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IPropertyEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPropertyEvent;
 
 public record PropertyChanged(
     TargetNode Parent,
     MetaPointer Property,
     PropertyValue NewValue,
     PropertyValue OldValue,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IPropertyEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPropertyEvent;
 
 #endregion
 
@@ -649,16 +662,18 @@ public record ChildAdded(
     MetaPointer Containment,
     Index Index,
     DeltaSerializationChunk NewChild,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
 
 public record ChildDeleted(
     TargetNode Parent,
     MetaPointer Containment,
     Index Index,
     DeltaSerializationChunk DeletedChild,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
 
 public record ChildReplaced(
     TargetNode Parent,
@@ -666,8 +681,9 @@ public record ChildReplaced(
     Index Index,
     DeltaSerializationChunk NewChild,
     DeltaSerializationChunk ReplacedChild,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
 
 public record ChildMovedFromOtherContainment(
     TargetNode NewParent,
@@ -677,8 +693,9 @@ public record ChildMovedFromOtherContainment(
     TargetNode OldParent,
     MetaPointer OldContainment,
     Index OldIndex,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
 {
     public TargetNode Parent => NewParent;
 
@@ -692,8 +709,9 @@ public record ChildMovedFromOtherContainmentInSameParent(
     TargetNode Parent,
     MetaPointer OldContainment,
     Index OldIndex,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
 {
     MetaPointer IContainmentEvent.Containment => NewContainment;
 }
@@ -704,8 +722,9 @@ public record ChildMovedInSameContainment(
     TargetNode Parent,
     MetaPointer Containment,
     Index OldIndex,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
 
 public record ChildMovedAndReplacedFromOtherContainment(
     TargetNode NewParent,
@@ -716,8 +735,9 @@ public record ChildMovedAndReplacedFromOtherContainment(
     MetaPointer OldContainment,
     Index OldIndex,
     DeltaSerializationChunk ReplacedChild,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
 {
     public TargetNode Parent => NewParent;
 
@@ -732,8 +752,9 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
     MetaPointer OldContainment,
     Index OldIndex,
     DeltaSerializationChunk ReplacedChild,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
 {
     MetaPointer IContainmentEvent.Containment => NewContainment;
 }
@@ -745,8 +766,9 @@ public record ChildMovedAndReplacedInSameContainment(
     MetaPointer Containment,
     Index OldIndex,
     DeltaSerializationChunk ReplacedChild,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
 
 #endregion
 
@@ -761,23 +783,26 @@ public record AnnotationAdded(
     TargetNode Parent,
     Index Index,
     DeltaSerializationChunk NewAnnotation,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
 
 public record AnnotationDeleted(
     TargetNode Parent,
     Index Index,
     DeltaSerializationChunk DeletedAnnotation,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
 
 public record AnnotationReplaced(
     TargetNode Parent,
     Index Index,
     DeltaSerializationChunk NewAnnotation,
     DeltaSerializationChunk ReplacedAnnotation,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
 
 public record AnnotationMovedFromOtherParent(
     TargetNode NewParent,
@@ -785,8 +810,9 @@ public record AnnotationMovedFromOtherParent(
     TargetNode MovedAnnotation,
     TargetNode OldParent,
     Index OldIndex,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent
 {
     TargetNode IAnnotationEvent.Parent => NewParent;
 }
@@ -796,8 +822,9 @@ public record AnnotationMovedInSameParent(
     TargetNode MovedAnnotation,
     TargetNode Parent,
     Index OldIndex,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
 
 public record AnnotationMovedAndReplacedFromOtherParent(
     TargetNode NewParent,
@@ -806,8 +833,9 @@ public record AnnotationMovedAndReplacedFromOtherParent(
     TargetNode OldParent,
     Index OldIndex,
     DeltaSerializationChunk ReplacedAnnotation,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent
 {
     TargetNode IAnnotationEvent.Parent => NewParent;
 }
@@ -818,8 +846,9 @@ public record AnnotationMovedAndReplacedInSameParent(
     TargetNode Parent,
     Index OldIndex,
     DeltaSerializationChunk ReplacedAnnotation,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
 
 #endregion
 
@@ -837,16 +866,18 @@ public record ReferenceAdded(
     MetaPointer Reference,
     Index Index,
     SerializedReferenceTarget NewTarget,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceDeleted(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
     SerializedReferenceTarget DeletedTarget,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceChanged(
     TargetNode Parent,
@@ -854,8 +885,9 @@ public record ReferenceChanged(
     Index Index,
     SerializedReferenceTarget NewTarget,
     SerializedReferenceTarget ReplacedTarget,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record EntryMovedFromOtherReference(
     TargetNode NewParent,
@@ -865,8 +897,9 @@ public record EntryMovedFromOtherReference(
     MetaPointer OldReference,
     Index OldIndex,
     SerializedReferenceTarget MovedEntry,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
 {
     public TargetNode Parent => NewParent;
 
@@ -880,8 +913,9 @@ public record EntryMovedFromOtherReferenceInSameParent(
     MetaPointer OldReference,
     Index OldIndex,
     SerializedReferenceTarget MovedEntry,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
 {
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
@@ -892,8 +926,9 @@ public record EntryMovedInSameReference(
     Index NewIndex,
     Index OldIndex,
     SerializedReferenceTarget MovedEntry,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record EntryMovedAndReplacedFromOtherReference(
     TargetNode NewParent,
@@ -904,8 +939,9 @@ public record EntryMovedAndReplacedFromOtherReference(
     Index OldIndex,
     SerializedReferenceTarget MovedEntry,
     SerializedReferenceTarget ReplacedEntry,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
 {
     public TargetNode Parent => NewParent;
 
@@ -920,8 +956,9 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParent(
     Index OldIndex,
     SerializedReferenceTarget MovedEntry,
     SerializedReferenceTarget ReplacedEntry,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
 {
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
@@ -933,8 +970,9 @@ public record EntryMovedAndReplacedInSameReference(
     Index OldIndex,
     SerializedReferenceTarget MovedEntry,
     SerializedReferenceTarget ReplacedEntry,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceResolveInfoAdded(
     TargetNode Parent,
@@ -942,8 +980,9 @@ public record ReferenceResolveInfoAdded(
     Index Index,
     ResolveInfo NewResolveInfo,
     TargetNode Target,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceResolveInfoDeleted(
     TargetNode Parent,
@@ -951,8 +990,9 @@ public record ReferenceResolveInfoDeleted(
     Index Index,
     TargetNode Target,
     ResolveInfo DeletedResolveInfo,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceResolveInfoChanged(
     TargetNode Parent,
@@ -961,8 +1001,9 @@ public record ReferenceResolveInfoChanged(
     ResolveInfo NewResolveInfo,
     TargetNode? Target,
     ResolveInfo ReplacedResolveInfo,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceTargetAdded(
     TargetNode Parent,
@@ -970,8 +1011,9 @@ public record ReferenceTargetAdded(
     Index Index,
     TargetNode NewTarget,
     ResolveInfo ResolveInfo,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceTargetDeleted(
     TargetNode Parent,
@@ -979,8 +1021,9 @@ public record ReferenceTargetDeleted(
     Index Index,
     ResolveInfo ResolveInfo,
     TargetNode DeletedTarget,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceTargetChanged(
     TargetNode Parent,
@@ -989,14 +1032,18 @@ public record ReferenceTargetChanged(
     TargetNode NewTarget,
     ResolveInfo? ResolveInfo,
     TargetNode ReplacedTarget,
+    EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
 
 #endregion
 
 #region Miscellaneous
 
-public record CompositeEvent(ISingleDeltaEvent[] Events, ProtocolMessage? Message)
+public record CompositeEvent(
+    ISingleDeltaEvent[] Events,
+    EventSequenceNumber EventSequenceNumber,
+    ProtocolMessage? Message)
     : IDeltaEvent
 {
     /// <inheritdoc />
@@ -1029,11 +1076,18 @@ public record CompositeEvent(ISingleDeltaEvent[] Events, ProtocolMessage? Messag
     }
 }
 
-public record NoOpEvent(CommandSource[] OriginCommands, ProtocolMessage? Message)
-    : SingleDeltaEventBase(OriginCommands, Message);
+public record NoOpEvent(
+    EventSequenceNumber EventSequenceNumber,
+    CommandSource[] OriginCommands,
+    ProtocolMessage? Message)
+    : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message);
 
-public record Error(string ErrorCode, CommandSource[] OriginCommands, ProtocolMessage Message)
-    : SingleDeltaEventBase(OriginCommands, Message);
+public record Error(
+    string ErrorCode,
+    EventSequenceNumber EventSequenceNumber,
+    CommandSource[] OriginCommands,
+    ProtocolMessage Message)
+    : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message);
 
 #endregion
 

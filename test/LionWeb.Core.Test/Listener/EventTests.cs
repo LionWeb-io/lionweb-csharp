@@ -33,7 +33,8 @@ public abstract class EventTestsBase
 {
     protected abstract Geometry CreateReplicator(Geometry node);
 
-    protected Geometry Clone(Geometry node) => (Geometry)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
+    protected Geometry Clone(Geometry node) =>
+        (Geometry)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
 
     #region Properties
 
@@ -671,7 +672,7 @@ public class EventsTest : EventTestsBase
     protected override Geometry CreateReplicator(Geometry node)
     {
         var clone = Clone(node);
-        
+
         var replicator = new PartitionEventReplicator(clone);
         replicator.ReplicateFrom(node.GetPublisher());
 
@@ -685,7 +686,7 @@ public class EventsTestSerialized : EventTestsBase
     protected override Geometry CreateReplicator(Geometry node)
     {
         var clone = Clone(node);
-        
+
         var lionWebVersion = LionWebVersions.v2024_1;
         List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
@@ -725,7 +726,7 @@ public class EventsTestJson : EventTestsBase
     protected override Geometry CreateReplicator(Geometry node)
     {
         var clone = Clone(node);
-        
+
         var lionWebVersion = LionWebVersions.v2024_1;
         List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
@@ -777,8 +778,8 @@ internal class CommandToEventMapper
 
     public static Dictionary<CompressedMetaPointer, IKeyed> BuildSharedKeyMap(IEnumerable<Language> languages)
     {
-        Dictionary<CompressedMetaPointer, IKeyed>  sharedKeyedMap = [];
-        
+        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = [];
+
         foreach (IKeyed keyed in languages.SelectMany(l => M1Extensions.Descendants<IKeyed>(l)))
         {
             var metaPointer = keyed switch
@@ -791,30 +792,52 @@ internal class CommandToEventMapper
 
             sharedKeyedMap[CompressedMetaPointer.Create(metaPointer, true)] = keyed;
         }
-        
+
         return sharedKeyedMap;
     }
-    
+
     public IDeltaEvent Map(IDeltaCommand deltaCommand) =>
         deltaCommand switch
         {
-            AddProperty a => new PropertyAdded(a.Parent, a.Property, a.NewValue, OriginCommands(a), null),
-            DeleteProperty a => new PropertyDeleted(a.Parent, a.Property, null, OriginCommands(a), null),
-            ChangeProperty a => new PropertyChanged(a.Parent, a.Property, a.NewValue, null, OriginCommands(a), null),
-            AddChild a => new ChildAdded(a.Parent, a.Containment, a.Index, a.NewChild, OriginCommands(a), null),
-            DeleteChild a => new ChildDeleted(a.Parent, a.Containment, a.Index, new([]), OriginCommands(a), null),
-            ReplaceChild a => new ChildReplaced(a.Parent, a.Containment, a.Index, a.NewChild, new([]), OriginCommands(a), null),
-            MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), null),
-            MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), null),
-            MoveChildInSameContainment a => new ChildMovedInSameContainment(a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), null),
-            AddAnnotation a => new AnnotationAdded(a.Parent, a.Index, a.NewAnnotation, OriginCommands(a), null),
-            DeleteAnnotation a => new AnnotationDeleted(a.Parent, a.Index, new([]), OriginCommands(a), null),
-            ReplaceAnnotation a => new AnnotationReplaced(a.Parent, a.Index, a.NewAnnotation, new([]), OriginCommands(a), null),
-            MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), null),
-            MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), null),
-            AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewTarget, OriginCommands(a), null),
-            DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, new(), OriginCommands(a), null),
-            ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewTarget, new(), OriginCommands(a), null),
+            AddProperty a => new PropertyAdded(a.Parent, a.Property, a.NewValue, NextSequence(), OriginCommands(a),
+                null),
+            DeleteProperty a => new PropertyDeleted(a.Parent, a.Property, null, NextSequence(), OriginCommands(a),
+                null),
+            ChangeProperty a => new PropertyChanged(a.Parent, a.Property, a.NewValue, null, NextSequence(),
+                OriginCommands(a), null),
+            AddChild a => new ChildAdded(a.Parent, a.Containment, a.Index, a.NewChild, NextSequence(),
+                OriginCommands(a), null),
+            DeleteChild a => new ChildDeleted(a.Parent, a.Containment, a.Index, new([]), NextSequence(),
+                OriginCommands(a), null),
+            ReplaceChild a => new ChildReplaced(a.Parent, a.Containment, a.Index, a.NewChild, new([]), NextSequence(),
+                OriginCommands(a), null),
+            MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewParent, a.NewContainment,
+                a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild),
+                NextSequence(), OriginCommands(a), null),
+            MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(
+                a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild),
+                GetIndex(a.MovedChild), NextSequence(), OriginCommands(a), null),
+            MoveChildInSameContainment a => new ChildMovedInSameContainment(a.NewIndex, a.MovedChild,
+                GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), NextSequence(),
+                OriginCommands(a), null),
+            AddAnnotation a => new AnnotationAdded(a.Parent, a.Index, a.NewAnnotation, NextSequence(),
+                OriginCommands(a), null),
+            DeleteAnnotation a => new AnnotationDeleted(a.Parent, a.Index, new([]), NextSequence(), OriginCommands(a),
+                null),
+            ReplaceAnnotation a => new AnnotationReplaced(a.Parent, a.Index, a.NewAnnotation, new([]), NextSequence(),
+                OriginCommands(a), null),
+            MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.NewIndex,
+                a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), NextSequence(),
+                OriginCommands(a), null),
+            MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation,
+                GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), NextSequence(), OriginCommands(a),
+                null),
+            AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewTarget, NextSequence(),
+                OriginCommands(a), null),
+            DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, new(), NextSequence(),
+                OriginCommands(a), null),
+            ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewTarget, new(),
+                NextSequence(), OriginCommands(a), null),
         };
 
     private NodeId GetParent(NodeId childId)
@@ -822,6 +845,7 @@ internal class CommandToEventMapper
         var child = (IWritableNode)_sharedNodeMap[childId];
         return child.GetParent().GetId();
     }
+
     private MetaPointer GetContainment(NodeId childId)
     {
         var child = (IWritableNode)_sharedNodeMap[childId];
@@ -844,7 +868,14 @@ internal class CommandToEventMapper
         return parent.GetAnnotations().ToList().IndexOf(annotation);
     }
 
-    private CommandSource[] OriginCommands(ISingleDeltaCommand a) => [new CommandSource("myParticipation", a.CommandId)];
+
+    private long _nextSequence = 0;
+
+    private long NextSequence() =>
+        _nextSequence++;
+
+    private CommandSource[] OriginCommands(ISingleDeltaCommand a) =>
+        [new CommandSource("myParticipation", a.CommandId)];
 }
 
 internal class CommandIdProvider : ICommandIdProvider
