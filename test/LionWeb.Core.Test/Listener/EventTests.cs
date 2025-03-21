@@ -844,7 +844,7 @@ internal class CommandToEventMapper
         return parent.GetAnnotations().ToList().IndexOf(annotation);
     }
 
-    private CommandSource[] OriginCommands(ISingleDeltaCommand a) => [new CommandSource(a.CommandId)];
+    private CommandSource[] OriginCommands(ISingleDeltaCommand a) => [new CommandSource("myParticipation", a.CommandId)];
 }
 
 internal class CommandIdProvider : ICommandIdProvider

@@ -332,7 +332,7 @@ public class DeltaProtocolPartitionEventReceiver
 
 
     private static EventId ToEventId(ISingleDeltaEvent @event) =>
-        string.Join("_", @event.OriginCommands.Select(c => c.Source));
+        string.Join("_", @event.OriginCommands.Select(c => c.CommandId));
 
     private IWritableNode ToNode(TargetNode nodeId)
     {

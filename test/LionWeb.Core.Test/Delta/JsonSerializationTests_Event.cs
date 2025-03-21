@@ -374,5 +374,5 @@ public class JsonSerializationTests_Event : JsonSerializationTestsBase
     ];
 
     private CommandSource CreateCommandSource() =>
-        new CommandSource(CreateTargetNode());
+        new CommandSource("myParticipation", CreateTargetNode());
 }

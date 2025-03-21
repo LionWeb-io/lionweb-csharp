@@ -19,12 +19,13 @@ namespace LionWeb.Core.Serialization;
 
 using TargetNode = NodeId;
 using CommandId = NodeId;
+using ParticipationId = NodeId;
 using QueryId = NodeId;
 using FreeId = NodeId;
 using MessageKind = NodeId;
 using MessageDataKey = NodeId;
 
-public record CommandSource(NodeId Source);
+public record CommandSource(ParticipationId ParticipationId, CommandId CommandId);
 
 public record DeltaSerializationChunk(SerializedNode[] Nodes)
 {
