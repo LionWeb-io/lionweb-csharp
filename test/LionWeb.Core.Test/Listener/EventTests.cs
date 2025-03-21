@@ -27,6 +27,7 @@ using M2;
 using M3;
 using Comparer = Core.Utilities.Comparer;
 using NodeId = string;
+using Index = int;
 
 public abstract class EventTestsBase
 {
@@ -797,39 +798,50 @@ internal class CommandToEventMapper
     public IDeltaEvent Map(IDeltaCommand deltaCommand) =>
         deltaCommand switch
         {
-            AddProperty a => new PropertyAdded(a.Property, a.NewValue, OriginCommands(a), null),
-            DeleteProperty a => new PropertyDeleted(a.Property, null, OriginCommands(a), null),
-            ChangeProperty a => new PropertyChanged(a.Property, a.NewValue, null, OriginCommands(a), null),
-            AddChild a => new ChildAdded(a.Containment, a.NewChild, OriginCommands(a), null),
-            DeleteChild a => new ChildDeleted(a.Containment, new([]), OriginCommands(a), null),
-            ReplaceChild a => new ChildReplaced(a.Containment, a.NewChild, new([]), OriginCommands(a), null),
-            MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewContainment, a.MovedChild, ContainmentParent(a.MovedChild), OriginCommands(a), null),
-            MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, ContainmentParent(a.MovedChild).Parent, ContainmentParent(a.MovedChild).Containment, ContainmentParent(a.MovedChild).Index, OriginCommands(a), null),
-            MoveChildInSameContainment a => new ChildMovedInSameContainment(a.NewIndex, a.MovedChild, ContainmentParent(a.MovedChild).Parent, ContainmentParent(a.MovedChild).Containment, ContainmentParent(a.MovedChild).Index, OriginCommands(a), null),
-            AddAnnotation a => new AnnotationAdded(a.Parent, a.NewAnnotation, OriginCommands(a), null),
-            DeleteAnnotation a => new AnnotationDeleted(a.Parent, new([]), OriginCommands(a), null),
-            ReplaceAnnotation a => new AnnotationReplaced(a.Parent, a.NewAnnotation, new([]), OriginCommands(a), null),
-            MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.MovedAnnotation, AnnotationParent(a.MovedAnnotation), OriginCommands(a), null),
-            MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation, AnnotationParent(a.MovedAnnotation).Parent, AnnotationParent(a.MovedAnnotation).Index, OriginCommands(a), null),
-            AddReference a => new ReferenceAdded(a.Reference, a.NewTarget, OriginCommands(a), null),
-            DeleteReference a => new ReferenceDeleted(a.Reference, new(), OriginCommands(a), null),
-            ChangeReference a => new ReferenceChanged(a.Reference, a.NewTarget, new(), OriginCommands(a), null),
+            AddProperty a => new PropertyAdded(a.Parent, a.Property, a.NewValue, OriginCommands(a), null),
+            DeleteProperty a => new PropertyDeleted(a.Parent, a.Property, null, OriginCommands(a), null),
+            ChangeProperty a => new PropertyChanged(a.Parent, a.Property, a.NewValue, null, OriginCommands(a), null),
+            AddChild a => new ChildAdded(a.Parent, a.Containment, a.Index, a.NewChild, OriginCommands(a), null),
+            DeleteChild a => new ChildDeleted(a.Parent, a.Containment, a.Index, new([]), OriginCommands(a), null),
+            ReplaceChild a => new ChildReplaced(a.Parent, a.Containment, a.Index, a.NewChild, new([]), OriginCommands(a), null),
+            MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), null),
+            MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), null),
+            MoveChildInSameContainment a => new ChildMovedInSameContainment(a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), null),
+            AddAnnotation a => new AnnotationAdded(a.Parent, a.Index, a.NewAnnotation, OriginCommands(a), null),
+            DeleteAnnotation a => new AnnotationDeleted(a.Parent, a.Index, new([]), OriginCommands(a), null),
+            ReplaceAnnotation a => new AnnotationReplaced(a.Parent, a.Index, a.NewAnnotation, new([]), OriginCommands(a), null),
+            MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), null),
+            MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), null),
+            AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewTarget, OriginCommands(a), null),
+            DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, new(), OriginCommands(a), null),
+            ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewTarget, new(), OriginCommands(a), null),
         };
 
-    private DeltaContainment ContainmentParent(NodeId childId)
+    private NodeId GetParent(NodeId childId)
+    {
+        var child = (IWritableNode)_sharedNodeMap[childId];
+        return child.GetParent().GetId();
+    }
+    private MetaPointer GetContainment(NodeId childId)
+    {
+        var child = (IWritableNode)_sharedNodeMap[childId];
+        var parent = (IWritableNode)child.GetParent();
+        return parent.GetContainmentOf(child).ToMetaPointer();
+    }
+
+    private Index GetIndex(NodeId childId)
     {
         var child = (IWritableNode)_sharedNodeMap[childId];
         var parent = (IWritableNode)child.GetParent();
         var containment = parent.GetContainmentOf(child);
-        return new DeltaContainment(parent.GetId(), containment.ToMetaPointer(),
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList().IndexOf(child));
+        return M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList().IndexOf(child);
     }
 
-    private DeltaAnnotation AnnotationParent(NodeId annotationId)
+    private Index GetAnnotationIndex(NodeId annotationId)
     {
         var annotation = _sharedNodeMap[annotationId];
         var parent = annotation.GetParent();
-        return new DeltaAnnotation(parent.GetId(), parent.GetAnnotations().ToList().IndexOf(annotation));
+        return parent.GetAnnotations().ToList().IndexOf(annotation);
     }
 
     private CommandSource[] OriginCommands(ISingleDeltaCommand a) => [new CommandSource(a.CommandId)];

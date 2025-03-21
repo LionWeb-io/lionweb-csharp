@@ -75,7 +75,7 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddProperty()
     {
-        var input = new AddProperty(CreateProperty(), CreatePropertyValue(), CreateCommandId(),
+        var input = new AddProperty(CreateTargetNode(), CreateMetaPointer(), CreatePropertyValue(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -83,14 +83,14 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void DeleteProperty()
     {
-        var input = new DeleteProperty(CreateProperty(), CreateCommandId(), CreateProtocolMessage());
+        var input = new DeleteProperty(CreateTargetNode(), CreateMetaPointer(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ChangeProperty()
     {
-        var input = new ChangeProperty(CreateProperty(), CreatePropertyValue(), CreateCommandId(),
+        var input = new ChangeProperty(CreateTargetNode(), CreateMetaPointer(), CreatePropertyValue(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -102,28 +102,28 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddChild()
     {
-        var input = new AddChild(CreateContainment(), CreateChunk(), CreateCommandId(), CreateProtocolMessage());
+        var input = new AddChild(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateChunk(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeleteChild()
     {
-        var input = new DeleteChild(CreateContainment(), CreateCommandId(), CreateProtocolMessage());
+        var input = new DeleteChild(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ReplaceChild()
     {
-        var input = new ReplaceChild(CreateContainment(), CreateChunk(), CreateCommandId(), CreateProtocolMessage());
+        var input = new ReplaceChild(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateChunk(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveChildFromOtherContainment()
     {
-        var input = new MoveChildFromOtherContainment(CreateContainment(), CreateTargetNode(), CreateCommandId(),
+        var input = new MoveChildFromOtherContainment(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateTargetNode(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -147,7 +147,7 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void MoveAndReplaceChildFromOtherContainment()
     {
-        var input = new MoveAndReplaceChildFromOtherContainment(CreateContainment(), CreateTargetNode(),
+        var input = new MoveAndReplaceChildFromOtherContainment(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateTargetNode(),
             CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -175,21 +175,21 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddAnnotation()
     {
-        var input = new AddAnnotation(CreateAnnotation(), CreateChunk(), CreateCommandId(), CreateProtocolMessage());
+        var input = new AddAnnotation(CreateTargetNode(), CreateIndex(), CreateChunk(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeleteAnnotation()
     {
-        var input = new DeleteAnnotation(CreateAnnotation(), CreateCommandId(), CreateProtocolMessage());
+        var input = new DeleteAnnotation(CreateTargetNode(), CreateIndex(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ReplaceAnnotation()
     {
-        var input = new ReplaceAnnotation(CreateAnnotation(), CreateChunk(), CreateCommandId(),
+        var input = new ReplaceAnnotation(CreateTargetNode(), CreateIndex(), CreateChunk(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -197,7 +197,7 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void MoveAnnotationFromOtherParent()
     {
-        var input = new MoveAnnotationFromOtherParent(CreateAnnotation(), CreateTargetNode(), CreateCommandId(),
+        var input = new MoveAnnotationFromOtherParent(CreateTargetNode(), CreateIndex(), CreateTargetNode(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -213,7 +213,7 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void MoveAndReplaceAnnotationFromOtherParent()
     {
-        var input = new MoveAndReplaceAnnotationFromOtherParent(CreateAnnotation(), CreateTargetNode(),
+        var input = new MoveAndReplaceAnnotationFromOtherParent(CreateTargetNode(), CreateIndex(), CreateTargetNode(),
             CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -233,28 +233,28 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddReference()
     {
-        var input = new AddReference(CreateReference(), CreateTarget(), CreateCommandId(), CreateProtocolMessage());
+        var input = new AddReference(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateTarget(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeleteReference()
     {
-        var input = new DeleteReference(CreateReference(), CreateCommandId(), CreateProtocolMessage());
+        var input = new DeleteReference(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ChangeReference()
     {
-        var input = new ChangeReference(CreateReference(), CreateTarget(), CreateCommandId(), CreateProtocolMessage());
+        var input = new ChangeReference(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateTarget(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveEntryFromOtherReference()
     {
-        var input = new MoveEntryFromOtherReference(CreateReference(), CreateReference(), CreateCommandId(),
+        var input = new MoveEntryFromOtherReference(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -278,7 +278,7 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void MoveAndReplaceEntryFromOtherReference()
     {
-        var input = new MoveAndReplaceEntryFromOtherReference(CreateReference(), CreateReference(), CreateCommandId(),
+        var input = new MoveAndReplaceEntryFromOtherReference(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -302,7 +302,7 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddReferenceResolveInfo()
     {
-        var input = new AddReferenceResolveInfo(CreateReference(), CreateResolveInfo(), CreateCommandId(),
+        var input = new AddReferenceResolveInfo(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateResolveInfo(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -310,14 +310,14 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void DeleteReferenceResolveInfo()
     {
-        var input = new DeleteReferenceResolveInfo(CreateReference(), CreateCommandId(), CreateProtocolMessage());
+        var input = new DeleteReferenceResolveInfo(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ChangeReferenceResolveInfo()
     {
-        var input = new ChangeReferenceResolveInfo(CreateReference(), CreateResolveInfo(), CreateCommandId(),
+        var input = new ChangeReferenceResolveInfo(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateResolveInfo(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -325,7 +325,7 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddReferenceTarget()
     {
-        var input = new AddReferenceTarget(CreateReference(), CreateTargetNode(), CreateCommandId(),
+        var input = new AddReferenceTarget(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateTargetNode(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -333,14 +333,14 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void DeleteReferenceTarget()
     {
-        var input = new DeleteReferenceTarget(CreateReference(), CreateCommandId(), CreateProtocolMessage());
+        var input = new DeleteReferenceTarget(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateCommandId(), CreateProtocolMessage());
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ChangeReferenceTarget()
     {
-        var input = new ChangeReferenceTarget(CreateReference(), CreateTargetNode(), CreateCommandId(),
+        var input = new ChangeReferenceTarget(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateTargetNode(), CreateCommandId(),
             CreateProtocolMessage());
         AssertSerialization(input);
     }
@@ -351,10 +351,10 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     public void CompositeCommand()
     {
         var input = new CompositeCommand([
-            new DeleteProperty(CreateProperty(), CreateCommandId(), CreateProtocolMessage()),
-            new DeleteChild(CreateContainment(), CreateCommandId(), CreateProtocolMessage()),
-            new DeleteAnnotation(CreateAnnotation(), CreateCommandId(), CreateProtocolMessage()),
-            new DeleteReference(CreateReference(), CreateCommandId(), CreateProtocolMessage())
+            new DeleteProperty(CreateTargetNode(), CreateMetaPointer(), CreateCommandId(), CreateProtocolMessage()),
+            new DeleteChild(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateCommandId(), CreateProtocolMessage()),
+            new DeleteAnnotation(CreateTargetNode(), CreateIndex(), CreateCommandId(), CreateProtocolMessage()),
+            new DeleteReference(CreateTargetNode(), CreateMetaPointer(), CreateIndex(), CreateCommandId(), CreateProtocolMessage())
         ], CreateProtocolMessage());
         AssertSerialization(input);
     }

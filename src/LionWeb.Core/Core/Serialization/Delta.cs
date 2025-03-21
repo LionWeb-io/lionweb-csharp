@@ -94,14 +94,6 @@ public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageD
 
 public record ProtocolMessageData(MessageDataKey Key, string Value);
 
-public record DeltaProperty(TargetNode Parent, MetaPointer Property);
-
-public record DeltaContainment(TargetNode Parent, MetaPointer Containment, Index Index);
-
-public record DeltaAnnotation(TargetNode Parent, Index Index);
-
-public record DeltaReference(TargetNode Parent, MetaPointer Reference, Index Index);
-
 public interface IDeltaContent
 {
     ProtocolMessage? Message { get; }
@@ -220,18 +212,24 @@ public interface IFeatureCommand : ISingleDeltaCommand;
 
 public interface IPropertyCommand : IFeatureCommand
 {
-    DeltaProperty Property { get; }
-
-    TargetNode Parent => Property.Parent;
+    TargetNode Parent { get; }
+    MetaPointer Property { get; }
 };
 
-public record AddProperty(DeltaProperty Property, PropertyValue NewValue, CommandId CommandId, ProtocolMessage? Message)
+public record AddProperty(
+    TargetNode Parent,
+    MetaPointer Property,
+    PropertyValue NewValue,
+    CommandId CommandId,
+    ProtocolMessage? Message)
     : IPropertyCommand;
 
-public record DeleteProperty(DeltaProperty Property, CommandId CommandId, ProtocolMessage? Message) : IPropertyCommand;
+public record DeleteProperty(TargetNode Parent, MetaPointer Property, CommandId CommandId, ProtocolMessage? Message)
+    : IPropertyCommand;
 
 public record ChangeProperty(
-    DeltaProperty Property,
+    TargetNode Parent,
+    MetaPointer Property,
     PropertyValue NewValue,
     CommandId CommandId,
     ProtocolMessage? Message) : IPropertyCommand;
@@ -243,22 +241,33 @@ public record ChangeProperty(
 public interface IContainmentCommand : IFeatureCommand;
 
 public record AddChild(
-    DeltaContainment Containment,
+    TargetNode Parent,
+    MetaPointer Containment,
+    Index Index,
     DeltaSerializationChunk NewChild,
     CommandId CommandId,
     ProtocolMessage? Message) : IContainmentCommand;
 
-public record DeleteChild(DeltaContainment Containment, CommandId CommandId, ProtocolMessage? Message)
+public record DeleteChild(
+    TargetNode Parent,
+    MetaPointer Containment,
+    Index Index,
+    CommandId CommandId,
+    ProtocolMessage? Message)
     : IContainmentCommand;
 
 public record ReplaceChild(
-    DeltaContainment Containment,
+    TargetNode Parent,
+    MetaPointer Containment,
+    Index Index,
     DeltaSerializationChunk NewChild,
     CommandId CommandId,
     ProtocolMessage? Message) : IContainmentCommand;
 
 public record MoveChildFromOtherContainment(
-    DeltaContainment NewContainment,
+    TargetNode NewParent,
+    MetaPointer NewContainment,
+    Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
     ProtocolMessage? Message) : IContainmentCommand;
@@ -277,7 +286,9 @@ public record MoveChildInSameContainment(
     ProtocolMessage? Message) : IContainmentCommand;
 
 public record MoveAndReplaceChildFromOtherContainment(
-    DeltaContainment NewContainment,
+    TargetNode NewParent,
+    MetaPointer NewContainment,
+    Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
     ProtocolMessage? Message) : IContainmentCommand;
@@ -302,22 +313,25 @@ public record MoveAndReplaceChildInSameContainment(
 public interface IAnnotationCommand : ISingleDeltaCommand;
 
 public record AddAnnotation(
-    DeltaAnnotation Parent,
+    TargetNode Parent,
+    Index Index,
     DeltaSerializationChunk NewAnnotation,
     CommandId CommandId,
     ProtocolMessage? Message) : IAnnotationCommand;
 
-public record DeleteAnnotation(DeltaAnnotation Parent, CommandId CommandId, ProtocolMessage? Message)
+public record DeleteAnnotation(TargetNode Parent, Index Index, CommandId CommandId, ProtocolMessage? Message)
     : IAnnotationCommand;
 
 public record ReplaceAnnotation(
-    DeltaAnnotation Parent,
+    TargetNode Parent,
+    Index Index,
     DeltaSerializationChunk NewAnnotation,
     CommandId CommandId,
     ProtocolMessage? Message) : IAnnotationCommand;
 
 public record MoveAnnotationFromOtherParent(
-    DeltaAnnotation NewParent,
+    TargetNode NewParent,
+    Index NewIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
     ProtocolMessage? Message) : IAnnotationCommand;
@@ -329,7 +343,8 @@ public record MoveAnnotationInSameParent(
     ProtocolMessage? Message) : IAnnotationCommand;
 
 public record MoveAndReplaceAnnotationFromOtherParent(
-    DeltaAnnotation NewParent,
+    TargetNode NewParent,
+    Index NewIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
     ProtocolMessage? Message) : IAnnotationCommand;
@@ -347,23 +362,36 @@ public record MoveAndReplaceAnnotationInSameParent(
 public interface IReferenceCommand : IFeatureCommand;
 
 public record AddReference(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     SerializedReferenceTarget NewTarget,
     CommandId CommandId,
     ProtocolMessage? Message) : IReferenceCommand;
 
-public record DeleteReference(DeltaReference Reference, CommandId CommandId, ProtocolMessage? Message)
+public record DeleteReference(
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
+    CommandId CommandId,
+    ProtocolMessage? Message)
     : IReferenceCommand;
 
 public record ChangeReference(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     SerializedReferenceTarget NewTarget,
     CommandId CommandId,
     ProtocolMessage? Message) : IReferenceCommand;
 
 public record MoveEntryFromOtherReference(
-    DeltaReference NewReference,
-    DeltaReference OldReference,
+    TargetNode NewParent,
+    MetaPointer NewReference,
+    Index NewIndex,
+    TargetNode OldParent,
+    MetaPointer OldReference,
+    Index OldIndex,
     CommandId CommandId,
     ProtocolMessage? Message) : IReferenceCommand;
 
@@ -385,8 +413,12 @@ public record MoveEntryInSameReference(
     ProtocolMessage? Message) : IReferenceCommand;
 
 public record MoveAndReplaceEntryFromOtherReference(
-    DeltaReference NewReference,
-    DeltaReference OldReference,
+    TargetNode NewParent,
+    MetaPointer NewReference,
+    Index NewIndex,
+    TargetNode OldParent,
+    MetaPointer OldReference,
+    Index OldIndex,
     CommandId CommandId,
     ProtocolMessage? Message) : IReferenceCommand;
 
@@ -408,31 +440,49 @@ public record MoveAndReplaceEntryInSameReference(
     ProtocolMessage? Message) : IReferenceCommand;
 
 public record AddReferenceResolveInfo(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
     ProtocolMessage? Message) : IReferenceCommand;
 
-public record DeleteReferenceResolveInfo(DeltaReference Reference, CommandId CommandId, ProtocolMessage? Message)
+public record DeleteReferenceResolveInfo(
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
+    CommandId CommandId,
+    ProtocolMessage? Message)
     : IReferenceCommand;
 
 public record ChangeReferenceResolveInfo(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
     ProtocolMessage? Message) : IReferenceCommand;
 
 public record AddReferenceTarget(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     TargetNode NewTarget,
     CommandId CommandId,
     ProtocolMessage? Message) : IReferenceCommand;
 
-public record DeleteReferenceTarget(DeltaReference Reference, CommandId CommandId, ProtocolMessage? Message)
+public record DeleteReferenceTarget(
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
+    CommandId CommandId,
+    ProtocolMessage? Message)
     : IReferenceCommand;
 
 public record ChangeReferenceTarget(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     TargetNode NewTarget,
     CommandId CommandId,
     ProtocolMessage? Message) : IReferenceCommand;
@@ -554,27 +604,29 @@ public interface IFeatureEvent : ISingleDeltaEvent
 
 public interface IPropertyEvent : IFeatureEvent
 {
-    DeltaProperty Property { get; }
+    TargetNode Parent { get; }
+    MetaPointer Property { get; }
 
-    TargetNode IFeatureEvent.Parent => Property.Parent;
-
-    MetaPointer IFeatureEvent.Feature => Property.Property;
+    MetaPointer IFeatureEvent.Feature => Property;
 };
 
 public record PropertyAdded(
-    DeltaProperty Property,
+    TargetNode Parent,
+    MetaPointer Property,
     PropertyValue NewValue,
     CommandSource[] OriginCommands,
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IPropertyEvent;
 
 public record PropertyDeleted(
-    DeltaProperty Property,
+    TargetNode Parent,
+    MetaPointer Property,
     PropertyValue OldValue,
     CommandSource[] OriginCommands,
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IPropertyEvent;
 
 public record PropertyChanged(
-    DeltaProperty Property,
+    TargetNode Parent,
+    MetaPointer Property,
     PropertyValue NewValue,
     PropertyValue OldValue,
     CommandSource[] OriginCommands,
@@ -592,49 +644,44 @@ public interface IContainmentEvent : IFeatureEvent
 };
 
 public record ChildAdded(
-    DeltaContainment Containment,
+    TargetNode Parent,
+    MetaPointer Containment,
+    Index Index,
     DeltaSerializationChunk NewChild,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent
-{
-    public TargetNode Parent => Containment.Parent;
-
-    MetaPointer IContainmentEvent.Containment => Containment.Containment;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent;
 
 public record ChildDeleted(
-    DeltaContainment Containment,
+    TargetNode Parent,
+    MetaPointer Containment,
+    Index Index,
     DeltaSerializationChunk DeletedChild,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent
-{
-    public TargetNode Parent => Containment.Parent;
-
-    MetaPointer IContainmentEvent.Containment => Containment.Containment;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent;
 
 public record ChildReplaced(
-    DeltaContainment Containment,
+    TargetNode Parent,
+    MetaPointer Containment,
+    Index Index,
     DeltaSerializationChunk NewChild,
     DeltaSerializationChunk ReplacedChild,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent
-{
-    public TargetNode Parent => Containment.Parent;
-
-    MetaPointer IContainmentEvent.Containment => Containment.Containment;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent;
 
 public record ChildMovedFromOtherContainment(
-    DeltaContainment NewContainment,
+    TargetNode NewParent,
+    MetaPointer NewContainment,
+    Index NewIndex,
     TargetNode MovedChild,
-    DeltaContainment OldContainment,
+    TargetNode OldParent,
+    MetaPointer OldContainment,
+    Index OldIndex,
     CommandSource[] OriginCommands,
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent
 {
-    public TargetNode Parent => NewContainment.Parent;
+    public TargetNode Parent => NewParent;
 
-    MetaPointer IContainmentEvent.Containment => NewContainment.Containment;
+    MetaPointer IContainmentEvent.Containment => NewContainment;
 }
 
 public record ChildMovedFromOtherContainmentInSameParent(
@@ -660,16 +707,20 @@ public record ChildMovedInSameContainment(
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent;
 
 public record ChildMovedAndReplacedFromOtherContainment(
-    DeltaContainment NewContainment,
+    TargetNode NewParent,
+    MetaPointer NewContainment,
+    Index NewIndex,
     TargetNode MovedChild,
-    DeltaContainment OldContainment,
+    TargetNode OldParent,
+    MetaPointer OldContainment,
+    Index OldIndex,
     DeltaSerializationChunk ReplacedChild,
     CommandSource[] OriginCommands,
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IContainmentEvent
 {
-    public TargetNode Parent => NewContainment.Parent;
+    public TargetNode Parent => NewParent;
 
-    MetaPointer IContainmentEvent.Containment => NewContainment.Containment;
+    MetaPointer IContainmentEvent.Containment => NewContainment;
 }
 
 public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
@@ -706,41 +757,37 @@ public interface IAnnotationEvent : ISingleDeltaEvent
 };
 
 public record AnnotationAdded(
-    DeltaAnnotation Parent,
+    TargetNode Parent,
+    Index Index,
     DeltaSerializationChunk NewAnnotation,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent
-{
-    TargetNode IAnnotationEvent.Parent => Parent.Parent;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent;
 
 public record AnnotationDeleted(
-    DeltaAnnotation Parent,
+    TargetNode Parent,
+    Index Index,
     DeltaSerializationChunk DeletedAnnotation,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent
-{
-    TargetNode IAnnotationEvent.Parent => Parent.Parent;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent;
 
 public record AnnotationReplaced(
-    DeltaAnnotation Parent,
+    TargetNode Parent,
+    Index Index,
     DeltaSerializationChunk NewAnnotation,
     DeltaSerializationChunk ReplacedAnnotation,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent
-{
-    TargetNode IAnnotationEvent.Parent => Parent.Parent;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent;
 
 public record AnnotationMovedFromOtherParent(
-    DeltaAnnotation NewParent,
+    TargetNode NewParent,
+    Index NewIndex,
     TargetNode MovedAnnotation,
-    DeltaAnnotation OldParent,
+    TargetNode OldParent,
+    Index OldIndex,
     CommandSource[] OriginCommands,
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent
 {
-    TargetNode IAnnotationEvent.Parent => NewParent.Parent;
+    TargetNode IAnnotationEvent.Parent => NewParent;
 }
 
 public record AnnotationMovedInSameParent(
@@ -752,14 +799,16 @@ public record AnnotationMovedInSameParent(
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent;
 
 public record AnnotationMovedAndReplacedFromOtherParent(
-    DeltaAnnotation NewParent,
+    TargetNode NewParent,
+    Index NewIndex,
     TargetNode MovedAnnotation,
-    DeltaAnnotation OldParent,
+    TargetNode OldParent,
+    Index OldIndex,
     DeltaSerializationChunk ReplacedAnnotation,
     CommandSource[] OriginCommands,
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IAnnotationEvent
 {
-    TargetNode IAnnotationEvent.Parent => NewParent.Parent;
+    TargetNode IAnnotationEvent.Parent => NewParent;
 }
 
 public record AnnotationMovedAndReplacedInSameParent(
@@ -783,49 +832,44 @@ public interface IReferenceEvent : IFeatureEvent
 };
 
 public record ReferenceAdded(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     SerializedReferenceTarget NewTarget,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
-{
-    public TargetNode Parent => Reference.Parent;
-
-    MetaPointer IReferenceEvent.Reference => Reference.Reference;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceDeleted(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     SerializedReferenceTarget DeletedTarget,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
-{
-    public TargetNode Parent => Reference.Parent;
-
-    MetaPointer IReferenceEvent.Reference => Reference.Reference;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceChanged(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     SerializedReferenceTarget NewTarget,
     SerializedReferenceTarget ReplacedTarget,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
-{
-    public TargetNode Parent => Reference.Parent;
-
-    MetaPointer IReferenceEvent.Reference => Reference.Reference;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record EntryMovedFromOtherReference(
-    DeltaReference NewReference,
-    DeltaReference OldReference,
+    TargetNode NewParent,
+    MetaPointer NewReference,
+    Index NewIndex,
+    TargetNode OldParent,
+    MetaPointer OldReference,
+    Index OldIndex,
     SerializedReferenceTarget MovedEntry,
     CommandSource[] OriginCommands,
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
 {
-    public TargetNode Parent => NewReference.Parent;
+    public TargetNode Parent => NewParent;
 
-    MetaPointer IReferenceEvent.Reference => NewReference.Reference;
+    MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
 public record EntryMovedFromOtherReferenceInSameParent(
@@ -851,16 +895,20 @@ public record EntryMovedInSameReference(
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record EntryMovedAndReplacedFromOtherReference(
-    DeltaReference NewReference,
-    DeltaReference OldReference,
+    TargetNode NewParent,
+    MetaPointer NewReference,
+    Index NewIndex,
+    TargetNode OldParent,
+    MetaPointer OldReference,
+    Index OldIndex,
     SerializedReferenceTarget MovedEntry,
     SerializedReferenceTarget ReplacedEntry,
     CommandSource[] OriginCommands,
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
 {
-    public TargetNode Parent => NewReference.Parent;
+    public TargetNode Parent => NewParent;
 
-    MetaPointer IReferenceEvent.Reference => NewReference.Reference;
+    MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
 public record EntryMovedAndReplacedFromOtherReferenceInSameParent(
@@ -888,78 +936,60 @@ public record EntryMovedAndReplacedInSameReference(
     ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceResolveInfoAdded(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     ResolveInfo NewResolveInfo,
     TargetNode Target,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
-{
-    public TargetNode Parent => Reference.Parent;
-
-    MetaPointer IReferenceEvent.Reference => Reference.Reference;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceResolveInfoDeleted(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     TargetNode Target,
     ResolveInfo DeletedResolveInfo,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
-{
-    public TargetNode Parent => Reference.Parent;
-
-    MetaPointer IReferenceEvent.Reference => Reference.Reference;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceResolveInfoChanged(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     ResolveInfo NewResolveInfo,
     TargetNode? Target,
     ResolveInfo ReplacedResolveInfo,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
-{
-    public TargetNode Parent => Reference.Parent;
-
-    MetaPointer IReferenceEvent.Reference => Reference.Reference;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceTargetAdded(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     TargetNode NewTarget,
     ResolveInfo ResolveInfo,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
-{
-    public TargetNode Parent => Reference.Parent;
-
-    MetaPointer IReferenceEvent.Reference => Reference.Reference;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceTargetDeleted(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     ResolveInfo ResolveInfo,
     TargetNode DeletedTarget,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
-{
-    public TargetNode Parent => Reference.Parent;
-
-    MetaPointer IReferenceEvent.Reference => Reference.Reference;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 public record ReferenceTargetChanged(
-    DeltaReference Reference,
+    TargetNode Parent,
+    MetaPointer Reference,
+    Index Index,
     TargetNode NewTarget,
     ResolveInfo? ResolveInfo,
     TargetNode ReplacedTarget,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent
-{
-    public TargetNode Parent => Reference.Parent;
-
-    MetaPointer IReferenceEvent.Reference => Reference.Reference;
-}
+    ProtocolMessage? Message) : SingleDeltaEventBase(OriginCommands, Message), IReferenceEvent;
 
 #endregion
 

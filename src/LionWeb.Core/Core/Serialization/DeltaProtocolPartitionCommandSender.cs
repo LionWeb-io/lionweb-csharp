@@ -29,7 +29,7 @@ public class DeltaProtocolPartitionCommandSender
     private readonly LionWebVersions _lionWebVersion;
     private readonly ISerializerVersionSpecifics _propertySerializer;
 
-    public event EventHandler<IDeltaCommand>? DeltaCommand; 
+    public event EventHandler<IDeltaCommand>? DeltaCommand;
 
     public DeltaProtocolPartitionCommandSender(IPartitionPublisher partitionPublisher,
         ICommandIdProvider commandIdProvider, LionWebVersions lionWebVersion)
@@ -44,7 +44,7 @@ public class DeltaProtocolPartitionCommandSender
     {
         if (DeltaCommand == null || @event == null)
             return;
-        
+
         IDeltaCommand deltaCommand = @event switch
         {
             PropertyAddedEvent a => OnPropertyAdded(sender, a),
@@ -66,7 +66,7 @@ public class DeltaProtocolPartitionCommandSender
             ReferenceChangedEvent a => OnReferenceChanged(sender, a),
             _ => throw new NotImplementedException(@event.GetType().Name)
         };
-        
+
         DeltaCommand.Invoke(sender, deltaCommand);
     }
 
@@ -74,7 +74,8 @@ public class DeltaProtocolPartitionCommandSender
 
     private AddProperty OnPropertyAdded(object? sender, PropertyAddedEvent @event) =>
         new(
-            ToDelta(@event.Node, @event.Property),
+            @event.Node.GetId(),
+            @event.Property.ToMetaPointer(),
             ToDelta(@event.Node, @event.Property, @event.NewValue)!,
             NewCommandId(),
             null
@@ -82,21 +83,20 @@ public class DeltaProtocolPartitionCommandSender
 
     private DeleteProperty OnPropertyDeleted(object? sender, PropertyDeletedEvent @event) =>
         new(
-            ToDelta(@event.Node, @event.Property),
+            @event.Node.GetId(),
+            @event.Property.ToMetaPointer(),
             NewCommandId(),
             null
         );
 
     private ChangeProperty OnPropertyChanged(object? sender, PropertyChangedEvent @event) =>
         new(
-            ToDelta(@event.Node, @event.Property),
+            @event.Node.GetId(),
+            @event.Property.ToMetaPointer(),
             ToDelta(@event.Node, @event.Property, @event.NewValue)!,
             NewCommandId(),
             null
         );
-
-    private DeltaProperty ToDelta(IReadableNode parent, Property property) =>
-        new DeltaProperty(parent.GetId(), property.ToMetaPointer());
 
     private PropertyValue? ToDelta(IReadableNode parent, Property property, SemanticPropertyValue newValue) =>
         _propertySerializer.SerializeProperty(parent, property, newValue).Value;
@@ -107,7 +107,9 @@ public class DeltaProtocolPartitionCommandSender
 
     private AddChild OnChildAdded(object? sender, ChildAddedEvent @event) =>
         new(
-            ToDelta(@event.Parent, @event.Containment, @event.Index),
+            @event.Parent.GetId(),
+            @event.Containment.ToMetaPointer(),
+            @event.Index,
             ToDeltaChunk(@event.NewChild),
             NewCommandId(),
             null
@@ -115,14 +117,18 @@ public class DeltaProtocolPartitionCommandSender
 
     private DeleteChild OnChildDeleted(object? sender, ChildDeletedEvent @event) =>
         new(
-            ToDelta(@event.Parent, @event.Containment, @event.Index),
+            @event.Parent.GetId(),
+            @event.Containment.ToMetaPointer(),
+            @event.Index,
             NewCommandId(),
             null
         );
 
     private ReplaceChild OnChildReplaced(object? sender, ChildReplacedEvent @event) =>
         new(
-            ToDelta(@event.Parent, @event.Containment, @event.Index),
+            @event.Parent.GetId(),
+            @event.Containment.ToMetaPointer(),
+            @event.Index,
             ToDeltaChunk(@event.NewChild),
             NewCommandId(),
             null
@@ -131,7 +137,9 @@ public class DeltaProtocolPartitionCommandSender
     private MoveChildFromOtherContainment OnChildMovedFromOtherContainment(object? sender,
         ChildMovedFromOtherContainmentEvent @event) =>
         new(
-            ToDelta(@event.NewParent, @event.NewContainment, @event.NewIndex),
+            @event.NewParent.GetId(),
+            @event.NewContainment.ToMetaPointer(),
+            @event.NewIndex,
             @event.MovedChild.GetId(),
             NewCommandId(),
             null
@@ -156,16 +164,14 @@ public class DeltaProtocolPartitionCommandSender
             null
         );
 
-    private DeltaContainment ToDelta(IReadableNode parent, Containment containment, Index index) =>
-        new DeltaContainment(parent.GetId(), containment.ToMetaPointer(), index);
-
     #endregion
 
     #region Annotations
 
     private AddAnnotation OnAnnotationAdded(object? sender, AnnotationAddedEvent @event) =>
         new(
-            ToDelta(@event.Parent, @event.Index),
+            @event.Parent.GetId(),
+            @event.Index,
             ToDeltaChunk(@event.NewAnnotation),
             NewCommandId(),
             null
@@ -173,7 +179,8 @@ public class DeltaProtocolPartitionCommandSender
 
     private DeleteAnnotation OnAnnotationDeleted(object? sender, AnnotationDeletedEvent @event) =>
         new(
-            ToDelta(@event.Parent, @event.Index),
+            @event.Parent.GetId(),
+            @event.Index,
             NewCommandId(),
             null
         );
@@ -181,7 +188,8 @@ public class DeltaProtocolPartitionCommandSender
     private MoveAnnotationFromOtherParent OnAnnotationMovedFromOtherParent(object? sender,
         AnnotationMovedFromOtherParentEvent @event) =>
         new(
-            ToDelta(@event.NewParent, @event.NewIndex),
+            @event.NewParent.GetId(),
+            @event.NewIndex,
             @event.MovedAnnotation.GetId(),
             NewCommandId(),
             null
@@ -196,16 +204,15 @@ public class DeltaProtocolPartitionCommandSender
             null
         );
 
-    private DeltaAnnotation ToDelta(IReadableNode parent, Index index) =>
-        new DeltaAnnotation(parent.GetId(), index);
-
     #endregion
 
     #region References
 
     private AddReference OnReferenceAdded(object? sender, ReferenceAddedEvent @event) =>
         new(
-            ToDelta(@event.Parent, @event.Reference, @event.Index),
+            @event.Parent.GetId(),
+            @event.Reference.ToMetaPointer(),
+            @event.Index,
             ToDelta(@event.NewTarget),
             NewCommandId(),
             null
@@ -213,21 +220,22 @@ public class DeltaProtocolPartitionCommandSender
 
     private DeleteReference OnReferenceDeleted(object? sender, ReferenceDeletedEvent @event) =>
         new(
-            ToDelta(@event.Parent, @event.Reference, @event.Index),
+            @event.Parent.GetId(),
+            @event.Reference.ToMetaPointer(),
+            @event.Index,
             NewCommandId(),
             null
         );
 
     private ChangeReference OnReferenceChanged(object? sender, ReferenceChangedEvent @event) =>
         new(
-            ToDelta(@event.Parent, @event.Reference, @event.Index),
+            @event.Parent.GetId(),
+            @event.Reference.ToMetaPointer(),
+            @event.Index,
             ToDelta(@event.NewTarget),
             NewCommandId(),
             null
         );
-
-    private DeltaReference ToDelta(IReadableNode parent, Reference reference, Index index) =>
-        new DeltaReference(parent.GetId(), reference.ToMetaPointer(), index);
 
     private SerializedReferenceTarget ToDelta(IReferenceTarget target) =>
         new SerializedReferenceTarget { Reference = target.Reference?.GetId(), ResolveInfo = target.ResolveInfo };

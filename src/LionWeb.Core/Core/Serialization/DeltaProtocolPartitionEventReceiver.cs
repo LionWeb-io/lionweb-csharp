@@ -75,7 +75,7 @@ public class DeltaProtocolPartitionEventReceiver
 
     private PropertyAddedEvent OnPropertyAdded(PropertyAdded @event)
     {
-        var parent = ToNode(@event.Property.Parent);
+        var parent = ToNode(@event.Parent);
         var property = ToProperty(@event.Property, parent);
         return new PropertyAddedEvent(
             parent,
@@ -87,7 +87,7 @@ public class DeltaProtocolPartitionEventReceiver
 
     private PropertyDeletedEvent OnPropertyDeleted(PropertyDeleted @event)
     {
-        var parent = ToNode(@event.Property.Parent);
+        var parent = ToNode(@event.Parent);
         var property = ToProperty(@event.Property, parent);
         return new PropertyDeletedEvent(
             parent,
@@ -99,7 +99,7 @@ public class DeltaProtocolPartitionEventReceiver
 
     private PropertyChangedEvent OnPropertyChanged(PropertyChanged @event)
     {
-        var parent = ToNode(@event.Property.Parent);
+        var parent = ToNode(@event.Parent);
         var property = ToProperty(@event.Property, parent);
         return new PropertyChangedEvent(
             parent,
@@ -110,8 +110,8 @@ public class DeltaProtocolPartitionEventReceiver
         );
     }
 
-    private Property ToProperty(DeltaProperty deltaProperty, IReadableNode node) =>
-        ToFeature<Property>(deltaProperty.Property, node);
+    private Property ToProperty(MetaPointer deltaProperty, IReadableNode node) =>
+        ToFeature<Property>(deltaProperty, node);
 
     private SemanticPropertyValue ToPropertyValue(IReadableNode node, Property property, PropertyValue value) =>
         _deserializerBuilder.Build().VersionSpecifics.ConvertDatatype(node, property, property.Type, value) ??
@@ -129,7 +129,7 @@ public class DeltaProtocolPartitionEventReceiver
             parent,
             Deserialize(@event.NewChild),
             containment,
-            @event.Containment.Index,
+            @event.Index,
             ToEventId(@event)
         );
     }
@@ -139,10 +139,10 @@ public class DeltaProtocolPartitionEventReceiver
         var parent = ToNode(@event.Parent);
         var containment = ToContainment(@event.Containment, parent);
         return new ChildDeletedEvent(
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[@event.Containment.Index],
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[@event.Index],
             parent,
             containment,
-            @event.Containment.Index,
+            @event.Index,
             ToEventId(@event)
         );
     }
@@ -153,10 +153,10 @@ public class DeltaProtocolPartitionEventReceiver
         var containment = ToContainment(@event.Containment, parent);
         return new ChildReplacedEvent(
             Deserialize(@event.NewChild),
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[@event.Containment.Index],
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[@event.Index],
             parent,
             containment,
-            @event.Containment.Index,
+            @event.Index,
             ToEventId(@event)
         );
     }
@@ -164,18 +164,18 @@ public class DeltaProtocolPartitionEventReceiver
     private ChildMovedFromOtherContainmentEvent OnChildMovedFromOtherContainment(ChildMovedFromOtherContainment @event)
     {
         var movedChild = ToNode(@event.MovedChild);
-        var oldParent = ToNode(@event.OldContainment.Parent);
-        var newParent = ToNode(@event.NewContainment.Parent);
+        var oldParent = ToNode(@event.OldParent);
+        var newParent = ToNode(@event.NewParent);
         var oldContainment = ToContainment(@event.OldContainment, oldParent);
         var newContainment = ToContainment(@event.NewContainment, newParent);
         return new ChildMovedFromOtherContainmentEvent(
             newParent,
             newContainment,
-            @event.NewContainment.Index,
+            @event.NewIndex,
             movedChild,
             oldParent,
             oldContainment,
-            @event.OldContainment.Index,
+            @event.OldIndex,
             ToEventId(@event)
         );
     }
@@ -213,9 +213,6 @@ public class DeltaProtocolPartitionEventReceiver
         );
     }
 
-    private Containment ToContainment(DeltaContainment deltaContainment, IReadableNode node) =>
-        ToContainment(deltaContainment.Containment, node);
-
     private Containment ToContainment(MetaPointer deltaContainment, IReadableNode node) =>
         ToFeature<Containment>(deltaContainment, node);
 
@@ -229,7 +226,7 @@ public class DeltaProtocolPartitionEventReceiver
         return new AnnotationAddedEvent(
             parent,
             Deserialize(@event.NewAnnotation),
-            @event.Parent.Index,
+            @event.Index,
             ToEventId(@event)
         );
     }
@@ -237,11 +234,11 @@ public class DeltaProtocolPartitionEventReceiver
     private AnnotationDeletedEvent OnAnnotationDeleted(AnnotationDeleted @event)
     {
         var parent = ToNode(@event.Parent);
-        var deletedAnnotation = parent.GetAnnotations()[@event.Parent.Index];
+        var deletedAnnotation = parent.GetAnnotations()[@event.Index];
         return new AnnotationDeletedEvent(
             deletedAnnotation as IWritableNode ?? throw new InvalidValueException(null, deletedAnnotation),
             parent,
-            @event.Parent.Index,
+            @event.Index,
             ToEventId(@event)
         );
     }
@@ -253,10 +250,10 @@ public class DeltaProtocolPartitionEventReceiver
         var movedAnnotation = ToNode(@event.MovedAnnotation);
         return new AnnotationMovedFromOtherParentEvent(
             newParent,
-            @event.NewParent.Index,
+            @event.NewIndex,
             movedAnnotation,
             oldParent,
-            @event.OldParent.Index,
+            @event.OldIndex,
             ToEventId(@event)
         );
     }
@@ -274,9 +271,6 @@ public class DeltaProtocolPartitionEventReceiver
         );
     }
 
-    private IWritableNode ToNode(DeltaAnnotation deltaAnnotation) =>
-        ToNode(deltaAnnotation.Parent);
-
     #endregion
 
     #region References
@@ -288,7 +282,7 @@ public class DeltaProtocolPartitionEventReceiver
         return new ReferenceAddedEvent(
             parent,
             reference,
-            @event.Reference.Index,
+            @event.Index,
             ToTarget(@event.NewTarget),
             ToEventId(@event)
         );
@@ -301,7 +295,7 @@ public class DeltaProtocolPartitionEventReceiver
         return new ReferenceDeletedEvent(
             parent,
             reference,
-            @event.Reference.Index,
+            @event.Index,
             ToTarget(@event.DeletedTarget),
             ToEventId(@event)
         );
@@ -314,15 +308,15 @@ public class DeltaProtocolPartitionEventReceiver
         return new ReferenceChangedEvent(
             parent,
             reference,
-            @event.Reference.Index,
+            @event.Index,
             ToTarget(@event.NewTarget),
             ToTarget(@event.ReplacedTarget),
             ToEventId(@event)
         );
     }
 
-    private Reference ToReference(DeltaReference deltaReference, IReadableNode node) =>
-        ToFeature<Reference>(deltaReference.Reference, node);
+    private Reference ToReference(MetaPointer deltaReference, IReadableNode node) =>
+        ToFeature<Reference>(deltaReference, node);
 
     private IReferenceTarget ToTarget(SerializedReferenceTarget serializedTarget)
     {

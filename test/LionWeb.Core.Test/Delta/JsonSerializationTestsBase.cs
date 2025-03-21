@@ -76,20 +76,8 @@ public abstract class JsonSerializationTestsBase
             [new ProtocolMessageData("key0", "value0"), new ProtocolMessageData("key1", "value1")]
         );
 
-    protected DeltaProperty CreateProperty() =>
-        new DeltaProperty(CreateTargetNode(), CreateMetaPointer());
-
     protected String CreatePropertyValue() =>
         (++_nextPropertyValue).ToString();
-
-    protected DeltaContainment CreateContainment() =>
-        new DeltaContainment(CreateTargetNode(), CreateMetaPointer(), CreateIndex());
-
-    protected DeltaAnnotation CreateAnnotation() =>
-        new DeltaAnnotation(CreateTargetNode(), CreateIndex());
-
-    protected DeltaReference CreateReference() =>
-        new DeltaReference(CreateTargetNode(), CreateMetaPointer(), CreateIndex());
 
     protected SerializedReferenceTarget CreateTarget() =>
         new SerializedReferenceTarget() { Reference = CreateTargetNode(), ResolveInfo = CreateResolveInfo() };
