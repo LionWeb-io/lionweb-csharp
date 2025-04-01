@@ -1110,6 +1110,35 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
     /// <inheritdoc />
     public Concept GetConcept() => _m3.Language;
 
+
+    /// <inheritdoc />
+    protected override bool DetachChild(INode child)
+    {
+        if (base.DetachChild(child))
+        {
+            return true;
+        }
+
+        var c = GetContainmentOf(child);
+        if (c == _m3.Language_entities)
+            return _entities.Remove((LanguageEntity)child);
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override Containment? GetContainmentOf(INode child)
+    {
+        var result = base.GetContainmentOf(child);
+        if (result != null)
+            return result;
+
+        if (child is LanguageEntity s && _entities.Contains(s))
+            return _m3.Language_entities;
+
+        return null;
+    }
+    
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>
         base.CollectAllSetFeatures().Concat([
