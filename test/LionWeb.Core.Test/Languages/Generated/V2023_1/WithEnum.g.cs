@@ -114,7 +114,7 @@ public partial class EnumHolder : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetEnumValue([MaybeNullWhenAttribute(false)] out MyEnum? enumValue)
+        public bool TryGetEnumValue([NotNullWhenAttribute(true)] out MyEnum? enumValue)
 	{
 		enumValue = _enumValue;
 		return _enumValue != null;

@@ -113,7 +113,7 @@ public partial class BConcept : ConceptInstanceBase
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept.BRef"/>
     	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetAEnumProp([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum? aEnumProp)
+        public bool TryGetAEnumProp([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum? aEnumProp)
 	{
 		aEnumProp = _aEnumProp;
 		return _aEnumProp != null;
@@ -138,7 +138,7 @@ public partial class BConcept : ConceptInstanceBase
 	public LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
 
 	/// <remarks>Optional Single Reference</remarks>
-        public bool TryGetARef([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? aRef)
+        public bool TryGetARef([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? aRef)
 	{
 		aRef = _aRef;
 		return _aRef != null;

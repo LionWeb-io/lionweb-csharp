@@ -98,7 +98,7 @@ public partial class Container : ConceptInstanceBase
 	public IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> Libraries { get => AsNonEmptyReadOnly(_libraries, MultiLanguage.Instance.Container_libraries); init => AddLibraries(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
-        public bool TryGetLibraries([MaybeNullWhenAttribute(false)] out IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> libraries)
+        public bool TryGetLibraries([NotNullWhenAttribute(true)] out IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Library> libraries)
 	{
 		libraries = _libraries;
 		return _libraries.Count != 0;

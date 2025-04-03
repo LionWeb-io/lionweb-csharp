@@ -165,7 +165,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	public string? ConceptAlias { get => _conceptAlias; set => SetConceptAlias(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetConceptAlias([MaybeNullWhenAttribute(false)] out string? conceptAlias)
+        public bool TryGetConceptAlias([NotNullWhenAttribute(true)] out string? conceptAlias)
 	{
 		conceptAlias = _conceptAlias;
 		return _conceptAlias != null;
@@ -185,7 +185,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	public string? ConceptShortDescription { get => _conceptShortDescription; set => SetConceptShortDescription(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetConceptShortDescription([MaybeNullWhenAttribute(false)] out string? conceptShortDescription)
+        public bool TryGetConceptShortDescription([NotNullWhenAttribute(true)] out string? conceptShortDescription)
 	{
 		conceptShortDescription = _conceptShortDescription;
 		return _conceptShortDescription != null;
@@ -205,7 +205,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	public string? HelpUrl { get => _helpUrl; set => SetHelpUrl(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetHelpUrl([MaybeNullWhenAttribute(false)] out string? helpUrl)
+        public bool TryGetHelpUrl([NotNullWhenAttribute(true)] out string? helpUrl)
 	{
 		helpUrl = _helpUrl;
 		return _helpUrl != null;
@@ -315,7 +315,7 @@ public partial class Deprecated : AnnotationInstanceBase
 	public string? Build { get => _build; set => SetBuild(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetBuild([MaybeNullWhenAttribute(false)] out string? build)
+        public bool TryGetBuild([NotNullWhenAttribute(true)] out string? build)
 	{
 		build = _build;
 		return _build != null;
@@ -335,7 +335,7 @@ public partial class Deprecated : AnnotationInstanceBase
 	public string? Comment { get => _comment; set => SetComment(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetComment([MaybeNullWhenAttribute(false)] out string? comment)
+        public bool TryGetComment([NotNullWhenAttribute(true)] out string? comment)
 	{
 		comment = _comment;
 		return _comment != null;
@@ -426,7 +426,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	public string? Documentation { get => _documentation; set => SetDocumentation(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetDocumentation([MaybeNullWhenAttribute(false)] out string? documentation)
+        public bool TryGetDocumentation([NotNullWhenAttribute(true)] out string? documentation)
 	{
 		documentation = _documentation;
 		return _documentation != null;
@@ -446,7 +446,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	public IReadOnlyList<IReadableNode> SeeAlso { get => _seeAlso.AsReadOnly(); init => AddSeeAlso(value); }
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetSeeAlso([MaybeNullWhenAttribute(false)] out IReadOnlyList<IReadableNode> seeAlso)
+        public bool TryGetSeeAlso([NotNullWhenAttribute(true)] out IReadOnlyList<IReadableNode> seeAlso)
 	{
 		seeAlso = _seeAlso;
 		return _seeAlso.Count != 0;
@@ -558,7 +558,7 @@ public partial class ShortDescription : AnnotationInstanceBase
 	public string? Description { get => _description; set => SetDescription(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetDescription([MaybeNullWhenAttribute(false)] out string? description)
+        public bool TryGetDescription([NotNullWhenAttribute(true)] out string? description)
 	{
 		description = _description;
 		return _description != null;
@@ -633,7 +633,7 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetName([MaybeNullWhenAttribute(false)] out string? name)
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
 		return _name != null;

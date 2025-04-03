@@ -334,7 +334,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	public IReadOnlyList<MaterialGroup> AltGroups { get => _altGroups.AsReadOnly(); init => AddAltGroups(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public bool TryGetAltGroups([MaybeNullWhenAttribute(false)] out IReadOnlyList<MaterialGroup> altGroups)
+        public bool TryGetAltGroups([NotNullWhenAttribute(true)] out IReadOnlyList<MaterialGroup> altGroups)
 	{
 		altGroups = _altGroups;
 		return _altGroups.Count != 0;
@@ -372,7 +372,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	public MaterialGroup? DefaultGroup { get => _defaultGroup; set => SetDefaultGroup(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
-        public bool TryGetDefaultGroup([MaybeNullWhenAttribute(false)] out MaterialGroup? defaultGroup)
+        public bool TryGetDefaultGroup([NotNullWhenAttribute(true)] out MaterialGroup? defaultGroup)
 	{
 		defaultGroup = _defaultGroup;
 		return _defaultGroup != null;
@@ -394,7 +394,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	public IReadOnlyList<MaterialGroup> Groups { get => _groups.AsReadOnly(); init => AddGroups(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public bool TryGetGroups([MaybeNullWhenAttribute(false)] out IReadOnlyList<MaterialGroup> groups)
+        public bool TryGetGroups([NotNullWhenAttribute(true)] out IReadOnlyList<MaterialGroup> groups)
 	{
 		groups = _groups;
 		return _groups.Count != 0;
@@ -432,7 +432,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	public IReadOnlyList<IShape> Materials { get => _materials.AsReadOnly(); init => AddMaterials(value); }
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetMaterials([MaybeNullWhenAttribute(false)] out IReadOnlyList<IShape> materials)
+        public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
 	{
 		materials = _materials;
 		return _materials.Count != 0;
@@ -620,7 +620,7 @@ public partial class Circle : Shape
 	public Coord Center { get => _center ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Circle_center); set => SetCenter(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetCenter([MaybeNullWhenAttribute(false)] out Coord? center)
+        public bool TryGetCenter([NotNullWhenAttribute(true)] out Coord? center)
 	{
 		center = _center;
 		return _center != null;
@@ -645,7 +645,7 @@ public partial class Circle : Shape
 	public int R { get => _r ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Circle_r); set => SetR(value); }
 
 	/// <remarks>Required Property</remarks>
-        public bool TryGetR([MaybeNullWhenAttribute(false)] out int? r)
+        public bool TryGetR([NotNullWhenAttribute(true)] out int? r)
 	{
 		r = _r;
 		return _r != null;
@@ -763,7 +763,7 @@ public partial class CompositeShape : Shape
 	public IReadOnlyList<IShape> DisabledParts { get => AsNonEmptyReadOnly(_disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts); init => AddDisabledParts(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
-        public bool TryGetDisabledParts([MaybeNullWhenAttribute(false)] out IReadOnlyList<IShape> disabledParts)
+        public bool TryGetDisabledParts([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> disabledParts)
 	{
 		disabledParts = _disabledParts;
 		return _disabledParts.Count != 0;
@@ -812,7 +812,7 @@ public partial class CompositeShape : Shape
 	public IShape EvilPart { get => _evilPart ?? throw new UnsetFeatureException(ShapesLanguage.Instance.CompositeShape_evilPart); set => SetEvilPart(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetEvilPart([MaybeNullWhenAttribute(false)] out IShape? evilPart)
+        public bool TryGetEvilPart([NotNullWhenAttribute(true)] out IShape? evilPart)
 	{
 		evilPart = _evilPart;
 		return _evilPart != null;
@@ -837,7 +837,7 @@ public partial class CompositeShape : Shape
 	public IReadOnlyList<IShape> Parts { get => AsNonEmptyReadOnly(_parts, ShapesLanguage.Instance.CompositeShape_parts); init => AddParts(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
-        public bool TryGetParts([MaybeNullWhenAttribute(false)] out IReadOnlyList<IShape> parts)
+        public bool TryGetParts([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> parts)
 	{
 		parts = _parts;
 		return _parts.Count != 0;
@@ -1013,7 +1013,7 @@ public partial class Coord : ConceptInstanceBase
 	public int X { get => _x ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_x); set => SetX(value); }
 
 	/// <remarks>Required Property</remarks>
-        public bool TryGetX([MaybeNullWhenAttribute(false)] out int? x)
+        public bool TryGetX([NotNullWhenAttribute(true)] out int? x)
 	{
 		x = _x;
 		return _x != null;
@@ -1034,7 +1034,7 @@ public partial class Coord : ConceptInstanceBase
 	public int Y { get => _y ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_y); set => SetY(value); }
 
 	/// <remarks>Required Property</remarks>
-        public bool TryGetY([MaybeNullWhenAttribute(false)] out int? y)
+        public bool TryGetY([NotNullWhenAttribute(true)] out int? y)
 	{
 		y = _y;
 		return _y != null;
@@ -1055,7 +1055,7 @@ public partial class Coord : ConceptInstanceBase
 	public int Z { get => _z ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_z); set => SetZ(value); }
 
 	/// <remarks>Required Property</remarks>
-        public bool TryGetZ([MaybeNullWhenAttribute(false)] out int? z)
+        public bool TryGetZ([NotNullWhenAttribute(true)] out int? z)
 	{
 		z = _z;
 		return _z != null;
@@ -1165,7 +1165,7 @@ public partial class Documentation : AnnotationInstanceBase
 	public bool? Technical { get => _technical; set => SetTechnical(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetTechnical([MaybeNullWhenAttribute(false)] out bool? technical)
+        public bool TryGetTechnical([NotNullWhenAttribute(true)] out bool? technical)
 	{
 		technical = _technical;
 		return _technical != null;
@@ -1185,7 +1185,7 @@ public partial class Documentation : AnnotationInstanceBase
 	public string? Text { get => _text; set => SetText(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetText([MaybeNullWhenAttribute(false)] out string? text)
+        public bool TryGetText([NotNullWhenAttribute(true)] out string? text)
 	{
 		text = _text;
 		return _text != null;
@@ -1276,7 +1276,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	public Documentation? Documentation { get => _documentation; set => SetDocumentation(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
-        public bool TryGetDocumentation([MaybeNullWhenAttribute(false)] out Documentation? documentation)
+        public bool TryGetDocumentation([NotNullWhenAttribute(true)] out Documentation? documentation)
 	{
 		documentation = _documentation;
 		return _documentation != null;
@@ -1298,7 +1298,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public bool TryGetShapes([MaybeNullWhenAttribute(false)] out IReadOnlyList<IShape> shapes)
+        public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes)
 	{
 		shapes = _shapes;
 		return _shapes.Count != 0;
@@ -1463,7 +1463,7 @@ public partial class Line : Shape, INamedWritable
 	public Coord End { get => _end ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Line_end); set => SetEnd(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetEnd([MaybeNullWhenAttribute(false)] out Coord? end)
+        public bool TryGetEnd([NotNullWhenAttribute(true)] out Coord? end)
 	{
 		end = _end;
 		return _end != null;
@@ -1489,7 +1489,7 @@ public partial class Line : Shape, INamedWritable
 	public Coord Start { get => _start ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Line_start); set => SetStart(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetStart([MaybeNullWhenAttribute(false)] out Coord? start)
+        public bool TryGetStart([NotNullWhenAttribute(true)] out Coord? start)
 	{
 		start = _start;
 		return _start != null;
@@ -1618,7 +1618,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	public IShape? DefaultShape { get => _defaultShape; set => SetDefaultShape(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
-        public bool TryGetDefaultShape([MaybeNullWhenAttribute(false)] out IShape? defaultShape)
+        public bool TryGetDefaultShape([NotNullWhenAttribute(true)] out IShape? defaultShape)
 	{
 		defaultShape = _defaultShape;
 		return _defaultShape != null;
@@ -1641,7 +1641,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	public IReadOnlyList<IShape> Materials { get => AsNonEmptyReadOnly(_materials, ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
 
 	/// <remarks>Required Multiple Reference</remarks>
-        public bool TryGetMaterials([MaybeNullWhenAttribute(false)] out IReadOnlyList<IShape> materials)
+        public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
 	{
 		materials = _materials;
 		return _materials.Count != 0;
@@ -1690,7 +1690,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	public MatterState? MatterState { get => _matterState; set => SetMatterState(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetMatterState([MaybeNullWhenAttribute(false)] out MatterState? matterState)
+        public bool TryGetMatterState([NotNullWhenAttribute(true)] out MatterState? matterState)
 	{
 		matterState = _matterState;
 		return _matterState != null;
@@ -1824,7 +1824,7 @@ public partial class OffsetDuplicate : Shape
 	public Shape? AltSource { get => _altSource; set => SetAltSource(value); }
 
 	/// <remarks>Optional Single Reference</remarks>
-        public bool TryGetAltSource([MaybeNullWhenAttribute(false)] out Shape? altSource)
+        public bool TryGetAltSource([NotNullWhenAttribute(true)] out Shape? altSource)
 	{
 		altSource = _altSource;
 		return _altSource != null;
@@ -1844,7 +1844,7 @@ public partial class OffsetDuplicate : Shape
 	public Documentation? Docs { get => _docs; set => SetDocs(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
-        public bool TryGetDocs([MaybeNullWhenAttribute(false)] out Documentation? docs)
+        public bool TryGetDocs([NotNullWhenAttribute(true)] out Documentation? docs)
 	{
 		docs = _docs;
 		return _docs != null;
@@ -1868,7 +1868,7 @@ public partial class OffsetDuplicate : Shape
 	public Coord Offset { get => _offset ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_offset); set => SetOffset(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetOffset([MaybeNullWhenAttribute(false)] out Coord? offset)
+        public bool TryGetOffset([NotNullWhenAttribute(true)] out Coord? offset)
 	{
 		offset = _offset;
 		return _offset != null;
@@ -1892,7 +1892,7 @@ public partial class OffsetDuplicate : Shape
 	public Documentation? SecretDocs { get => _secretDocs; set => SetSecretDocs(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
-        public bool TryGetSecretDocs([MaybeNullWhenAttribute(false)] out Documentation? secretDocs)
+        public bool TryGetSecretDocs([NotNullWhenAttribute(true)] out Documentation? secretDocs)
 	{
 		secretDocs = _secretDocs;
 		return _secretDocs != null;
@@ -1916,7 +1916,7 @@ public partial class OffsetDuplicate : Shape
 	public Shape Source { get => _source ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_source); set => SetSource(value); }
 
 	/// <remarks>Required Single Reference</remarks>
-        public bool TryGetSource([MaybeNullWhenAttribute(false)] out Shape? source)
+        public bool TryGetSource([NotNullWhenAttribute(true)] out Shape? source)
 	{
 		source = _source;
 		return _source != null;
@@ -2108,7 +2108,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public bool TryGetShapes([MaybeNullWhenAttribute(false)] out IReadOnlyList<IShape> shapes)
+        public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes)
 	{
 		shapes = _shapes;
 		return _shapes.Count != 0;
@@ -2204,7 +2204,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetName([MaybeNullWhenAttribute(false)] out string? name)
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
 		return _name != null;
@@ -2228,7 +2228,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	public IReadOnlyList<Coord> Fixpoints { get => _fixpoints.AsReadOnly(); init => AddFixpoints(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public bool TryGetFixpoints([MaybeNullWhenAttribute(false)] out IReadOnlyList<Coord> fixpoints)
+        public bool TryGetFixpoints([NotNullWhenAttribute(true)] out IReadOnlyList<Coord> fixpoints)
 	{
 		fixpoints = _fixpoints;
 		return _fixpoints.Count != 0;
@@ -2272,7 +2272,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetUuid([MaybeNullWhenAttribute(false)] out string? uuid)
+        public bool TryGetUuid([NotNullWhenAttribute(true)] out string? uuid)
 	{
 		uuid = _uuid;
 		return _uuid != null;
@@ -2296,7 +2296,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	public Documentation? ShapeDocs { get => _shapeDocs; set => SetShapeDocs(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
-        public bool TryGetShapeDocs([MaybeNullWhenAttribute(false)] out Documentation? shapeDocs)
+        public bool TryGetShapeDocs([NotNullWhenAttribute(true)] out Documentation? shapeDocs)
 	{
 		shapeDocs = _shapeDocs;
 		return _shapeDocs != null;

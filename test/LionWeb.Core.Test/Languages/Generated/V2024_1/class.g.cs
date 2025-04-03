@@ -187,7 +187,7 @@ public partial class @out : @struct
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetDefault([MaybeNullWhenAttribute(false)] out @if? @default)
+        public bool TryGetDefault([NotNullWhenAttribute(true)] out @if? @default)
 	{
 		@default = _default;
 		return _default != null;
@@ -269,7 +269,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetString([MaybeNullWhenAttribute(false)] out @enum? @string)
+        public bool TryGetString([NotNullWhenAttribute(true)] out @enum? @string)
 	{
 		@string = _string;
 		return _string != null;
@@ -295,7 +295,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 	public @interface Double { get => _double ?? throw new UnsetFeatureException(ClassLanguage.Instance.record_double); set => SetDouble(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetDouble([MaybeNullWhenAttribute(false)] out @interface? @double)
+        public bool TryGetDouble([NotNullWhenAttribute(true)] out @interface? @double)
 	{
 		@double = _double;
 		return _double != null;
@@ -419,7 +419,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetString([MaybeNullWhenAttribute(false)] out @enum? @string)
+        public bool TryGetString([NotNullWhenAttribute(true)] out @enum? @string)
 	{
 		@string = _string;
 		return _string != null;
@@ -445,7 +445,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 	public @record Ref { get => _ref ?? throw new UnsetFeatureException(ClassLanguage.Instance.struct_ref); set => SetRef(value); }
 
 	/// <remarks>Required Single Reference</remarks>
-        public bool TryGetRef([MaybeNullWhenAttribute(false)] out @record? @ref)
+        public bool TryGetRef([NotNullWhenAttribute(true)] out @record? @ref)
 	{
 		@ref = _ref;
 		return _ref != null;

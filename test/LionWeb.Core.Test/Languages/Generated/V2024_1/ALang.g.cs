@@ -124,7 +124,7 @@ public partial class AConcept : ConceptInstanceBase
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
-        public bool TryGetBRef([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? bRef)
+        public bool TryGetBRef([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? bRef)
 	{
 		bRef = _bRef;
 		return _bRef != null;

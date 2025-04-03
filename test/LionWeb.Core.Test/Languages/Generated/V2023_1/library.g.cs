@@ -185,7 +185,7 @@ public partial class Book : ConceptInstanceBase
 	public Writer Author { get => _author ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
 
 	/// <remarks>Required Single Reference</remarks>
-        public bool TryGetAuthor([MaybeNullWhenAttribute(false)] out Writer? author)
+        public bool TryGetAuthor([NotNullWhenAttribute(true)] out Writer? author)
 	{
 		author = _author;
 		return _author != null;
@@ -208,7 +208,7 @@ public partial class Book : ConceptInstanceBase
 	public int Pages { get => _pages ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_pages); set => SetPages(value); }
 
 	/// <remarks>Required Property</remarks>
-        public bool TryGetPages([MaybeNullWhenAttribute(false)] out int? pages)
+        public bool TryGetPages([NotNullWhenAttribute(true)] out int? pages)
 	{
 		pages = _pages;
 		return _pages != null;
@@ -231,7 +231,7 @@ public partial class Book : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetTitle([MaybeNullWhenAttribute(false)] out string? title)
+        public bool TryGetTitle([NotNullWhenAttribute(true)] out string? title)
 	{
 		title = _title;
 		return _title != null;
@@ -253,7 +253,7 @@ public partial class Book : ConceptInstanceBase
 	public BookType? Type { get => _type; set => SetType(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetType([MaybeNullWhenAttribute(false)] out BookType? @type)
+        public bool TryGetType([NotNullWhenAttribute(true)] out BookType? @type)
 	{
 		@type = _type;
 		return _type != null;
@@ -385,7 +385,7 @@ public partial class GuideBookWriter : Writer
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetCountries([MaybeNullWhenAttribute(false)] out string? countries)
+        public bool TryGetCountries([NotNullWhenAttribute(true)] out string? countries)
 	{
 		countries = _countries;
 		return _countries != null;
@@ -460,7 +460,7 @@ public partial class Library : ConceptInstanceBase
 	public IReadOnlyList<Book> Books { get => AsNonEmptyReadOnly(_books, LibraryLanguage.Instance.Library_books); init => AddBooks(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
-        public bool TryGetBooks([MaybeNullWhenAttribute(false)] out IReadOnlyList<Book> books)
+        public bool TryGetBooks([NotNullWhenAttribute(true)] out IReadOnlyList<Book> books)
 	{
 		books = _books;
 		return _books.Count != 0;
@@ -510,7 +510,7 @@ public partial class Library : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetName([MaybeNullWhenAttribute(false)] out string? name)
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
 		return _name != null;
@@ -630,7 +630,7 @@ public partial class SpecialistBookWriter : Writer
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetSubject([MaybeNullWhenAttribute(false)] out string? subject)
+        public bool TryGetSubject([NotNullWhenAttribute(true)] out string? subject)
 	{
 		subject = _subject;
 		return _subject != null;
@@ -707,7 +707,7 @@ public partial class Writer : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetName([MaybeNullWhenAttribute(false)] out string? name)
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
 	{
 		name = _name;
 		return _name != null;
