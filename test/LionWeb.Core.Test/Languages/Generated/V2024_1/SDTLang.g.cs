@@ -256,7 +256,7 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetA([MaybeNullWhenAttribute(false)] out A? a)
+        public bool TryGetA([NotNullWhenAttribute(true)] out A? a)
 	{
 		a = _a;
 		return _a != null;
@@ -281,7 +281,7 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetAmount([MaybeNullWhenAttribute(false)] out Amount? amount)
+        public bool TryGetAmount([NotNullWhenAttribute(true)] out Amount? amount)
 	{
 		amount = _amount;
 		return _amount != null;
@@ -306,7 +306,7 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetComplex([MaybeNullWhenAttribute(false)] out ComplexNumber? complex)
+        public bool TryGetComplex([NotNullWhenAttribute(true)] out ComplexNumber? complex)
 	{
 		complex = _complex;
 		return _complex != null;
@@ -328,7 +328,7 @@ public partial class SDTConcept : ConceptInstanceBase
 	public Decimal? Decimal { get => _decimal; set => SetDecimal(value); }
 
 	/// <remarks>Optional Property</remarks>
-        public bool TryGetDecimal([MaybeNullWhenAttribute(false)] out Decimal? @decimal)
+        public bool TryGetDecimal([NotNullWhenAttribute(true)] out Decimal? @decimal)
 	{
 		@decimal = _decimal;
 		return _decimal != null;

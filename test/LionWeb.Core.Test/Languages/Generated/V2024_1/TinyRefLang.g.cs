@@ -102,7 +102,7 @@ public partial class MyConcept : ConceptInstanceBase
 	public IReadOnlyList<MyConcept> MultivaluedRef { get => AsNonEmptyReadOnly(_multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef); init => AddMultivaluedRef(value); }
 
 	/// <remarks>Required Multiple Reference</remarks>
-        public bool TryGetMultivaluedRef([MaybeNullWhenAttribute(false)] out IReadOnlyList<MyConcept> multivaluedRef)
+        public bool TryGetMultivaluedRef([NotNullWhenAttribute(true)] out IReadOnlyList<MyConcept> multivaluedRef)
 	{
 		multivaluedRef = _multivaluedRef;
 		return _multivaluedRef.Count != 0;
@@ -153,7 +153,7 @@ public partial class MyConcept : ConceptInstanceBase
 	public MyConcept SingularRef { get => _singularRef ?? throw new UnsetFeatureException(TinyRefLangLanguage.Instance.MyConcept_singularRef); set => SetSingularRef(value); }
 
 	/// <remarks>Required Single Reference</remarks>
-        public bool TryGetSingularRef([MaybeNullWhenAttribute(false)] out MyConcept? singularRef)
+        public bool TryGetSingularRef([NotNullWhenAttribute(true)] out MyConcept? singularRef)
 	{
 		singularRef = _singularRef;
 		return _singularRef != null;

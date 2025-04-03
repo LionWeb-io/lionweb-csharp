@@ -184,7 +184,7 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Multiple Containment</remarks>
         [Obsolete("deprChild comment")]
-	public bool TryGetDeprChild([MaybeNullWhenAttribute(false)] out IReadOnlyList<DeprIface> deprChild)
+	public bool TryGetDeprChild([NotNullWhenAttribute(true)] out IReadOnlyList<DeprIface> deprChild)
 	{
 		deprChild = _deprChild;
 		return _deprChild.Count != 0;
@@ -227,7 +227,7 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Property</remarks>
         [Obsolete("deprProp comment")]
-	public bool TryGetDeprProp([MaybeNullWhenAttribute(false)] out string? deprProp)
+	public bool TryGetDeprProp([NotNullWhenAttribute(true)] out string? deprProp)
 	{
 		deprProp = _deprProp;
 		return _deprProp != null;
@@ -252,7 +252,7 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	/// <remarks>Required Single Reference</remarks>
         [Obsolete("deprRef comment")]
-	public bool TryGetDeprRef([MaybeNullWhenAttribute(false)] out DeprAnnotation? deprRef)
+	public bool TryGetDeprRef([NotNullWhenAttribute(true)] out DeprAnnotation? deprRef)
 	{
 		deprRef = _deprRef;
 		return _deprRef != null;

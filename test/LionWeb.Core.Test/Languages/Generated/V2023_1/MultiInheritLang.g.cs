@@ -117,7 +117,7 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 	public INode IfaceContainment { get => _ifaceContainment ?? throw new UnsetFeatureException(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment); set => SetIfaceContainment(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetIfaceContainment([MaybeNullWhenAttribute(false)] out INode? ifaceContainment)
+        public bool TryGetIfaceContainment([NotNullWhenAttribute(true)] out INode? ifaceContainment)
 	{
 		ifaceContainment = _ifaceContainment;
 		return _ifaceContainment != null;

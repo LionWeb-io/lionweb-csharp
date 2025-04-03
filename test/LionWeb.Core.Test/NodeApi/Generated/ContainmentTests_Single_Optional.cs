@@ -78,7 +78,9 @@ public class ContainmentTests_Single_Optional
         var doc = new Documentation("myId");
         var parent = new Geometry("g") { Documentation = doc };
         Assert.IsTrue(parent.TryGetDocumentation(out var o));
-        Assert.AreSame(doc, o);
+        // `o` should NOT have a warning
+        Documentation documentation = o;
+        Assert.AreSame(doc, documentation);
     }
 
     #region existing

@@ -97,7 +97,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetEnumProp([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum? enumProp)
+        public bool TryGetEnumProp([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectEnumLang.DirectEnum? enumProp)
 	{
 		enumProp = _enumProp;
 		return _enumProp != null;
@@ -122,7 +122,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetSdtProp([MaybeNullWhenAttribute(false)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt? sdtProp)
+        public bool TryGetSdtProp([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedDirectSdtLang.DirectSdt? sdtProp)
 	{
 		sdtProp = _sdtProp;
 		return _sdtProp != null;
@@ -146,7 +146,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 	public INode Cont { get => _cont ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont); set => SetCont(value); }
 
 	/// <remarks>Required Single Containment</remarks>
-        public bool TryGetCont([MaybeNullWhenAttribute(false)] out INode? cont)
+        public bool TryGetCont([NotNullWhenAttribute(true)] out INode? cont)
 	{
 		cont = _cont;
 		return _cont != null;
@@ -175,7 +175,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public bool TryGetProp([MaybeNullWhenAttribute(false)] out string? prop)
+        public bool TryGetProp([NotNullWhenAttribute(true)] out string? prop)
 	{
 		prop = _prop;
 		return _prop != null;
@@ -201,7 +201,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 	public IReadableNode Ref { get => _ref ?? throw new UnsetFeatureException(LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref); set => SetRef(value); }
 
 	/// <remarks>Required Single Reference</remarks>
-        public bool TryGetRef([MaybeNullWhenAttribute(false)] out IReadableNode? @ref)
+        public bool TryGetRef([NotNullWhenAttribute(true)] out IReadableNode? @ref)
 	{
 		@ref = _ref;
 		return _ref != null;
