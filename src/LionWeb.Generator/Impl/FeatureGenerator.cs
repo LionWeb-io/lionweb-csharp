@@ -154,9 +154,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private ParameterSyntax OutParam(ParameterSyntax parameterSyntax) =>
         parameterSyntax
             .WithAttributeLists(AsAttributes([
-                Attribute(IdentifierName(AsType(typeof(MaybeNullWhenAttribute)).ToString()))
+                Attribute(IdentifierName(AsType(typeof(NotNullWhenAttribute)).ToString()))
                     .WithArgumentList(
-                        AttributeArgumentList(SingletonSeparatedList(AttributeArgument(False())))
+                        AttributeArgumentList(SingletonSeparatedList(AttributeArgument(True())))
                     )
             ]));
 
