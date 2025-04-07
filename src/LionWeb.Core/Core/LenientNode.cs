@@ -296,9 +296,9 @@ public class LenientNode : NodeBase, INode
         RemoveSelfParent(annotations?.ToList(), _annotations, null);
     
     private IEnumerable<Feature> FeatureKeys => _featureValues.Select(f => f.feature);
-    private bool TryGetFeature(Feature feature, out object? value)
+    private bool TryGetFeature(Feature featureToFind, out object? value)
     {
-        var result = _featureValues.Find(f => feature.EqualsIdentity(feature));
+        var result = _featureValues.Find(f => featureToFind.EqualsIdentity(f.feature));
         if (result != default)
         {
             value = result.value;
@@ -309,9 +309,9 @@ public class LenientNode : NodeBase, INode
         return false;
     }
 
-    private bool RemoveFeature(Feature feature)
+    private bool RemoveFeature(Feature featureToRemove)
     {
-        var result = _featureValues.Find(f => feature.EqualsIdentity(feature));
+        var result = _featureValues.Find(f => featureToRemove.EqualsIdentity(f.feature));
         if (result != default)
         {
             _featureValues.Remove(result);
@@ -321,16 +321,16 @@ public class LenientNode : NodeBase, INode
         return false;
     }
 
-    private void SetFeature(Feature feature, object? value)
+    private void SetFeature(Feature featureToSet, object? value)
     {
-        var result = _featureValues.Find(f => feature.EqualsIdentity(feature));
+        var result = _featureValues.Find(f => featureToSet.EqualsIdentity(f.feature));
         if (result != default)
         {
             var index = _featureValues.IndexOf(result);
-            _featureValues[index] = (feature, value);
+            _featureValues[index] = (featureToSet, value);
         } else
         {
-            _featureValues.Add((feature, value));
+            _featureValues.Add((featureToSet, value));
         }
     }
 }
