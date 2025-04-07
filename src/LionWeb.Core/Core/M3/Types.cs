@@ -173,7 +173,7 @@ public interface Concept : Classifier
     bool TryGetExtends(out Concept? extends)
     {
         extends = Extends;
-        return true;
+        return Extends != null;
     }
 
     /// A concept can implement zero or more <see cref="Interface">LionWeb interfaces</see>,
@@ -220,7 +220,7 @@ public interface Annotation : Classifier
     bool TryGetExtends([MaybeNullWhen(false)] out Annotation? extends)
     {
         extends = Extends;
-        return true;
+        return Extends != null;
     }
 
     /// An annotation can implement zero or more <see cref="Interface">LionWeb interfaces</see>,
