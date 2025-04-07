@@ -23,4 +23,6 @@ using System.Diagnostics.CodeAnalysis;
 public interface ILanguageRegistry
 {
     bool TryGetLanguage(LanguageIdentity languageIdentity, [NotNullWhen(true)] out DynamicLanguage? language);
+    
+    bool RegisterLanguage(DynamicLanguage language);
 }

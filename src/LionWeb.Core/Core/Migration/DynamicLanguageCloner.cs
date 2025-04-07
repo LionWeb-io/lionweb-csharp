@@ -21,10 +21,12 @@ using M2;
 using M3;
 using Utilities;
 
-class DynamicLanguageCloner
+public class DynamicLanguageCloner
 {
     private readonly LionWebVersions _lionWebVersion;
     private readonly Dictionary<IKeyed, DynamicIKeyed> _dynamicMap = [];
+
+    public IReadOnlyDictionary<IKeyed, DynamicIKeyed> DynamicMap => _dynamicMap.AsReadOnly();
 
     public DynamicLanguageCloner(LionWebVersions lionWebVersion)
     {
@@ -212,7 +214,7 @@ class DynamicLanguageCloner
         }
 
         if (keyed.GetLanguage().EqualsIdentity(_lionWebVersion.BuiltIns) ||
-            keyed.GetLanguage().Equals(_lionWebVersion.LionCore))
+            keyed.GetLanguage().EqualsIdentity(_lionWebVersion.LionCore))
         {
             return keyed;
         }
@@ -225,7 +227,7 @@ class DynamicLanguageCloner
             }
         }
 
-        throw new ArgumentException(nameof(T));
+        throw new ArgumentException(keyed.ToString());
     }
 
     #endregion

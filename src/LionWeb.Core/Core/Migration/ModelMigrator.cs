@@ -22,9 +22,12 @@ using M2;
 using M3;
 using Serialization;
 using System.Collections.Immutable;
+using Utilities;
 
 public class ModelMigrator : ILanguageRegistry
 {
+    private const int _maxMigrationRounds = 20;
+    
     private readonly List<IMigration> _migrations = [];
     private readonly Dictionary<LanguageIdentity, DynamicLanguage> _dynamicLanguages;
     private readonly LionWebVersions _lionWebVersion;
@@ -35,7 +38,7 @@ public class ModelMigrator : ILanguageRegistry
         _dynamicLanguages = new DynamicLanguageCloner(lionWebVersion).Clone(languages);
     }
 
-    public int MaxMigrationRounds { get; init; } = 20;
+    public int MaxMigrationRounds { get; init; } = _maxMigrationRounds;
     public CompressedIdConfig CompressedIdConfig { get; init; } = new();
 
     public bool SerializeEmptyFeatures { get; init; } = false;
@@ -65,19 +68,9 @@ public class ModelMigrator : ILanguageRegistry
             migrationRound++;
             changed = false;
 
-            var usedLanguages = nodes
-                .Descendants()
-                .SelectMany(n =>
-                    n.GetClassifier().Features.Select(f => f.GetLanguage())
-                        .Prepend(n.GetClassifier().GetLanguage())
-                )
-                .Distinct()
-                .Select(LanguageIdentity.FromLanguage)
-                .ToImmutableHashSet();
+            var usedLanguages = CollectUsedLanguages(nodes);
 
-            var applicableMigrations = _migrations
-                .Where(m => m.IsApplicable(usedLanguages))
-                .OrderBy(m => m.Priority);
+            var applicableMigrations = SelectApplicableMigrations(usedLanguages);
 
             foreach (var migration in applicableMigrations)
             {
@@ -92,11 +85,27 @@ public class ModelMigrator : ILanguageRegistry
             SerializeEmptyFeatures = SerializeEmptyFeatures, Handler = new MigrationSerializerHandler()
         };
 
-        var allNodes = nodes.Descendants().ToList();
+        var allNodes = nodes.Descendants();
         JsonUtils.WriteNodesToStream(migrated, serializer, allNodes);
 
         return anyChange;
     }
+
+    private static ImmutableHashSet<LanguageIdentity> CollectUsedLanguages(List<LenientNode> nodes) =>
+        nodes
+            .Descendants()
+            .SelectMany(n =>
+                n.GetClassifier().Features.Select(f => f.GetLanguage())
+                    .Prepend(n.GetClassifier().GetLanguage())
+            )
+            .Distinct()
+            .Select(LanguageIdentity.FromLanguage)
+            .ToImmutableHashSet();
+
+    private IOrderedEnumerable<IMigration> SelectApplicableMigrations(ImmutableHashSet<LanguageIdentity> usedLanguages) =>
+        _migrations
+            .Where(m => m.IsApplicable(usedLanguages))
+            .OrderBy(m => m.Priority);
 
     public void RegisterMigration(IMigration migration)
     {
@@ -106,6 +115,9 @@ public class ModelMigrator : ILanguageRegistry
 
     public bool TryGetLanguage(LanguageIdentity languageIdentity, out DynamicLanguage? language) =>
         _dynamicLanguages.TryGetValue(languageIdentity, out language);
+
+    public bool RegisterLanguage(DynamicLanguage language) =>
+        _dynamicLanguages.TryAdd(LanguageIdentity.FromLanguage(language),language );
 }
 
 public static class MigrationExtensions
@@ -115,5 +127,38 @@ public static class MigrationExtensions
     
     public static IEnumerable<LenientNode> Descendants(this LenientNode node) => 
         M1Extensions.Descendants<LenientNode>(node, true, true);
+
+    public static IEnumerable<LenientNode>
+        AllInstancesOf(this List<LenientNode> nodes, ClassifierIdentity classifier) =>
+        nodes
+            .Descendants()
+            .Where(n =>
+            {
+                var classifierIdentity = ClassifierIdentity.FromClassifier(n.GetClassifier());
+                return classifierIdentity == classifier;
+            });
     
+    public static IEnumerable<LenientNode>
+        AllInstancesOf(this List<LenientNode> nodes, Classifier classifier) =>
+        nodes
+            .Descendants()
+            .Where(n =>
+            {
+                return classifier.EqualsIdentity(n.GetClassifier());
+            });
+    
+    public static void SetProperty(this IWritableNode node, Property property, object? value) =>
+        node.Set(property, value);
+    
+    public static void SetChild(this LenientNode node, Containment containment, IWritableNode child) =>
+        node.Set(containment, child.ConvertSubtreeToLenient());
+    
+    public static void SetChildren(this LenientNode node, Containment containment, IEnumerable<IWritableNode> children) =>
+        node.Set(containment, children.Select(c => c.ConvertSubtreeToLenient()));
+
+    public static void ConvertSubtreeToLenient(this IReadableNode node) => node switch
+    {
+        LenientNode l => l,
+        var n=> new LenientNode(n.GetId(), n.GetClassifier())
+    }
 }
