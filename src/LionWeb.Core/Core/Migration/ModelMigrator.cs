@@ -82,7 +82,8 @@ public class ModelMigrator : ILanguageRegistry
             foreach (var migration in applicableMigrations)
             {
                 anyChange = true;
-                changed |= migration.Migrate(nodes, out nodes);
+                (var b, nodes) = migration.Migrate(nodes);
+                changed |= b;
             }
         } while (changed);
 

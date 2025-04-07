@@ -25,5 +25,12 @@ public interface IMigration
 
     bool IsApplicable(ISet<LanguageIdentity> languageIdentities);
 
-    bool Migrate(List<LenientNode> inputRootNodes, out List<LenientNode> migratedRootNodes);
+    // TODO: Maybe rename to Execute / Run / Apply?
+    // What happens if return=false and outputRootNodes != inputRootNodes?
+    MigrationResult Migrate(List<LenientNode> inputRootNodes);
+    
+    
+    // List<LenientNode> Apply(List<LenientNode> inputRootNodes, out bool changed);
 }
+
+public record MigrationResult(bool changed, List<LenientNode> outputRootNodes);
