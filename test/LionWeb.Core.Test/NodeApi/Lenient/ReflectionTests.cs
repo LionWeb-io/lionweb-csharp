@@ -133,7 +133,7 @@ public class ReflectionTests : LenientNodeTestsBase
     }
 
     private struct TestStruct(int a, string b);
-    
+
     [TestMethod]
     public void SetValueTypeProperty()
     {
@@ -146,7 +146,8 @@ public class ReflectionTests : LenientNodeTestsBase
     public void SetValueTypeListProperty()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<InvalidValueException>(() => node.Set(Documentation_text, new List<TestStruct>{ new TestStruct(2, "hi")}));
+        Assert.ThrowsException<InvalidValueException>(() =>
+            node.Set(Documentation_text, new List<TestStruct> { new TestStruct(2, "hi") }));
         Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
     }
 
@@ -157,7 +158,7 @@ public class ReflectionTests : LenientNodeTestsBase
         Assert.ThrowsException<InvalidValueException>(() => node.Set(Documentation_text, new object()));
         Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
     }
-    
+
     [TestMethod]
     public void GetUnknownProperty_Unset()
     {
@@ -190,7 +191,8 @@ public class ReflectionTests : LenientNodeTestsBase
     public void SetValueTypeListContainment()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<InvalidValueException>(() => node.Set(MaterialGroup_defaultShape, new List<TestStruct>{ new TestStruct(2, "hi")}));
+        Assert.ThrowsException<InvalidValueException>(() =>
+            node.Set(MaterialGroup_defaultShape, new List<TestStruct> { new TestStruct(2, "hi") }));
         Assert.ThrowsException<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
     }
 
@@ -201,7 +203,7 @@ public class ReflectionTests : LenientNodeTestsBase
         Assert.ThrowsException<InvalidValueException>(() => node.Set(MaterialGroup_defaultShape, new object()));
         Assert.ThrowsException<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
     }
-    
+
     [TestMethod]
     public void GetUnknownContainment_Unset()
     {
@@ -242,6 +244,52 @@ public class ReflectionTests : LenientNodeTestsBase
     }
 
     #endregion
+
+    #endregion
+
+    #region LanguageChange
+
+    [TestMethod]
+    public void GetFeatureAfterLanguageChange()
+    {
+        var node = newLine("id");
+        var startCoord = newCoord("start");
+        node.Set(Line_start, startCoord);
+
+        Assert.AreSame(startCoord, node.Get(Line_start));
+
+        Language lang = node.GetClassifier().GetLanguage();
+        var prop = new DynamicProperty("propId", lang.LionWebVersion, null)
+        {
+            Key = "myKey", Name = "myName", Optional = true, Type = lang.LionWebVersion.BuiltIns.String
+        };
+        (node.GetClassifier() as DynamicClassifier).AddFeatures([prop]);
+        node.Set(prop, "hello");
+
+        Assert.AreEqual("hello", node.Get(prop));
+    }
+
+    [TestMethod]
+    public void GetFeatureAfterLanguageChange_NameMixup()
+    {
+        var node = newLine("id");
+        var startCoord = newCoord("start");
+        node.Set(Line_start, startCoord);
+
+        Assert.AreSame(startCoord, node.Get(Line_start));
+
+        Language lang = node.GetClassifier().GetLanguage();
+        var prop = new DynamicProperty("propId", lang.LionWebVersion, null)
+        {
+            Key = "key-start", Name = "startProperty", Optional = true, Type = lang.LionWebVersion.BuiltIns.String
+        };
+        var lineConcept = node.GetClassifier() as DynamicClassifier;
+        lineConcept.AddFeatures([prop]);
+        (Line_start as DynamicContainment).Key = "key-start_old";
+        node.Set(prop, "hello");
+
+        Assert.AreEqual("hello", node.Get(prop));
+    }
 
     #endregion
 }

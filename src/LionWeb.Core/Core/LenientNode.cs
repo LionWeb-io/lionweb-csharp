@@ -328,6 +328,9 @@ public class LenientNode : NodeBase, INode
         {
             var index = _featureValues.IndexOf(result);
             _featureValues[index] = (feature, value);
+        } else
+        {
+            _featureValues.Add((feature, value));
         }
     }
 }
