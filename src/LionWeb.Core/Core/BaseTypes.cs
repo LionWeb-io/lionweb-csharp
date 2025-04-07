@@ -404,6 +404,14 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <inheritdoc />
     public virtual Containment? GetContainmentOf(INode child) => null;
 
+    // TODO: Implement properly
+    public bool TryGet(Feature? feature, out object? value)
+    {
+        var tryGet = Get(feature);
+        value = tryGet;
+        return tryGet != null;
+    }
+
     /// <inheritdoc />
     public sealed override object? Get(Feature? feature)
     {
