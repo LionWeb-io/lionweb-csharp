@@ -29,8 +29,9 @@ public interface IMigration
     // What happens if return=false and outputRootNodes != inputRootNodes?
     MigrationResult Migrate(List<LenientNode> inputRootNodes);
     
-    
     // List<LenientNode> Apply(List<LenientNode> inputRootNodes, out bool changed);
+
+    public const int DefaultPriority = 10_000;
 }
 
 public record MigrationResult(bool changed, List<LenientNode> outputRootNodes);

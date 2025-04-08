@@ -21,50 +21,44 @@ using M3;
 using System.Collections;
 using Utilities;
 
-public abstract class MigrationBase<T>(LanguageIdentity applicableLanguage) : IMigration where T : Language
+public abstract class MigrationBase<T> : IMigration where T : Language
 {
-    public const int DefaultPriority = 10_000;
-
-    public LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
-
+    protected readonly LanguageIdentity OriginLanguage;
+    protected readonly T _targetLang;
+    
     private ILanguageRegistry? _languageRegistry;
 
-    public MigrationBase(LanguageIdentity applicableLanguage, LanguageIdentity targetLanguage) : this(applicableLanguage)
+    public MigrationBase(LanguageIdentity originLanguage, T targetLanguage)
     {
-        
-    }
-    
-    public MigrationBase(LanguageIdentity originLanguage, T targetLanguage) : this(originLanguage, LanguageIdentity.FromLanguage(targetLanguage))
-    {
+        OriginLanguage = originLanguage;
         _targetLang = targetLanguage;
     }
 
-    protected readonly T _targetLang;
+    public LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
 
-    public virtual void Initialize(ILanguageRegistry languageRegistry) =>
-        _languageRegistry = languageRegistry;
-
-    
     protected ILanguageRegistry LanguageRegistry
     {
         get => _languageRegistry ?? throw new ApplicationException("LanguageRegistry is null");
         set => _languageRegistry = value;
     }
 
-    protected readonly LanguageIdentity _applicableLanguage = applicableLanguage;
+    /// <inheritdoc />
+    public virtual int Priority => IMigration.DefaultPriority;
 
     /// <inheritdoc />
-    public virtual int Priority => DefaultPriority;
+    public virtual void Initialize(ILanguageRegistry languageRegistry) =>
+        _languageRegistry = languageRegistry;
+
 
     /// <inheritdoc />
     public virtual bool IsApplicable(ISet<LanguageIdentity> languageIdentities) =>
-        languageIdentities.Contains(_applicableLanguage);
+        languageIdentities.Contains(OriginLanguage);
 
     /// <inheritdoc />
     public MigrationResult Migrate(List<LenientNode> inputRootNodes)
     {
         var result = MigrateInternal(inputRootNodes);
-        if (_languageRegistry.TryGetLanguage(_applicableLanguage, out var l))
+        if (_languageRegistry.TryGetLanguage(OriginLanguage, out var l))
         {
             if (l.Key != _targetLang.Key || l.Version != _targetLang.Version)
             {
@@ -78,7 +72,9 @@ public abstract class MigrationBase<T>(LanguageIdentity applicableLanguage) : IM
     }
 
     protected abstract MigrationResult MigrateInternal(List<LenientNode> inputRootNodes);
-    
+
+    #region Keyed identity helpers
+
     protected bool TryGetProperty(LenientNode node, FeatureIdentity featureIdentity, out object? value)
     {
         var property = TempProperty(featureIdentity);
@@ -204,14 +200,16 @@ public abstract class MigrationBase<T>(LanguageIdentity applicableLanguage) : IM
         return dynamicLanguage;
     }
 
+    protected LenientNode CreateNode(ClassifierIdentity classifierIdentity, string? id = null) =>
+        CreateNode(TempClassifier(classifierIdentity), id);
+
+    #endregion
 
     private int _nextNodeId = 0;
 
     protected virtual string NewId() =>
         (++_nextNodeId).ToString();
 
-    protected LenientNode CreateNode(ClassifierIdentity classifierIdentity, string? id = null) =>
-        CreateNode(TempClassifier(classifierIdentity), id);
     protected LenientNode CreateNode(Classifier classifier, string? id = null) =>
         new LenientNode(id ?? NewId(), classifier);
 }

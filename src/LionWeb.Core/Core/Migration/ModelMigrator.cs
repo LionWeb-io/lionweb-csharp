@@ -21,10 +21,18 @@ using M1;
 using M2;
 using M3;
 using Serialization;
+using System.Collections;
 using System.Collections.Immutable;
 using Utilities;
 
-public class ModelMigrator : ILanguageRegistry
+public interface IModelMigrator
+{
+    int MaxMigrationRounds { get; init; }
+    void RegisterMigration(IMigration migration);
+    Task<bool> Migrate(Stream input, Stream migrated);
+}
+
+public class ModelMigrator : ILanguageRegistry, IModelMigrator
 {
     private const int _maxMigrationRounds = 20;
     
@@ -38,11 +46,13 @@ public class ModelMigrator : ILanguageRegistry
         _dynamicLanguages = new DynamicLanguageCloner(lionWebVersion).Clone(languages);
     }
 
+    /// <inheritdoc />
     public int MaxMigrationRounds { get; init; } = _maxMigrationRounds;
     public CompressedIdConfig CompressedIdConfig { get; init; } = new();
 
     public bool SerializeEmptyFeatures { get; init; } = false;
 
+    /// <inheritdoc />
     public async Task<bool> Migrate(Stream input, Stream migrated)
     {
         var builder = new DeserializerBuilder()
@@ -55,8 +65,8 @@ public class ModelMigrator : ILanguageRegistry
 
         int migrationRound = 0;
         bool anyChange = false;
-        bool changed;
-        var nodes = loaded.Cast<LenientNode>().ToList();
+        bool changeInThisRound;
+        var rootNodes = loaded.Cast<LenientNode>().ToList();
 
         do
         {
@@ -66,26 +76,26 @@ public class ModelMigrator : ILanguageRegistry
             }
 
             migrationRound++;
-            changed = false;
+            changeInThisRound = false;
 
-            var usedLanguages = CollectUsedLanguages(nodes);
-
+            var usedLanguages = CollectUsedLanguages(rootNodes);
             var applicableMigrations = SelectApplicableMigrations(usedLanguages);
 
             foreach (var migration in applicableMigrations)
             {
-                anyChange = true;
-                (var b, nodes) = migration.Migrate(nodes);
-                changed |= b;
+                (var b, rootNodes) = migration.Migrate(rootNodes);
+                changeInThisRound |= b;
             }
-        } while (changed);
+            
+            anyChange |= changeInThisRound;
+        } while (changeInThisRound);
 
         var serializer = new Serializer(_lionWebVersion)
         {
             SerializeEmptyFeatures = SerializeEmptyFeatures, Handler = new MigrationSerializerHandler()
         };
 
-        var allNodes = nodes.Descendants();
+        var allNodes = rootNodes.Descendants();
         JsonUtils.WriteNodesToStream(migrated, serializer, allNodes);
 
         return anyChange;
@@ -107,15 +117,18 @@ public class ModelMigrator : ILanguageRegistry
             .Where(m => m.IsApplicable(usedLanguages))
             .OrderBy(m => m.Priority);
 
+    /// <inheritdoc />
     public void RegisterMigration(IMigration migration)
     {
         migration.Initialize(this);
         _migrations.Add(migration);
     }
 
+    /// <inheritdoc />
     public bool TryGetLanguage(LanguageIdentity languageIdentity, out DynamicLanguage? language) =>
         _dynamicLanguages.TryGetValue(languageIdentity, out language);
 
+    /// <inheritdoc />
     public bool RegisterLanguage(DynamicLanguage language) =>
         _dynamicLanguages.TryAdd(LanguageIdentity.FromLanguage(language),language );
 }
@@ -154,11 +167,52 @@ public static class MigrationExtensions
         node.Set(containment, child.ConvertSubtreeToLenient());
     
     public static void SetChildren(this LenientNode node, Containment containment, IEnumerable<IWritableNode> children) =>
-        node.Set(containment, children.Select(c => c.ConvertSubtreeToLenient()));
+        node.Set(containment, children.Select(ConvertSubtreeToLenient));
 
-    public static void ConvertSubtreeToLenient(this IReadableNode node) => node switch
+    public static void SetReference(this LenientNode node, Reference reference, IReadableNode target) =>
+        node.Set(reference, target);
+    
+    public static void SetReferences(this LenientNode node, Reference reference, IEnumerable<IReadableNode> targets) =>
+        node.Set(reference, targets);
+
+    public static LenientNode ConvertSubtreeToLenient(this IReadableNode node) => node switch
     {
         LenientNode l => l,
-        var n=> new LenientNode(n.GetId(), n.GetClassifier())
+        var n => ConvertToLenient(n)
+    };
+
+    private static LenientNode ConvertToLenient(IReadableNode node)
+    {
+        var result = new LenientNode(node.GetId(), node.GetClassifier());
+        result.AddAnnotations(node.GetAnnotations().Select(ConvertSubtreeToLenient));
+        foreach (Feature feature in node.CollectAllSetFeatures())
+        {
+            var value = node.Get(feature);
+            switch (feature)
+            {
+                case Property:
+                    result.Set(feature, value);
+                    break;
+                
+                case Containment:
+                    switch (value)
+                    {
+                        case IEnumerable enumerable:
+                            result.Set(feature, enumerable.Cast<IWritableNode>().Select(ConvertSubtreeToLenient));
+                            break;
+                        case IWritableNode writableNode:
+                            result.Set(feature, writableNode.ConvertSubtreeToLenient());
+                            break;
+                    }
+
+                    break;
+                
+                case Reference:
+                    result.Set(feature, value);
+                    break;
+            }
+        }
+        
+        return result;
     }
 }

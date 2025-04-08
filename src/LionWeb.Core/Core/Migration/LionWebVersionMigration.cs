@@ -64,8 +64,7 @@ public class LionWebVersionMigration(LionWebVersions from, LionWebVersions to) :
             }
         }
 
-        outputRootNodes = inputRootNodes;
-        return true;
+        return new(true, inputRootNodes);
     }
 
     private T Map<T>(T input) where T : IKeyed
