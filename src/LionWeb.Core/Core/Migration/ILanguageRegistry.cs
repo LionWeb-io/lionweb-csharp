@@ -24,5 +24,7 @@ public interface ILanguageRegistry
 {
     bool TryGetLanguage(LanguageIdentity languageIdentity, [NotNullWhen(true)] out DynamicLanguage? language);
     
-    bool RegisterLanguage(DynamicLanguage language);
+    bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null);
+
+    T Lookup<T>(T keyed) where T : IKeyed;
 }

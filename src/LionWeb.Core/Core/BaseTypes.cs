@@ -407,9 +407,16 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     // TODO: Implement properly
     public bool TryGet(Feature? feature, out object? value)
     {
-        var tryGet = Get(feature);
-        value = tryGet;
-        return tryGet != null;
+        try
+        {
+            var tryGet = Get(feature);
+            value = tryGet;
+            return tryGet != null;
+        } catch (UnknownFeatureException)
+        {
+            value = null;
+            return false;
+        }
     }
 
     /// <inheritdoc />
