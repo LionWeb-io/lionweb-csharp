@@ -23,14 +23,15 @@ using Utilities;
 
 public abstract class MigrationBase<T> : IMigration where T : Language
 {
-    protected readonly LanguageIdentity OriginLanguage;
+    protected readonly LanguageIdentity OriginLanguageIdentity;
     protected readonly T _targetLang;
-    
+
     private ILanguageRegistry? _languageRegistry;
+    // private DynamicLanguage _originLanguage;
 
     public MigrationBase(LanguageIdentity originLanguage, T targetLanguage)
     {
-        OriginLanguage = originLanguage;
+        OriginLanguageIdentity = originLanguage;
         _targetLang = targetLanguage;
     }
 
@@ -46,28 +47,36 @@ public abstract class MigrationBase<T> : IMigration where T : Language
     public virtual int Priority => IMigration.DefaultPriority;
 
     /// <inheritdoc />
-    public virtual void Initialize(ILanguageRegistry languageRegistry) =>
-        _languageRegistry = languageRegistry;
+    public virtual void Initialize(ILanguageRegistry languageRegistry)
+    {
+        LanguageRegistry = languageRegistry;
+        // if (languageRegistry.TryGetLanguage(LanguageIdentity.FromLanguage(_targetLang), out var dynamicTargetLang))
+        // {
+        //     _originLanguage = Cloner.Clone(dynamicTargetLang);
+        //     _originLanguage.Key = OriginLanguageIdentity.Key;
+        //     _originLanguage.Version = OriginLanguageIdentity.Version;
+        // }
+    }
 
 
     /// <inheritdoc />
     public virtual bool IsApplicable(ISet<LanguageIdentity> languageIdentities) =>
-        languageIdentities.Contains(OriginLanguage);
+        languageIdentities.Contains(OriginLanguageIdentity);
 
     /// <inheritdoc />
     public MigrationResult Migrate(List<LenientNode> inputRootNodes)
     {
         var result = MigrateInternal(inputRootNodes);
-        if (_languageRegistry.TryGetLanguage(OriginLanguage, out var l))
+        if (LanguageRegistry.TryGetLanguage(OriginLanguageIdentity, out var l))
         {
             if (l.Key != _targetLang.Key || l.Version != _targetLang.Version)
             {
                 l.Key = _targetLang.Key;
                 l.Version = _targetLang.Version;
-                result = result with { changed = true};
+                result = result with { changed = true };
             }
         }
-        
+
         return result;
     }
 
@@ -194,8 +203,9 @@ public abstract class MigrationBase<T> : IMigration where T : Language
     {
         if (LanguageRegistry.TryGetLanguage(languageIdentity, out var language))
             return language;
-        
-        DynamicLanguage dynamicLanguage = new(id ?? NewId(), LionWebVersion) { Key = languageIdentity.Key, Version = languageIdentity.Version };
+
+        DynamicLanguage dynamicLanguage =
+            new(id ?? NewId(), LionWebVersion) { Key = languageIdentity.Key, Version = languageIdentity.Version };
         LanguageRegistry.RegisterLanguage(dynamicLanguage);
         return dynamicLanguage;
     }
@@ -205,10 +215,83 @@ public abstract class MigrationBase<T> : IMigration where T : Language
 
     #endregion
 
-    private int _nextNodeId = 0;
+    #region LanguageEntity helpers
+
+    protected IEnumerable<LenientNode> AllInstancesOf(List<LenientNode> nodes, Classifier classifier) =>
+        nodes
+            .Descendants()
+            .Where(n => classifier.EqualsIdentity(Lookup(n.GetClassifier())));
+
+    protected void SetProperty(IWritableNode node, Property property, object? value) =>
+        node.Set(Lookup(property), value);
+
+    protected T Lookup<T>(T keyed) where T : IKeyed
+    {
+        // if (keyed.GetLanguage().EqualsIdentity(_originLanguage))
+        // {
+        //     return MigrationExtensions.Lookup(keyed, _targetLang);
+        // }
+
+        return LanguageRegistry.Lookup(keyed);
+    }
+
+    protected void SetChild(LenientNode node, Containment containment, IWritableNode child) =>
+        node.Set(Lookup(containment), ConvertSubtreeToLenient(child));
+
+    protected void SetChildren(LenientNode node, Containment containment, IEnumerable<IWritableNode> children) =>
+        node.Set(Lookup(containment), children.Select(ConvertSubtreeToLenient));
+
+    protected void SetReference(LenientNode node, Reference reference, IReadableNode target) =>
+        node.Set(Lookup(reference), target);
+
+    protected void SetReferences(LenientNode node, Reference reference, IEnumerable<IReadableNode> targets) =>
+        node.Set(Lookup(reference), targets);
+
+    protected LenientNode ConvertSubtreeToLenient(IReadableNode node) => node switch
+    {
+        LenientNode l => l,
+        var n => ConvertToLenient(n)
+    };
+
+    protected LenientNode ConvertToLenient(IReadableNode node)
+    {
+        var result = new LenientNode(node.GetId(), Lookup(node.GetClassifier()));
+        result.AddAnnotations(node.GetAnnotations().Select(ConvertSubtreeToLenient));
+        foreach (Feature feature in node.CollectAllSetFeatures())
+        {
+            var value = node.Get(feature);
+            switch (feature)
+            {
+                case Property:
+                    result.Set(feature, value);
+                    break;
+
+                case Containment:
+                    switch (value)
+                    {
+                        case IEnumerable enumerable:
+                            result.Set(feature, enumerable.Cast<IWritableNode>().Select(ConvertSubtreeToLenient));
+                            break;
+                        case IWritableNode writableNode:
+                            result.Set(feature, ConvertSubtreeToLenient(writableNode));
+                            break;
+                    }
+
+                    break;
+
+                case Reference:
+                    result.Set(feature, value);
+                    break;
+            }
+        }
+
+        return result;
+    }
+
+    #endregion
 
     protected virtual string NewId() =>
-        (++_nextNodeId).ToString();
+        IdUtils.NewId();
 
     protected LenientNode CreateNode(Classifier classifier, string? id = null) =>
         new LenientNode(id ?? NewId(), classifier);
