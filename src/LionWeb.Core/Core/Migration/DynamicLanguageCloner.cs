@@ -19,14 +19,19 @@ namespace LionWeb.Core.Migration;
 
 using M2;
 using M3;
+using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 public class DynamicLanguageCloner
 {
     private readonly LionWebVersions _lionWebVersion;
-    private readonly Dictionary<IKeyed, DynamicIKeyed> _dynamicMap = [];
+    private readonly Dictionary<IKeyed, DynamicIKeyed?> _dynamicMap = [];
 
-    public IReadOnlyDictionary<IKeyed, DynamicIKeyed> DynamicMap => _dynamicMap.AsReadOnly();
+    public IReadOnlyDictionary<IKeyed, DynamicIKeyed> DynamicMap =>
+        _dynamicMap
+            .Where(p => p.Value != null)
+            .ToDictionary()
+            .AsReadOnly()!;
 
     public DynamicLanguageCloner(LionWebVersions lionWebVersion)
     {
@@ -36,6 +41,7 @@ public class DynamicLanguageCloner
     public Dictionary<LanguageIdentity, DynamicLanguage> Clone(IEnumerable<Language> languages)
     {
         CreateClones(languages);
+        CloneReferencedElements();
         ResolveReferences();
 
         return _dynamicMap
@@ -51,24 +57,24 @@ public class DynamicLanguageCloner
         foreach (var l in languages)
         {
             DynamicLanguage dynamicLanguage = CloneLanguage(l);
-
-            foreach (var languageEntity in l.Entities)
-            {
-                DynamicLanguageEntity entity = languageEntity switch
-                {
-                    Annotation a => CloneAnnotation(a, dynamicLanguage),
-                    Concept c => CloneConcept(c, dynamicLanguage),
-                    Interface i => CloneInterface(i, dynamicLanguage),
-                    Enumeration e => CloneEnumeration(e, dynamicLanguage),
-                    PrimitiveType p => ClonePrimitiveType(p, dynamicLanguage),
-                    StructuredDataType s => CloneStructuredDataType(s, dynamicLanguage),
-                    _ => throw new ArgumentOutOfRangeException(nameof(languageEntity))
-                };
-
-                dynamicLanguage.AddEntities([entity]);
-                _dynamicMap.Add(languageEntity, entity);
-            }
+            dynamicLanguage.AddEntities(l.Entities.Select(e => CloneEntity(e, dynamicLanguage)));
         }
+    }
+
+    private DynamicLanguageEntity CloneEntity(LanguageEntity languageEntity, DynamicLanguage dynamicLanguage)
+    {
+        DynamicLanguageEntity entity = languageEntity switch
+        {
+            Annotation a => CloneAnnotation(a, dynamicLanguage),
+            Concept c => CloneConcept(c, dynamicLanguage),
+            Interface i => CloneInterface(i, dynamicLanguage),
+            Enumeration e => CloneEnumeration(e, dynamicLanguage),
+            PrimitiveType p => ClonePrimitiveType(p, dynamicLanguage),
+            StructuredDataType s => CloneStructuredDataType(s, dynamicLanguage),
+            _ => throw new ArgumentOutOfRangeException(languageEntity.ToString())
+        };
+        _dynamicMap[languageEntity] =  entity;
+        return entity;
     }
 
     private DynamicLanguage CloneLanguage(Language language)
@@ -78,7 +84,7 @@ public class DynamicLanguageCloner
             Name = language.Name, Key = language.Key, Version = language.Version,
         };
         result.SetFactory(new MigrationFactory(result));
-        _dynamicMap.Add(language, result);
+        _dynamicMap[language] = result;
         return result;
     }
 
@@ -134,6 +140,7 @@ public class DynamicLanguageCloner
         {
             var field = new DynamicField(f.GetId(), _lionWebVersion, result) { Name = f.Name, Key = f.Key };
             _dynamicMap.Add(f, field);
+            _dynamicMap.TryAdd(f.Type, null);
             return field;
         }));
         return result;
@@ -158,10 +165,45 @@ public class DynamicLanguageCloner
             _ => throw new ArgumentOutOfRangeException(nameof(f))
         });
         _dynamicMap.Add(f, result);
+        _dynamicMap.TryAdd(f.GetFeatureType(), null);
         return result;
     }
 
     #endregion
+
+    private void CloneReferencedElements()
+    {
+        var unclonedReferencedElements = _dynamicMap
+            .Where(p => p.Value == null)
+            .GroupBy(p => p.Key.GetLanguage(), new LanguageIdentityComparer());
+
+        foreach (var grouping in unclonedReferencedElements)
+        {
+            Language inputLanguage = grouping.Key;
+            DynamicLanguage language;
+            if (TryLookup(inputLanguage, out var cloned) && cloned is DynamicLanguage l)
+            {
+                language = l;
+            } else
+            {
+                language = CloneLanguage(inputLanguage);
+            }
+            
+            foreach ((IKeyed? keyed, _) in grouping)
+            {
+                switch (keyed)
+                {
+                    case LanguageEntity entity:
+                        var clonedEntity = CloneEntity(entity, language);
+                        language.AddEntities([clonedEntity]);
+                        break;
+                    
+                    default:
+                        throw new ArgumentException(keyed.ToString());
+                }
+            }
+        }
+    }
 
     #region References
 
@@ -210,24 +252,32 @@ public class DynamicLanguageCloner
     {
         if (keyed == null)
         {
-            throw new ArgumentException(nameof(T));
+            throw new ArgumentException(typeof(T).FullName);
         }
+        
+        return TryLookup(keyed, out var result) ? result : throw new ArgumentException(keyed.ToString());
+    }
 
+    private bool TryLookup<T>(T keyed, [NotNullWhen(true)] out T? result) where T : IKeyed
+    {
         if (keyed.GetLanguage().EqualsIdentity(_lionWebVersion.BuiltIns) ||
             keyed.GetLanguage().EqualsIdentity(_lionWebVersion.LionCore))
         {
-            return keyed;
+            result = keyed;
+            return true;
         }
 
         if (_dynamicMap.TryGetValue(keyed, out var value))
         {
-            if (value is T result)
+            if (value is T r)
             {
-                return result;
+                result = r;
+                return true;
             }
         }
-
-        throw new ArgumentException(keyed.ToString());
+        
+        result = default;
+        return false;
     }
 
     #endregion
