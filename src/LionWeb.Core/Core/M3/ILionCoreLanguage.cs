@@ -19,6 +19,8 @@
 
 namespace LionWeb.Core.M3;
 
+using System.Diagnostics.CodeAnalysis;
+
 /// The self-definition of the LionCore M3.
 public interface ILionCoreLanguage : Language
 {
@@ -186,6 +188,13 @@ public sealed class M3Concept : ConceptBase<ILionCoreLanguage>
 
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
+
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        value = Get(feature);
+        return true;
+    }
 }
 
 /// <inheritdoc />
@@ -211,6 +220,13 @@ public sealed class M3Interface : InterfaceBase<ILionCoreLanguage>
             return Extends;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
+    }
+
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        value = Get(feature);
+        return true;
     }
 }
 
@@ -240,6 +256,13 @@ public sealed class M3Reference : ReferenceBase<ILionCoreLanguage>
 
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
+    
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        value = Get(feature);
+        return true;
+    }
 }
 
 /// <inheritdoc />
@@ -268,6 +291,13 @@ public sealed class M3Containment : ContainmentBase<ILionCoreLanguage>
 
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
+    
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        value = Get(feature);
+        return true;
+    }
 }
 
 /// <inheritdoc />
@@ -293,5 +323,12 @@ public sealed class M3Property : PropertyBase<ILionCoreLanguage>
             return Type;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
+    }
+    
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        value = Get(feature);
+        return true;
     }
 }

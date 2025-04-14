@@ -19,6 +19,7 @@ namespace LionWeb.Core.M3;
 
 using M2;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 // The types here implement the LionCore M3.
@@ -45,7 +46,7 @@ public abstract class DynamicIKeyed(string id, LionWebVersions lionWebVersion) :
     }
 
     /// <inheritdoc />
-    public bool TryGetKey(out string? key)
+    public bool TryGetKey([NotNullWhen(true)] out string? key)
     {
         key = _key;
         return key != null;
@@ -59,7 +60,7 @@ public abstract class DynamicIKeyed(string id, LionWebVersions lionWebVersion) :
     }
 
     /// <inheritdoc />
-    public bool TryGetName(out string? name)
+    public bool TryGetName([NotNullWhen(true)] out string? name)
     {
         name = _name;
         return name != null;

@@ -128,18 +128,7 @@ public class Serializer : ISerializer
 
         var featureValues = node
             .CollectAllSetFeatures()
-            .ToDictionary(f => f, feature =>
-            {
-                // TODO: Remove after TryGet(Feature) is implemented
-                try
-                {
-                    return node.Get(feature);
-                } catch (UnsetFeatureException)
-                {
-                    // ignore
-                    return null;
-                }
-            });
+            .ToDictionary(f => f, feature => node.TryGet(feature, out var r) ? r : null);
 
         Dictionary<Feature, object?> properties = CollectProperties(featureValues);
         RemoveFromFeatureValues(properties);

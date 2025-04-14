@@ -20,6 +20,7 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 /// <summary>
@@ -104,21 +105,51 @@ public class LenientNode : NodeBase, INode
         if (feature == null)
             return false;
 
-        if (TryGetFeature(feature, out result))
+        if (TryGet(feature, out result))
+        {
+            if (feature.Optional)
+            {
+                return true;
+            }
+
+            if (result == null || (result is IEnumerable enumerable && !enumerable.OfType<object?>().Any()))
+            {
+                throw new UnsetFeatureException(feature);
+            }
+
+            return true;
+        }
+
+        if (!feature.Optional)
+            throw new UnsetFeatureException(feature);
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (feature == null)
+        {
+            value = null;
+            return false;
+        }
+
+        if (TryGetFeature(feature, out value))
         {
             switch (feature)
             {
-                case Containment { Multiple: true } when result is INode node:
-                    result = new List<INode> { node }.AsReadOnly();
+                case Containment { Multiple: true } when value is INode node:
+                    value = new List<INode> { node }.AsReadOnly();
                     break;
                 case Reference { Multiple: true }:
-                    switch (result)
+                    switch (value)
                     {
                         case INode iNode:
-                            result = new List<INode> { iNode }.AsReadOnly();
+                            value = new List<INode> { iNode }.AsReadOnly();
                             break;
                         case IReadableNode readableNode:
-                            result = new List<IReadableNode> { readableNode }.AsReadOnly();
+                            value = new List<IReadableNode> { readableNode }.AsReadOnly();
                             break;
                     }
 
@@ -128,16 +159,13 @@ public class LenientNode : NodeBase, INode
             return true;
         }
 
-        if (!feature.Optional)
-            throw new UnsetFeatureException(feature);
-
         switch (feature)
         {
             case Containment { Multiple: true }:
-                result = new List<INode>().AsReadOnly();
+                value = new List<INode>().AsReadOnly();
                 break;
             case Reference { Multiple: true }:
-                result = new List<IReadableNode>().AsReadOnly();
+                value = new List<IReadableNode>().AsReadOnly();
                 break;
         }
 
@@ -294,8 +322,9 @@ public class LenientNode : NodeBase, INode
     /// <inheritdoc />
     public override bool RemoveAnnotations(IEnumerable<INode> annotations) =>
         RemoveSelfParent(annotations?.ToList(), _annotations, null);
-    
+
     private IEnumerable<Feature> FeatureKeys => _featureValues.Select(f => f.feature);
+
     private bool TryGetFeature(Feature featureToFind, out object? value)
     {
         var result = _featureValues.Find(f => featureToFind.EqualsIdentity(f.feature));
@@ -317,7 +346,7 @@ public class LenientNode : NodeBase, INode
             _featureValues.Remove(result);
             return true;
         }
-        
+
         return false;
     }
 
