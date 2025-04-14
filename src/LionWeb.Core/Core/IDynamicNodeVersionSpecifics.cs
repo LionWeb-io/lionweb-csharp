@@ -22,6 +22,8 @@ using M3;
 using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1_Compatible;
 using VersionSpecific.V2024_1;
+using VersionSpecific.V2025_1_Compatible;
+using VersionSpecific.V2025_1;
 
 /// Externalized logic of <see cref="DynamicNode"/>, specific to one version of LionWeb standard.
 internal interface IDynamicNodeVersionSpecifics : IVersionSpecifics
@@ -35,6 +37,8 @@ internal interface IDynamicNodeVersionSpecifics : IVersionSpecifics
         IVersion2023_1 => new DynamicNodeVersionSpecifics_2023_1(),
         IVersion2024_1 => new DynamicNodeVersionSpecifics_2024_1(),
         IVersion2024_1_Compatible => new DynamicNodeVersionSpecifics_2024_1_Compatible(),
+        IVersion2025_1 => new DynamicNodeVersionSpecifics_2025_1(),
+        IVersion2025_1_Compatible => new DynamicNodeVersionSpecifics_2025_1_Compatible(),
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 
