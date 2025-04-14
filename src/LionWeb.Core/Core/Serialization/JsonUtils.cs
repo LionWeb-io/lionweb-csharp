@@ -72,8 +72,11 @@ public static class JsonUtils
     /// </summary>
     /// <param name="stream">Stream to read from.</param>
     /// <param name="deserializer">Deserializer to use.</param>
+    /// <param name="lionWebVersionChecker">Optional action to check the <see cref="SerializationChunk.SerializationFormatVersion"/>.
+    /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
-    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream stream, IDeserializer deserializer, Action<string>? lionWebVersionChecker = null)
+    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream stream, IDeserializer deserializer,
+        Action<string>? lionWebVersionChecker = null)
     {
         var streamReader = new Utf8JsonAsyncStreamReader(stream, leaveOpen: true);
 
