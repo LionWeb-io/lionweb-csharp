@@ -272,6 +272,7 @@ public class KeyedIdentityComparer : IEqualityComparer<IKeyed>
         (Feature a, Feature b) => a.EqualsIdentity(b),
         (Field a, Field b) => a.EqualsIdentity(b),
         (EnumerationLiteral a, EnumerationLiteral b) => a.EqualsIdentity(b),
+        (null, null) => true,
         _ => false
     };
 

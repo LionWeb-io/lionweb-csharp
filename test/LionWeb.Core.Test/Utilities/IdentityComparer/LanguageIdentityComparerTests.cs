@@ -15,18 +15,18 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Utilities;
+namespace LionWeb.Core.Test.Utilities.IdentityComparer;
 
 using Core.Utilities;
 using M3;
 
 [TestClass]
-public class EqualityComparerTests
+public class LanguageIdentityComparerTests
 {
-    LionWebVersions _lionWebVersion = LionWebVersions.Current;
+    readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
     [TestMethod]
-    public void LanguageIdentityComparer_Same()
+    public void Same()
     {
         var lang = new DynamicLanguage("id", _lionWebVersion) { Key = "key", Version = "x" };
 
@@ -36,7 +36,7 @@ public class EqualityComparerTests
     }
 
     [TestMethod]
-    public void LanguageIdentityComparer_Same_Changed_Key()
+    public void Same_Changed_Key()
     {
         var lang = new DynamicLanguage("id", _lionWebVersion) { Key = "key", Version = "x" };
 
@@ -50,7 +50,7 @@ public class EqualityComparerTests
     }
 
     [TestMethod]
-    public void LanguageIdentityComparer_Same_Changed_Version()
+    public void Same_Changed_Version()
     {
         var lang = new DynamicLanguage("id", _lionWebVersion) { Key = "key", Version = "x" };
 
@@ -64,7 +64,7 @@ public class EqualityComparerTests
     }
 
     [TestMethod]
-    public void LanguageIdentityComparer_Equals()
+    public void Equals()
     {
         var langA = new DynamicLanguage("id", _lionWebVersion) { Key = "key", Version = "x" };
         var langB = new DynamicLanguage("id", _lionWebVersion) { Key = "key", Version = "x" };
@@ -77,7 +77,7 @@ public class EqualityComparerTests
     }
 
     [TestMethod]
-    public void LanguageIdentityComparer_Different_Key()
+    public void Different_Key()
     {
         var langA = new DynamicLanguage("id", _lionWebVersion) { Key = "key", Version = "x" };
         var langB = new DynamicLanguage("id", _lionWebVersion) { Key = "otherKey", Version = "x" };
@@ -90,7 +90,7 @@ public class EqualityComparerTests
     }
 
     [TestMethod]
-    public void LanguageIdentityComparer_Different_Version()
+    public void Different_Version()
     {
         var langA = new DynamicLanguage("id", _lionWebVersion) { Key = "key", Version = "x" };
         var langB = new DynamicLanguage("id", _lionWebVersion) { Key = "key", Version = "y" };
@@ -103,7 +103,7 @@ public class EqualityComparerTests
     }
 
     [TestMethod]
-    public void LanguageIdentityComparer_Equals_Different_Name()
+    public void Equals_Different_Name()
     {
         var langA = new DynamicLanguage("id", _lionWebVersion) { Name = "a", Key = "key", Version = "x" };
         var langB = new DynamicLanguage("id", _lionWebVersion) { Name = "b", Key = "key", Version = "x" };
@@ -116,7 +116,7 @@ public class EqualityComparerTests
     }
 
     [TestMethod]
-    public void LanguageIdentityComparer_Equals_LeftNull()
+    public void Equals_LeftNull()
     {
         var lang = new DynamicLanguage("id", _lionWebVersion) { Name = "a", Key = "key", Version = "x" };
 
@@ -126,7 +126,7 @@ public class EqualityComparerTests
     }
 
     [TestMethod]
-    public void LanguageIdentityComparer_Equals_RightNull()
+    public void Equals_RightNull()
     {
         var lang = new DynamicLanguage("id", _lionWebVersion) { Name = "a", Key = "key", Version = "x" };
 
@@ -136,7 +136,7 @@ public class EqualityComparerTests
     }
 
     [TestMethod]
-    public void LanguageIdentityComparer_Equals_BothNull()
+    public void Equals_BothNull()
     {
         var comparer = new LanguageIdentityComparer();
 
