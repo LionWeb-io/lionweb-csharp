@@ -24,8 +24,8 @@ using Utilities;
 
 public class DynamicLanguageCloner
 {
-    private readonly LionWebVersions _lionWebVersion;
-    private readonly Dictionary<IKeyed, DynamicIKeyed?> _dynamicMap = [];
+    protected readonly LionWebVersions _lionWebVersion;
+    protected readonly Dictionary<IKeyed, DynamicIKeyed?> _dynamicMap = new(new KeyedIdentityComparer()) { };
 
     public IReadOnlyDictionary<IKeyed, DynamicIKeyed> DynamicMap =>
         _dynamicMap
@@ -38,7 +38,7 @@ public class DynamicLanguageCloner
         _lionWebVersion = lionWebVersion;
     }
 
-    public Dictionary<LanguageIdentity, DynamicLanguage> Clone(IEnumerable<Language> languages)
+    public virtual Dictionary<LanguageIdentity, DynamicLanguage> Clone(IEnumerable<Language> languages)
     {
         CreateClones(languages);
         CloneReferencedElements();

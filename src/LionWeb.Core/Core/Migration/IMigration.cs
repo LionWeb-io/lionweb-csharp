@@ -34,4 +34,9 @@ public interface IMigration
     public const int DefaultPriority = 10_000;
 }
 
+public interface IMigrationWithLionWebVersion : IMigration
+{
+    string SerializedLionWebVersion { get; set; }
+}
+
 public record MigrationResult(bool changed, List<LenientNode> outputRootNodes);

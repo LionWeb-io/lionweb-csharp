@@ -59,7 +59,22 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     {
         DeserializerBuilder builder = SetupDeserializerBuilder();
 
-        var loaded = await JsonUtils.ReadNodesFromStreamAsync(input, builder.Build());
+        string? lionWebVersion = null;
+        
+        var deserializer = builder.Build();
+        var loaded = await JsonUtils.ReadNodesFromStreamAsync(input, deserializer, serializedVersion =>
+        {
+            lionWebVersion = serializedVersion;
+            deserializer.LionWebVersion.AssureCompatible(serializedVersion);
+        });
+
+        if (lionWebVersion != null)
+        {
+            foreach (var migration in _migrations.OfType<IMigrationWithLionWebVersion>())
+            {
+                migration.SerializedLionWebVersion = lionWebVersion;
+            }
+        }
 
         int migrationRound = 0;
         bool anyChange = false;
@@ -166,7 +181,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
 
     /// <inheritdoc />
     public bool TryGetLanguage(LanguageIdentity languageIdentity, [NotNullWhen(true)] out DynamicLanguage? language) =>
-        _dynamicLanguages.TryGetValue(languageIdentity, out language);
+        _dynamicLanguages.TryGetValue(languageIdentity, out language) || _dynamicInputLanguages.TryGetValue(languageIdentity, out language);
 
     /// <inheritdoc />
     public bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null) =>
