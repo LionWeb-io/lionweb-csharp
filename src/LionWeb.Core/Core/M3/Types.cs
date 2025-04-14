@@ -169,11 +169,11 @@ public interface Concept : Classifier
     /// Gets the <see cref="Extends"/>.
     /// </summary>
     /// <param name="extends">Value of <see cref="Extends"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Extends"/> is set; <c>false</c> otherwise.</returns>
+    /// <returns><c>true</c></returns>
     bool TryGetExtends(out Concept? extends)
     {
         extends = Extends;
-        return Extends != null;
+        return true;
     }
 
     /// A concept can implement zero or more <see cref="Interface">LionWeb interfaces</see>,
@@ -216,11 +216,11 @@ public interface Annotation : Classifier
     /// Gets the <see cref="Extends"/>.
     /// </summary>
     /// <param name="extends">Value of <see cref="Extends"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Extends"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetExtends([MaybeNullWhen(false)] out Annotation? extends)
+    /// <returns><c>true</c></returns>
+    bool TryGetExtends(out Annotation? extends)
     {
         extends = Extends;
-        return Extends != null;
+        return true;
     }
 
     /// An annotation can implement zero or more <see cref="Interface">LionWeb interfaces</see>,

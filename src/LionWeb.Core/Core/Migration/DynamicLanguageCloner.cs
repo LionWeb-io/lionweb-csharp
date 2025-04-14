@@ -218,12 +218,12 @@ public class DynamicLanguageCloner
                     break;
                 case (Annotation i, DynamicAnnotation r):
                     r.Annotates = Lookup(i.Annotates);
-                    if (i.TryGetExtends(out var exA))
+                    if (i.TryGetExtends(out var exA) && exA != null)
                         r.Extends = Lookup(exA);
                     r.AddImplements(i.Implements.Select(Lookup));
                     break;
                 case (Concept i, DynamicConcept r):
-                    if (i.TryGetExtends(out var exC))
+                    if (i.TryGetExtends(out var exC) && exC != null)
                         r.Extends = Lookup(exC);
                     r.AddImplements(i.Implements.Select(Lookup));
                     break;
