@@ -24,8 +24,8 @@ using Utilities;
 
 public class DynamicLanguageCloner
 {
-    protected readonly LionWebVersions _lionWebVersion;
-    protected readonly Dictionary<IKeyed, DynamicIKeyed?> _dynamicMap = new(new KeyedIdentityComparer()) { };
+    private readonly LionWebVersions _lionWebVersion;
+    private readonly Dictionary<IKeyed, DynamicIKeyed?> _dynamicMap = new(new KeyedIdentityComparer()) { };
 
     public IReadOnlyDictionary<IKeyed, DynamicIKeyed> DynamicMap =>
         _dynamicMap

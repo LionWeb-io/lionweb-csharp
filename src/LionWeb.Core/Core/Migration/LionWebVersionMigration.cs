@@ -17,16 +17,10 @@
 
 namespace LionWeb.Core.Migration;
 
-using M2;
-using M3;
-
 public class LionWebVersionMigration(LionWebVersions from, LionWebVersions to) : IMigrationWithLionWebVersion
 {
-    private ILanguageRegistry _languageRegistry;
-    private readonly DynamicLanguageCloner _languageCloner = new NonRepeatingDynamicLanguageCloner(to);
-
     private bool _runMigration = true;
-    private string _serializedLionWebVersion;
+    private string? _serializedLionWebVersion;
 
     /// <inheritdoc />
     public required int Priority { get; init; }
@@ -34,7 +28,7 @@ public class LionWebVersionMigration(LionWebVersions from, LionWebVersions to) :
     /// <inheritdoc />
     public string SerializedLionWebVersion
     {
-        get => _serializedLionWebVersion;
+        get => _serializedLionWebVersion!;
         set
         {
             _runMigration = true;
@@ -45,82 +39,17 @@ public class LionWebVersionMigration(LionWebVersions from, LionWebVersions to) :
     /// <inheritdoc />
     public void Initialize(ILanguageRegistry languageRegistry)
     {
-        _languageRegistry = languageRegistry;
-        _languageCloner.Clone([from.BuiltIns, from.LionCore]);
     }
 
     /// <inheritdoc />
     public bool IsApplicable(ISet<LanguageIdentity> languageIdentities) =>
-        _runMigration && from.IsCompatibleWith(LionWebVersions.GetPureByVersionString(SerializedLionWebVersion));
-    // {
-    //     var isApplicable = _languageCloner.Clone(languageIdentities
-    //         .Select(li => _languageRegistry.TryGetLanguage(li, out var language) ? language : null)
-    //         .OfType<DynamicLanguage>()).Count != 0;
-    //     return isApplicable;
-    // }
+        _runMigration && _serializedLionWebVersion != null &&
+        from.IsCompatibleWith(LionWebVersions.GetPureByVersionString(SerializedLionWebVersion));
 
+    /// <inheritdoc />
     public MigrationResult Migrate(List<LenientNode> inputRootNodes)
     {
-        // foreach (var node in inputRootNodes.Descendants().ToList())
-        // {
-        //     node.SetClassifier(Map(node.GetClassifier()));
-        //     foreach (var feature in node.CollectAllSetFeatures().ToList())
-        //     {
-        //         var value = node.Get(feature);
-        //         var mapped = Map(feature);
-        //
-        //         if (mapped is Property prop)
-        //         {
-        //             value = (prop.Type, value) switch
-        //             {
-        //                 (Enumeration enm, Enum lit) => prop.Type.GetLanguage()
-        //                     .GetFactory()
-        //                     .GetEnumerationLiteral(enm.Literals.First(l => l.Key == lit.LionCoreKey())),
-        //
-        //                 (StructuredDataType, IStructuredDataTypeInstance inst) => From(inst),
-        //                 _ => value
-        //             };
-        //         }
-        //
-        //         node.Set(feature, null);
-        //         node.Set(mapped, value);
-        //     }
-        // }
-
         _runMigration = false;
         return new(true, inputRootNodes);
     }
-
-    private T Map<T>(T input) where T : IKeyed
-    {
-        return _languageRegistry.Lookup(input);
-        // if (_languageCloner.DynamicMap.TryGetValue(input, out var result) && result is T r)
-        // {
-        //     return r;
-        // }
-        //
-        // throw new KeyNotFoundException();
-    }
-
-    public IStructuredDataTypeInstance From(IStructuredDataTypeInstance instance)
-    {
-        var sdt = Map(instance.GetStructuredDataType());
-
-        return sdt.GetLanguage().GetFactory()
-            .CreateStructuredDataTypeInstance(sdt, new FieldValues(instance.CollectAllSetFields().Select(MapSdt)));
-
-        (Field f, object?) MapSdt(Field f) =>
-            (f, instance.Get(f) switch
-            {
-                IStructuredDataTypeInstance i => From(i),
-                var v => v
-            });
-    }
-
-    private class NonRepeatingDynamicLanguageCloner(LionWebVersions lionWebVersion)
-        : DynamicLanguageCloner(lionWebVersion)
-    {
-        public override Dictionary<LanguageIdentity, DynamicLanguage> Clone(IEnumerable<Language> languages) =>
-            base.Clone(languages.Where(l => !_dynamicMap.ContainsKey(l)));
-    };
 }
