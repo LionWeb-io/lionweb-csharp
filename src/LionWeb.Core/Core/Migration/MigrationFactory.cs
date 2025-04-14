@@ -20,6 +20,7 @@ namespace LionWeb.Core.Migration;
 using M2;
 using M3;
 
+/// Creates <see cref="LenientNode"/>s based on <paramref name="language"/>.
 public class MigrationFactory(Language language) : AbstractBaseNodeFactory(language)
 {
     /// <inheritdoc />

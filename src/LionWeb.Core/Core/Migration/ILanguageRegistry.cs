@@ -20,11 +20,22 @@ namespace LionWeb.Core.Migration;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
+/// Provides access to all languages known during the current <see cref="IModelMigrator">migration round</see>.
 public interface ILanguageRegistry
 {
+    /// Version of LionWeb standard used for migration.
+    LionWebVersions LionWebVersion { get; }
+    
+    /// Find language for <paramref name="languageIdentity"/>, if known.
+    /// <returns><c>true</c> if a language for <paramref name="languageIdentity"/> could be found; <c>false</c> otherwise.</returns>
     bool TryGetLanguage(LanguageIdentity languageIdentity, [NotNullWhen(true)] out DynamicLanguage? language);
     
+    /// Adds a new language to the current migration round.
+    /// Uses <see cref="LanguageIdentity.FromLanguage"/> if <paramref name="languageIdentity"/> is <c>null</c>.
+    /// <returns><c>true</c> if the language has been added to the list of languages; <c>false</c> if a language with <paramref name="languageIdentity"/> is already present.</returns>
     bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null);
 
+    /// Finds the equivalent of <paramref name="keyed"/> within the current round's languages.
+    /// <exception cref="ArgumentException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
     T Lookup<T>(T keyed) where T : IKeyed;
 }

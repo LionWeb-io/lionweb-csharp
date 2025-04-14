@@ -21,6 +21,8 @@ using M1;
 using M2;
 using M3;
 
+/// Integrates unknown language elements during deserialization as good as possible.
+/// <seealso cref="ModelMigrator"/>
 public class MigrationDeserializerHandler : DeserializerExceptionHandler
 {
     private readonly LionWebVersions _lionWebVersion;

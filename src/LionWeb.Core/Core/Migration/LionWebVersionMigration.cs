@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.Migration;
 
+/// Migrates to a newer <see cref="LionWebVersions">Version of LionWeb standard</see>.
+/// Only compatible with an <see cref="IModelMigrator"/> that uses a LionWebVersion compatible with <i>both</i> of <paramref name="from"/> and <param name="to"/>;
 public class LionWebVersionMigration(LionWebVersions from, LionWebVersions to) : IMigrationWithLionWebVersion
 {
     private bool _runMigration = true;
@@ -39,6 +41,8 @@ public class LionWebVersionMigration(LionWebVersions from, LionWebVersions to) :
     /// <inheritdoc />
     public void Initialize(ILanguageRegistry languageRegistry)
     {
+        from.AssureCompatible(languageRegistry.LionWebVersion);
+        to.AssureCompatible(languageRegistry.LionWebVersion);
     }
 
     /// <inheritdoc />

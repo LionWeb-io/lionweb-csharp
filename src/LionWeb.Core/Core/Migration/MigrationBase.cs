@@ -21,19 +21,16 @@ using M3;
 using System.Collections;
 using Utilities;
 
-public abstract class MigrationBase<T> : IMigration where T : Language
+/// Migrates instances from <paramref name="originLanguage"/> to <paramref name="targetLanguage"/>.
+/// Implementers MUST use the setters in this class instead of <see cref="IWritableNode.Set"/> to avoid mixing languages of different migration rounds.
+public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T targetLanguage) : IMigration
+    where T : Language
 {
-    protected readonly LanguageIdentity OriginLanguageIdentity;
-    protected readonly T _targetLang;
+    protected readonly LanguageIdentity OriginLanguageIdentity = originLanguage;
+    protected readonly T _targetLang = targetLanguage;
 
     private ILanguageRegistry? _languageRegistry;
     // private DynamicLanguage _originLanguage;
-
-    public MigrationBase(LanguageIdentity originLanguage, T targetLanguage)
-    {
-        OriginLanguageIdentity = originLanguage;
-        _targetLang = targetLanguage;
-    }
 
     public LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
 
@@ -60,10 +57,12 @@ public abstract class MigrationBase<T> : IMigration where T : Language
 
 
     /// <inheritdoc />
+    /// <returns><c>true</c> if <paramref name="languageIdentities"/> includes <see cref="originLanguage"/>.</returns>
     public virtual bool IsApplicable(ISet<LanguageIdentity> languageIdentities) =>
         languageIdentities.Contains(OriginLanguageIdentity);
 
     /// <inheritdoc />
+    /// Executes <see cref="MigrateInternal"/> and afterwards changes all usages of <see cref="originLanguage"/> to <see cref="targetLanguage"/>.
     public MigrationResult Migrate(List<LenientNode> inputRootNodes)
     {
         var result = MigrateInternal(inputRootNodes);
@@ -73,13 +72,14 @@ public abstract class MigrationBase<T> : IMigration where T : Language
             {
                 l.Key = _targetLang.Key;
                 l.Version = _targetLang.Version;
-                result = result with { changed = true };
+                result = result with { Changed = true };
             }
         }
 
         return result;
     }
 
+    /// Executes the actual migration.
     protected abstract MigrationResult MigrateInternal(List<LenientNode> inputRootNodes);
 
     #region Keyed identity helpers
@@ -217,14 +217,13 @@ public abstract class MigrationBase<T> : IMigration where T : Language
 
     #region LanguageEntity helpers
 
+    /// <inheritdoc cref="MigrationExtensions.AllInstancesOf"/>
     protected IEnumerable<LenientNode> AllInstancesOf(List<LenientNode> nodes, Classifier classifier) =>
         nodes
             .Descendants()
             .Where(n => classifier.EqualsIdentity(Lookup(n.GetClassifier())));
 
-    protected void SetProperty(IWritableNode node, Property property, object? value) =>
-        node.Set(Lookup(property), value);
-
+    /// <inheritdoc cref="ILanguageRegistry.Lookup{T}"/>
     protected T Lookup<T>(T keyed) where T : IKeyed
     {
         // if (keyed.GetLanguage().EqualsIdentity(_originLanguage))
@@ -235,24 +234,42 @@ public abstract class MigrationBase<T> : IMigration where T : Language
         return LanguageRegistry.Lookup(keyed);
     }
 
+    /// Sets <paramref name="node"/>'s <paramref name="property"/> to <paramref name="value"/>
+    /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
+    protected void SetProperty(IWritableNode node, Property property, object? value) =>
+        node.Set(Lookup(property), value);
+
+    /// Sets <paramref name="node"/>'s <paramref name="containment"/> to <paramref name="child"/>
+    /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> and
+    /// <see cref="ConvertSubtreeToLenient">node representations</see> during migration.
     protected void SetChild(LenientNode node, Containment containment, IWritableNode child) =>
         node.Set(Lookup(containment), ConvertSubtreeToLenient(child));
 
+    /// Sets <paramref name="node"/>'s <paramref name="containment"/> to <paramref name="children"/>
+    /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> and
+    /// <see cref="ConvertSubtreeToLenient">node representations</see> during migration.
     protected void SetChildren(LenientNode node, Containment containment, IEnumerable<IWritableNode> children) =>
         node.Set(Lookup(containment), children.Select(ConvertSubtreeToLenient));
 
+    /// Sets <paramref name="node"/>'s <paramref name="reference"/> to <paramref name="target"/>
+    /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
     protected void SetReference(LenientNode node, Reference reference, IReadableNode target) =>
         node.Set(Lookup(reference), target);
 
+    /// Sets <paramref name="node"/>'s <paramref name="reference"/> to <paramref name="targets"/>
+    /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
     protected void SetReferences(LenientNode node, Reference reference, IEnumerable<IReadableNode> targets) =>
         node.Set(Lookup(reference), targets);
 
+    
+    /// Converts <paramref name="node"/> and all <see cref="MigrationExtensions.Descendants"/> to <see cref="LenientNode"/>s.
     protected LenientNode ConvertSubtreeToLenient(IReadableNode node) => node switch
     {
         LenientNode l => l,
         var n => ConvertToLenient(n)
     };
 
+    /// Converts <paramref name="node"/> to a <see cref="LenientNode"/>, including all properties/property values, containments/children, and references.
     protected LenientNode ConvertToLenient(IReadableNode node)
     {
         var result = new LenientNode(node.GetId(), Lookup(node.GetClassifier()));
@@ -290,9 +307,12 @@ public abstract class MigrationBase<T> : IMigration where T : Language
 
     #endregion
 
+    /// <inheritdoc cref="IdUtils.NewId"/>
     protected virtual string NewId() =>
         IdUtils.NewId();
 
+    /// Creates a new node with classifier <paramref name="classifier"/> and node id <paramref name="id"/>,
+    /// or <see cref="NewId"/>.
     protected LenientNode CreateNode(Classifier classifier, string? id = null) =>
         new LenientNode(id ?? NewId(), classifier);
 }

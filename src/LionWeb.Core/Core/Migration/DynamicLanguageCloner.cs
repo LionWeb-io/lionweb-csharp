@@ -22,10 +22,10 @@ using M3;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
-public class DynamicLanguageCloner
+/// Clones Languages as <see cref="DynamicLanguage">DynamicLanguages</see> based on <paramref name="lionWebVersion"/>.
+public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
 {
-    private readonly LionWebVersions _lionWebVersion;
-    private readonly Dictionary<IKeyed, DynamicIKeyed?> _dynamicMap = new(new KeyedIdentityComparer()) { };
+    private readonly Dictionary<IKeyed, DynamicIKeyed?> _dynamicMap = new(new KeyedIdentityComparer());
 
     public IReadOnlyDictionary<IKeyed, DynamicIKeyed> DynamicMap =>
         _dynamicMap
@@ -33,11 +33,8 @@ public class DynamicLanguageCloner
             .ToDictionary()
             .AsReadOnly()!;
 
-    public DynamicLanguageCloner(LionWebVersions lionWebVersion)
-    {
-        _lionWebVersion = lionWebVersion;
-    }
-
+    /// Clones all of <paramref name="languages"/> as <see cref="DynamicLanguage">DynamicLanguages</see> based on <see cref="lionWebVersion"/>.
+    /// <paramref name="languages"/> MUST be self-contained, i.e. no language might refer to another language outside <paramref name="languages"/>.
     public virtual Dictionary<LanguageIdentity, DynamicLanguage> Clone(IEnumerable<Language> languages)
     {
         CreateClones(languages);
@@ -73,13 +70,13 @@ public class DynamicLanguageCloner
             StructuredDataType s => CloneStructuredDataType(s, dynamicLanguage),
             _ => throw new ArgumentOutOfRangeException(languageEntity.ToString())
         };
-        _dynamicMap[languageEntity] =  entity;
+        _dynamicMap[languageEntity] = entity;
         return entity;
     }
 
     private DynamicLanguage CloneLanguage(Language language)
     {
-        var result = new DynamicLanguage(language.GetId(), _lionWebVersion)
+        var result = new DynamicLanguage(language.GetId(), lionWebVersion)
         {
             Name = language.Name, Key = language.Key, Version = language.Version,
         };
@@ -90,14 +87,14 @@ public class DynamicLanguageCloner
 
     private DynamicAnnotation CloneAnnotation(Annotation a, DynamicLanguage language)
     {
-        var result = new DynamicAnnotation(a.GetId(), _lionWebVersion, language) { Name = a.Name, Key = a.Key };
+        var result = new DynamicAnnotation(a.GetId(), lionWebVersion, language) { Name = a.Name, Key = a.Key };
         result.AddFeatures(a.Features.Select(CloneFeature));
         return result;
     }
 
     private DynamicConcept CloneConcept(Concept c, DynamicLanguage language)
     {
-        var result = new DynamicConcept(c.GetId(), _lionWebVersion, language)
+        var result = new DynamicConcept(c.GetId(), lionWebVersion, language)
         {
             Name = c.Name, Key = c.Key, Abstract = c.Abstract, Partition = c.Partition,
         };
@@ -107,17 +104,17 @@ public class DynamicLanguageCloner
 
     private DynamicInterface CloneInterface(Interface i, DynamicLanguage language)
     {
-        var result = new DynamicInterface(i.GetId(), _lionWebVersion, language) { Name = i.Name, Key = i.Key };
+        var result = new DynamicInterface(i.GetId(), lionWebVersion, language) { Name = i.Name, Key = i.Key };
         result.AddFeatures(i.Features.Select(CloneFeature));
         return result;
     }
 
     private DynamicEnumeration CloneEnumeration(Enumeration enm, DynamicLanguage language)
     {
-        var result = new DynamicEnumeration(enm.GetId(), _lionWebVersion, language) { Name = enm.Name, Key = enm.Key };
+        var result = new DynamicEnumeration(enm.GetId(), lionWebVersion, language) { Name = enm.Name, Key = enm.Key };
         result.AddLiterals(enm.Literals.Select(lit =>
         {
-            var r = new DynamicEnumerationLiteral(lit.GetId(), _lionWebVersion, result)
+            var r = new DynamicEnumerationLiteral(lit.GetId(), lionWebVersion, result)
             {
                 Name = lit.Name, Key = lit.Key
             };
@@ -128,17 +125,17 @@ public class DynamicLanguageCloner
     }
 
     private DynamicLanguageEntity ClonePrimitiveType(PrimitiveType p, DynamicLanguage language) =>
-        new DynamicPrimitiveType(p.Key, _lionWebVersion, language) { Name = p.Name, Key = p.Key };
+        new DynamicPrimitiveType(p.Key, lionWebVersion, language) { Name = p.Name, Key = p.Key };
 
     private DynamicStructuredDataType CloneStructuredDataType(StructuredDataType sdt, DynamicLanguage language)
     {
-        var result = new DynamicStructuredDataType(sdt.Key, _lionWebVersion, language)
+        var result = new DynamicStructuredDataType(sdt.Key, lionWebVersion, language)
         {
             Name = sdt.Name, Key = sdt.Key
         };
         result.AddFields(sdt.Fields.Select<Field, DynamicField>(f =>
         {
-            var field = new DynamicField(f.GetId(), _lionWebVersion, result) { Name = f.Name, Key = f.Key };
+            var field = new DynamicField(f.GetId(), lionWebVersion, result) { Name = f.Name, Key = f.Key };
             _dynamicMap.Add(f, field);
             _dynamicMap.TryAdd(f.Type, null);
             return field;
@@ -150,15 +147,15 @@ public class DynamicLanguageCloner
     {
         var result = (DynamicFeature)(f switch
         {
-            Property p => new DynamicProperty(p.GetId(), _lionWebVersion, null)
+            Property p => new DynamicProperty(p.GetId(), lionWebVersion, null)
             {
                 Name = p.Name, Key = p.Key, Optional = p.Optional
             },
-            Containment c => new DynamicContainment(c.GetId(), _lionWebVersion, null)
+            Containment c => new DynamicContainment(c.GetId(), lionWebVersion, null)
             {
                 Name = c.Name, Key = c.Key, Optional = c.Optional, Multiple = c.Multiple
             },
-            Reference r => new DynamicReference(r.GetId(), _lionWebVersion, null)
+            Reference r => new DynamicReference(r.GetId(), lionWebVersion, null)
             {
                 Name = r.Name, Key = r.Name, Optional = r.Optional, Multiple = r.Multiple
             },
@@ -188,7 +185,7 @@ public class DynamicLanguageCloner
             {
                 language = CloneLanguage(inputLanguage);
             }
-            
+
             foreach ((IKeyed? keyed, _) in grouping)
             {
                 switch (keyed)
@@ -197,7 +194,7 @@ public class DynamicLanguageCloner
                         var clonedEntity = CloneEntity(entity, language);
                         language.AddEntities([clonedEntity]);
                         break;
-                    
+
                     default:
                         throw new ArgumentException(keyed.ToString());
                 }
@@ -218,12 +215,12 @@ public class DynamicLanguageCloner
                     break;
                 case (Annotation i, DynamicAnnotation r):
                     r.Annotates = Lookup(i.Annotates);
-                    if (i.TryGetExtends(out var exA) && exA != null)
+                    if (i.TryGetExtends(out var exA))
                         r.Extends = Lookup(exA);
                     r.AddImplements(i.Implements.Select(Lookup));
                     break;
                 case (Concept i, DynamicConcept r):
-                    if (i.TryGetExtends(out var exC) && exC != null)
+                    if (i.TryGetExtends(out var exC))
                         r.Extends = Lookup(exC);
                     r.AddImplements(i.Implements.Select(Lookup));
                     break;
@@ -254,14 +251,16 @@ public class DynamicLanguageCloner
         {
             throw new ArgumentException(typeof(T).FullName);
         }
-        
+
+        #pragma warning disable CS8631 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match constraint type.
         return TryLookup(keyed, out var result) ? result : throw new ArgumentException(keyed.ToString());
+        #pragma warning restore CS8631 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match constraint type.
     }
 
     private bool TryLookup<T>(T keyed, [NotNullWhen(true)] out T? result) where T : IKeyed
     {
-        if (keyed.GetLanguage().EqualsIdentity(_lionWebVersion.BuiltIns) ||
-            keyed.GetLanguage().EqualsIdentity(_lionWebVersion.LionCore))
+        if (keyed.GetLanguage().EqualsIdentity(lionWebVersion.BuiltIns) ||
+            keyed.GetLanguage().EqualsIdentity(lionWebVersion.LionCore))
         {
             result = keyed;
             return true;
@@ -275,7 +274,7 @@ public class DynamicLanguageCloner
                 return true;
             }
         }
-        
+
         result = default;
         return false;
     }
