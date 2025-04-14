@@ -965,7 +965,7 @@ public readonly record struct DynamicStructuredDataTypeInstance : IStructuredDat
 
     /// <inheritdoc />
     public object? Get(Field field) =>
-        _fields.FirstOrDefault(v => v.field == field);
+        _fields.FirstOrDefault(v => v.field == field).value;
 
     /// <inheritdoc />
     public bool Equals(DynamicStructuredDataTypeInstance other) =>
