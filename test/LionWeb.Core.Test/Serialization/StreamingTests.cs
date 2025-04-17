@@ -96,7 +96,11 @@ public class StreamingTests
         using Stream stream =
             File.OpenRead("output.json");
 
-        var deserializer = new Deserializer(LionWebVersions.v2024_1, compressedIdConfig: new(KeepOriginal: true));
+        var deserializer = new DeserializerBuilder()
+            .WithLionWebVersion(LionWebVersions.v2024_1)
+            .WithCompressedIds(new(KeepOriginal: true))
+            .Build();
+
         deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);
         deserializer.RegisterInstantiatedLanguage(_language);
 
