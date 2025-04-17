@@ -10,6 +10,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ### Added
 ### Fixed
+* `LenientNode` now works properly if keys of features change.
 ### Changed
 ### Removed
 ### Deprecated
