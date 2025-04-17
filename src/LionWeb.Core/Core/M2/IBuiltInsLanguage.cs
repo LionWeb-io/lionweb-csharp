@@ -75,7 +75,7 @@ public interface INamed : IReadableNode
     /// </summary>
     /// <param name="name">Value of <see cref="Name"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Name"/> is set; <c>false</c> otherwise.</returns>
-    public bool TryGetName([MaybeNullWhen(false)] out string? name);
+    public bool TryGetName([NotNullWhen(true)] out string? name);
 }
 
 /// Writable variant of <see cref="INamed"/>.
