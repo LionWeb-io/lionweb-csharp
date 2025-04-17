@@ -10,6 +10,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ### Added
 ### Fixed
+* Made `M1Extensions.ReplaceWith()` work for annotation instances.
 ### Changed
 ### Removed
 ### Deprecated
