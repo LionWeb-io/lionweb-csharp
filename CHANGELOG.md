@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [Unreleased]
 
 ### Added
+* Added `EnumerationLiteralIdentityComparer` and `KeyedIdentityComparer`.
 ### Fixed
 ### Changed
 ### Removed
