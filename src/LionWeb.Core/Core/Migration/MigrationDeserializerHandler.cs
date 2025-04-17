@@ -30,6 +30,7 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
     private readonly List<DynamicLanguage> _languages;
     private readonly Dictionary<ICompressedId, List<DynamicLanguage>> _languageKeys = [];
 
+    /// <inheritdoc />
     public MigrationDeserializerHandler(LionWebVersions lionWebVersion, IEnumerable<DynamicLanguage> languages)
     {
         _lionWebVersion = lionWebVersion;
@@ -53,10 +54,9 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
         }
     }
 
+    /// <inheritdoc />
     public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id)
     {
-        // Console.WriteLine($"UnknownClassifier: {classifier}");
-
         DynamicLanguage? lang = null;
         if (_languageKeys.TryGetValue(classifier.Language, out var languages))
         {
@@ -85,11 +85,10 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
         return result;
     }
 
+    /// <inheritdoc />
     public override Feature? UnknownFeature<TFeature>(CompressedMetaPointer feature, Classifier classifier,
         IReadableNode node)
     {
-        // Console.WriteLine($"UnknownFeature: {feature}");
-
         DynamicFeature? result = null;
         if (typeof(TFeature).IsAssignableFrom(typeof(Property)))
         {
@@ -144,6 +143,7 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
         return base.UnknownDatatype(value, datatype, property, node);
     }
 
+    /// <inheritdoc />
     public override IWritableNode? InvalidAnnotation(IReadableNode annotation, IReadableNode? node)
     {
         var oldClassifier = (DynamicClassifier)annotation.GetClassifier();
@@ -163,6 +163,7 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
         return lenientAnnotationInstance;
     }
 
+    /// <inheritdoc />
     public override IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node)
     {
         Console.WriteLine("bad");

@@ -37,7 +37,8 @@ public interface IMigration
     /// <summary>
     /// Runs the actual migration.
     /// </summary>
-    /// <param name="inputRootNodes">List of <i>root nodes</i> to migrate. Root nodes are all nodes without a <see cref="IReadableNode.GetParent">parent</see>.</param>
+    /// <param name="inputRootNodes">List of <i>root nodes</i> to migrate.
+    /// Root nodes are all nodes without a <see cref="IReadableNode.GetParent">parent</see>.</param>
     // TODO: Maybe rename to Execute / Run / Apply?
     // What happens if return=false and outputRootNodes != inputRootNodes?
     MigrationResult Migrate(List<LenientNode> inputRootNodes);

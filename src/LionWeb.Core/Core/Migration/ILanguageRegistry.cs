@@ -32,7 +32,8 @@ public interface ILanguageRegistry
     
     /// Adds a new language to the current migration round.
     /// Uses <see cref="LanguageIdentity.FromLanguage"/> if <paramref name="languageIdentity"/> is <c>null</c>.
-    /// <returns><c>true</c> if the language has been added to the list of languages; <c>false</c> if a language with <paramref name="languageIdentity"/> is already present.</returns>
+    /// <returns><c>true</c> if the language has been added to the list of languages;
+    /// <c>false</c> if a language with <paramref name="languageIdentity"/> is already present.</returns>
     bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null);
 
     /// Finds the equivalent of <paramref name="keyed"/> within the current round's languages.

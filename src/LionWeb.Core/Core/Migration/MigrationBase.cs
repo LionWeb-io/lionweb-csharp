@@ -23,16 +23,15 @@ using Utilities;
 
 /// Migrates instances from <paramref name="originLanguage"/> to <paramref name="targetLanguage"/>.
 /// Implementers MUST use the setters in this class instead of <see cref="IWritableNode.Set"/> to avoid mixing languages of different migration rounds.
-public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T targetLanguage) : IMigration
-    where T : Language
+public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLanguage, TTargetLanguage targetLanguage) : IMigration
+    where TTargetLanguage : Language
 {
     protected readonly LanguageIdentity OriginLanguageIdentity = originLanguage;
-    protected readonly T _targetLang = targetLanguage;
+    protected readonly TTargetLanguage _targetLang = targetLanguage;
 
     private ILanguageRegistry? _languageRegistry;
-    // private DynamicLanguage _originLanguage;
 
-    public LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
+    protected LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
 
     protected ILanguageRegistry LanguageRegistry
     {
@@ -44,16 +43,8 @@ public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T target
     public virtual int Priority => IMigration.DefaultPriority;
 
     /// <inheritdoc />
-    public virtual void Initialize(ILanguageRegistry languageRegistry)
-    {
+    public virtual void Initialize(ILanguageRegistry languageRegistry) =>
         LanguageRegistry = languageRegistry;
-        // if (languageRegistry.TryGetLanguage(LanguageIdentity.FromLanguage(_targetLang), out var dynamicTargetLang))
-        // {
-        //     _originLanguage = Cloner.Clone(dynamicTargetLang);
-        //     _originLanguage.Key = OriginLanguageIdentity.Key;
-        //     _originLanguage.Version = OriginLanguageIdentity.Version;
-        // }
-    }
 
 
     /// <inheritdoc />
@@ -62,19 +53,23 @@ public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T target
         languageIdentities.Contains(OriginLanguageIdentity);
 
     /// <inheritdoc />
-    /// Executes <see cref="MigrateInternal"/> and afterwards changes all usages of <see cref="originLanguage"/> to <see cref="targetLanguage"/>.
+    /// Executes <see cref="MigrateInternal"/> and afterward changes all usages of <see cref="originLanguage"/> to <see cref="targetLanguage"/>.
     public MigrationResult Migrate(List<LenientNode> inputRootNodes)
     {
         var result = MigrateInternal(inputRootNodes);
-        if (LanguageRegistry.TryGetLanguage(OriginLanguageIdentity, out var l))
+        if (!LanguageRegistry.TryGetLanguage(OriginLanguageIdentity, out var originLanguage))
         {
-            if (l.Key != _targetLang.Key || l.Version != _targetLang.Version)
-            {
-                l.Key = _targetLang.Key;
-                l.Version = _targetLang.Version;
-                result = result with { Changed = true };
-            }
+            return result;
         }
+
+        if (originLanguage.Key == _targetLang.Key && originLanguage.Version == _targetLang.Version)
+        {
+            return result;
+        }
+
+        originLanguage.Key = _targetLang.Key;
+        originLanguage.Version = _targetLang.Version;
+        result = result with { Changed = true };
 
         return result;
     }
@@ -110,7 +105,7 @@ public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T target
 
         if (node.CollectAllSetFeatures().Contains(containment, new FeatureIdentityComparer()))
         {
-            children = (node.Get(containment) as IEnumerable)?.Cast<LenientNode>().ToList();
+            children = (node.Get(containment) as IEnumerable)?.Cast<LenientNode>().ToList()!;
             return true;
         }
 
@@ -130,7 +125,7 @@ public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T target
 
         if (node.CollectAllSetFeatures().Contains(reference, new FeatureIdentityComparer()))
         {
-            targets = (node.Get(reference) as IEnumerable)?.Cast<IReadableNode>().ToList();
+            targets = (node.Get(reference) as IEnumerable)?.Cast<IReadableNode>().ToList()!;
             return true;
         }
 
@@ -148,7 +143,10 @@ public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T target
     {
         var classifier = TempClassifier(featureIdentity.Classifier, featureIdentity.Key + "-Concept");
 
-        var existing = classifier.Features.OfType<DynamicProperty>().FirstOrDefault(f => f.Key == featureIdentity.Key);
+        var existing = classifier
+            .Features
+            .OfType<DynamicProperty>()
+            .FirstOrDefault(f => f.Key == featureIdentity.Key);
         if (existing != null)
             return existing;
 
@@ -162,7 +160,9 @@ public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T target
     {
         var classifier = TempClassifier(featureIdentity.Classifier, featureIdentity.Key + "-Concept");
 
-        var existing = classifier.Features.OfType<DynamicContainment>()
+        var existing = classifier
+            .Features
+            .OfType<DynamicContainment>()
             .FirstOrDefault(f => f.Key == featureIdentity.Key);
         if (existing != null)
             return existing;
@@ -177,7 +177,10 @@ public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T target
     {
         var classifier = TempClassifier(featureIdentity.Classifier, featureIdentity.Key + "-Concept");
 
-        var existing = classifier.Features.OfType<DynamicReference>().FirstOrDefault(f => f.Key == featureIdentity.Key);
+        var existing = classifier
+            .Features
+            .OfType<DynamicReference>()
+            .FirstOrDefault(f => f.Key == featureIdentity.Key);
         if (existing != null)
             return existing;
 
@@ -191,7 +194,9 @@ public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T target
     {
         var language = TempLanguage(classifierIdentity.Language, id != null ? id + "-Language" : null);
 
-        var existing = language.Entities.OfType<DynamicClassifier>()
+        var existing = language
+            .Entities
+            .OfType<DynamicClassifier>()
             .FirstOrDefault(e => e.Key == classifierIdentity.Key);
         if (existing != null)
             return existing;
@@ -224,15 +229,8 @@ public abstract class MigrationBase<T>(LanguageIdentity originLanguage, T target
             .Where(n => classifier.EqualsIdentity(Lookup(n.GetClassifier())));
 
     /// <inheritdoc cref="ILanguageRegistry.Lookup{T}"/>
-    protected T Lookup<T>(T keyed) where T : IKeyed
-    {
-        // if (keyed.GetLanguage().EqualsIdentity(_originLanguage))
-        // {
-        //     return MigrationExtensions.Lookup(keyed, _targetLang);
-        // }
-
-        return LanguageRegistry.Lookup(keyed);
-    }
+    protected T Lookup<T>(T keyed) where T : IKeyed =>
+        LanguageRegistry.Lookup(keyed);
 
     /// Sets <paramref name="node"/>'s <paramref name="property"/> to <paramref name="value"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.

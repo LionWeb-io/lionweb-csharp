@@ -166,8 +166,6 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
         return result;
     }
 
-    #endregion
-
     private void CloneReferencedElements()
     {
         var unclonedReferencedElements = _dynamicMap
@@ -201,6 +199,8 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
             }
         }
     }
+
+    #endregion
 
     #region References
 

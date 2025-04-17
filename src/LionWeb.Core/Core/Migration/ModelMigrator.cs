@@ -40,7 +40,8 @@ public interface IModelMigrator
     void RegisterMigration(IMigration migration);
     
     /// <summary>
-    /// Execute the migration on all nodes from <paramref name="inputUtf8JsonStream"/>, and store the result to <paramref name="migratedUtf8JsonStream"/>.
+    /// Execute the migration on all nodes from <paramref name="inputUtf8JsonStream"/>,
+    /// and store the result to <paramref name="migratedUtf8JsonStream"/>.
     /// </summary>
     /// <returns><c>true</c> if the migration applied any changes; <c>false</c> otherwise.</returns>
     Task<bool> Migrate(Stream inputUtf8JsonStream, Stream migratedUtf8JsonStream);
@@ -223,9 +224,9 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
         Language inputLanguage = keyed.GetLanguage();
 
         Language language;
-        if (TryGetLanguage(LanguageIdentity.FromLanguage(inputLanguage), out var l))
+        if (TryGetLanguage(LanguageIdentity.FromLanguage(inputLanguage), out var inputLanguageEquivalent))
         {
-            language = l;
+            language = inputLanguageEquivalent;
         } else
         {
             var sameKey = _dynamicLanguages

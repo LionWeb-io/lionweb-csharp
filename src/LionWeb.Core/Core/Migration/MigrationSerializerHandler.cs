@@ -22,6 +22,7 @@ using M3;
 
 public class MigrationSerializerHandler : SerializerExceptionHandler
 {
+    /// <inheritdoc />
     public override Language? DuplicateUsedLanguage(Language a, Language b) => 
         a.Entities.Count >= b.Entities.Count ? a : b;
 }
