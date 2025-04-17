@@ -10,6 +10,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ### Added
 ### Fixed
+* Deserializer can now create instances of languages not registered beforehand.
 ### Changed
 ### Removed
 ### Deprecated
