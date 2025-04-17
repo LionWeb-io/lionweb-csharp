@@ -19,11 +19,11 @@ namespace LionWeb.Core.Test.Utilities.Cloner;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TinyRefLang;
 
 [TestClass]
 public class SingleRefClonerTests
 {
-
     [TestMethod]
     public void IncludedBefore()
     {
@@ -153,5 +153,20 @@ public class SingleRefClonerTests
 
         Assert.AreSame(line, actualDuplicate.Source);
         Assert.AreSame(line.GetId(), actualDuplicate.Source.GetId());
+    }
+
+    [TestMethod]
+    public void ReadOnlyTarget_External()
+    {
+        var target = TinyRefLangLanguage.Instance.GetFactory().CreateMyConcept();
+
+        var node = TinyRefLangLanguage.Instance.GetFactory().CreateMyConcept();
+        node.SingularRef = target;
+
+        var clone = Cloner.Clone(node);
+
+        var cloned = clone.SingularRef;
+
+        Assert.AreSame(target, cloned);
     }
 }
