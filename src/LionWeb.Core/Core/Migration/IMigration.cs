@@ -69,7 +69,7 @@ public record MigrationResult(bool Changed, List<LenientNode> OutputRootNodes)
             case (_, null):
                 throw new ArgumentException($"{nameof(OutputRootNodes)} must not be null");
 
-            case (false, _) when !OutputRootNodes.SequenceEqual(inputRootNodes):
+            case (false, _) when !OutputRootNodes.SequenceEqual(inputRootNodes, LenientNode.LenientNodeComparer):
                 throw new ArgumentException(
                     $"{nameof(OutputRootNodes)} must be equal to {nameof(inputRootNodes)} if {nameof(Changed)} is false");
         }
