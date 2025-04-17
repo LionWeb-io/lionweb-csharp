@@ -35,10 +35,10 @@ public interface IModelMigrator
 {
     /// Maximum number of rounds to try.
     int MaxMigrationRounds { get; init; }
-    
+
     /// Runs <paramref name="migration"/>, if <see cref="IMigration.IsApplicable">applicable</see>.
     void RegisterMigration(IMigration migration);
-    
+
     /// <summary>
     /// Execute the migration on all nodes from <paramref name="inputUtf8JsonStream"/>,
     /// and store the result to <paramref name="migratedUtf8JsonStream"/>.
@@ -83,24 +83,8 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     /// <inheritdoc />
     public async Task<bool> Migrate(Stream inputUtf8JsonStream, Stream migratedUtf8JsonStream)
     {
-        DeserializerBuilder builder = SetupDeserializerBuilder();
-
-        string? lionWebVersion = null;
-        
-        var deserializer = builder.Build();
-        var loaded = await JsonUtils.ReadNodesFromStreamAsync(inputUtf8JsonStream, deserializer, serializedVersion =>
-        {
-            lionWebVersion = serializedVersion;
-            deserializer.LionWebVersion.AssureCompatible(serializedVersion);
-        });
-
-        if (lionWebVersion != null)
-        {
-            foreach (var migration in _migrations.OfType<IMigrationWithLionWebVersion>())
-            {
-                migration.SerializedLionWebVersion = lionWebVersion;
-            }
-        }
+        (List<IReadableNode> loaded, string? lionWebVersion) = await Deserialize(inputUtf8JsonStream);
+        UpdateSerializedLionWebVersion(lionWebVersion);
 
         int migrationRound = 0;
         bool anyChange = false;
@@ -109,10 +93,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
 
         do
         {
-            if (migrationRound >= MaxMigrationRounds)
-            {
-                throw new ArgumentException($"Exceeded {MaxMigrationRounds} migration rounds.");
-            }
+            CheckMigrationRounds(migrationRound);
 
             migrationRound++;
             changeInThisRound = false;
@@ -123,7 +104,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
 
             foreach (var migration in applicableMigrations)
             {
-                (var b, rootNodes) = migration.Migrate(rootNodes);
+                (var b, rootNodes) = migration.Migrate(rootNodes).Validate(rootNodes);
                 changeInThisRound |= b;
                 ValidateRootNodes(rootNodes, migration);
             }
@@ -131,25 +112,49 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
             anyChange |= changeInThisRound;
         } while (changeInThisRound);
 
-        var serializer = new Serializer(LionWebVersion)
-        {
-            SerializeEmptyFeatures = SerializeEmptyFeatures, Handler = new MigrationSerializerHandler()
-        };
-
-        var allNodes = rootNodes.Descendants().ToList();
-        JsonUtils.WriteNodesToStream(migratedUtf8JsonStream, serializer, allNodes);
+        Serialize(migratedUtf8JsonStream, rootNodes);
 
         return anyChange;
     }
 
-    private DeserializerBuilder SetupDeserializerBuilder()
+    private async Task<(List<IReadableNode> loaded, string? lionWebVersion)> Deserialize(Stream inputUtf8JsonStream)
     {
-        var builder = new DeserializerBuilder()
+        string? lionWebVersion = null;
+        var deserializer = SetupDeserializerBuilder().Build();
+
+        var loaded = await JsonUtils.ReadNodesFromStreamAsync(inputUtf8JsonStream, deserializer, serializedVersion =>
+        {
+            lionWebVersion = serializedVersion;
+            deserializer.LionWebVersion.AssureCompatible(serializedVersion);
+        });
+
+        return (loaded, lionWebVersion);
+    }
+
+    private DeserializerBuilder SetupDeserializerBuilder() =>
+        new DeserializerBuilder()
             .WithCompressedIds(CompressedIdConfig)
             .WithLionWebVersion(LionWebVersion)
             .WithHandler(new MigrationDeserializerHandler(LionWebVersion, _dynamicLanguages.Values))
             .WithLanguages(_dynamicLanguages.Values);
-        return builder;
+
+    private void UpdateSerializedLionWebVersion(string? lionWebVersion)
+    {
+        if (lionWebVersion == null)
+            return;
+
+        foreach (var migration in _migrations.OfType<IMigrationWithLionWebVersion>())
+        {
+            migration.SerializedLionWebVersion = lionWebVersion;
+        }
+    }
+
+    private void CheckMigrationRounds(int migrationRound)
+    {
+        if (migrationRound >= MaxMigrationRounds)
+        {
+            throw new ArgumentException($"Exceeded {MaxMigrationRounds} migration rounds.");
+        }
     }
 
     private Dictionary<LanguageIdentity, DynamicLanguage> CollectUsedLanguages(List<LenientNode> nodes) =>
@@ -163,9 +168,8 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
             .Distinct()
             .ToDictionary(LanguageIdentity.FromLanguage, l => l);
 
-    private IOrderedEnumerable<IMigration>
-        SelectApplicableMigrations(ImmutableHashSet<LanguageIdentity> usedLanguages) =>
-        _migrations
+    private IOrderedEnumerable<IMigration> SelectApplicableMigrations(ImmutableHashSet<LanguageIdentity> usedLanguages)
+        => _migrations
             .Where(m => m.IsApplicable(usedLanguages))
             .OrderBy(m => m.Priority);
 
@@ -198,6 +202,17 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
             string.Join(", ", nodes.Select(n => n.GetId()));
     }
 
+    private void Serialize(Stream migratedUtf8JsonStream, List<LenientNode> rootNodes)
+    {
+        var serializer = new Serializer(LionWebVersion)
+        {
+            SerializeEmptyFeatures = SerializeEmptyFeatures, Handler = new MigrationSerializerHandler()
+        };
+
+        var allNodes = rootNodes.Descendants().ToList();
+        JsonUtils.WriteNodesToStream(migratedUtf8JsonStream, serializer, allNodes);
+    }
+
     /// <inheritdoc />
     public void RegisterMigration(IMigration migration)
     {
@@ -212,7 +227,8 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
 
     /// <inheritdoc />
     public bool TryGetLanguage(LanguageIdentity languageIdentity, [NotNullWhen(true)] out DynamicLanguage? language) =>
-        _dynamicLanguages.TryGetValue(languageIdentity, out language) || _dynamicInputLanguages.TryGetValue(languageIdentity, out language);
+        _dynamicLanguages.TryGetValue(languageIdentity, out language) ||
+        _dynamicInputLanguages.TryGetValue(languageIdentity, out language);
 
     /// <inheritdoc />
     public bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null) =>
@@ -245,7 +261,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
 
         return MigrationExtensions.Lookup(keyed, language);
     }
-    
+
     #endregion
 }
 

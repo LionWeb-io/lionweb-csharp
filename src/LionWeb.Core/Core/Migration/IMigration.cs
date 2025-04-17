@@ -58,4 +58,22 @@ public interface IMigrationWithLionWebVersion : IMigration
 /// <param name="Changed">Whether the migration applied any changes.</param>
 /// <param name="OutputRootNodes">All <i>root nodes</i> after migration.
 /// Might be the same, more, or less than <see cref="IMigration.Migrate">inputRootNodes</see>.</param>
-public record MigrationResult(bool Changed, List<LenientNode> OutputRootNodes);
+public record MigrationResult(bool Changed, List<LenientNode> OutputRootNodes)
+{
+    /// Checks this MigrationResult for internal consistency.
+    /// <exception cref="ArgumentException">If this MigrationResult is inconsistent.</exception>
+    public MigrationResult Validate(List<LenientNode> inputRootNodes)
+    {
+        switch (Changed, OutputRootNodes)
+        {
+            case (_, null):
+                throw new ArgumentException($"{nameof(OutputRootNodes)} must not be null");
+
+            case (false, _) when !OutputRootNodes.SequenceEqual(inputRootNodes):
+                throw new ArgumentException(
+                    $"{nameof(OutputRootNodes)} must be equal to {nameof(inputRootNodes)} if {nameof(Changed)} is false");
+        }
+
+        return this;
+    }
+};
