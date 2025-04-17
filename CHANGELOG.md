@@ -10,6 +10,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ### Added
 ### Fixed
+* Use `[NotNullWhen]` instead of `[MaybeNullWhen]` attributes for _TryGet_-like out parameters.
 ### Changed
 ### Removed
 ### Deprecated

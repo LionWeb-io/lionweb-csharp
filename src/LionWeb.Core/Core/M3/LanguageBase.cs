@@ -20,6 +20,7 @@
 namespace LionWeb.Core.M3;
 
 using M2;
+using System.Diagnostics.CodeAnalysis;
 
 /// <inheritdoc cref="Language"/>
 public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lionWebVersion)
@@ -75,7 +76,7 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     public abstract string Name { get; }
 
     /// <inheritdoc />
-    public bool TryGetName(out string? name)
+    public bool TryGetName([NotNullWhen(true)] out string? name)
     {
         name = Name;
         return name != null;
@@ -85,7 +86,7 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     public abstract string Key { get; }
 
     /// <inheritdoc />
-    public bool TryGetKey(out string? key)
+    public bool TryGetKey([NotNullWhen(true)] out string? key)
     {
         key = Key;
         return key != null;
@@ -95,7 +96,7 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     public abstract string Version { get; }
 
     /// <inheritdoc />
-    public bool TryGetVersion(out string? version)
+    public bool TryGetVersion([NotNullWhen(true)] out string? version)
     {
         version = Version;
         return version != null;
@@ -158,7 +159,7 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
     public required string Name { get; init; }
 
     /// <inheritdoc />
-    public bool TryGetName(out string? name)
+    public bool TryGetName([NotNullWhen(true)] out string? name)
     {
         name = Name;
         return name != null;
@@ -168,7 +169,7 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
     public required string Key { get; init; }
 
     /// <inheritdoc />
-    public bool TryGetKey(out string? key)
+    public bool TryGetKey([NotNullWhen(true)] out string? key)
     {
         key = Key;
         return key != null;

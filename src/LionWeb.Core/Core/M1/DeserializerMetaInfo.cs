@@ -89,16 +89,16 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
     }
 
     private bool LookupClassifier(CompressedMetaPointer compressedMetaPointer,
-        [MaybeNullWhen(false)] out Classifier classifier) =>
+        [NotNullWhen(true)] out Classifier? classifier) =>
         _classifiers.TryGetValue(compressedMetaPointer, out classifier) ||
         SelectVersion(compressedMetaPointer, out classifier);
 
-    private bool SelectVersion<T>(CompressedMetaPointer compressedMetaPointer, [MaybeNullWhen(false)] out T result)
+    private bool SelectVersion<T>(CompressedMetaPointer compressedMetaPointer, [NotNullWhen(true)] out T? result)
         where T : class, IKeyed
     {
         if (!_languagesByKey.TryGetValue(compressedMetaPointer.Language, out var languages))
         {
-            result = default;
+            result = null;
             return false;
         }
 
@@ -107,10 +107,10 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
     }
 
     private bool LookupFeature(CompressedMetaPointer compressedMetaPointer,
-        [MaybeNullWhen(false)] out Feature feature) =>
+        [NotNullWhen(true)] out Feature? feature) =>
         _features.TryGetValue(compressedMetaPointer, out feature) || SelectVersion(compressedMetaPointer, out feature);
 
-    internal bool LookupFactory(Language language, [MaybeNullWhen(false)] out INodeFactory factory) =>
+    internal bool LookupFactory(Language language, [NotNullWhen(true)] out INodeFactory? factory) =>
         _language2NodeFactory.TryGetValue(language, out factory);
 
     internal ICompressedId Compress(string id) =>
