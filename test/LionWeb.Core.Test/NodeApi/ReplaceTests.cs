@@ -21,7 +21,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class ReplaceTests
+public class ReplaceTests_Containment
 {
     [TestMethod]
     public void Beginning()
@@ -123,5 +123,74 @@ public class ReplaceTests
             ]
         };
         Assert.ThrowsException<InvalidValueException>(() => circle.ReplaceWith((INode)null));
+    }
+}
+
+[TestClass]
+public class ReplaceTests_Annotation
+{
+    [TestMethod]
+    public void Beginning()
+    {
+        var doc = new Documentation("circ0");
+        var bom = new BillOfMaterials("off0");
+
+        var shape = new Circle("geom");
+        shape.AddAnnotations([doc, bom]);
+        var ann = new Documentation("line");
+        doc.ReplaceWith(ann);
+
+        Assert.AreEqual(shape, ann.GetParent());
+        Assert.IsNull(doc.GetParent());
+
+        CollectionAssert.AreEqual(new List<INode> { ann, bom }, shape.GetAnnotations().ToList());
+    }
+
+    [TestMethod]
+    public void Middle()
+    {
+        var doc = new Documentation("circ0");
+        var bom = new BillOfMaterials("off0");
+        var bom2 = new BillOfMaterials("comp0");
+
+        var shape = new Circle("geom");
+        shape.AddAnnotations([doc, bom, bom2]);
+        var ann = new Documentation("line");
+        bom.ReplaceWith(ann);
+
+        Assert.AreEqual(shape, ann.GetParent());
+        Assert.IsNull(bom.GetParent());
+
+        CollectionAssert.AreEqual(new List<INode> { doc, ann, bom2 }, shape.GetAnnotations().ToList());
+    }
+
+    [TestMethod]
+    public void NoParent()
+    {
+        var doc = new Documentation("circ0");
+        var bom = new BillOfMaterials("line");
+
+        Assert.ThrowsException<TreeShapeException>(() => doc.ReplaceWith(bom));
+    }
+
+    [TestMethod]
+    public void NonFittingType()
+    {
+        var doc = new Documentation("circ0");
+
+        var shape = new Line("geom");
+        shape.AddAnnotations([doc]);
+        var coord = new Coord("coord");
+        Assert.ThrowsException<InvalidValueException>(() => doc.ReplaceWith(coord));
+    }
+
+    [TestMethod]
+    public void Null()
+    {
+        var doc = new Documentation("circ0");
+
+        var shape = new Line("geom");
+        shape.AddAnnotations([doc]);
+        Assert.ThrowsException<InvalidValueException>(() => doc.ReplaceWith((INode)null));
     }
 }
