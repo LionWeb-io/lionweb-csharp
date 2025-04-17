@@ -34,7 +34,8 @@ public class LanguageSerializationTests
     [TestMethod]
     public void shapes_language_with_external_annotations()
     {
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([ShapesLanguage.Instance]);
 
         var redeserialized = ILanguageDeserializerExtensions.Deserialize(serializationChunk);
         Language redeserializedShapes = redeserialized.Cast<INode>().OfType<Language>().First();
@@ -55,7 +56,8 @@ public class LanguageSerializationTests
         annInst.Set(age, 23);
         redeserializedCircle.AddAnnotations([annInst]);
 
-        var serializationChunk2 = new Serializer(_lionWebVersion).SerializeToChunk([redeserializedShapes]);
+        var serializationChunk2 = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([redeserializedShapes]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
         var redeserialized2 = ILanguageDeserializerExtensions.Deserialize(serializationChunk2, [language]);
         Language redeserializedShapes2 = redeserialized2.Cast<INode>().OfType<Language>().First();
@@ -70,7 +72,8 @@ public class LanguageSerializationTests
     [TestMethod]
     public void shapes_language_together_with_annotations()
     {
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([ShapesLanguage.Instance]);
 
         var redeserialized =
             new LanguageDeserializer(_lionWebVersion, compressedIdConfig: new(KeepOriginal: true))
@@ -101,7 +104,8 @@ public class LanguageSerializationTests
 
         redeserializedCircle.AddAnnotations([annInst]);
 
-        var serializationChunk2 = new Serializer(_lionWebVersion).SerializeToChunk([redeserializedShapes, language]);
+        var serializationChunk2 = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([redeserializedShapes, language]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
         var redeserialized2 =
             new LanguageDeserializer(_lionWebVersion, compressedIdConfig: new(KeepOriginal: true)).Deserialize(
@@ -119,7 +123,8 @@ public class LanguageSerializationTests
     [TestMethod]
     public void LionCore()
     {
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([_m3]);
+        var serializationChunk =
+            new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().SerializeToChunk([_m3]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
@@ -147,9 +152,13 @@ public class LanguageSerializationTests
             LionWebVersions.v2024_1.LionCore,
             LionWebVersions.v2024_1.BuiltIns
         ];
-        var chunk =
-            new Serializer(LionWebVersions.v2024_1_Compatible) { CompressedIdConfig = new(KeepOriginal: true) }
-                .SerializeToChunk(input);
+
+        var serializer = new SerializerBuilder()
+            .WithLionWebVersion(LionWebVersions.v2024_1_Compatible)
+            .WithCompressedIds(new(KeepOriginal: true))
+            .Build();
+
+        var chunk = serializer.SerializeToChunk(input);
 
         var deserializer =
             new LanguageDeserializer(LionWebVersions.v2024_1_Compatible, new SkipDeserializationHandler());
@@ -179,7 +188,8 @@ public class LanguageSerializationTests
     [TestMethod]
     public void shapes_language()
     {
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([ShapesLanguage.Instance]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([ShapesLanguage.Instance]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         var redeserialized = ILanguageDeserializerExtensions.Deserialize(serializationChunk);

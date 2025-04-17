@@ -32,7 +32,8 @@ public class KeywordLangTests
         LionWebVersions lionWebVersion = LionWebVersions.v2024_1;
 
         List<IReadableNode?> input = [ClassLanguage.Instance];
-        SerializationChunk chunk = new Serializer(lionWebVersion).SerializeToChunk(input);
+        SerializationChunk chunk = new SerializerBuilder().WithLionWebVersion(lionWebVersion).Build()
+            .SerializeToChunk(input);
 
         List<IReadableNode?> deserialized =
             new LanguageDeserializer(lionWebVersion).Deserialize(chunk).Cast<IReadableNode?>().ToList();
@@ -56,7 +57,8 @@ public class KeywordLangTests
         };
 
         List<IReadableNode?> input = [root, root.Ref, ((@struct)root.Ref.Double).Ref];
-        SerializationChunk chunk = new Serializer(lionWebVersion).SerializeToChunk(input);
+        SerializationChunk chunk = new SerializerBuilder().WithLionWebVersion(lionWebVersion).Build()
+            .SerializeToChunk(input);
 
         IDeserializer deserializer = new DeserializerBuilder()
             .WithCompressedIds(new(KeepOriginal: true))

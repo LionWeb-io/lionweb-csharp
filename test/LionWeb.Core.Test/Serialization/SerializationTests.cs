@@ -48,7 +48,8 @@ public class SerializationTests
     {
         INode rootNode = new ExampleModels(_lionWebVersion).ExampleModel(_language);
 
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([rootNode]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([rootNode]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
@@ -66,7 +67,8 @@ public class SerializationTests
             .Cast<INode>().First();
 
         Assert.IsInstanceOfType<INode>(shape0);
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([geometry, shape0]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([geometry, shape0]);
         Assert.AreEqual(4, serializationChunk.Nodes.Length);
     }
 
@@ -74,7 +76,8 @@ public class SerializationTests
     public void test_optional_string_property_serialization()
     {
         var documentation = ((ShapesFactory)_language.GetFactory()).CreateDocumentation();
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([documentation]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([documentation]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         var serializedProperty = serializationChunk.Nodes[0].Properties.First(p => p.Property.Key == "key-text");
@@ -88,7 +91,8 @@ public class SerializationTests
         var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
         var refGeo = new ReferenceGeometry("ref") { Shapes = [line] };
 
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([line, refGeo]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([line, refGeo]);
         var nodes = new DeserializerBuilder()
             .WithLanguage(ShapesLanguage.Instance)
             .Build()
@@ -103,7 +107,8 @@ public class SerializationTests
     {
         var compositeShape = new CompositeShape("comp");
 
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([compositeShape]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([compositeShape]);
         var nodes = new DeserializerBuilder()
             .WithLanguage(ShapesLanguage.Instance)
             .Build()
@@ -118,7 +123,8 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("goup");
 
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([materialGroup]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([materialGroup]);
         var nodes = new DeserializerBuilder()
             .WithLanguage(ShapesLanguage.Instance)
             .Build()
@@ -134,7 +140,7 @@ public class SerializationTests
         var materialGroup = new MaterialGroup("duplicate") { DefaultShape = new Circle("duplicate") };
 
         Assert.ThrowsException<SerializerException>(() =>
-            new Serializer(_lionWebVersion).SerializeToChunk([materialGroup]));
+            new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().SerializeToChunk([materialGroup]));
     }
 
     [TestMethod]
@@ -145,8 +151,9 @@ public class SerializationTests
         var a = new MaterialGroup("a") { DefaultShape = b };
         var b2 = new Circle("b");
 
-        var x = new Serializer(_lionWebVersion).Serialize([a, b, b]).ToList();
-        var serializedNodes = new Serializer(_lionWebVersion).Serialize([a, b, b2]).ToList();
+        var x = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b]).ToList();
+        var serializedNodes = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b2])
+            .ToList();
         Assert.AreEqual(2, serializedNodes.Count);
     }
 
@@ -166,7 +173,8 @@ public class SerializationTests
         var b = new Circle("b");
         a.Set(defaultShape, b);
 
-        Assert.ThrowsException<SerializerException>(() => new Serializer(_lionWebVersion).SerializeToChunk([a]));
+        Assert.ThrowsException<SerializerException>(() =>
+            new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().SerializeToChunk([a]));
     }
 
     [TestMethod]
@@ -185,7 +193,8 @@ public class SerializationTests
         var b = new Circle("b");
         a.Set(defaultShape, b);
 
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([a]);
+        var serializationChunk =
+            new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().SerializeToChunk([a]);
         Assert.AreEqual(2, serializationChunk.Languages.Length);
     }
 
@@ -194,7 +203,7 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
-        var serializer = new Serializer(_lionWebVersion);
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var serializedNodes = serializer.Serialize(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.AreEqual(1, serializer.UsedLanguages.Count());
@@ -205,7 +214,7 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
-        var serializer = new Serializer(_lionWebVersion);
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var serializedNodes = serializer.Serialize(new SingleEnumerable<INode>(materialGroup.Descendants(true)));
         Assert.AreEqual(2, serializedNodes.Count());
         Assert.ThrowsException<AssertFailedException>(() => Assert.AreEqual(2, serializedNodes.Count()));
@@ -216,7 +225,7 @@ public class SerializationTests
     {
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") };
 
-        var serializer = new Serializer(_lionWebVersion);
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         Assert.AreEqual(0, serializer.UsedLanguages.Count());
         var serializedNodes = serializer.Serialize(materialGroup.Descendants(true));
         Assert.AreEqual(2, serializedNodes.Count());
@@ -229,7 +238,7 @@ public class SerializationTests
         const string text = "\ud83d\ude0a Hällö 😊";
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") { Name = text } };
 
-        var serializer = new Serializer(_lionWebVersion);
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var stream = new MemoryStream();
         JsonUtils.WriteNodesToStream(stream, serializer, materialGroup.Descendants(true));
 
@@ -256,7 +265,7 @@ public class SerializationTests
             Complex = new ComplexNumber { Real = new Decimal { Int = 1, Frac = 0 }, Imaginary = new Decimal() }
         };
 
-        var serializer = new Serializer(_lionWebVersion);
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var serializedNodes = serializer.Serialize([node]).ToList();
         Assert.AreEqual(1, serializedNodes.Count);
         var serializedNode = serializedNodes.First();
@@ -297,7 +306,7 @@ public class SerializationTests
             }
         };
 
-        var serializer = new Serializer(_lionWebVersion);
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var serializedNodes = serializer.Serialize([node]).ToList();
         Assert.AreEqual(1, serializedNodes.Count);
         CollectionAssert.AreEquivalent(new List<SerializedLanguageReference>
@@ -320,7 +329,8 @@ public class SerializationTests
         var circle = new Circle("circle");
         var node = new OffsetDuplicate("od") { Uuid = "abc", Source = circle, Docs = new Documentation("docs") };
 
-        var serializer = new Serializer(_lionWebVersion) { SerializeEmptyFeatures = true };
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).WithSerializedEmptyFeatures(true)
+            .Build();
 
         var chunk = serializer.SerializeToChunk([node, circle]);
 
@@ -438,7 +448,8 @@ public class SerializationTests
         var circle = new Circle("circle");
         var node = new OffsetDuplicate("od") { Uuid = "abc", Source = circle, Docs = new Documentation("docs") };
 
-        var serializer = new Serializer(_lionWebVersion) { SerializeEmptyFeatures = false };
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).WithSerializedEmptyFeatures(false)
+            .Build();
 
         var chunk = serializer.SerializeToChunk([node, circle]);
 

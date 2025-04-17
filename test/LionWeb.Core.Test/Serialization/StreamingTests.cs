@@ -41,7 +41,8 @@ public class StreamingTests
     public void MassSerialization()
     {
         using Stream stream = File.Create("output.json");
-        JsonUtils.WriteNodesToStream(stream, new Serializer(_lionWebVersion), CreateNodes(_maxSize));
+        JsonUtils.WriteNodesToStream(stream, new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build(),
+            CreateNodes(_maxSize));
 
         IEnumerable<INode> CreateNodes(long count)
         {
@@ -96,8 +97,8 @@ public class StreamingTests
             File.OpenRead("output.json");
 
         var deserializer = new Deserializer(LionWebVersions.v2024_1, compressedIdConfig: new(KeepOriginal: true));
-            deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);
-            deserializer.RegisterInstantiatedLanguage(_language);
+        deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);
+        deserializer.RegisterInstantiatedLanguage(_language);
 
         List<IReadableNode> nodes = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).GetAwaiter().GetResult();
 

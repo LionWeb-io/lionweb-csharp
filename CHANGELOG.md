@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [Unreleased]
 
 ### Added
+* Introduced `SerializerBuilder`.
 ### Fixed
 ### Changed
 ### Removed
