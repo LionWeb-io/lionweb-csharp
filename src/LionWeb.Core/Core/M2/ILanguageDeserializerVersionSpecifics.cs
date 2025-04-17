@@ -23,6 +23,8 @@ using Utilities;
 using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1_Compatible;
 using VersionSpecific.V2024_1;
+using VersionSpecific.V2025_1_Compatible;
+using VersionSpecific.V2025_1;
 
 internal interface ILanguageDeserializerVersionSpecifics : IVersionSpecifics
 {
@@ -38,6 +40,9 @@ internal interface ILanguageDeserializerVersionSpecifics : IVersionSpecifics
             IVersion2024_1 => new LanguageDeserializerVersionSpecifics_2024_1(deserializer, handler),
             IVersion2024_1_Compatible =>
                 new LanguageDeserializerVersionSpecifics_2024_1_Compatible(deserializer, handler),
+            IVersion2025_1 => new LanguageDeserializerVersionSpecifics_2025_1(deserializer, handler),
+            IVersion2025_1_Compatible =>
+                new LanguageDeserializerVersionSpecifics_2025_1_Compatible(deserializer, handler),
             _ => throw new UnsupportedVersionException(lionWebVersion)
         };
 

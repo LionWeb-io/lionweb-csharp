@@ -22,6 +22,8 @@ using M3;
 using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1_Compatible;
 using VersionSpecific.V2024_1;
+using VersionSpecific.V2025_1_Compatible;
+using VersionSpecific.V2025_1;
 
 /// <summary>
 /// A supported version of LionWeb standard.
@@ -60,10 +62,10 @@ public interface LionWebVersions
     public static LionWebVersions Current => v2024_1;
 
     /// All supported <i>pure</i> versions of LionWeb standard.
-    public static IReadOnlyList<LionWebVersions> AllPureVersions { get => [v2023_1, v2024_1]; }
+    public static IReadOnlyList<LionWebVersions> AllPureVersions { get => [v2023_1, v2024_1, v2025_1]; }
 
     /// All supported <i>mixed</i> versions of LionWeb standard.
-    public static IReadOnlyList<LionWebVersions> AllMixedVersions { get => [v2024_1_Compatible]; }
+    public static IReadOnlyList<LionWebVersions> AllMixedVersions { get => [v2024_1_Compatible, v2025_1_Compatible]; }
 
     /// Finds the <i>pure</i> version of LionWeb standard defined by <paramref name="versionString"/>.
     /// <exception cref="UnsupportedVersionException">If LionWeb standard <paramref name="versionString"/> is not supported.</exception>
@@ -79,6 +81,8 @@ public interface LionWebVersions
         _ when versionInterface == typeof(IVersion2023_1) => v2023_1,
         _ when versionInterface == typeof(IVersion2024_1) => v2024_1,
         _ when versionInterface == typeof(IVersion2024_1_Compatible) => v2024_1_Compatible,
+        _ when versionInterface == typeof(IVersion2025_1) => v2025_1,
+        _ when versionInterface == typeof(IVersion2025_1_Compatible) => v2025_1_Compatible,
         _ => throw new UnsupportedVersionException(versionInterface.ToString())
     };
 
@@ -90,6 +94,12 @@ public interface LionWebVersions
 
     /// <inheritdoc cref="IVersion2024_1_Compatible"/>
     public static IVersion2024_1_Compatible v2024_1_Compatible => Version2024_1_Compatible.Instance;
+
+    /// <inheritdoc cref="IVersion2025_1"/>
+    public static IVersion2025_1 v2025_1 => Version2025_1.Instance;
+
+    /// <inheritdoc cref="IVersion2025_1_Compatible"/>
+    public static IVersion2025_1_Compatible v2025_1_Compatible => Version2025_1_Compatible.Instance;
 }
 
 /// Extensions for <see cref="LionWebVersions"/>.
@@ -123,6 +133,12 @@ public interface IVersion2024_1 : LionWebVersions;
 
 /// LionWeb standard 2024.1, backwards-compatible with 2023.1
 public interface IVersion2024_1_Compatible : LionWebVersions;
+
+/// LionWeb standard 2024.1, <b>NOT yet defined</b>
+public interface IVersion2025_1 : LionWebVersions;
+
+/// LionWeb standard 2024.1, backwards-compatible with 2023.1 and 2024.1
+public interface IVersion2025_1_Compatible : LionWebVersions;
 
 internal interface IVersionBase : LionWebVersions
 {

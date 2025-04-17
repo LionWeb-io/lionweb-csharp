@@ -23,6 +23,8 @@ using Serialization;
 using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1_Compatible;
 using VersionSpecific.V2024_1;
+using VersionSpecific.V2025_1_Compatible;
+using VersionSpecific.V2025_1;
 
 /// Externalized logic of <see cref="ISerializer"/>, specific to one version of LionWeb standard.
 internal interface ISerializerVersionSpecifics : IVersionSpecifics
@@ -36,6 +38,8 @@ internal interface ISerializerVersionSpecifics : IVersionSpecifics
         IVersion2023_1 => new SerializerVersionSpecifics_2023_1(),
         IVersion2024_1 => new SerializerVersionSpecifics_2024_1(),
         IVersion2024_1_Compatible => new SerializerVersionSpecifics_2024_1_Compatible(),
+        IVersion2025_1 => new SerializerVersionSpecifics_2025_1(),
+        IVersion2025_1_Compatible => new SerializerVersionSpecifics_2025_1_Compatible(),
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 
