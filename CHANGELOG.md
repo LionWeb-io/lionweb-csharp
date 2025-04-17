@@ -10,6 +10,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ### Added
 ### Fixed
+* `Cloner` can now deal with read-only external reference targets.
 ### Changed
 ### Removed
 ### Deprecated
