@@ -75,9 +75,11 @@ public class LanguageSerializationTests
         var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
             .SerializeToChunk([ShapesLanguage.Instance]);
 
-        var redeserialized =
-            new LanguageDeserializer(_lionWebVersion, compressedIdConfig: new(KeepOriginal: true))
-                .Deserialize(serializationChunk);
+        var redeserialized = new LanguageDeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithCompressedIds(new(KeepOriginal: true))
+            .Build()
+            .Deserialize(serializationChunk);
         Language redeserializedShapes = redeserialized.Cast<INode>().OfType<Language>().First();
 
         var language =
@@ -107,9 +109,11 @@ public class LanguageSerializationTests
         var serializationChunk2 = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
             .SerializeToChunk([redeserializedShapes, language]);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk2));
-        var redeserialized2 =
-            new LanguageDeserializer(_lionWebVersion, compressedIdConfig: new(KeepOriginal: true)).Deserialize(
-                serializationChunk2);
+        var redeserialized2 = new LanguageDeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithCompressedIds(new(KeepOriginal: true))
+            .Build()
+            .Deserialize(serializationChunk2);
         Language redeserializedShapes2 = redeserialized2.Cast<INode>().OfType<Language>()
             .First(l => l.Key == ShapesLanguage.Instance.Key);
         DynamicClassifier redeserializedCircle2 =
@@ -128,7 +132,11 @@ public class LanguageSerializationTests
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         // Just run the deserializer for now (without really checking anything), to see whether it crashes or not:
-        var deserializer = new LanguageDeserializer(_lionWebVersion, new SkipDeserializationHandler());
+        var deserializer = new LanguageDeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithHandler(new SkipDeserializationHandler())
+            .Build();
+
         foreach (var serializedNode in serializationChunk.Nodes)
         {
             deserializer.Process(serializedNode);
@@ -160,8 +168,10 @@ public class LanguageSerializationTests
 
         var chunk = serializer.SerializeToChunk(input);
 
-        var deserializer =
-            new LanguageDeserializer(LionWebVersions.v2024_1_Compatible, new SkipDeserializationHandler());
+        var deserializer = new LanguageDeserializerBuilder()
+            .WithLionWebVersion(LionWebVersions.v2024_1_Compatible)
+            .WithHandler(new SkipDeserializationHandler())
+            .Build();
 
         var actual = deserializer.Deserialize(chunk).Cast<Language>().ToList();
 

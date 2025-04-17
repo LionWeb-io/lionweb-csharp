@@ -176,7 +176,7 @@ public class StructuredDataTypesTests
         var chunk = new SerializerBuilder().WithLionWebVersion(lionWebVersion).Build()
             .SerializeToChunk([language]);
         Assert.ThrowsException<UnsupportedStructuredDataTypeException>(() =>
-            new LanguageDeserializer(lionWebVersion).Deserialize(chunk));
+            new LanguageDeserializerBuilder().WithLionWebVersion(lionWebVersion).Build().Deserialize(chunk));
     }
 
     #endregion

@@ -35,8 +35,12 @@ public class KeywordLangTests
         SerializationChunk chunk = new SerializerBuilder().WithLionWebVersion(lionWebVersion).Build()
             .SerializeToChunk(input);
 
-        List<IReadableNode?> deserialized =
-            new LanguageDeserializer(lionWebVersion).Deserialize(chunk).Cast<IReadableNode?>().ToList();
+        List<IReadableNode?> deserialized = new LanguageDeserializerBuilder()
+            .WithLionWebVersion(lionWebVersion)
+            .Build()
+            .Deserialize(chunk)
+            .Cast<IReadableNode?>()
+            .ToList();
 
         List<IDifference> differences = new Comparer(input, deserialized).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));

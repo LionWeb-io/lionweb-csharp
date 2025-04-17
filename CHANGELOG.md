@@ -10,6 +10,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ### Added
 * Introduced `SerializerBuilder`.
+* Introduced `LanguageDeserializerBuilder`.
 ### Fixed
 ### Changed
 ### Removed
