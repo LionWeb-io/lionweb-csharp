@@ -36,19 +36,21 @@ public class LionWebVersionMigrationTests
         LionWebVersions targetVersionCompatible = LionWebVersions.v2024_1_Compatible;
         LionWebVersions targetVersion = LionWebVersions.v2024_1;
 
-        DynamicLanguage language = CreateLanguage2023(inputVersion, out DynamicInterface iface, out DynamicConcept concept, out DynamicAnnotation ann, out DynamicEnumeration enm, out DynamicProperty propString, out DynamicProperty propEnum, out DynamicProperty propBool);
+        DynamicLanguage language = CreateLanguage2023(inputVersion, out DynamicInterface iface,
+            out DynamicConcept concept, out DynamicAnnotation ann, out DynamicEnumeration enm,
+            out DynamicProperty propString, out DynamicProperty propEnum, out DynamicProperty propBool);
 
         var nodes = CreateInstances2023(language, concept, propString, propEnum, enm, ann, propBool);
 
         MemoryStream output = Migrate(targetVersionCompatible, language, inputVersion, nodes);
 
-        var targetLanguage = CreateLanguage2023(targetVersion, out _,out _,out _,out _,out _,out _,out _);
+        var targetLanguage = CreateLanguage2023(targetVersion, out _, out _, out _, out _, out _, out _, out _);
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(targetVersion)
             .WithLanguage(targetLanguage)
             .Build();
         var deserializedNodes = await JsonUtils.ReadNodesFromStreamAsync(output, deserializer);
-        
+
         Assert.AreEqual(nodes.Count(n => n.GetParent() == null), deserializedNodes.Count);
         Assert.IsTrue(deserializedNodes.All(n => n.GetClassifier().GetLanguage().LionWebVersion == targetVersion));
     }
@@ -60,19 +62,21 @@ public class LionWebVersionMigrationTests
         LionWebVersions targetVersionCompatible = LionWebVersions.v2025_1_Compatible;
         LionWebVersions targetVersion = LionWebVersions.v2025_1;
 
-        DynamicLanguage language = CreateLanguage2023(inputVersion, out DynamicInterface iface, out DynamicConcept concept, out DynamicAnnotation ann, out DynamicEnumeration enm, out DynamicProperty propString, out DynamicProperty propEnum, out DynamicProperty propBool);
+        DynamicLanguage language = CreateLanguage2023(inputVersion, out DynamicInterface iface,
+            out DynamicConcept concept, out DynamicAnnotation ann, out DynamicEnumeration enm,
+            out DynamicProperty propString, out DynamicProperty propEnum, out DynamicProperty propBool);
 
         var nodes = CreateInstances2023(language, concept, propString, propEnum, enm, ann, propBool);
 
         MemoryStream output = Migrate(targetVersionCompatible, language, inputVersion, nodes);
 
-        var targetLanguage = CreateLanguage2023(targetVersion, out _,out _,out _,out _,out _,out _,out _);
+        var targetLanguage = CreateLanguage2023(targetVersion, out _, out _, out _, out _, out _, out _, out _);
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(targetVersion)
             .WithLanguage(targetLanguage)
             .Build();
         var deserializedNodes = await JsonUtils.ReadNodesFromStreamAsync(output, deserializer);
-        
+
         Assert.AreEqual(nodes.Count(n => n.GetParent() == null), deserializedNodes.Count);
         Assert.IsTrue(deserializedNodes.All(n => n.GetClassifier().GetLanguage().LionWebVersion == targetVersion));
     }
@@ -84,21 +88,25 @@ public class LionWebVersionMigrationTests
         LionWebVersions targetVersionCompatible = LionWebVersions.v2025_1_Compatible;
         LionWebVersions targetVersion = LionWebVersions.v2025_1;
 
-        DynamicLanguage language = CreateLanguage2024(inputVersion, out DynamicInterface iface, out DynamicProperty propString, out DynamicConcept concept, out DynamicEnumeration enm, out DynamicProperty propEnum, out DynamicAnnotation ann, out DynamicStructuredDataType nestedSdt, out DynamicStructuredDataType sdt, out DynamicProperty propSdt);
+        DynamicLanguage language = CreateLanguage2024(inputVersion, out DynamicInterface iface,
+            out DynamicProperty propString, out DynamicConcept concept, out DynamicEnumeration enm,
+            out DynamicProperty propEnum, out DynamicAnnotation ann, out DynamicStructuredDataType nestedSdt,
+            out DynamicStructuredDataType sdt, out DynamicProperty propSdt);
 
         var factory = language.GetFactory();
 
-        var  nodes = CreateInstances2024(factory, concept, propString, propEnum, enm, ann, nestedSdt, sdt, propSdt);
+        var nodes = CreateInstances2024(factory, concept, propString, propEnum, enm, ann, nestedSdt, sdt, propSdt);
 
         MemoryStream output = Migrate(targetVersionCompatible, language, inputVersion, nodes);
 
-        var targetLanguage = CreateLanguage2024(targetVersion, out _,out _,out _,out _,out _,out _,out _,out _,out _);
+        var targetLanguage =
+            CreateLanguage2024(targetVersion, out _, out _, out _, out _, out _, out _, out _, out _, out _);
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(targetVersion)
             .WithLanguage(targetLanguage)
             .Build();
         var deserializedNodes = await JsonUtils.ReadNodesFromStreamAsync(output, deserializer);
-        
+
         Assert.AreEqual(nodes.Count(n => n.GetParent() == null), deserializedNodes.Count);
         Assert.IsTrue(deserializedNodes.All(n => n.GetClassifier().GetLanguage().LionWebVersion == targetVersion));
     }
@@ -106,8 +114,13 @@ public class LionWebVersionMigrationTests
     private MemoryStream Migrate(LionWebVersions targetVersionCompatible, DynamicLanguage language,
         LionWebVersions inputVersion, List<INode> nodes)
     {
-        var modelMigrator = new ModelMigrator(targetVersionCompatible, [language, inputVersion.BuiltIns, inputVersion.LionCore, targetVersionCompatible.BuiltIns, targetVersionCompatible.LionCore]);
-        modelMigrator.RegisterMigration(new LionWebVersionMigration(inputVersion, targetVersionCompatible) { Priority = 0 });
+        var modelMigrator = new ModelMigrator(targetVersionCompatible,
+        [
+            language, inputVersion.BuiltIns, inputVersion.LionCore, targetVersionCompatible.BuiltIns,
+            targetVersionCompatible.LionCore
+        ]);
+        modelMigrator.RegisterMigration(
+            new LionWebVersionMigration(inputVersion, targetVersionCompatible) { Priority = 0 });
 
         var input = new MemoryStream();
         JsonUtils.WriteNodesToStream(input, new Serializer(inputVersion), nodes);
@@ -124,7 +137,8 @@ public class LionWebVersionMigrationTests
         return output;
     }
 
-    private static List<INode> CreateInstances2024(INodeFactory factory, DynamicConcept concept, DynamicProperty propString,
+    private static List<INode> CreateInstances2024(INodeFactory factory, DynamicConcept concept,
+        DynamicProperty propString,
         DynamicProperty propEnum, DynamicEnumeration enm, DynamicAnnotation ann, DynamicStructuredDataType nestedSdt,
         DynamicStructuredDataType sdt, DynamicProperty propSdt)
     {
@@ -156,72 +170,36 @@ public class LionWebVersionMigrationTests
             Name = "lang-name", Key = "lang-key", Version = "lang-version"
         };
 
-        iface = new DynamicInterface("iface", inputVersion, null) { Name = "iface-name", Key = "iface-key" };
-        language.AddEntities([iface]);
-        propString = new DynamicProperty("propString", inputVersion, null)
-        {
-            Name = "propString-name", Key = "propString-key", Optional = true, Type = inputVersion.BuiltIns.String
-        };
-        iface.AddFeatures([propString]);
-        iface.AddExtends([inputVersion.BuiltIns.INamed]);
+        iface = language.Interface("iface", "iface-key", "iface-name").Extending(inputVersion.BuiltIns.INamed);
+        propString = iface.Property("propString", "propString-key", "propString-name").IsOptional()
+            .OfType(inputVersion.BuiltIns.String);
 
-        concept = new DynamicConcept("concept", inputVersion, null) { Name = "concept-name", Key = "concept-key", };
-        language.AddEntities([concept]);
-        enm = new DynamicEnumeration("enm", inputVersion, null) { Name = "enm-name", Key = "enm-key" };
-        language.AddEntities([enm]);
-        enm.AddLiterals([
-            new DynamicEnumerationLiteral("litA", inputVersion, null) { Name = "litA-name", Key = "litA-key" },
-            new DynamicEnumerationLiteral("litB", inputVersion, null) { Name = "litB-name", Key = "litB-key" }
-        ]);
-        propEnum = new DynamicProperty("propEnum", inputVersion, null)
-        {
-            Name = "propEnum-name", Key = "propEnum-key", Optional = true, Type = enm
-        };
-        concept.AddFeatures([propEnum]);
-        concept.AddImplements([inputVersion.BuiltIns.INamed]);
+        concept = language.Concept("concept", "concept-key", "concept-name").Implementing(inputVersion.BuiltIns.INamed);
 
-        ann = new DynamicAnnotation("annotation", inputVersion, null)
-        {
-            Name = "annotation-name", Key = "annotation-key", Annotates = inputVersion.BuiltIns.Node
-        };
-        language.AddEntities([ann]);
+        enm = language.Enumeration("enm", "enm-key", "enm-name");
+        enm.EnumerationLiteral("litA", "litA-key", "litA-name");
+        enm.EnumerationLiteral("litB", "litB-key", "litB-name");
 
-        nestedSdt = new DynamicStructuredDataType("nestedSdt", inputVersion, null)
-        {
-            Name = "nestedSdt-name", Key = "nestedSdt-key"
-        };
-        nestedSdt.AddFields([
-            new DynamicField("enumField", inputVersion, null)
-            {
-                Name = "enumField-name", Key = "enumField-key", Type = enm
-            }
-        ]);
-        language.AddEntities([nestedSdt]);
+        propEnum = concept.Property("propEnum", "propEnum-key", "propEnum-name").IsOptional().OfType(enm);
 
-        sdt = new DynamicStructuredDataType("sdt", inputVersion, null) { Name = "sdt-name", Key = "sdt-key" };
-        sdt.AddFields([
-            new DynamicField("intField", inputVersion, null)
-            {
-                Name = "intField-name", Key = "intField-key", Type = inputVersion.BuiltIns.Integer
-            },
-            new DynamicField("nestField", inputVersion, null)
-            {
-                Name = "nestField-name", Key = "nestField-key", Type = nestedSdt
-            }
-        ]);
-        language.AddEntities([sdt]);
+        ann = language.Annotation("annotation", "annotation-key", "annotation-name")
+            .Annotating(inputVersion.BuiltIns.Node).Implementing(inputVersion.BuiltIns.INamed);
 
-        propSdt = new DynamicProperty("propSdt", inputVersion, null)
-        {
-            Name = "propSdt-name", Key = "propSdt-key", Optional = true, Type = sdt
-        };
-        ann.AddFeatures([propSdt]);
-        ann.AddImplements([inputVersion.BuiltIns.INamed]);
+        nestedSdt = language.StructuredDataType("nestedSdt", "nestedSdt-key", "nestedSdt-name");
+        nestedSdt.Field("enumField", "enumField-key", "enumField-name").OfType(enm);
+
+        sdt = language.StructuredDataType("sdt", "sdt-key", "sdt-name");
+        sdt.Field("intField", "intField-key", "intField-name").OfType(inputVersion.BuiltIns.Integer);
+        sdt.Field("nestField", "nestField-key", "nestField-name").OfType(nestedSdt);
+
+        propSdt = ann.Property("propSdt", "propSdt-key", "propSdt-name").IsOptional().OfType(sdt);
+
         return language;
     }
 
     private static DynamicLanguage CreateLanguage2023(LionWebVersions inputVersion, out DynamicInterface iface,
-        out DynamicConcept concept, out DynamicAnnotation ann, out DynamicEnumeration enm, out DynamicProperty propString,
+        out DynamicConcept concept, out DynamicAnnotation ann, out DynamicEnumeration enm,
+        out DynamicProperty propString,
         out DynamicProperty propEnum, out DynamicProperty propBool)
     {
         var language = new DynamicLanguage("lang", inputVersion)
@@ -229,46 +207,29 @@ public class LionWebVersionMigrationTests
             Name = "lang-name", Key = "lang-key", Version = "lang-version"
         };
 
-        iface = new DynamicInterface("iface", inputVersion, null) { Name = "iface-name", Key = "iface-key" };
-        language.AddEntities([iface]);
-        propString = new DynamicProperty("propString", inputVersion, null)
-        {
-            Name = "propString-name", Key = "propString-key", Optional = true, Type = inputVersion.BuiltIns.String
-        };
-        iface.AddFeatures([propString]);
-        iface.AddExtends([inputVersion.BuiltIns.INamed]);
+        iface = language.Interface("iface", "iface-key", "iface-name").Extending(inputVersion.BuiltIns.INamed);
+        propString = iface.Property("propString", "propString-key", "propString-name").IsOptional()
+            .OfType(inputVersion.BuiltIns.String);
 
-        concept = new DynamicConcept("concept", inputVersion, null) { Name = "concept-name", Key = "concept-key", };
-        language.AddEntities([concept]);
-        enm = new DynamicEnumeration("enm", inputVersion, null) { Name = "enm-name", Key = "enm-key" };
-        language.AddEntities([enm]);
-        enm.AddLiterals([
-            new DynamicEnumerationLiteral("litA", inputVersion, null) { Name = "litA-name", Key = "litA-key" },
-            new DynamicEnumerationLiteral("litB", inputVersion, null) { Name = "litB-name", Key = "litB-key" }
-        ]);
-        propEnum = new DynamicProperty("propEnum", inputVersion, null)
-        {
-            Name = "propEnum-name", Key = "propEnum-key", Optional = true, Type = enm
-        };
-        concept.AddFeatures([propEnum]);
-        concept.AddImplements([inputVersion.BuiltIns.INamed]);
+        concept = language.Concept("concept", "concept-key", "concept-name").Implementing(inputVersion.BuiltIns.INamed);
 
-        ann = new DynamicAnnotation("annotation", inputVersion, null)
-        {
-            Name = "annotation-name", Key = "annotation-key", Annotates = inputVersion.BuiltIns.Node
-        };
-        language.AddEntities([ann]);
+        enm = language.Enumeration("enm", "enm-key", "enm-name");
+        enm.EnumerationLiteral("litA", "litA-key", "litA-name");
+        enm.EnumerationLiteral("litB", "litB-key", "litB-name");
 
-        propBool = new DynamicProperty("propBool", inputVersion, null)
-        {
-            Name = "propBool-name", Key = "propBool-key", Optional = true, Type = inputVersion.BuiltIns.Boolean
-        };
-        ann.AddFeatures([propBool]);
-        ann.AddImplements([inputVersion.BuiltIns.INamed]);
+        propEnum = concept.Property("propEnum", "propEnum-key", "propEnum-name").IsOptional().OfType(enm);
+
+        ann = language.Annotation("annotation", "annotation-key", "annotation-name")
+            .Annotating(inputVersion.BuiltIns.Node).Implementing(inputVersion.BuiltIns.INamed);
+
+        propBool = ann.Property("propBool", "propBool-key", "propBool-name").IsOptional()
+            .OfType(inputVersion.BuiltIns.Boolean);
+        
         return language;
     }
 
-    private static List<INode> CreateInstances2023(DynamicLanguage language, DynamicConcept concept, DynamicProperty propString,
+    private static List<INode> CreateInstances2023(DynamicLanguage language, DynamicConcept concept,
+        DynamicProperty propString,
         DynamicProperty propEnum, DynamicEnumeration enm, DynamicAnnotation ann, DynamicProperty propBool)
     {
         var factory = language.GetFactory();
