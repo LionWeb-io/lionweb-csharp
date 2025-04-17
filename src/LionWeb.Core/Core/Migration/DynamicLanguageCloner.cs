@@ -27,6 +27,7 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
 {
     private readonly Dictionary<IKeyed, DynamicIKeyed?> _dynamicMap = new(new KeyedIdentityComparer());
 
+    /// Provides a mapping of all cloned elements to their clones.
     public IReadOnlyDictionary<IKeyed, DynamicIKeyed> DynamicMap =>
         _dynamicMap
             .Where(p => p.Value != null)
@@ -35,7 +36,7 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
 
     /// Clones all of <paramref name="languages"/> as <see cref="DynamicLanguage">DynamicLanguages</see> based on <see cref="lionWebVersion"/>.
     /// <paramref name="languages"/> MUST be self-contained, i.e. no language might refer to another language outside <paramref name="languages"/>.
-    public virtual Dictionary<LanguageIdentity, DynamicLanguage> Clone(IEnumerable<Language> languages)
+    public Dictionary<LanguageIdentity, DynamicLanguage> Clone(IEnumerable<Language> languages)
     {
         CreateClones(languages);
         CloneReferencedElements();
@@ -157,7 +158,7 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
             },
             Reference r => new DynamicReference(r.GetId(), lionWebVersion, null)
             {
-                Name = r.Name, Key = r.Name, Optional = r.Optional, Multiple = r.Multiple
+                Name = r.Name, Key = r.Key, Optional = r.Optional, Multiple = r.Multiple
             },
             _ => throw new ArgumentOutOfRangeException(nameof(f))
         });
@@ -252,15 +253,16 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
             throw new ArgumentException(typeof(T).FullName);
         }
 
-        #pragma warning disable CS8631 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match constraint type.
+#pragma warning disable CS8631 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match constraint type.
         return TryLookup(keyed, out var result) ? result : throw new ArgumentException(keyed.ToString());
-        #pragma warning restore CS8631
+#pragma warning restore CS8631
     }
 
     private bool TryLookup<T>(T keyed, [NotNullWhen(true)] out T? result) where T : IKeyed
     {
-        if (keyed.GetLanguage().EqualsIdentity(lionWebVersion.BuiltIns) ||
-            keyed.GetLanguage().EqualsIdentity(lionWebVersion.LionCore))
+        var keyedLanguage = keyed.GetLanguage();
+        if (keyedLanguage.Key == lionWebVersion.BuiltIns.Key ||
+            keyedLanguage.Key == lionWebVersion.LionCore.Key)
         {
             result = keyed;
             return true;
