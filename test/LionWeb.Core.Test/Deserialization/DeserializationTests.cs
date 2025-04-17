@@ -272,7 +272,8 @@ public class DeserializationTests
     {
         var line = new Line("line") { Start = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
 
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk([line]);
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([line]);
         var nodes = new DeserializerBuilder()
             .WithLanguage(ShapesLanguage.Instance)
             .Build()

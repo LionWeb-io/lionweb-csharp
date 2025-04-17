@@ -33,8 +33,9 @@ public class HandlerSerializationTests
             throw new NotImplementedException();
 
         public void DuplicateNodeId(IReadableNode n) => incrementer();
-        
-        public string? UnknownDatatype(IReadableNode node, Feature property, object? value) => throw new NotImplementedException();
+
+        public string? UnknownDatatype(IReadableNode node, Feature property, object? value) =>
+            throw new NotImplementedException();
     }
 
     [TestMethod]
@@ -44,8 +45,10 @@ public class HandlerSerializationTests
 
         int count = 0;
 
-        var serializer =
-            new Serializer(_lionWebVersion) { Handler = new DuplicateNodeHandler(() => Interlocked.Increment(ref count)) };
+        var serializer = new SerializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithHandler(new DuplicateNodeHandler(() => Interlocked.Increment(ref count)))
+            .Build();
 
         try
         {
@@ -59,17 +62,18 @@ public class HandlerSerializationTests
 
     class DuplicateLanguageHandler(Func<Language, Language, Language?> incrementer) : ISerializerHandler
     {
-        Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) => incrementer(a,b);
+        Language? ISerializerHandler.DuplicateUsedLanguage(Language a, Language b) => incrementer(a, b);
 
         public void DuplicateNodeId(IReadableNode n) => throw new NotImplementedException();
-        
-        public string? UnknownDatatype(IReadableNode node, Feature property, object? value) => throw new NotImplementedException();
+
+        public string? UnknownDatatype(IReadableNode node, Feature property, object? value) =>
+            throw new NotImplementedException();
     }
 
     [TestMethod]
     public void DuplicateLanguage_CustomHandler()
     {
-        var lang = new DynamicLanguage("abc",_lionWebVersion)
+        var lang = new DynamicLanguage("abc", _lionWebVersion)
         {
             Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
         };
@@ -85,15 +89,15 @@ public class HandlerSerializationTests
         var dictionary = new ConcurrentDictionary<Language, byte>();
 
         var serializer =
-            new Serializer(_lionWebVersion)
-            {
-                Handler = new DuplicateLanguageHandler((a, b) =>
+            new SerializerBuilder()
+                .WithLionWebVersion(_lionWebVersion)
+                .WithHandler(new DuplicateLanguageHandler((a, b) =>
                 {
                     dictionary[a] = 1;
                     dictionary[b] = 1;
                     return null;
-                })
-            };
+                }))
+                .Build();
 
         try
         {
@@ -108,7 +112,7 @@ public class HandlerSerializationTests
     [TestMethod]
     public void DuplicateLanguage_CustomHandler_Heal()
     {
-        var lang = new DynamicLanguage("abc",_lionWebVersion)
+        var lang = new DynamicLanguage("abc", _lionWebVersion)
         {
             Key = ShapesLanguage.Instance.Key, Version = ShapesLanguage.Instance.Version
         };
@@ -123,16 +127,15 @@ public class HandlerSerializationTests
 
         var dictionary = new ConcurrentDictionary<Language, byte>();
 
-        var serializer =
-            new Serializer(_lionWebVersion)
+        var serializer = new SerializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithHandler(new DuplicateLanguageHandler((a, b) =>
             {
-                Handler = new DuplicateLanguageHandler((a, b) =>
-                {
-                    dictionary[a] = 1;
-                    dictionary[b] = 1;
-                    return ShapesLanguage.Instance;
-                })
-            };
+                dictionary[a] = 1;
+                dictionary[b] = 1;
+                return ShapesLanguage.Instance;
+            }))
+            .Build();
 
         ISerializerExtensions.Serialize(serializer, a.Descendants(true, true));
 

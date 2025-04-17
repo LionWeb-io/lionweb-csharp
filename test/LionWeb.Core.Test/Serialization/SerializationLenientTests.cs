@@ -49,7 +49,8 @@ public class SerializationLenientTests
         rootNode.Set(ShapesLanguage.Instance.Line_end, MyEnum.literal1);
 
         IEnumerable<IReadableNode> nodes = new List<INode> { rootNode, childA, childB };
-        var serializationChunk = new Serializer(_lionWebVersion).SerializeToChunk(nodes);
+        var serializationChunk =
+            new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().SerializeToChunk(nodes);
         Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
 
         var readableNodes = new DeserializerBuilder()
@@ -109,7 +110,8 @@ public class SerializationLenientTests
                 .OfType<Classifier>()
                 .SelectMany(c => c.Features)
                 .FirstOrDefault(f =>
-                    CompressedMetaPointer.Create(f.ToMetaPointer(), new CompressedIdConfig(true, false)).Equals(feature));
+                    CompressedMetaPointer.Create(f.ToMetaPointer(), new CompressedIdConfig(true, false))
+                        .Equals(feature));
 
             return replacementFeature;
         }
@@ -196,7 +198,7 @@ public class SerializationLenientTests
 
             Containment leftCont = leftFeature as Containment ?? LenientContainment.Create(leftFeature);
             Reference leftRef = leftFeature as Reference ?? LenientReference.Create(leftFeature);
-            
+
             Property leftProp = leftFeature as Property ?? LenientProperty.Create(leftFeature, leftValue);
             Property rightProp = rightFeature as Property ?? LenientProperty.Create(rightFeature, rightValue);
 

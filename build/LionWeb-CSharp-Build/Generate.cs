@@ -113,7 +113,7 @@ void SerializeLanguagesLocally(LionWebVersions lionWebVersion, string name, para
 {
     JsonUtils.WriteNodesToStream(
         new FileStream($"chunks/localDefs/{lionWebVersion.VersionString}/{name}.json", FileMode.Create),
-        new Serializer(lionWebVersion),
+        new SerializerBuilder().WithLionWebVersion(lionWebVersion).Build(),
         languages.SelectMany(l => M1Extensions.Descendants<IReadableNode>(l, true, true)));
 }
 
@@ -123,6 +123,9 @@ DynamicLanguage[] DeserializeExternalLanguage(LionWebVersions lionWebVersion, st
     SerializationChunk serializationChunk =
         JsonUtils.ReadJsonFromString<SerializationChunk>(
             File.ReadAllText($"chunks/externalDefs/{lionWebVersion.VersionString}/{name}.json"));
-    return new LanguageDeserializer(lionWebVersion, compressedIdConfig: new(KeepOriginal: true))
+    return new LanguageDeserializerBuilder()
+        .WithLionWebVersion(lionWebVersion)
+        .WithCompressedIds(new(KeepOriginal: true))
+        .Build()
         .Deserialize(serializationChunk, dependentLanguages).ToArray();
 }
