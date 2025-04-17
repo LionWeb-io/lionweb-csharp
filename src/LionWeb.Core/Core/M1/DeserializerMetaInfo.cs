@@ -110,8 +110,14 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
         [MaybeNullWhen(false)] out Feature feature) =>
         _features.TryGetValue(compressedMetaPointer, out feature) || SelectVersion(compressedMetaPointer, out feature);
 
-    internal bool LookupFactory(Language language, [MaybeNullWhen(false)] out INodeFactory factory) =>
-        _language2NodeFactory.TryGetValue(language, out factory);
+    internal bool LookupFactory(Language language, [NotNullWhen(true)] out INodeFactory? factory)
+    {
+        if (_language2NodeFactory.TryGetValue(language, out factory))
+            return true;
+
+        factory = language.GetFactory();
+        return factory != null;
+    }
 
     internal ICompressedId Compress(string id) =>
         ICompressedId.Create(id, CompressedIdConfig);
