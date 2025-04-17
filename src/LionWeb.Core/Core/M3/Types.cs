@@ -120,11 +120,11 @@ public interface Classifier : LanguageEntity
     /// Gets the <see cref="Features"/>.
     /// </summary>
     /// <param name="features">Value of <see cref="Features"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Features"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetFeatures(out IReadOnlyList<Feature>? features)
+    /// <returns><c>true</c> if <see cref="Features"/> is set and not empty; <c>false</c> otherwise.</returns>
+    bool TryGetFeatures([NotNullWhen(true)] out IReadOnlyList<Feature>? features)
     {
         features = Features;
-        return true;
+        return features is { Count: > 0 };
     }
 }
 
@@ -169,11 +169,11 @@ public interface Concept : Classifier
     /// Gets the <see cref="Extends"/>.
     /// </summary>
     /// <param name="extends">Value of <see cref="Extends"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Extends"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetExtends(out Concept? extends)
+    /// <returns><c>true</c> if <see cref="Extends"/> is set and not empty; <c>false</c> otherwise.</returns>
+    bool TryGetExtends([NotNullWhen(true)] out Concept? extends)
     {
         extends = Extends;
-        return true;
+        return extends != null;
     }
 
     /// A concept can implement zero or more <see cref="Interface">LionWeb interfaces</see>,
@@ -184,11 +184,11 @@ public interface Concept : Classifier
     /// Gets the <see cref="Implements"/>.
     /// </summary>
     /// <param name="implements">Value of <see cref="Implements"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Implements"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetImplements([MaybeNullWhen(false)] out IReadOnlyList<Interface>? implements)
+    /// <returns><c>true</c> if <see cref="Implements"/> is set and not empty; <c>false</c> otherwise.</returns>
+    bool TryGetImplements([NotNullWhen(true)] out IReadOnlyList<Interface>? implements)
     {
         implements = Implements;
-        return implements != null;
+        return implements is { Count: > 0 };
     }
 }
 
@@ -220,7 +220,7 @@ public interface Annotation : Classifier
     bool TryGetExtends([MaybeNullWhen(false)] out Annotation? extends)
     {
         extends = Extends;
-        return true;
+        return extends != null;
     }
 
     /// An annotation can implement zero or more <see cref="Interface">LionWeb interfaces</see>,
@@ -231,11 +231,11 @@ public interface Annotation : Classifier
     /// Gets the <see cref="Implements"/>.
     /// </summary>
     /// <param name="implements">Value of <see cref="Implements"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Implements"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetImplements([MaybeNullWhen(false)] out IReadOnlyList<Interface>? implements)
+    /// <returns><c>true</c> if <see cref="Implements"/> is set and not empty; <c>false</c> otherwise.</returns>
+    bool TryGetImplements([NotNullWhen(true)] out IReadOnlyList<Interface>? implements)
     {
         implements = Implements;
-        return implements != null;
+        return implements is { Count: > 0 };
     }
 }
 
@@ -250,11 +250,11 @@ public interface Interface : Classifier
     /// Gets the <see cref="Extends"/>.
     /// </summary>
     /// <param name="extends">Value of <see cref="Extends"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Extends"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetExtends([MaybeNullWhen(false)] out IReadOnlyList<Interface>? extends)
+    /// <returns><c>true</c> if <see cref="Extends"/> is set and not empty; <c>false</c> otherwise.</returns>
+    bool TryGetExtends([NotNullWhen(true)] out IReadOnlyList<Interface>? extends)
     {
         extends = Extends;
-        return extends != null;
+        return extends is { Count: > 0 };
     }
 }
 
@@ -280,11 +280,11 @@ public interface Enumeration : Datatype
     /// Gets the <see cref="Literals"/>.
     /// </summary>
     /// <param name="literals">Value of <see cref="Literals"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Literals"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetLiterals([MaybeNullWhen(false)] out IReadOnlyList<EnumerationLiteral>? literals)
+    /// <returns><c>true</c> if <see cref="Literals"/> is set and not empty; <c>false</c> otherwise.</returns>
+    bool TryGetLiterals([NotNullWhen(true)] out IReadOnlyList<EnumerationLiteral>? literals)
     {
         literals = Literals;
-        return literals != null;
+        return literals is { Count: > 0 };
     }
 }
 
@@ -302,11 +302,11 @@ public interface StructuredDataType : Datatype
     /// Gets the <see cref="Fields"/>.
     /// </summary>
     /// <param name="fields">Value of <see cref="Fields"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Fields"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetFields([MaybeNullWhen(false)] out IReadOnlyList<Field>? fields)
+    /// <returns><c>true</c> if <see cref="Fields"/> is set and not empty; <c>false</c> otherwise.</returns>
+    bool TryGetFields([NotNullWhen(true)] out IReadOnlyList<Field>? fields)
     {
         fields = Fields;
-        return fields?.Count > 0;
+        return fields is { Count: > 0 };
     }
 }
 
@@ -345,11 +345,11 @@ public interface Language : IKeyed, IPartitionInstance
     /// Gets the <see cref="Entities"/>.
     /// </summary>
     /// <param name="entities">Value of <see cref="Entities"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="Entities"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetEntities([MaybeNullWhen(false)] out IReadOnlyList<LanguageEntity>? entities)
+    /// <returns><c>true</c> if <see cref="Entities"/> is set and not empty; <c>false</c> otherwise.</returns>
+    bool TryGetEntities([NotNullWhen(true)] out IReadOnlyList<LanguageEntity>? entities)
     {
         entities = Entities;
-        return entities != null;
+        return entities is { Count: > 0 };
     }
 
     /// Other languages that define <see cref="LanguageEntity">LanguageEntities</see> that this language depends on.
@@ -359,11 +359,11 @@ public interface Language : IKeyed, IPartitionInstance
     /// Gets the <see cref="DependsOn"/>.
     /// </summary>
     /// <param name="dependsOn">Value of <see cref="DependsOn"/> if set, or <c>null</c>.</param>
-    /// <returns><c>true</c> if <see cref="DependsOn"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetDependsOn([MaybeNullWhen(false)] out IReadOnlyList<Language>? dependsOn)
+    /// <returns><c>true</c> if <see cref="DependsOn"/> is set and not empty; <c>false</c> otherwise.</returns>
+    bool TryGetDependsOn([NotNullWhen(true)] out IReadOnlyList<Language>? dependsOn)
     {
         dependsOn = DependsOn;
-        return dependsOn != null;
+        return dependsOn is { Count: > 0 };
     }
 
     /// <summary>

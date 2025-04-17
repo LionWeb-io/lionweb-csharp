@@ -20,6 +20,8 @@
 namespace LionWeb.Core.M3;
 
 using M2;
+using System.Diagnostics.CodeAnalysis;
+using Utilities;
 
 /// <inheritdoc cref="Language"/>
 public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lionWebVersion)
@@ -69,6 +71,43 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
             return DependsOn;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
+    }
+
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (_builtIns.INamed_name.EqualsIdentity(feature) && ((Language)this).TryGetName(out var name))
+        {
+            value = name;
+            return true;
+        }
+
+        if (_m3.IKeyed_key.EqualsIdentity(feature) && ((Language)this).TryGetKey(out var key))
+        {
+            value = key;
+            return true;
+        }
+
+        if (_m3.Language_version.EqualsIdentity(feature) && ((Language)this).TryGetVersion(out var version))
+        {
+            value = version;
+            return true;
+        }
+
+        if (_m3.Language_entities.EqualsIdentity(feature) && ((Language)this).TryGetEntities(out var entities))
+        {
+            value = entities;
+            return true;
+        }
+
+        if (_m3.Language_dependsOn.EqualsIdentity(feature) && ((Language)this).TryGetDependsOn(out var dependsOn))
+        {
+            value = dependsOn;
+            return true;
+        }
+
+        value = null;
+        return false;
     }
 
     /// <inheritdoc />
@@ -155,6 +194,25 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
     }
 
     /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (_builtIns.INamed_name.EqualsIdentity(feature) && TryGetName(out var name))
+        {
+            value = name;
+            return true;
+        }
+
+        if (_m3.IKeyed_key.EqualsIdentity(feature) && TryGetKey(out var key))
+        {
+            value = key;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
     public required string Name { get; init; }
 
     /// <inheritdoc />
@@ -206,6 +264,22 @@ public abstract class ClassifierBase<TLanguage>(string id, TLanguage parent)
     }
 
     /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.Classifier_features.EqualsIdentity(feature) && ((Classifier)this).TryGetFeatures(out var features))
+        {
+            value = features;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
     public IReadOnlyList<Feature> Features => FeaturesLazy.Value;
 
     /// <inheritdoc cref="Features"/>
@@ -241,6 +315,34 @@ public class AnnotationBase<TLanguage>(string id, TLanguage parent) : Classifier
             return Implements;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
+    }
+
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.Annotation_annotates.EqualsIdentity(feature) && ((Annotation)this).TryGetAnnotates(out var annotates))
+        {
+            value = annotates;
+            return true;
+        }
+
+        if (feature == _m3.Annotation_extends && ((Annotation)this).TryGetExtends(out var extends))
+        {
+            value = extends;
+            return true;
+        }
+
+        if (feature == _m3.Annotation_implements && ((Annotation)this).TryGetImplements(out var implements))
+        {
+            value = implements;
+            return true;
+        }
+
+        value = null;
+        return false;
     }
 
     /// <inheritdoc />
@@ -297,6 +399,40 @@ public class ConceptBase<TLanguage>(string id, TLanguage parent) : ClassifierBas
     }
 
     /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.Concept_abstract.EqualsIdentity(feature) && ((Concept)this).TryGetAbstract(out var @abstract))
+        {
+            value = @abstract;
+            return true;
+        }
+
+        if (_m3.Concept_partition.EqualsIdentity(feature) && ((Concept)this).TryGetPartition(out var partition))
+        {
+            value = partition;
+            return true;
+        }
+
+        if (_m3.Concept_extends.EqualsIdentity(feature) && ((Concept)this).TryGetExtends(out var extends))
+        {
+            value = extends;
+            return true;
+        }
+
+        if (_m3.Concept_implements.EqualsIdentity(feature) && ((Concept)this).TryGetImplements(out var implements))
+        {
+            value = implements;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
     public bool Abstract { get; init; } = false;
 
     /// <inheritdoc />
@@ -342,6 +478,22 @@ public class InterfaceBase<TLanguage>(string id, TLanguage parent) : ClassifierB
     }
 
     /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.Interface_extends.EqualsIdentity(feature) && ((Interface)this).TryGetExtends(out var extends))
+        {
+            value = extends;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
     public IReadOnlyList<Interface> Extends => ExtendsLazy.Value;
 
     /// <inheritdoc cref="Extends"/>
@@ -374,6 +526,22 @@ public abstract class FeatureBase<TLanguage> : IKeyedBase<TLanguage>, Feature wh
     }
 
     /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.Feature_optional.EqualsIdentity(feature) && ((Feature)this).TryGetOptional(out var optional))
+        {
+            value = optional;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
     public required bool Optional { get; init; }
 }
 
@@ -403,6 +571,28 @@ public abstract class LinkBase<TLanguage> : FeatureBase<TLanguage>, Link where T
             return Type;
 
         return null;
+    }
+
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.Link_multiple.EqualsIdentity(feature) && ((Link)this).TryGetMultiple(out var multiple))
+        {
+            value = multiple;
+            return true;
+        }
+
+        if (_m3.Link_type.EqualsIdentity(feature) && ((Link)this).TryGetType(out var type))
+        {
+            value = type;
+            return true;
+        }
+
+        value = null;
+        return false;
     }
 
     /// <inheritdoc />
@@ -493,6 +683,22 @@ public class PropertyBase<TLanguage> : FeatureBase<TLanguage>, Property where TL
     }
 
     /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.Property_type.EqualsIdentity(feature) && ((Property)this).TryGetType(out var type))
+        {
+            value = type;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
     public required Datatype Type { get; init; }
 
     /// <inheritdoc />
@@ -564,6 +770,22 @@ public class EnumerationBase<TLanguage> : DatatypeBase<TLanguage>, Enumeration w
     }
 
     /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.Enumeration_literals.EqualsIdentity(feature) && ((Enumeration)this).TryGetLiterals(out var literals))
+        {
+            value = literals;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
     public IReadOnlyList<EnumerationLiteral> Literals => LiteralsLazy.Value;
 
     /// <inheritdoc cref="Literals"/>
@@ -627,6 +849,22 @@ public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, Struct
     }
 
     /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.StructuredDataType_fields.EqualsIdentity(feature) && ((StructuredDataType)this).TryGetFields(out var fields))
+        {
+            value = fields;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    /// <inheritdoc />
     public IReadOnlyList<Field> Fields => FieldsLazy.Value;
 
     /// <inheritdoc cref="Fields"/>
@@ -665,6 +903,22 @@ public class FieldBase<TLanguage> : IKeyedBase<TLanguage>, Field where TLanguage
             return Type;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
+    }
+
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (base.TryGet(feature, out value))
+            return true;
+
+        if (_m3.Field_type.EqualsIdentity(feature) && ((Field)this).TryGetType(out var type))
+        {
+            value = type;
+            return true;
+        }
+
+        value = null;
+        return false;
     }
 
     /// <inheritdoc />

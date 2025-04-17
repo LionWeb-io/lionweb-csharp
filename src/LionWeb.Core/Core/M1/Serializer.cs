@@ -128,7 +128,7 @@ public class Serializer : ISerializer
 
         var featureValues = node
             .CollectAllSetFeatures()
-            .ToDictionary(f => f, node.Get);
+            .ToDictionary(f => f, feature => node.TryGet(feature, out var r) ? r : null);
 
         Dictionary<Feature, object?> properties = CollectProperties(featureValues);
         RemoveFromFeatureValues(properties);

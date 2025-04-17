@@ -231,8 +231,8 @@ public class M2ReflectionTests
     public void Language_TryGet_Entities()
     {
         var node = new DynamicLanguage("a", _lionWebVersion);
-        Assert.IsTrue(((Language)node).TryGetEntities(out var empty));
-        Assert.IsTrue(empty.Count == 0);
+        Assert.IsFalse(((Language)node).TryGetEntities(out var empty));
+        Assert.IsTrue(empty?.Count == 0);
 
         node.AddEntities([new DynamicConcept("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Language)node).TryGetEntities(out var value));
@@ -257,8 +257,8 @@ public class M2ReflectionTests
     public void Language_TryGet_DependsOn()
     {
         var node = new DynamicLanguage("a", _lionWebVersion);
-        Assert.IsTrue(((Language)node).TryGetDependsOn(out var empty));
-        Assert.IsTrue(empty.Count == 0);
+        Assert.IsFalse(((Language)node).TryGetDependsOn(out var empty));
+        Assert.IsTrue(empty?.Count == 0);
 
         node.AddDependsOn([node]);
         Assert.IsTrue(((Language)node).TryGetDependsOn(out var value));
@@ -367,8 +367,8 @@ public class M2ReflectionTests
     public void Annotation_TryGet_Features()
     {
         var node = new DynamicAnnotation("a", _lionWebVersion, lang);
-        Assert.IsTrue(((Annotation)node).TryGetFeatures(out var empty));
-        Assert.IsTrue(empty.Count == 0);
+        Assert.IsFalse(((Annotation)node).TryGetFeatures(out var empty));
+        Assert.IsTrue(empty?.Count == 0);
 
         node.AddFeatures([new DynamicProperty("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Annotation)node).TryGetFeatures(out var value));
@@ -412,7 +412,7 @@ public class M2ReflectionTests
     public void Annotation_TryGet_Extends()
     {
         var node = new DynamicAnnotation("a", _lionWebVersion, lang);
-        Assert.IsTrue(((Annotation)node).TryGetExtends(out var empty));
+        Assert.IsFalse(((Annotation)node).TryGetExtends(out var empty));
         Assert.IsNull(empty);
 
         node.Extends = node;
@@ -436,8 +436,8 @@ public class M2ReflectionTests
     public void Annotation_TryGet_Implements()
     {
         var node = new DynamicAnnotation("a", _lionWebVersion, lang);
-        Assert.IsTrue(((Annotation)node).TryGetImplements(out var empty));
-        Assert.IsTrue(empty.Count == 0);
+        Assert.IsFalse(((Annotation)node).TryGetImplements(out var empty));
+        Assert.IsTrue(empty?.Count == 0);
 
         node.AddImplements([new DynamicInterface("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Annotation)node).TryGetImplements(out var value));
@@ -546,8 +546,8 @@ public class M2ReflectionTests
     public void Concept_TryGet_Features()
     {
         var node = new DynamicConcept("a", _lionWebVersion, lang);
-        Assert.IsTrue(((Concept)node).TryGetFeatures(out var empty));
-        Assert.IsTrue(empty.Count == 0);
+        Assert.IsFalse(((Concept)node).TryGetFeatures(out var empty));
+        Assert.IsTrue(empty?.Count == 0);
 
         node.AddFeatures([new DynamicProperty("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Concept)node).TryGetFeatures(out var value));
@@ -613,7 +613,7 @@ public class M2ReflectionTests
     public void Concept_TryGet_Extends()
     {
         var node = new DynamicConcept("a", _lionWebVersion, null);
-        Assert.IsTrue(((Concept)node).TryGetExtends(out var empty));
+        Assert.IsFalse(((Concept)node).TryGetExtends(out var empty));
         Assert.AreEqual(null, empty);
 
         node.Extends = node;
@@ -637,8 +637,8 @@ public class M2ReflectionTests
     public void Concept_TryGet_Implements()
     {
         var node = new DynamicConcept("a", _lionWebVersion, lang);
-        Assert.IsTrue(((Concept)node).TryGetImplements(out var empty));
-        Assert.IsTrue(empty.Count == 0);
+        Assert.IsFalse(((Concept)node).TryGetImplements(out var empty));
+        Assert.IsTrue(empty?.Count == 0);
 
         node.AddImplements([new DynamicInterface("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Concept)node).TryGetImplements(out var value));
@@ -1024,8 +1024,8 @@ public class M2ReflectionTests
     public void Enumeration_TryGet_Literals()
     {
         var node = new DynamicEnumeration("a", _lionWebVersion, lang);
-        Assert.IsTrue(((Enumeration)node).TryGetLiterals(out var empty));
-        Assert.IsTrue(empty.Count == 0);
+        Assert.IsFalse(((Enumeration)node).TryGetLiterals(out var empty));
+        Assert.IsTrue(empty?.Count == 0);
 
         node.AddLiterals([new DynamicEnumerationLiteral("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Enumeration)node).TryGetLiterals(out var value));
@@ -1262,8 +1262,8 @@ public class M2ReflectionTests
     public void Interface_TryGet_Features()
     {
         var node = new DynamicInterface("a", _lionWebVersion, lang);
-        Assert.IsTrue(((Interface)node).TryGetFeatures(out var empty));
-        Assert.IsTrue(empty.Count == 0);
+        Assert.IsFalse(((Interface)node).TryGetFeatures(out var empty));
+        Assert.IsTrue(empty?.Count == 0);
 
         node.AddFeatures([new DynamicProperty("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Interface)node).TryGetFeatures(out var value));
@@ -1286,8 +1286,8 @@ public class M2ReflectionTests
     public void Interface_TryGet_Extends()
     {
         var node = new DynamicInterface("a", _lionWebVersion, lang);
-        Assert.IsTrue(((Interface)node).TryGetExtends(out var empty));
-        Assert.IsTrue(empty.Count == 0);
+        Assert.IsFalse(((Interface)node).TryGetExtends(out var empty));
+        Assert.IsTrue(empty?.Count == 0);
 
         node.AddExtends([new DynamicInterface("b", _lionWebVersion, null)]);
         Assert.IsTrue(((Interface)node).TryGetExtends(out var value));

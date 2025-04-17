@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [Unreleased]
 
 ### Added
+* Added `bool IReadableNode.TryGet(Feature, out object? value)`.
 ### Fixed
 ### Changed
 ### Removed
