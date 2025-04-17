@@ -22,6 +22,7 @@ using Core.Utilities;
 using Languages.Generated.V2024_1.SDTLang;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M3;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 [TestClass]
@@ -485,6 +486,11 @@ public class HasherTests
         public IEnumerable<Feature> CollectAllSetFeatures() => [];
 
         public object? Get(Feature feature) => throw new UnknownFeatureException(GetClassifier(), feature);
+        public bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+        {
+            value = null;
+            return false;
+        }
 
         public void DetachFromParent() { }
 
