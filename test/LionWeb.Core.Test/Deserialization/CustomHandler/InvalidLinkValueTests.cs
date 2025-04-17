@@ -783,7 +783,7 @@ public class InvalidLinkValueTests
                 new SerializedNode
                 {
                     Id = "ref_3",
-                    Classifier = new MetaPointer("key-Shapes", "1", "key-Circle"),
+                    Classifier = new MetaPointer("key-Shapes", "1", "key-Coord"),
                     Properties = [],
                     Containments = [],
                     References = [],

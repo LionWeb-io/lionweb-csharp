@@ -109,11 +109,11 @@ public abstract class ClonerBase
                 throw new TypeExpectationFailedException(typeof(IList), featureValue);
             }
 
-            IEnumerable<INode> resolvedTargets = featureValues.OfType<INode>().Select(ResolveReference).OfType<INode>();
+            IEnumerable<IReadableNode> resolvedTargets = featureValues.OfType<IReadableNode>().Select(ResolveReference).OfType<IReadableNode>();
             result.Set(reference, resolvedTargets.ToList());
-        } else if (featureValue is INode target)
+        } else if (featureValue is IReadableNode target)
         {
-            INode? resolvedTarget = ResolveReference(target);
+            IReadableNode? resolvedTarget = ResolveReference(target);
             if (resolvedTarget is not null)
             {
                 result.Set(reference, resolvedTarget);
@@ -122,9 +122,9 @@ public abstract class ClonerBase
 
         return;
 
-        INode? ResolveReference(INode target)
+        IReadableNode? ResolveReference(IReadableNode target)
         {
-            if (_nodes.TryGetValue(target, out INode? found))
+            if (target is INode iNode && _nodes.TryGetValue(iNode, out INode? found))
             {
                 return found;
             }
