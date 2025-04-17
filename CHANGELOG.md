@@ -10,6 +10,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ### Added
 ### Fixed
+* Enabled replacing `DynamicLanguage.entities`.
+* Aligned behavior of `DynamicStructuredDataTypeInstance.CollectAllSetFields()` and `Get()` with other implementations.
+* Ensure stable results of `DynamicStructuredDataTypeInstance.Equals()` and `GetHashCode()`.
 ### Changed
 ### Removed
 ### Deprecated
