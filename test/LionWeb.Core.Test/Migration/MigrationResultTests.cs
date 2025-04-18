@@ -62,10 +62,20 @@ public class MigrationResultTests
     [TestMethod]
     public void Validate_ChangedFalse_OutputInputEqual()
     {
+        var lenientNode = new LenientNode("l", ShapesLanguage.Instance.Line);
+        List<LenientNode> input = [lenientNode];
+        List<LenientNode> output = [lenientNode];
+
+        Assert.IsNotNull(new MigrationResult(false, output).Validate(input));
+    }
+    
+    [TestMethod]
+    public void Validate_ChangedFalse_OutputInputEqualNotSame()
+    {
         List<LenientNode> input = [new LenientNode("l", ShapesLanguage.Instance.Line)];
         List<LenientNode> output = [new LenientNode("l", ShapesLanguage.Instance.Line)];
 
-        Assert.IsNotNull(new MigrationResult(false, output).Validate(input));
+        Assert.ThrowsException<ArgumentException>(() => new MigrationResult(false, output).Validate(input));
     }
     
     [TestMethod]

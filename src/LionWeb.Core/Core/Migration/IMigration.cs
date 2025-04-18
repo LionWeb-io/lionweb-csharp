@@ -39,8 +39,6 @@ public interface IMigration
     /// </summary>
     /// <param name="inputRootNodes">List of <i>root nodes</i> to migrate.
     /// Root nodes are all nodes without a <see cref="IReadableNode.GetParent">parent</see>.</param>
-    // TODO: Maybe rename to Execute / Run / Apply?
-    // What happens if return=false and outputRootNodes != inputRootNodes?
     MigrationResult Migrate(List<LenientNode> inputRootNodes);
 }
 
@@ -69,7 +67,7 @@ public record MigrationResult(bool Changed, List<LenientNode> OutputRootNodes)
             case (_, null):
                 throw new ArgumentException($"{nameof(OutputRootNodes)} must not be null");
 
-            case (false, _) when !OutputRootNodes.SequenceEqual(inputRootNodes, LenientNode.LenientNodeComparer):
+            case (false, _) when !OutputRootNodes.SequenceEqual(inputRootNodes):
                 throw new ArgumentException(
                     $"{nameof(OutputRootNodes)} must be equal to {nameof(inputRootNodes)} if {nameof(Changed)} is false");
         }
