@@ -54,6 +54,9 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
 
     private readonly List<IMigration> _migrations = [];
     private readonly Dictionary<LanguageIdentity, DynamicLanguage> _dynamicInputLanguages;
+    private readonly DeserializerBuilder _deserializerBuilder;
+    private readonly SerializerBuilder _serializerBuilder;
+    
     private Dictionary<LanguageIdentity, DynamicLanguage> _dynamicLanguages;
 
     /// <param name="lionWebVersion">Version of LionWeb standard to use for
@@ -76,9 +79,31 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     /// <inheritdoc />
     public int MaxMigrationRounds { get; init; } = _maxMigrationRounds;
 
-    public CompressedIdConfig CompressedIdConfig { get; init; } = new();
+    public DeserializerBuilder DeserializerBuilder
+    {
+        get => _deserializerBuilder;
+        init
+        {
+            value.LionWebVersion.AssureCompatible(LionWebVersion);
+            if(SerializerBuilder != null)
+                value.LionWebVersion.AssureCompatible(SerializerBuilder.LionWebVersion);
+            
+            _deserializerBuilder = value;
+        }
+    }
 
-    public bool SerializeEmptyFeatures { get; init; } = false;
+    public SerializerBuilder SerializerBuilder
+    {
+        get => _serializerBuilder;
+        init
+        {
+            value.LionWebVersion.AssureCompatible(LionWebVersion);
+            if(DeserializerBuilder != null)
+                value.LionWebVersion.AssureCompatible(DeserializerBuilder.LionWebVersion);
+            
+            _serializerBuilder = value;
+        }
+    }
 
     /// <inheritdoc />
     public async Task<bool> Migrate(Stream inputUtf8JsonStream, Stream migratedUtf8JsonStream)
@@ -112,7 +137,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
             anyChange |= changeInThisRound;
         } while (changeInThisRound);
 
-        Serialize(migratedUtf8JsonStream, rootNodes);
+        await Serialize(migratedUtf8JsonStream, rootNodes);
 
         return anyChange;
     }
@@ -120,7 +145,10 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     private async Task<(List<IReadableNode> loaded, string? lionWebVersion)> Deserialize(Stream inputUtf8JsonStream)
     {
         string? lionWebVersion = null;
-        var deserializer = SetupDeserializerBuilder().Build();
+        var builder = DeserializerBuilder ?? new DeserializerBuilder().WithLionWebVersion(LionWebVersion);
+        var deserializer = builder
+            .WithHandler(new MigrationDeserializerHandler(LionWebVersion, _dynamicLanguages.Values, builder.Handler ?? new DeserializerExceptionHandler()))
+            .WithLanguages(_dynamicLanguages.Values).Build();
 
         var loaded = await JsonUtils.ReadNodesFromStreamAsync(inputUtf8JsonStream, deserializer, serializedVersion =>
         {
@@ -130,13 +158,6 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
 
         return (loaded, lionWebVersion);
     }
-
-    private DeserializerBuilder SetupDeserializerBuilder() =>
-        new DeserializerBuilder()
-            .WithCompressedIds(CompressedIdConfig)
-            .WithLionWebVersion(LionWebVersion)
-            .WithHandler(new MigrationDeserializerHandler(LionWebVersion, _dynamicLanguages.Values))
-            .WithLanguages(_dynamicLanguages.Values);
 
     private void UpdateSerializedLionWebVersion(string? lionWebVersion)
     {
@@ -202,15 +223,16 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
             string.Join(", ", nodes.Select(n => n.GetId()));
     }
 
-    private void Serialize(Stream migratedUtf8JsonStream, List<LenientNode> rootNodes)
+    private async Task Serialize(Stream migratedUtf8JsonStream, List<LenientNode> rootNodes)
     {
-        var serializer = new Serializer(LionWebVersion)
-        {
-            SerializeEmptyFeatures = SerializeEmptyFeatures, Handler = new MigrationSerializerHandler()
-        };
+        var builder = SerializerBuilder ?? new SerializerBuilder().WithLionWebVersion(LionWebVersion);
+
+        var serializer = builder
+            .WithHandler(new MigrationSerializerHandler(builder.Handler ?? new SerializerExceptionHandler()))
+            .Build();
 
         var allNodes = rootNodes.Descendants().ToList();
-        JsonUtils.WriteNodesToStream(migratedUtf8JsonStream, serializer, allNodes);
+        await JsonUtils.WriteNodesToStreamAsync(migratedUtf8JsonStream, serializer, allNodes);
     }
 
     /// <inheritdoc />

@@ -18,6 +18,7 @@
 namespace LionWeb.Core.M3;
 
 using M1;
+using M2;
 using Serialization;
 
 /// <summary>

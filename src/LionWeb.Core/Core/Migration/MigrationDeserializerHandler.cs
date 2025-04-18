@@ -23,7 +23,7 @@ using M3;
 
 /// Integrates unknown language elements during deserialization as good as possible.
 /// <seealso cref="ModelMigrator"/>
-public class MigrationDeserializerHandler : DeserializerExceptionHandler
+public class MigrationDeserializerHandler : DeserializerDelegatingHandler
 {
     private readonly LionWebVersions _lionWebVersion;
     private readonly CompressedIdConfig _compressedIdConfig;
@@ -31,7 +31,8 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
     private readonly Dictionary<ICompressedId, List<DynamicLanguage>> _languageKeys = [];
 
     /// <inheritdoc />
-    public MigrationDeserializerHandler(LionWebVersions lionWebVersion, IEnumerable<DynamicLanguage> languages)
+    public MigrationDeserializerHandler(LionWebVersions lionWebVersion, IEnumerable<DynamicLanguage> languages,
+        IDeserializerHandler delegateHandler) : base(delegateHandler)
     {
         _lionWebVersion = lionWebVersion;
         _compressedIdConfig = new CompressedIdConfig(false);
@@ -47,8 +48,7 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
         if (_languageKeys.TryGetValue(Compress(language.Key), out var langs))
         {
             langs.Add(language);
-        }
-        else
+        } else
         {
             _languageKeys[Compress(language.Key)] = [language];
         }
@@ -99,8 +99,7 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
                 Optional = true,
                 Type = _lionWebVersion.BuiltIns.String
             };
-        }
-        else if (typeof(TFeature).IsAssignableFrom(typeof(Containment)))
+        } else if (typeof(TFeature).IsAssignableFrom(typeof(Containment)))
         {
             result = new DynamicContainment(feature.Key.Original!, _lionWebVersion, null)
             {
@@ -110,8 +109,7 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
                 Optional = true,
                 Type = _lionWebVersion.BuiltIns.Node
             };
-        }
-        else if (typeof(TFeature).IsAssignableFrom(typeof(Reference)))
+        } else if (typeof(TFeature).IsAssignableFrom(typeof(Reference)))
         {
             result = new DynamicReference(feature.Key.Original!, _lionWebVersion, null)
             {
@@ -121,26 +119,13 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
                 Optional = true,
                 Type = _lionWebVersion.BuiltIns.Node
             };
-        }
-        else
+        } else
         {
             throw new ArgumentOutOfRangeException(nameof(feature));
         }
 
         ((DynamicClassifier)classifier).AddFeatures([result]);
         return result;
-    }
-
-    public override Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property,
-        IReadableNode node)
-    {
-        return base.UnknownEnumerationLiteral(key, enumeration, property, node);
-    }
-
-    public override object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property,
-        IReadableNode node)
-    {
-        return base.UnknownDatatype(value, datatype, property, node);
     }
 
     /// <inheritdoc />
@@ -163,13 +148,6 @@ public class MigrationDeserializerHandler : DeserializerExceptionHandler
         return lenientAnnotationInstance;
     }
 
-    /// <inheritdoc />
-    public override IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node)
-    {
-        Console.WriteLine("bad");
-        return base.UnresolvableChild(childId, containment, node);
-    }
-    
     private ICompressedId Compress(string key) =>
         ICompressedId.Create(key, _compressedIdConfig);
 }

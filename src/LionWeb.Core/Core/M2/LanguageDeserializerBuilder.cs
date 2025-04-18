@@ -15,10 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1;
+namespace LionWeb.Core.M2;
 
-using M2;
-using M3;
+using LionWeb.Core.M3;
+using M1;
 
 /// Builds an M2 (i.e. language-level) <see cref="ILanguageDeserializer"/>.
 public class LanguageDeserializerBuilder
@@ -26,16 +26,20 @@ public class LanguageDeserializerBuilder
     private readonly Dictionary<Language, INodeFactory> _languages = new();
     private readonly HashSet<IReadableNode> _dependentNodes = new();
     private readonly HashSet<Language> _dependentLanguages = new();
-    private ILanguageDeserializerHandler? _handler;
     private CompressedIdConfig _compressedIdConfig = new();
-    private LionWebVersions _lionWebVersion = LionWebVersions.Current;
     private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
+    
+    /// <inheritdoc cref="WithLionWebVersion"/>
+    public LionWebVersions LionWebVersion { get; set; } = LionWebVersions.Current;
+    
+    /// <inheritdoc cref="WithHandler"/>
+    public ILanguageDeserializerHandler? Handler { get; set; }
 
     /// Registers a custom handler.
     /// Defaults to <see cref="DeserializerExceptionHandler"/>.
     public LanguageDeserializerBuilder WithHandler(ILanguageDeserializerHandler handler)
     {
-        _handler = handler;
+        Handler = handler;
         return this;
     }
 
@@ -107,7 +111,7 @@ public class LanguageDeserializerBuilder
     /// Defaults to <see cref="LionWebVersions.Current"/>.
     public LanguageDeserializerBuilder WithLionWebVersion(LionWebVersions lionWebVersion)
     {
-        _lionWebVersion = lionWebVersion;
+        LionWebVersion = lionWebVersion;
         return this;
     }
 
@@ -118,7 +122,7 @@ public class LanguageDeserializerBuilder
     /// </exception>
     public ILanguageDeserializer Build()
     {
-        var result = new LanguageDeserializer(_lionWebVersion, _handler, _compressedIdConfig)
+        var result = new LanguageDeserializer(LionWebVersion, Handler, _compressedIdConfig)
         {
             ResolveInfoHandling = _referenceResolveInfoHandling
         };

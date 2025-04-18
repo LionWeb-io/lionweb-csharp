@@ -15,17 +15,22 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Migration;
+namespace LionWeb.Core.M1;
 
-using M1;
 using M3;
 
-/// For duplicate languages, selects the one with more <see cref="Language.Entities"/>. 
-/// <seealso cref="ModelMigrator"/>
-public class MigrationSerializerHandler(ISerializerHandler delegateHandler)
-    : SerializerDelegatingHandler(delegateHandler)
+/// Delegates all calls to <paramref name="delegateHandler"/>.
+public class SerializerDelegatingHandler(ISerializerHandler delegateHandler) : ISerializerHandler
 {
     /// <inheritdoc />
-    public override Language? DuplicateUsedLanguage(Language a, Language b) =>
-        a.Entities.Count >= b.Entities.Count ? a : b;
+    public virtual Language? DuplicateUsedLanguage(Language a, Language b) =>
+        delegateHandler.DuplicateUsedLanguage(a, b);
+
+    /// <inheritdoc />
+    public virtual void DuplicateNodeId(IReadableNode n) =>
+        delegateHandler.DuplicateNodeId(n);
+
+    /// <inheritdoc />
+    public virtual string? UnknownDatatype(IReadableNode node, Feature property, object? value) =>
+        delegateHandler.UnknownDatatype(node, property, value);
 }

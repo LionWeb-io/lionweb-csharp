@@ -20,17 +20,21 @@ namespace LionWeb.Core.M1;
 /// Builds an <see cref="ISerializer"/>.
 public class SerializerBuilder
 {
-    private LionWebVersions _lionWebVersion = LionWebVersions.Current;
-    private ISerializerHandler? _handler;
     private CompressedIdConfig _compressedIdConfig = new();
     private bool _serializeEmptyFeatures = true;
     private bool _persistLionCoreReferenceTargetIds = false;
+    
+    /// <inheritdoc cref="WithLionWebVersion"/>
+    public LionWebVersions LionWebVersion { get; set; } = LionWebVersions.Current;
+    
+    /// <inheritdoc cref="WithHandler"/>
+    public ISerializerHandler? Handler { get; set; }
 
     /// Registers a custom handler.
     /// Defaults to <see cref="SerializerExceptionHandler"/>.
     public SerializerBuilder WithHandler(ISerializerHandler handler)
     {
-        _handler = handler;
+        Handler = handler;
         return this;
     }
 
@@ -46,7 +50,7 @@ public class SerializerBuilder
     /// Defaults to <see cref="LionWebVersions.Current"/>.
     public SerializerBuilder WithLionWebVersion(LionWebVersions lionWebVersion)
     {
-        _lionWebVersion = lionWebVersion;
+        LionWebVersion = lionWebVersion;
         return this;
     }
 
@@ -67,10 +71,10 @@ public class SerializerBuilder
     /// <summary>Builds the serializer.</summary>
     public ISerializer Build()
     {
-        Serializer result = new Serializer(_lionWebVersion)
+        Serializer result = new Serializer(LionWebVersion)
         {
             CompressedIdConfig = _compressedIdConfig,
-            Handler = _handler ?? new SerializerExceptionHandler(),
+            Handler = Handler ?? new SerializerExceptionHandler(),
             SerializeEmptyFeatures = _serializeEmptyFeatures,
             PersistLionCoreReferenceTargetIds = _persistLionCoreReferenceTargetIds
         };

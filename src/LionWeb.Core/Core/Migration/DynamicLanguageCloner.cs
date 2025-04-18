@@ -261,10 +261,15 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
     private bool TryLookup<T>(T keyed, [NotNullWhen(true)] out T? result) where T : IKeyed
     {
         var keyedLanguage = keyed.GetLanguage();
-        if (keyedLanguage.Key == lionWebVersion.BuiltIns.Key ||
-            keyedLanguage.Key == lionWebVersion.LionCore.Key)
+        if (keyedLanguage.Key == lionWebVersion.BuiltIns.Key)
         {
-            result = keyed;
+            result = lionWebVersion.BuiltIns.FindByKey<T>(keyed.Key);
+            return true;
+        }
+
+        if (keyedLanguage.Key == lionWebVersion.LionCore.Key)
+        {
+            result = lionWebVersion.LionCore.FindByKey<T>(keyed.Key);
             return true;
         }
 

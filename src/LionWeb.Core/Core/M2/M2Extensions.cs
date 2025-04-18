@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M2;
 
+using M1;
 using M3;
 using System.Collections;
 using System.Collections.Immutable;
@@ -46,6 +47,11 @@ public static class M2Extensions
 
         return result.First();
     }
+
+    public static T FindByKey<T>(this Language language, string key) where T : IKeyed =>
+        M1Extensions.Descendants<IKeyed>(language, true, true)
+            .OfType<T>()
+            .FindByKey(key);
 
     /// <summary>
     /// Returns the classifier with <paramref name="key"/> contained in <paramref name="language"/>.

@@ -50,13 +50,13 @@ public static class JsonUtils
         File.WriteAllText(path, WriteJsonToString(data));
 
     /// <summary>
-    /// Uses <paramref name="serializer"/> to write <paramref name="nodes"/> to <paramref name="stream"/> efficiently.
+    /// Uses <paramref name="serializer"/> to write <paramref name="nodes"/> to <paramref name="utf8JsonStream"/> efficiently.
     /// </summary>
-    /// <param name="stream">Stream to serialize <paramref name="nodes"/> to.
+    /// <param name="utf8JsonStream">Stream to serialize <paramref name="nodes"/> to.
     /// <i>Only</i> includes these nodes, no descendants etc.</param>
     /// <param name="serializer">Serializer to use.</param>
     /// <param name="nodes">Nodes to serialize.</param>
-    public static void WriteNodesToStream(Stream stream, ISerializer serializer, IEnumerable<IReadableNode> nodes)
+    public static void WriteNodesToStream(Stream utf8JsonStream, ISerializer serializer, IEnumerable<IReadableNode> nodes)
     {
         object data = new LazySerializationChunk
         {
@@ -64,21 +64,39 @@ public static class JsonUtils
             Nodes = serializer.Serialize(nodes),
             Languages = serializer.UsedLanguages
         };
-        JsonSerializer.Serialize(stream, data, _writeOptions);
+        JsonSerializer.Serialize(utf8JsonStream, data, _writeOptions);
     }
 
     /// <summary>
-    /// Uses <paramref name="deserializer"/> to read nodes from <paramref name="stream"/>.  
+    /// Uses <paramref name="serializer"/> to write <paramref name="nodes"/> to <paramref name="utf8JsonStream"/> efficiently.
     /// </summary>
-    /// <param name="stream">Stream to read from.</param>
+    /// <param name="utf8JsonStream">Stream to serialize <paramref name="nodes"/> to.
+    /// <i>Only</i> includes these nodes, no descendants etc.</param>
+    /// <param name="serializer">Serializer to use.</param>
+    /// <param name="nodes">Nodes to serialize.</param>
+    public static async Task WriteNodesToStreamAsync(Stream utf8JsonStream, ISerializer serializer, IEnumerable<IReadableNode> nodes)
+    {
+        object data = new LazySerializationChunk
+        {
+            SerializationFormatVersion = serializer.LionWebVersion.VersionString,
+            Nodes = serializer.Serialize(nodes),
+            Languages = serializer.UsedLanguages
+        };
+        await JsonSerializer.SerializeAsync(utf8JsonStream, data, _writeOptions);
+    }
+
+    /// <summary>
+    /// Uses <paramref name="deserializer"/> to read nodes from <paramref name="utf8JsonStream"/>.  
+    /// </summary>
+    /// <param name="utf8JsonStream">Stream to read from.</param>
     /// <param name="deserializer">Deserializer to use.</param>
     /// <param name="lionWebVersionChecker">Optional action to check the <see cref="SerializationChunk.SerializationFormatVersion"/>.
     /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
-    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream stream, IDeserializer deserializer,
+    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream utf8JsonStream, IDeserializer deserializer,
         Action<string>? lionWebVersionChecker = null)
     {
-        var streamReader = new Utf8JsonAsyncStreamReader(stream, leaveOpen: true);
+        var streamReader = new Utf8JsonAsyncStreamReader(utf8JsonStream, leaveOpen: true);
 
         bool insideNodes = false;
         while (await Advance())
