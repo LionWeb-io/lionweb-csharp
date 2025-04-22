@@ -56,7 +56,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     private readonly Dictionary<LanguageIdentity, DynamicLanguage> _dynamicInputLanguages;
     private readonly DeserializerBuilder _deserializerBuilder;
     private readonly SerializerBuilder _serializerBuilder;
-    
+
     private Dictionary<LanguageIdentity, DynamicLanguage> _dynamicLanguages;
 
     /// <param name="lionWebVersion">Version of LionWeb standard to use for
@@ -85,9 +85,9 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
         init
         {
             value.LionWebVersion.AssureCompatible(LionWebVersion);
-            if(SerializerBuilder != null)
+            if (SerializerBuilder != null)
                 value.LionWebVersion.AssureCompatible(SerializerBuilder.LionWebVersion);
-            
+
             _deserializerBuilder = value;
         }
     }
@@ -98,9 +98,9 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
         init
         {
             value.LionWebVersion.AssureCompatible(LionWebVersion);
-            if(DeserializerBuilder != null)
+            if (DeserializerBuilder != null)
                 value.LionWebVersion.AssureCompatible(DeserializerBuilder.LionWebVersion);
-            
+
             _serializerBuilder = value;
         }
     }
@@ -147,7 +147,8 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
         string? lionWebVersion = null;
         var builder = DeserializerBuilder ?? new DeserializerBuilder().WithLionWebVersion(LionWebVersion);
         var deserializer = builder
-            .WithHandler(new MigrationDeserializerHandler(LionWebVersion, _dynamicLanguages.Values, builder.Handler ?? new DeserializerExceptionHandler()))
+            .WithHandler(new MigrationDeserializerHandler(LionWebVersion, _dynamicLanguages.Values,
+                builder.Handler ?? new DeserializerExceptionHandler()))
             .WithLanguages(_dynamicLanguages.Values).Build();
 
         var loaded = await JsonUtils.ReadNodesFromStreamAsync(inputUtf8JsonStream, deserializer, serializedVersion =>
@@ -179,14 +180,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     }
 
     private Dictionary<LanguageIdentity, DynamicLanguage> CollectUsedLanguages(List<LenientNode> nodes) =>
-        nodes
-            .Descendants()
-            .SelectMany(n =>
-                n.GetClassifier().Features.Select(f => f.GetLanguage())
-                    .Prepend(n.GetClassifier().GetLanguage())
-            )
-            .Cast<DynamicLanguage>()
-            .Distinct()
+        MigrationExtensions.CollectUsedLanguages(nodes)
             .ToDictionary(LanguageIdentity.FromLanguage, l => l);
 
     private IOrderedEnumerable<IMigration> SelectApplicableMigrations(ImmutableHashSet<LanguageIdentity> usedLanguages)
@@ -285,40 +279,4 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     }
 
     #endregion
-}
-
-/// Extensions useful to work with <see cref="LenientNode"/>s during Migration.
-public static class MigrationExtensions
-{
-    /// All <see cref="M1Extensions.Descendants"/> of <paramref name="nodes"/>, including annotations.
-    public static IEnumerable<LenientNode> Descendants(this List<LenientNode> nodes) =>
-        nodes.SelectMany(Descendants);
-
-    /// All <see cref="M1Extensions.Descendants"/> of <paramref name="node"/>, including annotations.
-    public static IEnumerable<LenientNode> Descendants(this LenientNode node) =>
-        M1Extensions.Descendants<LenientNode>(node, true, true);
-
-    /// All <see cref="Descendants(System.Collections.Generic.List{LionWeb.Core.LenientNode})">descendants</see> of
-    /// <paramref name="nodes"/> that are instances of <paramref name="classifier"/>.
-    public static IEnumerable<LenientNode>
-        AllInstancesOf(this List<LenientNode> nodes, ClassifierIdentity classifier) =>
-        nodes
-            .Descendants()
-            .Where(n =>
-            {
-                var classifierIdentity = ClassifierIdentity.FromClassifier(n.GetClassifier());
-                return classifierIdentity == classifier;
-            });
-
-    internal static T Lookup<T>(T keyed, Language language) where T : IKeyed
-    {
-        var mapped = M1Extensions
-            .Descendants<IKeyed>(language, true)
-            .FirstOrDefault(k => k.Key == keyed.Key);
-
-        if (mapped is T result)
-            return result;
-
-        throw new ArgumentException($"No lookup for {keyed.Key}");
-    }
 }

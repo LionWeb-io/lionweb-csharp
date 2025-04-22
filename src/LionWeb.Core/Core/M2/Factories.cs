@@ -212,33 +212,44 @@ public class ReflectiveBaseNodeFactory(Language language) : AbstractBaseNodeFact
     /// <inheritdoc />
     public override Enum GetEnumerationLiteral(EnumerationLiteral literal)
     {
-        if (_enums.TryGetValue(literal.GetEnumeration(), out Type enm))
+        if (_enums.TryGetValue(literal.GetEnumeration(), out Type? enm))
         {
             var result = Enum.Parse(enm, literal.Name);
-            return result as Enum;
+            return (Enum)result;
         }
 
-        return CreateEnum(literal);
+        return CreateEnumLiteral(literal);
     }
 
-    private Enum CreateEnum(EnumerationLiteral literal)
+    private Enum CreateEnumLiteral(EnumerationLiteral literal) =>
+        (Enum)Enum.Parse(CreateEnum(literal.GetEnumeration()), literal.Name);
+
+    protected Type CreateEnum(Enumeration enm)
     {
-        var name = new AssemblyName(literal.GetEnumeration().Name);
+        var name = new AssemblyName(enm.Name);
         var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
-        var moduleBuilder = assemblyBuilder.DefineDynamicModule(literal.GetEnumeration().Name);
-        var enumBuilder = moduleBuilder.DefineEnum("EnumeratedTypes." + literal.GetEnumeration().Name,
-            TypeAttributes.Public,
-            typeof(int));
+        var moduleBuilder = assemblyBuilder.DefineDynamicModule(enm.Name);
+        var enumBuilder = moduleBuilder.DefineEnum("EnumeratedTypes." + enm.Name,
+            TypeAttributes.Public, typeof(int));
+        enumBuilder.SetCustomAttribute(CreateLionCoreMetaPointerAttribute(enm));
 
         int val = 1;
-        foreach (var lit in literal.GetEnumeration().Literals)
+        foreach (var lit in enm.Literals)
         {
-            enumBuilder.DefineLiteral(lit.Name, val++);
+            var literalBuilder = enumBuilder.DefineLiteral(lit.Name, val++);
+            literalBuilder.SetCustomAttribute(CreateLionCoreMetaPointerAttribute(lit));
         }
 
         Type type = enumBuilder.CreateType();
-        _enums[literal.GetEnumeration()] = type;
-        return Enum.Parse(type, literal.Name) as Enum;
+        _enums[enm] = type;
+        return type;
+    }
+
+    private static CustomAttributeBuilder CreateLionCoreMetaPointerAttribute(IKeyed keyed)
+    {
+        var constructorInfo = typeof(LionCoreMetaPointer).GetConstructor([typeof(Type), typeof(string)]);
+        var customAttributeBuilder = new CustomAttributeBuilder(constructorInfo!, [typeof(Language), keyed.Key]);
+        return customAttributeBuilder;
     }
 
     /// <inheritdoc />

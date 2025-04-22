@@ -21,19 +21,13 @@ using M2;
 using M3;
 
 /// Creates <see cref="LenientNode"/>s based on <paramref name="language"/>.
-public class MigrationFactory(Language language) : AbstractBaseNodeFactory(language)
+public class MigrationFactory(Language language) : ReflectiveBaseNodeFactory(language)
 {
     /// <inheritdoc />
     public override INode CreateNode(string id, Classifier classifier) =>
         new LenientNode(id, classifier);
-
-    /// <inheritdoc />
-    public override Enum GetEnumerationLiteral(EnumerationLiteral literal) =>
-        EnumValueFor<Enum>(literal);
-
-    /// <inheritdoc />
-    public override IStructuredDataTypeInstance CreateStructuredDataTypeInstance(
-        StructuredDataType structuredDataType,
-        IFieldValues fieldValues) =>
-        new DynamicStructuredDataTypeInstance(structuredDataType, fieldValues);
+    
+    /// Updates internal representation of C# Enum for <paramref name="enumeration"/> (e.g. after key change).
+    public void UpdateEnumeration(Enumeration enumeration) =>
+        CreateEnum(enumeration);
 }
