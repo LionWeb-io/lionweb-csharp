@@ -47,6 +47,35 @@ public class ReadOnlyLine(string id, IReadableNode? parent)
         _ => throw new UnknownFeatureException(GetClassifier(), feature)
     };
 
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        switch (feature)
+        {
+            case not null when _builtIns.INamed_name.EqualsIdentity(feature) && Name != null:
+                value = Name;
+                return true;
+            case not null when ShapesLanguage.Instance.IShape_uuid.EqualsIdentity(feature) && Uuid != null:
+                value = Uuid;
+                return true;
+            case not null when ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature) &&
+                               Fixpoints is { Count: > 0 }:
+                value = Fixpoints;
+                return true;
+            case not null when ShapesLanguage.Instance.Shape_shapeDocs.EqualsIdentity(feature) && ShapeDocs != null:
+                value = ShapeDocs;
+                return true;
+            case not null when ShapesLanguage.Instance.Line_start.EqualsIdentity(feature) && Start != null:
+                value = Start;
+                return true;
+            case not null when ShapesLanguage.Instance.Line_end.EqualsIdentity(feature) && End != null:
+                value = End;
+                return true;
+            default:
+                value = null;
+                return false;
+        }
+    }
+
     /// <inheritdoc/>
     public override IEnumerable<Feature> CollectAllSetFeatures()
     {

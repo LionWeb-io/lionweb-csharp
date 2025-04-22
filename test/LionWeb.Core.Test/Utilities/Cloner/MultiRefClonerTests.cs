@@ -20,6 +20,7 @@ namespace LionWeb.Core.Test.Utilities.Cloner;
 using Core.Utilities;
 using Languages;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2024_1.TinyRefLang;
 using M2;
 
 [TestClass]
@@ -205,5 +206,34 @@ public class MultiRefClonerTests : ClonerTestsBase
         var result = new Cloner([referenceGeometry]) { IncludingReferences = true }.Clone().Values.First();
 
         Assert.IsInstanceOfType<ReferenceGeometry>(result);
+    }
+
+    [TestMethod]
+    public void ReadOnlyTargets_External()
+    {
+        var targetA = TinyRefLangLanguage.Instance.GetFactory().CreateMyConcept();
+
+        var targetB = new ReadOnlyLine("targetB", null)
+        {
+            Name = "targetB",
+            Uuid = "uuid",
+            Start = new Coord("s"),
+            End = new Coord("s")
+        };
+
+        var targetC = TinyRefLangLanguage.Instance.GetFactory().CreateMyConcept();
+
+        var node = TinyRefLangLanguage.Instance.GetFactory().CreateMyConcept();
+        var input = new List<INamed> {targetA, targetB, targetC};
+        node.AddMultivaluedRef(input);
+
+        var clone = Cloner.Clone(node);
+
+        var cloned = clone.MultivaluedRef;
+        CollectionAssert.AreEqual(input, cloned.ToList());
+        
+        Assert.AreSame(targetA, cloned.First());
+        Assert.AreSame(targetB, cloned.Skip(1).First());
+        Assert.AreSame(targetC, cloned.Last());
     }
 }

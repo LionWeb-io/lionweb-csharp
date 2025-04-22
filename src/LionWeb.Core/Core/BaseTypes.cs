@@ -60,6 +60,17 @@ public interface IReadableNode
     /// <seealso cref="IWritableNode.Set"/>
     /// <see cref="CollectAllSetFeatures"/>
     public object? Get(Feature feature);
+    
+    /// <summary>
+    /// Tries to get the value of the given <paramref name="feature"/> on <c>this</c> node.
+    /// </summary>
+    /// <returns>
+    /// If <paramref name="feature"/> is _single_: <c>true</c> if <paramref name="feature"/> is set on <c>this</c>; <c>false</c> otherwise.
+    /// If <paramref name="feature"/> is _multiple_: <c>true</c> if <paramref name="feature"/> is not empty on <c>this</c>; <c>false</c> otherwise.
+    /// </returns>
+    /// <seealso cref="Get"/>
+    /// <see cref="CollectAllSetFeatures"/>
+    public bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
 }
 
 /// The type-parametrized twin of the non-generic <see cref="IReadableNode"/> interface.
@@ -343,6 +354,9 @@ public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : I
 
     /// <inheritdoc />
     public abstract object? Get(Feature feature);
+
+    /// <inheritdoc />
+    public abstract bool TryGet(Feature feature, [NotNullWhen(true)] out object? value);
 }
 
 /// Base implementation of <see cref="INode"/>.
@@ -425,6 +439,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         result = null;
         return false;
     }
+
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value) =>
+        GetInternal(feature, out value);
 
     /// <inheritdoc />
     public void Set(Feature feature, object? value)

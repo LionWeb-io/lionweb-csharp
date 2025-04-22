@@ -20,6 +20,7 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 /// <summary>
@@ -59,7 +60,7 @@ using Utilities;
 /// </summary>
 public class LenientNode : NodeBase, INode
 {
-    private readonly Dictionary<Feature, object?> _featureValues = new(new FeatureIdentityComparer());
+    private readonly List<(Feature feature, object? value)> _featureValues = [];
     private Classifier? _classifier;
 
     /// <summary>
@@ -87,7 +88,7 @@ public class LenientNode : NodeBase, INode
     /// <see cref="IReadableNode.CollectAllSetFeatures"/> returns all set features, even if the feature is unknown to
     /// the target node's classifier, or the feature's value doesn't adhere to the feature's type.
     /// </summary>
-    public override IEnumerable<Feature> CollectAllSetFeatures() => _featureValues.Keys;
+    public override IEnumerable<Feature> CollectAllSetFeatures() => FeatureKeys;
 
     /// <summary>
     /// <see cref="IReadableNode.Get"/> returns single values as-is, and any enumerable nodes as
@@ -104,21 +105,50 @@ public class LenientNode : NodeBase, INode
         if (feature == null)
             return false;
 
-        if (_featureValues.TryGetValue(feature, out result))
+        if (TryGet(feature, out result))
+        {
+            if (feature.Optional)
+            {
+                return true;
+            }
+
+            if (result == null || (result is IEnumerable enumerable && !enumerable.OfType<object?>().Any()))
+            {
+                throw new UnsetFeatureException(feature);
+            }
+
+            return true;
+        }
+
+        if (!feature.Optional)
+            throw new UnsetFeatureException(feature);
+
+        return false;
+    }
+
+    public bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    {
+        if (feature == null)
+        {
+            value = null;
+            return false;
+        }
+
+        if (TryGetFeature(feature, out value))
         {
             switch (feature)
             {
-                case Containment { Multiple: true } when result is INode node:
-                    result = new List<INode> { node }.AsReadOnly();
+                case Containment { Multiple: true } when value is INode node:
+                    value = new List<INode> { node }.AsReadOnly();
                     break;
                 case Reference { Multiple: true }:
-                    switch (result)
+                    switch (value)
                     {
                         case INode iNode:
-                            result = new List<INode> { iNode }.AsReadOnly();
+                            value = new List<INode> { iNode }.AsReadOnly();
                             break;
                         case IReadableNode readableNode:
-                            result = new List<IReadableNode> { readableNode }.AsReadOnly();
+                            value = new List<IReadableNode> { readableNode }.AsReadOnly();
                             break;
                     }
 
@@ -128,16 +158,13 @@ public class LenientNode : NodeBase, INode
             return true;
         }
 
-        if (!feature.Optional)
-            throw new UnsetFeatureException(feature);
-
         switch (feature)
         {
             case Containment { Multiple: true }:
-                result = new List<INode>().AsReadOnly();
+                value = new List<INode>().AsReadOnly();
                 break;
             case Reference { Multiple: true }:
-                result = new List<IReadableNode>().AsReadOnly();
+                value = new List<IReadableNode>().AsReadOnly();
                 break;
         }
 
@@ -164,12 +191,12 @@ public class LenientNode : NodeBase, INode
             return true;
         }
 
-        var oldValue = _featureValues.TryGetValue(feature, out var old) ? old : null;
+        var oldValue = TryGetFeature(feature, out var old) ? old : null;
 
         switch (value)
         {
             case null:
-                if (_featureValues.Remove(feature))
+                if (RemoveFeature(feature))
                     return true;
                 if (_classifier != null && _classifier.AllFeatures().Contains(feature))
                     return true;
@@ -182,18 +209,18 @@ public class LenientNode : NodeBase, INode
                     AttachChild(node);
                 }
 
-                _featureValues[feature] = readableNode;
+                SetFeature(feature, readableNode);
                 return true;
 
             case string:
-                _featureValues[feature] = value;
+                SetFeature(feature, value);
                 return true;
 
             case IEnumerable:
                 var readableNodes = M2Extensions.AsNodes<IReadableNode>(value).ToList();
                 if (readableNodes.Count == 0)
                 {
-                    if (_featureValues.Remove(feature))
+                    if (RemoveFeature(feature))
                         return true;
                     if (_classifier != null && _classifier.AllFeatures().Contains(feature))
                         return true;
@@ -209,10 +236,10 @@ public class LenientNode : NodeBase, INode
                         AttachChild(newChild);
                     }
 
-                    _featureValues[feature] = newChildren.ToList();
+                    SetFeature(feature, newChildren.ToList());
                 } else
                 {
-                    _featureValues[feature] = readableNodes;
+                    SetFeature(feature, readableNodes);
                 }
 
                 return true;
@@ -221,7 +248,7 @@ public class LenientNode : NodeBase, INode
                 if (!v.GetType().IsValueType)
                     throw new InvalidValueException(feature, value);
 
-                _featureValues[feature] = value;
+                SetFeature(feature, value);
                 return true;
         }
     }
@@ -245,12 +272,12 @@ public class LenientNode : NodeBase, INode
         if (base.DetachChild(child))
             return true;
 
-        foreach (var (key, value) in _featureValues.Where(pair => pair.Key is Containment))
+        foreach (var (key, value) in _featureValues.Where(pair => pair.feature is Containment))
         {
             switch (value)
             {
                 case IReadableNode:
-                    _featureValues.Remove(key);
+                    RemoveFeature(key);
                     return true;
                 case IList list:
                     int index = list.IndexOf(child);
@@ -259,7 +286,7 @@ public class LenientNode : NodeBase, INode
 
                     list.RemoveAt(index);
                     if (list.Count == 0)
-                        _featureValues.Remove(key);
+                        RemoveFeature(key);
 
                     return true;
             }
@@ -270,11 +297,10 @@ public class LenientNode : NodeBase, INode
 
     /// <inheritdoc/>
     public override Containment? GetContainmentOf(INode child) =>
-        _featureValues
-            .Keys
+        FeatureKeys
             .OfType<Containment>()
             .FirstOrDefault(k => k
-                .AsNodes<INode>(_featureValues[k])
+                .AsNodes<INode>(TryGetFeature(k, out var value) ? value : null)
                 .Contains(child));
 
     /// <inheritdoc />
@@ -295,4 +321,44 @@ public class LenientNode : NodeBase, INode
     /// <inheritdoc />
     public override bool RemoveAnnotations(IEnumerable<INode> annotations) =>
         RemoveSelfParent(annotations?.ToList(), _annotations, null);
+
+    private IEnumerable<Feature> FeatureKeys => _featureValues.Select(f => f.feature);
+
+    private bool TryGetFeature(Feature featureToFind, out object? value)
+    {
+        var result = _featureValues.Find(f => featureToFind.EqualsIdentity(f.feature));
+        if (result != default)
+        {
+            value = result.value;
+            return true;
+        }
+
+        value = null;
+        return false;
+    }
+
+    private bool RemoveFeature(Feature featureToRemove)
+    {
+        var result = _featureValues.Find(f => featureToRemove.EqualsIdentity(f.feature));
+        if (result != default)
+        {
+            _featureValues.Remove(result);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void SetFeature(Feature featureToSet, object? value)
+    {
+        var result = _featureValues.Find(f => featureToSet.EqualsIdentity(f.feature));
+        if (result != default)
+        {
+            var index = _featureValues.IndexOf(result);
+            _featureValues[index] = (featureToSet, value);
+        } else
+        {
+            _featureValues.Add((featureToSet, value));
+        }
+    }
 }
