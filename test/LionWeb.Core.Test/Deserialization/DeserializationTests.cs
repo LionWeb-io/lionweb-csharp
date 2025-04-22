@@ -289,34 +289,43 @@ public class DeserializationTests
             DeserializerHandlerSelectOtherLanguageVersion.SelectVersion<T>(metaPointer, languages);
     }
 
-    [TestMethod]
-    public void UnfittingLanguageVersion()
+    private class UnregisteredFactoryDeserializationHandler(Language language) : DeserializerExceptionHandler
     {
-        var v1 = new DynamicLanguage("id-A", _lionWebVersion) { Key = "lang", Version = "1" };
-        var v2 = new DynamicLanguage("id-B", _lionWebVersion) { Key = "lang", Version = "2" };
-        var v3 = new DynamicLanguage("id-C", _lionWebVersion) { Key = "lang", Version = "3" };
+        public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id)
+        {
+            var firstClassifier = language.Entities.OfType<Classifier>().First();
+            var firstCompressedMetaPointer = CompressedMetaPointer.Create(firstClassifier.ToMetaPointer(), new CompressedIdConfig());
+            
+            if(classifier.Equals(firstCompressedMetaPointer))
+                return firstClassifier;
+            
+            return base.UnknownClassifier(classifier, id);
+        }
+    }
+    
+    [TestMethod]
+    public void DeserializeUnregisteredFactory()
+    {
+        var v1 = new DynamicLanguage("id-A", _lionWebVersion) { Key = "langA", Version = "1" };
+        var v2 = new DynamicLanguage("id-B", _lionWebVersion) { Key = "langB", Version = "2" };
 
         v1.Concept("id-A-concept", "key-A-concept", "AConcept");
-        v1.Concept("id-A-concept2", "key-D-concept", "DConcept-A");
         v2.Concept("id-B-concept", "key-B-concept", "BConcept");
-        v3.Concept("id-C-concept", "key-C-concept", "CConcept");
-        v3.Concept("id-C-concept2", "key-D-concept", "DConcept-C");
 
         var chunk = new SerializationChunk
         {
             SerializationFormatVersion = _lionWebVersion.VersionString,
             Languages =
             [
-                new SerializedLanguageReference { Key = "lang", Version = "1" },
-                new SerializedLanguageReference { Key = "lang", Version = "2" },
-                new SerializedLanguageReference { Key = "lang", Version = "3" }
+                new SerializedLanguageReference { Key = "langA", Version = "1" },
+                new SerializedLanguageReference { Key = "langB", Version = "2" },
             ],
             Nodes =
             [
                 new SerializedNode
                 {
                     Id = "A-id",
-                    Classifier = new MetaPointer("lang", "x", "key-A-concept"),
+                    Classifier = new MetaPointer("langA", "1", "key-A-concept"),
                     Properties = [],
                     Containments = [],
                     References = [],
@@ -326,51 +335,27 @@ public class DeserializationTests
                 new SerializedNode
                 {
                     Id = "B-id",
-                    Classifier = new MetaPointer("lang", "x", "key-B-concept"),
+                    Classifier = new MetaPointer("langB", "2", "key-B-concept"),
                     Properties = [],
                     Containments = [],
                     References = [],
                     Annotations = [],
                     Parent = null
-                },
-                new SerializedNode
-                {
-                    Id = "C-id",
-                    Classifier = new MetaPointer("lang", "x", "key-C-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
-                    Parent = null
-                },
-                new SerializedNode
-                {
-                    Id = "D-id",
-                    Classifier = new MetaPointer("lang", "x", "key-D-concept"),
-                    Properties = [],
-                    Containments = [],
-                    References = [],
-                    Annotations = [],
-                    Parent = null
-                },
+                }
             ]
         };
 
         var deserializer = new DeserializerBuilder()
             .WithLanguage(v1)
-            .WithLanguage(v2)
-            .WithLanguage(v3)
             .WithCompressedIds(new(KeepOriginal: true))
-            .WithHandler(new ClosestVersionDeserializerHandler())
+            .WithHandler(new UnregisteredFactoryDeserializationHandler(v2))
             .Build();
 
         var nodes = deserializer.Deserialize(chunk);
 
-        Assert.AreEqual(4, nodes.Count);
+        Assert.AreEqual(2, nodes.Count);
         Assert.AreSame(v1, nodes[0].GetClassifier().GetLanguage());
         Assert.AreSame(v2, nodes[1].GetClassifier().GetLanguage());
-        Assert.AreSame(v3, nodes[2].GetClassifier().GetLanguage());
-        Assert.AreSame(v3, nodes[3].GetClassifier().GetLanguage());
     }
 
     [TestMethod]
