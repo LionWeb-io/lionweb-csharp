@@ -14,6 +14,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
+* Use `[NotNullWhen]` instead of `[MaybeNullWhen]` attributes for _TryGet_-like out parameters.
 ### Changed
 ### Removed
 ### Deprecated
