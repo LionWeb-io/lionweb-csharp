@@ -20,6 +20,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Enabled replacing `DynamicLanguage.entities`.
 * Aligned behavior of `DynamicStructuredDataTypeInstance.CollectAllSetFields()` and `Get()` with other implementations.
 * Ensure stable results of `DynamicStructuredDataTypeInstance.Equals()` and `GetHashCode()`.
+* `Cloner` can now deal with read-only external reference targets.
 ### Changed
 ### Removed
 ### Deprecated
