@@ -36,7 +36,7 @@ public interface IKeyed : INamed
     /// </summary>
     /// <param name="key">Value of <see cref="Key"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Key"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetKey([MaybeNullWhen(false)] out string? key);
+    bool TryGetKey([NotNullWhen(true)] out string? key);
 }
 
 /// A Feature represents a characteristic or some form of data associated with a particular <see cref="Classifier"/>.
@@ -51,7 +51,7 @@ public interface Feature : IKeyed
     /// </summary>
     /// <param name="optional">Value of <see cref="Optional"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Optional"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetOptional([MaybeNullWhen(false)] out bool? optional)
+    bool TryGetOptional([NotNullWhen(true)] out bool? optional)
     {
         optional = Optional;
         return optional != null;
@@ -69,7 +69,7 @@ public interface Property : Feature
     /// </summary>
     /// <param name="type">Value of <see cref="Type"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Type"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetType([MaybeNullWhen(false)] out Datatype? type);
+    bool TryGetType([NotNullWhen(true)] out Datatype? type);
 }
 
 /// Represent a connection to a <see cref="Classifier"/>.
@@ -84,7 +84,7 @@ public interface Link : Feature
     /// </summary>
     /// <param name="multiple">Value of <see cref="Multiple"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Multiple"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetMultiple([MaybeNullWhen(false)] out bool? multiple)
+    bool TryGetMultiple([NotNullWhen(true)] out bool? multiple)
     {
         multiple = Multiple;
         return multiple != null;
@@ -98,7 +98,7 @@ public interface Link : Feature
     /// </summary>
     /// <param name="type">Value of <see cref="Type"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Type"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetType([MaybeNullWhen(false)] out Classifier? type);
+    bool TryGetType([NotNullWhen(true)] out Classifier? type);
 }
 
 /// Represents a relation between a containing <see cref="Classifier"/> and a contained <see cref="Classifier"/>.
@@ -140,7 +140,7 @@ public interface Concept : Classifier
     /// </summary>
     /// <param name="abstract">Value of <see cref="Abstract"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Abstract"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetAbstract([MaybeNullWhen(false)] out bool? @abstract)
+    bool TryGetAbstract([NotNullWhen(true)] out bool? @abstract)
     {
         @abstract = Abstract;
         return @abstract != null;
@@ -156,7 +156,7 @@ public interface Concept : Classifier
     /// </summary>
     /// <param name="partition">Value of <see cref="Partition"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Partition"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetPartition([MaybeNullWhen(false)] out bool? partition)
+    bool TryGetPartition([NotNullWhen(true)] out bool? partition)
     {
         partition = Partition;
         return partition != null;
@@ -203,7 +203,7 @@ public interface Annotation : Classifier
     /// </summary>
     /// <param name="annotates">Value of <see cref="Annotates"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Annotates"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetAnnotates([MaybeNullWhen(false)] out Classifier? annotates)
+    bool TryGetAnnotates([NotNullWhen(true)] out Classifier? annotates)
     {
         annotates = Annotates;
         return annotates != null;
@@ -217,7 +217,7 @@ public interface Annotation : Classifier
     /// </summary>
     /// <param name="extends">Value of <see cref="Extends"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Extends"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetExtends([MaybeNullWhen(false)] out Annotation? extends)
+    bool TryGetExtends([NotNullWhen(true)] out Annotation? extends)
     {
         extends = Extends;
         return extends != null;
@@ -321,7 +321,7 @@ public interface Field : IKeyed
     /// </summary>
     /// <param name="type">Value of <see cref="Type"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Type"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetType([MaybeNullWhen(false)] out Datatype? type);
+    bool TryGetType([NotNullWhen(true)] out Datatype? type);
 }
 
 /// A Language will provide the Concepts necessary to describe ideas
@@ -336,7 +336,7 @@ public interface Language : IKeyed, IPartitionInstance
     /// </summary>
     /// <param name="version">Value of <see cref="Version"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Version"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetVersion([MaybeNullWhen(false)] out string? version);
+    bool TryGetVersion([NotNullWhen(true)] out string? version);
 
     /// All <see cref="LanguageEntity">LanguageEntities</see> defined by this language.
     public IReadOnlyList<LanguageEntity> Entities { get; }
