@@ -1139,8 +1139,8 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
             return true;
         }
 
-        var c = GetContainmentOf(child);
-        if (c == _m3.Language_entities)
+        var containment = GetContainmentOf(child);
+        if (containment == _m3.Language_entities)
             return _entities.Remove((LanguageEntity)child);
 
         return false;
