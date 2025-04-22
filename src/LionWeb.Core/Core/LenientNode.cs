@@ -126,8 +126,7 @@ public class LenientNode : NodeBase, INode
         return false;
     }
 
-    /// <inheritdoc />
-    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    public bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
     {
         if (feature == null)
         {

@@ -19,6 +19,7 @@ namespace LionWeb.Core.M2;
 
 using LionWeb.Core.M3;
 using M1;
+using M3;
 
 /// Builds an M2 (i.e. language-level) <see cref="ILanguageDeserializer"/>.
 public class LanguageDeserializerBuilder
@@ -28,10 +29,10 @@ public class LanguageDeserializerBuilder
     private readonly HashSet<Language> _dependentLanguages = new();
     private CompressedIdConfig _compressedIdConfig = new();
     private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
-    
+
     /// <inheritdoc cref="WithLionWebVersion"/>
     public LionWebVersions LionWebVersion { get; set; } = LionWebVersions.Current;
-    
+
     /// <inheritdoc cref="WithHandler"/>
     public ILanguageDeserializerHandler? Handler { get; set; }
 

@@ -20,6 +20,7 @@
 namespace LionWeb.Core.Test;
 
 using Languages;
+using M1;
 using M2;
 using M3;
 
@@ -239,6 +240,21 @@ public class M2ReflectionTests
         Assert.IsFalse(value.Count == 0);
     }
 
+    [TestMethod]
+    public void Language_Replace_Entity()
+    {
+        DynamicConcept conceptA = new DynamicConcept("my-id", _lionWebVersion, lang) { Key = "my-key", Name = "SomeName" };
+        DynamicEnumeration enumA = new DynamicEnumeration("enum-id", _lionWebVersion, lang) { Key = "enum-key", Name = "SomeEnum" };
+        lang.Set(LanguageEntities, new List<LanguageEntity> { conceptA });
+        CollectionAssert.AreEqual(new List<object> { conceptA }, lang.Entities.ToList());
+        Assert.AreSame(_lionWebVersion.LionCore.Language_entities, lang.GetContainmentOf(conceptA));
+        conceptA.ReplaceWith(enumA);
+        CollectionAssert.AreEqual(new List<object> { enumA }, lang.Entities.ToList());
+        Assert.IsNull(conceptA.GetParent());
+        Assert.IsNull(lang.GetContainmentOf(conceptA));
+        Assert.AreSame(lang, enumA.GetParent());
+    }
+    
     [TestMethod]
     public void Language_Set_DependsOn()
     {

@@ -116,7 +116,11 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
             return true;
 
         factory = language.GetFactory();
-        return factory != null;
+        if (factory == null)
+            return false;
+
+        _language2NodeFactory[language] = factory;
+        return true;
     }
 
     internal ICompressedId Compress(string id) =>
