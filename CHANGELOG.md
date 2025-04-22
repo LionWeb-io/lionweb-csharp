@@ -12,6 +12,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added `LionWebVersions` _2025.1_ and _2025.1-compatible_. No content differences to _2024.1_ so far.
 * Added `EnumerationLiteralIdentityComparer` and `KeyedIdentityComparer`.
 * Added `bool IReadableNode.TryGet(Feature, out object? value)`.
+* `JsonUtils.ReadNodesFromStreamAsync()` provides access to the `serializationFormatVersion`.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
