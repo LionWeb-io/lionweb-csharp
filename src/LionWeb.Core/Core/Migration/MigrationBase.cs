@@ -17,14 +17,16 @@
 
 namespace LionWeb.Core.Migration;
 
+using M2;
 using M3;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 /// Migrates instances from <paramref name="originLanguage"/> to <paramref name="targetLanguage"/>.
 /// Implementers MUST use the setters in this class instead of <see cref="IWritableNode.Set"/> to avoid mixing languages of different migration rounds.
-public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLanguage, TTargetLanguage targetLanguage) : IMigration
-    where TTargetLanguage : Language
+public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLanguage, TTargetLanguage targetLanguage)
+    : IMigration where TTargetLanguage : Language
 {
     protected readonly LanguageIdentity OriginLanguageIdentity = originLanguage;
     protected readonly TTargetLanguage _targetLang = targetLanguage;
@@ -226,7 +228,19 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     protected IEnumerable<LenientNode> AllInstancesOf(List<LenientNode> nodes, Classifier classifier) =>
         nodes
             .Descendants()
-            .Where(n => classifier.EqualsIdentity(Lookup(n.GetClassifier())));
+            .Where(n => IsInstanceOf(n, classifier));
+
+    /// Whether <paramref name="node"/> is an instance of <paramref name="classifier"/>.
+    /// Handles specialization correctly as long as all involved languages are <see cref="ILanguageRegistry.KnownLanguages">known</see>.
+    protected bool IsInstanceOf(LenientNode node, Classifier classifier)
+    {
+        Classifier lookup = Lookup(node.GetClassifier());
+
+        var languages = _languageRegistry?.KnownLanguages ?? [(DynamicLanguage)classifier.GetLanguage()];
+        var allSpecializations = Lookup(classifier).AllSpecializations(languages, true);
+
+        return allSpecializations.Any(c => c.EqualsIdentity(lookup));
+    }
 
     /// <inheritdoc cref="ILanguageRegistry.Lookup{T}"/>
     protected T Lookup<T>(T keyed) where T : IKeyed =>
@@ -234,8 +248,11 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
 
     /// Sets <paramref name="node"/>'s <paramref name="property"/> to <paramref name="value"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
-    protected void SetProperty(IWritableNode node, Property property, object? value) =>
+    protected void SetProperty(LenientNode node, Property property, object? value) =>
         node.Set(Lookup(property), value);
+
+    protected bool TryGetProperty(LenientNode node, Property property, [NotNullWhen(true)] out object? value) =>
+        node.TryGet(Lookup(property), out value);
 
     /// Sets <paramref name="node"/>'s <paramref name="containment"/> to <paramref name="child"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> and
@@ -243,23 +260,118 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     protected void SetChild(LenientNode node, Containment containment, IWritableNode child) =>
         node.Set(Lookup(containment), ConvertSubtreeToLenient(child));
 
+    protected bool TryGetChild(LenientNode node, Containment containment, [NotNullWhen(true)] out LenientNode? value)
+    {
+        if (node.TryGet(containment, out var v))
+        {
+            switch (v)
+            {
+                case LenientNode n:
+                    value = n;
+                    return true;
+
+                case IEnumerable e:
+                    var nodes = e.Cast<LenientNode>().ToList();
+                    if (nodes.Count == 1)
+                    {
+                        value = nodes.First();
+                        return true;
+                    }
+
+                    value = null;
+                    return false;
+            }
+        }
+
+        value = null;
+        return false;
+    }
+
     /// Sets <paramref name="node"/>'s <paramref name="containment"/> to <paramref name="children"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> and
     /// <see cref="ConvertSubtreeToLenient">node representations</see> during migration.
     protected void SetChildren(LenientNode node, Containment containment, IEnumerable<IWritableNode> children) =>
         node.Set(Lookup(containment), children.Select(ConvertSubtreeToLenient));
 
+    protected bool TryGetChildren(LenientNode node, Containment containment,
+        [NotNullWhen(true)] out List<LenientNode>? value)
+    {
+        if (node.TryGet(containment, out var v))
+        {
+            switch (v)
+            {
+                case LenientNode n:
+                    value = [n];
+                    return true;
+
+                case IEnumerable e:
+                    value = e.Cast<LenientNode>().ToList();
+                    return true;
+            }
+        }
+
+        value = null;
+        return false;
+    }
+
     /// Sets <paramref name="node"/>'s <paramref name="reference"/> to <paramref name="target"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
     protected void SetReference(LenientNode node, Reference reference, IReadableNode target) =>
         node.Set(Lookup(reference), target);
+
+    protected bool TryGetReference(LenientNode node, Reference reference, [NotNullWhen(true)] out IReadableNode? value)
+    {
+        if (node.TryGet(reference, out var v))
+        {
+            switch (v)
+            {
+                case IReadableNode n:
+                    value = n;
+                    return true;
+
+                case IEnumerable e:
+                    var nodes = e.Cast<IReadableNode>().ToList();
+                    if (nodes.Count == 1)
+                    {
+                        value = nodes.First();
+                        return true;
+                    }
+
+                    value = null;
+                    return false;
+            }
+        }
+
+        value = null;
+        return false;
+    }
 
     /// Sets <paramref name="node"/>'s <paramref name="reference"/> to <paramref name="targets"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
     protected void SetReferences(LenientNode node, Reference reference, IEnumerable<IReadableNode> targets) =>
         node.Set(Lookup(reference), targets);
 
-    
+    protected bool TryGetReferences(LenientNode node, Reference reference,
+        [NotNullWhen(true)] out List<IReadableNode>? value)
+    {
+        if (node.TryGet(reference, out var v))
+        {
+            switch (v)
+            {
+                case IReadableNode n:
+                    value = [n];
+                    return true;
+
+                case IEnumerable e:
+                    value = e.Cast<IReadableNode>().ToList();
+                    return true;
+            }
+        }
+
+        value = null;
+        return false;
+    }
+
     /// Converts <paramref name="node"/> and all <see cref="MigrationExtensions.Descendants"/> to <see cref="LenientNode"/>s.
     protected LenientNode ConvertSubtreeToLenient(IReadableNode node) => node switch
     {
