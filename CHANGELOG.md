@@ -9,7 +9,13 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [Unreleased]
 
 ### Added
+* Added `LionWebVersions` _2025.1_ and _2025.1-compatible_. No content differences to _2024.1_ so far.
+* Added `EnumerationLiteralIdentityComparer` and `KeyedIdentityComparer`.
 ### Fixed
+* `LenientNode` now works properly if keys of features change.
+* Deserializer can now create instances of languages not registered beforehand.
+* Use `[NotNullWhen]` instead of `[MaybeNullWhen]` attributes for _TryGet_-like out parameters.
+* Made `M1Extensions.ReplaceWith()` work for annotation instances.
 * `Cloner` can now deal with read-only external reference targets.
 ### Changed
 ### Removed
