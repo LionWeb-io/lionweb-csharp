@@ -25,16 +25,20 @@ public class DeserializerBuilder
 {
     private readonly Dictionary<Language, INodeFactory> _languages = new();
     private readonly HashSet<IReadableNode> _dependentNodes = new();
-    private IDeserializerHandler? _handler;
     private CompressedIdConfig _compressedIdConfig = new();
-    private LionWebVersions _lionWebVersion = LionWebVersions.Current;
     private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
+    
+    /// <inheritdoc cref="WithLionWebVersion"/>
+    public LionWebVersions LionWebVersion { get; set; } = LionWebVersions.Current;
+    
+    /// <inheritdoc cref="WithHandler"/>
+    public IDeserializerHandler? Handler { get; set; }
 
     /// Registers a custom handler.
     /// Defaults to <see cref="DeserializerExceptionHandler"/>.
     public DeserializerBuilder WithHandler(IDeserializerHandler handler)
     {
-        _handler = handler;
+        Handler = handler;
         return this;
     }
 
@@ -102,7 +106,7 @@ public class DeserializerBuilder
     /// Defaults to <see cref="LionWebVersions.Current"/>.
     public DeserializerBuilder WithLionWebVersion(LionWebVersions lionWebVersion)
     {
-        _lionWebVersion = lionWebVersion;
+        LionWebVersion = lionWebVersion;
         return this;
     }
 
@@ -113,7 +117,7 @@ public class DeserializerBuilder
     /// </exception>
     public IDeserializer Build()
     {
-        IDeserializer result = new Deserializer(_lionWebVersion, _handler, _compressedIdConfig)
+        IDeserializer result = new Deserializer(LionWebVersion, Handler, _compressedIdConfig)
         {
             ResolveInfoHandling = _referenceResolveInfoHandling
         };
