@@ -29,7 +29,7 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void Identical()
     {
-        var input = newAmount(1, 2, "EUR", true);
+        var input = NewAmount(1, 2, "EUR", true);
 
         Assert.AreEqual(input, input);
         Assert.AreEqual(input.GetHashCode(), input.GetHashCode());
@@ -38,8 +38,8 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void Same()
     {
-        var input = newAmount(1, 2, "EUR", true);
-        var same = newAmount(1, 2, "EUR", true);
+        var input = NewAmount(1, 2, "EUR", true);
+        var same = NewAmount(1, 2, "EUR", true);
 
         Assert.AreEqual(input, same);
         Assert.AreEqual(input.GetHashCode(), same.GetHashCode());
@@ -48,8 +48,8 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void NotSame_NestedSdt()
     {
-        var input = newAmount(1, 2, "EUR", true);
-        var same = newAmount(2, 2, "EUR", true);
+        var input = NewAmount(1, 2, "EUR", true);
+        var same = NewAmount(2, 2, "EUR", true);
 
         Assert.AreNotEqual(input, same);
         Assert.AreNotEqual(input.GetHashCode(), same.GetHashCode());
@@ -58,8 +58,8 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void NotSame_NestedEnum()
     {
-        var input = newAmount(1, 2, "EUR", true);
-        var same = newAmount(1, 2, "GBP", true);
+        var input = NewAmount(1, 2, "EUR", true);
+        var same = NewAmount(1, 2, "GBP", true);
 
         Assert.AreNotEqual(input, same);
         Assert.AreNotEqual(input.GetHashCode(), same.GetHashCode());
@@ -68,8 +68,8 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void NotSame_NestedBoolean()
     {
-        var input = newAmount(1, 2, "EUR", true);
-        var same = newAmount(1, 2, "GBP", false);
+        var input = NewAmount(1, 2, "EUR", true);
+        var same = NewAmount(1, 2, "GBP", false);
 
         Assert.AreNotEqual(input, same);
         Assert.AreNotEqual(input.GetHashCode(), same.GetHashCode());
@@ -82,34 +82,34 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void Reflective()
     {
-        var parent = newSdtConcept("od");
-        var value = newDecimal(1, 2);
+        var parent = NewSdtConcept("od");
+        var value = NewDecimal(1, 2);
         parent.Set(SdtConcept_decimal, value);
-        Assert.AreEqual(newDecimal(1, 2), parent.Get(SdtConcept_decimal));
+        Assert.AreEqual(NewDecimal(1, 2), parent.Get(SdtConcept_decimal));
     }
 
     [TestMethod]
     public void Get_Reflective()
     {
-        var parent = newSdtConcept("od");
-        parent.Set(SdtConcept_decimal, newDecimal(1, 2));
-        Assert.AreEqual(newDecimal(1, 2), parent.Get(SdtConcept_decimal));
+        var parent = NewSdtConcept("od");
+        parent.Set(SdtConcept_decimal, NewDecimal(1, 2));
+        Assert.AreEqual(NewDecimal(1, 2), parent.Get(SdtConcept_decimal));
     }
 
     [TestMethod]
     public void Bye_Reflective()
     {
-        var parent = newSdtConcept("od");
-        var value = newDecimal(11, 22);
+        var parent = NewSdtConcept("od");
+        var value = NewDecimal(11, 22);
         parent.Set(SdtConcept_decimal, value);
-        Assert.AreEqual(newDecimal(11, 22), parent.Get(SdtConcept_decimal));
+        Assert.AreEqual(NewDecimal(11, 22), parent.Get(SdtConcept_decimal));
     }
 
     [TestMethod]
     public void OtherSdt_Reflective()
     {
-        var parent = newSdtConcept("od");
-        var value = newAmount(11, 22, "EUR", true);
+        var parent = NewSdtConcept("od");
+        var value = NewAmount(11, 22, "EUR", true);
         Assert.ThrowsException<InvalidValueException>(() => parent.Set(SdtConcept_decimal, value));
         Assert.AreEqual(null, parent.Get(SdtConcept_decimal));
     }
@@ -117,7 +117,7 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void Boolean_Reflective()
     {
-        var parent = newSdtConcept("od");
+        var parent = NewSdtConcept("od");
         var value = true;
         Assert.ThrowsException<InvalidValueException>(() => parent.Set(SdtConcept_decimal, value));
         Assert.AreEqual(null, parent.Get(SdtConcept_decimal));
@@ -126,7 +126,7 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void Integer_Reflective()
     {
-        var parent = newSdtConcept("od");
+        var parent = NewSdtConcept("od");
         var value = 10;
         Assert.ThrowsException<InvalidValueException>(() => parent.Set(SdtConcept_decimal, value));
         Assert.AreEqual(null, parent.Get(SdtConcept_decimal));
@@ -139,7 +139,7 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void Null_Reflective()
     {
-        var parent = newSdtConcept("od");
+        var parent = NewSdtConcept("od");
         object? value = null;
         parent.Set(SdtConcept_decimal, value);
         Assert.AreEqual(null, parent.Get(SdtConcept_decimal));
@@ -148,7 +148,7 @@ public class StructuredDataTypesTests
     [TestMethod]
     public void Null_Get_Reflective()
     {
-        var parent = newSdtConcept("od");
+        var parent = NewSdtConcept("od");
         Assert.AreEqual(null, parent.Get(SdtConcept_decimal));
     }
 
@@ -181,6 +181,270 @@ public class StructuredDataTypesTests
 
     #endregion
 
+    #region Empty
+
+    [TestMethod]
+    public void Empty()
+    {
+        var dec = NewDecimal();
+
+        Assert.ThrowsException<UnsetFieldException>(() => dec.Get(DecimalInt()));
+    }
+
+    [TestMethod]
+    [Ignore("ToString() not yet implemented for DynamicStructuredDataTypeInstance")]
+    public void Empty_ToString()
+    {
+        var dec = NewDecimal();
+
+        Assert.AreEqual("Decimal { Frac = , Int =  }", dec.ToString());
+    }
+
+    [TestMethod]
+    [Ignore("GetHashCode() not yet implemented for DynamicStructuredDataTypeInstance")]
+    public void Empty_GetHashCode()
+    {
+        var dec = NewDecimal();
+
+        Assert.AreEqual(0, dec.GetHashCode());
+    }
+
+    [TestMethod]
+    public void Empty_Equals()
+    {
+        var dec = NewDecimal();
+
+        Assert.IsTrue(dec.Equals(NewDecimal()));
+    }
+
+    [TestMethod]
+    public void Empty_CollectAllSetFields()
+    {
+        var dec = NewDecimal();
+
+        CollectionAssert.AreEqual(new List<Field>(), dec.CollectAllSetFields().ToList());
+    }
+
+    [TestMethod]
+    public void Empty_Get()
+    {
+        var dec = NewDecimal();
+
+        Assert.ThrowsException<UnsetFieldException>(() => dec.Get(DecimalInt()));
+        Assert.ThrowsException<UnsetFieldException>(() => dec.Get(DecimalFrac()));
+    }
+
+    #endregion
+
+    #region Partial
+
+    [TestMethod]
+    public void Partial()
+    {
+        var name = "test";
+        var e2F = NewF(name);
+        var e = NewE(e2F);
+
+        Assert.AreEqual(NewF("test"), e.Get(E_e2f()));
+    }
+
+
+    [TestMethod]
+    [Ignore("ToString() not yet implemented for DynamicStructuredDataTypeInstance")]
+    public void Partial_ToString()
+    {
+        var e = NewE(NewF("test"));
+
+        Assert.AreEqual("E { E2f = F { Name = test }, Name =  }", e.ToString());
+    }
+
+    [TestMethod]
+    public void Partial_GetHashCode()
+    {
+        var e = NewE(NewF("test"));
+
+        Assert.AreNotEqual(0, e.GetHashCode());
+    }
+
+    [TestMethod]
+    public void Partial_Equals()
+    {
+        var e = NewE(NewF("test"));
+
+        Assert.IsTrue(e.Equals(NewE(NewF("test"))));
+
+        Assert.IsFalse(e.Equals(NewE()));
+        Assert.IsFalse(e.Equals(NewE(NewF("hello"))));
+        Assert.IsFalse(e.Equals(NewE("test")));
+    }
+
+    [TestMethod]
+    public void Partial_CollectAllSetFields()
+    {
+        var e = NewE(NewF("test"));
+
+        CollectionAssert.AreEqual(new List<Field> { E_e2f() },
+            e.CollectAllSetFields().ToList());
+    }
+
+    [TestMethod]
+    public void Partial_Get()
+    {
+        var e = NewE(NewF("test"));
+
+        Assert.AreEqual(NewF("test"), e.Get(E_e2f()));
+        Assert.ThrowsException<UnsetFieldException>(() => e.Get(E_name()));
+    }
+
+    [TestMethod]
+    public void Partial_Null()
+    {
+        var e = NewE(NewF("test"), null);
+
+        Assert.AreEqual("test", ((IStructuredDataTypeInstance)e.Get(E_e2f())).Get(F_name()));
+    }
+
+    [TestMethod]
+    public void Partial_Null_ToString()
+    {
+        var e = NewE(NewF("test"), null);
+
+        // Assert.AreEqual("E { E2f = F { Name = test }, Name =  }", e.ToString());
+        Assert.IsNotNull(e.ToString());
+    }
+
+    [TestMethod]
+    public void Partial_Null_GetHashCode()
+    {
+        var e = NewE(NewF("test"), null);
+
+        Assert.AreNotEqual(0, e.GetHashCode());
+    }
+
+    [TestMethod]
+    public void Partial_Null_Equals()
+    {
+        var e = NewE(NewF("test"), null);
+
+        Assert.IsTrue(e.Equals(NewE(NewF("test"))));
+
+        Assert.IsFalse(e.Equals(NewE()));
+        Assert.IsFalse(e.Equals(NewE(NewF("hello"))));
+        Assert.IsFalse(e.Equals(NewE("Test")));
+    }
+
+    [TestMethod]
+    public void Partial_Null_Equals_Null()
+    {
+        var e = NewE(NewF("test"), null);
+
+        Assert.IsTrue(e.Equals(NewE(NewF("test"), null)));
+
+        Assert.IsFalse(e.Equals(NewE()));
+        Assert.IsFalse(e.Equals(NewE(NewF("hello"))));
+        Assert.IsFalse(e.Equals(NewE("Test")));
+    }
+
+    [TestMethod]
+    public void Partial_Equals_Null()
+    {
+        var e = NewE(NewF("test"));
+
+        Assert.IsTrue(e.Equals(NewE(NewF("test"), null)));
+
+        Assert.IsFalse(e.Equals(NewE()));
+        Assert.IsFalse(e.Equals(NewE(NewF("hello"))));
+        Assert.IsFalse(e.Equals(NewE("Test")));
+    }
+
+    [TestMethod]
+    public void Partial_Null_CollectAllSetFields()
+    {
+        var e = NewE(NewF("test"), null);
+
+        CollectionAssert.AreEqual(new List<Field> { E_e2f() },
+            e.CollectAllSetFields().ToList());
+    }
+
+    [TestMethod]
+    public void Partial_Null_Get()
+    {
+        var e = NewE(NewF("test"), null);
+
+        Assert.AreEqual(NewF("test"), e.Get(E_e2f()));
+        Assert.ThrowsException<UnsetFieldException>(() => e.Get(E_name()));
+    }
+
+    #endregion
+
+    #region Complete
+
+    [TestMethod]
+    public void Complete()
+    {
+        var amount = NewAmount(23, 42, "EUR", true);
+
+        Assert.AreEqual(23, ((IStructuredDataTypeInstance)amount.Get(Amount_value())).Get(DecimalInt()));
+        Assert.AreEqual(42, ((IStructuredDataTypeInstance)amount.Get(Amount_value())).Get(DecimalFrac()));
+        Assert.AreEqual(CurrencyEUR(), amount.Get(Amount_currency()));
+        Assert.AreEqual(true, amount.Get(Amount_digital()));
+    }
+
+    [TestMethod]
+    [Ignore("ToString() not yet implemented for DynamicStructuredDataTypeInstance")]
+    public void Complete_ToString()
+    {
+        var amount = NewAmount(23, 42, "EUR", true);
+
+        Assert.AreEqual("Amount { Currency = EUR, Digital = True, Value = Decimal { Frac = 42, Int = 23 } }",
+            amount.ToString());
+    }
+
+    [TestMethod]
+    [Ignore("GetHashCode() not yet implemented for DynamicStructuredDataTypeInstance")]
+    public void Complete_GetHashCode()
+    {
+        var amount = NewAmount(23, 42, "EUR", true);
+
+        Assert.AreNotEqual(0, amount.GetHashCode());
+        Assert.AreEqual(663245779, amount.GetHashCode());
+    }
+
+    [TestMethod]
+    public void Complete_Equals()
+    {
+        var amount = NewAmount(23, 42, "EUR", true);
+        var amount2 = NewAmount(23, 42, "EUR", true);
+
+        Assert.IsTrue(amount.Equals(amount2));
+
+        Assert.IsFalse(amount.Equals(NewAmount()));
+        Assert.IsFalse(amount.Equals(NewAmount(CurrencyEUR())));
+    }
+
+    [TestMethod]
+    public void Complete_CollectAllSetFields()
+    {
+        var amount = NewAmount(23, 42, "EUR", true);
+
+        var expected = new List<Field> { Amount_value(), Amount_currency(), Amount_digital() };
+        List<Field> actual = amount.CollectAllSetFields().ToList();
+        CollectionAssert.AreEqual(expected, actual);
+    }
+
+    [TestMethod]
+    public void Complete_Get()
+    {
+        var amount = NewAmount(23, 42, "EUR", true);
+
+        Assert.AreEqual(NewDecimal(23, 42), amount.Get(Amount_value()));
+        Assert.AreEqual(CurrencyEUR(), amount.Get(Amount_currency()));
+        Assert.AreEqual(true, amount.Get(Amount_digital()));
+    }
+
+    #endregion
+
+
     private DynamicLanguage _sdtLang;
 
     [TestInitialize]
@@ -192,7 +456,7 @@ public class StructuredDataTypesTests
             .First();
     }
 
-    private DynamicNode newSdtConcept(string id) =>
+    private DynamicNode NewSdtConcept(string id) =>
         _sdtLang.GetFactory().CreateNode(id, _sdtLang.ClassifierByKey("key-SDTConcept")) as DynamicNode ??
         throw new AssertFailedException();
 
@@ -200,34 +464,95 @@ public class StructuredDataTypesTests
         _sdtLang.ClassifierByKey("key-SDTConcept").FeatureByKey("key-SDTDecimalField") as Property ??
         throw new AssertFailedException();
 
-    private IStructuredDataTypeInstance newDecimal(int dec, int frac)
+    private IStructuredDataTypeInstance NewDecimal(int dec, int frac)
     {
-        var decSdt = _sdtLang.StructuredDataTypeByKey("key-SDTDecimal");
+        var decSdt = Decimal_();
         var decValue = _sdtLang.GetFactory().CreateStructuredDataTypeInstance(decSdt,
-            new FieldValues { { decSdt.FieldByKey("key-SDTInt"), dec }, { decSdt.FieldByKey("key-SDTFrac"), frac }, }
+            new FieldValues { { DecimalInt(), dec }, { DecimalFrac(), frac }, }
         );
 
         return decValue;
     }
 
-    private IStructuredDataTypeInstance newAmount(int dec, int frac, string currency, bool digital)
+    private StructuredDataType Decimal_() => _sdtLang.StructuredDataTypeByKey("key-SDTDecimal");
+
+    private Field DecimalInt() => Decimal_().FieldByKey("key-SDTInt");
+    private Field DecimalFrac() => Decimal_().FieldByKey("key-SDTFrac");
+
+    private IStructuredDataTypeInstance NewDecimal()
     {
-        var decValue = newDecimal(dec, frac);
-
-        var currencyEnum = _sdtLang.Enumerations().FirstOrDefault(c => c.Key == "key-SDTCurrency")!;
-        var currencyLit = currencyEnum.Literals.FirstOrDefault(l => l.Name == currency)!;
-        var currencyValue = _sdtLang.GetFactory().GetEnumerationLiteral(currencyLit);
-
-        var amountSdt = _sdtLang.StructuredDataTypeByKey("key-SDTAmount");
-        var amountValue = _sdtLang.GetFactory().CreateStructuredDataTypeInstance(amountSdt,
-            new FieldValues
-            {
-                { amountSdt.FieldByKey("key-SDTValue"), decValue },
-                { amountSdt.FieldByKey("key-SDTCurr"), currencyValue },
-                { amountSdt.FieldByKey("key-SDTDigital"), digital }
-            }
+        var decSdt = Decimal_();
+        var decValue = _sdtLang.GetFactory().CreateStructuredDataTypeInstance(decSdt,
+            new FieldValues { }
         );
 
-        return amountValue;
+        return decValue;
     }
+
+    private IStructuredDataTypeInstance NewE() =>
+        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(E_(),
+            new FieldValues { }
+        );
+
+    private IStructuredDataTypeInstance NewE(IStructuredDataTypeInstance e2F) =>
+        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(E_(),
+            new FieldValues { { E_e2f(), e2F }, }
+        );
+
+    private IStructuredDataTypeInstance NewE(string name) =>
+        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(E_(),
+            new FieldValues { { E_name(), name }, }
+        );
+
+
+    private IStructuredDataTypeInstance NewE(IStructuredDataTypeInstance e2F, string? name) =>
+        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(E_(),
+            new FieldValues { { E_e2f(), e2F }, { E_name(), name }, }
+        );
+
+    private IStructuredDataTypeInstance NewF(string name) =>
+        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(F_(),
+            new FieldValues { { F_name(), name }, }
+        );
+
+    private StructuredDataType E_() => _sdtLang.StructuredDataTypeByKey("key-SDE");
+    private StructuredDataType F_() => _sdtLang.StructuredDataTypeByKey("key-SDF");
+    private Field F_name() => F_().FieldByKey("key-SDTfName");
+    private Field E_e2f() => E_().FieldByKey("key-SDTf");
+    private Field E_name() => E_().FieldByKey("key-SDTeName");
+
+    private Enumeration Currency_() => _sdtLang.Enumerations().FirstOrDefault(c => c.Key == "key-SDTCurrency")!;
+
+    private EnumerationLiteral Currency(string currency) =>
+        Currency_().Literals.FirstOrDefault(l => l.Name == currency)!;
+
+    private Enum CurrencyValue(string currency) => _sdtLang.GetFactory().GetEnumerationLiteral(Currency(currency));
+    private Enum CurrencyEUR() => CurrencyValue("EUR");
+
+    private StructuredDataType Amount_() => _sdtLang.StructuredDataTypeByKey("key-SDTAmount");
+    private Field Amount_value() => Amount_().FieldByKey("key-SDTValue");
+    private Field Amount_digital() => Amount_().FieldByKey("key-SDTDigital");
+    private Field Amount_currency() => Amount_().FieldByKey("key-SDTCurr");
+
+    private IStructuredDataTypeInstance NewAmount() =>
+        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(Amount_(),
+            new FieldValues { }
+        );
+
+    private IStructuredDataTypeInstance NewAmount(Enum cur) =>
+        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(
+            Amount_(),
+            new FieldValues { { Amount_currency(), cur } }
+        );
+
+
+    private IStructuredDataTypeInstance NewAmount(int dec, int frac, string currency, bool digital) =>
+        _sdtLang.GetFactory().CreateStructuredDataTypeInstance(Amount_(),
+            new FieldValues
+            {
+                { Amount_value(), NewDecimal(dec, frac) },
+                { Amount_currency(), CurrencyValue(currency) },
+                { Amount_digital(), digital }
+            }
+        );
 }

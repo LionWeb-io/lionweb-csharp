@@ -255,6 +255,31 @@ public class SerializationTests
     }
 
     [TestMethod]
+    public async Task SerializedLionWebVersion()
+    {
+        const string text = "\ud83d\ude0a Hällö 😊";
+        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") { Name = text } };
+
+        var serializer = new Serializer(_lionWebVersion);
+        var stream = new MemoryStream();
+        JsonUtils.WriteNodesToStream(stream, serializer, materialGroup.Descendants(true));
+
+        stream.Seek(0, SeekOrigin.Begin);
+
+        var deserializer = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        string serializedLionWebVersion = null;
+        var readableNodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, s =>
+        {
+            serializedLionWebVersion = s;
+        });
+
+        Assert.AreEqual(_lionWebVersion.VersionString, serializedLionWebVersion);
+    }
+
+    [TestMethod]
     public void SerializeStructuredDataType()
     {
         var node = new SDTConcept("nodeId")
