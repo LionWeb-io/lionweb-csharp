@@ -16,6 +16,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Deserializer can now create instances of languages not registered beforehand.
 * Use `[NotNullWhen]` instead of `[MaybeNullWhen]` attributes for _TryGet_-like out parameters.
 * Made `M1Extensions.ReplaceWith()` work for annotation instances.
+* Enabled replacing `DynamicLanguage.entities`.
+* Aligned behavior of `DynamicStructuredDataTypeInstance.CollectAllSetFields()` and `Get()` with other implementations.
+* Ensure stable results of `DynamicStructuredDataTypeInstance.Equals()` and `GetHashCode()`.
 ### Changed
 ### Removed
 ### Deprecated
