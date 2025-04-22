@@ -1,4 +1,4 @@
-﻿// Copyright 2024 TRUMPF Laser SE and other contributors
+﻿// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -15,42 +15,43 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1;
+namespace LionWeb.Core.M2;
 
-using M2;
+using M1;
 using M3;
 
-/// Builds an M1 (i.e. instance-level) <see cref="IDeserializer"/>.
-public class DeserializerBuilder
+/// Builds an M2 (i.e. language-level) <see cref="ILanguageDeserializer"/>.
+public class LanguageDeserializerBuilder
 {
     private readonly Dictionary<Language, INodeFactory> _languages = new();
     private readonly HashSet<IReadableNode> _dependentNodes = new();
+    private readonly HashSet<Language> _dependentLanguages = new();
     private CompressedIdConfig _compressedIdConfig = new();
     private ReferenceResolveInfoHandling _referenceResolveInfoHandling = ReferenceResolveInfoHandling.None;
-    
+
     /// <inheritdoc cref="WithLionWebVersion"/>
     public LionWebVersions LionWebVersion { get; set; } = LionWebVersions.Current;
-    
+
     /// <inheritdoc cref="WithHandler"/>
-    public IDeserializerHandler? Handler { get; set; }
+    public ILanguageDeserializerHandler? Handler { get; set; }
 
     /// Registers a custom handler.
     /// Defaults to <see cref="DeserializerExceptionHandler"/>.
-    public DeserializerBuilder WithHandler(IDeserializerHandler handler)
+    public LanguageDeserializerBuilder WithHandler(ILanguageDeserializerHandler handler)
     {
         Handler = handler;
         return this;
     }
 
     /// Registers an <see cref="IDeserializer.RegisterInstantiatedLanguage">instantiated language</see>.
-    public DeserializerBuilder WithLanguage(Language language)
+    public LanguageDeserializerBuilder WithLanguage(Language language)
     {
         WithCustomFactory(language, language.GetFactory());
         return this;
     }
 
     /// Registers several <see cref="IDeserializer.RegisterInstantiatedLanguage">instantiated languages</see>.
-    public DeserializerBuilder WithLanguages(IEnumerable<Language> languages)
+    public LanguageDeserializerBuilder WithLanguages(IEnumerable<Language> languages)
     {
         foreach (Language language in languages)
         {
@@ -61,14 +62,14 @@ public class DeserializerBuilder
     }
 
     /// Registers an <see cref="IDeserializer.RegisterInstantiatedLanguage">instantiated language</see> with custom factory.
-    public DeserializerBuilder WithCustomFactory(Language language, INodeFactory factory)
+    public LanguageDeserializerBuilder WithCustomFactory(Language language, INodeFactory factory)
     {
         _languages[language] = factory;
         return this;
     }
 
     /// Registers <see cref="IDeserializer.RegisterDependentNodes">dependent nodes</see>.
-    public DeserializerBuilder WithDependentNodes(IEnumerable<IReadableNode> dependentNodes)
+    public LanguageDeserializerBuilder WithDependentNodes(IEnumerable<IReadableNode> dependentNodes)
     {
         foreach (var dependentNode in dependentNodes)
         {
@@ -78,24 +79,28 @@ public class DeserializerBuilder
         return this;
     }
 
-    /// Whether to compress ids, and whether to store uncompressed node and meta-pointer ids
-    /// alongside the compressed ones during processing.
-    public DeserializerBuilder WithCompressedIds(CompressedIdConfig? config = null)
+    /// Registers <see cref="ILanguageDeserializer.RegisterDependentLanguage">dependent languages</see>.
+    public LanguageDeserializerBuilder WithDependentLanguages(IEnumerable<Language> dependentLanguages)
     {
-        _compressedIdConfig = config ?? new ();
+        foreach (var dependentLanguage in dependentLanguages)
+        {
+            _dependentLanguages.Add(dependentLanguage);
+        }
+
         return this;
     }
 
-    /// <inheritdoc cref="WithCompressedIds(LionWeb.Core.M1.CompressedIdConfig?)"/>
-    /// <param name="compress">Whether we compress ids at all.</param>
-    /// <param name="keepOriginal">Whether we keep the original around for compressed ids. Uses more memory, but eases debugging.</param>
-    [Obsolete("Use WithCompressedIds(CompressedIdConfig) instead.")]
-    public DeserializerBuilder WithCompressedIds(bool keepOriginal = true, bool compress = true) =>
-        WithCompressedIds(new CompressedIdConfig(compress, keepOriginal));
-    
+    /// Whether to compress ids, and whether to store uncompressed node and meta-pointer ids
+    /// alongside the compressed ones during processing.
+    public LanguageDeserializerBuilder WithCompressedIds(CompressedIdConfig? config = null)
+    {
+        _compressedIdConfig = config ?? new();
+        return this;
+    }
+
     /// Whether we try to resolve references by <see cref="LionWeb.Core.Serialization.SerializedReferenceTarget.ResolveInfo"/>.
     /// Defaults to <see cref="ReferenceResolveInfoHandling.None"/>.
-    public DeserializerBuilder WithReferenceResolveInfoHandling(
+    public LanguageDeserializerBuilder WithReferenceResolveInfoHandling(
         ReferenceResolveInfoHandling referenceResolveInfoHandling)
     {
         _referenceResolveInfoHandling = referenceResolveInfoHandling;
@@ -104,7 +109,7 @@ public class DeserializerBuilder
 
     /// The version of LionWeb standard to use.
     /// Defaults to <see cref="LionWebVersions.Current"/>.
-    public DeserializerBuilder WithLionWebVersion(LionWebVersions lionWebVersion)
+    public LanguageDeserializerBuilder WithLionWebVersion(LionWebVersions lionWebVersion)
     {
         LionWebVersion = lionWebVersion;
         return this;
@@ -115,9 +120,9 @@ public class DeserializerBuilder
     /// If any <see cref="WithLanguage">registered language</see>'s LionWeb version is not compatible with
     /// the <see cref="WithLionWebVersion">selected version of LionWeb standard</see>.
     /// </exception>
-    public IDeserializer Build()
+    public ILanguageDeserializer Build()
     {
-        IDeserializer result = new Deserializer(LionWebVersion, Handler, _compressedIdConfig)
+        var result = new LanguageDeserializer(LionWebVersion, Handler, _compressedIdConfig)
         {
             ResolveInfoHandling = _referenceResolveInfoHandling
         };
@@ -127,6 +132,10 @@ public class DeserializerBuilder
         }
 
         result.RegisterDependentNodes(_dependentNodes);
+        foreach (var dependentLanguage in _dependentLanguages)
+        {
+            result.RegisterDependentLanguage(dependentLanguage);
+        }
 
         return result;
     }

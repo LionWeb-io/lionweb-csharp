@@ -13,6 +13,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added `EnumerationLiteralIdentityComparer` and `KeyedIdentityComparer`.
 * Added `bool IReadableNode.TryGet(Feature, out object? value)`.
 * `JsonUtils.ReadNodesFromStreamAsync()` provides access to the `serializationFormatVersion`.
+* Introduced `SerializerBuilder`.
+* Introduced `LanguageDeserializerBuilder`.
+* Introduced delegating implementations for `SerializerHandler`, `DeserializerHandler`, `LanguageDeserializerHandler`.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
