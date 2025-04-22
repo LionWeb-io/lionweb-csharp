@@ -97,7 +97,7 @@ public class LionWebVersionMigrationTests
 
         var factory = language.GetFactory();
 
-        var nodes = CreateInstances2024(factory, concept, propString, propEnum, enm, ann, nestedSdt, sdt, propSdt);
+        var nodes = CreateInstances2024(inputVersion, factory, concept, propString, propEnum, enm, ann, nestedSdt, sdt, propSdt);
 
         MemoryStream output = await Migrate(targetVersionCompatible, language, inputVersion, nodes);
 
@@ -135,14 +135,15 @@ public class LionWebVersionMigrationTests
         return output;
     }
 
-    private static List<INode> CreateInstances2024(INodeFactory factory, DynamicConcept concept,
-        DynamicProperty propString,
-        DynamicProperty propEnum, DynamicEnumeration enm, DynamicAnnotation ann, DynamicStructuredDataType nestedSdt,
-        DynamicStructuredDataType sdt, DynamicProperty propSdt)
+    private static List<INode> CreateInstances2024(LionWebVersions lionWebVersion, INodeFactory factory,
+        DynamicConcept concept, DynamicProperty propString, DynamicProperty propEnum, DynamicEnumeration enm,
+        DynamicAnnotation ann, DynamicStructuredDataType nestedSdt, DynamicStructuredDataType sdt,
+        DynamicProperty propSdt)
     {
         var conceptInstance = factory.CreateNode("conceptId", concept);
         conceptInstance.Set(propString, "conceptInstance");
         conceptInstance.Set(propEnum, factory.GetEnumerationLiteral(enm.Literals.First()));
+        conceptInstance.Set(lionWebVersion.BuiltIns.INamed_name, "my concept instance");
 
         var annInstance = factory.CreateNode("annotationId", ann);
         annInstance.Set(propString, "annInstance");
@@ -239,6 +240,7 @@ public class LionWebVersionMigrationTests
         var conceptInstance = factory.CreateNode("conceptId", concept);
         conceptInstance.Set(propString, "conceptInstance");
         conceptInstance.Set(propEnum, factory.GetEnumerationLiteral(enm.Literals.First()));
+        conceptInstance.Set(LionWebVersions.v2023_1.BuiltIns.INamed_name, "my concept instance");
 
         var annInstance = factory.CreateNode("annotationId", ann);
         annInstance.Set(propString, "annInstance");
