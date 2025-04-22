@@ -17,39 +17,51 @@
 
 // ReSharper disable InconsistentNaming
 
-namespace LionWeb.Core.VersionSpecific.V2024_1_Compatible;
+namespace LionWeb.Core.VersionSpecific.V2025_1_Compatible;
 
 using M1;
 using M3;
 using Utilities;
 using V2023_1;
 using V2024_1;
+using V2025_1;
 
-/// <see cref="IDeserializer"/> parts specific to LionWeb <see cref="IVersion2024_1_Compatible"/>.  
-internal class DeserializerVersionSpecifics_2024_1_Compatible<T, H>(
+/// <see cref="IDeserializer"/> parts specific to LionWeb <see cref="IVersion2025_1_Compatible"/>.  
+internal class DeserializerVersionSpecifics_2025_1_Compatible<T, H>(
     DeserializerBase<T, H> deserializer,
     DeserializerMetaInfo metaInfo,
     IDeserializerHandler handler)
-    : DeserializerVersionSpecifics_2024_1<T, H>(deserializer, metaInfo, handler)
+    : DeserializerVersionSpecifics_2025_1<T, H>(deserializer, metaInfo, handler)
     where T : class, IReadableNode where H : class, IDeserializerHandler
 {
-    public override LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
+    public override LionWebVersions Version => LionWebVersions.v2025_1_Compatible;
 
-    protected override object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype, string value)
+    protected override object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype,
+        string value)
     {
         ICompressedId compressedId = _metaInfo.Compress(node.GetId());
         return datatype switch
         {
-            var b when BuiltInsLanguage_2023_1.Instance.Boolean.EqualsIdentity(b) || BuiltInsLanguage_2024_1.Instance.Boolean.EqualsIdentity(b) =>
+            var b when
+                BuiltInsLanguage_2023_1.Instance.Boolean.EqualsIdentity(b) ||
+                BuiltInsLanguage_2024_1.Instance.Boolean.EqualsIdentity(b) ||
+                BuiltInsLanguage_2025_1.Instance.Boolean.EqualsIdentity(b)
+                =>
                 bool.TryParse(value, out var result)
                     ? result
                     : _handler.InvalidPropertyValue<bool>(value, property, compressedId),
-            var i when BuiltInsLanguage_2023_1.Instance.Integer.EqualsIdentity(i) || BuiltInsLanguage_2024_1.Instance.Integer.EqualsIdentity(i) =>
+            var i when
+                BuiltInsLanguage_2023_1.Instance.Integer.EqualsIdentity(i) ||
+                BuiltInsLanguage_2024_1.Instance.Integer.EqualsIdentity(i) ||
+                BuiltInsLanguage_2025_1.Instance.Integer.EqualsIdentity(i) =>
                 int.TryParse(value, out var result)
                     ? result
                     : _handler.InvalidPropertyValue<int>(value, property, compressedId),
             // leave a String value as a string:
-            var s when BuiltInsLanguage_2023_1.Instance.String.EqualsIdentity(s) || BuiltInsLanguage_2024_1.Instance.String.EqualsIdentity(s) =>
+            var s when
+                BuiltInsLanguage_2023_1.Instance.String.EqualsIdentity(s) ||
+                BuiltInsLanguage_2024_1.Instance.String.EqualsIdentity(s) ||
+                BuiltInsLanguage_2025_1.Instance.String.EqualsIdentity(s) =>
                 value,
             _ => _handler.UnknownDatatype(value, datatype, property, node)
         };
@@ -59,5 +71,6 @@ internal class DeserializerVersionSpecifics_2024_1_Compatible<T, H>(
     {
         RegisterLanguage(BuiltInsLanguage_2023_1.Instance);
         RegisterLanguage(BuiltInsLanguage_2024_1.Instance);
+        RegisterLanguage(BuiltInsLanguage_2025_1.Instance);
     }
 }
