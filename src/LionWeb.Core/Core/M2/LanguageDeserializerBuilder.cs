@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M2;
 
-using LionWeb.Core.M3;
 using M1;
 using M3;
 

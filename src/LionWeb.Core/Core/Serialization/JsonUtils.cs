@@ -94,7 +94,7 @@ public static class JsonUtils
     /// should throw <see cref="VersionMismatchException"/> if the check fails.
     /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
-    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream stream, IDeserializer deserializer,
+    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream utf8JsonStream, IDeserializer deserializer,
         Action<string>? lionWebVersionChecker = null)
     {
         var streamReader = new Utf8JsonAsyncStreamReader(utf8JsonStream, leaveOpen: true);
