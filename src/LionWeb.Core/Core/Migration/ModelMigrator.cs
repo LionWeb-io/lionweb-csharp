@@ -242,6 +242,9 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     public LionWebVersions LionWebVersion { get; }
 
     /// <inheritdoc />
+    public IEnumerable<DynamicLanguage> KnownLanguages { get => _dynamicLanguages.Values; }
+
+    /// <inheritdoc />
     public bool TryGetLanguage(LanguageIdentity languageIdentity, [NotNullWhen(true)] out DynamicLanguage? language) =>
         _dynamicLanguages.TryGetValue(languageIdentity, out language) ||
         _dynamicInputLanguages.TryGetValue(languageIdentity, out language);

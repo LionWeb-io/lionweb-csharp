@@ -26,6 +26,9 @@ public interface ILanguageRegistry
     /// Version of LionWeb standard used for migration.
     LionWebVersions LionWebVersion { get; }
     
+    /// Enumerates all languages known in the current migration round.
+    IEnumerable<DynamicLanguage> KnownLanguages { get; }
+    
     /// Find language for <paramref name="languageIdentity"/>, if known.
     /// <returns><c>true</c> if a language for <paramref name="languageIdentity"/> could be found; <c>false</c> otherwise.</returns>
     bool TryGetLanguage(LanguageIdentity languageIdentity, [NotNullWhen(true)] out DynamicLanguage? language);
