@@ -129,7 +129,8 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
     public bool Optional { get; set; }
 
     /// <inheritdoc />
-    protected DynamicFeature(string id, DynamicClassifier? parent, LionWebVersions lionWebVersion) : base(id, lionWebVersion)
+    protected DynamicFeature(string id, DynamicClassifier? parent, LionWebVersions lionWebVersion) :
+        base(id, lionWebVersion)
     {
         parent?.AddFeatures([this]);
         _parent = parent;
@@ -180,7 +181,8 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
 }
 
 /// <inheritdoc cref="Property"/>
-public class DynamicProperty(string id, LionWebVersions lionWebVersion, DynamicClassifier? classifier) : DynamicFeature(id, classifier, lionWebVersion), Property
+public class DynamicProperty(string id, LionWebVersions lionWebVersion, DynamicClassifier? classifier)
+    : DynamicFeature(id, classifier, lionWebVersion), Property
 {
     private Datatype? _type;
 
@@ -246,7 +248,8 @@ public class DynamicProperty(string id, LionWebVersions lionWebVersion, DynamicC
 }
 
 /// <inheritdoc cref="Link"/>
-public abstract class DynamicLink(string id, DynamicClassifier? classifier, LionWebVersions lionWebVersion) : DynamicFeature(id, classifier, lionWebVersion), Link
+public abstract class DynamicLink(string id, DynamicClassifier? classifier, LionWebVersions lionWebVersion)
+    : DynamicFeature(id, classifier, lionWebVersion), Link
 {
     private Classifier? _type;
 
@@ -329,14 +332,16 @@ public abstract class DynamicLink(string id, DynamicClassifier? classifier, Lion
 }
 
 /// <inheritdoc cref="Containment"/>
-public class DynamicContainment(string id, LionWebVersions lionWebVersion, DynamicClassifier? classifier) : DynamicLink(id, classifier, lionWebVersion), Containment
+public class DynamicContainment(string id, LionWebVersions lionWebVersion, DynamicClassifier? classifier)
+    : DynamicLink(id, classifier, lionWebVersion), Containment
 {
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.Containment;
 }
 
 /// <inheritdoc cref="Reference"/>
-public class DynamicReference(string id, LionWebVersions lionWebVersion, DynamicClassifier? classifier) : DynamicLink(id, classifier, lionWebVersion), Reference
+public class DynamicReference(string id, LionWebVersions lionWebVersion, DynamicClassifier? classifier)
+    : DynamicLink(id, classifier, lionWebVersion), Reference
 {
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.Reference;
@@ -442,7 +447,8 @@ public abstract class DynamicClassifier(string id, LionWebVersions lionWebVersio
 }
 
 /// <inheritdoc cref="Concept"/>
-public class DynamicConcept(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicClassifier(id, lionWebVersion, language), Concept
+public class DynamicConcept(string id, LionWebVersions lionWebVersion, DynamicLanguage? language)
+    : DynamicClassifier(id, lionWebVersion, language), Concept
 {
     /// <inheritdoc />
     public bool Abstract { get; set; }
@@ -564,10 +570,11 @@ public class DynamicConcept(string id, LionWebVersions lionWebVersion, DynamicLa
 }
 
 /// <inheritdoc cref="Annotation"/>
-public class DynamicAnnotation(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicClassifier(id, lionWebVersion, language), Annotation
+public class DynamicAnnotation(string id, LionWebVersions lionWebVersion, DynamicLanguage? language)
+    : DynamicClassifier(id, lionWebVersion, language), Annotation
 {
     private Classifier? _annotates;
-    
+
     /// <inheritdoc />
     public Classifier Annotates
     {
@@ -575,12 +582,12 @@ public class DynamicAnnotation(string id, LionWebVersions lionWebVersion, Dynami
         set => _annotates = value;
     }
 
-    
+
     /// <inheritdoc />
     public Annotation? Extends { get; set; }
 
     private readonly List<Interface> _implements = [];
-    
+
     /// <inheritdoc />
     public IReadOnlyList<Interface> Implements => _implements.AsReadOnly();
 
@@ -673,7 +680,8 @@ public class DynamicAnnotation(string id, LionWebVersions lionWebVersion, Dynami
 }
 
 /// <inheritdoc cref="Interface"/>
-public class DynamicInterface(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicClassifier(id, lionWebVersion, language), Interface
+public class DynamicInterface(string id, LionWebVersions lionWebVersion, DynamicLanguage? language)
+    : DynamicClassifier(id, lionWebVersion, language), Interface
 {
     private readonly List<Interface> _extends = [];
 
@@ -738,14 +746,16 @@ public abstract class DynamicDatatype(string id, LionWebVersions lionWebVersion,
     : DynamicLanguageEntity(id, lionWebVersion, language), Datatype;
 
 /// <inheritdoc cref="PrimitiveType"/>
-public class DynamicPrimitiveType(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicDatatype(id, lionWebVersion, language), PrimitiveType
+public class DynamicPrimitiveType(string id, LionWebVersions lionWebVersion, DynamicLanguage? language)
+    : DynamicDatatype(id, lionWebVersion, language), PrimitiveType
 {
     /// <inheritdoc />
     public override Classifier GetClassifier() => _m3.PrimitiveType;
 }
 
 /// <inheritdoc cref="Enumeration"/>
-public class DynamicEnumeration(string id, LionWebVersions lionWebVersion, DynamicLanguage? language) : DynamicDatatype(id, lionWebVersion, language), Enumeration
+public class DynamicEnumeration(string id, LionWebVersions lionWebVersion, DynamicLanguage? language)
+    : DynamicDatatype(id, lionWebVersion, language), Enumeration
 {
     private readonly List<EnumerationLiteral> _literals = [];
 
@@ -962,24 +972,32 @@ public readonly record struct DynamicStructuredDataTypeInstance : IStructuredDat
 
     /// <inheritdoc />
     public IEnumerable<Field> CollectAllSetFields() =>
-        _fields.Select(v => v.field);
+        _fields.Where(v => v.value != null).Select(v => v.field);
 
     /// <inheritdoc />
     public object? Get(Field field) =>
-        _fields.FirstOrDefault(v => v.field == field);
+        _fields.FirstOrDefault(v => v.field == field).value ?? throw new UnsetFieldException(field);
 
     /// <inheritdoc />
     public bool Equals(DynamicStructuredDataTypeInstance other) =>
         _structuredDataType.EqualsIdentity(other._structuredDataType) &&
-        _fields.SequenceEqual(other._fields);
+        OrderWithValue(_fields).SequenceEqual(OrderWithValue(other._fields));
+
+    private static IEnumerable<(Field field, object? value)> OrderWithValue(
+        IEnumerable<(Field field, object? value)> fields) =>
+        fields.Where(f => f.value != null).OrderBy(f => f.field.Key);
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
-        hashCode.Add(_structuredDataType);
+        hashCode.Add(_structuredDataType.GetHashCodeIdentity());
         foreach (var field in _fields)
-            hashCode.Add(field);
+        {
+            hashCode.Add(field.field.GetHashCodeIdentity());
+            hashCode.Add(field.value);
+        }
+
         return hashCode.ToHashCode();
     }
 }
@@ -993,7 +1011,8 @@ public class DynamicField : DynamicIKeyed, Field
     private Datatype? _type;
 
     /// <inheritdoc cref="Field"/>
-    public DynamicField(string id, LionWebVersions lionWebVersion, DynamicStructuredDataType? structuredDataType) : base(id, lionWebVersion)
+    public DynamicField(string id, LionWebVersions lionWebVersion, DynamicStructuredDataType? structuredDataType)
+        : base(id, lionWebVersion)
     {
         structuredDataType?.AddFields([this]);
         _parent = structuredDataType;
@@ -1067,7 +1086,7 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
     public LionWebVersions LionWebVersion { get; } = lionWebVersion;
 
     private string? _version;
-    
+
     /// <inheritdoc />
     public string Version
     {
@@ -1110,6 +1129,35 @@ public class DynamicLanguage(string id, LionWebVersions lionWebVersion) : Dynami
 
     /// <inheritdoc />
     public Concept GetConcept() => _m3.Language;
+
+
+    /// <inheritdoc />
+    protected override bool DetachChild(INode child)
+    {
+        if (base.DetachChild(child))
+        {
+            return true;
+        }
+
+        var containment = GetContainmentOf(child);
+        if (containment == _m3.Language_entities)
+            return _entities.Remove((LanguageEntity)child);
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public override Containment? GetContainmentOf(INode child)
+    {
+        var result = base.GetContainmentOf(child);
+        if (result != null)
+            return result;
+
+        if (child is LanguageEntity s && _entities.Contains(s))
+            return _m3.Language_entities;
+
+        return null;
+    }
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() =>

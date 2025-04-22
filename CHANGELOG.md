@@ -11,11 +11,15 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Added
 * Added `LionWebVersions` _2025.1_ and _2025.1-compatible_. No content differences to _2024.1_ so far.
 * Added `EnumerationLiteralIdentityComparer` and `KeyedIdentityComparer`.
+* Added `bool IReadableNode.TryGet(Feature, out object? value)`.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
 * Use `[NotNullWhen]` instead of `[MaybeNullWhen]` attributes for _TryGet_-like out parameters.
 * Made `M1Extensions.ReplaceWith()` work for annotation instances.
+* Enabled replacing `DynamicLanguage.entities`.
+* Aligned behavior of `DynamicStructuredDataTypeInstance.CollectAllSetFields()` and `Get()` with other implementations.
+* Ensure stable results of `DynamicStructuredDataTypeInstance.Equals()` and `GetHashCode()`.
 * `Cloner` can now deal with read-only external reference targets.
 ### Changed
 ### Removed
