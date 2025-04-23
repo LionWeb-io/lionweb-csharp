@@ -34,6 +34,7 @@ public static class MigrationExtensions
 
     /// All <see cref="Descendants(System.Collections.Generic.List{LionWeb.Core.LenientNode})">descendants</see> of
     /// <paramref name="nodes"/> that are instances of <paramref name="classifier"/>.
+    [Obsolete]
     public static IEnumerable<LenientNode>
         AllInstancesOf(this List<LenientNode> nodes, ClassifierIdentity classifier) =>
         nodes

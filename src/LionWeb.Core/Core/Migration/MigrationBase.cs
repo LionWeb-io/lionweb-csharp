@@ -77,6 +77,7 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
 
     #region Keyed identity helpers
 
+    [Obsolete]
     protected bool TryGetProperty(LenientNode node, FeatureIdentity featureIdentity, out object? value)
     {
         var property = TempProperty(featureIdentity);
@@ -91,12 +92,14 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
         return false;
     }
 
+    [Obsolete]
     protected void SetProperty(LenientNode node, FeatureIdentity featureIdentity, object? value)
     {
         var property = TempProperty(featureIdentity);
         node.Set(property, value);
     }
 
+    [Obsolete]
     protected bool TryGetContainment(LenientNode node, FeatureIdentity featureIdentity, out List<LenientNode> children)
     {
         var containment = TempContainment(featureIdentity);
@@ -111,12 +114,14 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
         return false;
     }
 
+    [Obsolete]
     protected void SetContainment(LenientNode node, FeatureIdentity featureIdentity, List<LenientNode> children)
     {
         var containment = TempContainment(featureIdentity);
         node.Set(containment, children);
     }
 
+    [Obsolete]
     protected bool TryGetReference(LenientNode node, FeatureIdentity featureIdentity, out List<IReadableNode> targets)
     {
         var reference = TempReference(featureIdentity);
@@ -131,12 +136,14 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
         return false;
     }
 
+    [Obsolete]
     protected void SetReference(LenientNode node, FeatureIdentity featureIdentity, List<IReadableNode> targets)
     {
         var reference = TempReference(featureIdentity);
         node.Set(reference, targets);
     }
 
+    [Obsolete]
     private DynamicProperty TempProperty(FeatureIdentity featureIdentity)
     {
         var classifier = TempClassifier(featureIdentity.Classifier, featureIdentity.Key + "-Concept");
@@ -154,6 +161,7 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
         };
     }
 
+    [Obsolete]
     private DynamicContainment TempContainment(FeatureIdentity featureIdentity)
     {
         var classifier = TempClassifier(featureIdentity.Classifier, featureIdentity.Key + "-Concept");
@@ -171,6 +179,7 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
         };
     }
 
+    [Obsolete]
     private DynamicReference TempReference(FeatureIdentity featureIdentity)
     {
         var classifier = TempClassifier(featureIdentity.Classifier, featureIdentity.Key + "-Concept");
@@ -188,6 +197,7 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
         };
     }
 
+    [Obsolete]
     protected DynamicClassifier TempClassifier(ClassifierIdentity classifierIdentity, string? id = null)
     {
         var language = TempLanguage(classifierIdentity.Language, id != null ? id + "-Language" : null);
@@ -202,6 +212,7 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
         return new DynamicConcept(id ?? NewId(), LionWebVersion, language) { Key = classifierIdentity.Key };
     }
 
+    [Obsolete]
     protected DynamicLanguage TempLanguage(LanguageIdentity languageIdentity, string? id = null)
     {
         if (LanguageRegistry.TryGetLanguage(languageIdentity, out var language))
@@ -213,6 +224,7 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
         return dynamicLanguage;
     }
 
+    [Obsolete]
     protected LenientNode CreateNode(ClassifierIdentity classifierIdentity, string? id = null) =>
         CreateNode(TempClassifier(classifierIdentity), id);
 

@@ -28,6 +28,7 @@ public record LanguageIdentity(string Key, string Version)
 }
 
 /// Represents the identifying parts of a <see cref="Classifier"/>.
+[Obsolete]
 public record ClassifierIdentity(string Key, LanguageIdentity Language)
 {
     public static ClassifierIdentity FromClassifier(Classifier classifier) =>
@@ -35,6 +36,7 @@ public record ClassifierIdentity(string Key, LanguageIdentity Language)
 }
 
 /// Represents the identifying parts of a <see cref="Feature"/>.
+[Obsolete]
 public record FeatureIdentity(string Key, ClassifierIdentity Classifier)
 {
     public static FeatureIdentity FromFeature(Feature feature) =>
