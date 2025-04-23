@@ -186,6 +186,13 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
 
     private void ValidateRootNodes(List<LenientNode> rootNodes, IMigration migration)
     {
+        var nullRootNodes = rootNodes
+            .Where(n => n == null)
+            .ToList();
+
+        if (nullRootNodes.Count > 0)
+            throw new InvalidRootNodesException(migration, "null root nodes");
+        
         var nonRootNodes = rootNodes
             .Where(n => n.GetParent() != null)
             .ToList();
