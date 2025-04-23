@@ -168,7 +168,7 @@ public class LanguageRegistryTests : MigrationTestsBase
             var newLang = TinyRefLangLanguage.Instance;
             Assert.IsFalse(lr.TryGetLanguage(LanguageIdentity.FromLanguage(newLang), out var _));
 
-            var dynamicLanguage = new DynamicLanguageCloner(lr.LionWebVersion).Clone([newLang]).Values.First();
+            var dynamicLanguage = DynamicClone(lr.LionWebVersion, newLang);
             var result = lr.RegisterLanguage(dynamicLanguage);
             Assert.IsTrue(result);
             
@@ -195,7 +195,7 @@ public class LanguageRegistryTests : MigrationTestsBase
             var newLang = ShapesLanguage.Instance;
             Assert.IsTrue(lr.TryGetLanguage(LanguageIdentity.FromLanguage(newLang), out var _));
 
-            var dynamicLanguage = new DynamicLanguageCloner(lr.LionWebVersion).Clone([newLang]).Values.First();
+            var dynamicLanguage = DynamicClone(lr.LionWebVersion, newLang);
             var result = lr.RegisterLanguage(dynamicLanguage);
             Assert.IsFalse(result);
         });
@@ -303,7 +303,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, []);
         var migration = new LanguageRegistryMigration(lr =>
         {
-            var dynamicLanguage = new DynamicLanguageCloner(lr.LionWebVersion).Clone([ShapesLanguage.Instance]).Values.First();
+            var dynamicLanguage = DynamicClone(lr.LionWebVersion, ShapesLanguage.Instance);
             dynamicLanguage.Version = "other";
             
             var lookup = lr.Lookup(dynamicLanguage);

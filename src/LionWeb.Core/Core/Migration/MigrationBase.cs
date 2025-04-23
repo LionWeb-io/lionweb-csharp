@@ -247,6 +247,8 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     protected void SetProperty(LenientNode node, Property property, object? value) =>
         node.Set(Lookup(property), value);
 
+    /// Tries to get <paramref name="property"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
+    /// <returns><c>true</c> if <paramref name="property"/> is set in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetProperty(LenientNode node, Property property, [NotNullWhen(true)] out object? value) =>
         node.TryGet(Lookup(property), out value);
 
@@ -256,9 +258,11 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     protected void SetChild(LenientNode node, Containment containment, IWritableNode child) =>
         node.Set(Lookup(containment), ConvertSubtreeToLenient(child));
 
+    /// Tries to get <paramref name="containment"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
+    /// <returns><c>true</c> if <paramref name="containment"/> is set with single node in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetChild(LenientNode node, Containment containment, [NotNullWhen(true)] out LenientNode? value)
     {
-        if (node.TryGet(containment, out var v))
+        if (node.TryGet(Lookup(containment), out var v))
         {
             switch (v)
             {
@@ -289,10 +293,12 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     protected void SetChildren(LenientNode node, Containment containment, IEnumerable<IWritableNode> children) =>
         node.Set(Lookup(containment), children.Select(ConvertSubtreeToLenient));
 
+    /// Tries to get <paramref name="containment"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
+    /// <returns><c>true</c> if <paramref name="containment"/> is set with at least one node in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetChildren(LenientNode node, Containment containment,
         [NotNullWhen(true)] out List<LenientNode>? value)
     {
-        if (node.TryGet(containment, out var v))
+        if (node.TryGet(Lookup(containment), out var v))
         {
             switch (v)
             {
@@ -302,7 +308,7 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
 
                 case IEnumerable e:
                     value = e.Cast<LenientNode>().ToList();
-                    return true;
+                    return value.Count != 0;
             }
         }
 
@@ -315,9 +321,11 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     protected void SetReference(LenientNode node, Reference reference, IReadableNode target) =>
         node.Set(Lookup(reference), target);
 
+    /// Tries to get <paramref name="reference"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
+    /// <returns><c>true</c> if <paramref name="reference"/> is set with single node in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetReference(LenientNode node, Reference reference, [NotNullWhen(true)] out IReadableNode? value)
     {
-        if (node.TryGet(reference, out var v))
+        if (node.TryGet(Lookup(reference), out var v))
         {
             switch (v)
             {
@@ -347,10 +355,12 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     protected void SetReferences(LenientNode node, Reference reference, IEnumerable<IReadableNode> targets) =>
         node.Set(Lookup(reference), targets);
 
+    /// Tries to get <paramref name="reference"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
+    /// <returns><c>true</c> if <paramref name="reference"/> is set with at least one node in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetReferences(LenientNode node, Reference reference,
         [NotNullWhen(true)] out List<IReadableNode>? value)
     {
-        if (node.TryGet(reference, out var v))
+        if (node.TryGet(Lookup(reference), out var v))
         {
             switch (v)
             {
@@ -360,7 +370,7 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
 
                 case IEnumerable e:
                     value = e.Cast<IReadableNode>().ToList();
-                    return true;
+                    return value.Count != 0;
             }
         }
 
@@ -417,8 +427,20 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     protected virtual string NewId() =>
         IdUtils.NewId();
 
+    /// <inheritdoc cref="CreateNode(DynamicClassifier,string?)"/>
+    protected virtual LenientNode CreateNode(Classifier classifier, string? id = null)
+    {
+        if (classifier is not DynamicClassifier)
+            classifier = Lookup(classifier);
+        
+        if (classifier is not DynamicClassifier dynamicClassifier)
+            throw new UnknownLookupException(classifier);
+        
+        return CreateNode(dynamicClassifier, id);
+    }
+
     /// Creates a new node with classifier <paramref name="classifier"/> and node id <paramref name="id"/>,
     /// or <see cref="NewId"/>.
-    protected LenientNode CreateNode(Classifier classifier, string? id = null) =>
+    protected virtual LenientNode CreateNode(DynamicClassifier classifier, string? id = null) =>
         new LenientNode(id ?? NewId(), classifier);
 }

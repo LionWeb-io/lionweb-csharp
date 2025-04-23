@@ -17,15 +17,18 @@
 
 namespace LionWeb.Core.Test.Migration;
 
+using Core.Migration;
+using Core.Utilities;
 using Core.Serialization;
 using Languages.Generated.V2023_1.Shapes.M2;
 using M1;
+using M3;
 
 public abstract class MigrationTestsBase
 {
     protected static async Task<MemoryStream> Serialize(IReadableNode input) =>
         await Serialize([input]);
-    
+
     protected static async Task<MemoryStream> Serialize(IEnumerable<IReadableNode> inputs)
     {
         var inputStream = new MemoryStream();
@@ -35,7 +38,7 @@ public abstract class MigrationTestsBase
         return inputStream;
     }
 
-    protected  static async Task<List<IReadableNode>> Deserialize(MemoryStream outputStream)
+    protected static async Task<List<IReadableNode>> Deserialize(MemoryStream outputStream)
     {
         outputStream.Seek(0, SeekOrigin.Begin);
         var resultNodes = await JsonUtils.ReadNodesFromStreamAsync(outputStream,
@@ -44,4 +47,12 @@ public abstract class MigrationTestsBase
         return resultNodes;
     }
 
+    protected DynamicLanguage DynamicClone(LionWebVersions lionWebVersion, Language language) =>
+        new DynamicLanguageCloner(lionWebVersion).Clone([language]).Values.First();
+
+    protected static bool Compare(IReadableNode? expected, IReadableNode actual) =>
+        new Comparer([expected], [actual]) { BehaviorConfig = new() { CompareCompatibleClassifier = false } }.AreEqual();
+
+    protected static bool Compare(List<IReadableNode>? expected, List<IReadableNode> actual) =>
+        new Comparer(expected ?? [], actual) { BehaviorConfig = new() { CompareCompatibleClassifier = false } }.AreEqual();
 }
