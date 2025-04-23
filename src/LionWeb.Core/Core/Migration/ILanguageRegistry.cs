@@ -41,6 +41,6 @@ public interface ILanguageRegistry
 
     /// Finds the equivalent of <paramref name="keyed"/> within the current round's languages.
     /// <exception cref="UnknownLookupException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
-    /// <exception cref="DuplicateLanguageKeyMapping">If more than one language could be mapped to the same key.</exception>
+    /// <exception cref="AmbiguousLanguageKeyMapping">If not exactly one language could be mapped to the same key.</exception>
     T Lookup<T>(T keyed) where T : IKeyed;
 }

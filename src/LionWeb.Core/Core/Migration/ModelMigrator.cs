@@ -276,7 +276,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
                 language = sameKey[0];
             } else
             {
-                throw new DuplicateLanguageKeyMapping(inputLanguage.Key, sameKey);
+                throw new AmbiguousLanguageKeyMapping(inputLanguage.Key, sameKey);
             }
         }
 

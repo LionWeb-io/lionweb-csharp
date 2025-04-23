@@ -169,36 +169,47 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
 
     private void CloneReferencedElements()
     {
-        var unclonedReferencedElements = _dynamicMap
-            .Where(p => p.Value == null)
-            .GroupBy(p => p.Key.GetLanguage(), new LanguageIdentityComparer());
+        List<IGrouping<Language, KeyValuePair<IKeyed, DynamicIKeyed?>>> unclonedReferencedElements = CollectUnclonedReferencedElements();
 
-        foreach (var grouping in unclonedReferencedElements)
+        while (unclonedReferencedElements.Count != 0)
         {
-            Language inputLanguage = grouping.Key;
-            DynamicLanguage language;
-            if (TryLookup(inputLanguage, out var cloned) && cloned is DynamicLanguage l)
+            foreach (var grouping in unclonedReferencedElements)
             {
-                language = l;
-            } else
-            {
-                language = CloneLanguage(inputLanguage);
-            }
-
-            foreach ((IKeyed? keyed, _) in grouping)
-            {
-                switch (keyed)
+                Language inputLanguage = grouping.Key;
+                DynamicLanguage language;
+                if (TryLookup(inputLanguage, out var cloned) && cloned is DynamicLanguage l)
                 {
-                    case LanguageEntity entity:
-                        var clonedEntity = CloneEntity(entity, language);
-                        language.AddEntities([clonedEntity]);
-                        break;
+                    language = l;
+                } else
+                {
+                    language = CloneLanguage(inputLanguage);
+                }
 
-                    default:
-                        throw new ArgumentException(keyed.ToString());
+                foreach ((IKeyed? keyed, _) in grouping)
+                {
+                    switch (keyed)
+                    {
+                        case LanguageEntity entity:
+                            var clonedEntity = CloneEntity(entity, language);
+                            language.AddEntities([clonedEntity]);
+                            break;
+
+                        default:
+                            throw new ArgumentException(keyed.ToString());
+                    }
                 }
             }
+            
+            unclonedReferencedElements = CollectUnclonedReferencedElements();
         }
+        
+        return;
+
+        List<IGrouping<Language, KeyValuePair<IKeyed, DynamicIKeyed?>>> CollectUnclonedReferencedElements() =>
+            _dynamicMap
+                .Where(p => p.Value == null)
+                .GroupBy(p => p.Key.GetLanguage(), new LanguageIdentityComparer())
+                .ToList();
     }
 
     #endregion

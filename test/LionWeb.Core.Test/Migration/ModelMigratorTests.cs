@@ -24,7 +24,7 @@ using M1;
 using System.Text;
 
 [TestClass]
-public class ModelMigratorTests
+public class ModelMigratorTests : MigrationTestsBase
 {
     #region MaxRounds
 
@@ -335,22 +335,4 @@ public class ModelMigratorTests
     }
 
     #endregion
-
-    private static async Task<MemoryStream> Serialize(IReadableNode input)
-    {
-        var inputStream = new MemoryStream();
-        await JsonUtils.WriteNodesToStreamAsync(inputStream,
-            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).Build(), [input]);
-        inputStream.Seek(0, SeekOrigin.Begin);
-        return inputStream;
-    }
-
-    private static async Task<List<IReadableNode>> Deserialize(MemoryStream outputStream)
-    {
-        outputStream.Seek(0, SeekOrigin.Begin);
-        var resultNodes = await JsonUtils.ReadNodesFromStreamAsync(outputStream,
-            new DeserializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).WithLanguage(ShapesLanguage.Instance)
-                .Build());
-        return resultNodes;
-    }
 }
