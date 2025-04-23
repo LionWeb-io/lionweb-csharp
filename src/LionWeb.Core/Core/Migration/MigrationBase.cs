@@ -37,7 +37,7 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
 
     protected ILanguageRegistry LanguageRegistry
     {
-        get => _languageRegistry ?? throw new ApplicationException("LanguageRegistry is null");
+        get => _languageRegistry ?? throw new IllegalMigrationStateException("LanguageRegistry is null");
         set => _languageRegistry = value;
     }
 

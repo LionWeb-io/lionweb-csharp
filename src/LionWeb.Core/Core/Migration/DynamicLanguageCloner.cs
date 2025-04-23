@@ -160,7 +160,7 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
             {
                 Name = r.Name, Key = r.Key, Optional = r.Optional, Multiple = r.Multiple
             },
-            _ => throw new ArgumentOutOfRangeException(nameof(f))
+            _ => throw new ArgumentOutOfRangeException(f.ToString())
         });
         _dynamicMap.Add(f, result);
         _dynamicMap.TryAdd(f.GetFeatureType(), null);
@@ -249,12 +249,10 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
     private T Lookup<T>(T keyed) where T : IKeyed?
     {
         if (keyed == null)
-        {
-            throw new ArgumentException(typeof(T).FullName);
-        }
+            throw new UnknownLookupException(typeof(T).FullName!);
 
 #pragma warning disable CS8631 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match constraint type.
-        return TryLookup(keyed, out var result) ? result : throw new ArgumentException(keyed.ToString());
+        return TryLookup(keyed, out var result) ? result : throw new UnknownLookupException(keyed);
 #pragma warning restore CS8631
     }
 

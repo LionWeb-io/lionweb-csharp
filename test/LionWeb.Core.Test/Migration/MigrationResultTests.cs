@@ -29,7 +29,7 @@ public class MigrationResultTests
         List<LenientNode> input = [new LenientNode("l", ShapesLanguage.Instance.Line)];
         List<LenientNode> output = null;
 
-        Assert.ThrowsException<ArgumentException>(() => new MigrationResult(true, output).Validate(input));
+        Assert.ThrowsException<InvalidMigrationResultException>(() => new MigrationResult(true, output).Validate(input));
     }
 
     [TestMethod]
@@ -38,7 +38,7 @@ public class MigrationResultTests
         List<LenientNode> input = [new LenientNode("l", ShapesLanguage.Instance.Line)];
         List<LenientNode> output = null;
 
-        Assert.ThrowsException<ArgumentException>(() => new MigrationResult(false, output).Validate(input));
+        Assert.ThrowsException<InvalidMigrationResultException>(() => new MigrationResult(false, output).Validate(input));
     }
 
     [TestMethod]
@@ -47,7 +47,7 @@ public class MigrationResultTests
         List<LenientNode> input = [new LenientNode("l", ShapesLanguage.Instance.Line)];
         List<LenientNode> output = [];
 
-        Assert.ThrowsException<ArgumentException>(() => new MigrationResult(false, output).Validate(input));
+        Assert.ThrowsException<InvalidMigrationResultException>(() => new MigrationResult(false, output).Validate(input));
     }
     
     [TestMethod]
@@ -75,7 +75,7 @@ public class MigrationResultTests
         List<LenientNode> input = [new LenientNode("l", ShapesLanguage.Instance.Line)];
         List<LenientNode> output = [new LenientNode("l", ShapesLanguage.Instance.Line)];
 
-        Assert.ThrowsException<ArgumentException>(() => new MigrationResult(false, output).Validate(input));
+        Assert.ThrowsException<InvalidMigrationResultException>(() => new MigrationResult(false, output).Validate(input));
     }
     
     [TestMethod]
@@ -84,6 +84,6 @@ public class MigrationResultTests
         List<LenientNode> input = [new LenientNode("l", ShapesLanguage.Instance.Line)];
         List<LenientNode> output = [new LenientNode("l", ShapesLanguage.Instance.Circle)];
 
-        Assert.ThrowsException<ArgumentException>(() => new MigrationResult(false, output).Validate(input));
+        Assert.ThrowsException<InvalidMigrationResultException>(() => new MigrationResult(false, output).Validate(input));
     }
 }

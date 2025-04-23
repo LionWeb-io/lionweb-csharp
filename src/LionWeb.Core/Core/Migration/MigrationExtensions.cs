@@ -161,6 +161,9 @@ public static class MigrationExtensions
         if (mapped is T result)
             return result;
 
-        throw new ArgumentException($"No lookup for {keyed.Key}");
+        if (mapped != null)
+            throw new UnknownLookupException($"{mapped.Key}, as it's not a {typeof(T)}: {keyed}");
+        
+        throw new UnknownLookupException(keyed);
     }
 }

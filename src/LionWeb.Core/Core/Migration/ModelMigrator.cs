@@ -172,9 +172,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     private void CheckMigrationRounds(int migrationRound)
     {
         if (migrationRound >= MaxMigrationRounds)
-        {
-            throw new ArgumentException($"Exceeded {MaxMigrationRounds} migration rounds.");
-        }
+            throw new MaxMigrationRoundsExceededException(MaxMigrationRounds);
     }
 
     private Dictionary<LanguageIdentity, DynamicLanguage> CollectUsedLanguages(List<LenientNode> nodes) =>
@@ -207,8 +205,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
             messages.Add($"duplicate ids: {JoinNodeIds(duplicateRootIds)}");
 
         if (messages.Count != 0)
-            throw new ArgumentException(
-                $"migration {migration} resulted in invalid root nodes: {string.Join("; ", messages)}");
+            throw new InvalidRootNodesException(migration, string.Join("; ", messages));
         return;
 
         string JoinNodeIds(IEnumerable<IReadableNode> nodes) =>
@@ -272,7 +269,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
                 language = sameKey[0];
             } else
             {
-                throw new ArgumentException($"More than one mapped language for key {inputLanguage.Key}: {sameKey}");
+                throw new DuplicateLanguageKeyMapping(inputLanguage.Key, sameKey);
             }
         }
 

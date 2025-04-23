@@ -100,7 +100,7 @@ public class DynamicLanguageClonerTests
 
         var cloner = new DynamicLanguageCloner(LionWebVersions.Current);
 
-        Assert.ThrowsException<ArgumentException>(() => cloner.Clone([inputLangA]));
+        Assert.ThrowsException<UnknownLookupException>(() => cloner.Clone([inputLangA]));
     }
 
     [TestMethod]

@@ -121,7 +121,7 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
             };
         } else
         {
-            throw new ArgumentOutOfRangeException(nameof(feature));
+            throw new ArgumentOutOfRangeException(feature.ToString());
         }
 
         ((DynamicClassifier)classifier).AddFeatures([result]);

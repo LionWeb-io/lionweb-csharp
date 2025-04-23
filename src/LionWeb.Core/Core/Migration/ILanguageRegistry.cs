@@ -40,6 +40,7 @@ public interface ILanguageRegistry
     bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null);
 
     /// Finds the equivalent of <paramref name="keyed"/> within the current round's languages.
-    /// <exception cref="ArgumentException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
+    /// <exception cref="UnknownLookupException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
+    /// <exception cref="DuplicateLanguageKeyMapping">If more than one language could be mapped to the same key.</exception>
     T Lookup<T>(T keyed) where T : IKeyed;
 }
