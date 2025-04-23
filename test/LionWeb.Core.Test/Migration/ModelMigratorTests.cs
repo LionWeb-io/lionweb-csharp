@@ -53,6 +53,69 @@ public class ModelMigratorTests
     
     #endregion
 
+    #region NoMigrations
+
+    [TestMethod]
+    public async Task NoMigrations()
+    {
+        var input = new Circle("circle");
+        MemoryStream inputStream = await Serialize(input);
+
+        var migrator = new ModelMigrator(LionWebVersions.v2023_1, [])
+        {
+            SerializerBuilder = new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1)
+                .WithSerializedEmptyFeatures(false)
+        };
+
+        var outputStream = new MemoryStream();
+        var migrated = await migrator.Migrate(inputStream, outputStream);
+        Assert.IsFalse(migrated);
+        
+        var resultNodes = await Deserialize(outputStream);
+        Assert.AreEqual(1, resultNodes.Count);
+    }
+
+    #endregion
+
+    #region NotApplicable
+
+    [TestMethod]
+    public async Task NotApplicable()
+    {
+        var input = new Circle("circle");
+        MemoryStream inputStream = await Serialize(input);
+
+        var migrator = new ModelMigrator(LionWebVersions.v2023_1, []);
+        var migration = new NotApplicableMigration();
+        migrator.RegisterMigration(migration);
+
+        var outputStream = new MemoryStream();
+        var migrated = await migrator.Migrate(inputStream, outputStream);
+        Assert.IsFalse(migrated);
+        Assert.IsFalse(migration.Executed);
+        
+        var resultNodes = await Deserialize(outputStream);
+        Assert.AreEqual(1, resultNodes.Count);
+    }
+
+    private class NotApplicableMigration : IMigration
+    {
+        public bool Executed { get; set; } = false;
+        
+        public int Priority => 0;
+        public void Initialize(ILanguageRegistry languageRegistry) { }
+
+        public bool IsApplicable(ISet<LanguageIdentity> languageIdentities) => false;
+
+        public MigrationResult Migrate(List<LenientNode> inputRootNodes)
+        {
+            Executed = true;
+            return new MigrationResult(true, inputRootNodes);
+        }
+    }
+
+    #endregion
+
     #region SerializerDeserializer
 
     [TestMethod]
