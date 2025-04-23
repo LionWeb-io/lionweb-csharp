@@ -51,11 +51,11 @@ public static class MigrationExtensions
         HashSet<Language> result = [];
 
         foreach (var node in nodes.Descendants())
-        {
             CollectUsedLanguages(node.GetClassifier(), result);
-        }
         
-        return result.Where(l => l is not IBuiltInsLanguage and not ILionCoreLanguage).Cast<DynamicLanguage>();
+        return result
+            .Where(l => l is not IBuiltInsLanguage and not ILionCoreLanguage)
+            .Cast<DynamicLanguage>();
     }
 
     private static void CollectUsedLanguages(Classifier? classifier, HashSet<Language> alreadyCollected)
@@ -65,9 +65,7 @@ public static class MigrationExtensions
 
         alreadyCollected.Add(classifier.GetLanguage());
         foreach (var feature in classifier.Features)
-        {
             CollectUsedLanguages(feature, alreadyCollected);
-        }
         
         switch (classifier)
         {
@@ -75,24 +73,18 @@ public static class MigrationExtensions
                 CollectUsedLanguages(a.Annotates, alreadyCollected);
                 CollectUsedLanguages(a.Extends, alreadyCollected);
                 foreach (var iface in a.Implements)
-                {
                     CollectUsedLanguages(iface, alreadyCollected);
-                }
                 break;
             
             case Concept c:
                 CollectUsedLanguages(c.Extends, alreadyCollected);
                 foreach (var iface in c.Implements)
-                {
                     CollectUsedLanguages(iface, alreadyCollected);
-                }
                 break;
             
             case Interface i:
                 foreach (var iface in i.Extends)
-                {
                     CollectUsedLanguages(iface, alreadyCollected);
-                }
                 break;
         }
     }
@@ -122,14 +114,11 @@ public static class MigrationExtensions
         
         alreadyCollected.Add(datatype.GetLanguage());
 
+        if (datatype is not StructuredDataType s)
+            return;
 
-        if (datatype is StructuredDataType s)
-        {
-            foreach (var field in s.Fields)
-            {
-                CollectUsedLanguages(field.Type, alreadyCollected);
-            }
-        }
+        foreach (var field in s.Fields)
+            CollectUsedLanguages(field.Type, alreadyCollected);
     }
     //
     // private static void CollectUsedLanguages(LenientNode? node, HashSet<Language> alreadyCollected)

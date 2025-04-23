@@ -60,14 +60,10 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     {
         var result = MigrateInternal(inputRootNodes);
         if (!LanguageRegistry.TryGetLanguage(OriginLanguageIdentity, out var originLanguage))
-        {
             return result;
-        }
 
         if (originLanguage.Key == _targetLang.Key && originLanguage.Version == _targetLang.Version)
-        {
             return result;
-        }
 
         originLanguage.Key = _targetLang.Key;
         originLanguage.Version = _targetLang.Version;

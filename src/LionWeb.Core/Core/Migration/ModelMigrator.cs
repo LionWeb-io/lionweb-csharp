@@ -166,9 +166,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
             return;
 
         foreach (var migration in _migrations.OfType<IMigrationWithLionWebVersion>())
-        {
             migration.SerializedLionWebVersion = lionWebVersion;
-        }
     }
 
     private void CheckMigrationRounds(int migrationRound)
