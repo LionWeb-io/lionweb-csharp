@@ -26,14 +26,13 @@ using System.Text;
 [TestClass]
 public class ModelMigratorTests
 {
+    #region MaxRounds
+
     [TestMethod]
     public async Task MaxRounds()
     {
         var input = new Circle("circle");
-        var inputStream = new MemoryStream();
-        await JsonUtils.WriteNodesToStreamAsync(inputStream,
-            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).Build(), [input]);
-        inputStream.Seek(0, SeekOrigin.Begin);
+        MemoryStream inputStream = await Serialize(input);
 
         var migrator = new ModelMigrator(LionWebVersions.v2023_1, []) { MaxMigrationRounds = 17 };
         migrator.RegisterMigration(new InfiniteMigration());
@@ -41,6 +40,20 @@ public class ModelMigratorTests
         await Assert.ThrowsExceptionAsync<MaxMigrationRoundsExceededException>(() =>
             migrator.Migrate(inputStream, Stream.Null));
     }
+
+    private class InfiniteMigration : IMigration
+    {
+        public int Priority => 0;
+        public void Initialize(ILanguageRegistry languageRegistry) { }
+
+        public bool IsApplicable(ISet<LanguageIdentity> languageIdentities) => true;
+
+        public MigrationResult Migrate(List<LenientNode> inputRootNodes) => new(true, inputRootNodes);
+    }
+    
+    #endregion
+
+    #region SerializerDeserializer
 
     [TestMethod]
     public void InvalidSerializerBuilder()
@@ -88,10 +101,7 @@ public class ModelMigratorTests
     public async Task UseCustomSerializer()
     {
         var input = new Circle("circle");
-        var inputStream = new MemoryStream();
-        await JsonUtils.WriteNodesToStreamAsync(inputStream,
-            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).Build(), [input]);
-        inputStream.Seek(0, SeekOrigin.Begin);
+        MemoryStream inputStream = await Serialize(input);
 
         var migrator = new ModelMigrator(LionWebVersions.v2023_1, [])
         {
@@ -101,12 +111,10 @@ public class ModelMigratorTests
         migrator.RegisterMigration(new OnceMigration());
 
         var outputStream = new MemoryStream();
-        await migrator.Migrate(inputStream, outputStream);
-        outputStream.Seek(0, SeekOrigin.Begin);
-
-        var resultNodes = await JsonUtils.ReadNodesFromStreamAsync(outputStream,
-            new DeserializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).WithLanguage(ShapesLanguage.Instance)
-                .Build());
+        var migrated = await migrator.Migrate(inputStream, outputStream);
+        Assert.IsTrue(migrated);
+        
+        var resultNodes = await Deserialize(outputStream);
         Assert.AreEqual(1, resultNodes.Count);
 
         // We shouldn't serialize unset features
@@ -120,10 +128,7 @@ public class ModelMigratorTests
         var refTarget = new Circle("circle");
         var input = new ReferenceGeometry("ref") { Shapes = [refTarget] };
 
-        var inputStream = new MemoryStream();
-        await JsonUtils.WriteNodesToStreamAsync(inputStream,
-            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).Build(), [input]);
-        inputStream.Seek(0, SeekOrigin.Begin);
+        MemoryStream inputStream = await Serialize(input);
 
         var deserializerBuilder = new DeserializerBuilder()
             .WithLionWebVersion(LionWebVersions.v2023_1)
@@ -133,9 +138,10 @@ public class ModelMigratorTests
         migrator.RegisterMigration(new OnceMigration());
 
         var outputStream = new MemoryStream();
-        await migrator.Migrate(inputStream, outputStream);
-        outputStream.Seek(0, SeekOrigin.Begin);
+        var migrated = await migrator.Migrate(inputStream, outputStream);
+        Assert.IsTrue(migrated);
 
+        outputStream.Seek(0, SeekOrigin.Begin);
         var resultNodes = await JsonUtils.ReadNodesFromStreamAsync(outputStream,
             deserializerBuilder.WithLanguage(ShapesLanguage.Instance).Build());
 
@@ -143,14 +149,30 @@ public class ModelMigratorTests
         Assert.AreSame(refTarget, resultNodes.OfType<ReferenceGeometry>().First().Shapes[0]);
     }
 
+    private class OnceMigration : IMigration
+    {
+        private bool migrated = false;
+        public int Priority => 0;
+        public void Initialize(ILanguageRegistry languageRegistry) { }
+
+        public bool IsApplicable(ISet<LanguageIdentity> languageIdentities) => !migrated;
+
+        public MigrationResult Migrate(List<LenientNode> inputRootNodes)
+        {
+            migrated = true;
+            return new MigrationResult(true, inputRootNodes);
+        }
+    }
+
+    #endregion
+
+    #region SerializedLionWebVersion
+
     [TestMethod]
     public async Task ReceiveSerializedLionWebVersion()
     {
         var input = new Circle("circle");
-        var inputStream = new MemoryStream();
-        await JsonUtils.WriteNodesToStreamAsync(inputStream,
-            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).Build(), [input]);
-        inputStream.Seek(0, SeekOrigin.Begin);
+        MemoryStream inputStream = await Serialize(input);
 
         var migrator = new ModelMigrator(LionWebVersions.v2023_1, []);
         var migration = new SerializedLionWebVersionMigration();
@@ -158,19 +180,38 @@ public class ModelMigratorTests
         Assert.IsNull(migration.SerializedLionWebVersion);
         
         migrator.RegisterMigration(migration);
-        await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        Assert.IsTrue(migrated);
         
         Assert.AreEqual(LionWebVersions.v2023_1.VersionString, migration.SerializedLionWebVersion);
     }
+
+    private class SerializedLionWebVersionMigration : IMigrationWithLionWebVersion
+    {
+        private bool migrated = false;
+        public int Priority => 0;
+        public void Initialize(ILanguageRegistry languageRegistry) { }
+
+        public bool IsApplicable(ISet<LanguageIdentity> languageIdentities) => !migrated;
+
+        public MigrationResult Migrate(List<LenientNode> inputRootNodes)
+        {
+            migrated = true;
+            return new MigrationResult(true, inputRootNodes);
+        }
+
+        public string SerializedLionWebVersion { get; set; }
+    }
+
+    #endregion
+
+    #region RootNodes
 
     [TestMethod]
     public async Task NullRootNodes()
     {
         var input = new Circle("circle");
-        var inputStream = new MemoryStream();
-        await JsonUtils.WriteNodesToStreamAsync(inputStream,
-            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).Build(), [input]);
-        inputStream.Seek(0, SeekOrigin.Begin);
+        MemoryStream inputStream = await Serialize(input);
 
         var migrator = new ModelMigrator(LionWebVersions.v2023_1, []);
 
@@ -184,10 +225,7 @@ public class ModelMigratorTests
     public async Task NonRootNodes()
     {
         var input = new Circle("circle");
-        var inputStream = new MemoryStream();
-        await JsonUtils.WriteNodesToStreamAsync(inputStream,
-            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).Build(), [input]);
-        inputStream.Seek(0, SeekOrigin.Begin);
+        MemoryStream inputStream = await Serialize(input);
 
         var migrator = new ModelMigrator(LionWebVersions.v2023_1, []);
 
@@ -205,10 +243,7 @@ public class ModelMigratorTests
     public async Task DuplicateRootNodeIds()
     {
         var input = new Circle("circle");
-        var inputStream = new MemoryStream();
-        await JsonUtils.WriteNodesToStreamAsync(inputStream,
-            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).Build(), [input]);
-        inputStream.Seek(0, SeekOrigin.Begin);
+        MemoryStream inputStream = await Serialize(input);
 
         var migrator = new ModelMigrator(LionWebVersions.v2023_1, []);
 
@@ -221,48 +256,6 @@ public class ModelMigratorTests
             migrator.Migrate(inputStream, Stream.Null));
     }
 
-    private class InfiniteMigration : IMigration
-    {
-        public int Priority => 0;
-        public void Initialize(ILanguageRegistry languageRegistry) { }
-
-        public bool IsApplicable(ISet<LanguageIdentity> languageIdentities) => true;
-
-        public MigrationResult Migrate(List<LenientNode> inputRootNodes) => new(true, inputRootNodes);
-    }
-
-    private class OnceMigration : IMigration
-    {
-        private bool migrated = false;
-        public int Priority => 0;
-        public void Initialize(ILanguageRegistry languageRegistry) { }
-
-        public bool IsApplicable(ISet<LanguageIdentity> languageIdentities) => !migrated;
-
-        public MigrationResult Migrate(List<LenientNode> inputRootNodes)
-        {
-            migrated = true;
-            return new MigrationResult(true, inputRootNodes);
-        }
-    }
-    
-    private class SerializedLionWebVersionMigration : IMigrationWithLionWebVersion
-    {
-        private bool migrated = false;
-        public int Priority => 0;
-        public void Initialize(ILanguageRegistry languageRegistry) { }
-
-        public bool IsApplicable(ISet<LanguageIdentity> languageIdentities) => !migrated;
-
-        public MigrationResult Migrate(List<LenientNode> inputRootNodes)
-        {
-            migrated = true;
-            return new MigrationResult(true, inputRootNodes);
-        }
-
-        public string SerializedLionWebVersion { get; set; }
-    }
-    
     private class RootNodesMigration(List<LenientNode> rootNodes) : IMigration
     {
         private bool migrated = false;
@@ -276,5 +269,25 @@ public class ModelMigratorTests
             migrated = true;
             return new MigrationResult(true, rootNodes);
         }
+    }
+
+    #endregion
+
+    private static async Task<MemoryStream> Serialize(IReadableNode input)
+    {
+        var inputStream = new MemoryStream();
+        await JsonUtils.WriteNodesToStreamAsync(inputStream,
+            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).Build(), [input]);
+        inputStream.Seek(0, SeekOrigin.Begin);
+        return inputStream;
+    }
+
+    private static async Task<List<IReadableNode>> Deserialize(MemoryStream outputStream)
+    {
+        outputStream.Seek(0, SeekOrigin.Begin);
+        var resultNodes = await JsonUtils.ReadNodesFromStreamAsync(outputStream,
+            new DeserializerBuilder().WithLionWebVersion(LionWebVersions.v2023_1).WithLanguage(ShapesLanguage.Instance)
+                .Build());
+        return resultNodes;
     }
 }
