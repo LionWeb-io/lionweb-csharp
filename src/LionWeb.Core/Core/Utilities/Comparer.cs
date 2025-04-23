@@ -589,7 +589,7 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
             case (Annotation leftAnn, Annotation rightAnn):
                 result.AddRange(CompareAnnotation(left, leftAnn, right, rightAnn));
                 break;
-            case (Annotation, Concept) or (Concept, Annotation):
+            case (Annotation, Concept) or (Concept, Annotation) when BehaviorConfig.CompareCompatibleClassifier:
                 result.Add(new IncompatibleClassifierDifference(left, right));
                 break;
         }
@@ -632,15 +632,17 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
 }
 
 /// <summary>
-/// Configures the behavior of <see cref="System.Collections.Comparer"/>.
+/// Configures the behavior of <see cref="Comparer"/>.
 /// </summary>
 public class ComparerBehaviorConfig
 {
-    // nothing here yet
+    /// Whether we should compare classifier compatibility; defaults to <c>true</c>.
+    /// <seealso cref="IncompatibleClassifierDifference"/>
+    public bool CompareCompatibleClassifier { get; init; } = true;
 }
 
 /// <summary>
-/// Configures the output of <see cref="System.Collections.Comparer"/>.
+/// Configures the output of <see cref="Comparer"/>.
 /// </summary>
 public class ComparerOutputConfig
 {
