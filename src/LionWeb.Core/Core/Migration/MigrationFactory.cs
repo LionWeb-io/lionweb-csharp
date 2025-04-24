@@ -29,5 +29,5 @@ public class MigrationFactory(Language language) : ReflectiveBaseNodeFactory(lan
     
     /// Updates internal representation of C# Enum for <paramref name="enumeration"/> (e.g. after key change).
     public void UpdateEnumeration(Enumeration enumeration) =>
-        CreateEnum(enumeration);
+        CreateRuntimeEnum(enumeration);
 }
