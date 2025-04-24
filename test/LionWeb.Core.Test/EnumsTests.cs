@@ -50,9 +50,7 @@ public class EnumsTests
     {
         var key = ShapesLanguage.Instance.MatterState_liquid.Key;
         
-        var enumeration = ShapesDynamic.Language.Entities.OfType<Enumeration>()
-            .First(e => e.Key == ShapesLanguage.Instance.MatterState.Key);
-        var literal = enumeration.Literals.First(l => l.Key == key);
+        var literal = ShapesDynamic.Language.FindByKey<EnumerationLiteral>(key);
         
         Assert.AreEqual(key, ShapesDynamic.Language.GetFactory().GetEnumerationLiteral(literal).LionCoreKey());
     }
