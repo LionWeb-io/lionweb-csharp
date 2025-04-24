@@ -98,7 +98,7 @@ public class ReadOnlyLine(string id, IReadableNode? parent)
     /// <see cref="INamed"/>
     public required string Name { get; init; }
 
-    public bool TryGetName([MaybeNullWhen(false)] out string? name)
+    public bool TryGetName([NotNullWhen(true)] out string? name)
     {
         name = Name;
         return name != null;

@@ -46,7 +46,7 @@ public interface IReadableNode
     /// <seealso cref="IWritableNode.InsertAnnotations"/>
     /// <seealso cref="IWritableNode.RemoveAnnotations"/>
     public IReadOnlyList<IReadableNode> GetAnnotations();
-
+    
     /// The <see cref="Classifier"/> that <c>this</c> node is an instance of.
     public Classifier GetClassifier();
 

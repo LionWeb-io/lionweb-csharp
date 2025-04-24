@@ -133,7 +133,7 @@ public class ReflectionTests : LenientNodeTestsBase
     }
 
     private struct TestStruct(int a, string b);
-    
+
     [TestMethod]
     public void SetValueTypeProperty()
     {
@@ -146,7 +146,8 @@ public class ReflectionTests : LenientNodeTestsBase
     public void SetValueTypeListProperty()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<InvalidValueException>(() => node.Set(Documentation_text, new List<TestStruct>{ new TestStruct(2, "hi")}));
+        Assert.ThrowsException<InvalidValueException>(() =>
+            node.Set(Documentation_text, new List<TestStruct> { new TestStruct(2, "hi") }));
         Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
     }
 
@@ -157,7 +158,7 @@ public class ReflectionTests : LenientNodeTestsBase
         Assert.ThrowsException<InvalidValueException>(() => node.Set(Documentation_text, new object()));
         Assert.ThrowsException<UnknownFeatureException>(() => node.Get(Documentation_text));
     }
-    
+
     [TestMethod]
     public void GetUnknownProperty_Unset()
     {
@@ -190,7 +191,8 @@ public class ReflectionTests : LenientNodeTestsBase
     public void SetValueTypeListContainment()
     {
         var node = newCircle("id");
-        Assert.ThrowsException<InvalidValueException>(() => node.Set(MaterialGroup_defaultShape, new List<TestStruct>{ new TestStruct(2, "hi")}));
+        Assert.ThrowsException<InvalidValueException>(() =>
+            node.Set(MaterialGroup_defaultShape, new List<TestStruct> { new TestStruct(2, "hi") }));
         Assert.ThrowsException<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
     }
 
@@ -201,7 +203,7 @@ public class ReflectionTests : LenientNodeTestsBase
         Assert.ThrowsException<InvalidValueException>(() => node.Set(MaterialGroup_defaultShape, new object()));
         Assert.ThrowsException<UnknownFeatureException>(() => node.Get(MaterialGroup_defaultShape));
     }
-    
+
     [TestMethod]
     public void GetUnknownContainment_Unset()
     {
