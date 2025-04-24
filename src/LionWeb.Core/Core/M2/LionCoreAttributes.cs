@@ -42,6 +42,18 @@ public abstract class LionCoreKeyAttribute : LionCoreAttribute
                 AttributeTargets.Property | AttributeTargets.Struct)]
 public class LionCoreMetaPointer : LionCoreKeyAttribute
 {
+    /// <inheritdoc cref="LionCoreMetaPointer"/>
+    public LionCoreMetaPointer() { }
+
+    /// <inheritdoc />
+    /// <param name="language"><see cref="Language"/></param>
+    /// <param name="key"><see cref="LionCoreKeyAttribute.Key"/></param>
+    public LionCoreMetaPointer(Type language, string key)
+    {
+        Language = language;
+        Key = key;
+    }
+
     /// <summary>
     /// The <see cref="Language">LionWeb Language</see> that defines this element.
     /// </summary>

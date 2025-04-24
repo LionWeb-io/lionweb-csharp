@@ -18,6 +18,8 @@
 namespace LionWeb.Core.Test;
 
 using Core.Serialization;
+using Languages;
+using Languages.Generated.V2023_1.Shapes.M2;
 using Languages.Generated.V2024_1.WithEnum.M2;
 using M1;
 using M2;
@@ -37,10 +39,22 @@ public class EnumsTests
     }
 
     [TestMethod]
-    public void LionCoreKeysOnEnums()
+    public void LionCoreKeysOnEnums_Generated()
     {
         Assert.AreEqual("lit1", MyEnum.literal1.LionCoreKey());
         Assert.AreEqual(MyEnum.literal2, _factory.GetEnumerationLiteral(_language.Enumerations().First().Literals[1]));
+    }
+
+    [TestMethod]
+    public void LionCoreKeysOnEnums_Dynamic()
+    {
+        var key = ShapesLanguage.Instance.MatterState_liquid.Key;
+        
+        var enumeration = ShapesDynamic.Language.Entities.OfType<Enumeration>()
+            .First(e => e.Key == ShapesLanguage.Instance.MatterState.Key);
+        var literal = enumeration.Literals.First(l => l.Key == key);
+        
+        Assert.AreEqual(key, ShapesDynamic.Language.GetFactory().GetEnumerationLiteral(literal).LionCoreKey());
     }
 
     private EnumHolder Model()
