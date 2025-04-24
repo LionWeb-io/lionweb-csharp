@@ -589,8 +589,11 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
             case (Annotation leftAnn, Annotation rightAnn):
                 result.AddRange(CompareAnnotation(left, leftAnn, right, rightAnn));
                 break;
-            case (Annotation, Concept) or (Concept, Annotation):
+            case (Annotation, Concept) or (Concept, Annotation) when BehaviorConfig.CompareCompatibleClassifier:
                 result.Add(new IncompatibleClassifierDifference(left, right));
+                break;
+            case var (leftClassifier, rightClassifier):
+                result.AddRange(CompareClassifier(left, leftClassifier, right, rightClassifier));
                 break;
         }
 
@@ -625,6 +628,20 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
         return result;
     }
 
+    /// Compares <paramref name="leftClassifier"/> and <paramref name="rightClassifier"/>.
+    protected virtual List<IDifference> CompareClassifier(IReadableNode left, Classifier leftClassifier, IReadableNode right,
+        Classifier rightClassifier)
+    {
+        List<IDifference> result = [];
+
+        if (!leftClassifier.EqualsIdentity(rightClassifier))
+        {
+            result.Add(new ClassifierDifference(left, right));
+        }
+
+        return result;
+    }
+
     /// Compares <paramref name="a"/> and <paramref name="b"/> from the same side.
     protected virtual bool AreSameSideNodesEqual(IReadableNode? a, IReadableNode? b) =>
         // ReSharper disable once PossibleUnintendedReferenceComparison
@@ -632,15 +649,17 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
 }
 
 /// <summary>
-/// Configures the behavior of <see cref="System.Collections.Comparer"/>.
+/// Configures the behavior of <see cref="Comparer"/>.
 /// </summary>
 public class ComparerBehaviorConfig
 {
-    // nothing here yet
+    /// Whether we should compare classifier compatibility; defaults to <c>true</c>.
+    /// <seealso cref="IncompatibleClassifierDifference"/>
+    public bool CompareCompatibleClassifier { get; init; } = true;
 }
 
 /// <summary>
-/// Configures the output of <see cref="System.Collections.Comparer"/>.
+/// Configures the output of <see cref="Comparer"/>.
 /// </summary>
 public class ComparerOutputConfig
 {

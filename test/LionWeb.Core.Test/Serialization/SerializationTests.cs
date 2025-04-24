@@ -260,9 +260,9 @@ public class SerializationTests
         const string text = "\ud83d\ude0a Hällö 😊";
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") { Name = text } };
 
-        var serializer = new Serializer(_lionWebVersion);
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var stream = new MemoryStream();
-        JsonUtils.WriteNodesToStream(stream, serializer, materialGroup.Descendants(true));
+        await JsonUtils.WriteNodesToStreamAsync(stream, serializer, materialGroup.Descendants(true));
 
         stream.Seek(0, SeekOrigin.Begin);
 
