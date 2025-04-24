@@ -24,29 +24,6 @@ using Serialization;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 
-/// Runs all <see cref="RegisterMigration">registered migrations</see> in their applicable order.
-/// Will fail if running for more than <see cref="MaxMigrationRounds"/> rounds.
-///
-/// <p>
-/// Each round consists of all <see cref="IMigration.IsApplicable">applicable</see> <see cref="IMigration">migrations</see>
-/// ordered by their <see cref="IMigration.Priority"/>.
-/// </p> 
-public interface IModelMigrator
-{
-    /// Maximum number of rounds to try.
-    int MaxMigrationRounds { get; init; }
-
-    /// Runs <paramref name="migration"/>, if <see cref="IMigration.IsApplicable">applicable</see>.
-    void RegisterMigration(IMigration migration);
-
-    /// <summary>
-    /// Execute the migration on all nodes from <paramref name="inputUtf8JsonStream"/>,
-    /// and store the result to <paramref name="migratedUtf8JsonStream"/>.
-    /// </summary>
-    /// <returns><c>true</c> if the migration applied any changes; <c>false</c> otherwise.</returns>
-    Task<bool> Migrate(Stream inputUtf8JsonStream, Stream migratedUtf8JsonStream);
-}
-
 /// <inheritdoc cref="LionWeb.Core.Migration.IModelMigrator"/>
 public class ModelMigrator : ILanguageRegistry, IModelMigrator
 {
