@@ -73,6 +73,24 @@ public class ComparerNodeTests : ComparerTestsBase
     }
 
     [TestMethod]
+    public void Annotation_Concept_Ignored()
+    {
+        var left = lF.NewDocumentation("b");
+        var right = rF.NewLine("a");
+
+        var parent = new NodeDifference(left, right);
+        IDifference[] differences = [parent, new IncompatibleClassifierDifference(left, right) { Parent = parent } ];
+        Comparer comparer = new Comparer([(IReadableNode?)left], [right])
+        {
+            BehaviorConfig = new()
+            {
+                CompareCompatibleClassifier = false
+            }
+        };
+        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(OutputConfig));
+    }
+
+    [TestMethod]
     public void Single_Null_Same()
     {
         AreEqual((INode)null, (INode)null);

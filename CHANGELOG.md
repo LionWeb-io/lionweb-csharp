@@ -16,6 +16,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Introduced `SerializerBuilder`.
 * Introduced `LanguageDeserializerBuilder`.
 * Introduced delegating implementations for `SerializerHandler`, `DeserializerHandler`, `LanguageDeserializerHandler`.
+* Introduced `ComparerBehaviorConfig.CompareCompatibleClassifier` to configure whether 
+  instances of C# `Annotation` and `Concept` should be considered different.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
