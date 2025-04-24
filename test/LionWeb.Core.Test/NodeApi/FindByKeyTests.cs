@@ -28,70 +28,86 @@ public class FindByKeyTests
     [TestMethod]
     public void Language()
     {
-        var target = ShapesLanguage.Instance;
-        Assert.AreSame(target, ShapesLanguage.Instance.FindByKey<Language>(target.Key));
+        var language = ShapesLanguage.Instance;
+        var actual = language.FindByKey<Language>(language.Key);
+        Assert.AreSame(language, actual);
     }
 
     [TestMethod]
-    public void Annotation()
+    public void Classifier()
     {
-        var target = ShapesLanguage.Instance.Documentation;
-        Assert.AreSame(target, ShapesLanguage.Instance.FindByKey<Annotation>(target.Key));
-    }
-
-    [TestMethod]
-    public void Concept()
-    {
-        var target = ShapesLanguage.Instance.Circle;
-        Assert.AreSame(target, ShapesLanguage.Instance.FindByKey<Concept>(target.Key));
-    }
-
-    [TestMethod]
-    public void Interface()
-    {
-        var target = ShapesLanguage.Instance.IShape;
-        Assert.AreSame(target, ShapesLanguage.Instance.FindByKey<Interface>(target.Key));
+        var language = ShapesLanguage.Instance;
+        var actual = language.FindByKey<Classifier>(language.Circle.Key);
+        Assert.AreSame(language.Circle, actual);
     }
 
     [TestMethod]
     public void Feature()
     {
-        var target = ShapesLanguage.Instance.IShape_uuid;
-        Assert.AreSame(target, ShapesLanguage.Instance.FindByKey<Feature>(target.Key));
+        var language = ShapesLanguage.Instance;
+        var actual = language.FindByKey<Feature>(language.Circle_center.Key);
+        Assert.AreSame(language.Circle_center, actual);
     }
 
     [TestMethod]
     public void Enumeration()
     {
-        var target = ShapesLanguage.Instance.MatterState;
-        Assert.AreSame(target, ShapesLanguage.Instance.FindByKey<Enumeration>(target.Key));
+        var language = ShapesLanguage.Instance;
+        var actual = language.FindByKey<Enumeration>(language.MatterState.Key);
+        Assert.AreSame(language.MatterState, actual);
     }
 
     [TestMethod]
     public void EnumerationLiteral()
     {
-        var target = ShapesLanguage.Instance.MatterState_liquid;
-        Assert.AreSame(target, ShapesLanguage.Instance.FindByKey<EnumerationLiteral>(target.Key));
-    }
-
-    [TestMethod]
-    public void Sdt()
-    {
-        var target = SDTLangLanguage.Instance.A;
-        Assert.AreSame(target, SDTLangLanguage.Instance.FindByKey<StructuredDataType>(target.Key));
-    }
-
-    [TestMethod]
-    public void Field()
-    {
-        var target = SDTLangLanguage.Instance.A_a2b;
-        Assert.AreSame(target, SDTLangLanguage.Instance.FindByKey<Field>(target.Key));
+        var language = ShapesLanguage.Instance;
+        var actual = language.FindByKey<EnumerationLiteral>(language.MatterState_liquid.Key);
+        Assert.AreSame(language.MatterState_liquid, actual);
     }
 
     [TestMethod]
     public void PrimitiveType()
     {
-        var target = LionWebVersions.v2024_1.BuiltIns.Boolean;
-        Assert.AreSame(target, LionWebVersions.v2024_1.BuiltIns.FindByKey<PrimitiveType>(target.Key));
+        var language = LionWebVersions.v2024_1.BuiltIns;
+        var actual = language.FindByKey<PrimitiveType>(language.Boolean.Key);
+        Assert.AreSame(language.Boolean, actual);
+    }
+
+    [TestMethod]
+    public void Sdt()
+    {
+        var language = SDTLangLanguage.Instance;
+        var actual = language.FindByKey<StructuredDataType>(SDTLangLanguage.Instance.A.Key);
+        Assert.AreSame(SDTLangLanguage.Instance.A, actual);
+    }
+
+    [TestMethod]
+    public void Field()
+    {
+        var language = SDTLangLanguage.Instance;
+        var actual = language.FindByKey<Field>(language.A_a2b.Key);
+        Assert.AreSame(language.A_a2b, actual);
+    }
+
+    [TestMethod]
+    public void Supertype()
+    {
+        var language = SDTLangLanguage.Instance;
+        var actual = language.FindByKey<IKeyed>(language.A_a2b.Key);
+        Assert.AreSame(language.A_a2b, actual);
+    }
+
+    [TestMethod]
+    public void WrongType()
+    {
+        var language = SDTLangLanguage.Instance;
+        Assert.ThrowsException<KeyNotFoundException>(() => language.FindByKey<EnumerationLiteral>(language.A_a2b.Key));
+    }
+
+    [TestMethod]
+    public void UnknownKey()
+    {
+        var language = ShapesLanguage.Instance;
+        Assert.ThrowsException<KeyNotFoundException>(() => language.FindByKey<IKeyed>("asdf"));
     }
 }

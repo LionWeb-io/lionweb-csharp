@@ -262,7 +262,7 @@ public class SerializationTests
 
         var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
         var stream = new MemoryStream();
-        JsonUtils.WriteNodesToStream(stream, serializer, materialGroup.Descendants(true));
+        await JsonUtils.WriteNodesToStreamAsync(stream, serializer, materialGroup.Descendants(true));
 
         stream.Seek(0, SeekOrigin.Begin);
 

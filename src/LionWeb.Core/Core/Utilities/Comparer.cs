@@ -592,6 +592,9 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
             case (Annotation, Concept) or (Concept, Annotation) when BehaviorConfig.CompareCompatibleClassifier:
                 result.Add(new IncompatibleClassifierDifference(left, right));
                 break;
+            case var (leftClassifier, rightClassifier):
+                result.AddRange(CompareClassifier(left, leftClassifier, right, rightClassifier));
+                break;
         }
 
         return result;
@@ -618,6 +621,20 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
         List<IDifference> result = [];
 
         if (!leftAnn.EqualsIdentity(rightAnn))
+        {
+            result.Add(new ClassifierDifference(left, right));
+        }
+
+        return result;
+    }
+
+    /// Compares <paramref name="leftClassifier"/> and <paramref name="rightClassifier"/>.
+    protected virtual List<IDifference> CompareClassifier(IReadableNode left, Classifier leftClassifier, IReadableNode right,
+        Classifier rightClassifier)
+    {
+        List<IDifference> result = [];
+
+        if (!leftClassifier.EqualsIdentity(rightClassifier))
         {
             result.Add(new ClassifierDifference(left, right));
         }
