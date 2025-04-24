@@ -6,7 +6,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 
-## [Unreleased]
+## [0.3.0] - tbd
 
 ### Added
 * Added `LionWebVersions` _2025.1_ and _2025.1-compatible_. No content differences to _2024.1_ so far.
@@ -22,6 +22,17 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added `M2Extensions.FindByKey()` to search for arbitrary keyed elements in a language.
 * Via `ReflectiveBaseNodeFactory.CreateEnumLiteral()` dynamically created C# enums 
   now have proper `LionCoreMetaPointer` attributes.
+* Support for model migrations:
+  * `IModelMigrator.Migate()` takes a serialized model, runs all registered `IMigration`s, and serializes the result.
+    It works completely with `LenientNode`s and `DynamicLanguage`s. 
+  * Implementations of `IMigration` provide the actual migrations.
+  * `MigrationBase` provides a lot of infrastructure to migrate to a new version of a language.
+  * `MigrationExtensions` provides static infrastructure methods.
+  * `ILanguageRegistry`, available to all `IMigration`s, provides access to languages present during migration.
+  * `DynmaicLanguageCloner` creates a `DynamicLanguage` clone of any language.
+  * We provide two built-in migrations:
+    * `LionWebVersionMigration` migrates to a newer version of LionWeb standard.
+    * `KeysMigration` migrates changed `IKeyed.Key`s.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
@@ -36,7 +47,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ### Deprecated
 ### Security
 
-## [0.2.4] - tbd
+## [0.2.4] - 2025-03-13
 
 ### Added
 * Introduced optionally compressed ids during deserialization.
