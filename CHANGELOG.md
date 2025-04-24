@@ -16,6 +16,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Introduced `SerializerBuilder`.
 * Introduced `LanguageDeserializerBuilder`.
 * Introduced delegating implementations for `SerializerHandler`, `DeserializerHandler`, `LanguageDeserializerHandler`.
+* Added async variant `JsonUtils.WriteNodesToStreamAsync()`.
 * Introduced `ComparerBehaviorConfig.CompareCompatibleClassifier` to configure whether 
   instances of C# `Annotation` and `Concept` should be considered different.
 ### Fixed
