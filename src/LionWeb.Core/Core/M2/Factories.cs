@@ -235,10 +235,10 @@ public class ReflectiveBaseNodeFactory(Language language) : AbstractBaseNodeFact
         enumBuilder.SetCustomAttribute(CreateLionCoreMetaPointerAttribute(enumeration));
 
         int value = 1;
-        foreach (var lit in enumeration.Literals)
+        foreach (var literal in enumeration.Literals)
         {
-            var literalBuilder = enumBuilder.DefineLiteral(lit.Name, value++);
-            literalBuilder.SetCustomAttribute(CreateLionCoreMetaPointerAttribute(lit));
+            var literalBuilder = enumBuilder.DefineLiteral(literal.Name, value++);
+            literalBuilder.SetCustomAttribute(CreateLionCoreMetaPointerAttribute(literal));
         }
 
         Type type = enumBuilder.CreateType();
