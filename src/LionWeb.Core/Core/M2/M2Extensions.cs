@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M2;
 
+using M1;
 using M3;
 using System.Collections;
 using System.Collections.Immutable;
@@ -37,15 +38,25 @@ public static class M2Extensions
     /// <exception cref="KeyNotFoundException">If the given <paramref name="ts"/> does not contain a thing with the given key.</exception>
     private static T FindByKey<T>(this IEnumerable<T> ts, string key) where T : IKeyed
     {
-        IEnumerable<T> result = ts.Where(t => t.Key == key);
-        if (!result.Any())
-        {
-            throw new KeyNotFoundException(
-                $"could not find element with key=\"{key}\" among: {string.Join(", ", ts.Select(t => t.Key))}");
-        }
+        T? result = ts.FirstOrDefault(t => t.Key == key);
+        if (result != null)
+            return result;
 
-        return result.First();
+        throw new KeyNotFoundException($"could not find element with key=\"{key}\"");
     }
+
+    /// <summary>
+    /// Searches the things of type <typeparamref name="T"/> within the given <paramref name="language"/>
+    /// by the given <paramref name="key"/> (from <see cref="IKeyed"/>).
+    /// </summary>
+    /// <param name="language">Language to search through.</param>
+    /// <param name="key">Key of the requested thing.</param>
+    /// <returns>A <typeparamref name="T"/> with the given key, or:</returns>
+    /// <exception cref="KeyNotFoundException">If the given <paramref name="language"/> does not contain a thing with the given key.</exception>
+    public static T FindByKey<T>(this Language language, string key) where T : IKeyed =>
+        M1Extensions.Descendants<IKeyed>(language, true, true)
+            .OfType<T>()
+            .FindByKey(key);
 
     /// <summary>
     /// Returns the classifier with <paramref name="key"/> contained in <paramref name="language"/>.
