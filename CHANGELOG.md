@@ -23,16 +23,18 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Via `ReflectiveBaseNodeFactory.CreateEnumLiteral()` dynamically created C# enums 
   now have proper `LionCoreMetaPointer` attributes.
 * Support for model migrations:
-  * `IModelMigrator.Migate()` takes a serialized model, runs all registered `IMigration`s, and serializes the result.
-    It works completely with `LenientNode`s and `DynamicLanguage`s. 
+  * `IModelMigrator.Migrate()` takes a serialized model, runs all registered `IMigration`s, and serializes the result.
+    It works completely with `LenientNode`s and `DynamicLanguage`s (handled by `ModelMigrator`). 
   * Implementations of `IMigration` provide the actual migrations.
   * `MigrationBase` provides a lot of infrastructure to migrate to a new version of a language.
   * `MigrationExtensions` provides static infrastructure methods.
   * `ILanguageRegistry`, available to all `IMigration`s, provides access to languages present during migration.
-  * `DynmaicLanguageCloner` creates a `DynamicLanguage` clone of any language.
+  * `DynamicLanguageCloner` creates a `DynamicLanguage` clone of any language.
   * We provide two built-in migrations:
     * `LionWebVersionMigration` migrates to a newer version of LionWeb standard.
     * `KeysMigration` migrates changed `IKeyed.Key`s.
+  * Have a look at [plugin loading](https://learn.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support)
+    to load several versions of the same language in parallel.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
