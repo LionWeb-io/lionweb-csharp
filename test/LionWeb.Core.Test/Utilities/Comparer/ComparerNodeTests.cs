@@ -20,6 +20,7 @@
 namespace LionWeb.Core.Test.Utilities.Comparer;
 
 using Core.Utilities;
+using Languages.Generated.V2024_1.Shapes.M2;
 using M2;
 
 [TestClass]
@@ -73,13 +74,11 @@ public class ComparerNodeTests : ComparerTestsBase
     }
 
     [TestMethod]
-    public void Annotation_Concept_Ignored()
+    public void Annotation_Concept_Ignored_Same()
     {
         var left = lF.NewDocumentation("b");
-        var right = rF.NewLine("a");
+        var right = new LenientNode("r", ShapesLanguage.Instance.Documentation);
 
-        var parent = new NodeDifference(left, right);
-        IDifference[] differences = [parent, new IncompatibleClassifierDifference(left, right) { Parent = parent } ];
         Comparer comparer = new Comparer([(IReadableNode?)left], [right])
         {
             BehaviorConfig = new()
@@ -88,6 +87,27 @@ public class ComparerNodeTests : ComparerTestsBase
             }
         };
         Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(OutputConfig));
+    }
+
+    [TestMethod]
+    public void Annotation_Concept_Ignored_Different()
+    {
+        var left = lF.NewDocumentation("b");
+        var right = rF.NewLine("a");
+
+        Comparer comparer = new Comparer([(IReadableNode?)left], [right])
+        {
+            BehaviorConfig = new()
+            {
+                CompareCompatibleClassifier = false
+            }
+        };
+        
+        var actual = comparer.Compare().Distinct().ToList();
+        var parent = new NodeDifference(left, right);
+        List<IDifference> expected = [parent, new ClassifierDifference(left, right) { Parent = parent } ];
+
+        CollectionAssert.AreEqual(expected, actual, comparer.ToMessage(OutputConfig));
     }
 
     [TestMethod]
