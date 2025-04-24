@@ -212,33 +212,45 @@ public class ReflectiveBaseNodeFactory(Language language) : AbstractBaseNodeFact
     /// <inheritdoc />
     public override Enum GetEnumerationLiteral(EnumerationLiteral literal)
     {
-        if (_enums.TryGetValue(literal.GetEnumeration(), out Type enm))
+        if (_enums.TryGetValue(literal.GetEnumeration(), out Type? enm))
         {
             var result = Enum.Parse(enm, literal.Name);
-            return result as Enum;
+            return (Enum)result;
         }
 
-        return CreateEnum(literal);
+        return CreateEnumLiteral(literal);
     }
 
-    private Enum CreateEnum(EnumerationLiteral literal)
-    {
-        var name = new AssemblyName(literal.GetEnumeration().Name);
-        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
-        var moduleBuilder = assemblyBuilder.DefineDynamicModule(literal.GetEnumeration().Name);
-        var enumBuilder = moduleBuilder.DefineEnum("EnumeratedTypes." + literal.GetEnumeration().Name,
-            TypeAttributes.Public,
-            typeof(int));
+    private Enum CreateEnumLiteral(EnumerationLiteral literal) =>
+        (Enum)Enum.Parse(CreateRuntimeEnum(literal.GetEnumeration()), literal.Name);
 
-        int val = 1;
-        foreach (var lit in literal.GetEnumeration().Literals)
+    /// Creates a C# <see cref="Enum"/> corresponding to LionWeb <paramref name="enumeration"/> via reflection.
+    protected Type CreateRuntimeEnum(Enumeration enumeration)
+    {
+        var name = new AssemblyName(enumeration.Name);
+        var assemblyBuilder = AssemblyBuilder.DefineDynamicAssembly(name, AssemblyBuilderAccess.Run);
+        var moduleBuilder = assemblyBuilder.DefineDynamicModule(enumeration.Name);
+        var enumBuilder = moduleBuilder.DefineEnum("EnumeratedTypes." + enumeration.Name,
+            TypeAttributes.Public, typeof(int));
+        enumBuilder.SetCustomAttribute(CreateLionCoreMetaPointerAttribute(enumeration));
+
+        int value = 1;
+        foreach (var literal in enumeration.Literals)
         {
-            enumBuilder.DefineLiteral(lit.Name, val++);
+            var literalBuilder = enumBuilder.DefineLiteral(literal.Name, value++);
+            literalBuilder.SetCustomAttribute(CreateLionCoreMetaPointerAttribute(literal));
         }
 
         Type type = enumBuilder.CreateType();
-        _enums[literal.GetEnumeration()] = type;
-        return Enum.Parse(type, literal.Name) as Enum;
+        _enums[enumeration] = type;
+        return type;
+    }
+
+    private static CustomAttributeBuilder CreateLionCoreMetaPointerAttribute(IKeyed keyed)
+    {
+        var constructorInfo = typeof(LionCoreMetaPointer).GetConstructor([typeof(Type), typeof(string)]);
+        var customAttributeBuilder = new CustomAttributeBuilder(constructorInfo!, [typeof(Language), keyed.Key]);
+        return customAttributeBuilder;
     }
 
     /// <inheritdoc />

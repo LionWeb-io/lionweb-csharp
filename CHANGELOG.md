@@ -20,6 +20,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Introduced `ComparerBehaviorConfig.CompareCompatibleClassifier` to configure whether 
   instances of C# `Annotation` and `Concept` should be considered different.
 * Added `M2Extensions.FindByKey()` to search for arbitrary keyed elements in a language.
+* Via `ReflectiveBaseNodeFactory.CreateEnumLiteral()` dynamically created C# enums 
+  now have proper `LionCoreMetaPointer` attributes.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
