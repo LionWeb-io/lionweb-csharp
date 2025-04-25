@@ -35,6 +35,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
     * `KeysMigration` migrates changed `IKeyed.Key`s.
   * Have a look at [plugin loading](https://learn.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support)
     to load several versions of the same language in parallel.
+* Added `GeneratorConfig` to adjust the supertype of generated interfaces (`INode` vs. `IReadableNode`).
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.

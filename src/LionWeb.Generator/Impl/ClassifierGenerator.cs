@@ -173,9 +173,9 @@ public class ClassifierGenerator(
 
     private InterfaceDeclarationSyntax ClassifierInterface(Interface iface)
     {
-        var bases = iface.Extends.Ordered().Select(e => AsType(e, false)).ToList();
-        if (bases.Count == 0)
-            bases = [AsType(typeof(INode))];
+        var bases = iface.Extends.Ordered().Select(e => AsType(e, writeable: _config.WritableInterfaces)).ToList();
+        if (bases.Count == 0 || iface.Extends.Count == 1 && iface.Extends[0].EqualsIdentity(_builtIns.INamed))
+            bases.Add(AsType(_config.WritableInterfaces ? typeof(INode) : typeof(IReadableNode)));
 
         return InterfaceDeclaration(ClassifierName)
             .WithAttributeLists(AsAttributes(
