@@ -33,6 +33,7 @@ public class TestLanguagesDefinitions
     public Language? SdtLang { get; private set; }
     public Language? KeywordLang { get; private set; }
     public Language MultiInheritLang { get; private set; }
+    public Language NamedLang { get; private set; }
 
     public List<Language> MixedLangs { get; private set; } = [];
 
@@ -43,6 +44,7 @@ public class TestLanguagesDefinitions
         CreateALangBLang();
         CreateTinyRefLang();
         CreateMultiInheritLang();
+        CreateNamedLang();
         if (lionWebVersion.LionCore is ILionCoreLanguageWithStructuredDataType)
         {
             CreateSdtLang();
@@ -115,7 +117,7 @@ public class TestLanguagesDefinitions
 
         if (description != null)
             conceptDescrption.Set(specificLanguage.ConceptDescription_conceptShortDescription, description);
-        
+
         if (helpUrl != null)
             conceptDescrption.Set(specificLanguage.ConceptDescription_helpUrl, helpUrl);
 
@@ -126,12 +128,12 @@ public class TestLanguagesDefinitions
     {
         ISpecificLanguage specificLanguage = ISpecificLanguage.Get(_lionWebVersion);
         INode keyedDescription = specificLanguage.GetFactory().CreateNode(id, specificLanguage.KeyedDescription);
-        
-        if(documentation != null)
+
+        if (documentation != null)
             keyedDescription.Set(specificLanguage.KeyedDescription_documentation, documentation);
-        
+
         keyedDescription.Set(specificLanguage.KeyedDescription_seeAlso, seeAlso);
-        
+
         return keyedDescription;
     }
 
@@ -178,7 +180,7 @@ public class TestLanguagesDefinitions
 
         baseIface.Containment("id-ifaceContainment", "key-ifaceContainment", "ifaceContainment")
             .OfType(_lionWebVersion.BuiltIns.Node);
-        
+
         MultiInheritLang = lang;
     }
 
@@ -377,5 +379,40 @@ public class TestLanguagesDefinitions
             .OfType(sdt);
 
         KeywordLang = keywordLang;
+    }
+
+    private void CreateNamedLang()
+    {
+        var namedLang = new DynamicLanguage("id-NamedLang", _lionWebVersion)
+        {
+            Name = "NamedLang", Key = "key-NamedLang", Version = "1"
+        };
+
+        var iface = namedLang.Interface("id-Iface", "key-Iface", "Iface");
+        var namedIface = namedLang.Interface("id-NamedIface", "key-NamedIface", "NamedIface")
+            .Extending(_lionWebVersion.BuiltIns.INamed);
+        var namedAnn = namedLang.Annotation("id-NamedAnn", "key-NamedAnn", "NamedAnn")
+            .Implementing(_lionWebVersion.BuiltIns.INamed);
+        var namedAbstractConcept = namedLang
+            .Concept("id-NamedAbstractConcept", "key-NamedAbstractConcept", "NamedAbstractConcept")
+            .IsAbstract()
+            .Implementing(_lionWebVersion.BuiltIns.INamed);
+        var namedConcept = namedLang.Concept("id-NamedConcept", "key-NamedConcept", "NamedConcept")
+            .Implementing(_lionWebVersion.BuiltIns.INamed);
+
+        var ifaceConcept = namedLang.Concept("id-IfaceConcept", "key-IfaceConcept", "IfaceConcept")
+            .Implementing(iface);
+        var namedIfaceAnn = namedLang.Annotation("id-NamedIfaceAnn", "key-NamedIfaceAnn", "NamedIfaceAnn")
+            .Implementing(namedIface);
+        var namedIfaceConcept = namedLang.Concept("id-NamedIfaceConcept", "key-NamedIfaceConcept", "NamedIfaceConcept")
+            .Implementing(namedIface);
+        var namedConcreteConcept = namedLang
+            .Concept("id-NamedConcreteConcept", "key-NamedConcreteConcept", "NamedConcreteConcept")
+            .Extending(namedAbstractConcept);
+        var namedSubConcept = namedLang.Concept("id-NamedSubConcept", "key-NamedSubConcept", "NamedSubConcept")
+            .Extending(namedConcept)
+            .Implementing(_lionWebVersion.BuiltIns.INamed);
+
+        NamedLang = namedLang;
     }
 }

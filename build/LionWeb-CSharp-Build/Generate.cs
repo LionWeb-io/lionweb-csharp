@@ -20,6 +20,7 @@ using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
+using LionWeb.Core.Migration;
 using LionWeb.Core.Serialization;
 using LionWeb.Generator;
 using LionWeb.Generator.Names;
@@ -54,6 +55,9 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
     var keywordLang = testLanguagesDefinitions.KeywordLang;
     var multiInheritLang = testLanguagesDefinitions.MultiInheritLang;
+    var namedLang = testLanguagesDefinitions.NamedLang;
+    var namedLangReadInterfaces = new DynamicLanguageCloner(lionWebVersion).Clone([namedLang]).Values.First();
+    namedLangReadInterfaces.Name = "NamedReadInterfaces";
 
     var lionWebVersionNamespace = "V" + lionWebVersion.VersionString.Replace('.', '_');
     string prefix = $"LionWeb.Core.Test.Languages.Generated.{lionWebVersionNamespace}";
@@ -69,6 +73,8 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(tinyRefLang, $"{prefix}.TinyRefLang"),
         new(deprecatedLang, $"{prefix}.DeprecatedLang"),
         new(multiInheritLang, $"{prefix}.MultiInheritLang"),
+        new(namedLang, $"{prefix}.NamedLang"),
+        new(namedLangReadInterfaces, $"{prefix}.NamedLangReadInterfaces"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
         // new(specificLanguage, $"Io.Lionweb.Mps.Specific.{lionWebVersionNamespace}")
