@@ -44,6 +44,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Aligned behavior of `DynamicStructuredDataTypeInstance.CollectAllSetFields()` and `Get()` with other implementations.
 * Ensure stable results of `DynamicStructuredDataTypeInstance.Equals()` and `GetHashCode()`.
 * `Cloner` can now deal with read-only external reference targets.
+* Generator would create uncompilable code if a concept inherits `INamed` via an interface.
 ### Changed
 ### Removed
 ### Deprecated

@@ -65,6 +65,7 @@ public class ClassifierGenerator(
         }
 
         bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
+        bases.AddRange(AddINamedWritableInterface(annotation.Extends));
 
         return ClassifierClass(bases, GenGetClassifier("GetAnnotation", typeof(Annotation)));
     }
@@ -82,11 +83,30 @@ public class ClassifierGenerator(
         }
 
         bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
+        bases.AddRange(AddINamedWritableInterface(concept.Extends));
 
         if (concept.Partition)
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
         return ClassifierClass(bases, GenGetClassifier("GetConcept", typeof(Concept)));
+    }
+
+    private IEnumerable<TypeSyntax> AddINamedWritableInterface(Classifier? extends)
+    {
+        if (
+            // We are an INamed
+            classifier.AllGeneralizations().Contains(_builtIns.INamed) &&
+            // INamedWritable gets added directly
+            !Interfaces.Contains(_builtIns.INamed) &&
+            (
+                extends == null ||
+                // INamedWritable gets added to supertype
+                !extends.AllGeneralizations().Contains(_builtIns.INamed)
+            )
+        )
+            return [AsType(typeof(INamedWritable))];
+
+        return [];
     }
 
     private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases, MethodDeclarationSyntax genGetClassifier)
