@@ -21,7 +21,7 @@ using Core.Serialization;
 using Core.Utilities;
 using M1;
 using M2;
-using @namespace.@int.@public;
+using @namespace.@int.@public.V2024_1;
 
 [TestClass]
 public class KeywordLangTests

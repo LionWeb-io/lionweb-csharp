@@ -55,7 +55,9 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var keywordLang = testLanguagesDefinitions.KeywordLang;
     var multiInheritLang = testLanguagesDefinitions.MultiInheritLang;
 
-    string prefix = $"LionWeb.Core.Test.Languages.Generated.V{lionWebVersion.VersionString.Replace('.', '_')}";
+    var lionWebVersionNamespace = "V" + lionWebVersion.VersionString.Replace('.', '_');
+    string prefix = $"LionWeb.Core.Test.Languages.Generated.{lionWebVersionNamespace}";
+    
     List<Names> names =
     [
         new(libraryLanguage, $"{prefix}.Library.M2"),
@@ -69,14 +71,14 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(multiInheritLang, $"{prefix}.MultiInheritLang"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
-        // new(specificLanguage, $"Io.Lionweb.Mps.Specific.V{lionWebVersion.VersionString.Replace('.', '_')}")
+        // new(specificLanguage, $"Io.Lionweb.Mps.Specific.{lionWebVersionNamespace}")
     ];
 
     if (sdtLang != null)
         names.Add(new(sdtLang, $"{prefix}.SDTLang"));
 
     if (keywordLang != null)
-        names.Add(new(keywordLang, $"@namespace.@int.@public"));
+        names.Add(new(keywordLang, $"@namespace.@int.@public.{lionWebVersionNamespace}"));
 
     names.AddRange(testLanguagesDefinitions
         .MixedLangs
@@ -101,7 +103,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         generator.Generate();
         Console.WriteLine($"generated code for: {name.Language.Name}");
 
-        var path = @$"{generationPath}/V{lionWebVersion.VersionString.Replace('.', '_')}/{name.Language.Name}.g.cs";
+        var path = @$"{generationPath}/{lionWebVersionNamespace}/{name.Language.Name}.g.cs";
         generator.Persist(path);
         Console.WriteLine($"persisted to: {path}");
     }
