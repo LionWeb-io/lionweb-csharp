@@ -23,6 +23,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1;
+using VersionSpecific.V2025_1;
 
 /// Externalized logic of <see cref="GeneratorFacade"/>, specific to one version of LionWeb standard.
 internal interface IGeneratorVersionSpecifics : IVersionSpecifics
@@ -36,6 +37,8 @@ internal interface IGeneratorVersionSpecifics : IVersionSpecifics
         IVersion2023_1 => new GeneratorVersionSpecifics_2023_1(),
         IVersion2024_1 => new GeneratorVersionSpecifics_2024_1(),
         IVersion2024_1_Compatible => new GeneratorVersionSpecifics_2024_1_Compatible(),
+        IVersion2025_1 => new GeneratorVersionSpecifics_2025_1(),
+        IVersion2025_1_Compatible => new GeneratorVersionSpecifics_2025_1_Compatible(),
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
 
