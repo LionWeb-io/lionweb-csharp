@@ -47,7 +47,7 @@ public class GeneratorFacade
     {
         if (_compilationUnit == null)
         {
-            var generator = new DefinitionGenerator(Names, LionWebVersion);
+            var generator = new DefinitionGenerator(Names, LionWebVersion, Config);
             _compilationUnit = generator.DefinitionFile();
         }
 
@@ -59,6 +59,9 @@ public class GeneratorFacade
 
     /// Version of LionWeb standard to use for generation.
     public LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
+    
+    /// <inheritdoc cref="GeneratorConfig"/>
+    public GeneratorConfig Config { get; init; } = new();
 
     /// Stores the output of <see cref="Generate"/> to the file at <paramref name="path"/>.
     public void Persist(string path)
@@ -93,7 +96,7 @@ public class GeneratorFacade
             .Append(MetadataReference.CreateFromFile(typeof(Stack<>).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(ISet<>).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location));
-        var compilation = CSharpCompilation.Create("foo", new[] { tree }, refApis);
+        var compilation = CSharpCompilation.Create("foo", [tree], refApis);
         var diagnostics = compilation.GetDiagnostics();
         return diagnostics;
     }

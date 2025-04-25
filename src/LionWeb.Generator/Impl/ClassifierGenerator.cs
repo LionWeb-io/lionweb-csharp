@@ -36,8 +36,12 @@ using static AstExtensions;
 /// <seealso cref="FeatureMethodsGenerator"/>
 /// <seealso cref="ContainmentMethodsGenerator"/>
 /// <seealso cref="FeatureGenerator"/>
-public class ClassifierGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion)
-    : ClassifierGeneratorBase(new UniqueFeatureNames(names), lionWebVersion)
+public class ClassifierGenerator(
+    Classifier classifier,
+    INames names,
+    LionWebVersions lionWebVersion,
+    GeneratorConfig config)
+    : ClassifierGeneratorBase(new UniqueFeatureNames(names), lionWebVersion, config)
 {
     /// <inheritdoc cref="ClassifierGenerator"/>
     public TypeDeclarationSyntax ClassifierType() =>
@@ -101,10 +105,11 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(
                 FeaturesToImplement(classifier)
-                    .SelectMany(f => new FeatureGenerator(classifier, f, _names, _lionWebVersion).Members())
+                    .SelectMany(f => new FeatureGenerator(classifier, f, _names, _lionWebVersion, _config).Members())
                     .Concat(new List<MemberDeclarationSyntax> { GenConstructor(), genGetClassifier })
-                    .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion).FeatureMethods())
-                    .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion).ContainmentMethods())
+                    .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion, _config).FeatureMethods())
+                    .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion, _config)
+                        .ContainmentMethods())
             ))
             .Xdoc(XdocDefault());
     }
@@ -161,7 +166,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.Ordered().SelectMany(f =>
-                new FeatureGenerator(classifier, f, _names, _lionWebVersion).AbstractMembers())))
+                new FeatureGenerator(classifier, f, _names, _lionWebVersion, _config).AbstractMembers())))
             .Xdoc(XdocDefault());
     }
 

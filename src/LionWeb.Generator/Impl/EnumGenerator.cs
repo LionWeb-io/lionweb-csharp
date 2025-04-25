@@ -28,8 +28,8 @@ using static AstExtensions;
 /// <summary>
 /// Generates Enumeration enums.
 /// </summary>
-public class EnumGenerator(Enumeration enumeration, INames names, LionWebVersions lionWebVersion)
-    : GeneratorBase(names, lionWebVersion)
+public class EnumGenerator(Enumeration enumeration, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    : GeneratorBase(names, lionWebVersion, config)
 {
     /// <inheritdoc cref="EnumGenerator"/>
     public EnumDeclarationSyntax EnumType() =>

@@ -79,6 +79,8 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
         // new(specificLanguage, $"Io.Lionweb.Mps.Specific.{lionWebVersionNamespace}")
     ];
+    
+    Dictionary<Language, GeneratorConfig> configs = new() { { namedLangReadInterfaces, new() {WritableInterfaces = false} } };
 
     if (sdtLang != null)
         names.Add(new(sdtLang, $"{prefix}.SDTLang"));
@@ -105,7 +107,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 
     foreach (var name in names)
     {
-        var generator = new GeneratorFacade { Names = name, LionWebVersion = lionWebVersion };
+        var generator = new GeneratorFacade { Names = name, LionWebVersion = lionWebVersion, Config = configs.GetValueOrDefault(name.Language) ?? new() };
         generator.Generate();
         Console.WriteLine($"generated code for: {name.Language.Name}");
 

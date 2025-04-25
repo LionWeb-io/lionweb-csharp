@@ -28,8 +28,12 @@ using static AstExtensions;
 /// <summary>
 /// Generates StructuredDataType readonly record structs.
 /// </summary>
-public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, LionWebVersions lionWebVersion)
-    : GeneratorBase(names, lionWebVersion)
+public class StructuredDataTypeGenerator(
+    StructuredDataType sdt,
+    INames names,
+    LionWebVersions lionWebVersion,
+    GeneratorConfig config)
+    : GeneratorBase(names, lionWebVersion, config)
 {
     private string SdtName => sdt.Name.PrefixKeyword();
     private IEnumerable<Field> Fields => sdt.Fields.Ordered();
