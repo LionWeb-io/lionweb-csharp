@@ -35,15 +35,17 @@ public abstract class GeneratorBase
     protected readonly INames _names;
 
     protected readonly LionWebVersions _lionWebVersion;
+    protected readonly GeneratorConfig _config;
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
 
     /// <inheritdoc cref="GeneratorBase"/>
-    protected GeneratorBase(INames names, LionWebVersions lionWebVersion)
+    protected GeneratorBase(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
     {
         lionWebVersion.AssureCompatible(names.Language.LionWebVersion);
         _names = names;
         _lionWebVersion = lionWebVersion;
+        _config = config;
         _m3 = lionWebVersion.LionCore;
         _builtIns = lionWebVersion.BuiltIns;
     }

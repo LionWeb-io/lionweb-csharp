@@ -42,8 +42,8 @@ using Property = Core.M3.Property;
 /// - InsertFeature()
 /// - RemoveFeature()
 /// </summary>
-public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion)
-    : GeneratorBase(names, lionWebVersion)
+public class FeatureGenerator(Classifier classifier, Feature feature, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    : GeneratorBase(names, lionWebVersion, config)
 {
     /// <inheritdoc cref="FeatureGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> Members() =>

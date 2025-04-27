@@ -26,8 +26,8 @@ using Names;
 /// <summary>
 /// Common base class for all generators for concept/annotation classes and interface interfaces.
 /// </summary>
-public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lionWebVersion)
-    : GeneratorBase(names, lionWebVersion)
+public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    : GeneratorBase(names, lionWebVersion, config)
 {
     /// <summary>
     /// Required by <see cref="UniqueFeatureNames"/> to 

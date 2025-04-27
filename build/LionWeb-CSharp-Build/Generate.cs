@@ -20,6 +20,7 @@ using LionWeb.Core;
 using LionWeb.Core.M1;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
+using LionWeb.Core.Migration;
 using LionWeb.Core.Serialization;
 using LionWeb.Generator;
 using LionWeb.Generator.Names;
@@ -54,8 +55,13 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
     var keywordLang = testLanguagesDefinitions.KeywordLang;
     var multiInheritLang = testLanguagesDefinitions.MultiInheritLang;
+    var namedLang = testLanguagesDefinitions.NamedLang;
+    var namedLangReadInterfaces = new DynamicLanguageCloner(lionWebVersion).Clone([namedLang]).Values.First();
+    namedLangReadInterfaces.Name = "NamedReadInterfaces";
 
-    string prefix = $"LionWeb.Core.Test.Languages.Generated.V{lionWebVersion.VersionString.Replace('.', '_')}";
+    var lionWebVersionNamespace = "V" + lionWebVersion.VersionString.Replace('.', '_');
+    string prefix = $"LionWeb.Core.Test.Languages.Generated.{lionWebVersionNamespace}";
+    
     List<Names> names =
     [
         new(libraryLanguage, $"{prefix}.Library.M2"),
@@ -67,16 +73,20 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(tinyRefLang, $"{prefix}.TinyRefLang"),
         new(deprecatedLang, $"{prefix}.DeprecatedLang"),
         new(multiInheritLang, $"{prefix}.MultiInheritLang"),
+        new(namedLang, $"{prefix}.NamedLang"),
+        new(namedLangReadInterfaces, $"{prefix}.NamedLangReadInterfaces"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
-        // new(specificLanguage, $"Io.Lionweb.Mps.Specific.V{lionWebVersion.VersionString.Replace('.', '_')}")
+        // new(specificLanguage, $"Io.Lionweb.Mps.Specific.{lionWebVersionNamespace}")
     ];
+    
+    Dictionary<Language, GeneratorConfig> configs = new() { { namedLangReadInterfaces, new() {WritableInterfaces = false} } };
 
     if (sdtLang != null)
         names.Add(new(sdtLang, $"{prefix}.SDTLang"));
 
     if (keywordLang != null)
-        names.Add(new(keywordLang, $"@namespace.@int.@public"));
+        names.Add(new(keywordLang, $"@namespace.@int.@public.{lionWebVersionNamespace}"));
 
     names.AddRange(testLanguagesDefinitions
         .MixedLangs
@@ -97,11 +107,11 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 
     foreach (var name in names)
     {
-        var generator = new GeneratorFacade { Names = name, LionWebVersion = lionWebVersion };
+        var generator = new GeneratorFacade { Names = name, LionWebVersion = lionWebVersion, Config = configs.GetValueOrDefault(name.Language) ?? new() };
         generator.Generate();
         Console.WriteLine($"generated code for: {name.Language.Name}");
 
-        var path = @$"{generationPath}/V{lionWebVersion.VersionString.Replace('.', '_')}/{name.Language.Name}.g.cs";
+        var path = @$"{generationPath}/{lionWebVersionNamespace}/{name.Language.Name}.g.cs";
         generator.Persist(path);
         Console.WriteLine($"persisted to: {path}");
     }

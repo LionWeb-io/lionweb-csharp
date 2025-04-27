@@ -13,6 +13,7 @@
     <ItemGroup>
       <Folder Include="chunks\localDefs\2023.1\" />
       <Folder Include="chunks\localDefs\2024.1\" />
+      <Folder Include="chunks\localDefs\2025.1\" />
     </ItemGroup>
 
 </Project>

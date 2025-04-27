@@ -36,8 +36,12 @@ using static AstExtensions;
 /// <seealso cref="FeatureMethodsGenerator"/>
 /// <seealso cref="ContainmentMethodsGenerator"/>
 /// <seealso cref="FeatureGenerator"/>
-public class ClassifierGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion)
-    : ClassifierGeneratorBase(new UniqueFeatureNames(names), lionWebVersion)
+public class ClassifierGenerator(
+    Classifier classifier,
+    INames names,
+    LionWebVersions lionWebVersion,
+    GeneratorConfig config)
+    : ClassifierGeneratorBase(new UniqueFeatureNames(names), lionWebVersion, config)
 {
     /// <inheritdoc cref="ClassifierGenerator"/>
     public TypeDeclarationSyntax ClassifierType() =>
@@ -61,6 +65,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
         }
 
         bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
+        bases.AddRange(AddINamedWritableInterface(annotation.Extends));
 
         return ClassifierClass(bases, GenGetClassifier("GetAnnotation", typeof(Annotation)));
     }
@@ -78,11 +83,30 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
         }
 
         bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
+        bases.AddRange(AddINamedWritableInterface(concept.Extends));
 
         if (concept.Partition)
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
         return ClassifierClass(bases, GenGetClassifier("GetConcept", typeof(Concept)));
+    }
+
+    private IEnumerable<TypeSyntax> AddINamedWritableInterface(Classifier? extends)
+    {
+        if (
+            // We are an INamed
+            classifier.AllGeneralizations().Contains(_builtIns.INamed) &&
+            // INamedWritable gets added directly
+            !Interfaces.Contains(_builtIns.INamed) &&
+            (
+                extends == null ||
+                // INamedWritable gets added to supertype
+                !extends.AllGeneralizations().Contains(_builtIns.INamed)
+            )
+        )
+            return [AsType(typeof(INamedWritable))];
+
+        return [];
     }
 
     private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases, MethodDeclarationSyntax genGetClassifier)
@@ -101,10 +125,11 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(
                 FeaturesToImplement(classifier)
-                    .SelectMany(f => new FeatureGenerator(classifier, f, _names, _lionWebVersion).Members())
+                    .SelectMany(f => new FeatureGenerator(classifier, f, _names, _lionWebVersion, _config).Members())
                     .Concat(new List<MemberDeclarationSyntax> { GenConstructor(), genGetClassifier })
-                    .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion).FeatureMethods())
-                    .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion).ContainmentMethods())
+                    .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion, _config).FeatureMethods())
+                    .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion, _config)
+                        .ContainmentMethods())
             ))
             .Xdoc(XdocDefault());
     }
@@ -148,9 +173,9 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
 
     private InterfaceDeclarationSyntax ClassifierInterface(Interface iface)
     {
-        var bases = iface.Extends.Ordered().Select(e => AsType(e, false)).ToList();
-        if (bases.Count == 0)
-            bases = [AsType(typeof(INode))];
+        var bases = iface.Extends.Ordered().Select(e => AsType(e, writeable: _config.WritableInterfaces)).ToList();
+        if (bases.Count == 0 || iface.Extends.Count == 1 && iface.Extends[0].EqualsIdentity(_builtIns.INamed))
+            bases.Add(AsType(_config.WritableInterfaces ? typeof(INode) : typeof(IReadableNode)));
 
         return InterfaceDeclaration(ClassifierName)
             .WithAttributeLists(AsAttributes(
@@ -161,7 +186,7 @@ public class ClassifierGenerator(Classifier classifier, INames names, LionWebVer
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword, SyntaxKind.PartialKeyword))
             .WithBaseList(AsBase(bases.ToArray()))
             .WithMembers(List(iface.Features.Ordered().SelectMany(f =>
-                new FeatureGenerator(classifier, f, _names, _lionWebVersion).AbstractMembers())))
+                new FeatureGenerator(classifier, f, _names, _lionWebVersion, _config).AbstractMembers())))
             .Xdoc(XdocDefault());
     }
 

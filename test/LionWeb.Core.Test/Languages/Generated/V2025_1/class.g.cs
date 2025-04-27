@@ -4,12 +4,12 @@
 // ReSharper disable SuggestVarOrType_Elsewhere
 #pragma warning disable 1591
 #nullable enable
-namespace @namespace.@int.@public.V2024_1;
+namespace @namespace.@int.@public.V2025_1;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
-using LionWeb.Core.VersionSpecific.V2024_1;
+using LionWeb.Core.VersionSpecific.V2025_1;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -19,7 +19,7 @@ using @base = string;
 public partial class ClassLanguage : LanguageBase<IClassFactory>
 {
 	public static readonly ClassLanguage Instance = new Lazy<ClassLanguage>(() => new("id-keyword-lang")).Value;
-	public ClassLanguage(string id) : base(id, LionWebVersions.v2024_1)
+	public ClassLanguage(string id) : base(id, LionWebVersions.v2025_1)
 	{
 		_base = new(() => new PrimitiveTypeBase<ClassLanguage>("id-keyword-prim", this) { Key = "key-keyword-prim", Name = "base" });
 		_enum = new(() => new EnumerationBase<ClassLanguage>("id-keyword-enm", this) { Key = "key-keyword-enm", Name = "enum", LiteralsLazy = new(() => [enum_internal]) });
@@ -229,7 +229,7 @@ public partial class @out : @struct
 			return true;
 		if (ClassLanguage.Instance.out_default.EqualsIdentity(feature))
 		{
-			if (value is @namespace.@int.@public.V2024_1.@if v)
+			if (value is @namespace.@int.@public.V2025_1.@if v)
 			{
 				Default = v;
 				return true;
@@ -345,7 +345,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 			return true;
 		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
 		{
-			if (value is @namespace.@int.@public.V2024_1.@enum v)
+			if (value is @namespace.@int.@public.V2025_1.@enum v)
 			{
 				String = v;
 				return true;
@@ -356,7 +356,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 
 		if (ClassLanguage.Instance.record_double.EqualsIdentity(feature))
 		{
-			if (value is @namespace.@int.@public.V2024_1.@interface v)
+			if (value is @namespace.@int.@public.V2025_1.@interface v)
 			{
 				Double = v;
 				return true;
@@ -493,7 +493,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 			return true;
 		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
 		{
-			if (value is @namespace.@int.@public.V2024_1.@enum v)
+			if (value is @namespace.@int.@public.V2025_1.@enum v)
 			{
 				String = v;
 				return true;
@@ -504,7 +504,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 
 		if (ClassLanguage.Instance.struct_ref.EqualsIdentity(feature))
 		{
-			if (value is @namespace.@int.@public.V2024_1.@record v)
+			if (value is @namespace.@int.@public.V2025_1.@record v)
 			{
 				Ref = v;
 				return true;

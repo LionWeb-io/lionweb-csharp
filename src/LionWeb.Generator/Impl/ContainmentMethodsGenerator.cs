@@ -31,8 +31,8 @@ using static AstExtensions;
 /// - DetachChild()
 /// - GetContainmentOf()
 /// </summary>
-public class ContainmentMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion)
-    : ClassifierGeneratorBase(names, lionWebVersion)
+public class ContainmentMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    : ClassifierGeneratorBase(names, lionWebVersion, config)
 {
     /// <inheritdoc cref="ContainmentMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> ContainmentMethods()
