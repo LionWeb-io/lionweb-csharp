@@ -36,6 +36,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   * Have a look at [plugin loading](https://learn.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support)
     to load several versions of the same language in parallel.
 * Added `GeneratorConfig` to adjust the supertype of generated interfaces (`INode` vs. `IReadableNode`).
+* Added `FeatureClassifierIdentityComparer` distinct from `FeatureIdentityComparer`: The former takes a feature's classifier
+  into account, the latter only the hosting language.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
