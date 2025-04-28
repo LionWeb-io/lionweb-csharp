@@ -20,6 +20,12 @@ namespace LionWeb.Core.Test.Migration;
 using Core.Migration;
 using Core.Serialization;
 using Languages.Generated.V2023_1.Shapes.M2;
+using Languages.Generated.V2024_1.Circular.A;
+using Languages.Generated.V2024_1.Mixed.MixedBaseConceptLang;
+using Languages.Generated.V2024_1.Mixed.MixedBaseContainmentLang;
+using Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang;
+using Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang;
+using Languages.Generated.V2024_1.Mixed.MixedConceptLang;
 using M1;
 using System.Text;
 
@@ -50,7 +56,7 @@ public class ModelMigratorTests : MigrationTestsBase
 
         public MigrationResult Migrate(List<LenientNode> inputRootNodes) => new(true, inputRootNodes);
     }
-    
+
     #endregion
 
     #region NoMigrations
@@ -70,7 +76,7 @@ public class ModelMigratorTests : MigrationTestsBase
         var outputStream = new MemoryStream();
         var migrated = await migrator.MigrateAsync(inputStream, outputStream);
         Assert.IsFalse(migrated);
-        
+
         var resultNodes = await Deserialize(outputStream);
         Assert.AreEqual(1, resultNodes.Count);
     }
@@ -93,7 +99,7 @@ public class ModelMigratorTests : MigrationTestsBase
         var migrated = await migrator.MigrateAsync(inputStream, outputStream);
         Assert.IsFalse(migrated);
         Assert.IsFalse(migration.Executed);
-        
+
         var resultNodes = await Deserialize(outputStream);
         Assert.AreEqual(1, resultNodes.Count);
     }
@@ -101,7 +107,7 @@ public class ModelMigratorTests : MigrationTestsBase
     private class NotApplicableMigration : IMigration
     {
         public bool Executed { get; set; } = false;
-        
+
         public int Priority => 0;
         public void Initialize(ILanguageRegistry languageRegistry) { }
 
@@ -176,7 +182,7 @@ public class ModelMigratorTests : MigrationTestsBase
         var outputStream = new MemoryStream();
         var migrated = await migrator.MigrateAsync(inputStream, outputStream);
         Assert.IsTrue(migrated);
-        
+
         var resultNodes = await Deserialize(outputStream);
         Assert.AreEqual(1, resultNodes.Count);
 
@@ -212,6 +218,40 @@ public class ModelMigratorTests : MigrationTestsBase
         Assert.AreSame(refTarget, resultNodes.OfType<ReferenceGeometry>().First().Shapes[0]);
     }
 
+    [TestMethod]
+    public async Task DeserializeCrossLanguageConcept()
+    {
+        var child = new AConcept("a");
+        var input = new MixedConcept("mixed") { Cont = child, Prop = "myProp", Ref = child };
+
+        IEnumerable<IReadableNode> inputs = [input, child];
+        var inputStream = new MemoryStream();
+        await JsonUtils.WriteNodesToStreamAsync(inputStream,
+            new SerializerBuilder().WithLionWebVersion(LionWebVersions.v2024_1).Build(), inputs);
+        inputStream.Seek(0, SeekOrigin.Begin);
+
+        var migrator = new ModelMigrator(LionWebVersions.v2024_1, []);
+        migrator.RegisterMigration(new OnceMigration());
+
+        var outputStream = new MemoryStream();
+        var migrated = await migrator.MigrateAsync(inputStream, outputStream);
+        Assert.IsTrue(migrated);
+
+        outputStream.Seek(0, SeekOrigin.Begin);
+        var resultNodes = await JsonUtils.ReadNodesFromStreamAsync(outputStream,
+            new DeserializerBuilder().WithLionWebVersion(LionWebVersions.v2024_1).WithLanguages([
+                ALangLanguage.Instance,
+                MixedConceptLangLanguage.Instance,
+                MixedBaseConceptLangLanguage.Instance,
+                MixedBasePropertyLangLanguage.Instance,
+                MixedBaseContainmentLangLanguage.Instance,
+                MixedBaseReferenceLangLanguage.Instance
+            ]).Build());
+
+        Assert.AreEqual(1, resultNodes.Count);
+    }
+
+
     private class OnceMigration : IMigration
     {
         private bool migrated = false;
@@ -239,13 +279,13 @@ public class ModelMigratorTests : MigrationTestsBase
 
         var migrator = new ModelMigrator(LionWebVersions.v2023_1, []);
         var migration = new SerializedLionWebVersionMigration();
-        
+
         Assert.IsNull(migration.SerializedLionWebVersion);
-        
+
         migrator.RegisterMigration(migration);
         var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
-        
+
         Assert.AreEqual(LionWebVersions.v2023_1.VersionString, migration.SerializedLionWebVersion);
     }
 
@@ -279,7 +319,7 @@ public class ModelMigratorTests : MigrationTestsBase
         var migrator = new ModelMigrator(LionWebVersions.v2023_1, []);
 
         migrator.RegisterMigration(new RootNodesMigration([new LenientNode("a", ShapesLanguage.Instance.Line), null]));
-        
+
         await Assert.ThrowsExceptionAsync<InvalidRootNodesException>(() =>
             migrator.MigrateAsync(inputStream, Stream.Null));
     }
@@ -295,9 +335,9 @@ public class ModelMigratorTests : MigrationTestsBase
         var parent = new LenientNode("a", ShapesLanguage.Instance.Line);
         var child = new LenientNode("b", ShapesLanguage.Instance.Coord);
         parent.Set(ShapesLanguage.Instance.Line_start, child);
-        
+
         migrator.RegisterMigration(new RootNodesMigration([parent, child]));
-        
+
         await Assert.ThrowsExceptionAsync<InvalidRootNodesException>(() =>
             migrator.MigrateAsync(inputStream, Stream.Null));
     }
@@ -312,9 +352,9 @@ public class ModelMigratorTests : MigrationTestsBase
 
         var parent = new LenientNode("a", ShapesLanguage.Instance.Line);
         var child = new LenientNode("a", ShapesLanguage.Instance.Coord);
-        
+
         migrator.RegisterMigration(new RootNodesMigration([parent, child]));
-        
+
         await Assert.ThrowsExceptionAsync<InvalidRootNodesException>(() =>
             migrator.MigrateAsync(inputStream, Stream.Null));
     }

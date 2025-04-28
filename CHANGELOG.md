@@ -49,6 +49,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * `Cloner` can now deal with read-only external reference targets.
 * Generator would create uncompilable code if a concept inherits `INamed` via an interface.
 * If a node refers to one of its own children, the Serializer would write the reference as containment.
+* During deserialization, `ModelMigrator` would add a feature to the wrong language if the node's concept is from a 
+  different language as the feature.
 ### Changed
 ### Removed
 ### Deprecated
