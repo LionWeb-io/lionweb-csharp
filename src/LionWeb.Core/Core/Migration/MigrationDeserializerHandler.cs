@@ -20,6 +20,7 @@ namespace LionWeb.Core.Migration;
 using M1;
 using M2;
 using M3;
+using Serialization;
 
 /// Integrates unknown language elements during deserialization as good as possible.
 /// <seealso cref="ModelMigrator"/>
@@ -55,34 +56,46 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
     }
 
     /// <inheritdoc />
-    public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id)
-    {
-        DynamicLanguage? lang = null;
-        if (_languageKeys.TryGetValue(classifier.Language, out var languages))
-        {
-            lang = languages.FirstOrDefault(l => Equals(Compress(l.Version), classifier.Version));
-        }
+    public override Classifier? UnknownClassifier(CompressedMetaPointer classifier, ICompressedId id) =>
+        CreateClassifier(classifier);
 
-        if (lang == null)
-        {
-            lang = new DynamicLanguage(classifier.Language.Original!, _lionWebVersion)
-            {
-                Name = "Language-" + classifier.Language.Original!,
-                Key = classifier.Language.Original!,
-                Version = classifier.Version.Original!
-            };
-            lang.SetFactory(new MigrationFactory(lang));
-            _languages.Add(lang);
-            AddLanguage(lang);
-        }
+    private DynamicConcept CreateClassifier(CompressedMetaPointer classifier)
+    {
+        DynamicLanguage lang = GetOrCreateLanguage(classifier);
 
         var result = new DynamicConcept(classifier.Key.Original!, _lionWebVersion, null)
         {
             Name = "Concept-" + classifier.Key.Original!, Key = classifier.Key.Original!
         };
         lang.AddEntities([result]);
-
         return result;
+    }
+
+    private DynamicLanguage GetOrCreateLanguage(CompressedMetaPointer metaPointer)
+    {
+        DynamicLanguage? lang = null;
+        if (_languageKeys.TryGetValue(metaPointer.Language, out var languages))
+        {
+            lang = languages.FirstOrDefault(l => Equals(Compress(l.Version), metaPointer.Version));
+        }
+
+        lang ??= CreateLanguage(metaPointer);
+        return lang;
+    }
+
+    private DynamicLanguage CreateLanguage(CompressedMetaPointer classifier)
+    {
+        var language = classifier.Language.Original!;
+        var version = classifier.Version.Original!;
+
+        var lang = new DynamicLanguage(language, _lionWebVersion)
+        {
+            Name = "Language-" + language, Key = language, Version = version
+        };
+        lang.SetFactory(new MigrationFactory(lang));
+        _languages.Add(lang);
+        AddLanguage(lang);
+        return lang;
     }
 
     /// <inheritdoc />
@@ -124,7 +137,15 @@ public class MigrationDeserializerHandler : DeserializerDelegatingHandler
             throw new ArgumentOutOfRangeException(feature.ToString());
         }
 
-        ((DynamicClassifier)classifier).AddFeatures([result]);
+        var language = GetOrCreateLanguage(feature);
+        var defaultClassifierKey = $"{feature.Language.Original}_defaultClassifier";
+        var defaultClassifier =
+            language.Entities.OfType<DynamicConcept>().FirstOrDefault(e => e.Key == defaultClassifierKey) ??
+            CreateClassifier(CompressedMetaPointer.Create(
+                new MetaPointer(feature.Language.Original!, feature.Version.Original!, defaultClassifierKey),
+                _compressedIdConfig));
+
+        defaultClassifier.AddFeatures([result]);
         return result;
     }
 

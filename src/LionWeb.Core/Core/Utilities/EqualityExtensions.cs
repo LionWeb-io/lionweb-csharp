@@ -137,7 +137,7 @@ public class LanguageIdentityComparer : IEqualityComparer<Language>
 /// </summary>
 /// <seealso cref="LanguageEntityIdentityComparer"/>
 /// <seealso cref="LanguageIdentityComparer"/>
-public class FeatureIdentityComparer : IEqualityComparer<Feature>
+public class FeatureClassifierIdentityComparer : IEqualityComparer<Feature>
 {
     /// <inheritdoc />
     public bool Equals(Feature? x, Feature? y)
@@ -159,6 +159,39 @@ public class FeatureIdentityComparer : IEqualityComparer<Feature>
     /// <inheritdoc />
     public int GetHashCode(Feature obj) =>
         HashCode.Combine(obj.Key, obj.GetFeatureClassifier().GetHashCodeIdentity());
+}
+
+/// <summary>
+/// Compares <see cref="Feature">Features</see> by their <see cref="IKeyed.Key"/>, and their <see cref="M2Extensions.GetLanguage">hosting Language</see>.
+/// </summary>
+/// <remarks>
+/// We <i>don't include</i> the feature's classifier by default to align with <see cref="LionWeb.Core.Serialization.MetaPointer"/> semantics
+/// -- keys should be unique per language.
+/// Refer to <see cref="FeatureClassifierIdentityComparer"/> to also include the feature's classifier.
+/// </remarks>
+/// <seealso cref="LanguageIdentityComparer"/>
+public class FeatureIdentityComparer : IEqualityComparer<Feature>
+{
+    /// <inheritdoc />
+    public bool Equals(Feature? x, Feature? y)
+    {
+        if (ReferenceEquals(x, y))
+        {
+            return true;
+        }
+
+        if (x == null || y == null)
+        {
+            return false;
+        }
+
+        return x.Key == y.Key &&
+               x.GetLanguage().EqualsIdentity(y.GetLanguage());
+    }
+
+    /// <inheritdoc />
+    public int GetHashCode(Feature obj) =>
+        HashCode.Combine(obj.Key, obj.GetLanguage().GetHashCodeIdentity());
 }
 
 /// <summary>

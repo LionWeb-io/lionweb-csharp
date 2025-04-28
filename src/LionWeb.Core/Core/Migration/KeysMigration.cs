@@ -23,7 +23,9 @@ using System.Diagnostics.CodeAnalysis;
 
 /// Replaces all language element keys as mapped in <paramref name="keyMapping"/>.
 /// <paramref name="keyMapping"/>'s <i>keys</i> MUST include the keys of all processed languages.
-public class KeysMigration(Dictionary<string, string> keyMapping) : IMigration
+/// <param name="keyMapping">All keys to map.</param>
+/// <param name="languageVersionMapping">Optional mapping of <i>old</i> language keys to <i>new</i> language version.</param>
+public class KeysMigration(Dictionary<string, string> keyMapping, Dictionary<string, string>? languageVersionMapping = null) : IMigration
 {
     /// <inheritdoc />
     public required int Priority { get; init; }
@@ -46,6 +48,7 @@ public class KeysMigration(Dictionary<string, string> keyMapping) : IMigration
         {
             var migrationFactory = (MigrationFactory)language.GetFactory();
 
+            result |= ReplaceVersion(language);
             result |= ReplaceKey(language);
 
             foreach (var entity in language.Entities.Cast<DynamicLanguageEntity>())
@@ -81,6 +84,20 @@ public class KeysMigration(Dictionary<string, string> keyMapping) : IMigration
 
 
         return new MigrationResult(result, inputRootNodes);
+    }
+
+    private bool ReplaceVersion(DynamicLanguage language)
+    {
+        if(languageVersionMapping == null)
+            return false;
+
+        if (languageVersionMapping.TryGetValue(language.Key, out var version) && version != language.Version)
+        {
+            language.Version = version;
+            return true;
+        }
+        
+        return false;
     }
 
     private bool ReplaceKey(DynamicIKeyed keyed)

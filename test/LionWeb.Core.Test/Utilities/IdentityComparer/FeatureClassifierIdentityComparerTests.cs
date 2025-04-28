@@ -22,7 +22,7 @@ using M2;
 using M3;
 
 [TestClass]
-public class FeatureIdentityComparerTests
+public class FeatureClassifierIdentityComparerTests
 {
     readonly LionWebVersions _lionWebVersion = LionWebVersions.Current;
 
@@ -33,7 +33,7 @@ public class FeatureIdentityComparerTests
         var entity = new DynamicConcept("id", _lionWebVersion, lang) { Key = "conceptKey" };
         var feature = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
         Assert.AreSame(entity, feature.GetFeatureClassifier());
         Assert.AreEqual(comparer.GetHashCode(feature), comparer.GetHashCode(feature));
         Assert.IsTrue(comparer.Equals(feature, feature));
@@ -46,7 +46,7 @@ public class FeatureIdentityComparerTests
         var entity = new DynamicConcept("id", _lionWebVersion, lang) { Key = "conceptKey" };
         var feature = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         var hashCodeA = comparer.GetHashCode(feature);
         feature.Key = "otherKey";
@@ -62,13 +62,13 @@ public class FeatureIdentityComparerTests
         var entity = new DynamicConcept("id", _lionWebVersion, lang) { Key = "conceptKey" };
         var feature = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         var hashCodeA = comparer.GetHashCode(feature);
         entity.Key = "Y";
         var hashCodeB = comparer.GetHashCode(feature);
 
-        Assert.AreEqual(hashCodeA, hashCodeB);
+        Assert.AreNotEqual(hashCodeA, hashCodeB);
     }
 
     [TestMethod]
@@ -78,7 +78,7 @@ public class FeatureIdentityComparerTests
         var entity = new DynamicConcept("id", _lionWebVersion, lang) { Key = "conceptKey" };
         var feature = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         var hashCodeA = comparer.GetHashCode(feature);
         lang.Key = "Y";
@@ -94,7 +94,7 @@ public class FeatureIdentityComparerTests
         var entity = new DynamicConcept("id", _lionWebVersion, lang) { Key = "conceptKey" };
         var feature = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         var hashCodeA = comparer.GetHashCode(feature);
         lang.Version = "Y";
@@ -111,7 +111,7 @@ public class FeatureIdentityComparerTests
         var featureA = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
         var featureB = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         Assert.AreNotSame(featureA, featureB);
         Assert.AreEqual(comparer.GetHashCode(featureA), comparer.GetHashCode(featureB));
@@ -128,7 +128,7 @@ public class FeatureIdentityComparerTests
         var entityB = new DynamicConcept("id", _lionWebVersion, langB) { Key = "key" };
         var featureB = new DynamicProperty("id", _lionWebVersion, entityB) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         Assert.AreNotSame(featureA, featureB);
         Assert.AreEqual(comparer.GetHashCode(featureA), comparer.GetHashCode(featureB));
@@ -145,11 +145,11 @@ public class FeatureIdentityComparerTests
         var entityB = new DynamicConcept("id", _lionWebVersion, langB) { Key = "otherKey" };
         var featureB = new DynamicProperty("id", _lionWebVersion, entityB) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         Assert.AreNotSame(featureA, featureB);
-        Assert.AreEqual(comparer.GetHashCode(featureA), comparer.GetHashCode(featureB));
-        Assert.IsTrue(comparer.Equals(featureA, featureB));
+        Assert.AreNotEqual(comparer.GetHashCode(featureA), comparer.GetHashCode(featureB));
+        Assert.IsFalse(comparer.Equals(featureA, featureB));
     }
 
     [TestMethod]
@@ -162,7 +162,7 @@ public class FeatureIdentityComparerTests
         var entityB = new DynamicConcept("id", _lionWebVersion, langB) { Key = "key" };
         Feature featureB = new DynamicReference("id", _lionWebVersion, entityB) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         Assert.AreNotSame(featureA, featureB);
         Assert.AreEqual(comparer.GetHashCode(featureA), comparer.GetHashCode(featureB));
@@ -177,7 +177,7 @@ public class FeatureIdentityComparerTests
         var featureA = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
         var featureB = new DynamicProperty("id", _lionWebVersion, entity) { Key = "otherKey" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         Assert.AreNotSame(featureA, featureB);
         Assert.AreNotEqual(comparer.GetHashCode(featureA), comparer.GetHashCode(featureB));
@@ -192,7 +192,7 @@ public class FeatureIdentityComparerTests
         var featureA = new DynamicProperty("id", _lionWebVersion, entity) { Name = "a", Key = "key" };
         var featureB = new DynamicProperty("id", _lionWebVersion, entity) { Name = "b", Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         Assert.AreNotSame(featureA, featureB);
         Assert.AreEqual(comparer.GetHashCode(featureA), comparer.GetHashCode(featureB));
@@ -206,7 +206,7 @@ public class FeatureIdentityComparerTests
         var entity = new DynamicConcept("id", _lionWebVersion, lang) { Key = "conceptKey" };
         var feature = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         Assert.IsFalse(comparer.Equals(null, feature));
     }
@@ -218,7 +218,7 @@ public class FeatureIdentityComparerTests
         var entity = new DynamicConcept("id", _lionWebVersion, lang) { Key = "conceptKey" };
         var feature = new DynamicProperty("id", _lionWebVersion, entity) { Key = "key" };
 
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         Assert.IsFalse(comparer.Equals(feature, null));
     }
@@ -226,7 +226,7 @@ public class FeatureIdentityComparerTests
     [TestMethod]
     public void Equals_BothNull()
     {
-        var comparer = new FeatureIdentityComparer();
+        var comparer = new FeatureClassifierIdentityComparer();
 
         Assert.IsTrue(comparer.Equals(null, null));
     }

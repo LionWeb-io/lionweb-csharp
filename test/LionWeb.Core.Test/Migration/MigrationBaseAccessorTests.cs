@@ -39,7 +39,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new SetPropertyMigration(ShapesLanguage.Instance.Circle_r, 15);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -54,7 +54,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new SetPropertyMigration(ShapesLanguage.Instance.Circle_r, "asdf");
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -71,7 +71,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new SetPropertyMigration(dynamic.FindByKey<Property>(ShapesLanguage.Instance.Circle_r.Key), 15);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -106,7 +106,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new TryGetPropertyMigration(ShapesLanguage.Instance.Circle_r, 15);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsFalse(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -121,7 +121,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new TryGetPropertyMigration(ShapesLanguage.Instance.Circle_r, "15");
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -139,7 +139,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetPropertyMigration(dynamic.FindByKey<Property>(ShapesLanguage.Instance.Circle_r.Key), "15");
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -177,7 +177,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new Circle("c") { Center = new Coord("co") });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -193,7 +193,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new Circle("c") { Fixpoints = [new Coord("co")] });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -211,7 +211,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new SetChildMigration(ShapesLanguage.Instance.Circle_center, new Line("c"), expected);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -230,7 +230,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new Circle("c") { Center = new Coord("co") });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -269,7 +269,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new TryGetChildMigration(ShapesLanguage.Instance.Circle_center, null);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsFalse(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -285,7 +285,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetChildMigration(ShapesLanguage.Instance.Shape_shapeDocs, new Documentation("c") { Text = "a" });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -304,7 +304,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
                 new Documentation("c") { Text = "a" });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -320,7 +320,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetChildMigration(ShapesLanguage.Instance.IShape_fixpoints, new Coord("a"));
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -336,7 +336,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetChildMigration(ShapesLanguage.Instance.IShape_fixpoints, null);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsFalse(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -377,7 +377,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new Circle("c") { Fixpoints = [new Coord("co")] });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -394,7 +394,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new Circle("c") { Fixpoints = [new Coord("co"), new Coord("do")] });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -412,7 +412,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new SetChildrenMigration(ShapesLanguage.Instance.IShape_fixpoints, [new Line("c")], expected);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -432,7 +432,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new Circle("c") { Fixpoints = [new Coord("co")] });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -474,7 +474,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new TryGetChildrenMigration(ShapesLanguage.Instance.Circle_center, null);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsFalse(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -491,7 +491,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
                 [new Documentation("c") { Text = "a" }]);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -510,7 +510,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
                 [new Documentation("c") { Text = "a" }]);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -526,7 +526,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetChildrenMigration(ShapesLanguage.Instance.IShape_fixpoints, [new Coord("a")]);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -542,7 +542,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetChildrenMigration(ShapesLanguage.Instance.IShape_fixpoints, [new Coord("a"), new Coord("b")]);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -585,7 +585,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new SetReferenceMigration(ShapesLanguage.Instance.OffsetDuplicate_source, target, expected);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -604,7 +604,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new SetReferenceMigration(ShapesLanguage.Instance.ReferenceGeometry_shapes, target, expected);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -623,7 +623,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new SetReferenceMigration(ShapesLanguage.Instance.OffsetDuplicate_source, target, expected);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -645,7 +645,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             dynamic.FindByKey<Reference>(ShapesLanguage.Instance.OffsetDuplicate_source.Key), target, expected);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -684,7 +684,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new TryGetReferenceMigration(ShapesLanguage.Instance.OffsetDuplicate_source, null);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsFalse(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -701,7 +701,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetReferenceMigration(ShapesLanguage.Instance.OffsetDuplicate_source, target);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -728,7 +728,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
                 target);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -745,7 +745,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetReferenceMigration(ShapesLanguage.Instance.ReferenceGeometry_shapes, target);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -763,7 +763,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetReferenceMigration(ShapesLanguage.Instance.ReferenceGeometry_shapes, null);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsFalse(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -805,7 +805,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new ReferenceGeometry("c") { Shapes = [target] });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -824,7 +824,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new ReferenceGeometry("c") { Shapes = [targetA, targetB] });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -844,7 +844,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             [target], expected);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -873,7 +873,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             [target], expected);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -915,7 +915,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new TryGetReferencesMigration(ShapesLanguage.Instance.OffsetDuplicate_source, null);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsFalse(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -931,7 +931,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
         var migration = new TryGetReferencesMigration(ShapesLanguage.Instance.OffsetDuplicate_source, [target]);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -955,7 +955,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetReferencesMigration(dynamic.FindByKey<Reference>(ShapesLanguage.Instance.OffsetDuplicate_source.Key), [target]);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -972,7 +972,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetReferencesMigration(ShapesLanguage.Instance.ReferenceGeometry_shapes, [target]);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -990,7 +990,7 @@ public class MigrationBaseAccessorTests : MigrationTestsBase
             new TryGetReferencesMigration(ShapesLanguage.Instance.ReferenceGeometry_shapes, [targetA, targetB]);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }

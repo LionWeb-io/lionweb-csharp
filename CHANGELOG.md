@@ -36,6 +36,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
   * Have a look at [plugin loading](https://learn.microsoft.com/en-us/dotnet/core/tutorials/creating-app-with-plugin-support)
     to load several versions of the same language in parallel.
 * Added `GeneratorConfig` to adjust the supertype of generated interfaces (`INode` vs. `IReadableNode`).
+* Added `FeatureClassifierIdentityComparer` distinct from `FeatureIdentityComparer`: The former takes a feature's classifier
+  into account, the latter only the hosting language.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
@@ -46,6 +48,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Ensure stable results of `DynamicStructuredDataTypeInstance.Equals()` and `GetHashCode()`.
 * `Cloner` can now deal with read-only external reference targets.
 * Generator would create uncompilable code if a concept inherits `INamed` via an interface.
+* If a node refers to one of its own children, the Serializer would write the reference as containment.
+* During deserialization, `ModelMigrator` would add a feature to the wrong language if the node's concept is from a 
+  different language as the feature.
 ### Changed
 ### Removed
 ### Deprecated

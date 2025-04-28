@@ -444,7 +444,7 @@ public class ShapesMigrationTests
             migrator.RegisterMigration(migration);
         }
 
-        var result = await migrator.Migrate(inputStream, outputStream);
+        var result = await migrator.MigrateAsync(inputStream, outputStream);
         outputStream.Seek(0, SeekOrigin.Begin);
 
         return result;
