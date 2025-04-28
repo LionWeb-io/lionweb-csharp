@@ -218,7 +218,7 @@ public class KeysMigrationTests
         var migrator = new ModelMigrator(lionWebVersion, [ShapesLanguage.Instance, SDTLangLanguage.Instance]);
         migrator.RegisterMigration(new KeysMigration(keyMapping) { Priority = 0 });
 
-        var result = await migrator.Migrate(inputStream, outputStream ?? Stream.Null);
+        var result = await migrator.MigrateAsync(inputStream, outputStream ?? Stream.Null);
         if (outputStream != null)
             outputStream.Seek(0, SeekOrigin.Begin);
 

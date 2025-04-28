@@ -38,7 +38,7 @@ public class ModelMigratorTests : MigrationTestsBase
         migrator.RegisterMigration(new InfiniteMigration());
 
         await Assert.ThrowsExceptionAsync<MaxMigrationRoundsExceededException>(() =>
-            migrator.Migrate(inputStream, Stream.Null));
+            migrator.MigrateAsync(inputStream, Stream.Null));
     }
 
     private class InfiniteMigration : IMigration
@@ -68,7 +68,7 @@ public class ModelMigratorTests : MigrationTestsBase
         };
 
         var outputStream = new MemoryStream();
-        var migrated = await migrator.Migrate(inputStream, outputStream);
+        var migrated = await migrator.MigrateAsync(inputStream, outputStream);
         Assert.IsFalse(migrated);
         
         var resultNodes = await Deserialize(outputStream);
@@ -90,7 +90,7 @@ public class ModelMigratorTests : MigrationTestsBase
         migrator.RegisterMigration(migration);
 
         var outputStream = new MemoryStream();
-        var migrated = await migrator.Migrate(inputStream, outputStream);
+        var migrated = await migrator.MigrateAsync(inputStream, outputStream);
         Assert.IsFalse(migrated);
         Assert.IsFalse(migration.Executed);
         
@@ -174,7 +174,7 @@ public class ModelMigratorTests : MigrationTestsBase
         migrator.RegisterMigration(new OnceMigration());
 
         var outputStream = new MemoryStream();
-        var migrated = await migrator.Migrate(inputStream, outputStream);
+        var migrated = await migrator.MigrateAsync(inputStream, outputStream);
         Assert.IsTrue(migrated);
         
         var resultNodes = await Deserialize(outputStream);
@@ -201,7 +201,7 @@ public class ModelMigratorTests : MigrationTestsBase
         migrator.RegisterMigration(new OnceMigration());
 
         var outputStream = new MemoryStream();
-        var migrated = await migrator.Migrate(inputStream, outputStream);
+        var migrated = await migrator.MigrateAsync(inputStream, outputStream);
         Assert.IsTrue(migrated);
 
         outputStream.Seek(0, SeekOrigin.Begin);
@@ -243,7 +243,7 @@ public class ModelMigratorTests : MigrationTestsBase
         Assert.IsNull(migration.SerializedLionWebVersion);
         
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         
         Assert.AreEqual(LionWebVersions.v2023_1.VersionString, migration.SerializedLionWebVersion);
@@ -281,7 +281,7 @@ public class ModelMigratorTests : MigrationTestsBase
         migrator.RegisterMigration(new RootNodesMigration([new LenientNode("a", ShapesLanguage.Instance.Line), null]));
         
         await Assert.ThrowsExceptionAsync<InvalidRootNodesException>(() =>
-            migrator.Migrate(inputStream, Stream.Null));
+            migrator.MigrateAsync(inputStream, Stream.Null));
     }
 
     [TestMethod]
@@ -299,7 +299,7 @@ public class ModelMigratorTests : MigrationTestsBase
         migrator.RegisterMigration(new RootNodesMigration([parent, child]));
         
         await Assert.ThrowsExceptionAsync<InvalidRootNodesException>(() =>
-            migrator.Migrate(inputStream, Stream.Null));
+            migrator.MigrateAsync(inputStream, Stream.Null));
     }
 
     [TestMethod]
@@ -316,7 +316,7 @@ public class ModelMigratorTests : MigrationTestsBase
         migrator.RegisterMigration(new RootNodesMigration([parent, child]));
         
         await Assert.ThrowsExceptionAsync<InvalidRootNodesException>(() =>
-            migrator.Migrate(inputStream, Stream.Null));
+            migrator.MigrateAsync(inputStream, Stream.Null));
     }
 
     private class RootNodesMigration(List<LenientNode> rootNodes) : IMigration

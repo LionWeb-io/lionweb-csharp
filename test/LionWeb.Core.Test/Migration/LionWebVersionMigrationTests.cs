@@ -128,7 +128,7 @@ public class LionWebVersionMigrationTests
         TestContext.WriteLine(Encoding.UTF8.GetString(input.GetBuffer()));
 
         var output = new MemoryStream();
-        await modelMigrator.Migrate(input, output);
+        await modelMigrator.MigrateAsync(input, output);
         output.Seek(0, SeekOrigin.Begin);
         TestContext.WriteLine("serialized after migration:");
         TestContext.WriteLine(Encoding.UTF8.GetString(output.GetBuffer()));

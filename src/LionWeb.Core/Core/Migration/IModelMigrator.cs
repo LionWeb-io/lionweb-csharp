@@ -37,5 +37,5 @@ public interface IModelMigrator
     /// and store the result to <paramref name="migratedUtf8JsonStream"/>.
     /// </summary>
     /// <returns><c>true</c> if the migration applied any changes; <c>false</c> otherwise.</returns>
-    Task<bool> Migrate(Stream inputUtf8JsonStream, Stream migratedUtf8JsonStream);
+    Task<bool> MigrateAsync(Stream inputUtf8JsonStream, Stream migratedUtf8JsonStream);
 }

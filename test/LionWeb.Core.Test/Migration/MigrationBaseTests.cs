@@ -65,7 +65,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new OriginLanguageIdentityMigration();
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -101,7 +101,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new TargetLangMigration();
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -136,7 +136,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new LionWebVersionMigration();
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -176,7 +176,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new RemovedOriginLanguageIdentityMigration();
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
 
         var knownLanguages = migrator.KnownLanguages.ToList();
@@ -208,7 +208,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ChangedKeyAndVersionMigration(targetLang);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
 
         var knownLanguages = migrator.KnownLanguages.ToList();
@@ -238,7 +238,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new MigrationBaseMigration(ShapesLanguage.Instance.Line);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -253,7 +253,7 @@ public class MigrationBaseTests : MigrationTestsBase
 
         migrator.RegisterMigration(migration);
         await Assert.ThrowsExceptionAsync<UnknownLookupException>(async () =>
-            await migrator.Migrate(inputStream, Stream.Null));
+            await migrator.MigrateAsync(inputStream, Stream.Null));
     }
 
     [TestMethod]
@@ -268,7 +268,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new MigrationBaseMigration(targetLang.FindByKey<Classifier>(ShapesLanguage.Instance.Line.Key));
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -284,7 +284,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new MigrationBaseMigration(targetLang.FindByKey<Classifier>(ShapesLanguage.Instance.Line.Key));
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -317,7 +317,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new IsInstanceOfMigration(ShapesLanguage.Instance.Circle);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -331,7 +331,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new IsInstanceOfMigration(ShapesLanguage.Instance.Line);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsFalse(migrated);
     }
 
@@ -345,7 +345,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new IsInstanceOfMigration(ShapesLanguage.Instance.IShape);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -359,7 +359,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new IsInstanceOfMigration(ShapesLanguage.Instance.IShape);
 
         migrator.RegisterMigration(migration);
-        await Assert.ThrowsExceptionAsync<UnknownLookupException>(() => migrator.Migrate(inputStream, Stream.Null));
+        await Assert.ThrowsExceptionAsync<UnknownLookupException>(() => migrator.MigrateAsync(inputStream, Stream.Null));
     }
 
     private class IsInstanceOfMigration(Classifier classifier) : MigrationBase<ShapesLanguage>(
@@ -391,7 +391,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new AllInstancesOfMigration(ShapesLanguage.Instance.Circle);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -405,7 +405,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new AllInstancesOfMigration(ShapesLanguage.Instance.Coord);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -419,7 +419,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new AllInstancesOfMigration(ShapesLanguage.Instance.Line);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsFalse(migrated);
     }
 
@@ -452,7 +452,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_LenientMigration();
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -466,7 +466,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_ReadableMigration(input);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -482,7 +482,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_ReadableMigration(input);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -496,7 +496,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_ReadableMigration(input);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -511,7 +511,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_ReadableMigration(input);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -526,7 +526,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_ReadableMigration(input);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -542,7 +542,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_ReadableMigration(input);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -557,7 +557,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_ReadableMigration(input);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -572,7 +572,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_ReadableMigration(input);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 
@@ -588,7 +588,7 @@ public class MigrationBaseTests : MigrationTestsBase
         var migration = new ConvertSubtreeToLenient_ReadableMigration(input);
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
     }
 

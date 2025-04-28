@@ -83,7 +83,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     }
 
     /// <inheritdoc />
-    public async Task<bool> Migrate(Stream inputUtf8JsonStream, Stream migratedUtf8JsonStream)
+    public async Task<bool> MigrateAsync(Stream inputUtf8JsonStream, Stream migratedUtf8JsonStream)
     {
         (List<IReadableNode> loaded, string? lionWebVersion) = await Deserialize(inputUtf8JsonStream);
         UpdateSerializedLionWebVersion(lionWebVersion);

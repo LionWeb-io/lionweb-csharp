@@ -58,7 +58,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -87,7 +87,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -111,7 +111,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -129,7 +129,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -147,7 +147,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -178,7 +178,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -201,7 +201,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -229,7 +229,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -251,7 +251,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -270,7 +270,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -289,7 +289,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -312,7 +312,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -337,7 +337,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -358,7 +358,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
@@ -376,7 +376,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.Migrate(inputStream, Stream.Null);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
         Assert.IsTrue(migrated);
         Assert.IsTrue(migration.Migrated);
     }
