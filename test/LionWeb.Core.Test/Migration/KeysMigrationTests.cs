@@ -66,10 +66,31 @@ public class KeysMigrationTests
         var input = new Circle("c");
 
         var output = new MemoryStream();
-        var result = await Migrate([input], new() { { ShapesLanguage.Instance.Key, ShapesLanguage.Instance.Key } },
-            output);
+        var result = await Migrate([input], new() { { ShapesLanguage.Instance.Key, ShapesLanguage.Instance.Key } }, output);
 
         Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public async Task LanguageIdenticalSameVersion()
+    {
+        var input = new Circle("c");
+
+        var output = new MemoryStream();
+        var result = await Migrate([input], new() { { ShapesLanguage.Instance.Key, ShapesLanguage.Instance.Key } }, output, new() { { ShapesLanguage.Instance.Key, ShapesLanguage.Instance.Version } });
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public async Task LanguageIdenticalOtherVersion()
+    {
+        var input = new Circle("c");
+
+        var output = new MemoryStream();
+        var result = await Migrate([input], new() { { ShapesLanguage.Instance.Key, ShapesLanguage.Instance.Key } }, output, new() { { ShapesLanguage.Instance.Key, "asdf" } });
+
+        Assert.IsTrue(result);
     }
 
     [TestMethod]
@@ -208,7 +229,7 @@ public class KeysMigrationTests
     }
 
     private async Task<bool> Migrate(IEnumerable<IReadableNode> inputNodes, Dictionary<string, string> keyMapping,
-        Stream? outputStream = null)
+        Stream? outputStream = null, Dictionary<string,string>? languageVersionMapping = null)
     {
         var inputStream = new MemoryStream();
         await JsonUtils.WriteNodesToStreamAsync(inputStream,
@@ -216,7 +237,7 @@ public class KeysMigrationTests
         inputStream.Seek(0, SeekOrigin.Begin);
 
         var migrator = new ModelMigrator(lionWebVersion, [ShapesLanguage.Instance, SDTLangLanguage.Instance]);
-        migrator.RegisterMigration(new KeysMigration(keyMapping) { Priority = 0 });
+        migrator.RegisterMigration(new KeysMigration(keyMapping, languageVersionMapping) { Priority = 0 });
 
         var result = await migrator.MigrateAsync(inputStream, outputStream ?? Stream.Null);
         if (outputStream != null)
