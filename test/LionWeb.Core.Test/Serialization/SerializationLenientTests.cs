@@ -79,6 +79,35 @@ public class SerializationLenientTests
         Assert.AreEqual("lit1", diff.RightValue);
     }
 
+    [TestMethod]
+    public void ReferenceToChild()
+    {
+        var parent = new LenientNode("parent", ShapesLanguage.Instance.MaterialGroup);
+        var child = new LenientNode("child", ShapesLanguage.Instance.Line);
+        
+        parent.Set(ShapesLanguage.Instance.MaterialGroup_defaultShape, child);
+        parent.Set(ShapesLanguage.Instance.MaterialGroup_materials, child);
+        
+        IEnumerable<IReadableNode> nodes = new List<INode> { parent, child };
+        var serializationChunk =
+            new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().SerializeToChunk(nodes);
+        
+        var readableNodes = new DeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithLanguage(ShapesLanguage.Instance)
+            .WithCustomFactory(ShapesLanguage.Instance, new LenientFactory(ShapesLanguage.Instance))
+            .Build()
+            .Deserialize(serializationChunk);
+        
+        Assert.AreEqual(1, readableNodes.Count);
+
+        var comparer = new LenientComparer(new List<IReadableNode> { parent }, readableNodes);
+        var differences = comparer.Compare().ToList();
+        TestContext.WriteLine(differences.DescribeAll(new ComparerOutputConfig()));
+        
+        Assert.AreEqual(0, differences.Count);
+    }
+
     public class LenientFactory(Language language) : AbstractBaseNodeFactory(language)
     {
         public override INode CreateNode(string id, Classifier classifier) =>

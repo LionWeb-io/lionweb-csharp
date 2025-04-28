@@ -48,6 +48,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Ensure stable results of `DynamicStructuredDataTypeInstance.Equals()` and `GetHashCode()`.
 * `Cloner` can now deal with read-only external reference targets.
 * Generator would create uncompilable code if a concept inherits `INamed` via an interface.
+* If a node refers to one of its own children, the Serializer would write the reference as containment.
 ### Changed
 ### Removed
 ### Deprecated

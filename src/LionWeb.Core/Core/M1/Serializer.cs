@@ -223,10 +223,11 @@ public class Serializer : ISerializer
         var containments = featureValues
             .Where(pair =>
                 pair.Key is Containment
-                || (pair.Value is IReadableNode n && ReferenceEquals(n.GetParent(), node))
-                || (pair.Value is IEnumerable<IReadableNode> en && en.All(c => ReferenceEquals(c.GetParent(), node)))
-                || (pair.Value is IEnumerable e &&
-                    e.Cast<IReadableNode>().All(c => ReferenceEquals(c.GetParent(), node)))
+                || pair.Key is Property && (
+                    (pair.Value is IReadableNode n && ReferenceEquals(n.GetParent(), node))
+                    || (pair.Value is IEnumerable e &&
+                        e.Cast<IReadableNode>().All(c => ReferenceEquals(c.GetParent(), node)))
+                )
             )
             .ToDictionary();
         return containments;
