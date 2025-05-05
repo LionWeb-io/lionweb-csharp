@@ -73,7 +73,7 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
 
         var clone = new DynamicLanguageCloner(
                 TargetLang.LionWebVersion,
-                languageRegistry.KnownLanguages.Where(l => l.Key != TargetLang.Key && l.Version != TargetLang.Version)
+                languageRegistry.KnownLanguages.Where(l => l.Key != TargetLang.Key || l.Version != TargetLang.Version)
             )
             .Clone(TargetLang);
         clone.Version = OriginLanguageIdentity.Version;

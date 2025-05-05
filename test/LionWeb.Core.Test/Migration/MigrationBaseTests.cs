@@ -330,6 +330,49 @@ public class MigrationBaseTests : MigrationTestsBase
         }
     }
 
+    [TestMethod]
+    public async Task OriginLanguage_ImplicitDependant_SameVersion()
+    {
+        var inputLangA = new DynamicLanguage("langA", LionWebVersions.v2023_1)
+        {
+            Key = "key-langA", Name = "langA", Version = "version"
+        };
+        var concept = inputLangA.Concept("concept-id", "concept-key", "concept-name");
+        var inputLangB = new DynamicLanguage("langB", LionWebVersions.v2023_1)
+        {
+            Key = "key-langB", Name = "langB", Version = "version"
+        };
+        inputLangA.AddDependsOn([inputLangB]);
+        var input = inputLangA.GetFactory().CreateNode("n", concept);
+        MemoryStream inputStream = await Serialize(input);
+
+        var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, [inputLangA, inputLangB]);
+        var migration = new SameVersionOriginLanguageMigration(inputLangB.Name, inputLangA);
+
+        migrator.RegisterMigration(migration);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
+        Assert.IsTrue(migrated);
+        Assert.IsTrue(migration.Migrated);
+    }
+
+    private class SameVersionOriginLanguageMigration(string expectedName, DynamicLanguage targetLang)
+        : MigrationBase<DynamicLanguage>("asdf", targetLang)
+    {
+        public bool Migrated { get; private set; } = false;
+
+        public override bool IsApplicable(ISet<LanguageIdentity> languageIdentities) =>
+            !Migrated;
+
+        protected override MigrationResult MigrateInternal(List<LenientNode> inputRootNodes)
+        {
+            Migrated = true;
+            Assert.IsTrue(LanguageRegistry.TryGetLanguage(new LanguageIdentity(TargetLang.Key, "asdf"),
+                out var actual));
+            Assert.AreEqual(expectedName, actual.DependsOn[0].Name);
+            return new(true, inputRootNodes);
+        }
+    }
+
     #endregion
 
     #region RemovedOriginLanguageIdentity
