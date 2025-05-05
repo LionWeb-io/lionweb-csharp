@@ -65,6 +65,9 @@ public class AmbiguousLanguageKeyMapping(string key, IEnumerable<DynamicLanguage
 public class UnknownLookupException : MigrationExceptionBase
 {
     /// No equivalent can be found for <paramref name="key"/>.
+    public UnknownLookupException(string key, LanguageIdentity languageIdentity) : base($"No lookup found for {languageIdentity}, key {key}") { }
+    
+    /// No equivalent can be found for <paramref name="key"/>.
     public UnknownLookupException(string key) : base($"No lookup found for key {key}") { }
 
     /// No equivalent can be found for <paramref name="keyed"/>.

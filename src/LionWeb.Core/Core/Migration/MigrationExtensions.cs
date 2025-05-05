@@ -20,6 +20,7 @@ namespace LionWeb.Core.Migration;
 using M1;
 using M2;
 using M3;
+using System.Diagnostics.CodeAnalysis;
 
 /// Extensions useful to work with <see cref="LenientNode"/>s during Migration.
 public static class MigrationExtensions
@@ -155,16 +156,25 @@ public static class MigrationExtensions
 
     internal static T Lookup<T>(T keyed, Language language) where T : IKeyed
     {
+        if(TryLookup<T>(keyed.Key, language, out var result))
+            return result;
+        
+        throw new UnknownLookupException(keyed.Key, LanguageIdentity.FromLanguage(language));
+    }
+
+    internal static bool TryLookup<T>(string key, Language language, [NotNullWhen(true)] out T? result) where T : IKeyed
+    {
         var mapped = M1Extensions
             .Descendants<IKeyed>(language, true)
-            .FirstOrDefault(k => k.Key == keyed.Key);
+            .FirstOrDefault(k => k.Key == key);
 
-        if (mapped is T result)
-            return result;
-
-        if (mapped != null)
-            throw new UnknownLookupException($"{mapped.Key}, as it's not a {typeof(T)}: {keyed}");
+        if (mapped is T r)
+        {
+            result = r;
+            return true;
+        }
         
-        throw new UnknownLookupException(keyed);
+        result = default;
+        return false;
     }
 }

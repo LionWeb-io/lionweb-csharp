@@ -43,4 +43,6 @@ public interface ILanguageRegistry
     /// <exception cref="UnknownLookupException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
     /// <exception cref="AmbiguousLanguageKeyMapping">If not exactly one language could be mapped to the same key.</exception>
     T Lookup<T>(T keyed) where T : IKeyed;
+    
+    bool TryLookup<T>(string key, LanguageIdentity languageIdentity, [NotNullWhen(true)] out T? result) where T : IKeyed;
 }

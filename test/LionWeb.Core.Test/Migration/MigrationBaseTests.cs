@@ -151,7 +151,7 @@ public class MigrationBaseTests : MigrationTestsBase
         protected override MigrationResult MigrateInternal(List<LenientNode> inputRootNodes)
         {
             Migrated = true;
-            Assert.AreSame(ShapesLanguage.Instance, TargetLang);
+            Assert.AreSame(ShapesLanguage.Instance, DestinationLanguage);
             return new(true, inputRootNodes);
         }
     }
@@ -366,7 +366,7 @@ public class MigrationBaseTests : MigrationTestsBase
         protected override MigrationResult MigrateInternal(List<LenientNode> inputRootNodes)
         {
             Migrated = true;
-            Assert.IsTrue(LanguageRegistry.TryGetLanguage(new LanguageIdentity(TargetLang.Key, "asdf"),
+            Assert.IsTrue(LanguageRegistry.TryGetLanguage(new LanguageIdentity(DestinationLanguage.Key, "asdf"),
                 out var actual));
             Assert.AreEqual(expectedName, actual.DependsOn[0].Name);
             return new(true, inputRootNodes);
@@ -432,7 +432,7 @@ public class MigrationBaseTests : MigrationTestsBase
         LanguageIdentity.FromLanguage(ShapesLanguage.Instance), target)
     {
         protected override MigrationResult MigrateInternal(List<LenientNode> inputRootNodes) =>
-            new(true, [CreateNode(TargetLang.Entities.OfType<Concept>().First())]);
+            new(true, [CreateNode(DestinationLanguage.Entities.OfType<Concept>().First())]);
     }
 
     #endregion

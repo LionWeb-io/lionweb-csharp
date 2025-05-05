@@ -23,17 +23,17 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
-/// Migrates instances from <see cref="OriginLanguageIdentity"/> to <see cref="TargetLang"/>.
+/// Migrates instances from <see cref="OriginLanguageIdentity"/> to <see cref="DestinationLanguage"/>.
 /// Implementers MUST use the setters in this class instead of <see cref="IWritableNode.Set"/> to avoid mixing languages of different migration rounds.
 public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetLanguage : Language
 {
     /// Language we migrate <i>from</i>
-    /// <seealso cref="TargetLang"/>
+    /// <seealso cref="DestinationLanguage"/>
     protected readonly LanguageIdentity OriginLanguageIdentity;
 
     /// Language we migrate <i>to</i>
     /// <seealso cref="OriginLanguageIdentity"/> 
-    protected readonly TTargetLanguage TargetLang;
+    protected readonly TTargetLanguage DestinationLanguage;
 
     private ILanguageRegistry? _languageRegistry;
 
@@ -54,7 +54,7 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     protected MigrationBase(LanguageIdentity originLanguage, TTargetLanguage targetLanguage)
     {
         OriginLanguageIdentity = originLanguage;
-        TargetLang = targetLanguage;
+        DestinationLanguage = targetLanguage;
         LionWebVersion = targetLanguage.LionWebVersion;
     }
 
@@ -68,28 +68,31 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     public virtual void Initialize(ILanguageRegistry languageRegistry)
     {
         LanguageRegistry = languageRegistry;
-        if (OriginLanguageIdentity.Key != TargetLang.Key || OriginLanguageIdentity.Version == TargetLang.Version)
-            return;
+        RegisterTargetLanguage();
+    }
 
-        if (TargetLang is DynamicLanguage dynamicLang)
-        {
-            languageRegistry.RegisterLanguage(dynamicLang, OriginLanguageIdentity);
+    private void RegisterTargetLanguage()
+    {
+        if (OriginLanguageIdentity.Key != DestinationLanguage.Key || OriginLanguageIdentity.Version == DestinationLanguage.Version)
             return;
-        }
+        
+        var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
 
-        if (languageRegistry.TryGetLanguage(LanguageIdentity.FromLanguage(TargetLang), out var dynamicTarget))
+        if (LanguageRegistry.TryGetLanguage(destinationIdentity, out _))
+            return;
+        
+        if (DestinationLanguage is DynamicLanguage dynamicLang)
         {
-            languageRegistry.RegisterLanguage(dynamicTarget, OriginLanguageIdentity);
+            LanguageRegistry.RegisterLanguage(dynamicLang, OriginLanguageIdentity);
             return;
         }
         
-        var clone = new DynamicLanguageCloner(
-                TargetLang.LionWebVersion,
-                languageRegistry.KnownLanguages.Where(l => l.Key != TargetLang.Key || l.Version != TargetLang.Version)
+        var dynamicDestination = new DynamicLanguageCloner(
+                DestinationLanguage.LionWebVersion,
+                LanguageRegistry.KnownLanguages.Where(l => l.Key != DestinationLanguage.Key || l.Version != DestinationLanguage.Version)
             )
-            .Clone(TargetLang);
-        clone.Version = OriginLanguageIdentity.Version;
-        languageRegistry.RegisterLanguage(clone);
+            .Clone(DestinationLanguage);
+        LanguageRegistry.RegisterLanguage(dynamicDestination);
     }
 
     /// <inheritdoc />
@@ -98,18 +101,18 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
         languageIdentities.Contains(OriginLanguageIdentity);
 
     /// <inheritdoc />
-    /// Executes <see cref="MigrateInternal"/> and afterward changes all usages of <see cref="OriginLanguageIdentity"/> to <see cref="TargetLang"/>.
+    /// Executes <see cref="MigrateInternal"/> and afterward changes all usages of <see cref="OriginLanguageIdentity"/> to <see cref="DestinationLanguage"/>.
     public MigrationResult Migrate(List<LenientNode> inputRootNodes)
     {
         var result = MigrateInternal(inputRootNodes);
         if (!LanguageRegistry.TryGetLanguage(OriginLanguageIdentity, out var originLanguage))
             return result;
 
-        if (originLanguage.Key == TargetLang.Key && originLanguage.Version == TargetLang.Version)
+        if (originLanguage.Key == DestinationLanguage.Key && originLanguage.Version == DestinationLanguage.Version)
             return result;
 
-        originLanguage.Key = TargetLang.Key;
-        originLanguage.Version = TargetLang.Version;
+        originLanguage.Key = DestinationLanguage.Key;
+        originLanguage.Version = DestinationLanguage.Version;
         result = result with { Changed = true };
 
         return result;
@@ -281,43 +284,71 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
             .Descendants()
             .Where(n => IsInstanceOf(n, classifier));
 
-    /// Whether <paramref name="node"/> is an instance of <paramref name="classifier"/>.
+    /// Whether <paramref name="node"/> is an instance of <paramref name="destinationClassifier"/>.
     /// Handles specialization correctly as long as all involved languages are <see cref="ILanguageRegistry.KnownLanguages">known</see>.
-    protected bool IsInstanceOf(LenientNode node, Classifier classifier)
+    protected bool IsInstanceOf(LenientNode node, Classifier destinationClassifier)
     {
-        Classifier lookup = Lookup(node.GetClassifier());
+        Classifier lookup = LookupAsDestination(node.GetClassifier());
 
-        var languages = _languageRegistry?.KnownLanguages ?? [(DynamicLanguage)classifier.GetLanguage()];
-        var allSpecializations = Lookup(classifier).AllSpecializations(languages, true);
+        var languages = LanguageRegistry.KnownLanguages;
+        var allSpecializations = LookupAsDestination(destinationClassifier).AllSpecializations(languages, true);
 
         return allSpecializations.Any(c => c.EqualsIdentity(lookup));
     }
 
-    /// <inheritdoc cref="ILanguageRegistry.Lookup{T}"/>
-    protected T Lookup<T>(T keyed) where T : IKeyed =>
-        LanguageRegistry.Lookup(keyed);
+    protected T LookupAsOrigin<T>(T keyed) where T : IKeyed
+    {
+        if (keyed.GetLanguage().Key == OriginLanguageIdentity.Key && LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
+            return originResult;
+        
+        return LanguageRegistry.Lookup(keyed); 
+    }
 
+    protected T LookupAsDestination<T>(T keyed) where T : IKeyed
+    {
+        var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
+        if (keyed.GetLanguage().Key == DestinationLanguage.Key && LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
+            return destinationResult;
+        
+        return LanguageRegistry.Lookup(keyed); 
+    }
+
+    /// <inheritdoc cref="ILanguageRegistry.Lookup{T}"/>
+    protected T LookupAsOriginOrDestination<T>(T keyed) where T : IKeyed
+    {
+        var keyedLanguage = keyed.GetLanguage();
+        
+        if (keyedLanguage.Key == OriginLanguageIdentity.Key && LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
+            return originResult;
+
+        var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
+        if (keyedLanguage.Key == DestinationLanguage.Key && LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
+            return destinationResult;
+        
+        return LanguageRegistry.Lookup(keyed); 
+    }
+    
     /// Sets <paramref name="node"/>'s <paramref name="property"/> to <paramref name="value"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
     protected void SetProperty(LenientNode node, Property property, object? value) =>
-        node.Set(Lookup(property), value);
+        node.Set(LookupAsOriginOrDestination(property), value);
 
     /// Tries to get <paramref name="property"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
     /// <returns><c>true</c> if <paramref name="property"/> is set in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetProperty(LenientNode node, Property property, [NotNullWhen(true)] out object? value) =>
-        node.TryGet(Lookup(property), out value);
+        node.TryGet(LookupAsOriginOrDestination(property), out value);
 
     /// Sets <paramref name="node"/>'s <paramref name="containment"/> to <paramref name="child"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> and
     /// <see cref="ConvertSubtreeToLenient">node representations</see> during migration.
     protected void SetChild(LenientNode node, Containment containment, IWritableNode child) =>
-        node.Set(Lookup(containment), ConvertSubtreeToLenient(child));
+        node.Set(LookupAsOriginOrDestination(containment), ConvertSubtreeToLenient(child));
 
     /// Tries to get <paramref name="containment"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
     /// <returns><c>true</c> if <paramref name="containment"/> is set with single node in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetChild(LenientNode node, Containment containment, [NotNullWhen(true)] out LenientNode? value)
     {
-        if (node.TryGet(Lookup(containment), out var v))
+        if (node.TryGet(LookupAsOriginOrDestination(containment), out var v))
         {
             switch (v)
             {
@@ -346,14 +377,14 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> and
     /// <see cref="ConvertSubtreeToLenient">node representations</see> during migration.
     protected void SetChildren(LenientNode node, Containment containment, IEnumerable<IWritableNode> children) =>
-        node.Set(Lookup(containment), children.Select(ConvertSubtreeToLenient));
+        node.Set(LookupAsOriginOrDestination(containment), children.Select(ConvertSubtreeToLenient));
 
     /// Tries to get <paramref name="containment"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
     /// <returns><c>true</c> if <paramref name="containment"/> is set with at least one node in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetChildren(LenientNode node, Containment containment,
         [NotNullWhen(true)] out List<LenientNode>? value)
     {
-        if (node.TryGet(Lookup(containment), out var v))
+        if (node.TryGet(LookupAsOriginOrDestination(containment), out var v))
         {
             switch (v)
             {
@@ -374,13 +405,13 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     /// Sets <paramref name="node"/>'s <paramref name="reference"/> to <paramref name="target"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
     protected void SetReference(LenientNode node, Reference reference, IReadableNode target) =>
-        node.Set(Lookup(reference), target);
+        node.Set(LookupAsOriginOrDestination(reference), target);
 
     /// Tries to get <paramref name="reference"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
     /// <returns><c>true</c> if <paramref name="reference"/> is set with single node in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetReference(LenientNode node, Reference reference, [NotNullWhen(true)] out IReadableNode? value)
     {
-        if (node.TryGet(Lookup(reference), out var v))
+        if (node.TryGet(LookupAsOriginOrDestination(reference), out var v))
         {
             switch (v)
             {
@@ -408,14 +439,14 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     /// Sets <paramref name="node"/>'s <paramref name="reference"/> to <paramref name="targets"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
     protected void SetReferences(LenientNode node, Reference reference, IEnumerable<IReadableNode> targets) =>
-        node.Set(Lookup(reference), targets);
+        node.Set(LookupAsOriginOrDestination(reference), targets);
 
     /// Tries to get <paramref name="reference"/> from <paramref name="node"/> and returns it in <paramref name="value"/>.
     /// <returns><c>true</c> if <paramref name="reference"/> is set with at least one node in <paramref name="node"/>; <c>false</c> otherwise.</returns>
     protected bool TryGetReferences(LenientNode node, Reference reference,
         [NotNullWhen(true)] out List<IReadableNode>? value)
     {
-        if (node.TryGet(Lookup(reference), out var v))
+        if (node.TryGet(LookupAsOriginOrDestination(reference), out var v))
         {
             switch (v)
             {
@@ -443,7 +474,7 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     /// Converts <paramref name="node"/> to a <see cref="LenientNode"/>, including all properties/property values, containments/children, and references.
     protected LenientNode ConvertToLenient(IReadableNode node)
     {
-        var result = new LenientNode(node.GetId(), Lookup(node.GetClassifier()));
+        var result = new LenientNode(node.GetId(), LookupAsOriginOrDestination(node.GetClassifier()));
         result.AddAnnotations(node.GetAnnotations().Select(ConvertSubtreeToLenient));
         foreach (Feature feature in node.CollectAllSetFeatures())
         {
@@ -486,7 +517,7 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     protected virtual LenientNode CreateNode(Classifier classifier, string? id = null)
     {
         if (classifier is not DynamicClassifier)
-            classifier = Lookup(classifier);
+            classifier = LookupAsOriginOrDestination(classifier);
 
         if (classifier is not DynamicClassifier dynamicClassifier)
             throw new UnknownLookupException(classifier);
