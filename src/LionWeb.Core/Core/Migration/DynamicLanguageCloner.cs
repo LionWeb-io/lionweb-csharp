@@ -17,13 +17,17 @@
 
 namespace LionWeb.Core.Migration;
 
+using M1;
 using M2;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 /// Clones Languages as <see cref="DynamicLanguage">DynamicLanguages</see> based on <paramref name="lionWebVersion"/>.
-public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
+/// Uses <paramref name="externalLanguages"/> to resolve references not found within cloned languages. 
+public class DynamicLanguageCloner(
+    LionWebVersions lionWebVersion,
+    IEnumerable<DynamicLanguage>? externalLanguages = null)
 {
     private readonly Dictionary<IKeyed, DynamicIKeyed?> _dynamicMap = new(new KeyedIdentityComparer());
 
@@ -31,8 +35,14 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
     public IReadOnlyDictionary<IKeyed, DynamicIKeyed> DynamicMap =>
         _dynamicMap
             .Where(p => p.Value != null)
-            .ToDictionary()
+            .ToDictionary(new KeyedIdentityComparer())
             .AsReadOnly()!;
+
+    private readonly Dictionary<IKeyed, DynamicIKeyed> _externalElements = externalLanguages == null
+        ? new Dictionary<IKeyed, DynamicIKeyed>()
+        : externalLanguages
+            .SelectMany(l => M1Extensions.Descendants<DynamicIKeyed>(l, true))
+            .ToDictionary(IKeyed (k) => k, new KeyedIdentityComparer());
 
     /// Clones all of <paramref name="languages"/> as <see cref="DynamicLanguage">DynamicLanguages</see> based on <see cref="lionWebVersion"/>.
     /// <paramref name="languages"/> MUST be self-contained, i.e. no language might refer to another language outside <paramref name="languages"/>.
@@ -138,7 +148,7 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
         {
             var field = new DynamicField(f.GetId(), lionWebVersion, result) { Name = f.Name, Key = f.Key };
             _dynamicMap.Add(f, field);
-            _dynamicMap.TryAdd(f.Type, null);
+            TryAdd(f.Type);
             return field;
         }));
         return result;
@@ -163,13 +173,14 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
             _ => throw new ArgumentOutOfRangeException(f.ToString())
         });
         _dynamicMap.Add(f, result);
-        _dynamicMap.TryAdd(f.GetFeatureType(), null);
+        TryAdd(f.GetFeatureType());
         return result;
     }
 
     private void CloneReferencedElements()
     {
-        List<IGrouping<Language, KeyValuePair<IKeyed, DynamicIKeyed?>>> unclonedReferencedElements = CollectUnclonedReferencedElements();
+        List<IGrouping<Language, KeyValuePair<IKeyed, DynamicIKeyed?>>> unclonedReferencedElements =
+            CollectUnclonedReferencedElements();
 
         while (unclonedReferencedElements.Count != 0)
         {
@@ -199,10 +210,10 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
                     }
                 }
             }
-            
+
             unclonedReferencedElements = CollectUnclonedReferencedElements();
         }
-        
+
         return;
 
         List<IGrouping<Language, KeyValuePair<IKeyed, DynamicIKeyed?>>> CollectUnclonedReferencedElements() =>
@@ -291,15 +302,29 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
             }
         }
 
+        if (_externalElements.TryGetValue(keyed, out var externalElement))
+        {
+            if (externalElement is T r)
+            {
+                result = r;
+                return true;
+            }
+        }
+
         result = default;
         return false;
     }
 
+    private void TryAdd(LanguageEntity keyed) =>
+        _dynamicMap.TryAdd(keyed, TryLookup(keyed, out var t) ? t as DynamicIKeyed : null);
+
     #endregion
 }
 
+/// <seealso cref="DynamicLanguageCloner"/>
 public static class DynamicLanguageClonerExtensions
 {
+    /// Clones <paramref name="language"/> with <see cref="DynamicLanguageCloner.Clone"/>.
     public static DynamicLanguage Clone(this DynamicLanguageCloner cloner, Language language) =>
         cloner.Clone([language])[LanguageIdentity.FromLanguage(language)];
 }

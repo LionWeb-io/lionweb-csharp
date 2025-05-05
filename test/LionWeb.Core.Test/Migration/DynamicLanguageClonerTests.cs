@@ -104,6 +104,28 @@ public class DynamicLanguageClonerTests
     }
 
     [TestMethod]
+    public void Language_ExternalDependsOn_Listed()
+    {
+        var inputLangA = new DynamicLanguage("langA", LionWebVersions.Current)
+        {
+            Key = "key-langA", Name = "langA", Version = "version"
+        };
+        var inputLangB = new DynamicLanguage("langB", LionWebVersions.Current)
+        {
+            Key = "key-langB", Name = "langB", Version = "version"
+        };
+        inputLangA.AddDependsOn([inputLangB]);
+
+        var cloner = new DynamicLanguageCloner(LionWebVersions.Current, [inputLangB]);
+
+        var dynamicLanguages = cloner.Clone([inputLangA]);
+
+        AssertEqual([inputLangA], dynamicLanguages);
+        Assert.AreEqual(1, dynamicLanguages.Values.Count);
+        Assert.AreSame(inputLangB, dynamicLanguages.Values.First().DependsOn[0]);
+    }
+
+    [TestMethod]
     public void Annotation()
     {
         var inputLang = new DynamicLanguage("lang", LionWebVersions.Current)
