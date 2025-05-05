@@ -20,6 +20,7 @@ namespace LionWeb.Core.M3;
 using M2;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using Utilities;
 
 // The types here implement the LionCore M3.
@@ -975,24 +976,55 @@ public readonly record struct DynamicStructuredDataTypeInstance : IStructuredDat
         _fields.Where(v => v.value != null).Select(v => v.field);
 
     /// <inheritdoc />
-    public object? Get(Field field) =>
-        _fields.FirstOrDefault(v => v.field == field).value ?? throw new UnsetFieldException(field);
+    public object? Get(Field field) => TryGet(field, out var result) ? result : throw new UnsetFieldException(field);
+
+    /// <summary>
+    /// Gets the <paramref name="value"/> of the given <paramref name="field"/> on <c>this</c>.
+    /// </summary>
+    /// <returns><c>true</c> if <paramref name="field"/> is set, <c>false</c> otherwise.</returns>
+    /// <seealso cref="Get"/>
+    public bool TryGet(Field field, [NotNullWhen(true)] out object? value)
+    {
+        value = _fields.FirstOrDefault(v => v.field == field).value;
+        return value != null;
+    }
+
+    /// <inheritdoc />
+    public override string ToString()
+    {
+        var result = new StringBuilder(_structuredDataType.Name);
+        result.Append(" {");
+
+        bool first = true;
+        foreach (var field in _structuredDataType.Fields.OrderBy(f => f.Name))
+        {
+            if (!first)
+                result.Append(',');
+            first = false;
+
+            result.Append(' ');
+            result.Append(field.Name);
+            result.Append(" = ");
+            if (TryGet(field, out var value))
+                result.Append(value);
+        }
+
+        result.Append(" }");
+
+        return result.ToString();
+    }
 
     /// <inheritdoc />
     public bool Equals(DynamicStructuredDataTypeInstance other) =>
         _structuredDataType.EqualsIdentity(other._structuredDataType) &&
         OrderWithValue(_fields).SequenceEqual(OrderWithValue(other._fields));
 
-    private static IEnumerable<(Field field, object? value)> OrderWithValue(
-        IEnumerable<(Field field, object? value)> fields) =>
-        fields.Where(f => f.value != null).OrderBy(f => f.field.Key);
-
     /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
         hashCode.Add(_structuredDataType.GetHashCodeIdentity());
-        foreach (var field in _fields)
+        foreach (var field in OrderWithValue(_fields))
         {
             hashCode.Add(field.field.GetHashCodeIdentity());
             hashCode.Add(field.value);
@@ -1000,6 +1032,10 @@ public readonly record struct DynamicStructuredDataTypeInstance : IStructuredDat
 
         return hashCode.ToHashCode();
     }
+
+    private static IEnumerable<(Field field, object? value)> OrderWithValue(
+        IEnumerable<(Field field, object? value)> fields) =>
+        fields.Where(f => f.value != null).OrderBy(f => f.field.Key);
 }
 
 /// <inheritdoc cref="Field"/>
