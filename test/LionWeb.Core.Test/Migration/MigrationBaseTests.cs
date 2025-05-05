@@ -18,6 +18,8 @@
 namespace LionWeb.Core.Test.Migration;
 
 using Core.Migration;
+using Languages.Generated.V2023_1.Circular.A;
+using Languages.Generated.V2023_1.Circular.B;
 using Languages.Generated.V2023_1.Shapes.M2;
 using Languages.Generated.V2024_1.TinyRefLang;
 using M2;
@@ -102,7 +104,8 @@ public class MigrationBaseTests : MigrationTestsBase
         Assert.IsTrue(migration.Migrated);
     }
 
-    private class ShortOriginLanguageIdentityMigration() : MigrationBase<ShapesLanguage>("asdf", ShapesLanguage.Instance)
+    private class ShortOriginLanguageIdentityMigration()
+        : MigrationBase<ShapesLanguage>("asdf", ShapesLanguage.Instance)
     {
         public bool Migrated { get; private set; } = false;
 
@@ -164,7 +167,8 @@ public class MigrationBaseTests : MigrationTestsBase
         MemoryStream inputStream = await Serialize(input);
 
         var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, []);
-        var migration = new LionWebVersionMigration(LionWebVersions.v2025_1) { LionWebVersion = LionWebVersions.v2025_1 };
+        var migration =
+            new LionWebVersionMigration(LionWebVersions.v2025_1) { LionWebVersion = LionWebVersions.v2025_1 };
 
         migrator.RegisterMigration(migration);
         var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
@@ -236,7 +240,8 @@ public class MigrationBaseTests : MigrationTestsBase
         protected override MigrationResult MigrateInternal(List<LenientNode> inputRootNodes)
         {
             Migrated = true;
-            Assert.IsTrue(LanguageRegistry.TryGetLanguage(new LanguageIdentity(ShapesLanguage.Instance.Key, "asdf"), out var actual));
+            Assert.IsTrue(LanguageRegistry.TryGetLanguage(new LanguageIdentity(ShapesLanguage.Instance.Key, "asdf"),
+                out var actual));
             Assert.AreEqual("SomethingElse", actual.Name);
             return new(true, inputRootNodes);
         }
@@ -267,8 +272,60 @@ public class MigrationBaseTests : MigrationTestsBase
         protected override MigrationResult MigrateInternal(List<LenientNode> inputRootNodes)
         {
             Migrated = true;
-            Assert.IsTrue(LanguageRegistry.TryGetLanguage(new LanguageIdentity(ShapesLanguage.Instance.Key, "asdf"), out var actual));
+            Assert.IsTrue(LanguageRegistry.TryGetLanguage(new LanguageIdentity(ShapesLanguage.Instance.Key, "asdf"),
+                out var actual));
             Assert.AreEqual(ShapesLanguage.Instance.Name, actual.Name);
+            return new(true, inputRootNodes);
+        }
+    }
+
+    [TestMethod]
+    public async Task OriginLanguage_ImplicitDependant_Listed()
+    {
+        var input = new AConcept("a");
+        MemoryStream inputStream = await Serialize(input);
+
+        var bLangClone = new DynamicLanguageCloner(LionWebVersions.v2023_1).Clone(BLangLanguage.Instance);
+        bLangClone.Name = "BLangClone";
+
+        var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, [bLangClone]);
+        var migration = new ImplicitDependantOriginLanguageMigration(bLangClone.Name);
+
+        migrator.RegisterMigration(migration);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
+        Assert.IsTrue(migrated);
+        Assert.IsTrue(migration.Migrated);
+    }
+
+    [TestMethod]
+    public async Task OriginLanguage_ImplicitDependant()
+    {
+        var input = new AConcept("a");
+        MemoryStream inputStream = await Serialize(input);
+
+        var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, []);
+        var migration = new ImplicitDependantOriginLanguageMigration(BLangLanguage.Instance.Name);
+
+        migrator.RegisterMigration(migration);
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
+        Assert.IsTrue(migrated);
+        Assert.IsTrue(migration.Migrated);
+    }
+
+    private class ImplicitDependantOriginLanguageMigration(string expectedName)
+        : MigrationBase<ALangLanguage>("asdf", ALangLanguage.Instance)
+    {
+        public bool Migrated { get; private set; } = false;
+
+        public override bool IsApplicable(ISet<LanguageIdentity> languageIdentities) =>
+            !Migrated;
+
+        protected override MigrationResult MigrateInternal(List<LenientNode> inputRootNodes)
+        {
+            Migrated = true;
+            Assert.IsTrue(LanguageRegistry.TryGetLanguage(new LanguageIdentity(ALangLanguage.Instance.Key, "asdf"),
+                out var actual));
+            Assert.AreEqual(expectedName, actual.DependsOn[0].Name);
             return new(true, inputRootNodes);
         }
     }

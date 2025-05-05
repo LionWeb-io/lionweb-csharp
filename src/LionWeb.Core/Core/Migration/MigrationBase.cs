@@ -30,15 +30,14 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     /// Language we migrate <i>from</i>
     /// <seealso cref="TargetLang"/>
     protected readonly LanguageIdentity OriginLanguageIdentity;
-    
+
     /// Language we migrate <i>to</i>
     /// <seealso cref="OriginLanguageIdentity"/> 
     protected readonly TTargetLanguage TargetLang;
 
     private ILanguageRegistry? _languageRegistry;
 
-    [Obsolete]
-    public LionWebVersions LionWebVersion { get; init; }
+    [Obsolete] public LionWebVersions LionWebVersion { get; init; }
 
     /// Access to <see cref="IModelMigrator"/>'s <see cref="ILanguageRegistry"/>.
     /// <exception cref="IllegalMigrationStateException">If not set yet (i.e. before registering to an <see cref="IModelMigrator"/>).</exception>
@@ -72,7 +71,11 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
         if (OriginLanguageIdentity.Key != TargetLang.Key || OriginLanguageIdentity.Version == TargetLang.Version)
             return;
 
-        var clone = new DynamicLanguageCloner(TargetLang.LionWebVersion).Clone(TargetLang);
+        var clone = new DynamicLanguageCloner(
+                TargetLang.LionWebVersion,
+                languageRegistry.KnownLanguages.Where(l => l.Key != TargetLang.Key && l.Version != TargetLang.Version)
+            )
+            .Clone(TargetLang);
         clone.Version = OriginLanguageIdentity.Version;
         languageRegistry.RegisterLanguage(clone);
     }
