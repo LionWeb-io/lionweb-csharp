@@ -91,7 +91,6 @@ public class DynamicLanguageCloner(
         {
             Name = language.Name, Key = language.Key, Version = language.Version,
         };
-        result.SetFactory(new MigrationFactory(result));
         _dynamicMap[language] = result;
         return result;
     }

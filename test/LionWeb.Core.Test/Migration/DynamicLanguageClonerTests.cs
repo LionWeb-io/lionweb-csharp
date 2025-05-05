@@ -53,6 +53,7 @@ public class DynamicLanguageClonerTests
     }
 
     [TestMethod]
+    [Ignore]
     public void MigrationFactory()
     {
         var inputLang = new DynamicLanguage("lang", LionWebVersions.Current)

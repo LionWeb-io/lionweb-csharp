@@ -50,6 +50,10 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     {
         LionWebVersion = lionWebVersion;
         _dynamicInputLanguages = new DynamicLanguageCloner(lionWebVersion).Clone(languages);
+        foreach ((_, DynamicLanguage lang) in _dynamicInputLanguages)
+        {
+            lang.SetFactory(new MigrationFactory(lang));
+        }
         _dynamicLanguages = _dynamicInputLanguages;
     }
 
@@ -229,8 +233,11 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
         _dynamicInputLanguages.TryGetValue(languageIdentity, out language);
 
     /// <inheritdoc />
-    public bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null) =>
-        _dynamicLanguages.TryAdd(languageIdentity ?? LanguageIdentity.FromLanguage(language), language);
+    public bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null)
+    {
+        language.SetFactory(new MigrationFactory(language));
+        return _dynamicLanguages.TryAdd(languageIdentity ?? LanguageIdentity.FromLanguage(language), language);
+    }
 
     /// <inheritdoc />
     public T Lookup<T>(T keyed) where T : IKeyed
