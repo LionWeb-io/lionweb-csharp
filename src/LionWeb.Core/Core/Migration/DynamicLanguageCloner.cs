@@ -297,3 +297,9 @@ public class DynamicLanguageCloner(LionWebVersions lionWebVersion)
 
     #endregion
 }
+
+public static class DynamicLanguageClonerExtensions
+{
+    public static DynamicLanguage Clone(this DynamicLanguageCloner cloner, Language language) =>
+        cloner.Clone([language])[LanguageIdentity.FromLanguage(language)];
+}

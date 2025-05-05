@@ -23,18 +23,25 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
-/// Migrates instances from <paramref name="originLanguage"/> to <paramref name="targetLanguage"/>.
+/// Migrates instances from <see cref="OriginLanguageIdentity"/> to <see cref="TargetLang"/>.
 /// Implementers MUST use the setters in this class instead of <see cref="IWritableNode.Set"/> to avoid mixing languages of different migration rounds.
-public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLanguage, TTargetLanguage targetLanguage)
-    : IMigration where TTargetLanguage : Language
+public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetLanguage : Language
 {
-    protected readonly LanguageIdentity OriginLanguageIdentity = originLanguage;
-    protected readonly TTargetLanguage _targetLang = targetLanguage;
+    /// Language we migrate <i>from</i>
+    /// <seealso cref="TargetLang"/>
+    protected readonly LanguageIdentity OriginLanguageIdentity;
+    
+    /// Language we migrate <i>to</i>
+    /// <seealso cref="OriginLanguageIdentity"/> 
+    protected readonly TTargetLanguage TargetLang;
 
     private ILanguageRegistry? _languageRegistry;
 
-    protected LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
+    [Obsolete]
+    public LionWebVersions LionWebVersion { get; init; }
 
+    /// Access to <see cref="IModelMigrator"/>'s <see cref="ILanguageRegistry"/>.
+    /// <exception cref="IllegalMigrationStateException">If not set yet (i.e. before registering to an <see cref="IModelMigrator"/>).</exception>
     protected ILanguageRegistry LanguageRegistry
     {
         get => _languageRegistry ?? throw new IllegalMigrationStateException("LanguageRegistry is null");
@@ -42,31 +49,52 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     }
 
     /// <inheritdoc />
-    public virtual int Priority => IMigration.DefaultPriority;
+    public virtual int Priority { get; init; } = IMigration.DefaultPriority;
+
+    /// Migrates instances from <paramref name="originLanguage"/> to <paramref name="targetLanguage"/>.
+    protected MigrationBase(LanguageIdentity originLanguage, TTargetLanguage targetLanguage)
+    {
+        OriginLanguageIdentity = originLanguage;
+        TargetLang = targetLanguage;
+        LionWebVersion = targetLanguage.LionWebVersion;
+    }
+
+    /// Migrates instances from <tt>{ Key = <paramref name="targetLanguage"/>.key, Version = <paramref name="originVersion"/> }</tt> to <paramref name="targetLanguage"/>.
+    protected MigrationBase(string originVersion, TTargetLanguage targetLanguage)
+        : this(new LanguageIdentity(targetLanguage.Key, originVersion), targetLanguage)
+    {
+    }
 
     /// <inheritdoc />
-    public virtual void Initialize(ILanguageRegistry languageRegistry) =>
+    public virtual void Initialize(ILanguageRegistry languageRegistry)
+    {
         LanguageRegistry = languageRegistry;
+        if (OriginLanguageIdentity.Key != TargetLang.Key || OriginLanguageIdentity.Version == TargetLang.Version)
+            return;
 
+        var clone = new DynamicLanguageCloner(TargetLang.LionWebVersion).Clone(TargetLang);
+        clone.Version = OriginLanguageIdentity.Version;
+        languageRegistry.RegisterLanguage(clone);
+    }
 
     /// <inheritdoc />
-    /// <returns><c>true</c> if <paramref name="languageIdentities"/> includes <see cref="originLanguage"/>.</returns>
+    /// <returns><c>true</c> if <paramref name="languageIdentities"/> includes <see cref="OriginLanguageIdentity"/>.</returns>
     public virtual bool IsApplicable(ISet<LanguageIdentity> languageIdentities) =>
         languageIdentities.Contains(OriginLanguageIdentity);
 
     /// <inheritdoc />
-    /// Executes <see cref="MigrateInternal"/> and afterward changes all usages of <see cref="originLanguage"/> to <see cref="targetLanguage"/>.
+    /// Executes <see cref="MigrateInternal"/> and afterward changes all usages of <see cref="OriginLanguageIdentity"/> to <see cref="TargetLang"/>.
     public MigrationResult Migrate(List<LenientNode> inputRootNodes)
     {
         var result = MigrateInternal(inputRootNodes);
         if (!LanguageRegistry.TryGetLanguage(OriginLanguageIdentity, out var originLanguage))
             return result;
 
-        if (originLanguage.Key == _targetLang.Key && originLanguage.Version == _targetLang.Version)
+        if (originLanguage.Key == TargetLang.Key && originLanguage.Version == TargetLang.Version)
             return result;
 
-        originLanguage.Key = _targetLang.Key;
-        originLanguage.Version = _targetLang.Version;
+        originLanguage.Key = TargetLang.Key;
+        originLanguage.Version = TargetLang.Version;
         result = result with { Changed = true };
 
         return result;
@@ -444,10 +472,10 @@ public abstract class MigrationBase<TTargetLanguage>(LanguageIdentity originLang
     {
         if (classifier is not DynamicClassifier)
             classifier = Lookup(classifier);
-        
+
         if (classifier is not DynamicClassifier dynamicClassifier)
             throw new UnknownLookupException(classifier);
-        
+
         return CreateNode(dynamicClassifier, id);
     }
 

@@ -116,7 +116,7 @@ public class ShapesMigrationTests
     {
         var toVersion = LionWebVersions.v2023_1;
 
-        var targetLang = new DynamicLanguageCloner(toVersion).Clone([_v2023_1]).Values.First();
+        var targetLang = new DynamicLanguageCloner(toVersion).Clone(_v2023_1);
         targetLang.Version = "v2";
 
         var input = Instance2023();
