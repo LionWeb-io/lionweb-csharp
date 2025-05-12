@@ -20,6 +20,7 @@
 namespace LionWeb.Core.Test.Utilities.Comparer;
 
 using Core.Utilities;
+using M3;
 
 [TestClass]
 public class ComparerReferenceTests : ComparerTestsBase
@@ -39,6 +40,38 @@ public class ComparerReferenceTests : ComparerTestsBase
         right.AddShapes([rightShape, rightSource]);
 
         AreEqual(left, right);
+    }
+    
+    [TestMethod]
+    public void Single_ToSingleContainment()
+    {
+        var lionWebVersion = LionWebVersions.v2023_1;
+        var lang = new DynamicLanguage("l", lionWebVersion) {Key = "l", Version = "l", Name = "l"};
+        var concept = lang.Concept("c", "c", "c");
+        var cont = concept.Containment("cont", "cont", "cont").OfType(lionWebVersion.BuiltIns.Node).IsOptional(true)
+            .IsMultiple(false);
+        var refer = concept.Reference("ref", "ref", "ref").OfType(lionWebVersion.BuiltIns.Node).IsOptional(true).IsMultiple(false);
+
+        var left = SimpleTree(concept, cont, refer);
+        var right = SimpleTree(concept, cont, refer);
+
+        AreEqual(left, right);
+        var leftHash = new Hasher([left]).Hash();
+        var rightHash = new Hasher([right]).Hash();
+        
+        Assert.AreEqual(leftHash, rightHash);
+    }
+
+    private static DynamicNode SimpleTree(DynamicConcept concept, DynamicContainment cont, DynamicReference refer)
+    {
+        var root = new DynamicNode("root", concept);
+        var child = new DynamicNode("child", concept);
+        var grandChild = new DynamicNode("grandChild", concept);
+        root.Set(cont, child);
+        child.Set(cont, grandChild);
+        grandChild.Set(refer, child);
+
+        return root;
     }
 
     [TestMethod]
