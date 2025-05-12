@@ -37,8 +37,6 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
 
     private ILanguageRegistry? _languageRegistry;
 
-    [Obsolete] public LionWebVersions LionWebVersion { get; init; }
-
     /// Access to <see cref="IModelMigrator"/>'s <see cref="ILanguageRegistry"/>.
     /// <exception cref="IllegalMigrationStateException">If not set yet (i.e. before registering to an <see cref="IModelMigrator"/>).</exception>
     protected ILanguageRegistry LanguageRegistry
@@ -55,7 +53,6 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
     {
         OriginLanguageIdentity = originLanguage;
         DestinationLanguage = destinationLanguage;
-        LionWebVersion = destinationLanguage.LionWebVersion;
     }
 
     /// Migrates instances from <tt>{ Key = <paramref name="destinationLanguage"/>.key, Version = <paramref name="originVersion"/> }</tt> to <paramref name="destinationLanguage"/>.
@@ -73,23 +70,25 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
 
     private void RegisterDestinationLanguage()
     {
-        if (OriginLanguageIdentity.Key != DestinationLanguage.Key || OriginLanguageIdentity.Version == DestinationLanguage.Version)
+        if (OriginLanguageIdentity.Key != DestinationLanguage.Key ||
+            OriginLanguageIdentity.Version == DestinationLanguage.Version)
             return;
-        
+
         var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
 
         if (LanguageRegistry.TryGetLanguage(destinationIdentity, out _))
             return;
-        
+
         if (DestinationLanguage is DynamicLanguage dynamicLang)
         {
             LanguageRegistry.RegisterLanguage(dynamicLang, OriginLanguageIdentity);
             return;
         }
-        
+
         var dynamicDestination = new DynamicLanguageCloner(
                 DestinationLanguage.LionWebVersion,
-                LanguageRegistry.KnownLanguages.Where(l => l.Key != DestinationLanguage.Key || l.Version != DestinationLanguage.Version)
+                LanguageRegistry.KnownLanguages.Where(l =>
+                    l.Key != DestinationLanguage.Key || l.Version != DestinationLanguage.Version)
             )
             .Clone(DestinationLanguage);
         LanguageRegistry.RegisterLanguage(dynamicDestination);
@@ -120,161 +119,6 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
 
     /// Executes the actual migration.
     protected abstract MigrationResult MigrateInternal(List<LenientNode> inputRootNodes);
-
-    #region Keyed identity helpers
-
-    [Obsolete]
-    protected bool TryGetProperty(LenientNode node, FeatureIdentity featureIdentity, out object? value)
-    {
-        var property = TempProperty(featureIdentity);
-
-        if (node.CollectAllSetFeatures().Contains(property, new FeatureIdentityComparer()))
-        {
-            value = node.Get(property);
-            return true;
-        }
-
-        value = null;
-        return false;
-    }
-
-    [Obsolete]
-    protected void SetProperty(LenientNode node, FeatureIdentity featureIdentity, object? value)
-    {
-        var property = TempProperty(featureIdentity);
-        node.Set(property, value);
-    }
-
-    [Obsolete]
-    protected bool TryGetContainment(LenientNode node, FeatureIdentity featureIdentity, out List<LenientNode> children)
-    {
-        var containment = TempContainment(featureIdentity);
-
-        if (node.CollectAllSetFeatures().Contains(containment, new FeatureIdentityComparer()))
-        {
-            children = (node.Get(containment) as IEnumerable)?.Cast<LenientNode>().ToList()!;
-            return true;
-        }
-
-        children = [];
-        return false;
-    }
-
-    [Obsolete]
-    protected void SetContainment(LenientNode node, FeatureIdentity featureIdentity, List<LenientNode> children)
-    {
-        var containment = TempContainment(featureIdentity);
-        node.Set(containment, children);
-    }
-
-    [Obsolete]
-    protected bool TryGetReference(LenientNode node, FeatureIdentity featureIdentity, out List<IReadableNode> targets)
-    {
-        var reference = TempReference(featureIdentity);
-
-        if (node.CollectAllSetFeatures().Contains(reference, new FeatureIdentityComparer()))
-        {
-            targets = (node.Get(reference) as IEnumerable)?.Cast<IReadableNode>().ToList()!;
-            return true;
-        }
-
-        targets = [];
-        return false;
-    }
-
-    [Obsolete]
-    protected void SetReference(LenientNode node, FeatureIdentity featureIdentity, List<IReadableNode> targets)
-    {
-        var reference = TempReference(featureIdentity);
-        node.Set(reference, targets);
-    }
-
-    [Obsolete]
-    private DynamicProperty TempProperty(FeatureIdentity featureIdentity)
-    {
-        var classifier = TempClassifier(featureIdentity.Classifier, featureIdentity.Key + "-Concept");
-
-        var existing = classifier
-            .Features
-            .OfType<DynamicProperty>()
-            .FirstOrDefault(f => f.Key == featureIdentity.Key);
-        if (existing != null)
-            return existing;
-
-        return new(featureIdentity.Key, LionWebVersion, classifier)
-        {
-            Key = featureIdentity.Key, Name = "Reference-" + featureIdentity.Key, Optional = true
-        };
-    }
-
-    [Obsolete]
-    private DynamicContainment TempContainment(FeatureIdentity featureIdentity)
-    {
-        var classifier = TempClassifier(featureIdentity.Classifier, featureIdentity.Key + "-Concept");
-
-        var existing = classifier
-            .Features
-            .OfType<DynamicContainment>()
-            .FirstOrDefault(f => f.Key == featureIdentity.Key);
-        if (existing != null)
-            return existing;
-
-        return new(featureIdentity.Key, LionWebVersion, classifier)
-        {
-            Key = featureIdentity.Key, Name = "Reference-" + featureIdentity.Key, Optional = true
-        };
-    }
-
-    [Obsolete]
-    private DynamicReference TempReference(FeatureIdentity featureIdentity)
-    {
-        var classifier = TempClassifier(featureIdentity.Classifier, featureIdentity.Key + "-Concept");
-
-        var existing = classifier
-            .Features
-            .OfType<DynamicReference>()
-            .FirstOrDefault(f => f.Key == featureIdentity.Key);
-        if (existing != null)
-            return existing;
-
-        return new(featureIdentity.Key, LionWebVersion, classifier)
-        {
-            Key = featureIdentity.Key, Name = "Reference-" + featureIdentity.Key, Optional = true
-        };
-    }
-
-    [Obsolete]
-    protected DynamicClassifier TempClassifier(ClassifierIdentity classifierIdentity, string? id = null)
-    {
-        var language = TempLanguage(classifierIdentity.Language, id != null ? id + "-Language" : null);
-
-        var existing = language
-            .Entities
-            .OfType<DynamicClassifier>()
-            .FirstOrDefault(e => e.Key == classifierIdentity.Key);
-        if (existing != null)
-            return existing;
-
-        return new DynamicConcept(id ?? NewId(), LionWebVersion, language) { Key = classifierIdentity.Key };
-    }
-
-    [Obsolete]
-    protected DynamicLanguage TempLanguage(LanguageIdentity languageIdentity, string? id = null)
-    {
-        if (LanguageRegistry.TryGetLanguage(languageIdentity, out var language))
-            return language;
-
-        DynamicLanguage dynamicLanguage =
-            new(id ?? NewId(), LionWebVersion) { Key = languageIdentity.Key, Version = languageIdentity.Version };
-        LanguageRegistry.RegisterLanguage(dynamicLanguage);
-        return dynamicLanguage;
-    }
-
-    [Obsolete]
-    protected LenientNode CreateNode(ClassifierIdentity classifierIdentity, string? id = null) =>
-        CreateNode(TempClassifier(classifierIdentity), id);
-
-    #endregion
 
     #region LanguageEntity helpers
 
@@ -480,7 +324,6 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
 
     #region Lookup
 
-    
     /// Finds the equivalent of <paramref name="keyed"/>
     /// <list type="bullet">
     /// <item>within <see cref="OriginLanguageIdentity"/>, if <paramref name="keyed"/>'s language's key matches <see cref="OriginLanguageIdentity"/>'s key;</item>
@@ -489,10 +332,11 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
     /// <exception cref="UnknownLookupException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
     protected T LookupAsOrigin<T>(T keyed) where T : IKeyed
     {
-        if (keyed.GetLanguage().Key == OriginLanguageIdentity.Key && LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
+        if (keyed.GetLanguage().Key == OriginLanguageIdentity.Key &&
+            LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
             return originResult;
-        
-        return LanguageRegistry.Lookup(keyed); 
+
+        return LanguageRegistry.Lookup(keyed);
     }
 
     /// Finds the equivalent of <paramref name="keyed"/>
@@ -504,10 +348,11 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
     protected T LookupAsDestination<T>(T keyed) where T : IKeyed
     {
         var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
-        if (keyed.GetLanguage().Key == DestinationLanguage.Key && LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
+        if (keyed.GetLanguage().Key == DestinationLanguage.Key &&
+            LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
             return destinationResult;
-        
-        return LanguageRegistry.Lookup(keyed); 
+
+        return LanguageRegistry.Lookup(keyed);
     }
 
     /// Finds the equivalent of <paramref name="keyed"/>
@@ -520,19 +365,21 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
     protected T LookupAsOriginOrDestination<T>(T keyed) where T : IKeyed
     {
         var keyedLanguage = keyed.GetLanguage();
-        
-        if (keyedLanguage.Key == OriginLanguageIdentity.Key && LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
+
+        if (keyedLanguage.Key == OriginLanguageIdentity.Key &&
+            LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
             return originResult;
 
         var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
-        if (keyedLanguage.Key == DestinationLanguage.Key && LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
+        if (keyedLanguage.Key == DestinationLanguage.Key &&
+            LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
             return destinationResult;
-        
-        return LanguageRegistry.Lookup(keyed); 
+
+        return LanguageRegistry.Lookup(keyed);
     }
 
     #endregion
-    
+
     /// <inheritdoc cref="IdUtils.NewId"/>
     protected virtual string NewId() =>
         IdUtils.NewId();

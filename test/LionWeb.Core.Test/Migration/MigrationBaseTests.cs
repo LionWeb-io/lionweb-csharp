@@ -158,58 +158,6 @@ public class MigrationBaseTests : MigrationTestsBase
 
     #endregion
 
-    #region LionWebVersion
-
-    [TestMethod]
-    public async Task LionWebVersion_Set()
-    {
-        var input = new Circle("circle");
-        MemoryStream inputStream = await Serialize(input);
-
-        var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, []);
-        var migration =
-            new LionWebVersionMigration(LionWebVersions.v2025_1) { LionWebVersion = LionWebVersions.v2025_1 };
-
-        migrator.RegisterMigration(migration);
-        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
-        Assert.IsTrue(migrated);
-        Assert.IsTrue(migration.Migrated);
-    }
-
-    [TestMethod]
-    public async Task LionWebVersion_Default()
-    {
-        var input = new Circle("circle");
-        MemoryStream inputStream = await Serialize(input);
-
-        var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, []);
-        var migration = new LionWebVersionMigration(LionWebVersions.v2023_1);
-
-        migrator.RegisterMigration(migration);
-        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
-        Assert.IsTrue(migrated);
-        Assert.IsTrue(migration.Migrated);
-    }
-
-    private class LionWebVersionMigration(LionWebVersions expectedVersion) : MigrationBase<ShapesLanguage>(
-        LanguageIdentity.FromLanguage(ShapesLanguage.Instance),
-        ShapesLanguage.Instance)
-    {
-        public bool Migrated { get; private set; } = false;
-
-        public override bool IsApplicable(ISet<LanguageIdentity> languageIdentities) =>
-            !Migrated && base.IsApplicable(languageIdentities);
-
-        protected override MigrationResult MigrateInternal(List<LenientNode> inputRootNodes)
-        {
-            Migrated = true;
-            Assert.AreSame(expectedVersion, LionWebVersion, LionWebVersion.ToString());
-            return new(true, inputRootNodes);
-        }
-    }
-
-    #endregion
-
     #region OriginLanguage
 
     [TestMethod]
