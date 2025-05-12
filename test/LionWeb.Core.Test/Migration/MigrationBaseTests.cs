@@ -45,7 +45,6 @@ public class MigrationBaseTests : MigrationTestsBase
         public override void Initialize(ILanguageRegistry languageRegistry)
         {
             var x = LanguageRegistry.LionWebVersion;
-            Console.WriteLine(x);
             base.Initialize(languageRegistry);
         }
 

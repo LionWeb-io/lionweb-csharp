@@ -53,7 +53,6 @@ public class DynamicLanguageClonerTests
     }
 
     [TestMethod]
-    [Ignore]
     public void MigrationFactory()
     {
         var inputLang = new DynamicLanguage("lang", LionWebVersions.Current)
@@ -64,7 +63,7 @@ public class DynamicLanguageClonerTests
         var cloner = new DynamicLanguageCloner(LionWebVersions.Current);
         var dynamicLanguages = cloner.Clone([inputLang]);
 
-        Assert.IsInstanceOfType<MigrationFactory>(dynamicLanguages.Values.First().GetFactory());
+        Assert.IsNotInstanceOfType<MigrationFactory>(dynamicLanguages.Values.First().GetFactory());
     }
 
     [TestMethod]

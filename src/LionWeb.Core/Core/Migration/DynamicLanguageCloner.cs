@@ -38,11 +38,12 @@ public class DynamicLanguageCloner(
             .ToDictionary(new KeyedIdentityComparer())
             .AsReadOnly()!;
 
-    private readonly Dictionary<IKeyed, DynamicIKeyed> _externalElements = externalLanguages == null
-        ? new Dictionary<IKeyed, DynamicIKeyed>()
-        : externalLanguages
-            .SelectMany(l => M1Extensions.Descendants<DynamicIKeyed>(l, true))
-            .ToDictionary(IKeyed (k) => k, new KeyedIdentityComparer());
+    private readonly Dictionary<IKeyed, DynamicIKeyed> _externalElements =
+        externalLanguages == null
+            ? new Dictionary<IKeyed, DynamicIKeyed>()
+            : externalLanguages
+                .SelectMany(l => M1Extensions.Descendants<DynamicIKeyed>(l, true))
+                .ToDictionary(IKeyed (k) => k, new KeyedIdentityComparer());
 
     /// Clones all of <paramref name="languages"/> as <see cref="DynamicLanguage">DynamicLanguages</see> based on <see cref="lionWebVersion"/>.
     /// <paramref name="languages"/> MUST be self-contained, i.e. no language might refer to another language outside <paramref name="languages"/>.

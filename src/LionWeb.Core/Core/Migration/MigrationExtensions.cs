@@ -54,7 +54,7 @@ public static class MigrationExtensions
 
         foreach (var node in nodes.Descendants())
             CollectUsedLanguages(node.GetClassifier(), result);
-        
+
         return result
             .Where(l => l is not IBuiltInsLanguage and not ILionCoreLanguage)
             .Cast<DynamicLanguage>();
@@ -68,7 +68,7 @@ public static class MigrationExtensions
         alreadyCollected.Add(classifier.GetLanguage());
         foreach (var feature in classifier.Features)
             CollectUsedLanguages(feature, alreadyCollected);
-        
+
         switch (classifier)
         {
             case Annotation a:
@@ -77,13 +77,13 @@ public static class MigrationExtensions
                 foreach (var iface in a.Implements)
                     CollectUsedLanguages(iface, alreadyCollected);
                 break;
-            
+
             case Concept c:
                 CollectUsedLanguages(c.Extends, alreadyCollected);
                 foreach (var iface in c.Implements)
                     CollectUsedLanguages(iface, alreadyCollected);
                 break;
-            
+
             case Interface i:
                 foreach (var iface in i.Extends)
                     CollectUsedLanguages(iface, alreadyCollected);
@@ -95,9 +95,9 @@ public static class MigrationExtensions
     {
         if (feature == null)
             return;
-        
+
         alreadyCollected.Add(feature.GetLanguage());
-        
+
         switch (feature)
         {
             case Property p:
@@ -113,7 +113,7 @@ public static class MigrationExtensions
     {
         if (datatype == null)
             return;
-        
+
         alreadyCollected.Add(datatype.GetLanguage());
 
         if (datatype is not StructuredDataType s)
@@ -121,45 +121,6 @@ public static class MigrationExtensions
 
         foreach (var field in s.Fields)
             CollectUsedLanguages(field.Type, alreadyCollected);
-    }
-    //
-    // private static void CollectUsedLanguages(LenientNode? node, HashSet<Language> alreadyCollected)
-    // {
-    //     if (node == null)
-    //         return;
-    //     
-    //     foreach (var property in node.CollectAllSetFeatures().OfType<Property>())
-    //     {
-    //         if (node.TryGet(property, out var value))
-    //             CollectUsedLanguages(property.Type, value, alreadyCollected);
-    //         
-    //     }
-    // }
-    //
-    // private static void CollectUsedLanguages(Datatype datatype, object? value, HashSet<Language> alreadyCollected)
-    // {
-    //     switch (datatype)
-    //     {
-    //         case Enumeration e:
-    //             x = CollectUsedLanguages(e);
-    //             break;
-    //         case StructuredDataType:
-    //             x = value is IStructuredDataTypeInstance inst
-    //                 ? inst.CollectAllSetFields().SelectMany(f => CollectUsedLanguages(f.Type, inst.Get(f)))
-    //                 : [];
-    //             break;
-    //         default:
-    //             x = [];
-    //             break;
-    //     }
-    // }
-
-    internal static T Lookup<T>(T keyed, Language language) where T : IKeyed
-    {
-        if(TryLookup<T>(keyed.Key, language, out var result))
-            return result;
-        
-        throw new UnknownLookupException(keyed.Key, LanguageIdentity.FromLanguage(language));
     }
 
     internal static bool TryLookup<T>(string key, Language language, [NotNullWhen(true)] out T? result) where T : IKeyed
@@ -173,7 +134,7 @@ public static class MigrationExtensions
             result = r;
             return true;
         }
-        
+
         result = default;
         return false;
     }
