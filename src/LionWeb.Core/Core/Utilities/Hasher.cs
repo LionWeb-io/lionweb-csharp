@@ -184,7 +184,7 @@ public class Hasher
     {
         if (_referenceIndices.TryGetValue(node.GetId(), out var index))
         {
-            index.Internal = true;
+            _referenceIndices[node.GetId()] = index with { Internal = true };
             return;
         }
 
@@ -197,7 +197,7 @@ public class Hasher
         {
             if (index.Index == _indexUnset)
             {
-                index.Index = ++_nextReferenceIndex;
+                _referenceIndices[node.GetId()] = index with { Index = ++_nextReferenceIndex };
             }
 
             return index.Index;
@@ -240,9 +240,9 @@ public readonly record struct ByteArrayHash : IHash
     /// <param name="Hash">Hash code.</param>
     public ByteArrayHash(string Algorithm, byte[] Hash)
     {
-        if(Hash.Length < 4)
+        if (Hash.Length < 4)
             throw new ArgumentException("Hash must contain at least 4 bytes.");
-        
+
         this.Algorithm = Algorithm;
         this.Hash = Hash;
     }
