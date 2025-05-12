@@ -294,6 +294,17 @@ public class HasherTests
     }
 
     [TestMethod]
+    public void Reference_Internal_Equal_After_OtherId()
+    {
+        var targetA = new Line("Ta");
+        var hashA = new Hasher([new OffsetDuplicate("A") { Source = targetA }, targetA]).Hash();
+        var targetB = new Line("Tb");
+        var hashB = new Hasher([new OffsetDuplicate("B") { Source = targetB }, targetB]).Hash();
+
+        Assert.AreEqual(hashA, hashB);
+    }
+
+    [TestMethod]
     public void Reference_Internal_Different_Before()
     {
         var targetA = new Line("T");
