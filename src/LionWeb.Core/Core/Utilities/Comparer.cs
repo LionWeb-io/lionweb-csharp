@@ -172,10 +172,6 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
         {
             var leftCurrent = leftEnumerator.Current;
             var rightCurrent = rightEnumerator.Current;
-            if (leftCurrent != null)
-            {
-                _nodeMapping[leftCurrent] = rightCurrent;
-            }
 
             result.AddRange(CompareNode(leftOwner, leftCurrent, link, rightOwner, rightCurrent));
         }
@@ -206,6 +202,9 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     protected virtual List<IDifference> CompareNode(IReadableNode? leftOwner, IReadableNode? left, Link? containment,
         IReadableNode? rightOwner, IReadableNode? right)
     {
+        if (left != null)
+            _nodeMapping[left] = right;
+
         List<IDifference> result = [];
 
         switch (left, right)
@@ -629,7 +628,8 @@ public class Comparer(IList<IReadableNode?> _left, IList<IReadableNode?> _right)
     }
 
     /// Compares <paramref name="leftClassifier"/> and <paramref name="rightClassifier"/>.
-    protected virtual List<IDifference> CompareClassifier(IReadableNode left, Classifier leftClassifier, IReadableNode right,
+    protected virtual List<IDifference> CompareClassifier(IReadableNode left, Classifier leftClassifier,
+        IReadableNode right,
         Classifier rightClassifier)
     {
         List<IDifference> result = [];
