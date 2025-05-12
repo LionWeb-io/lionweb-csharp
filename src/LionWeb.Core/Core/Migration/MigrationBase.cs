@@ -25,7 +25,7 @@ using Utilities;
 
 /// Migrates instances from <see cref="OriginLanguageIdentity"/> to <see cref="DestinationLanguage"/>.
 /// Implementers MUST use the setters in this class instead of <see cref="IWritableNode.Set"/> to avoid mixing languages of different migration rounds.
-public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetLanguage : Language
+public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDestinationLanguage : Language
 {
     /// Language we migrate <i>from</i>
     /// <seealso cref="DestinationLanguage"/>
@@ -33,7 +33,7 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
 
     /// Language we migrate <i>to</i>
     /// <seealso cref="OriginLanguageIdentity"/> 
-    protected readonly TTargetLanguage DestinationLanguage;
+    protected readonly TDestinationLanguage DestinationLanguage;
 
     private ILanguageRegistry? _languageRegistry;
 
@@ -50,17 +50,17 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     /// <inheritdoc />
     public virtual int Priority { get; init; } = IMigration.DefaultPriority;
 
-    /// Migrates instances from <paramref name="originLanguage"/> to <paramref name="targetLanguage"/>.
-    protected MigrationBase(LanguageIdentity originLanguage, TTargetLanguage targetLanguage)
+    /// Migrates instances from <paramref name="originLanguage"/> to <paramref name="destinationLanguage"/>.
+    protected MigrationBase(LanguageIdentity originLanguage, TDestinationLanguage destinationLanguage)
     {
         OriginLanguageIdentity = originLanguage;
-        DestinationLanguage = targetLanguage;
-        LionWebVersion = targetLanguage.LionWebVersion;
+        DestinationLanguage = destinationLanguage;
+        LionWebVersion = destinationLanguage.LionWebVersion;
     }
 
-    /// Migrates instances from <tt>{ Key = <paramref name="targetLanguage"/>.key, Version = <paramref name="originVersion"/> }</tt> to <paramref name="targetLanguage"/>.
-    protected MigrationBase(string originVersion, TTargetLanguage targetLanguage)
-        : this(new LanguageIdentity(targetLanguage.Key, originVersion), targetLanguage)
+    /// Migrates instances from <tt>{ Key = <paramref name="destinationLanguage"/>.key, Version = <paramref name="originVersion"/> }</tt> to <paramref name="destinationLanguage"/>.
+    protected MigrationBase(string originVersion, TDestinationLanguage destinationLanguage)
+        : this(new LanguageIdentity(destinationLanguage.Key, originVersion), destinationLanguage)
     {
     }
 
@@ -68,10 +68,10 @@ public abstract class MigrationBase<TTargetLanguage> : IMigration where TTargetL
     public virtual void Initialize(ILanguageRegistry languageRegistry)
     {
         LanguageRegistry = languageRegistry;
-        RegisterTargetLanguage();
+        RegisterDestinationLanguage();
     }
 
-    private void RegisterTargetLanguage()
+    private void RegisterDestinationLanguage()
     {
         if (OriginLanguageIdentity.Key != DestinationLanguage.Key || OriginLanguageIdentity.Version == DestinationLanguage.Version)
             return;

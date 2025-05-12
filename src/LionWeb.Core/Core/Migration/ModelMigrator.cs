@@ -164,7 +164,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     private IOrderedEnumerable<IMigration> SelectApplicableMigrations(ImmutableHashSet<LanguageIdentity> usedLanguages)
         => _migrations
             .Where(m => m.IsApplicable(usedLanguages))
-            .OrderBy(m => m.Priority);
+            .OrderByDescending(m => m.Priority);
 
     private void ValidateRootNodes(List<LenientNode> rootNodes, IMigration migration)
     {
@@ -244,7 +244,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     public T Lookup<T>(T keyed) where T : IKeyed
     {
         var languageIdentity = LanguageIdentity.FromLanguage(keyed.GetLanguage());
-        if (TryLookup<T>(keyed.GetId(), languageIdentity, out var result))
+        if (TryLookup<T>(keyed.Key, languageIdentity, out var result))
             return result;
         
         throw new UnknownLookupException(keyed.Key, languageIdentity);

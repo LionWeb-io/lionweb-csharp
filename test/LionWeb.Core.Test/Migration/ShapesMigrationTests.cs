@@ -134,8 +134,8 @@ public class ShapesMigrationTests
         Assert.AreEqual(input.AsString(), resultNodes.OfType<INode>().First().AsString());
     }
 
-    private class ShapesMigrationV2(DynamicLanguage targetLang) : MigrationBase<DynamicLanguage>(
-        LanguageIdentity.FromLanguage(_v2023_1), targetLang)
+    private class ShapesMigrationV2(DynamicLanguage destinationLang) : MigrationBase<DynamicLanguage>(
+        LanguageIdentity.FromLanguage(_v2023_1), destinationLang)
     {
         protected override MigrationResult MigrateInternal(List<LenientNode> inputRootNodes) =>
             new(true, inputRootNodes);

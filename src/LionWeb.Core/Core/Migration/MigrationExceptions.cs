@@ -57,10 +57,6 @@ public class InvalidRootNodesException(IMigration migration, string message)
 public class InvalidMigrationResultException(string message)
     : MigrationExceptionBase(message);
 
-/// Not exactly one language could be mapped to the same <paramref name="key"/>.
-public class AmbiguousLanguageKeyMapping(string key, IEnumerable<DynamicLanguage> languages)
-    : MigrationExceptionBase($"Not exactly one mapped language for key {key}: {string.Join(", ", languages.Select(l => $"({l.Key}, {l.Version})"))}");
-
 /// Lookup of a <see cref="IKeyed"/> language element failed. 
 public class UnknownLookupException : MigrationExceptionBase
 {
