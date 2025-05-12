@@ -375,4 +375,67 @@ public class ModelMigratorTests : MigrationTestsBase
     }
 
     #endregion
+
+    #region Priority
+
+    [TestMethod]
+    public async Task Priority()
+    {
+        var input = new Circle("circle");
+        MemoryStream inputStream = await Serialize(input);
+
+        var migrator = new ModelMigrator(LionWebVersions.v2023_1, []);
+
+        bool first = false;
+        bool second = false;
+
+        var firstMigration = new PriorityMigration(() =>
+        {
+            Assert.IsFalse(first);
+            Assert.IsFalse(second);
+            first = true;
+        })
+        {
+            Priority = 2
+        };
+        migrator.RegisterMigration(firstMigration);
+
+        var secondMigration = new PriorityMigration(() =>
+        {
+            Assert.IsTrue(first);
+            Assert.IsFalse(second);
+            second = true;
+        })
+        {
+            Priority = 1
+        };
+        migrator.RegisterMigration(secondMigration);
+
+        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
+        Assert.IsTrue(migrated);
+        Assert.IsTrue(firstMigration.Migrated);
+        Assert.IsTrue(secondMigration.Migrated);
+        Assert.IsTrue(first);
+        Assert.IsTrue(second);
+    }
+
+    private class PriorityMigration(Action a) : IMigration
+    {
+        public bool Migrated { get; set; } = false;
+        
+        public required int Priority { get; init; }
+        public void Initialize(ILanguageRegistry languageRegistry) { }
+
+        public bool IsApplicable(ISet<LanguageIdentity> languageIdentities) =>
+            !Migrated;
+
+        public MigrationResult Migrate(List<LenientNode> inputRootNodes)
+        {
+            Migrated = true;
+            a();
+            return new(true, inputRootNodes);
+        }
+    }
+
+    #endregion
 }
