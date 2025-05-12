@@ -286,6 +286,7 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
 
     /// Whether <paramref name="node"/> is an instance of <paramref name="destinationClassifier"/>.
     /// Handles specialization correctly as long as all involved languages are <see cref="ILanguageRegistry.KnownLanguages">known</see>.
+    /// This works better if <paramref name="destinationClassifier"/> is part of <see cref="DestinationLanguage"/>.
     protected bool IsInstanceOf(LenientNode node, Classifier destinationClassifier)
     {
         Classifier lookup = LookupAsDestination(node.GetClassifier());
@@ -296,38 +297,6 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
         return allSpecializations.Any(c => c.EqualsIdentity(lookup));
     }
 
-    protected T LookupAsOrigin<T>(T keyed) where T : IKeyed
-    {
-        if (keyed.GetLanguage().Key == OriginLanguageIdentity.Key && LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
-            return originResult;
-        
-        return LanguageRegistry.Lookup(keyed); 
-    }
-
-    protected T LookupAsDestination<T>(T keyed) where T : IKeyed
-    {
-        var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
-        if (keyed.GetLanguage().Key == DestinationLanguage.Key && LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
-            return destinationResult;
-        
-        return LanguageRegistry.Lookup(keyed); 
-    }
-
-    /// <inheritdoc cref="ILanguageRegistry.Lookup{T}"/>
-    protected T LookupAsOriginOrDestination<T>(T keyed) where T : IKeyed
-    {
-        var keyedLanguage = keyed.GetLanguage();
-        
-        if (keyedLanguage.Key == OriginLanguageIdentity.Key && LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
-            return originResult;
-
-        var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
-        if (keyedLanguage.Key == DestinationLanguage.Key && LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
-            return destinationResult;
-        
-        return LanguageRegistry.Lookup(keyed); 
-    }
-    
     /// Sets <paramref name="node"/>'s <paramref name="property"/> to <paramref name="value"/>
     /// while taking care of different <see cref="DynamicLanguageCloner">language variants</see> during migration.
     protected void SetProperty(LenientNode node, Property property, object? value) =>
@@ -464,7 +433,7 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
         return false;
     }
 
-    /// Converts <paramref name="node"/> and all <see cref="MigrationExtensions.Descendants"/> to <see cref="LenientNode"/>s.
+    /// Converts <paramref name="node"/> and all <see cref="MigrationExtensions.Descendants(LionWeb.Core.LenientNode)"/> to <see cref="LenientNode"/>s.
     protected LenientNode ConvertSubtreeToLenient(IReadableNode node) => node switch
     {
         LenientNode l => l,
@@ -509,6 +478,61 @@ public abstract class MigrationBase<TDestinationLanguage> : IMigration where TDe
 
     #endregion
 
+    #region Lookup
+
+    
+    /// Finds the equivalent of <paramref name="keyed"/>
+    /// <list type="bullet">
+    /// <item>within <see cref="OriginLanguageIdentity"/>, if <paramref name="keyed"/>'s language's key matches <see cref="OriginLanguageIdentity"/>'s key;</item>
+    /// <item>otherwise, within <see cref="ILanguageRegistry.KnownLanguages"/>.</item>
+    /// </list>
+    /// <exception cref="UnknownLookupException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
+    protected T LookupAsOrigin<T>(T keyed) where T : IKeyed
+    {
+        if (keyed.GetLanguage().Key == OriginLanguageIdentity.Key && LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
+            return originResult;
+        
+        return LanguageRegistry.Lookup(keyed); 
+    }
+
+    /// Finds the equivalent of <paramref name="keyed"/>
+    /// <list type="bullet">
+    /// <item>within <see cref="DestinationLanguage"/>, if <paramref name="keyed"/>'s language's key matches <see cref="DestinationLanguage"/>'s key;</item>
+    /// <item>otherwise, within <see cref="ILanguageRegistry.KnownLanguages"/>.</item>
+    /// </list>
+    /// <exception cref="UnknownLookupException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
+    protected T LookupAsDestination<T>(T keyed) where T : IKeyed
+    {
+        var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
+        if (keyed.GetLanguage().Key == DestinationLanguage.Key && LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
+            return destinationResult;
+        
+        return LanguageRegistry.Lookup(keyed); 
+    }
+
+    /// Finds the equivalent of <paramref name="keyed"/>
+    /// <list type="number">
+    /// <item>within <see cref="OriginLanguageIdentity"/>, if <paramref name="keyed"/>'s language's key matches <see cref="OriginLanguageIdentity"/>'s key;</item>
+    /// <item>within <see cref="DestinationLanguage"/>, if <paramref name="keyed"/>'s language's key matches <see cref="DestinationLanguage"/>'s key;</item>
+    /// <item>otherwise, within <see cref="ILanguageRegistry.KnownLanguages"/>.</item>
+    /// </list>
+    /// <exception cref="UnknownLookupException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
+    protected T LookupAsOriginOrDestination<T>(T keyed) where T : IKeyed
+    {
+        var keyedLanguage = keyed.GetLanguage();
+        
+        if (keyedLanguage.Key == OriginLanguageIdentity.Key && LanguageRegistry.TryLookup<T>(keyed.Key, OriginLanguageIdentity, out var originResult))
+            return originResult;
+
+        var destinationIdentity = LanguageIdentity.FromLanguage(DestinationLanguage);
+        if (keyedLanguage.Key == DestinationLanguage.Key && LanguageRegistry.TryLookup<T>(keyed.Key, destinationIdentity, out var destinationResult))
+            return destinationResult;
+        
+        return LanguageRegistry.Lookup(keyed); 
+    }
+
+    #endregion
+    
     /// <inheritdoc cref="IdUtils.NewId"/>
     protected virtual string NewId() =>
         IdUtils.NewId();
