@@ -33,19 +33,6 @@ public static class MigrationExtensions
     public static IEnumerable<LenientNode> Descendants(this LenientNode node) =>
         M1Extensions.Descendants(node, true, true);
 
-    /// All <see cref="Descendants(System.Collections.Generic.List{LionWeb.Core.LenientNode})">descendants</see> of
-    /// <paramref name="nodes"/> that are instances of <paramref name="classifier"/>.
-    [Obsolete]
-    public static IEnumerable<LenientNode>
-        AllInstancesOf(this List<LenientNode> nodes, ClassifierIdentity classifier) =>
-        nodes
-            .Descendants()
-            .Where(n =>
-            {
-                var classifierIdentity = ClassifierIdentity.FromClassifier(n.GetClassifier());
-                return classifierIdentity == classifier;
-            });
-
     /// Collects all languages used in <paramref name="nodes"/> via their classifier + generalizations, features, types,
     /// and instance values (for <see cref="EnumerationLiteral"/>).  
     public static IEnumerable<DynamicLanguage> CollectUsedLanguages(List<LenientNode> nodes)
