@@ -1,0 +1,96 @@
+﻿= Migration Infrastructure
+
+LioWeb C# provides the infrastructure to migrate M1 or instance models.
+A _migration_ automatically converts a given chunk of nodes from its _origin_ state to its _destination_ state.
+Typically, we migrate between different versions of the same language; however, the framework can handle any kind of migration.
+
+== Overview
+As migrations tend to deal with unknown models, they always operate on
+`LionWeb.Core.LenientNode`, classified by `LionWeb.Core.M3.DynamicLanguage`.
+This `INode` implementation tries its best to represent every information present in the serialized chunk, even if the contents violate language structure.
+`DynamicLanguage` enables migrations to change language structure on-the-fly.
+
+`IModelMigrator.MigrateAsync()` is asynchronous, as it deals with i/o during deserialization and serialization.
+The actual `IMigration.Migrate()` is synchronous, as we have to execute them serially.
+
+=== IModelMigrator
+Interface `LionWeb.Core.Migration.IModelMigrator` provides the entry point to use migrations.
+We first use `RegisterMigration()` to select all possible migrations we might want to execute, and then call `MigrateAsync()` to execute all needed migrations.
+
+After the migrator deserialized the `inputUtf8JsonStream`, it starts the first _migration round_:
+it selects applicable migrations via `IMigration.IsApplicable()`, then orders them according to `IMigration.Priority`.
+We execute all migrations, feeding the output nodes from the previous migration as input to the next migration.
+As long as any migration applied any changes, and we're below `IModelMigrator.MaxMigrationRounds` number of migration rounds, we continue with the next round.
+Finally, we serialize the last set of output nodes to `migratedUtf8JsonStream`.
+
+=== IMigration
+Every actual migration implements `LionWeb.Core.Migration.IMigration`.
+Upon registration, the `IModelMigrator` calls `IMigration.Initialize()` and passes an `LionWeb.Core.Migration.ILanguageRegistry`.
+The migration can use the language registry to initialize itself.
+The migrator checks each round whether a migration `IsApplicable()`.
+A migration gets all language identities (`LionWeb.Core.Migration.LanguageIdentity`) present in the current input nodes to decide whether it can process this input.
+If yes, the migrator calls `Migrate()` and passes all _input root nodes_.
+The migrator does its work, and returns a `LionWeb.Core.Migration.MigrationResult` -- signalling whether it `MigrationResult.Changed` anything, and the resulting `MigrationResult.OutputRootNodes`.
+
+=== IMigrationWithLionWebVersion
+`LionWeb.Core.Migration.IMigrationWithLionWebVersion` extends `IMigration` and informs the implementer about the LionWeb version used in the `inputUtf8JsonStream`.
+
+== Implementations
+=== ModelMigrator
+`LionWeb.Core.Migration.ModelMigrator` is the default implementation of `IModelMigrator` and `ILanguageRegistry`.
+You probably don't need to implement an alternative.
+
+It sets `MaxMigrationRounds` to 20 by default.
+The constructor takes a `LionWebVersions` and a list of ``Language``s.
+The languages are important to reason about classifier relations, e.g. to find all specializations of a classifier, or to know the owner of an inherited feature.
+We use `LionWeb.Core.Migration.DynamicLanguageCloner` to convert all _initialized languages_ into their `DynamicLanguage` counterpart.
+
+We can customize the `DeserializerBuilder` and `SerializerBuilder`, if needed.
+They must be compatible with the migrator's `LionWebVersion`.
+
+If the migrator encounters unknown language elements during deserialization, it creates them on-the-fly.
+
+WARNING: We can only use the information available in the serialized chunk to reconstruct unknown languages.
+This means keys and language version are accurate, but names and ids are artificial.
+Inheritance relations and owners of features might be inaccurate.
+
+`ILanguageRegistry.KnownLanguages` are composed of all languages present in the current migration round, and all _initialized languages_.
+All other methods of `ILanguageRegistry` work on that set of languages.
+
+=== MigrationBase
+Most migration implementations should extend `LionWeb.Core.Migration.MigrationBase`.
+This base class provides lots of convenience methods.
+It assumes we migrate from `OriginLanguageIdentity` to `DestinationLanguage`, and have an instance of `DestinationLanguage` available (e.g. as generated language).
+An even simpler variant of the constructor only takes the `destinationLanguage` and the origin's `version`, assuming we migrate the same language from a previous version to the current version.
+By default, `MigrationBase.IsApplicable()` if the `OriginLanguageIdentity` is used in the input nodes.
+
+During `Initialize()`, `MigrationBase` registers the `DestinationLanguage` to the `ILanguageRegistry`.
+It delegates `Migrate()` to abstract `MigrateInternal()`, and updates ``OriginLanguage``'s key and version to ``DestinationLanguage``'s equivalent in the `ILanguageRegistry`.
+
+We use the known `DestinationLanguage` to provide lots of convenience methods.
+In general, these methods take language elements (classifiers, features, etc.) from either origin or destination language, and process them properly.
+
+* `AllInstancesOf()` finds all instances of a classifier within a list of nodes.
+We advise to use classifiers from the destination language as parameter, as we need accurate inheritance information.
+
+* `SetProperty()` / `TryGetProperty()` to deal with properties
+
+* `SetChild()` / `TryGetChild()` / `SetChildren()` / `TryGetChildren()` to deal with children
+
+* `SetReference()` / `TryGetReference()` / `SetReferences()` / `TryGetReferences()` to deal with references
+
+* `ConvertSubtreeToLenient()` to convert a tree of nodes build with destination language instances to lenient nodes.
+
+* `LookupAsOrigin()` to find a language element in origin language.
+
+* `LookupAsDestination()` to find a language element in destination language.
+
+* `LookupAsOriginOrDestination()` to first try finding a language element in origin, then in destination language.
+
+=== Ready to use migrations
+
+.KeysMigration
+`LionWeb.Core.Migration.KeysMigration` Replaces all language element keys as mapped in the constructor parameter.
+
+.LanguageVersionMigration
+`LionWeb.Core.Migration.LanguageVersionMigration` Bumps all language versions mentioned in constructor parameter.

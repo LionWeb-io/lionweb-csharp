@@ -265,7 +265,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, []);
         var migration = new LanguageRegistryMigration(lr =>
         {
-            Assert.ThrowsException<AmbiguousLanguageKeyMapping>(() =>
+            Assert.ThrowsException<UnknownLookupException>(() =>
                 lr.Lookup<Language>(TinyRefLangLanguage.Instance));
         });
 
@@ -306,15 +306,11 @@ public class LanguageRegistryTests : MigrationTestsBase
             var dynamicLanguage = DynamicClone(lr.LionWebVersion, ShapesLanguage.Instance);
             dynamicLanguage.Version = "other";
             
-            var lookup = lr.Lookup(dynamicLanguage);
-            Assert.IsNotNull(lookup);
-            Assert.AreNotEqual(dynamicLanguage.Version, lookup.Version);
+            Assert.ThrowsException<UnknownLookupException>(() =>  lr.Lookup(dynamicLanguage));
         });
 
         migrator.RegisterMigration(migration);
-        var migrated = await migrator.MigrateAsync(inputStream, Stream.Null);
-        Assert.IsTrue(migrated);
-        Assert.IsTrue(migration.Migrated);
+        await migrator.MigrateAsync(inputStream, Stream.Null);
     }
 
     #endregion
@@ -372,7 +368,7 @@ public class LanguageRegistryTests : MigrationTestsBase
         var migrator = new ModelMigrator(LionWebVersions.v2024_1_Compatible, []);
         var migration = new LanguageRegistryMigration(lr =>
         {
-            Assert.ThrowsException<AmbiguousLanguageKeyMapping>(() => lr.Lookup(TinyRefLangLanguage.Instance.MyConcept));
+            Assert.ThrowsException<UnknownLookupException>(() => lr.Lookup(TinyRefLangLanguage.Instance.MyConcept));
         });
 
         migrator.RegisterMigration(migration);

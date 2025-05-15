@@ -30,11 +30,11 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     private const int _maxMigrationRounds = 20;
 
     private readonly List<IMigration> _migrations = [];
-    private readonly Dictionary<LanguageIdentity, DynamicLanguage> _dynamicInputLanguages;
     private readonly DeserializerBuilder _deserializerBuilder;
     private readonly SerializerBuilder _serializerBuilder;
+    private readonly Dictionary<LanguageIdentity, DynamicLanguage> _initializedLanguages;
 
-    private Dictionary<LanguageIdentity, DynamicLanguage> _dynamicLanguages;
+    private Dictionary<LanguageIdentity, DynamicLanguage> _currentRoundLanguages;
 
     /// <param name="lionWebVersion">Version of LionWeb standard to use for
     /// <see cref="Deserializer.LionWebVersion">deserializing</see>,
@@ -49,8 +49,13 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     public ModelMigrator(LionWebVersions lionWebVersion, IEnumerable<Language> languages)
     {
         LionWebVersion = lionWebVersion;
-        _dynamicInputLanguages = new DynamicLanguageCloner(lionWebVersion).Clone(languages);
-        _dynamicLanguages = _dynamicInputLanguages;
+        _initializedLanguages = new DynamicLanguageCloner(lionWebVersion).Clone(languages);
+        foreach ((_, DynamicLanguage lang) in _initializedLanguages)
+        {
+            lang.SetFactory(new MigrationFactory(lang));
+        }
+
+        _currentRoundLanguages = new();
     }
 
     /// <inheritdoc />
@@ -100,8 +105,8 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
             migrationRound++;
             changeInThisRound = false;
 
-            _dynamicLanguages = CollectUsedLanguages(rootNodes);
-            var usedLanguages = _dynamicLanguages.Keys.ToImmutableHashSet();
+            _currentRoundLanguages = CollectUsedLanguages(rootNodes);
+            var usedLanguages = _currentRoundLanguages.Keys.ToImmutableHashSet();
             var applicableMigrations = SelectApplicableMigrations(usedLanguages);
 
             foreach (var migration in applicableMigrations)
@@ -124,9 +129,9 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
         string? lionWebVersion = null;
         var builder = DeserializerBuilder ?? new DeserializerBuilder().WithLionWebVersion(LionWebVersion);
         var deserializer = builder
-            .WithHandler(new MigrationDeserializerHandler(LionWebVersion, _dynamicLanguages.Values,
+            .WithHandler(new MigrationDeserializerHandler(LionWebVersion, KnownLanguages,
                 builder.Handler ?? new DeserializerExceptionHandler()))
-            .WithLanguages(_dynamicLanguages.Values).Build();
+            .WithLanguages(KnownLanguages).Build();
 
         var loaded = await JsonUtils.ReadNodesFromStreamAsync(inputUtf8JsonStream, deserializer, serializedVersion =>
         {
@@ -159,7 +164,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     private IOrderedEnumerable<IMigration> SelectApplicableMigrations(ImmutableHashSet<LanguageIdentity> usedLanguages)
         => _migrations
             .Where(m => m.IsApplicable(usedLanguages))
-            .OrderBy(m => m.Priority);
+            .OrderByDescending(m => m.Priority);
 
     private void ValidateRootNodes(List<LenientNode> rootNodes, IMigration migration)
     {
@@ -169,7 +174,7 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
 
         if (nullRootNodes.Count > 0)
             throw new InvalidRootNodesException(migration, "null root nodes");
-        
+
         var nonRootNodes = rootNodes
             .Where(n => n.GetParent() != null)
             .ToList();
@@ -221,43 +226,40 @@ public class ModelMigrator : ILanguageRegistry, IModelMigrator
     public LionWebVersions LionWebVersion { get; }
 
     /// <inheritdoc />
-    public IEnumerable<DynamicLanguage> KnownLanguages { get => _dynamicLanguages.Values; }
+    public IEnumerable<DynamicLanguage> KnownLanguages { get => _currentRoundLanguages.Values.Concat(_initializedLanguages.Values); }
 
     /// <inheritdoc />
     public bool TryGetLanguage(LanguageIdentity languageIdentity, [NotNullWhen(true)] out DynamicLanguage? language) =>
-        _dynamicLanguages.TryGetValue(languageIdentity, out language) ||
-        _dynamicInputLanguages.TryGetValue(languageIdentity, out language);
+        _currentRoundLanguages.TryGetValue(languageIdentity, out language) ||
+        _initializedLanguages.TryGetValue(languageIdentity, out language);
 
     /// <inheritdoc />
-    public bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null) =>
-        _dynamicLanguages.TryAdd(languageIdentity ?? LanguageIdentity.FromLanguage(language), language);
+    public bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null)
+    {
+        language.SetFactory(new MigrationFactory(language));
+        return _currentRoundLanguages.TryAdd(languageIdentity ?? LanguageIdentity.FromLanguage(language), language);
+    }
 
     /// <inheritdoc />
     public T Lookup<T>(T keyed) where T : IKeyed
     {
-        Language inputLanguage = keyed.GetLanguage();
+        var languageIdentity = LanguageIdentity.FromLanguage(keyed.GetLanguage());
+        if (TryLookup<T>(keyed.Key, languageIdentity, out var result))
+            return result;
+        
+        throw new UnknownLookupException(keyed.Key, languageIdentity);
+    }
 
-        Language language;
-        if (TryGetLanguage(LanguageIdentity.FromLanguage(inputLanguage), out var inputLanguageEquivalent))
+    /// <inheritdoc />
+    public bool TryLookup<T>(string key, LanguageIdentity languageIdentity,[NotNullWhen(true)]  out T? result) where T : IKeyed
+    {
+        if (!TryGetLanguage(languageIdentity, out var inputLanguageEquivalent))
         {
-            language = inputLanguageEquivalent;
-        } else
-        {
-            var sameKey = _dynamicLanguages
-                .Values
-                .Where(l => l.Key == inputLanguage.Key)
-                .ToList();
-
-            if (sameKey.Count == 1)
-            {
-                language = sameKey[0];
-            } else
-            {
-                throw new AmbiguousLanguageKeyMapping(inputLanguage.Key, sameKey);
-            }
+            result = default;
+            return false;
         }
 
-        return MigrationExtensions.Lookup(keyed, language);
+        return MigrationExtensions.TryLookup<T>(key, inputLanguageEquivalent, out result);
     }
 
     #endregion

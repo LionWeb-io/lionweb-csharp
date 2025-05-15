@@ -48,7 +48,7 @@ public abstract class MigrationTestsBase
     }
 
     protected DynamicLanguage DynamicClone(LionWebVersions lionWebVersion, Language language) =>
-        new DynamicLanguageCloner(lionWebVersion).Clone([language]).Values.First();
+        new DynamicLanguageCloner(lionWebVersion).Clone(language);
 
     protected static bool Compare(IReadableNode? expected, IReadableNode actual) =>
         new Comparer([expected], [actual]) { BehaviorConfig = new() { CompareCompatibleClassifier = false } }.AreEqual();

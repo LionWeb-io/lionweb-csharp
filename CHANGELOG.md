@@ -38,6 +38,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added `GeneratorConfig` to adjust the supertype of generated interfaces (`INode` vs. `IReadableNode`).
 * Added `FeatureClassifierIdentityComparer` distinct from `FeatureIdentityComparer`: The former takes a feature's classifier
   into account, the latter only the hosting language.
+* Added `DynamicStructuredDataTypeInstance.TryGet()`
+* Added external languages to `DynamicLanguageCloner`.
+* Added convenience method `DynamicLanguageClonerExtensions.Clone(Language)`.
 ### Fixed
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
@@ -54,6 +57,13 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * `Comparer` didn't recognize internal references to nodes that are children in single containments.
 * `Hasher` would not recognize internal references if it encounters the reference before the target node. 
 ### Changed
+* Made `DynamicStructuredDataTypeInstance.GetHashCode()` more stable.
+* `DynamicLanguageCloner` doesn't change a language's factory anymore.
+* `ILanguageRegistry` works on both registered and current round's languages.
+* Separated `KeysMigration.languageVersionMapping` into new class `LanguageVersionMigration`.
+* Improved naming within `MigrationBase`.
+* Simplified `MigrationBase` constructor.
+* Clear separation of `MigrationBase` lookup for _origin_ and _destination_.
 ### Removed
 ### Deprecated
 ### Security

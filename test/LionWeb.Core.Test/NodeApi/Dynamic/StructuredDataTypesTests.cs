@@ -192,21 +192,19 @@ public class StructuredDataTypesTests
     }
 
     [TestMethod]
-    [Ignore("ToString() not yet implemented for DynamicStructuredDataTypeInstance")]
     public void Empty_ToString()
     {
         var dec = NewDecimal();
 
-        Assert.AreEqual("Decimal { Frac = , Int =  }", dec.ToString());
+        Assert.AreEqual("Decimal { frac = , int =  }", dec.ToString());
     }
 
     [TestMethod]
-    [Ignore("GetHashCode() not yet implemented for DynamicStructuredDataTypeInstance")]
     public void Empty_GetHashCode()
     {
         var dec = NewDecimal();
 
-        Assert.AreEqual(0, dec.GetHashCode());
+        Assert.AreNotEqual(0, dec.GetHashCode());
     }
 
     [TestMethod]
@@ -250,12 +248,11 @@ public class StructuredDataTypesTests
 
 
     [TestMethod]
-    [Ignore("ToString() not yet implemented for DynamicStructuredDataTypeInstance")]
     public void Partial_ToString()
     {
         var e = NewE(NewF("test"));
 
-        Assert.AreEqual("E { E2f = F { Name = test }, Name =  }", e.ToString());
+        Assert.AreEqual("E { e2f = F { name = test }, name =  }", e.ToString());
     }
 
     [TestMethod]
@@ -391,23 +388,20 @@ public class StructuredDataTypesTests
     }
 
     [TestMethod]
-    [Ignore("ToString() not yet implemented for DynamicStructuredDataTypeInstance")]
     public void Complete_ToString()
     {
         var amount = NewAmount(23, 42, "EUR", true);
 
-        Assert.AreEqual("Amount { Currency = EUR, Digital = True, Value = Decimal { Frac = 42, Int = 23 } }",
+        Assert.AreEqual("Amount { currency = EUR, digital = True, value = Decimal { frac = 42, int = 23 } }",
             amount.ToString());
     }
 
     [TestMethod]
-    [Ignore("GetHashCode() not yet implemented for DynamicStructuredDataTypeInstance")]
     public void Complete_GetHashCode()
     {
         var amount = NewAmount(23, 42, "EUR", true);
 
         Assert.AreNotEqual(0, amount.GetHashCode());
-        Assert.AreEqual(663245779, amount.GetHashCode());
     }
 
     [TestMethod]

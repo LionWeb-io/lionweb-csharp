@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Migration;
 
-using M2;
 using M3;
 
 /// Represents the identifying parts of a <see cref="Language"/>.
@@ -25,20 +24,4 @@ public record LanguageIdentity(string Key, string Version)
 {
     public static LanguageIdentity FromLanguage(Language language) =>
         new(language.Key, language.Version);
-}
-
-/// Represents the identifying parts of a <see cref="Classifier"/>.
-[Obsolete]
-public record ClassifierIdentity(string Key, LanguageIdentity Language)
-{
-    public static ClassifierIdentity FromClassifier(Classifier classifier) =>
-        new(classifier.Key, LanguageIdentity.FromLanguage(classifier.GetLanguage()));
-}
-
-/// Represents the identifying parts of a <see cref="Feature"/>.
-[Obsolete]
-public record FeatureIdentity(string Key, ClassifierIdentity Classifier)
-{
-    public static FeatureIdentity FromFeature(Feature feature) =>
-        new(feature.Key, ClassifierIdentity.FromClassifier(feature.GetClassifier()));
 }

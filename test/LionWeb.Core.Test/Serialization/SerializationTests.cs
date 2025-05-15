@@ -144,17 +144,14 @@ public class SerializationTests
     }
 
     [TestMethod]
-    [Ignore]
     public void DuplicateNode()
     {
         var b = new Circle("b");
         var a = new MaterialGroup("a") { DefaultShape = b };
         var b2 = new Circle("b");
 
-        var x = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b]).ToList();
-        var serializedNodes = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b2])
-            .ToList();
-        Assert.AreEqual(2, serializedNodes.Count);
+        Assert.ThrowsException<SerializerException>(() => new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b]).ToList());
+        Assert.ThrowsException<SerializerException>(() => new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build().Serialize([a, b, b2]).ToList());
     }
 
     [TestMethod]

@@ -26,7 +26,7 @@ public interface ILanguageRegistry
     /// Version of LionWeb standard used for migration.
     LionWebVersions LionWebVersion { get; }
     
-    /// Enumerates all languages known in the current migration round.
+    /// Enumerates all languages registered to the <see cref="IModelMigrator"/> and known in the current migration round.
     IEnumerable<DynamicLanguage> KnownLanguages { get; }
     
     /// Find language for <paramref name="languageIdentity"/>, if known.
@@ -39,8 +39,11 @@ public interface ILanguageRegistry
     /// <c>false</c> if a language with <paramref name="languageIdentity"/> is already present.</returns>
     bool RegisterLanguage(DynamicLanguage language, LanguageIdentity? languageIdentity = null);
 
-    /// Finds the equivalent of <paramref name="keyed"/> within the current round's languages.
+    /// Finds the equivalent of <paramref name="keyed"/> within <see cref="KnownLanguages"/>.
     /// <exception cref="UnknownLookupException">If no equivalent can be found for <paramref name="keyed"/>.</exception>
-    /// <exception cref="AmbiguousLanguageKeyMapping">If not exactly one language could be mapped to the same key.</exception>
     T Lookup<T>(T keyed) where T : IKeyed;
+    
+    /// Finds the equivalent of <paramref name="key"/> and <paramref name="languageIdentity"/> within <see cref="KnownLanguages"/>, if known.
+    /// <returns><c>true</c> if <paramref name="key"/> / <paramref name="languageIdentity"/> could be found; <c>false</c> otherwise.</returns>
+    bool TryLookup<T>(string key, LanguageIdentity languageIdentity, [NotNullWhen(true)] out T? result) where T : IKeyed;
 }

@@ -56,7 +56,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var keywordLang = testLanguagesDefinitions.KeywordLang;
     var multiInheritLang = testLanguagesDefinitions.MultiInheritLang;
     var namedLang = testLanguagesDefinitions.NamedLang;
-    var namedLangReadInterfaces = new DynamicLanguageCloner(lionWebVersion).Clone([namedLang]).Values.First();
+    var namedLangReadInterfaces = new DynamicLanguageCloner(lionWebVersion).Clone(namedLang);
     namedLangReadInterfaces.Name = "NamedReadInterfaces";
 
     var lionWebVersionNamespace = "V" + lionWebVersion.VersionString.Replace('.', '_');

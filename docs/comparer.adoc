@@ -1,6 +1,6 @@
 = Comparer Examples
 
-Class `LionWeb.Utils.Comparer` deeply compares two lists of nodes with detailed report on differences.
+Class `LionWeb.Core.Utilities.Comparer` deeply compares two lists of nodes with detailed report on differences.
 It considers all input nodes, including all descendants and annotations.
 
 This document lists examples for each compared element.
@@ -433,7 +433,7 @@ However, due to the way C# implements enumerations, it can happen.
 
 === Reference
 We distinguish between _internal_ and _external_ reference targets.
-An _internal_ target is element of the set of nodes to be compared, an _external_ target is not element of this set of nodes.
+An _internal_ target is part of the set of nodes to be compared, an _external_ target is not part of this set of nodes.
 We compare both kinds of targets, but in different ways.
 
 We consider references with _internal_ targets equal if their <<Feature, reference>> and <<Node, target node>> match, i.e. their target nodes are considered _comparable_.
