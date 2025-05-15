@@ -58,7 +58,7 @@ Inheritance relations and owners of features might be inaccurate.
 All other methods of `ILanguageRegistry` work on that set of languages.
 
 === MigrationBase
-Most migration implementations want to extend `LionWeb.Core.Migration.MigrationBase`.
+Most migration implementations should extend `LionWeb.Core.Migration.MigrationBase`.
 This base class provides lots of convenience methods.
 It assumes we migrate from `OriginLanguageIdentity` to `DestinationLanguage`, and have an instance of `DestinationLanguage` available (e.g. as generated language).
 An even simpler variant of the constructor only takes the `destinationLanguage` and the origin's `version`, assuming we migrate the same language from a previous version to the current version.
