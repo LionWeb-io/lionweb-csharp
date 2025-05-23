@@ -296,3 +296,12 @@ public class LenientNode : NodeBase, INode
     public override bool RemoveAnnotations(IEnumerable<INode> annotations) =>
         RemoveSelfParent(annotations?.ToList(), _annotations, null, null);
 }
+
+public class LenientPartition : LenientNode, IPartitionInstance
+{
+    public LenientPartition(NodeId id, Classifier? classifier) : base(id, classifier)
+    {
+    }
+
+    public Concept GetConcept() => (Concept)GetClassifier();
+}

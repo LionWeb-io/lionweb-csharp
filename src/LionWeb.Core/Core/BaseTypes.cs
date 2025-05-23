@@ -121,7 +121,7 @@ public interface IPartitionInstance : IConceptInstance
 
     /// Optional hook to raise partition events.
     /// Not supported by every implementation. 
-    internal IPartitionCommander? GetCommander() => null;
+    IPartitionCommander? GetCommander() => null;
 }
 
 /// <inheritdoc cref="IPartitionInstance" />

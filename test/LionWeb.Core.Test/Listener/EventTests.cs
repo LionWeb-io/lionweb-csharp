@@ -23,11 +23,9 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 using M1.Event;
 using M1.Event.Partition;
-using M2;
 using M3;
 using Comparer = Core.Utilities.Comparer;
 using NodeId = string;
-using Index = int;
 
 public abstract class EventTestsBase
 {
@@ -767,118 +765,7 @@ public class EventsTestJson : EventTestsBase
     }
 }
 
-internal class CommandToEventMapper
-{
-    private readonly Dictionary<NodeId, IReadableNode> _sharedNodeMap;
-
-    public CommandToEventMapper(Dictionary<NodeId, IReadableNode> sharedNodeMap)
-    {
-        _sharedNodeMap = sharedNodeMap;
-    }
-
-    public static Dictionary<CompressedMetaPointer, IKeyed> BuildSharedKeyMap(IEnumerable<Language> languages)
-    {
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = [];
-
-        foreach (IKeyed keyed in languages.SelectMany(l => M1Extensions.Descendants<IKeyed>(l)))
-        {
-            var metaPointer = keyed switch
-            {
-                LanguageEntity l => l.ToMetaPointer(),
-                Feature feat => feat.ToMetaPointer(),
-                EnumerationLiteral l => l.GetEnumeration().ToMetaPointer(),
-                _ => throw new NotImplementedException(keyed.GetType().Name)
-            };
-
-            sharedKeyedMap[CompressedMetaPointer.Create(metaPointer, true)] = keyed;
-        }
-
-        return sharedKeyedMap;
-    }
-
-    public IDeltaEvent Map(IDeltaCommand deltaCommand) =>
-        deltaCommand switch
-        {
-            AddProperty a => new PropertyAdded(a.Parent, a.Property, a.NewValue, NextSequence(), OriginCommands(a),
-                null),
-            DeleteProperty a => new PropertyDeleted(a.Parent, a.Property, null, NextSequence(), OriginCommands(a),
-                null),
-            ChangeProperty a => new PropertyChanged(a.Parent, a.Property, a.NewValue, null, NextSequence(),
-                OriginCommands(a), null),
-            AddChild a => new ChildAdded(a.Parent, a.Containment, a.Index, a.NewChild, NextSequence(),
-                OriginCommands(a), null),
-            DeleteChild a => new ChildDeleted(a.Parent, a.Containment, a.Index, new([]), NextSequence(),
-                OriginCommands(a), null),
-            ReplaceChild a => new ChildReplaced(a.Parent, a.Containment, a.Index, a.NewChild, new([]), NextSequence(),
-                OriginCommands(a), null),
-            MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewParent, a.NewContainment,
-                a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild),
-                NextSequence(), OriginCommands(a), null),
-            MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(
-                a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild),
-                GetIndex(a.MovedChild), NextSequence(), OriginCommands(a), null),
-            MoveChildInSameContainment a => new ChildMovedInSameContainment(a.NewIndex, a.MovedChild,
-                GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), NextSequence(),
-                OriginCommands(a), null),
-            AddAnnotation a => new AnnotationAdded(a.Parent, a.Index, a.NewAnnotation, NextSequence(),
-                OriginCommands(a), null),
-            DeleteAnnotation a => new AnnotationDeleted(a.Parent, a.Index, new([]), NextSequence(), OriginCommands(a),
-                null),
-            ReplaceAnnotation a => new AnnotationReplaced(a.Parent, a.Index, a.NewAnnotation, new([]), NextSequence(),
-                OriginCommands(a), null),
-            MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.NewIndex,
-                a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), NextSequence(),
-                OriginCommands(a), null),
-            MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation,
-                GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), NextSequence(), OriginCommands(a),
-                null),
-            AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewTarget, NextSequence(),
-                OriginCommands(a), null),
-            DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, new(), NextSequence(),
-                OriginCommands(a), null),
-            ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewTarget, new(),
-                NextSequence(), OriginCommands(a), null),
-        };
-
-    private NodeId GetParent(NodeId childId)
-    {
-        var child = (IWritableNode)_sharedNodeMap[childId];
-        return child.GetParent().GetId();
-    }
-
-    private MetaPointer GetContainment(NodeId childId)
-    {
-        var child = (IWritableNode)_sharedNodeMap[childId];
-        var parent = (IWritableNode)child.GetParent();
-        return parent.GetContainmentOf(child).ToMetaPointer();
-    }
-
-    private Index GetIndex(NodeId childId)
-    {
-        var child = (IWritableNode)_sharedNodeMap[childId];
-        var parent = (IWritableNode)child.GetParent();
-        var containment = parent.GetContainmentOf(child);
-        return M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList().IndexOf(child);
-    }
-
-    private Index GetAnnotationIndex(NodeId annotationId)
-    {
-        var annotation = _sharedNodeMap[annotationId];
-        var parent = annotation.GetParent();
-        return parent.GetAnnotations().ToList().IndexOf(annotation);
-    }
-
-
-    private long _nextSequence = 0;
-
-    private long NextSequence() =>
-        _nextSequence++;
-
-    private CommandSource[] OriginCommands(ISingleDeltaCommand a) =>
-        [new CommandSource("myParticipation", a.CommandId)];
-}
-
-internal class CommandIdProvider : ICommandIdProvider
+public class CommandIdProvider : ICommandIdProvider
 {
     private int nextId = 0;
     public string Create() => (++nextId).ToString();

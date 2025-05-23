@@ -117,7 +117,7 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     }
 }
 
-internal class SameIdCloner : Cloner
+public class SameIdCloner : Cloner
 {
     public SameIdCloner(IEnumerable<INode> inputNodes) : base(inputNodes)
     {
