@@ -95,6 +95,10 @@ public abstract class EventIdFilteringEventForwarder<TEvent, TPublisher>(TPublis
         _eventIds.Remove(eventId);
 
     /// <inheritdoc />
-    protected override bool Filter<TSubscribedEvent>(TEvent @event) =>
-        !_eventIds.Contains(@event.EventId);
+    protected override bool Filter<TSubscribedEvent>(TEvent @event)
+    {
+        var result = !_eventIds.Contains(@event.EventId);
+        Console.WriteLine($"Forwarding event id {@event.EventId}: {result}");
+        return result;
+    }
 }

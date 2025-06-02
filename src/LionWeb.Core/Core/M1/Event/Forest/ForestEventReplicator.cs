@@ -63,6 +63,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     /// <inheritdoc />
     protected override void ProcessEvent(object? sender, IForestEvent? @event)
     {
+        Console.WriteLine($"{this.GetType()}: processing event {@event}");
         switch (@event)
         {
             case PartitionAddedEvent a:

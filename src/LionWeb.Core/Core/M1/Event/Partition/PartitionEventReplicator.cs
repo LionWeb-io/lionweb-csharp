@@ -37,6 +37,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     /// <inheritdoc />
     protected override void ProcessEvent(object? sender, IPartitionEvent? @event)
     {
+        Console.WriteLine($"{sender}: processing event {@event}");
         switch (@event)
         {
             case PropertyAddedEvent a:
@@ -103,6 +104,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private void LocalHandler(object? sender, IPartitionEvent @event)
     {
+        // Console.WriteLine($"{this.GetType()}: Received event: {@event}");
         switch (@event)
         {
             case ChildAddedEvent a:
@@ -161,6 +163,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     private void OnRemotePropertyAdded(object? sender, PropertyAddedEvent @event) =>
         SuppressEventForwarding(() =>
         {
+            Console.WriteLine($"Node {@event.Node.PrintIdentity()}: Setting {@event.Property} to {@event.NewValue}");
             Lookup(@event.Node.GetId()).Set(@event.Property, @event.NewValue);
         });
 
@@ -188,6 +191,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
             var clone = Clone(newChildNode);
 
+            Console.WriteLine($"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {@event.Containment} at {@event.Index}");
             var newValue = InsertContainment(localParent, @event.Containment, @event.Index, clone);
 
             localParent.Set(@event.Containment, newValue);
