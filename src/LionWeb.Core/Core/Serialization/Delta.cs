@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Serialization;
 
+using System.Text;
 using TargetNode = NodeId;
 using CommandId = NodeId;
 using ParticipationId = NodeId;
@@ -57,6 +58,26 @@ public record DeltaSerializationChunk(SerializedNode[] Nodes)
 
         return HashCode.Combine(Nodes);
     }
+
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(Nodes));
+        builder.Append(" = [");
+        bool first = true;
+        foreach (var node in Nodes)
+        {
+            if (!first)
+            {
+                builder.Append(", ");
+            }
+
+            first = false;
+            builder.Append(node);
+        }
+        builder.Append(']');
+
+        return true;
+    }
 }
 
 public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageData[] Data)
@@ -92,6 +113,37 @@ public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageD
 
         return hashCode.ToHashCode();
     }
+
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(Kind));
+        builder.Append(" = ");
+        builder.Append(Kind);
+        builder.Append(", ");
+
+        builder.Append(nameof(Message));
+        builder.Append(" = ");
+        builder.Append(Message);
+        builder.Append(", ");
+
+        builder.Append(nameof(Data));
+        builder.Append(" = [");
+        bool first = true;
+        foreach (var data in Data)
+        {
+            if (!first)
+            {
+                builder.Append(", ");
+            }
+
+            first = false;
+            builder.Append(data);
+        }
+
+        builder.Append(']');
+
+        return true;
+    }
 }
 
 public record ProtocolMessageData(MessageDataKey Key, string Value);
@@ -112,7 +164,22 @@ public interface IDeltaQueryRequest : IDeltaQuery;
 
 public interface IDeltaQueryResponse : IDeltaQuery;
 
-public abstract record DeltaQueryBase(QueryId QueryId, ProtocolMessage? Message);
+public abstract record DeltaQueryBase(QueryId QueryId, ProtocolMessage? Message)
+{
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(QueryId));
+        builder.Append(" = ");
+        builder.Append(QueryId);
+        builder.Append(", ");
+
+        builder.Append(nameof(Message));
+        builder.Append(" = ");
+        builder.Append(Message);
+
+        return true;
+    }
+};
 
 public record SubscribePartitionsRequest(
     bool Creation,
@@ -169,13 +236,40 @@ public record GetAvailableIdsResponse(FreeId[] Ids, QueryId QueryId, ProtocolMes
 
         return hashCode.ToHashCode();
     }
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+
+        builder.Append(", ");
+        builder.Append(nameof(Ids));
+        builder.Append(" = [");
+        bool first = true;
+        foreach (var id in Ids)
+        {
+            if (!first)
+            {
+                builder.Append(", ");
+            }
+
+            first = false;
+            builder.Append(id);
+        }
+
+        builder.Append(']');
+
+        return true;
+    }
 }
 
 #endregion
 
 #region Command
 
-public interface IDeltaCommand : IDeltaContent;
+public interface IDeltaCommand : IDeltaContent
+{
+    CommandId? CommandId { get; }
+}
 
 public interface ISingleDeltaCommand : IDeltaCommand
 {
@@ -494,6 +588,8 @@ public record ChangeReferenceTarget(
 public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage? Message)
     : IDeltaCommand
 {
+    public CommandId? CommandId => null;
+
     /// <inheritdoc />
     public virtual bool Equals(CompositeCommand? other)
     {
@@ -521,6 +617,31 @@ public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage? 
 
         hashCode.Add(Message);
         return hashCode.ToHashCode();
+    }
+
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(Commands));
+        builder.Append(" = [");
+        bool first = true;
+        foreach (var command in Commands)
+        {
+            if (!first)
+            {
+                builder.Append(", ");
+            }
+
+            first = false;
+            builder.Append(command);
+        }
+        builder.Append("], ");
+
+        builder.Append(nameof(Message));
+        builder.Append(" = ");
+        builder.Append(Message);
+        builder.Append(", ");
+
+        return true;
     }
 }
 
@@ -571,6 +692,35 @@ public abstract record SingleDeltaEventBase(
         hashCode.Add(Message);
         return hashCode.ToHashCode();
     }
+
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(EventSequenceNumber));
+        builder.Append(" = ");
+        builder.Append(EventSequenceNumber);
+        builder.Append(", ");
+
+        builder.Append(nameof(OriginCommands));
+        builder.Append(" = [");
+        bool first = true;
+        foreach (var command in OriginCommands)
+        {
+            if (!first)
+            {
+                builder.Append(", ");
+            }
+
+            first = false;
+            builder.Append(command);
+        }
+        
+        builder.Append("], ");
+        builder.Append(nameof(Message));
+        builder.Append(" = ");
+        builder.Append(Message);
+
+        return true;
+    }
 }
 
 #region Partitions
@@ -581,13 +731,39 @@ public record PartitionAdded(
     DeltaSerializationChunk NewPartition,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewPartition));
+        builder.Append(" = ");
+        builder.Append(NewPartition);
+        
+        return true;
+    }
+}
 
 public record PartitionDeleted(
     DeltaSerializationChunk DeletedPartition,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(DeletedPartition));
+        builder.Append(" = ");
+        builder.Append(DeletedPartition);
+        
+        return true;
+    }
+}
 
 #endregion
 
@@ -601,7 +777,31 @@ public record ClassifierChanged(
     MetaPointer OldClassifier,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), INodeEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), INodeEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Node));
+        builder.Append(" = ");
+        builder.Append(Node);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewClassifier));
+        builder.Append(" = ");
+        builder.Append(NewClassifier);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldClassifier));
+        builder.Append(" = ");
+        builder.Append(OldClassifier);
+        
+        return true;
+    }
+    
+}
 
 #endregion
 
@@ -627,7 +827,30 @@ public record PropertyAdded(
     PropertyValue NewValue,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPropertyEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPropertyEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Property));
+        builder.Append(" = ");
+        builder.Append(Property);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewValue));
+        builder.Append(" = ");
+        builder.Append(NewValue);
+        
+        return true;
+    }
+}
 
 public record PropertyDeleted(
     TargetNode Parent,
@@ -635,7 +858,31 @@ public record PropertyDeleted(
     PropertyValue OldValue,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPropertyEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPropertyEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Property));
+        builder.Append(" = ");
+        builder.Append(Property);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldValue));
+        builder.Append(" = ");
+        builder.Append(OldValue);
+        
+        return true;
+    }
+    
+}
 
 public record PropertyChanged(
     TargetNode Parent,
@@ -644,7 +891,35 @@ public record PropertyChanged(
     PropertyValue OldValue,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPropertyEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPropertyEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Property));
+        builder.Append(" = ");
+        builder.Append(Property);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewValue));
+        builder.Append(" = ");
+        builder.Append(NewValue);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldValue));
+        builder.Append(" = ");
+        builder.Append(OldValue);
+        
+        return true;
+    }
+}
 
 #endregion
 
@@ -664,7 +939,35 @@ public record ChildAdded(
     DeltaSerializationChunk NewChild,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Containment));
+        builder.Append(" = ");
+        builder.Append(Containment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewChild));
+        builder.Append(" = ");
+        builder.Append(NewChild);
+        
+        return true;
+    }
+}
 
 public record ChildDeleted(
     TargetNode Parent,
@@ -673,7 +976,35 @@ public record ChildDeleted(
     DeltaSerializationChunk DeletedChild,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Containment));
+        builder.Append(" = ");
+        builder.Append(Containment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(DeletedChild));
+        builder.Append(" = ");
+        builder.Append(DeletedChild);
+        
+        return true;
+    }
+}
 
 public record ChildReplaced(
     TargetNode Parent,
@@ -683,7 +1014,40 @@ public record ChildReplaced(
     DeltaSerializationChunk ReplacedChild,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Containment));
+        builder.Append(" = ");
+        builder.Append(Containment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewChild));
+        builder.Append(" = ");
+        builder.Append(NewChild);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedChild));
+        builder.Append(" = ");
+        builder.Append(ReplacedChild);
+        
+        return true;
+    }
+}
 
 public record ChildMovedFromOtherContainment(
     TargetNode NewParent,
@@ -700,6 +1064,48 @@ public record ChildMovedFromOtherContainment(
     public TargetNode Parent => NewParent;
 
     MetaPointer IContainmentEvent.Containment => NewContainment;
+    
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewParent));
+        builder.Append(" = ");
+        builder.Append(NewParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewContainment));
+        builder.Append(" = ");
+        builder.Append(NewContainment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedChild));
+        builder.Append(" = ");
+        builder.Append(MovedChild);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldParent));
+        builder.Append(" = ");
+        builder.Append(OldParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldContainment));
+        builder.Append(" = ");
+        builder.Append(OldContainment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        return true;
+    }
 }
 
 public record ChildMovedFromOtherContainmentInSameParent(
@@ -714,6 +1120,43 @@ public record ChildMovedFromOtherContainmentInSameParent(
     ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
 {
     MetaPointer IContainmentEvent.Containment => NewContainment;
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewContainment));
+        builder.Append(" = ");
+        builder.Append(NewContainment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedChild));
+        builder.Append(" = ");
+        builder.Append(MovedChild);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldContainment));
+        builder.Append(" = ");
+        builder.Append(OldContainment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        return true;
+    }
 }
 
 public record ChildMovedInSameContainment(
@@ -724,7 +1167,40 @@ public record ChildMovedInSameContainment(
     Index OldIndex,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedChild));
+        builder.Append(" = ");
+        builder.Append(MovedChild);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Containment));
+        builder.Append(" = ");
+        builder.Append(Containment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        return true;
+    }
+}
 
 public record ChildMovedAndReplacedFromOtherContainment(
     TargetNode NewParent,
@@ -742,6 +1218,53 @@ public record ChildMovedAndReplacedFromOtherContainment(
     public TargetNode Parent => NewParent;
 
     MetaPointer IContainmentEvent.Containment => NewContainment;
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewParent));
+        builder.Append(" = ");
+        builder.Append(NewParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewContainment));
+        builder.Append(" = ");
+        builder.Append(NewContainment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedChild));
+        builder.Append(" = ");
+        builder.Append(MovedChild);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldParent));
+        builder.Append(" = ");
+        builder.Append(OldParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldContainment));
+        builder.Append(" = ");
+        builder.Append(OldContainment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedChild));
+        builder.Append(" = ");
+        builder.Append(ReplacedChild);
+        
+        return true;
+    }
 }
 
 public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
@@ -757,6 +1280,48 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
     ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
 {
     MetaPointer IContainmentEvent.Containment => NewContainment;
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewContainment));
+        builder.Append(" = ");
+        builder.Append(NewContainment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedChild));
+        builder.Append(" = ");
+        builder.Append(MovedChild);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldContainment));
+        builder.Append(" = ");
+        builder.Append(OldContainment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedChild));
+        builder.Append(" = ");
+        builder.Append(ReplacedChild);
+        
+        return true;
+    }
 }
 
 public record ChildMovedAndReplacedInSameContainment(
@@ -768,7 +1333,45 @@ public record ChildMovedAndReplacedInSameContainment(
     DeltaSerializationChunk ReplacedChild,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IContainmentEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedChild));
+        builder.Append(" = ");
+        builder.Append(MovedChild);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Containment));
+        builder.Append(" = ");
+        builder.Append(Containment);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedChild));
+        builder.Append(" = ");
+        builder.Append(ReplacedChild);
+        
+        return true;
+    }
+}
 
 #endregion
 
@@ -785,7 +1388,30 @@ public record AnnotationAdded(
     DeltaSerializationChunk NewAnnotation,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewAnnotation));
+        builder.Append(" = ");
+        builder.Append(NewAnnotation);
+        
+        return true;
+    }
+}
 
 public record AnnotationDeleted(
     TargetNode Parent,
@@ -793,7 +1419,30 @@ public record AnnotationDeleted(
     DeltaSerializationChunk DeletedAnnotation,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(DeletedAnnotation));
+        builder.Append(" = ");
+        builder.Append(DeletedAnnotation);
+        
+        return true;
+    }
+}
 
 public record AnnotationReplaced(
     TargetNode Parent,
@@ -802,7 +1451,35 @@ public record AnnotationReplaced(
     DeltaSerializationChunk ReplacedAnnotation,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewAnnotation));
+        builder.Append(" = ");
+        builder.Append(NewAnnotation);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedAnnotation));
+        builder.Append(" = ");
+        builder.Append(ReplacedAnnotation);
+        
+        return true;
+    }
+}
 
 public record AnnotationMovedFromOtherParent(
     TargetNode NewParent,
@@ -815,6 +1492,38 @@ public record AnnotationMovedFromOtherParent(
     ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent
 {
     TargetNode IAnnotationEvent.Parent => NewParent;
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewParent));
+        builder.Append(" = ");
+        builder.Append(NewParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedAnnotation));
+        builder.Append(" = ");
+        builder.Append(MovedAnnotation);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldParent));
+        builder.Append(" = ");
+        builder.Append(OldParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        return true;
+    }
 }
 
 public record AnnotationMovedInSameParent(
@@ -824,7 +1533,35 @@ public record AnnotationMovedInSameParent(
     Index OldIndex,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedAnnotation));
+        builder.Append(" = ");
+        builder.Append(MovedAnnotation);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        return true;
+    }
+}
 
 public record AnnotationMovedAndReplacedFromOtherParent(
     TargetNode NewParent,
@@ -838,6 +1575,43 @@ public record AnnotationMovedAndReplacedFromOtherParent(
     ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent
 {
     TargetNode IAnnotationEvent.Parent => NewParent;
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewParent));
+        builder.Append(" = ");
+        builder.Append(NewParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedAnnotation));
+        builder.Append(" = ");
+        builder.Append(MovedAnnotation);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldParent));
+        builder.Append(" = ");
+        builder.Append(OldParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedAnnotation));
+        builder.Append(" = ");
+        builder.Append(ReplacedAnnotation);
+        
+        return true;
+    }
 }
 
 public record AnnotationMovedAndReplacedInSameParent(
@@ -848,7 +1622,40 @@ public record AnnotationMovedAndReplacedInSameParent(
     DeltaSerializationChunk ReplacedAnnotation,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IAnnotationEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedAnnotation));
+        builder.Append(" = ");
+        builder.Append(MovedAnnotation);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedAnnotation));
+        builder.Append(" = ");
+        builder.Append(ReplacedAnnotation);
+        
+        return true;
+    }
+}
 
 #endregion
 
@@ -868,7 +1675,35 @@ public record ReferenceAdded(
     SerializedReferenceTarget NewTarget,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewTarget));
+        builder.Append(" = ");
+        builder.Append(NewTarget);
+        
+        return true;
+    }
+}
 
 public record ReferenceDeleted(
     TargetNode Parent,
@@ -877,7 +1712,35 @@ public record ReferenceDeleted(
     SerializedReferenceTarget DeletedTarget,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(DeletedTarget));
+        builder.Append(" = ");
+        builder.Append(DeletedTarget);
+        
+        return true;
+    }
+}
 
 public record ReferenceChanged(
     TargetNode Parent,
@@ -887,7 +1750,40 @@ public record ReferenceChanged(
     SerializedReferenceTarget ReplacedTarget,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewTarget));
+        builder.Append(" = ");
+        builder.Append(NewTarget);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedTarget));
+        builder.Append(" = ");
+        builder.Append(ReplacedTarget);
+        
+        return true;
+    }
+}
 
 public record EntryMovedFromOtherReference(
     TargetNode NewParent,
@@ -904,6 +1800,48 @@ public record EntryMovedFromOtherReference(
     public TargetNode Parent => NewParent;
 
     MetaPointer IReferenceEvent.Reference => NewReference;
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewParent));
+        builder.Append(" = ");
+        builder.Append(NewParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewReference));
+        builder.Append(" = ");
+        builder.Append(NewReference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldParent));
+        builder.Append(" = ");
+        builder.Append(OldParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldReference));
+        builder.Append(" = ");
+        builder.Append(OldReference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedEntry));
+        builder.Append(" = ");
+        builder.Append(MovedEntry);
+        
+        return true;
+    }
 }
 
 public record EntryMovedFromOtherReferenceInSameParent(
@@ -918,6 +1856,43 @@ public record EntryMovedFromOtherReferenceInSameParent(
     ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
 {
     MetaPointer IReferenceEvent.Reference => NewReference;
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewReference));
+        builder.Append(" = ");
+        builder.Append(NewReference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldReference));
+        builder.Append(" = ");
+        builder.Append(OldReference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedEntry));
+        builder.Append(" = ");
+        builder.Append(MovedEntry);
+        
+        return true;
+    }
 }
 
 public record EntryMovedInSameReference(
@@ -928,7 +1903,40 @@ public record EntryMovedInSameReference(
     SerializedReferenceTarget MovedEntry,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedEntry));
+        builder.Append(" = ");
+        builder.Append(MovedEntry);
+        
+        return true;
+    }
+}
 
 public record EntryMovedAndReplacedFromOtherReference(
     TargetNode NewParent,
@@ -946,6 +1954,53 @@ public record EntryMovedAndReplacedFromOtherReference(
     public TargetNode Parent => NewParent;
 
     MetaPointer IReferenceEvent.Reference => NewReference;
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewParent));
+        builder.Append(" = ");
+        builder.Append(NewParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewReference));
+        builder.Append(" = ");
+        builder.Append(NewReference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldParent));
+        builder.Append(" = ");
+        builder.Append(OldParent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldReference));
+        builder.Append(" = ");
+        builder.Append(OldReference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedEntry));
+        builder.Append(" = ");
+        builder.Append(MovedEntry);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedEntry));
+        builder.Append(" = ");
+        builder.Append(ReplacedEntry);
+        
+        return true;
+    }
 }
 
 public record EntryMovedAndReplacedFromOtherReferenceInSameParent(
@@ -961,6 +2016,48 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParent(
     ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
 {
     MetaPointer IReferenceEvent.Reference => NewReference;
+
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewReference));
+        builder.Append(" = ");
+        builder.Append(NewReference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldReference));
+        builder.Append(" = ");
+        builder.Append(OldReference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedEntry));
+        builder.Append(" = ");
+        builder.Append(MovedEntry);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedEntry));
+        builder.Append(" = ");
+        builder.Append(ReplacedEntry);
+        
+        return true;
+    }
 }
 
 public record EntryMovedAndReplacedInSameReference(
@@ -972,7 +2069,45 @@ public record EntryMovedAndReplacedInSameReference(
     SerializedReferenceTarget ReplacedEntry,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewIndex));
+        builder.Append(" = ");
+        builder.Append(NewIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(OldIndex));
+        builder.Append(" = ");
+        builder.Append(OldIndex);
+        
+        builder.Append(", ");
+        builder.Append(nameof(MovedEntry));
+        builder.Append(" = ");
+        builder.Append(MovedEntry);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedEntry));
+        builder.Append(" = ");
+        builder.Append(ReplacedEntry);
+        
+        return true;
+    }
+}
 
 public record ReferenceResolveInfoAdded(
     TargetNode Parent,
@@ -982,7 +2117,40 @@ public record ReferenceResolveInfoAdded(
     TargetNode Target,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewResolveInfo));
+        builder.Append(" = ");
+        builder.Append(NewResolveInfo);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Target));
+        builder.Append(" = ");
+        builder.Append(Target);
+        
+        return true;
+    }
+}
 
 public record ReferenceResolveInfoDeleted(
     TargetNode Parent,
@@ -992,7 +2160,40 @@ public record ReferenceResolveInfoDeleted(
     ResolveInfo DeletedResolveInfo,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Target));
+        builder.Append(" = ");
+        builder.Append(Target);
+        
+        builder.Append(", ");
+        builder.Append(nameof(DeletedResolveInfo));
+        builder.Append(" = ");
+        builder.Append(DeletedResolveInfo);
+        
+        return true;
+    }
+}
 
 public record ReferenceResolveInfoChanged(
     TargetNode Parent,
@@ -1003,7 +2204,45 @@ public record ReferenceResolveInfoChanged(
     ResolveInfo ReplacedResolveInfo,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewResolveInfo));
+        builder.Append(" = ");
+        builder.Append(NewResolveInfo);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Target));
+        builder.Append(" = ");
+        builder.Append(Target);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedResolveInfo));
+        builder.Append(" = ");
+        builder.Append(ReplacedResolveInfo);
+        
+        return true;
+    }
+}
 
 public record ReferenceTargetAdded(
     TargetNode Parent,
@@ -1013,7 +2252,40 @@ public record ReferenceTargetAdded(
     ResolveInfo ResolveInfo,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewTarget));
+        builder.Append(" = ");
+        builder.Append(NewTarget);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ResolveInfo));
+        builder.Append(" = ");
+        builder.Append(ResolveInfo);
+        
+        return true;
+    }
+}
 
 public record ReferenceTargetDeleted(
     TargetNode Parent,
@@ -1023,7 +2295,40 @@ public record ReferenceTargetDeleted(
     TargetNode DeletedTarget,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ResolveInfo));
+        builder.Append(" = ");
+        builder.Append(ResolveInfo);
+        
+        builder.Append(", ");
+        builder.Append(nameof(DeletedTarget));
+        builder.Append(" = ");
+        builder.Append(DeletedTarget);
+        
+        return true;
+    }
+}
 
 public record ReferenceTargetChanged(
     TargetNode Parent,
@@ -1034,7 +2339,45 @@ public record ReferenceTargetChanged(
     TargetNode ReplacedTarget,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent;
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IReferenceEvent
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        
+        builder.Append(", ");
+        builder.Append(nameof(Index));
+        builder.Append(" = ");
+        builder.Append(Index);
+        
+        builder.Append(", ");
+        builder.Append(nameof(NewTarget));
+        builder.Append(" = ");
+        builder.Append(NewTarget);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ResolveInfo));
+        builder.Append(" = ");
+        builder.Append(ResolveInfo);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ReplacedTarget));
+        builder.Append(" = ");
+        builder.Append(ReplacedTarget);
+        
+        return true;
+    }
+}
 
 #endregion
 
@@ -1074,20 +2417,70 @@ public record CompositeEvent(
         hashCode.Add(Message);
         return hashCode.ToHashCode();
     }
+
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(Events));
+        builder.Append(" = [");
+        bool first = true;
+        foreach (var node in Events)
+        {
+            if (!first)
+            {
+                builder.Append(", ");
+            }
+
+            first = false;
+            builder.Append(node);
+        }
+        builder.Append("], ");
+        
+        builder.Append(nameof(EventSequenceNumber));
+        builder.Append(" = ");
+        builder.Append(EventSequenceNumber);
+        builder.Append(", ");
+        
+        builder.Append(nameof(Message));
+        builder.Append(" = ");
+        builder.Append(Message);
+        
+        return true;
+    }
 }
 
 public record NoOpEvent(
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
     ProtocolMessage? Message)
-    : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message);
+    : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message)
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        return true;
+    }
+}
 
 public record Error(
     string ErrorCode,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
     ProtocolMessage Message)
-    : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message);
+    : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message)
+{
+    protected override bool PrintMembers(StringBuilder builder)
+    {
+        base.PrintMembers(builder);
+        
+        builder.Append(", ");
+        builder.Append(nameof(ErrorCode));
+        builder.Append(" = ");
+        builder.Append(ErrorCode);
+        
+        return true;
+    }
+}
 
 #endregion
 

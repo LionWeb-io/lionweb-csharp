@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.Serialization;
 
+using System.Text;
+
 /// <summary>
 /// This type, together with all the types in this file, represent data structures
 /// to capture a parsing of a LionWeb serialization chunk in JSON format.
@@ -125,6 +127,81 @@ public record SerializedNode
         return hashCode.ToHashCode();
     }
 
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(Id));
+        builder.Append(" = ");
+        builder.Append(Id);
+        builder.Append(", ");
+
+        builder.Append(nameof(Classifier));
+        builder.Append(" = ");
+        builder.Append(Classifier);
+        builder.Append(", ");
+
+        builder.Append(nameof(Properties));
+        builder.Append(" = [");
+        bool firstProperty = true;
+        foreach (var property in Properties)
+        {
+            if (!firstProperty)
+            {
+                builder.Append(", ");
+            }
+            firstProperty = false;
+            builder.Append(property);
+        }
+        builder.Append("], ");
+
+        builder.Append(nameof(Containments));
+        builder.Append(" = [");
+        bool firstContainment = true;
+        foreach (var containment in Containments)
+        {
+            if (!firstContainment)
+            {
+                builder.Append(", ");
+            }
+            firstContainment = false;
+            builder.Append(containment);
+        }
+        builder.Append("], ");
+
+        builder.Append(nameof(References));
+        builder.Append(" = [");
+        bool firstReference = true;
+        foreach (var reference in References)
+        {
+            if (!firstReference)
+            {
+                builder.Append(", ");
+            }
+            firstReference = false;
+            builder.Append(reference);
+        }
+        builder.Append("], ");
+
+        builder.Append(nameof(Annotations));
+        builder.Append(" = [");
+        bool firstAnnotation = true;
+        foreach (var annotation in Annotations)
+        {
+            if (!firstAnnotation)
+            {
+                builder.Append(", ");
+            }
+            firstAnnotation = false;
+            builder.Append(annotation);
+        }
+        builder.Append("], ");
+
+        builder.Append(nameof(Parent));
+        builder.Append(" = ");
+        builder.Append(Parent);
+
+        return true;
+    }
+
     public required string Id { get; init; }
     public required MetaPointer Classifier { get; init; }
     public required SerializedProperty[] Properties { get; init; }
@@ -174,6 +251,30 @@ public record SerializedContainment
         return hashCode.ToHashCode();
     }
 
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(Containment));
+        builder.Append(" = ");
+        builder.Append(Containment);
+        builder.Append(", ");
+
+        builder.Append(nameof(Children));
+        builder.Append(" = [");
+        bool first = true;
+        foreach (var child in Children)
+        {
+            if (!first)
+            {
+                builder.Append(", ");
+            }
+            first = false;
+            builder.Append(child);
+        }
+        builder.Append(']');
+        
+        return true;
+    }
+
     public required MetaPointer Containment { get; init; }
     public required string[] Children { get; init; }
 }
@@ -213,6 +314,30 @@ public record SerializedReference
         }
 
         return hashCode.ToHashCode();
+    }
+
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(Reference));
+        builder.Append(" = ");
+        builder.Append(Reference);
+        builder.Append(", ");
+
+        builder.Append(nameof(Targets));
+        builder.Append(" = [");
+        bool first = true;
+        foreach (var target in Targets)
+        {
+            if (!first)
+            {
+                builder.Append(", ");
+            }
+            first = false;
+            builder.Append(target);
+        }
+        builder.Append(']');
+        
+        return true;
     }
 
     public required MetaPointer Reference { get; init; }
