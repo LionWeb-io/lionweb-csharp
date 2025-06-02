@@ -24,14 +24,14 @@ using M3;
 using TargetNode = NodeId;
 using SemanticPropertyValue = object;
 
-public class DeltaProtocolPartitionEventReceiver
+public class DeltaProtocolPartitionCommandReceiver
 {
     private readonly PartitionEventHandler _eventHandler;
     private readonly Dictionary<NodeId, IReadableNode> _sharedNodeMap;
     private readonly Dictionary<CompressedMetaPointer, IKeyed> _sharedKeyedMap;
     private readonly DeserializerBuilder _deserializerBuilder;
 
-    public DeltaProtocolPartitionEventReceiver(
+    public DeltaProtocolPartitionCommandReceiver(
         PartitionEventHandler eventHandler,
         Dictionary<NodeId, IReadableNode> sharedNodeMap,
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
@@ -45,37 +45,35 @@ public class DeltaProtocolPartitionEventReceiver
     }
 
 
-    public void Receive(IDeltaEvent deltaEvent)
+    public void Receive(IDeltaCommand deltaCommand)
     {
-        M1.Event.Partition.IPartitionEvent partitionEvent = deltaEvent switch
+        M1.Event.Partition.IPartitionEvent partitionCommand = deltaCommand switch
         {
-            PropertyAdded a => OnPropertyAdded(a),
-            PropertyDeleted a => OnPropertyDeleted(a),
-            PropertyChanged a => OnPropertyChanged(a),
-            ChildAdded a => OnChildAdded(a),
-            ChildDeleted a => OnChildDeleted(a),
-            ChildReplaced a => OnChildReplaced(a),
-            ChildMovedFromOtherContainment a => OnChildMovedFromOtherContainment(a),
-            ChildMovedFromOtherContainmentInSameParent a => OnChildMovedFromOtherContainmentInSameParent(a),
-            ChildMovedInSameContainment a => OnChildMovedInSameContainment(a),
-            AnnotationAdded a => OnAnnotationAdded(a),
-            AnnotationDeleted a => OnAnnotationDeleted(a),
-            AnnotationMovedFromOtherParent a => OnAnnotationMovedFromOtherParent(a),
-            AnnotationMovedInSameParent a => OnAnnotationMovedInSameParent(a),
-            ReferenceAdded a => OnReferenceAdded(a),
-            ReferenceDeleted a => OnReferenceDeleted(a),
-            ReferenceChanged a => OnReferenceChanged(a),
-            _ => throw new NotImplementedException(deltaEvent.GetType().Name)
+            AddProperty a => OnAddProperty(a),
+            DeleteProperty a => OnDeleteProperty(a),
+            ChangeProperty a => OnChangeProperty(a),
+            AddChild a => OnAddChild(a),
+            DeleteChild a => OnDeleteChild(a),
+            ReplaceChild a => OnReplaceChild(a),
+            MoveChildFromOtherContainment a => OnMoveChildFromOtherContainment(a),
+            MoveChildFromOtherContainmentInSameParent a => OnMoveChildFromOtherContainmentInSameParent(a),
+            MoveChildInSameContainment a => OnMoveChildInSameContainment(a),
+            AddAnnotation a => OnAddAnnotation(a),
+            DeleteAnnotation a => OnDeleteAnnotation(a),
+            MoveAnnotationFromOtherParent a => OnMoveAnnotationFromOtherParent(a),
+            MoveAnnotationInSameParent a => OnMoveAnnotationInSameParent(a),
+            AddReference a => OnAddReference(a),
+            DeleteReference a => OnDeleteReference(a),
+            ChangeReference a => OnChangeReference(a),
+            _ => throw new NotImplementedException(deltaCommand.GetType().Name)
         };
         
-        // Console.WriteLine($"raising {partitionEvent}");
-
-        _eventHandler.Raise(partitionEvent);
+        _eventHandler.Raise(partitionCommand);
     }
 
     #region Properties
 
-    private PropertyAddedEvent OnPropertyAdded(PropertyAdded @event)
+    private PropertyAddedEvent OnAddProperty(AddProperty @event)
     {
         var parent = ToNode(@event.Parent);
         var property = ToProperty(@event.Property, parent);
@@ -83,11 +81,11 @@ public class DeltaProtocolPartitionEventReceiver
             parent,
             property,
             ToPropertyValue(parent, property, @event.NewValue),
-            ToEventId(@event)
+            ToCommandId(@event)
         );
     }
 
-    private PropertyDeletedEvent OnPropertyDeleted(PropertyDeleted @event)
+    private PropertyDeletedEvent OnDeleteProperty(DeleteProperty @event)
     {
         var parent = ToNode(@event.Parent);
         var property = ToProperty(@event.Property, parent);
@@ -95,11 +93,11 @@ public class DeltaProtocolPartitionEventReceiver
             parent,
             property,
             parent.Get(property) ?? throw new UnsetFeatureException(property),
-            ToEventId(@event)
+            ToCommandId(@event)
         );
     }
 
-    private PropertyChangedEvent OnPropertyChanged(PropertyChanged @event)
+    private PropertyChangedEvent OnChangeProperty(ChangeProperty @event)
     {
         var parent = ToNode(@event.Parent);
         var property = ToProperty(@event.Property, parent);
@@ -108,7 +106,7 @@ public class DeltaProtocolPartitionEventReceiver
             property,
             ToPropertyValue(parent, property, @event.NewValue),
             parent.Get(property) ?? throw new UnsetFeatureException(property),
-            ToEventId(@event)
+            ToCommandId(@event)
         );
     }
 
@@ -123,7 +121,7 @@ public class DeltaProtocolPartitionEventReceiver
 
     #region Children
 
-    private ChildAddedEvent OnChildAdded(ChildAdded @event)
+    private ChildAddedEvent OnAddChild(AddChild @event)
     {
         var parent = ToNode(@event.Parent);
         var containment = ToContainment(@event.Containment, parent);
@@ -132,11 +130,11 @@ public class DeltaProtocolPartitionEventReceiver
             Deserialize(@event.NewChild),
             containment,
             @event.Index,
-            ToEventId(@event)
+            ToCommandId(@event)
         );
     }
 
-    private ChildDeletedEvent OnChildDeleted(ChildDeleted @event)
+    private ChildDeletedEvent OnDeleteChild(DeleteChild @event)
     {
         var parent = ToNode(@event.Parent);
         var containment = ToContainment(@event.Containment, parent);
@@ -145,11 +143,11 @@ public class DeltaProtocolPartitionEventReceiver
             parent,
             containment,
             @event.Index,
-            ToEventId(@event)
+            ToCommandId(@event)
         );
     }
 
-    private ChildReplacedEvent OnChildReplaced(ChildReplaced @event)
+    private ChildReplacedEvent OnReplaceChild(ReplaceChild @event)
     {
         var parent = ToNode(@event.Parent);
         var containment = ToContainment(@event.Containment, parent);
@@ -159,16 +157,16 @@ public class DeltaProtocolPartitionEventReceiver
             parent,
             containment,
             @event.Index,
-            ToEventId(@event)
+            ToCommandId(@event)
         );
     }
 
-    private ChildMovedFromOtherContainmentEvent OnChildMovedFromOtherContainment(ChildMovedFromOtherContainment @event)
+    private ChildMovedFromOtherContainmentEvent OnMoveChildFromOtherContainment(MoveChildFromOtherContainment @event)
     {
         var movedChild = ToNode(@event.MovedChild);
-        var oldParent = ToNode(@event.OldParent);
+        var oldParent = (IWritableNode) movedChild.GetParent();
         var newParent = ToNode(@event.NewParent);
-        var oldContainment = ToContainment(@event.OldContainment, oldParent);
+        var oldContainment = oldParent.GetContainmentOf(movedChild);
         var newContainment = ToContainment(@event.NewContainment, newParent);
         return new ChildMovedFromOtherContainmentEvent(
             newParent,
@@ -177,17 +175,17 @@ public class DeltaProtocolPartitionEventReceiver
             movedChild,
             oldParent,
             oldContainment,
-            @event.OldIndex,
-            ToEventId(@event)
+            0, // TODO FIXME
+            ToCommandId(@event)
         );
     }
 
-    private ChildMovedFromOtherContainmentInSameParentEvent OnChildMovedFromOtherContainmentInSameParent(
-        ChildMovedFromOtherContainmentInSameParent @event)
+    private ChildMovedFromOtherContainmentInSameParentEvent OnMoveChildFromOtherContainmentInSameParent(
+        MoveChildFromOtherContainmentInSameParent @event)
     {
-        var parent = ToNode(@event.Parent);
         var movedChild = ToNode(@event.MovedChild);
-        var oldContainment = ToContainment(@event.OldContainment, parent);
+        var parent = (IWritableNode) movedChild.GetParent();
+        var oldContainment = parent.GetContainmentOf(movedChild);
         var newContainment = ToContainment(@event.NewContainment, parent);
         return new ChildMovedFromOtherContainmentInSameParentEvent(
             newContainment,
@@ -195,23 +193,23 @@ public class DeltaProtocolPartitionEventReceiver
             movedChild,
             parent,
             oldContainment,
-            @event.OldIndex,
-            ToEventId(@event)
+            0, // TODO FIXME
+            ToCommandId(@event)
         );
     }
 
-    private ChildMovedInSameContainmentEvent OnChildMovedInSameContainment(ChildMovedInSameContainment @event)
+    private ChildMovedInSameContainmentEvent OnMoveChildInSameContainment(MoveChildInSameContainment @event)
     {
-        var parent = ToNode(@event.Parent);
         var movedChild = ToNode(@event.MovedChild);
-        var containment = ToContainment(@event.Containment, parent);
+        var parent = (IWritableNode) movedChild.GetParent();
+        var containment = parent.GetContainmentOf(movedChild);
         return new ChildMovedInSameContainmentEvent(
             @event.NewIndex,
             movedChild,
             parent,
             containment,
-            @event.OldIndex,
-            ToEventId(@event)
+            0, // TODO FIXME
+            ToCommandId(@event)
         );
     }
 
@@ -222,18 +220,18 @@ public class DeltaProtocolPartitionEventReceiver
 
     #region Annotations
 
-    private AnnotationAddedEvent OnAnnotationAdded(AnnotationAdded @event)
+    private AnnotationAddedEvent OnAddAnnotation(AddAnnotation @event)
     {
         var parent = ToNode(@event.Parent);
         return new AnnotationAddedEvent(
             parent,
             Deserialize(@event.NewAnnotation),
             @event.Index,
-            ToEventId(@event)
+            ToCommandId(@event)
         );
     }
 
-    private AnnotationDeletedEvent OnAnnotationDeleted(AnnotationDeleted @event)
+    private AnnotationDeletedEvent OnDeleteAnnotation(DeleteAnnotation @event)
     {
         var parent = ToNode(@event.Parent);
         var deletedAnnotation = parent.GetAnnotations()[@event.Index];
@@ -241,35 +239,35 @@ public class DeltaProtocolPartitionEventReceiver
             deletedAnnotation as IWritableNode ?? throw new InvalidValueException(null, deletedAnnotation),
             parent,
             @event.Index,
-            ToEventId(@event)
+            ToCommandId(@event)
         );
     }
 
-    private AnnotationMovedFromOtherParentEvent OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParent @event)
+    private AnnotationMovedFromOtherParentEvent OnMoveAnnotationFromOtherParent(MoveAnnotationFromOtherParent @event)
     {
-        var oldParent = ToNode(@event.OldParent);
-        var newParent = ToNode(@event.NewParent);
         var movedAnnotation = ToNode(@event.MovedAnnotation);
+        var oldParent = (IWritableNode) movedAnnotation.GetParent();
+        var newParent = ToNode(@event.NewParent);
         return new AnnotationMovedFromOtherParentEvent(
             newParent,
             @event.NewIndex,
             movedAnnotation,
             oldParent,
-            @event.OldIndex,
-            ToEventId(@event)
+            0, // TODO FIXME
+            ToCommandId(@event)
         );
     }
 
-    private AnnotationMovedInSameParentEvent OnAnnotationMovedInSameParent(AnnotationMovedInSameParent @event)
+    private AnnotationMovedInSameParentEvent OnMoveAnnotationInSameParent(MoveAnnotationInSameParent @event)
     {
-        var parent = ToNode(@event.Parent);
         var movedAnnotation = ToNode(@event.MovedAnnotation);
+        var parent = (IWritableNode) movedAnnotation.GetParent();
         return new AnnotationMovedInSameParentEvent(
             @event.NewIndex,
             movedAnnotation,
             parent,
-            @event.OldIndex,
-            ToEventId(@event)
+            0, // TODO FIXME
+            ToCommandId(@event)
         );
     }
 
@@ -277,7 +275,7 @@ public class DeltaProtocolPartitionEventReceiver
 
     #region References
 
-    private ReferenceAddedEvent OnReferenceAdded(ReferenceAdded @event)
+    private ReferenceAddedEvent OnAddReference(AddReference @event)
     {
         var parent = ToNode(@event.Parent);
         var reference = ToReference(@event.Reference, parent);
@@ -286,11 +284,11 @@ public class DeltaProtocolPartitionEventReceiver
             reference,
             @event.Index,
             ToTarget(@event.NewTarget),
-            ToEventId(@event)
+            ToCommandId(@event)
         );
     }
 
-    private ReferenceDeletedEvent OnReferenceDeleted(ReferenceDeleted @event)
+    private ReferenceDeletedEvent OnDeleteReference(DeleteReference @event)
     {
         var parent = ToNode(@event.Parent);
         var reference = ToReference(@event.Reference, parent);
@@ -298,12 +296,12 @@ public class DeltaProtocolPartitionEventReceiver
             parent,
             reference,
             @event.Index,
-            ToTarget(@event.DeletedTarget),
-            ToEventId(@event)
+            new ReferenceTarget(null, parent.Get(reference) as IReadableNode),
+            ToCommandId(@event)
         );
     }
 
-    private ReferenceChangedEvent OnReferenceChanged(ReferenceChanged @event)
+    private ReferenceChangedEvent OnChangeReference(ChangeReference @event)
     {
         var parent = ToNode(@event.Parent);
         var reference = ToReference(@event.Reference, parent);
@@ -312,8 +310,8 @@ public class DeltaProtocolPartitionEventReceiver
             reference,
             @event.Index,
             ToTarget(@event.NewTarget),
-            ToTarget(@event.ReplacedTarget),
-            ToEventId(@event)
+            new ReferenceTarget(null, parent.Get(reference) as IReadableNode),
+            ToCommandId(@event)
         );
     }
 
@@ -333,8 +331,8 @@ public class DeltaProtocolPartitionEventReceiver
     #endregion
 
 
-    private static EventId ToEventId(ISingleDeltaEvent @event) =>
-        string.Join("_", @event.OriginCommands.Select(c => c.CommandId));
+    private static CommandId ToCommandId(ISingleDeltaCommand command) =>
+        command.CommandId;
 
     private IWritableNode ToNode(TargetNode nodeId)
     {

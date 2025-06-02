@@ -144,7 +144,7 @@ public class WebSocketTests
 
         public void Send(Action<string> action)
         {
-            var commandToEventMapper = new CommandToEventMapper(_sharedNodeMap);
+            var commandToEventMapper = new CommandToEventMapper(_name, _sharedNodeMap);
 
             var commandSender =
                 new DeltaProtocolPartitionCommandSender(_publisher, new CommandIdProvider(), lionWebVersion);

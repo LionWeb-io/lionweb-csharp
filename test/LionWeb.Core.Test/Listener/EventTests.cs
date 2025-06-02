@@ -709,7 +709,7 @@ public class EventsTestSerialized : EventTestsBase
             deserializerBuilder
         );
 
-        var commandToEventMapper = new CommandToEventMapper(sharedNodeMap);
+        var commandToEventMapper = new CommandToEventMapper("myParticipation", sharedNodeMap);
         commandSender.DeltaCommand += (sender, command) => eventReceiver.Receive(commandToEventMapper.Map(command));
 
         var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
@@ -751,7 +751,7 @@ public class EventsTestJson : EventTestsBase
 
         var deltaSerializer = new DeltaSerializer();
 
-        var commandToEventMapper = new CommandToEventMapper(sharedNodeMap);
+        var commandToEventMapper = new CommandToEventMapper("myParticipation", sharedNodeMap);
         commandSender.DeltaCommand += (sender, command) =>
         {
             var json = deltaSerializer.Serialize(command);

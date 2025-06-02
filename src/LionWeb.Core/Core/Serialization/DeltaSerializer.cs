@@ -37,7 +37,7 @@ public class DeltaSerializer
         JsonSerializer.Deserialize<T>(json, _jsonSerializerOptions);
 }
 
-internal class DeltaProtocolTypeResolver : DefaultJsonTypeInfoResolver
+public class DeltaProtocolTypeResolver : DefaultJsonTypeInfoResolver
     {
         private static readonly List<JsonDerivedType> _queries = [];
         private static readonly List<JsonDerivedType> _commands = [];
@@ -63,6 +63,7 @@ internal class DeltaProtocolTypeResolver : DefaultJsonTypeInfoResolver
             type.Assembly.GetTypes()
                 .Where(t => type.IsAssignableFrom(t) && !t.IsAbstract);
 
+        /// <inheritdoc />
         public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
         {
             JsonTypeInfo jsonTypeInfo = base.GetTypeInfo(type, options);

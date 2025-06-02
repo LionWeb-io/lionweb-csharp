@@ -20,14 +20,17 @@ namespace LionWeb.Core.Serialization;
 using M1;
 using M2;
 using M3;
+using ParticipationId = string;
 
 public class CommandToEventMapper
 {
     private readonly Dictionary<NodeId, IReadableNode> _sharedNodeMap;
+    private readonly ParticipationId _participationId;
 
-    public CommandToEventMapper(Dictionary<NodeId, IReadableNode> sharedNodeMap)
+    public CommandToEventMapper(ParticipationId participationId, Dictionary<NodeId, IReadableNode> sharedNodeMap)
     {
         _sharedNodeMap = sharedNodeMap;
+        _participationId = participationId;
     }
 
     public static Dictionary<CompressedMetaPointer, IKeyed> BuildSharedKeyMap(IEnumerable<Language> languages)
@@ -129,5 +132,5 @@ public class CommandToEventMapper
         _nextSequence++;
 
     private CommandSource[] OriginCommands(ISingleDeltaCommand a) =>
-        [new CommandSource("myParticipation", a.CommandId)];
+        [new CommandSource(_participationId, a.CommandId)];
 }
