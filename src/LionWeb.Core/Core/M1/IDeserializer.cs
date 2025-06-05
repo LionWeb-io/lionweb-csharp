@@ -20,6 +20,7 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
+using CompressedReference = (CompressedMetaPointer, List<(ICompressedId?, string?)>);
 
 /// <summary>
 /// Converts <see cref="SerializedNode">SerializedNodes</see> into <see cref="IReadableNode">IReadableNodes</see>.
@@ -71,6 +72,11 @@ public interface IDeserializer
 
     /// Version of LionWeb standard to use.
     LionWebVersions LionWebVersion { get; }
+
+    /// Installs all of <paramref name="references"/> into <paramref name="nodeId"/>, if the target can be found.
+    /// Takes care of <see cref="IDeserializerHandler.UnresolvableReferenceTarget"/>.
+    /// and <see cref="IDeserializerHandler.InvalidReference"/>.
+    protected internal void InstallNodeReferences(ICompressedId nodeId, IEnumerable<CompressedReference> references);
 }
 
 /// <inheritdoc />

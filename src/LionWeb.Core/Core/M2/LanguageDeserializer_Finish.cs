@@ -28,15 +28,6 @@ public partial class LanguageDeserializer
     {
         InstallLanguageLinks();
 
-        List<IWritableNode> deserializedAnnotationInstances = DeserializeAnnotations();
-        InstallAnnotationParents(deserializedAnnotationInstances);
-        InstallAnnotationReferences();
-
-        return _deserializedNodesById.Values.OfType<DynamicLanguage>();
-    }
-
-    private List<IWritableNode> DeserializeAnnotations()
-    {
         _deserializerBuilder
             .WithHandler(_handler)
             .WithCompressedIds(CompressedIdConfig)
@@ -46,6 +37,15 @@ public partial class LanguageDeserializer
 
         var deserializer = _deserializerBuilder.Build();
 
+        List<IWritableNode> deserializedAnnotationInstances = DeserializeAnnotations(deserializer);
+        InstallAnnotationParents(deserializedAnnotationInstances);
+        InstallAnnotationReferences(deserializer);
+
+        return _deserializedNodesById.Values.OfType<DynamicLanguage>();
+    }
+
+    private List<IWritableNode> DeserializeAnnotations(IDeserializer deserializer)
+    {
         var annotationNodes = _serializedNodesById
             .Where(p => !_deserializedNodesById.ContainsKey(p.Key))
             .Where(p => !IsInDependentNodes(p.Key))
@@ -110,14 +110,14 @@ public partial class LanguageDeserializer
         }
     }
 
-    private void InstallAnnotationReferences()
+    private void InstallAnnotationReferences(IDeserializer deserializer)
     {
         foreach (var serializedNode in _serializedNodesById.Values.Where(n => !IsLanguageNode(n)))
         {
-            InstallAnnotationReferences(serializedNode);
+            InstallAnnotationReferences(deserializer, serializedNode);
         }
     }
 
-    private void InstallAnnotationReferences(SerializedNode serializedNode) =>
-        InstallReferences(Compress(serializedNode.Id), serializedNode.References.Select(Compress));
+    private void InstallAnnotationReferences(IDeserializer deserializer, SerializedNode serializedNode) =>
+        deserializer.InstallNodeReferences(Compress(serializedNode.Id), serializedNode.References.Select(Compress));
 }

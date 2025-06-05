@@ -19,6 +19,8 @@ namespace LionWeb.Core.Test.Serialization;
 
 using Core.Serialization;
 using Core.Utilities;
+using Io.Lionweb.Mps.Specific;
+using Io.Lionweb.Mps.Specific.V2024_1;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 using M2;
@@ -316,6 +318,57 @@ public class LanguageSerializationTests
         };
 
         Assert.ThrowsException<DeserializerException>(() => ILanguageDeserializerExtensions.Deserialize(chunk));
+    }
+
+    [TestMethod]
+    public void LanguageWithMpsSpecific()
+    {
+        var lang = new DynamicLanguage("id-withMpsSpecific", _lionWebVersion)
+        {
+            Key = "key-withMpsSpecific", Version = "1", Name = "WithMpsSpecific"
+        };
+        lang.AddAnnotations([
+            new KeyedDescription("lang-desc") { Documentation = "lang doc" },
+            new VirtualPackage("lang-virt-package") { Name = "lang.virt.package" }
+        ]);
+
+        var concept = lang.Concept("id-specConcept", "key-specConcept", "specConcept");
+        concept.AddAnnotations([
+            new VirtualPackage("concept-virt-package") { Name = "concept.virt.package" },
+            new ConceptDescription("conceptDesc")
+            {
+                ConceptAlias = "Some concept",
+                ConceptShortDescription = "Some very strange concept",
+                HelpUrl = "https://example.com",
+            },
+            new ShortDescription("concept-short-desc") { Description = "very short concept" }
+        ]);
+
+        var prop = concept.Property("id-specProp", "key-specProp", "specProp").OfType(_lionWebVersion.BuiltIns.String)
+            .IsOptional();
+        prop.AddAnnotations([
+            new KeyedDescription("prop-desc") { Documentation = "prop doc", SeeAlso = [lang, lang.GetAnnotations()[0]] }
+        ]);
+
+        concept.AddAnnotations([
+            new KeyedDescription("concept-desc")
+            {
+                Documentation = "concept doc",
+                SeeAlso = [lang, lang.GetAnnotations()[0], prop, prop.GetAnnotations()[0]]
+            }
+        ]);
+
+        var serializationChunk = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build()
+            .SerializeToChunk([lang]);
+        Console.WriteLine(JsonUtils.WriteJsonToString(serializationChunk));
+
+        var deserializer = new LanguageDeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .Build();
+
+        var redeserialized = deserializer.Deserialize(serializationChunk, [ISpecificLanguage.Get(_lionWebVersion)]);
+        var comparer = new Comparer([lang], redeserialized.Cast<IReadableNode>().ToList());
+        Assert.IsTrue(comparer.AreEqual(), comparer.ToMessage(new ComparerOutputConfig()));
     }
 
     private TestContext testContextInstance;

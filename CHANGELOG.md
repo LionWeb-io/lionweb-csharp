@@ -55,7 +55,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * During deserialization, `ModelMigrator` would add a feature to the wrong language if the node's concept is from a 
   different language as the feature.
 * `Comparer` didn't recognize internal references to nodes that are children in single containments.
-* `Hasher` would not recognize internal references if it encounters the reference before the target node. 
+* `Hasher` would not recognize internal references if it encounters the reference before the target node.
+* Deserializing languages with annotations that contain references works now.
 ### Changed
 * Made `DynamicStructuredDataTypeInstance.GetHashCode()` more stable.
 * `DynamicLanguageCloner` doesn't change a language's factory anymore.

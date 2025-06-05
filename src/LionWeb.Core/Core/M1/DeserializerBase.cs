@@ -237,10 +237,11 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
         return default;
     }
 
-
-    /// Installs all of <paramref name="references"/> into <paramref name="nodeId"/>, if the target can be found.
-    /// Takes care of <see cref="IDeserializerHandler.UnresolvableReferenceTarget"/>.
-    /// and <see cref="IDeserializerHandler.InvalidReference"/>.
+    /// <inheritdoc />
+    void IDeserializer.InstallNodeReferences(ICompressedId nodeId, IEnumerable<CompressedReference> references) =>
+        InstallReferences(nodeId, references);
+    
+    /// <inheritdoc cref="IDeserializer.InstallNodeReferences"/>
     protected void InstallReferences(ICompressedId nodeId, IEnumerable<CompressedReference> references)
     {
         T node = _deserializedNodesById[nodeId];
