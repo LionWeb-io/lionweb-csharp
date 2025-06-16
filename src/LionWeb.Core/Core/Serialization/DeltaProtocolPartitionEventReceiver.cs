@@ -42,8 +42,6 @@ public class DeltaProtocolPartitionEventReceiver
     {
         IPartitionEvent partitionEvent = _mapper.Map(deltaEvent);
 
-        // Console.WriteLine($"raising {partitionEvent}");
-
         _eventHandler.Raise(partitionEvent);
     }
 }

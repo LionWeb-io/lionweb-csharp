@@ -18,6 +18,7 @@
 namespace LionWeb.Core.M1.Event.Forest;
 
 using Partition;
+using System.Diagnostics;
 
 /// Replicates events for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
 /// <inheritdoc cref="EventReplicatorBase{TEvent,TPublisher}"/>
@@ -63,7 +64,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     /// <inheritdoc />
     protected override void ProcessEvent(object? sender, IForestEvent? forestEvent)
     {
-        Console.WriteLine($"{this.GetType()}: processing event {forestEvent}");
+        Debug.WriteLine($"{this.GetType()}: processing event {forestEvent}");
         switch (forestEvent)
         {
             case PartitionAddedEvent a:

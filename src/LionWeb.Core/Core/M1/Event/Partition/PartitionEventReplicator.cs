@@ -19,6 +19,7 @@ namespace LionWeb.Core.M1.Event.Partition;
 
 using M3;
 using System.Collections;
+using System.Diagnostics;
 
 /// Replicates events for a <i>local</i> <see cref="IPartitionInstance">partition</see>.
 /// <inheritdoc cref="EventReplicatorBase{TEvent,TPublisher}"/>
@@ -37,7 +38,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     /// <inheritdoc />
     protected override void ProcessEvent(object? sender, IPartitionEvent? partitionEvent)
     {
-        Console.WriteLine($"{sender}: processing event {partitionEvent}");
+        Debug.WriteLine($"{sender}: processing event {partitionEvent}");
         switch (partitionEvent)
         {
             case PropertyAddedEvent a:
@@ -123,7 +124,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private void LocalHandler(object? sender, IPartitionEvent partitionEvent)
     {
-        // Console.WriteLine($"{this.GetType()}: Received event: {@event}");
         switch (partitionEvent)
         {
             case ChildAddedEvent a:
@@ -163,7 +163,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     private void OnRemotePropertyAdded(object? sender, PropertyAddedEvent propertyAddedEvent) =>
         SuppressEventForwarding(propertyAddedEvent, () =>
         {
-            Console.WriteLine($"Node {propertyAddedEvent.Node.PrintIdentity()}: Setting {propertyAddedEvent.Property} to {propertyAddedEvent.NewValue}");
+            Debug.WriteLine($"Node {propertyAddedEvent.Node.PrintIdentity()}: Setting {propertyAddedEvent.Property} to {propertyAddedEvent.NewValue}");
             Lookup(propertyAddedEvent.Node.GetId()).Set(propertyAddedEvent.Property, propertyAddedEvent.NewValue);
         });
 
@@ -191,7 +191,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
             var clone = Clone(newChildNode);
 
-            Console.WriteLine($"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {childAddedEvent.Containment} at {childAddedEvent.Index}");
+            Debug.WriteLine($"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {childAddedEvent.Containment} at {childAddedEvent.Index}");
             var newValue = InsertContainment(localParent, childAddedEvent.Containment, childAddedEvent.Index, clone);
 
             localParent.Set(childAddedEvent.Containment, newValue);

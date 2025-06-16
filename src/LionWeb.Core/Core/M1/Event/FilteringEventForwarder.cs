@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.M1.Event;
 
+using System.Diagnostics;
+
 /// Forwards events raised by <paramref name="localPublisher"/> to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>
 /// if the event passes <see cref="Filter{TSubscribedEvent}"/>.
 public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
@@ -39,7 +41,7 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
                 return;
 
             var r = Filter<TSubscribedEvent>(s);
-            Console.WriteLine($"Forwarding event id {@event.EventId}: {r?.EventId}");
+            Debug.WriteLine($"Forwarding event id {@event.EventId}: {r?.EventId}");
             if (r is not null)
                 handler(sender, s);
         };
