@@ -43,10 +43,10 @@ public class EventTests_MultiPartition
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> deletions = [];
-        node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
+        node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedChild)));
         List<(EventId, IReadableNode)> moves = [];
         node.GetPublisher()
-            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.AddShapes([moved]);
 
@@ -71,10 +71,10 @@ public class EventTests_MultiPartition
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
-            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedChild)));
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedChild)));
         List<(EventId, IReadableNode)> destinationMoves = [];
         node.GetPublisher()
-            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId, e.MovedChild)));
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.AddShapes([moved]);
 
@@ -100,10 +100,10 @@ public class EventTests_MultiPartition
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
-            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedChild)));
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedChild)));
         List<(EventId, IReadableNode)> destinationMoves = [];
         node.GetPublisher()
-            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId, e.MovedChild)));
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.InsertShapes(0, [moved]);
 
@@ -125,10 +125,10 @@ public class EventTests_MultiPartition
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> deletions = [];
-        node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedChild)));
+        node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedChild)));
         List<(EventId, IReadableNode)> moves = [];
         node.GetPublisher()
-            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId, e.MovedChild)));
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.Documentation = moved;
 
@@ -152,10 +152,10 @@ public class EventTests_MultiPartition
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
-            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedChild)));
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedChild)));
         List<(EventId, IReadableNode)> destinationMoves = [];
         node.GetPublisher()
-            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId, e.MovedChild)));
+            .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.Documentation = moved;
 
@@ -190,10 +190,10 @@ public class EventTests_MultiPartition
 
         List<(EventId, IReadableNode)> deletions = [];
         node.GetPublisher()
-            .Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId, e.DeletedAnnotation)));
+            .Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedAnnotation)));
         List<(EventId, IReadableNode)> moves = [];
         node.GetPublisher()
-            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => moves.Add((e.EventId, e.MovedAnnotation)));
+            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => moves.Add((e.EventId.ToString(), e.MovedAnnotation)));
 
         node.AddAnnotations([moved]);
 
@@ -219,11 +219,11 @@ public class EventTests_MultiPartition
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
-            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedAnnotation)));
+            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedAnnotation)));
         List<(EventId, IReadableNode)> destinationMoves = [];
         node.GetPublisher()
             .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) =>
-                destinationMoves.Add((e.EventId, e.MovedAnnotation)));
+                destinationMoves.Add((e.EventId.ToString(), e.MovedAnnotation)));
 
         node.AddAnnotations([moved]);
 
@@ -250,11 +250,11 @@ public class EventTests_MultiPartition
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
-            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => originMoves.Add((e.EventId, e.MovedAnnotation)));
+            .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedAnnotation)));
         List<(EventId, IReadableNode)> destinationMoves = [];
         node.GetPublisher()
             .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) =>
-                destinationMoves.Add((e.EventId, e.MovedAnnotation)));
+                destinationMoves.Add((e.EventId.ToString(), e.MovedAnnotation)));
 
         node.InsertAnnotations(0, [moved]);
 

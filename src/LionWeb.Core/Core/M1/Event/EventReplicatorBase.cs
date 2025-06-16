@@ -98,7 +98,7 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     /// to suppress forwarding events raised during executing <paramref name="action"/>. 
     protected void SuppressEventForwarding(Action action)
     {
-        EventId? eventId = null;
+        IEventId? eventId = null;
         if (_localCommander != null)
         {
             eventId = _localCommander.CreateEventId();

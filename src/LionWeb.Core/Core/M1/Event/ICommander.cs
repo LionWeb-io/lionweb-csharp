@@ -32,7 +32,7 @@ public interface ICommander<in TEvent> where TEvent : IEvent
     public bool CanRaise(params Type[] eventTypes);
 
     /// Either returns the next <see cref="RegisterEventId">registered event id</see>, or creates a globally unique one.
-    public EventId CreateEventId();
+    public IEventId CreateEventId();
     
     /// Registers <paramref name="eventId"/> in a FIFO queue.
     /// Each call to <see cref="CreateEventId"/> dequeues one entry, if available.
@@ -41,5 +41,5 @@ public interface ICommander<in TEvent> where TEvent : IEvent
     /// Allows callers to decide on the next event id used within their <i>asynchronous control flow</i>.
     /// </para>
     /// <seealso cref="AsyncLocal{T}"/>
-    void RegisterEventId(string eventId);
+    void RegisterEventId(IEventId eventId);
 }

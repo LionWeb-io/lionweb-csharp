@@ -53,7 +53,7 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     private readonly Dictionary<object, EventHandler<TEvent>> _handlers = [];
 
     // private readonly AsyncLocal<Queue<string>> _eventIds = new(x => new Queue<string>()) { Value = new() };
-    private readonly Queue<string> _eventIds = new();
+    private readonly Queue<IEventId> _eventIds = new();
 
     private event EventHandler<TEvent>? Event;
 
@@ -69,15 +69,17 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     }
 
     /// <inheritdoc />
-    public void RegisterEventId(EventId eventId)
+    public void RegisterEventId(IEventId eventId)
         // => _eventIds.Value!.Enqueue(eventId);
         => _eventIds.Enqueue(eventId);
 
     /// <inheritdoc />
-    public virtual EventId CreateEventId() =>
+    public virtual IEventId CreateEventId() =>
         // _eventIds.Value!
         _eventIds
-            .TryDequeue(out var registeredEventId) ? registeredEventId : (_eventIdPrefix + _nextId++);
+            .TryDequeue(out var registeredEventId)
+            ? registeredEventId
+            : new ParticipationEventId(ParticipationId, (_nextId++).ToString());
 
     /// <inheritdoc />
     public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent
@@ -140,3 +142,5 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
         Event != null &&
         eventTypes.Any(eventType => _subscribedEvents.TryGetValue(eventType, out var count) && count > 0);
 }
+
+public record ParticipationEventId(ParticipationId ParticipationId, CommandId CommandId) : IEventId;

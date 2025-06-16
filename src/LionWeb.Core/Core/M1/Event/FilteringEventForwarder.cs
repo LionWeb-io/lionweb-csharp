@@ -84,14 +84,14 @@ public abstract class EventIdFilteringEventForwarder<TEvent, TPublisher>(TPublis
     : FilteringEventForwarder<TEvent, TPublisher>(localPublisher)
     where TEvent : IEvent where TPublisher : IPublisher<TEvent>
 {
-    private readonly HashSet<EventId> _eventIds = [];
+    private readonly HashSet<IEventId> _eventIds = [];
 
     /// Suppresses future events with <paramref name="eventId"/> from <see cref="FilteringEventForwarder{TEvent,TPublisher}.Subscribe{TSubscribedEvent}">subscribers</see>.
-    protected void RegisterEventId(EventId eventId) =>
+    protected void RegisterEventId(IEventId eventId) =>
         _eventIds.Add(eventId);
 
     /// Forwards future events with <paramref name="eventId"/> to <see cref="FilteringEventForwarder{TEvent,TPublisher}.Subscribe{TSubscribedEvent}">subscribers</see>.
-    protected void UnregisterEventId(EventId eventId) =>
+    protected void UnregisterEventId(IEventId eventId) =>
         _eventIds.Remove(eventId);
 
     /// <inheritdoc />
