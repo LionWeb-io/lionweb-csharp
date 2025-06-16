@@ -20,11 +20,13 @@ namespace LionWeb.Core.M1.Event;
 using Forest;
 using Partition;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Utilities;
 
 public abstract class EventHandlerBase
 {
     protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
+    public abstract string ParticipationId { protected get; set; }
 
     private static ILookup<Type, Type> InitAllSubtypes()
     {
@@ -58,14 +60,25 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     private event EventHandler<TEvent>? Event;
 
     // Unique per instance
-    private readonly string _eventIdPrefix = IdUtils.NewId() + "-";
+    public override string ParticipationId
+    {
+        protected get => _participationId;
+        set
+        {
+            Console.WriteLine($"ParticipationId({RuntimeHelpers.GetHashCode(this)}): {value}-");
+            _participationId = value + "-";
+        }
+    }
+
     private int _nextId = 0;
+    private string _participationId;
 
     /// <inheritdoc cref="EventHandlerBase"/>
     /// <param name="sender">Optional sender of the events.</param>
     protected EventHandlerBase(object? sender)
     {
         _sender = sender ?? this;
+        ParticipationId = sender as string ?? IdUtils.NewId();
     }
 
     /// <inheritdoc />
