@@ -123,6 +123,10 @@ public class SameIdCloner : Cloner
     {
     }
 
+    /// <inheritdoc cref="Cloner.Clone()"/>
+    public static new T Clone<T>(T node) where T : class, INode =>
+        (T)new SameIdCloner([node]).Clone()[node];
+
     protected override string GetNewId(INode remoteNode) =>
         remoteNode.GetId();
 }
