@@ -21,4 +21,5 @@ global using ResolveInfo = string;
 global using MetaPointerKey = string;
 global using Index = int;
 global using EventId = string;
+global using ParticipationId = string;
 global using CommandId = string;

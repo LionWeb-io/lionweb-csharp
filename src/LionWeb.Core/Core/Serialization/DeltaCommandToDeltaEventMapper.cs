@@ -22,12 +22,12 @@ using M2;
 using M3;
 using ParticipationId = string;
 
-public class CommandToEventMapper
+public class DeltaCommandToDeltaEventMapper
 {
     private readonly Dictionary<NodeId, IReadableNode> _sharedNodeMap;
     private readonly ParticipationId _participationId;
 
-    public CommandToEventMapper(ParticipationId participationId, Dictionary<NodeId, IReadableNode> sharedNodeMap)
+    public DeltaCommandToDeltaEventMapper(ParticipationId participationId, Dictionary<NodeId, IReadableNode> sharedNodeMap)
     {
         _sharedNodeMap = sharedNodeMap;
         _participationId = participationId;

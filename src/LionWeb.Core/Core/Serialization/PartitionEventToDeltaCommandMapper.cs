@@ -18,149 +18,136 @@
 namespace LionWeb.Core.Serialization;
 
 using M1;
+using M1.Event;
 using M1.Event.Partition;
 using M3;
-using CommandId = NodeId;
-using SemanticPropertyValue = object;
 
-public class DeltaProtocolPartitionCommandSender
+public class PartitionEventToDeltaCommandMapper
 {
     private readonly ICommandIdProvider _commandIdProvider;
     private readonly LionWebVersions _lionWebVersion;
     private readonly ISerializerVersionSpecifics _propertySerializer;
 
-    public event EventHandler<IDeltaCommand>? DeltaCommand;
-
-    public DeltaProtocolPartitionCommandSender(IPartitionPublisher partitionPublisher,
-        ICommandIdProvider commandIdProvider, LionWebVersions lionWebVersion)
+    public PartitionEventToDeltaCommandMapper(ICommandIdProvider commandIdProvider, LionWebVersions lionWebVersion)
     {
-        partitionPublisher.Subscribe<M1.Event.Partition.IPartitionEvent>(ProcessEvent);
         _commandIdProvider = commandIdProvider;
         _lionWebVersion = lionWebVersion;
         _propertySerializer = ISerializerVersionSpecifics.Create(lionWebVersion);
     }
 
-    private void ProcessEvent(object? sender, M1.Event.Partition.IPartitionEvent? @event)
-    {
-        if (DeltaCommand == null || @event == null)
-            return;
-
-        IDeltaCommand deltaCommand = @event switch
+    public IDeltaCommand Map(IPartitionEvent partitionEvent) =>
+        partitionEvent switch
         {
-            PropertyAddedEvent a => OnPropertyAdded(sender, a),
-            PropertyDeletedEvent a => OnPropertyDeleted(sender, a),
-            PropertyChangedEvent a => OnPropertyChanged(sender, a),
-            ChildAddedEvent a => OnChildAdded(sender, a),
-            ChildDeletedEvent a => OnChildDeleted(sender, a),
-            ChildReplacedEvent a => OnChildReplaced(sender, a),
-            ChildMovedFromOtherContainmentEvent a => OnChildMovedFromOtherContainment(sender, a),
+            PropertyAddedEvent a => OnPropertyAdded(a),
+            PropertyDeletedEvent a => OnPropertyDeleted(a),
+            PropertyChangedEvent a => OnPropertyChanged(a),
+            ChildAddedEvent a => OnChildAdded(a),
+            ChildDeletedEvent a => OnChildDeleted(a),
+            ChildReplacedEvent a => OnChildReplaced(a),
+            ChildMovedFromOtherContainmentEvent a => OnChildMovedFromOtherContainment(a),
             ChildMovedFromOtherContainmentInSameParentEvent a =>
-                OnChildMovedFromOtherContainmentInSameParent(sender, a),
-            ChildMovedInSameContainmentEvent a => OnChildMovedInSameContainment(sender, a),
-            AnnotationAddedEvent a => OnAnnotationAdded(sender, a),
-            AnnotationDeletedEvent a => OnAnnotationDeleted(sender, a),
-            AnnotationMovedFromOtherParentEvent a => OnAnnotationMovedFromOtherParent(sender, a),
-            AnnotationMovedInSameParentEvent a => OnAnnotationMovedInSameParent(sender, a),
-            ReferenceAddedEvent a => OnReferenceAdded(sender, a),
-            ReferenceDeletedEvent a => OnReferenceDeleted(sender, a),
-            ReferenceChangedEvent a => OnReferenceChanged(sender, a),
-            _ => throw new NotImplementedException(@event.GetType().Name)
+                OnChildMovedFromOtherContainmentInSameParent(a),
+            ChildMovedInSameContainmentEvent a => OnChildMovedInSameContainment(a),
+            AnnotationAddedEvent a => OnAnnotationAdded(a),
+            AnnotationDeletedEvent a => OnAnnotationDeleted(a),
+            AnnotationMovedFromOtherParentEvent a => OnAnnotationMovedFromOtherParent(a),
+            AnnotationMovedInSameParentEvent a => OnAnnotationMovedInSameParent(a),
+            ReferenceAddedEvent a => OnReferenceAdded(a),
+            ReferenceDeletedEvent a => OnReferenceDeleted(a),
+            ReferenceChangedEvent a => OnReferenceChanged(a),
+            _ => throw new NotImplementedException(partitionEvent.GetType().Name)
         };
-
-        DeltaCommand.Invoke(sender, deltaCommand);
-    }
 
     #region Properties
 
-    private AddProperty OnPropertyAdded(object? sender, PropertyAddedEvent @event) =>
+    private AddProperty OnPropertyAdded(PropertyAddedEvent @event) =>
         new(
             @event.Node.GetId(),
             @event.Property.ToMetaPointer(),
             ToDelta(@event.Node, @event.Property, @event.NewValue)!,
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private DeleteProperty OnPropertyDeleted(object? sender, PropertyDeletedEvent @event) =>
+    private DeleteProperty OnPropertyDeleted(PropertyDeletedEvent @event) =>
         new(
             @event.Node.GetId(),
             @event.Property.ToMetaPointer(),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private ChangeProperty OnPropertyChanged(object? sender, PropertyChangedEvent @event) =>
+    private ChangeProperty OnPropertyChanged(PropertyChangedEvent @event) =>
         new(
             @event.Node.GetId(),
             @event.Property.ToMetaPointer(),
             ToDelta(@event.Node, @event.Property, @event.NewValue)!,
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private PropertyValue? ToDelta(IReadableNode parent, Property property, SemanticPropertyValue newValue) =>
+    private PropertyValue? ToDelta(IReadableNode parent, Property property, Object newValue) =>
         _propertySerializer.SerializeProperty(parent, property, newValue).Value;
 
     #endregion
 
     #region Children
 
-    private AddChild OnChildAdded(object? sender, ChildAddedEvent @event) =>
+    private AddChild OnChildAdded(ChildAddedEvent @event) =>
         new(
             @event.Parent.GetId(),
             @event.Containment.ToMetaPointer(),
             @event.Index,
             ToDeltaChunk(@event.NewChild),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private DeleteChild OnChildDeleted(object? sender, ChildDeletedEvent @event) =>
+    private DeleteChild OnChildDeleted(ChildDeletedEvent @event) =>
         new(
             @event.Parent.GetId(),
             @event.Containment.ToMetaPointer(),
             @event.Index,
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private ReplaceChild OnChildReplaced(object? sender, ChildReplacedEvent @event) =>
+    private ReplaceChild OnChildReplaced(ChildReplacedEvent @event) =>
         new(
             @event.Parent.GetId(),
             @event.Containment.ToMetaPointer(),
             @event.Index,
             ToDeltaChunk(@event.NewChild),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private MoveChildFromOtherContainment OnChildMovedFromOtherContainment(object? sender,
-        ChildMovedFromOtherContainmentEvent @event) =>
+    private MoveChildFromOtherContainment
+        OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentEvent @event) =>
         new(
             @event.NewParent.GetId(),
             @event.NewContainment.ToMetaPointer(),
             @event.NewIndex,
             @event.MovedChild.GetId(),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private MoveChildFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(object? sender,
+    private MoveChildFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParentEvent @event) =>
         new(
             @event.NewContainment.ToMetaPointer(),
             @event.NewIndex,
             @event.MovedChild.GetId(),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private MoveChildInSameContainment OnChildMovedInSameContainment(object? sender,
-        ChildMovedInSameContainmentEvent @event) =>
+    private MoveChildInSameContainment OnChildMovedInSameContainment(ChildMovedInSameContainmentEvent @event) =>
         new(
             @event.NewIndex,
             @event.MovedChild.GetId(),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
@@ -168,39 +155,38 @@ public class DeltaProtocolPartitionCommandSender
 
     #region Annotations
 
-    private AddAnnotation OnAnnotationAdded(object? sender, AnnotationAddedEvent @event) =>
+    private AddAnnotation OnAnnotationAdded(AnnotationAddedEvent @event) =>
         new(
             @event.Parent.GetId(),
             @event.Index,
             ToDeltaChunk(@event.NewAnnotation),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private DeleteAnnotation OnAnnotationDeleted(object? sender, AnnotationDeletedEvent @event) =>
+    private DeleteAnnotation OnAnnotationDeleted(AnnotationDeletedEvent @event) =>
         new(
             @event.Parent.GetId(),
             @event.Index,
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private MoveAnnotationFromOtherParent OnAnnotationMovedFromOtherParent(object? sender,
-        AnnotationMovedFromOtherParentEvent @event) =>
+    private MoveAnnotationFromOtherParent
+        OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentEvent @event) =>
         new(
             @event.NewParent.GetId(),
             @event.NewIndex,
             @event.MovedAnnotation.GetId(),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private MoveAnnotationInSameParent OnAnnotationMovedInSameParent(object? sender,
-        AnnotationMovedInSameParentEvent @event) =>
+    private MoveAnnotationInSameParent OnAnnotationMovedInSameParent(AnnotationMovedInSameParentEvent @event) =>
         new(
             @event.NewIndex,
             @event.MovedAnnotation.GetId(),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
@@ -208,32 +194,32 @@ public class DeltaProtocolPartitionCommandSender
 
     #region References
 
-    private AddReference OnReferenceAdded(object? sender, ReferenceAddedEvent @event) =>
+    private AddReference OnReferenceAdded(ReferenceAddedEvent @event) =>
         new(
             @event.Parent.GetId(),
             @event.Reference.ToMetaPointer(),
             @event.Index,
             ToDelta(@event.NewTarget),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private DeleteReference OnReferenceDeleted(object? sender, ReferenceDeletedEvent @event) =>
+    private DeleteReference OnReferenceDeleted(ReferenceDeletedEvent @event) =>
         new(
             @event.Parent.GetId(),
             @event.Reference.ToMetaPointer(),
             @event.Index,
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
-    private ChangeReference OnReferenceChanged(object? sender, ReferenceChangedEvent @event) =>
+    private ChangeReference OnReferenceChanged(ReferenceChangedEvent @event) =>
         new(
             @event.Parent.GetId(),
             @event.Reference.ToMetaPointer(),
             @event.Index,
             ToDelta(@event.NewTarget),
-            NewCommandId(),
+            ToCommandId(@event),
             null
         );
 
@@ -242,14 +228,18 @@ public class DeltaProtocolPartitionCommandSender
 
     #endregion
 
-    private CommandId NewCommandId() =>
-        _commandIdProvider.Create();
-
     private DeltaSerializationChunk ToDeltaChunk(IReadableNode node)
     {
         var serializer = new Serializer(_lionWebVersion);
         return new DeltaSerializationChunk(serializer.Serialize(M1Extensions.Descendants(node, true, true)).ToArray());
     }
+
+    private CommandId ToCommandId(IEvent @event) =>
+        @event.EventId switch
+        {
+            ParticipationEventId pei => pei.CommandId,
+            _ => _commandIdProvider.Create()
+        };
 }
 
 public interface ICommandIdProvider

@@ -128,7 +128,7 @@ public class WebSocketTests
                 .WithLionWebVersion(lionWebVersion)
                 .WithLanguages(languages);
             Dictionary<CompressedMetaPointer, IKeyed>
-                sharedKeyedMap = CommandToEventMapper.BuildSharedKeyMap(languages);
+                sharedKeyedMap = DeltaCommandToDeltaEventMapper.BuildSharedKeyMap(languages);
             _eventReceiver = new DeltaProtocolPartitionEventReceiver(
                 partitionEventHandler,
                 _sharedNodeMap,
@@ -144,19 +144,16 @@ public class WebSocketTests
 
         public void Send(Action<string> action)
         {
-            var commandToEventMapper = new CommandToEventMapper(_name, _sharedNodeMap);
+            var commandToEventMapper = new DeltaCommandToDeltaEventMapper(_name, _sharedNodeMap);
 
-            var commandSender =
-                new DeltaProtocolPartitionCommandSender(_publisher, new CommandIdProvider(), lionWebVersion);
-
-            commandSender.DeltaCommand += (sender, command) =>
+            _publisher.Subscribe<IPartitionEvent>((sender, deltaContent) =>
             {
-                var @event = commandToEventMapper.Map(command);
+                var @event = commandToEventMapper.Map((IDeltaCommand)deltaContent);
 
                 Console.WriteLine($"{_name} sending event: {@event}");
                 var deltaSerializer = new DeltaSerializer();
                 action(deltaSerializer.Serialize(@event));
-            };
+            });
         }
 
         public void Receive(string msg)
