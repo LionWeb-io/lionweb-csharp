@@ -47,9 +47,9 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         forestPublisher.Subscribe<IForestEvent>(LocalHandler);
     }
 
-    private void LocalHandler(object? sender, IForestEvent @event)
+    private void LocalHandler(object? sender, IForestEvent forestEvent)
     {
-        switch (@event)
+        switch (forestEvent)
         {
             case PartitionAddedEvent a:
                 OnLocalNewPartition(sender, a);
@@ -61,10 +61,10 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     }
 
     /// <inheritdoc />
-    protected override void ProcessEvent(object? sender, IForestEvent? @event)
+    protected override void ProcessEvent(object? sender, IForestEvent? forestEvent)
     {
-        Console.WriteLine($"{this.GetType()}: processing event {@event}");
-        switch (@event)
+        Console.WriteLine($"{this.GetType()}: processing event {forestEvent}");
+        switch (forestEvent)
         {
             case PartitionAddedEvent a:
                 OnRemoteNewPartition(null, a);
@@ -115,34 +115,34 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     #region Local
 
-    private void OnLocalNewPartition(object? sender, PartitionAddedEvent @event) =>
-        RegisterPartition(@event.NewPartition);
+    private void OnLocalNewPartition(object? sender, PartitionAddedEvent partitionAddedEvent) =>
+        RegisterPartition(partitionAddedEvent.NewPartition);
 
-    private void OnLocalPartitionDeleted(object? sender, PartitionDeletedEvent @event) =>
-        UnregisterPartition(@event.DeletedPartition);
+    private void OnLocalPartitionDeleted(object? sender, PartitionDeletedEvent partitionDeletedEvent) =>
+        UnregisterPartition(partitionDeletedEvent.DeletedPartition);
 
     #endregion
 
     #region Remote
 
-    private void OnRemoteNewPartition(object? sender, PartitionAddedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemoteNewPartition(object? sender, PartitionAddedEvent partitionAddedEvent) =>
+        SuppressEventForwarding(partitionAddedEvent, () =>
         {
-            var newPartition = (INode)@event.NewPartition;
+            var newPartition = (INode)partitionAddedEvent.NewPartition;
 
             var clone = (IPartitionInstance)Clone(newPartition);
 
             _localForest.AddPartitions([clone]);
 
-            var remoteListener = @event.NewPartition.GetPublisher();
+            var remoteListener = partitionAddedEvent.NewPartition.GetPublisher();
             if (remoteListener != null)
                 LookupPartition(clone).ReplicateFrom(remoteListener);
         });
 
-    private void OnRemotePartitionDeleted(object? sender, PartitionDeletedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemotePartitionDeleted(object? sender, PartitionDeletedEvent partitionDeletedEvent) =>
+        SuppressEventForwarding(partitionDeletedEvent, () =>
         {
-            var localPartition = (IPartitionInstance)Lookup(@event.DeletedPartition.GetId());
+            var localPartition = (IPartitionInstance)Lookup(partitionDeletedEvent.DeletedPartition.GetId());
             _localForest.RemovePartitions([localPartition]);
         });
 

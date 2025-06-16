@@ -35,10 +35,10 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     }
 
     /// <inheritdoc />
-    protected override void ProcessEvent(object? sender, IPartitionEvent? @event)
+    protected override void ProcessEvent(object? sender, IPartitionEvent? partitionEvent)
     {
-        Console.WriteLine($"{sender}: processing event {@event}");
-        switch (@event)
+        Console.WriteLine($"{sender}: processing event {partitionEvent}");
+        switch (partitionEvent)
         {
             case PropertyAddedEvent a:
                 OnRemotePropertyAdded(sender, a);
@@ -121,10 +121,10 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     #region Local
 
-    private void LocalHandler(object? sender, IPartitionEvent @event)
+    private void LocalHandler(object? sender, IPartitionEvent partitionEvent)
     {
         // Console.WriteLine($"{this.GetType()}: Received event: {@event}");
-        switch (@event)
+        switch (partitionEvent)
         {
             case ChildAddedEvent a:
                 OnLocalChildAdded(sender, a);
@@ -141,17 +141,17 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         }
     }
 
-    private void OnLocalChildAdded(object? sender, ChildAddedEvent @event) =>
-        RegisterNode(@event.NewChild);
+    private void OnLocalChildAdded(object? sender, ChildAddedEvent childAddedEvent) =>
+        RegisterNode(childAddedEvent.NewChild);
 
-    private void OnLocalChildDeleted(object? sender, ChildDeletedEvent @event) =>
-        UnregisterNode(@event.DeletedChild);
+    private void OnLocalChildDeleted(object? sender, ChildDeletedEvent childDeletedEvent) =>
+        UnregisterNode(childDeletedEvent.DeletedChild);
 
-    private void OnLocalAnnotationAdded(object? sender, AnnotationAddedEvent @event) =>
-        RegisterNode(@event.NewAnnotation);
+    private void OnLocalAnnotationAdded(object? sender, AnnotationAddedEvent annotationAddedEvent) =>
+        RegisterNode(annotationAddedEvent.NewAnnotation);
 
-    private void OnLocalAnnotationDeleted(object? sender, AnnotationDeletedEvent @event) =>
-        UnregisterNode(@event.DeletedAnnotation);
+    private void OnLocalAnnotationDeleted(object? sender, AnnotationDeletedEvent annotationDeletedEvent) =>
+        UnregisterNode(annotationDeletedEvent.DeletedAnnotation);
 
     #endregion
 
@@ -160,125 +160,125 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     #region Properties
 
-    private void OnRemotePropertyAdded(object? sender, PropertyAddedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemotePropertyAdded(object? sender, PropertyAddedEvent propertyAddedEvent) =>
+        SuppressEventForwarding(propertyAddedEvent, () =>
         {
-            Console.WriteLine($"Node {@event.Node.PrintIdentity()}: Setting {@event.Property} to {@event.NewValue}");
-            Lookup(@event.Node.GetId()).Set(@event.Property, @event.NewValue);
+            Console.WriteLine($"Node {propertyAddedEvent.Node.PrintIdentity()}: Setting {propertyAddedEvent.Property} to {propertyAddedEvent.NewValue}");
+            Lookup(propertyAddedEvent.Node.GetId()).Set(propertyAddedEvent.Property, propertyAddedEvent.NewValue);
         });
 
-    private void OnRemotePropertyDeleted(object? sender, PropertyDeletedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemotePropertyDeleted(object? sender, PropertyDeletedEvent propertyDeletedEvent) =>
+        SuppressEventForwarding(propertyDeletedEvent, () =>
         {
-            Lookup(@event.Node.GetId()).Set(@event.Property, null);
+            Lookup(propertyDeletedEvent.Node.GetId()).Set(propertyDeletedEvent.Property, null);
         });
 
-    private void OnRemotePropertyChanged(object? sender, PropertyChangedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemotePropertyChanged(object? sender, PropertyChangedEvent propertyChangedEvent) =>
+        SuppressEventForwarding(propertyChangedEvent, () =>
         {
-            Lookup(@event.Node.GetId()).Set(@event.Property, @event.NewValue);
+            Lookup(propertyChangedEvent.Node.GetId()).Set(propertyChangedEvent.Property, propertyChangedEvent.NewValue);
         });
 
     #endregion
 
     #region Children
 
-    private void OnRemoteChildAdded(object? sender, ChildAddedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemoteChildAdded(object? sender, ChildAddedEvent childAddedEvent) =>
+        SuppressEventForwarding(childAddedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
-            var newChildNode = (INode)@event.NewChild;
+            var localParent = Lookup(childAddedEvent.Parent.GetId());
+            var newChildNode = (INode)childAddedEvent.NewChild;
 
             var clone = Clone(newChildNode);
 
-            Console.WriteLine($"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {@event.Containment} at {@event.Index}");
-            var newValue = InsertContainment(localParent, @event.Containment, @event.Index, clone);
+            Console.WriteLine($"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {childAddedEvent.Containment} at {childAddedEvent.Index}");
+            var newValue = InsertContainment(localParent, childAddedEvent.Containment, childAddedEvent.Index, clone);
 
-            localParent.Set(@event.Containment, newValue);
+            localParent.Set(childAddedEvent.Containment, newValue);
         });
 
-    private void OnRemoteChildDeleted(object? sender, ChildDeletedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemoteChildDeleted(object? sender, ChildDeletedEvent childDeletedEvent) =>
+        SuppressEventForwarding(childDeletedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
+            var localParent = Lookup(childDeletedEvent.Parent.GetId());
 
             object? newValue = null;
-            if (@event.Containment.Multiple)
+            if (childDeletedEvent.Containment.Multiple)
             {
-                var existingChildren = localParent.Get(@event.Containment);
+                var existingChildren = localParent.Get(childDeletedEvent.Containment);
                 if (existingChildren is IList l)
                 {
                     var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.RemoveAt(@event.Index);
+                    children.RemoveAt(childDeletedEvent.Index);
                     newValue = children;
                 }
             }
 
-            localParent.Set(@event.Containment, newValue);
+            localParent.Set(childDeletedEvent.Containment, newValue);
         });
 
-    private void OnRemoteChildReplaced(object? sender, ChildReplacedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemoteChildReplaced(object? sender, ChildReplacedEvent childReplacedEvent) =>
+        SuppressEventForwarding(childReplacedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
+            var localParent = Lookup(childReplacedEvent.Parent.GetId());
 
-            object newValue = Clone((INode)@event.NewChild);
-            if (@event.Containment.Multiple)
+            object newValue = Clone((INode)childReplacedEvent.NewChild);
+            if (childReplacedEvent.Containment.Multiple)
             {
-                var existingChildren = localParent.Get(@event.Containment);
+                var existingChildren = localParent.Get(childReplacedEvent.Containment);
                 if (existingChildren is IList l)
                 {
                     var children = new List<IWritableNode>(l.Cast<IWritableNode>());
                     var newValueNode = (IWritableNode)newValue;
-                    children.Insert(@event.Index, newValueNode);
-                    var removeIndex = @event.Index + 1;
+                    children.Insert(childReplacedEvent.Index, newValueNode);
+                    var removeIndex = childReplacedEvent.Index + 1;
                     children.RemoveAt(removeIndex);
                     newValue = children;
                 }
             }
 
-            localParent.Set(@event.Containment, newValue);
+            localParent.Set(childReplacedEvent.Containment, newValue);
         });
 
     private void OnRemoteChildMovedFromOtherContainment(object? sender,
-        ChildMovedFromOtherContainmentEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+        ChildMovedFromOtherContainmentEvent childMovedEvent) =>
+        SuppressEventForwarding(childMovedEvent, () =>
         {
-            var localNewParent = Lookup(@event.NewParent.GetId());
-            var nodeToInsert = LookupOpt(@event.MovedChild.GetId()) ?? Clone((INode)@event.MovedChild);
-            var newValue = InsertContainment(localNewParent, @event.NewContainment, @event.NewIndex, nodeToInsert);
+            var localNewParent = Lookup(childMovedEvent.NewParent.GetId());
+            var nodeToInsert = LookupOpt(childMovedEvent.MovedChild.GetId()) ?? Clone((INode)childMovedEvent.MovedChild);
+            var newValue = InsertContainment(localNewParent, childMovedEvent.NewContainment, childMovedEvent.NewIndex, nodeToInsert);
 
-            localNewParent.Set(@event.NewContainment, newValue);
+            localNewParent.Set(childMovedEvent.NewContainment, newValue);
         });
 
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(object? sender,
-        ChildMovedFromOtherContainmentInSameParentEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+        ChildMovedFromOtherContainmentInSameParentEvent childMovedEvent) =>
+        SuppressEventForwarding(childMovedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
-            var newValue = InsertContainment(localParent, @event.NewContainment, @event.NewIndex,
-                Lookup(@event.MovedChild.GetId()));
+            var localParent = Lookup(childMovedEvent.Parent.GetId());
+            var newValue = InsertContainment(localParent, childMovedEvent.NewContainment, childMovedEvent.NewIndex,
+                Lookup(childMovedEvent.MovedChild.GetId()));
 
-            localParent.Set(@event.NewContainment, newValue);
+            localParent.Set(childMovedEvent.NewContainment, newValue);
         });
 
     private void OnRemoteChildMovedInSameContainment(object? sender,
-        ChildMovedInSameContainmentEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+        ChildMovedInSameContainmentEvent childMovedEvent) =>
+        SuppressEventForwarding(childMovedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
-            INode nodeToInsert = Lookup(@event.MovedChild.GetId());
+            var localParent = Lookup(childMovedEvent.Parent.GetId());
+            INode nodeToInsert = Lookup(childMovedEvent.MovedChild.GetId());
             object newValue = nodeToInsert;
-            var existingChildren = localParent.Get(@event.Containment);
+            var existingChildren = localParent.Get(childMovedEvent.Containment);
             if (existingChildren is IList l)
             {
                 var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                children.RemoveAt(@event.OldIndex);
-                children.Insert(@event.NewIndex, nodeToInsert);
+                children.RemoveAt(childMovedEvent.OldIndex);
+                children.Insert(childMovedEvent.NewIndex, nodeToInsert);
                 newValue = children;
             }
 
-            localParent.Set(@event.Containment, newValue);
+            localParent.Set(childMovedEvent.Containment, newValue);
         });
 
     private object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
@@ -308,93 +308,93 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     #region Annotations
 
-    private void OnRemoteAnnotationAdded(object? sender, AnnotationAddedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemoteAnnotationAdded(object? sender, AnnotationAddedEvent annotationAddedEvent) =>
+        SuppressEventForwarding(annotationAddedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
-            var clone = Clone((INode)@event.NewAnnotation);
-            localParent.InsertAnnotations(@event.Index, [clone]);
+            var localParent = Lookup(annotationAddedEvent.Parent.GetId());
+            var clone = Clone((INode)annotationAddedEvent.NewAnnotation);
+            localParent.InsertAnnotations(annotationAddedEvent.Index, [clone]);
         });
 
-    private void OnRemoteAnnotationDeleted(object? sender, AnnotationDeletedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemoteAnnotationDeleted(object? sender, AnnotationDeletedEvent annotationDeletedEvent) =>
+        SuppressEventForwarding(annotationDeletedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
-            var localDeleted = Lookup(@event.DeletedAnnotation.GetId());
+            var localParent = Lookup(annotationDeletedEvent.Parent.GetId());
+            var localDeleted = Lookup(annotationDeletedEvent.DeletedAnnotation.GetId());
             localParent.RemoveAnnotations([localDeleted]);
         });
 
     private void OnRemoteAnnotationMovedFromOtherParent(object? sender,
-        AnnotationMovedFromOtherParentEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+        AnnotationMovedFromOtherParentEvent annotationMovedEvent) =>
+        SuppressEventForwarding(annotationMovedEvent, () =>
         {
-            var localNewParent = Lookup(@event.NewParent.GetId());
-            var moved = LookupOpt(@event.MovedAnnotation.GetId()) ?? Clone((INode)@event.MovedAnnotation);
-            localNewParent.InsertAnnotations(@event.NewIndex, [moved]);
+            var localNewParent = Lookup(annotationMovedEvent.NewParent.GetId());
+            var moved = LookupOpt(annotationMovedEvent.MovedAnnotation.GetId()) ?? Clone((INode)annotationMovedEvent.MovedAnnotation);
+            localNewParent.InsertAnnotations(annotationMovedEvent.NewIndex, [moved]);
         });
 
     private void OnRemoteAnnotationMovedInSameParent(object? sender,
-        AnnotationMovedInSameParentEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+        AnnotationMovedInSameParentEvent annotationMovedEvent) =>
+        SuppressEventForwarding(annotationMovedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
-            INode nodeToInsert = Lookup(@event.MovedAnnotation.GetId());
-            localParent.InsertAnnotations(@event.NewIndex, [nodeToInsert]);
+            var localParent = Lookup(annotationMovedEvent.Parent.GetId());
+            INode nodeToInsert = Lookup(annotationMovedEvent.MovedAnnotation.GetId());
+            localParent.InsertAnnotations(annotationMovedEvent.NewIndex, [nodeToInsert]);
         });
 
     #endregion
 
     #region References
 
-    private void OnRemoteReferenceAdded(object? sender, ReferenceAddedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemoteReferenceAdded(object? sender, ReferenceAddedEvent referenceAddedEvent) =>
+        SuppressEventForwarding(referenceAddedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
-            INode target = Lookup(@event.NewTarget.Reference.GetId());
-            var newValue = InsertReference(localParent, @event.Reference, @event.Index, target);
+            var localParent = Lookup(referenceAddedEvent.Parent.GetId());
+            INode target = Lookup(referenceAddedEvent.NewTarget.Reference.GetId());
+            var newValue = InsertReference(localParent, referenceAddedEvent.Reference, referenceAddedEvent.Index, target);
 
-            localParent.Set(@event.Reference, newValue);
+            localParent.Set(referenceAddedEvent.Reference, newValue);
         });
 
-    private void OnRemoteReferenceDeleted(object? sender, ReferenceDeletedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemoteReferenceDeleted(object? sender, ReferenceDeletedEvent referenceDeletedEvent) =>
+        SuppressEventForwarding(referenceDeletedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
+            var localParent = Lookup(referenceDeletedEvent.Parent.GetId());
 
             object newValue = null;
-            if (@event.Reference.Multiple)
+            if (referenceDeletedEvent.Reference.Multiple)
             {
-                var existingTargets = localParent.Get(@event.Reference);
+                var existingTargets = localParent.Get(referenceDeletedEvent.Reference);
                 if (existingTargets is IList l)
                 {
                     var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.RemoveAt(@event.Index);
+                    targets.RemoveAt(referenceDeletedEvent.Index);
                     newValue = targets;
                 }
             }
 
-            localParent.Set(@event.Reference, newValue);
+            localParent.Set(referenceDeletedEvent.Reference, newValue);
         });
 
-    private void OnRemoteReferenceChanged(object? sender, ReferenceChangedEvent @event) =>
-        SuppressEventForwarding(@event, () =>
+    private void OnRemoteReferenceChanged(object? sender, ReferenceChangedEvent referenceChangedEvent) =>
+        SuppressEventForwarding(referenceChangedEvent, () =>
         {
-            var localParent = Lookup(@event.Parent.GetId());
+            var localParent = Lookup(referenceChangedEvent.Parent.GetId());
 
-            object newValue = Lookup(@event.NewTarget.Reference.GetId());
-            if (@event.Reference.Multiple)
+            object newValue = Lookup(referenceChangedEvent.NewTarget.Reference.GetId());
+            if (referenceChangedEvent.Reference.Multiple)
             {
-                var existingTargets = localParent.Get(@event.Reference);
+                var existingTargets = localParent.Get(referenceChangedEvent.Reference);
                 if (existingTargets is IList l)
                 {
                     var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.Insert(@event.Index, (IReadableNode)newValue);
-                    targets.RemoveAt(@event.Index + 1);
+                    targets.Insert(referenceChangedEvent.Index, (IReadableNode)newValue);
+                    targets.RemoveAt(referenceChangedEvent.Index + 1);
                     newValue = targets;
                 }
             }
 
-            localParent.Set(@event.Reference, newValue);
+            localParent.Set(referenceChangedEvent.Reference, newValue);
         });
 
     private object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)

@@ -66,40 +66,40 @@ public class DeltaEventToPartitionEventMapper
 
     #region Properties
 
-    private PropertyAddedEvent OnPropertyAdded(PropertyAdded @event)
+    private PropertyAddedEvent OnPropertyAdded(PropertyAdded propertyAddedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var property = ToProperty(@event.Property, parent);
+        var parent = ToNode(propertyAddedEvent.Parent);
+        var property = ToProperty(propertyAddedEvent.Property, parent);
         return new PropertyAddedEvent(
             parent,
             property,
-            ToPropertyValue(parent, property, @event.NewValue),
-            ToEventId(@event)
+            ToPropertyValue(parent, property, propertyAddedEvent.NewValue),
+            ToEventId(propertyAddedEvent)
         );
     }
 
-    private PropertyDeletedEvent OnPropertyDeleted(PropertyDeleted @event)
+    private PropertyDeletedEvent OnPropertyDeleted(PropertyDeleted propertyDeletedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var property = ToProperty(@event.Property, parent);
+        var parent = ToNode(propertyDeletedEvent.Parent);
+        var property = ToProperty(propertyDeletedEvent.Property, parent);
         return new PropertyDeletedEvent(
             parent,
             property,
             parent.Get(property) ?? throw new UnsetFeatureException(property),
-            ToEventId(@event)
+            ToEventId(propertyDeletedEvent)
         );
     }
 
-    private PropertyChangedEvent OnPropertyChanged(PropertyChanged @event)
+    private PropertyChangedEvent OnPropertyChanged(PropertyChanged propertyChangedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var property = ToProperty(@event.Property, parent);
+        var parent = ToNode(propertyChangedEvent.Parent);
+        var property = ToProperty(propertyChangedEvent.Property, parent);
         return new PropertyChangedEvent(
             parent,
             property,
-            ToPropertyValue(parent, property, @event.NewValue),
+            ToPropertyValue(parent, property, propertyChangedEvent.NewValue),
             parent.Get(property) ?? throw new UnsetFeatureException(property),
-            ToEventId(@event)
+            ToEventId(propertyChangedEvent)
         );
     }
 
@@ -114,95 +114,95 @@ public class DeltaEventToPartitionEventMapper
 
     #region Children
 
-    private ChildAddedEvent OnChildAdded(ChildAdded @event)
+    private ChildAddedEvent OnChildAdded(ChildAdded childAddedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var containment = ToContainment(@event.Containment, parent);
+        var parent = ToNode(childAddedEvent.Parent);
+        var containment = ToContainment(childAddedEvent.Containment, parent);
         return new ChildAddedEvent(
             parent,
-            Deserialize(@event.NewChild),
+            Deserialize(childAddedEvent.NewChild),
             containment,
-            @event.Index,
-            ToEventId(@event)
+            childAddedEvent.Index,
+            ToEventId(childAddedEvent)
         );
     }
 
-    private ChildDeletedEvent OnChildDeleted(ChildDeleted @event)
+    private ChildDeletedEvent OnChildDeleted(ChildDeleted childDeletedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var containment = ToContainment(@event.Containment, parent);
+        var parent = ToNode(childDeletedEvent.Parent);
+        var containment = ToContainment(childDeletedEvent.Containment, parent);
         return new ChildDeletedEvent(
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[@event.Index],
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[childDeletedEvent.Index],
             parent,
             containment,
-            @event.Index,
-            ToEventId(@event)
+            childDeletedEvent.Index,
+            ToEventId(childDeletedEvent)
         );
     }
 
-    private ChildReplacedEvent OnChildReplaced(ChildReplaced @event)
+    private ChildReplacedEvent OnChildReplaced(ChildReplaced childReplacedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var containment = ToContainment(@event.Containment, parent);
+        var parent = ToNode(childReplacedEvent.Parent);
+        var containment = ToContainment(childReplacedEvent.Containment, parent);
         return new ChildReplacedEvent(
-            Deserialize(@event.NewChild),
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[@event.Index],
+            Deserialize(childReplacedEvent.NewChild),
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[childReplacedEvent.Index],
             parent,
             containment,
-            @event.Index,
-            ToEventId(@event)
+            childReplacedEvent.Index,
+            ToEventId(childReplacedEvent)
         );
     }
 
-    private ChildMovedFromOtherContainmentEvent OnChildMovedFromOtherContainment(ChildMovedFromOtherContainment @event)
+    private ChildMovedFromOtherContainmentEvent OnChildMovedFromOtherContainment(ChildMovedFromOtherContainment childMovedEvent)
     {
-        var movedChild = ToNode(@event.MovedChild);
-        var oldParent = ToNode(@event.OldParent);
-        var newParent = ToNode(@event.NewParent);
-        var oldContainment = ToContainment(@event.OldContainment, oldParent);
-        var newContainment = ToContainment(@event.NewContainment, newParent);
+        var movedChild = ToNode(childMovedEvent.MovedChild);
+        var oldParent = ToNode(childMovedEvent.OldParent);
+        var newParent = ToNode(childMovedEvent.NewParent);
+        var oldContainment = ToContainment(childMovedEvent.OldContainment, oldParent);
+        var newContainment = ToContainment(childMovedEvent.NewContainment, newParent);
         return new ChildMovedFromOtherContainmentEvent(
             newParent,
             newContainment,
-            @event.NewIndex,
+            childMovedEvent.NewIndex,
             movedChild,
             oldParent,
             oldContainment,
-            @event.OldIndex,
-            ToEventId(@event)
+            childMovedEvent.OldIndex,
+            ToEventId(childMovedEvent)
         );
     }
 
     private ChildMovedFromOtherContainmentInSameParentEvent OnChildMovedFromOtherContainmentInSameParent(
-        ChildMovedFromOtherContainmentInSameParent @event)
+        ChildMovedFromOtherContainmentInSameParent childMovedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var movedChild = ToNode(@event.MovedChild);
-        var oldContainment = ToContainment(@event.OldContainment, parent);
-        var newContainment = ToContainment(@event.NewContainment, parent);
+        var parent = ToNode(childMovedEvent.Parent);
+        var movedChild = ToNode(childMovedEvent.MovedChild);
+        var oldContainment = ToContainment(childMovedEvent.OldContainment, parent);
+        var newContainment = ToContainment(childMovedEvent.NewContainment, parent);
         return new ChildMovedFromOtherContainmentInSameParentEvent(
             newContainment,
-            @event.NewIndex,
+            childMovedEvent.NewIndex,
             movedChild,
             parent,
             oldContainment,
-            @event.OldIndex,
-            ToEventId(@event)
+            childMovedEvent.OldIndex,
+            ToEventId(childMovedEvent)
         );
     }
 
-    private ChildMovedInSameContainmentEvent OnChildMovedInSameContainment(ChildMovedInSameContainment @event)
+    private ChildMovedInSameContainmentEvent OnChildMovedInSameContainment(ChildMovedInSameContainment childMovedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var movedChild = ToNode(@event.MovedChild);
-        var containment = ToContainment(@event.Containment, parent);
+        var parent = ToNode(childMovedEvent.Parent);
+        var movedChild = ToNode(childMovedEvent.MovedChild);
+        var containment = ToContainment(childMovedEvent.Containment, parent);
         return new ChildMovedInSameContainmentEvent(
-            @event.NewIndex,
+            childMovedEvent.NewIndex,
             movedChild,
             parent,
             containment,
-            @event.OldIndex,
-            ToEventId(@event)
+            childMovedEvent.OldIndex,
+            ToEventId(childMovedEvent)
         );
     }
 
@@ -213,54 +213,54 @@ public class DeltaEventToPartitionEventMapper
 
     #region Annotations
 
-    private AnnotationAddedEvent OnAnnotationAdded(AnnotationAdded @event)
+    private AnnotationAddedEvent OnAnnotationAdded(AnnotationAdded annotationAddedEvent)
     {
-        var parent = ToNode(@event.Parent);
+        var parent = ToNode(annotationAddedEvent.Parent);
         return new AnnotationAddedEvent(
             parent,
-            Deserialize(@event.NewAnnotation),
-            @event.Index,
-            ToEventId(@event)
+            Deserialize(annotationAddedEvent.NewAnnotation),
+            annotationAddedEvent.Index,
+            ToEventId(annotationAddedEvent)
         );
     }
 
-    private AnnotationDeletedEvent OnAnnotationDeleted(AnnotationDeleted @event)
+    private AnnotationDeletedEvent OnAnnotationDeleted(AnnotationDeleted annotationDeletedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var deletedAnnotation = parent.GetAnnotations()[@event.Index];
+        var parent = ToNode(annotationDeletedEvent.Parent);
+        var deletedAnnotation = parent.GetAnnotations()[annotationDeletedEvent.Index];
         return new AnnotationDeletedEvent(
             deletedAnnotation as IWritableNode ?? throw new InvalidValueException(null, deletedAnnotation),
             parent,
-            @event.Index,
-            ToEventId(@event)
+            annotationDeletedEvent.Index,
+            ToEventId(annotationDeletedEvent)
         );
     }
 
-    private AnnotationMovedFromOtherParentEvent OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParent @event)
+    private AnnotationMovedFromOtherParentEvent OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParent annotationMovedEvent)
     {
-        var oldParent = ToNode(@event.OldParent);
-        var newParent = ToNode(@event.NewParent);
-        var movedAnnotation = ToNode(@event.MovedAnnotation);
+        var oldParent = ToNode(annotationMovedEvent.OldParent);
+        var newParent = ToNode(annotationMovedEvent.NewParent);
+        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
         return new AnnotationMovedFromOtherParentEvent(
             newParent,
-            @event.NewIndex,
+            annotationMovedEvent.NewIndex,
             movedAnnotation,
             oldParent,
-            @event.OldIndex,
-            ToEventId(@event)
+            annotationMovedEvent.OldIndex,
+            ToEventId(annotationMovedEvent)
         );
     }
 
-    private AnnotationMovedInSameParentEvent OnAnnotationMovedInSameParent(AnnotationMovedInSameParent @event)
+    private AnnotationMovedInSameParentEvent OnAnnotationMovedInSameParent(AnnotationMovedInSameParent annotationMovedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var movedAnnotation = ToNode(@event.MovedAnnotation);
+        var parent = ToNode(annotationMovedEvent.Parent);
+        var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
         return new AnnotationMovedInSameParentEvent(
-            @event.NewIndex,
+            annotationMovedEvent.NewIndex,
             movedAnnotation,
             parent,
-            @event.OldIndex,
-            ToEventId(@event)
+            annotationMovedEvent.OldIndex,
+            ToEventId(annotationMovedEvent)
         );
     }
 
@@ -268,43 +268,43 @@ public class DeltaEventToPartitionEventMapper
 
     #region References
 
-    private ReferenceAddedEvent OnReferenceAdded(ReferenceAdded @event)
+    private ReferenceAddedEvent OnReferenceAdded(ReferenceAdded referenceAddedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var reference = ToReference(@event.Reference, parent);
+        var parent = ToNode(referenceAddedEvent.Parent);
+        var reference = ToReference(referenceAddedEvent.Reference, parent);
         return new ReferenceAddedEvent(
             parent,
             reference,
-            @event.Index,
-            ToTarget(@event.NewTarget),
-            ToEventId(@event)
+            referenceAddedEvent.Index,
+            ToTarget(referenceAddedEvent.NewTarget),
+            ToEventId(referenceAddedEvent)
         );
     }
 
-    private ReferenceDeletedEvent OnReferenceDeleted(ReferenceDeleted @event)
+    private ReferenceDeletedEvent OnReferenceDeleted(ReferenceDeleted referenceDeletedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var reference = ToReference(@event.Reference, parent);
+        var parent = ToNode(referenceDeletedEvent.Parent);
+        var reference = ToReference(referenceDeletedEvent.Reference, parent);
         return new ReferenceDeletedEvent(
             parent,
             reference,
-            @event.Index,
-            ToTarget(@event.DeletedTarget),
-            ToEventId(@event)
+            referenceDeletedEvent.Index,
+            ToTarget(referenceDeletedEvent.DeletedTarget),
+            ToEventId(referenceDeletedEvent)
         );
     }
 
-    private ReferenceChangedEvent OnReferenceChanged(ReferenceChanged @event)
+    private ReferenceChangedEvent OnReferenceChanged(ReferenceChanged referenceChangedEvent)
     {
-        var parent = ToNode(@event.Parent);
-        var reference = ToReference(@event.Reference, parent);
+        var parent = ToNode(referenceChangedEvent.Parent);
+        var reference = ToReference(referenceChangedEvent.Reference, parent);
         return new ReferenceChangedEvent(
             parent,
             reference,
-            @event.Index,
-            ToTarget(@event.NewTarget),
-            ToTarget(@event.ReplacedTarget),
-            ToEventId(@event)
+            referenceChangedEvent.Index,
+            ToTarget(referenceChangedEvent.NewTarget),
+            ToTarget(referenceChangedEvent.ReplacedTarget),
+            ToEventId(referenceChangedEvent)
         );
     }
 
@@ -324,9 +324,9 @@ public class DeltaEventToPartitionEventMapper
     #endregion
 
 
-    private static IEventId ToEventId(ISingleDeltaEvent @event) =>
-        new ParticipationEventId(@event.InternalParticipationId,
-            string.Join("_", @event.OriginCommands.Select(c => c.CommandId)));
+    private static IEventId ToEventId(ISingleDeltaEvent deltaEvent) =>
+        new ParticipationEventId(deltaEvent.InternalParticipationId,
+            string.Join("_", deltaEvent.OriginCommands.Select(c => c.CommandId)));
 
     private IWritableNode ToNode(TargetNode nodeId)
     {

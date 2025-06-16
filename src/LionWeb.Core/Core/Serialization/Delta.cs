@@ -2539,9 +2539,9 @@ public record CompositeEvent(
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
-        foreach (var @event in Events)
+        foreach (var deltaEvent in Events)
         {
-            hashCode.Add(@event);
+            hashCode.Add(deltaEvent);
         }
 
         hashCode.Add(Message);

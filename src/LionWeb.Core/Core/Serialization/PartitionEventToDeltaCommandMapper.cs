@@ -60,29 +60,29 @@ public class PartitionEventToDeltaCommandMapper
 
     #region Properties
 
-    private AddProperty OnPropertyAdded(PropertyAddedEvent @event) =>
+    private AddProperty OnPropertyAdded(PropertyAddedEvent propertyAddedEvent) =>
         new(
-            @event.Node.GetId(),
-            @event.Property.ToMetaPointer(),
-            ToDelta(@event.Node, @event.Property, @event.NewValue)!,
-            ToCommandId(@event),
+            propertyAddedEvent.Node.GetId(),
+            propertyAddedEvent.Property.ToMetaPointer(),
+            ToDelta(propertyAddedEvent.Node, propertyAddedEvent.Property, propertyAddedEvent.NewValue)!,
+            ToCommandId(propertyAddedEvent),
             null
         );
 
-    private DeleteProperty OnPropertyDeleted(PropertyDeletedEvent @event) =>
+    private DeleteProperty OnPropertyDeleted(PropertyDeletedEvent propertyDeletedEvent) =>
         new(
-            @event.Node.GetId(),
-            @event.Property.ToMetaPointer(),
-            ToCommandId(@event),
+            propertyDeletedEvent.Node.GetId(),
+            propertyDeletedEvent.Property.ToMetaPointer(),
+            ToCommandId(propertyDeletedEvent),
             null
         );
 
-    private ChangeProperty OnPropertyChanged(PropertyChangedEvent @event) =>
+    private ChangeProperty OnPropertyChanged(PropertyChangedEvent propertyChangedEvent) =>
         new(
-            @event.Node.GetId(),
-            @event.Property.ToMetaPointer(),
-            ToDelta(@event.Node, @event.Property, @event.NewValue)!,
-            ToCommandId(@event),
+            propertyChangedEvent.Node.GetId(),
+            propertyChangedEvent.Property.ToMetaPointer(),
+            ToDelta(propertyChangedEvent.Node, propertyChangedEvent.Property, propertyChangedEvent.NewValue)!,
+            ToCommandId(propertyChangedEvent),
             null
         );
 
@@ -93,61 +93,61 @@ public class PartitionEventToDeltaCommandMapper
 
     #region Children
 
-    private AddChild OnChildAdded(ChildAddedEvent @event) =>
+    private AddChild OnChildAdded(ChildAddedEvent childAddedEvent) =>
         new(
-            @event.Parent.GetId(),
-            @event.Containment.ToMetaPointer(),
-            @event.Index,
-            ToDeltaChunk(@event.NewChild),
-            ToCommandId(@event),
+            childAddedEvent.Parent.GetId(),
+            childAddedEvent.Containment.ToMetaPointer(),
+            childAddedEvent.Index,
+            ToDeltaChunk(childAddedEvent.NewChild),
+            ToCommandId(childAddedEvent),
             null
         );
 
-    private DeleteChild OnChildDeleted(ChildDeletedEvent @event) =>
+    private DeleteChild OnChildDeleted(ChildDeletedEvent childDeletedEvent) =>
         new(
-            @event.Parent.GetId(),
-            @event.Containment.ToMetaPointer(),
-            @event.Index,
-            ToCommandId(@event),
+            childDeletedEvent.Parent.GetId(),
+            childDeletedEvent.Containment.ToMetaPointer(),
+            childDeletedEvent.Index,
+            ToCommandId(childDeletedEvent),
             null
         );
 
-    private ReplaceChild OnChildReplaced(ChildReplacedEvent @event) =>
+    private ReplaceChild OnChildReplaced(ChildReplacedEvent childReplacedEvent) =>
         new(
-            @event.Parent.GetId(),
-            @event.Containment.ToMetaPointer(),
-            @event.Index,
-            ToDeltaChunk(@event.NewChild),
-            ToCommandId(@event),
+            childReplacedEvent.Parent.GetId(),
+            childReplacedEvent.Containment.ToMetaPointer(),
+            childReplacedEvent.Index,
+            ToDeltaChunk(childReplacedEvent.NewChild),
+            ToCommandId(childReplacedEvent),
             null
         );
 
     private MoveChildFromOtherContainment
-        OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentEvent @event) =>
+        OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentEvent childMovedEvent) =>
         new(
-            @event.NewParent.GetId(),
-            @event.NewContainment.ToMetaPointer(),
-            @event.NewIndex,
-            @event.MovedChild.GetId(),
-            ToCommandId(@event),
+            childMovedEvent.NewParent.GetId(),
+            childMovedEvent.NewContainment.ToMetaPointer(),
+            childMovedEvent.NewIndex,
+            childMovedEvent.MovedChild.GetId(),
+            ToCommandId(childMovedEvent),
             null
         );
 
     private MoveChildFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(
-        ChildMovedFromOtherContainmentInSameParentEvent @event) =>
+        ChildMovedFromOtherContainmentInSameParentEvent childMovedEvent) =>
         new(
-            @event.NewContainment.ToMetaPointer(),
-            @event.NewIndex,
-            @event.MovedChild.GetId(),
-            ToCommandId(@event),
+            childMovedEvent.NewContainment.ToMetaPointer(),
+            childMovedEvent.NewIndex,
+            childMovedEvent.MovedChild.GetId(),
+            ToCommandId(childMovedEvent),
             null
         );
 
-    private MoveChildInSameContainment OnChildMovedInSameContainment(ChildMovedInSameContainmentEvent @event) =>
+    private MoveChildInSameContainment OnChildMovedInSameContainment(ChildMovedInSameContainmentEvent childMovedEvent) =>
         new(
-            @event.NewIndex,
-            @event.MovedChild.GetId(),
-            ToCommandId(@event),
+            childMovedEvent.NewIndex,
+            childMovedEvent.MovedChild.GetId(),
+            ToCommandId(childMovedEvent),
             null
         );
 
@@ -155,38 +155,38 @@ public class PartitionEventToDeltaCommandMapper
 
     #region Annotations
 
-    private AddAnnotation OnAnnotationAdded(AnnotationAddedEvent @event) =>
+    private AddAnnotation OnAnnotationAdded(AnnotationAddedEvent annotationAddedEvent) =>
         new(
-            @event.Parent.GetId(),
-            @event.Index,
-            ToDeltaChunk(@event.NewAnnotation),
-            ToCommandId(@event),
+            annotationAddedEvent.Parent.GetId(),
+            annotationAddedEvent.Index,
+            ToDeltaChunk(annotationAddedEvent.NewAnnotation),
+            ToCommandId(annotationAddedEvent),
             null
         );
 
-    private DeleteAnnotation OnAnnotationDeleted(AnnotationDeletedEvent @event) =>
+    private DeleteAnnotation OnAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
         new(
-            @event.Parent.GetId(),
-            @event.Index,
-            ToCommandId(@event),
+            annotationDeletedEvent.Parent.GetId(),
+            annotationDeletedEvent.Index,
+            ToCommandId(annotationDeletedEvent),
             null
         );
 
     private MoveAnnotationFromOtherParent
-        OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentEvent @event) =>
+        OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentEvent annotationMovedEvent) =>
         new(
-            @event.NewParent.GetId(),
-            @event.NewIndex,
-            @event.MovedAnnotation.GetId(),
-            ToCommandId(@event),
+            annotationMovedEvent.NewParent.GetId(),
+            annotationMovedEvent.NewIndex,
+            annotationMovedEvent.MovedAnnotation.GetId(),
+            ToCommandId(annotationMovedEvent),
             null
         );
 
-    private MoveAnnotationInSameParent OnAnnotationMovedInSameParent(AnnotationMovedInSameParentEvent @event) =>
+    private MoveAnnotationInSameParent OnAnnotationMovedInSameParent(AnnotationMovedInSameParentEvent annotationMovedEvent) =>
         new(
-            @event.NewIndex,
-            @event.MovedAnnotation.GetId(),
-            ToCommandId(@event),
+            annotationMovedEvent.NewIndex,
+            annotationMovedEvent.MovedAnnotation.GetId(),
+            ToCommandId(annotationMovedEvent),
             null
         );
 
@@ -194,32 +194,32 @@ public class PartitionEventToDeltaCommandMapper
 
     #region References
 
-    private AddReference OnReferenceAdded(ReferenceAddedEvent @event) =>
+    private AddReference OnReferenceAdded(ReferenceAddedEvent referenceAddedEvent) =>
         new(
-            @event.Parent.GetId(),
-            @event.Reference.ToMetaPointer(),
-            @event.Index,
-            ToDelta(@event.NewTarget),
-            ToCommandId(@event),
+            referenceAddedEvent.Parent.GetId(),
+            referenceAddedEvent.Reference.ToMetaPointer(),
+            referenceAddedEvent.Index,
+            ToDelta(referenceAddedEvent.NewTarget),
+            ToCommandId(referenceAddedEvent),
             null
         );
 
-    private DeleteReference OnReferenceDeleted(ReferenceDeletedEvent @event) =>
+    private DeleteReference OnReferenceDeleted(ReferenceDeletedEvent referenceDeletedEvent) =>
         new(
-            @event.Parent.GetId(),
-            @event.Reference.ToMetaPointer(),
-            @event.Index,
-            ToCommandId(@event),
+            referenceDeletedEvent.Parent.GetId(),
+            referenceDeletedEvent.Reference.ToMetaPointer(),
+            referenceDeletedEvent.Index,
+            ToCommandId(referenceDeletedEvent),
             null
         );
 
-    private ChangeReference OnReferenceChanged(ReferenceChangedEvent @event) =>
+    private ChangeReference OnReferenceChanged(ReferenceChangedEvent referenceChangedEvent) =>
         new(
-            @event.Parent.GetId(),
-            @event.Reference.ToMetaPointer(),
-            @event.Index,
-            ToDelta(@event.NewTarget),
-            ToCommandId(@event),
+            referenceChangedEvent.Parent.GetId(),
+            referenceChangedEvent.Reference.ToMetaPointer(),
+            referenceChangedEvent.Index,
+            ToDelta(referenceChangedEvent.NewTarget),
+            ToCommandId(referenceChangedEvent),
             null
         );
 
