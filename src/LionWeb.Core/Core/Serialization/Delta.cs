@@ -29,6 +29,22 @@ using EventSequenceNumber = long;
 
 public record CommandSource(ParticipationId ParticipationId, CommandId CommandId);
 
+public sealed class DeltaProtocolVersion
+{
+    private readonly string _version;
+
+    private DeltaProtocolVersion(string version)
+    {
+        _version = version;
+    }
+
+    public static DeltaProtocolVersion? v2025_1 = new("2025.1");
+
+    public string Version => _version;
+
+    public override string ToString() => _version;
+}
+
 public record DeltaSerializationChunk(SerializedNode[] Nodes)
 {
     /// <inheritdoc />
@@ -74,6 +90,7 @@ public record DeltaSerializationChunk(SerializedNode[] Nodes)
             first = false;
             builder.Append(node);
         }
+
         builder.Append(']');
 
         return true;
@@ -151,6 +168,10 @@ public record ProtocolMessageData(MessageDataKey Key, string Value);
 public interface IDeltaContent
 {
     ProtocolMessage? Message { get; }
+    ParticipationId InternalParticipationId { get; set; }
+    public bool RequiresParticipationId => true;
+
+    string Id { get; }
 }
 
 #region Query
@@ -166,8 +187,17 @@ public interface IDeltaQueryResponse : IDeltaQuery;
 
 public abstract record DeltaQueryBase(QueryId QueryId, ProtocolMessage? Message)
 {
+    public ParticipationId InternalParticipationId { get; set; }
+
+    public string Id => QueryId;
+
     protected virtual bool PrintMembers(StringBuilder builder)
     {
+        builder.Append(nameof(InternalParticipationId));
+        builder.Append(" = ");
+        builder.Append(InternalParticipationId);
+        builder.Append(", ");
+
         builder.Append(nameof(QueryId));
         builder.Append(" = ");
         builder.Append(QueryId);
@@ -179,35 +209,102 @@ public abstract record DeltaQueryBase(QueryId QueryId, ProtocolMessage? Message)
 
         return true;
     }
-};
+}
+
+#region Subscription
+
+public interface IDeltaQuerySubscription : IDeltaQuery;
+
+#region SubscribePartitions
 
 public record SubscribePartitionsRequest(
     bool Creation,
     bool Deletion,
     bool Partitions,
     QueryId QueryId,
-    ProtocolMessage? Message) : DeltaQueryBase(QueryId, Message), IDeltaQuery;
+    ProtocolMessage? Message) : DeltaQueryBase(QueryId, Message), IDeltaQuerySubscription, IDeltaQueryRequest;
 
 public record SubscribePartitionsResponse(QueryId QueryId, ProtocolMessage? Message)
-    : DeltaQueryBase(QueryId, Message), IDeltaQueryResponse;
+    : DeltaQueryBase(QueryId, Message), IDeltaQuerySubscription, IDeltaQueryResponse;
+
+#endregion
+
+#region SubscribePartition
 
 public record SubscribePartitionRequest(TargetNode Partition, QueryId QueryId, ProtocolMessage? Message)
-    : DeltaQueryBase(QueryId, Message), IDeltaQueryRequest;
+    : DeltaQueryBase(QueryId, Message), IDeltaQuerySubscription, IDeltaQueryRequest;
 
 public record SubscribePartitionResponse(DeltaSerializationChunk Contents, QueryId QueryId, ProtocolMessage? Message)
-    : DeltaQueryBase(QueryId, Message), IDeltaQueryResponse;
+    : DeltaQueryBase(QueryId, Message), IDeltaQuerySubscription, IDeltaQueryResponse;
+
+#endregion
+
+#region UnsubscribePartition
 
 public record UnsubscribePartitionRequest(TargetNode Partition, QueryId QueryId, ProtocolMessage? Message)
-    : DeltaQueryBase(QueryId, Message), IDeltaQueryRequest;
+    : DeltaQueryBase(QueryId, Message), IDeltaQuerySubscription, IDeltaQueryRequest;
 
 public record UnsubscribePartitionResponse(QueryId QueryId, ProtocolMessage? Message)
-    : DeltaQueryBase(QueryId, Message), IDeltaQueryResponse;
+    : DeltaQueryBase(QueryId, Message), IDeltaQuerySubscription, IDeltaQueryResponse;
+
+#endregion
+
+#endregion
+
+#region Participation
+
+public interface IDeltaQueryParticipation : IDeltaQuery;
+
+#region SignOn
+
+public record SignOnRequest(string DeltaProtocolVersion, QueryId QueryId, ProtocolMessage? Message)
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryParticipation, IDeltaQueryRequest
+{
+    public bool RequiresParticipationId => false;
+}
+
+public record SignOnResponse(ParticipationId ParticipationId, QueryId QueryId, ProtocolMessage? Message)
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryParticipation, IDeltaQueryResponse;
+
+#endregion
+
+#region SignOff
+
+public record SignOffRequest(QueryId QueryId, ProtocolMessage? Message)
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryParticipation, IDeltaQueryRequest;
+
+public record SignOffResponse(ParticipationId ParticipationId, QueryId QueryId, ProtocolMessage? Message)
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryParticipation, IDeltaQueryResponse;
+
+#endregion
+
+#region Reconnect
+
+public record ReconnectRequest(
+    ParticipationId ParticipationId,
+    EventSequenceNumber LastReceivedSequenceNumber,
+    QueryId QueryId,
+    ProtocolMessage? Message)
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryParticipation, IDeltaQueryRequest;
+
+public record ReconnectResponse(EventSequenceNumber LastSentSequenceNumber, QueryId QueryId, ProtocolMessage? Message)
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryParticipation, IDeltaQueryResponse;
+
+#endregion
+
+#endregion
+
+#region Miscellaneous
+
+public interface IDeltaQueryMiscellaneous : IDeltaQuery;
+
+#region GetAvailableIds
 
 public record GetAvailableIdsRequest(int count, QueryId QueryId, ProtocolMessage? Message)
-    : DeltaQueryBase(QueryId, Message), IDeltaQueryRequest;
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryMiscellaneous, IDeltaQueryRequest;
 
 public record GetAvailableIdsResponse(FreeId[] Ids, QueryId QueryId, ProtocolMessage? Message)
-    : DeltaQueryBase(QueryId, Message), IDeltaQueryResponse
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryMiscellaneous, IDeltaQueryResponse
 {
     /// <inheritdoc />
     public virtual bool Equals(GetAvailableIdsResponse? other)
@@ -264,6 +361,20 @@ public record GetAvailableIdsResponse(FreeId[] Ids, QueryId QueryId, ProtocolMes
 
 #endregion
 
+#region ListPartitions
+
+public record ListPartitionsRequest(QueryId QueryId, ProtocolMessage? Message)
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryMiscellaneous, IDeltaQueryRequest;
+
+public record ListPartitionsResponse(DeltaSerializationChunk Partitions, QueryId QueryId, ProtocolMessage? Message)
+    : DeltaQueryBase(QueryId, Message), IDeltaQueryMiscellaneous, IDeltaQueryResponse;
+
+#endregion
+
+#endregion
+
+#endregion
+
 #region Command
 
 public interface IDeltaCommand : IDeltaContent
@@ -271,22 +382,34 @@ public interface IDeltaCommand : IDeltaContent
     CommandId? CommandId { get; }
 }
 
+public abstract record ADeltaCommand(CommandId? CommandId, ProtocolMessage? Message) : IDeltaCommand
+{
+    public ParticipationId InternalParticipationId { get; set; }
+    
+    public string Id => CommandId;
+}
+
 public interface ISingleDeltaCommand : IDeltaCommand
 {
     CommandId CommandId { get; }
 }
 
-public record CommandResponse(CommandId CommandId, ProtocolMessage? Message) : IDeltaContent;
+public record CommandResponse(CommandId CommandId, ProtocolMessage? Message) : IDeltaContent
+{
+    public ParticipationId InternalParticipationId { get; set; }
+    
+    public string Id => CommandId;
+}
 
 #region Partitions
 
 public interface IPartitionCommand : ISingleDeltaCommand;
 
 public record AddPartition(DeltaSerializationChunk NewPartition, CommandId CommandId, ProtocolMessage? Message)
-    : IPartitionCommand;
+    : ADeltaCommand(CommandId, Message), IPartitionCommand;
 
 public record DeletePartition(TargetNode DeletedPartition, CommandId CommandId, ProtocolMessage? Message)
-    : IPartitionCommand;
+    : ADeltaCommand(CommandId, Message), IPartitionCommand;
 
 #endregion
 
@@ -298,7 +421,7 @@ public record ChangeClassifier(
     TargetNode Node,
     MetaPointer NewClassifier,
     CommandId CommandId,
-    ProtocolMessage? Message) : INodeCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), INodeCommand;
 
 #endregion
 
@@ -318,17 +441,17 @@ public record AddProperty(
     PropertyValue NewValue,
     CommandId CommandId,
     ProtocolMessage? Message)
-    : IPropertyCommand;
+    : ADeltaCommand(CommandId, Message), IPropertyCommand;
 
 public record DeleteProperty(TargetNode Parent, MetaPointer Property, CommandId CommandId, ProtocolMessage? Message)
-    : IPropertyCommand;
+    : ADeltaCommand(CommandId, Message), IPropertyCommand;
 
 public record ChangeProperty(
     TargetNode Parent,
     MetaPointer Property,
     PropertyValue NewValue,
     CommandId CommandId,
-    ProtocolMessage? Message) : IPropertyCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IPropertyCommand;
 
 #endregion
 
@@ -342,7 +465,7 @@ public record AddChild(
     Index Index,
     DeltaSerializationChunk NewChild,
     CommandId CommandId,
-    ProtocolMessage? Message) : IContainmentCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IContainmentCommand;
 
 public record DeleteChild(
     TargetNode Parent,
@@ -350,7 +473,7 @@ public record DeleteChild(
     Index Index,
     CommandId CommandId,
     ProtocolMessage? Message)
-    : IContainmentCommand;
+    : ADeltaCommand(CommandId, Message), IContainmentCommand;
 
 public record ReplaceChild(
     TargetNode Parent,
@@ -358,7 +481,7 @@ public record ReplaceChild(
     Index Index,
     DeltaSerializationChunk NewChild,
     CommandId CommandId,
-    ProtocolMessage? Message) : IContainmentCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IContainmentCommand;
 
 public record MoveChildFromOtherContainment(
     TargetNode NewParent,
@@ -366,20 +489,20 @@ public record MoveChildFromOtherContainment(
     Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage? Message) : IContainmentCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IContainmentCommand;
 
 public record MoveChildFromOtherContainmentInSameParent(
     MetaPointer NewContainment,
     Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage? Message) : IContainmentCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IContainmentCommand;
 
 public record MoveChildInSameContainment(
     Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage? Message) : IContainmentCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IContainmentCommand;
 
 public record MoveAndReplaceChildFromOtherContainment(
     TargetNode NewParent,
@@ -387,20 +510,20 @@ public record MoveAndReplaceChildFromOtherContainment(
     Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage? Message) : IContainmentCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IContainmentCommand;
 
 public record MoveAndReplaceChildFromOtherContainmentInSameParent(
     MetaPointer NewContainment,
     Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage? Message) : IContainmentCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IContainmentCommand;
 
 public record MoveAndReplaceChildInSameContainment(
     Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage? Message) : IContainmentCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IContainmentCommand;
 
 #endregion
 
@@ -413,43 +536,43 @@ public record AddAnnotation(
     Index Index,
     DeltaSerializationChunk NewAnnotation,
     CommandId CommandId,
-    ProtocolMessage? Message) : IAnnotationCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IAnnotationCommand;
 
 public record DeleteAnnotation(TargetNode Parent, Index Index, CommandId CommandId, ProtocolMessage? Message)
-    : IAnnotationCommand;
+    : ADeltaCommand(CommandId, Message), IAnnotationCommand;
 
 public record ReplaceAnnotation(
     TargetNode Parent,
     Index Index,
     DeltaSerializationChunk NewAnnotation,
     CommandId CommandId,
-    ProtocolMessage? Message) : IAnnotationCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IAnnotationCommand;
 
 public record MoveAnnotationFromOtherParent(
     TargetNode NewParent,
     Index NewIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    ProtocolMessage? Message) : IAnnotationCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IAnnotationCommand;
 
 public record MoveAnnotationInSameParent(
     Index NewIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    ProtocolMessage? Message) : IAnnotationCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IAnnotationCommand;
 
 public record MoveAndReplaceAnnotationFromOtherParent(
     TargetNode NewParent,
     Index NewIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    ProtocolMessage? Message) : IAnnotationCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IAnnotationCommand;
 
 public record MoveAndReplaceAnnotationInSameParent(
     Index NewIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    ProtocolMessage? Message) : IAnnotationCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IAnnotationCommand;
 
 #endregion
 
@@ -463,7 +586,7 @@ public record AddReference(
     Index Index,
     SerializedReferenceTarget NewTarget,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record DeleteReference(
     TargetNode Parent,
@@ -471,7 +594,7 @@ public record DeleteReference(
     Index Index,
     CommandId CommandId,
     ProtocolMessage? Message)
-    : IReferenceCommand;
+    : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record ChangeReference(
     TargetNode Parent,
@@ -479,7 +602,7 @@ public record ChangeReference(
     Index Index,
     SerializedReferenceTarget NewTarget,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record MoveEntryFromOtherReference(
     TargetNode NewParent,
@@ -489,7 +612,7 @@ public record MoveEntryFromOtherReference(
     MetaPointer OldReference,
     Index OldIndex,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record MoveEntryFromOtherReferenceInSameParent(
     TargetNode Parent,
@@ -498,7 +621,7 @@ public record MoveEntryFromOtherReferenceInSameParent(
     MetaPointer OldReference,
     Index OldIndex,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record MoveEntryInSameReference(
     TargetNode Parent,
@@ -506,7 +629,7 @@ public record MoveEntryInSameReference(
     Index NewIndex,
     Index OldIndex,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record MoveAndReplaceEntryFromOtherReference(
     TargetNode NewParent,
@@ -516,7 +639,7 @@ public record MoveAndReplaceEntryFromOtherReference(
     MetaPointer OldReference,
     Index OldIndex,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record MoveAndReplaceEntryFromOtherReferenceInSameParent(
     TargetNode Parent,
@@ -525,7 +648,7 @@ public record MoveAndReplaceEntryFromOtherReferenceInSameParent(
     MetaPointer OldReference,
     Index OldIndex,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record MoveAndReplaceEntryInSameReference(
     TargetNode Parent,
@@ -533,7 +656,7 @@ public record MoveAndReplaceEntryInSameReference(
     Index NewIndex,
     Index OldIndex,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record AddReferenceResolveInfo(
     TargetNode Parent,
@@ -541,7 +664,7 @@ public record AddReferenceResolveInfo(
     Index Index,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record DeleteReferenceResolveInfo(
     TargetNode Parent,
@@ -549,7 +672,7 @@ public record DeleteReferenceResolveInfo(
     Index Index,
     CommandId CommandId,
     ProtocolMessage? Message)
-    : IReferenceCommand;
+    : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record ChangeReferenceResolveInfo(
     TargetNode Parent,
@@ -557,7 +680,7 @@ public record ChangeReferenceResolveInfo(
     Index Index,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record AddReferenceTarget(
     TargetNode Parent,
@@ -565,7 +688,7 @@ public record AddReferenceTarget(
     Index Index,
     TargetNode NewTarget,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record DeleteReferenceTarget(
     TargetNode Parent,
@@ -573,7 +696,7 @@ public record DeleteReferenceTarget(
     Index Index,
     CommandId CommandId,
     ProtocolMessage? Message)
-    : IReferenceCommand;
+    : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 public record ChangeReferenceTarget(
     TargetNode Parent,
@@ -581,12 +704,12 @@ public record ChangeReferenceTarget(
     Index Index,
     TargetNode NewTarget,
     CommandId CommandId,
-    ProtocolMessage? Message) : IReferenceCommand;
+    ProtocolMessage? Message) : ADeltaCommand(CommandId, Message), IReferenceCommand;
 
 #endregion
 
 public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage? Message)
-    : IDeltaCommand
+    : ADeltaCommand(null, Message), IDeltaCommand
 {
     public CommandId? CommandId => null;
 
@@ -619,7 +742,8 @@ public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage? 
         return hashCode.ToHashCode();
     }
 
-    protected virtual bool PrintMembers(StringBuilder builder)
+    /// <inheritdoc />
+    protected override bool PrintMembers(StringBuilder builder)
     {
         builder.Append(nameof(Commands));
         builder.Append(" = [");
@@ -634,6 +758,7 @@ public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage? 
             first = false;
             builder.Append(command);
         }
+
         builder.Append("], ");
 
         builder.Append(nameof(Message));
@@ -665,6 +790,10 @@ public abstract record SingleDeltaEventBase(
     ProtocolMessage? Message)
     : ISingleDeltaEvent
 {
+    public ParticipationId InternalParticipationId { get; set; }
+
+    public string Id => string.Join("__", OriginCommands.Select(x => x.ToString()));
+
     public virtual bool Equals(SingleDeltaEventBase? other)
     {
         if (other is null)
@@ -713,7 +842,7 @@ public abstract record SingleDeltaEventBase(
             first = false;
             builder.Append(command);
         }
-        
+
         builder.Append("], ");
         builder.Append(nameof(Message));
         builder.Append(" = ");
@@ -725,23 +854,23 @@ public abstract record SingleDeltaEventBase(
 
 #region Partitions
 
-public interface IPartitionEvent : ISingleDeltaEvent;
+public interface IPartitionDeltaEvent : ISingleDeltaEvent;
 
 public record PartitionAdded(
     DeltaSerializationChunk NewPartition,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionDeltaEvent
 {
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewPartition));
         builder.Append(" = ");
         builder.Append(NewPartition);
-        
+
         return true;
     }
 }
@@ -750,17 +879,17 @@ public record PartitionDeleted(
     DeltaSerializationChunk DeletedPartition,
     EventSequenceNumber EventSequenceNumber,
     CommandSource[] OriginCommands,
-    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionEvent
+    ProtocolMessage? Message) : SingleDeltaEventBase(EventSequenceNumber, OriginCommands, Message), IPartitionDeltaEvent
 {
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(DeletedPartition));
         builder.Append(" = ");
         builder.Append(DeletedPartition);
-        
+
         return true;
     }
 }
@@ -782,25 +911,24 @@ public record ClassifierChanged(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Node));
         builder.Append(" = ");
         builder.Append(Node);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewClassifier));
         builder.Append(" = ");
         builder.Append(NewClassifier);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldClassifier));
         builder.Append(" = ");
         builder.Append(OldClassifier);
-        
+
         return true;
     }
-    
 }
 
 #endregion
@@ -832,22 +960,22 @@ public record PropertyAdded(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Property));
         builder.Append(" = ");
         builder.Append(Property);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewValue));
         builder.Append(" = ");
         builder.Append(NewValue);
-        
+
         return true;
     }
 }
@@ -863,25 +991,24 @@ public record PropertyDeleted(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Property));
         builder.Append(" = ");
         builder.Append(Property);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldValue));
         builder.Append(" = ");
         builder.Append(OldValue);
-        
+
         return true;
     }
-    
 }
 
 public record PropertyChanged(
@@ -896,27 +1023,27 @@ public record PropertyChanged(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Property));
         builder.Append(" = ");
         builder.Append(Property);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewValue));
         builder.Append(" = ");
         builder.Append(NewValue);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldValue));
         builder.Append(" = ");
         builder.Append(OldValue);
-        
+
         return true;
     }
 }
@@ -944,27 +1071,27 @@ public record ChildAdded(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Containment));
         builder.Append(" = ");
         builder.Append(Containment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewChild));
         builder.Append(" = ");
         builder.Append(NewChild);
-        
+
         return true;
     }
 }
@@ -981,27 +1108,27 @@ public record ChildDeleted(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Containment));
         builder.Append(" = ");
         builder.Append(Containment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(DeletedChild));
         builder.Append(" = ");
         builder.Append(DeletedChild);
-        
+
         return true;
     }
 }
@@ -1019,32 +1146,32 @@ public record ChildReplaced(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Containment));
         builder.Append(" = ");
         builder.Append(Containment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewChild));
         builder.Append(" = ");
         builder.Append(NewChild);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedChild));
         builder.Append(" = ");
         builder.Append(ReplacedChild);
-        
+
         return true;
     }
 }
@@ -1064,46 +1191,46 @@ public record ChildMovedFromOtherContainment(
     public TargetNode Parent => NewParent;
 
     MetaPointer IContainmentEvent.Containment => NewContainment;
-    
+
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewParent));
         builder.Append(" = ");
         builder.Append(NewParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewContainment));
         builder.Append(" = ");
         builder.Append(NewContainment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedChild));
         builder.Append(" = ");
         builder.Append(MovedChild);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldParent));
         builder.Append(" = ");
         builder.Append(OldParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldContainment));
         builder.Append(" = ");
         builder.Append(OldContainment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         return true;
     }
 }
@@ -1124,37 +1251,37 @@ public record ChildMovedFromOtherContainmentInSameParent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewContainment));
         builder.Append(" = ");
         builder.Append(NewContainment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedChild));
         builder.Append(" = ");
         builder.Append(MovedChild);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldContainment));
         builder.Append(" = ");
         builder.Append(OldContainment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         return true;
     }
 }
@@ -1172,32 +1299,32 @@ public record ChildMovedInSameContainment(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedChild));
         builder.Append(" = ");
         builder.Append(MovedChild);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Containment));
         builder.Append(" = ");
         builder.Append(Containment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         return true;
     }
 }
@@ -1222,47 +1349,47 @@ public record ChildMovedAndReplacedFromOtherContainment(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewParent));
         builder.Append(" = ");
         builder.Append(NewParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewContainment));
         builder.Append(" = ");
         builder.Append(NewContainment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedChild));
         builder.Append(" = ");
         builder.Append(MovedChild);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldParent));
         builder.Append(" = ");
         builder.Append(OldParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldContainment));
         builder.Append(" = ");
         builder.Append(OldContainment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedChild));
         builder.Append(" = ");
         builder.Append(ReplacedChild);
-        
+
         return true;
     }
 }
@@ -1284,42 +1411,42 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewContainment));
         builder.Append(" = ");
         builder.Append(NewContainment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedChild));
         builder.Append(" = ");
         builder.Append(MovedChild);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldContainment));
         builder.Append(" = ");
         builder.Append(OldContainment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedChild));
         builder.Append(" = ");
         builder.Append(ReplacedChild);
-        
+
         return true;
     }
 }
@@ -1338,37 +1465,37 @@ public record ChildMovedAndReplacedInSameContainment(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedChild));
         builder.Append(" = ");
         builder.Append(MovedChild);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Containment));
         builder.Append(" = ");
         builder.Append(Containment);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedChild));
         builder.Append(" = ");
         builder.Append(ReplacedChild);
-        
+
         return true;
     }
 }
@@ -1393,22 +1520,22 @@ public record AnnotationAdded(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewAnnotation));
         builder.Append(" = ");
         builder.Append(NewAnnotation);
-        
+
         return true;
     }
 }
@@ -1424,22 +1551,22 @@ public record AnnotationDeleted(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(DeletedAnnotation));
         builder.Append(" = ");
         builder.Append(DeletedAnnotation);
-        
+
         return true;
     }
 }
@@ -1456,27 +1583,27 @@ public record AnnotationReplaced(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewAnnotation));
         builder.Append(" = ");
         builder.Append(NewAnnotation);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedAnnotation));
         builder.Append(" = ");
         builder.Append(ReplacedAnnotation);
-        
+
         return true;
     }
 }
@@ -1496,32 +1623,32 @@ public record AnnotationMovedFromOtherParent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewParent));
         builder.Append(" = ");
         builder.Append(NewParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedAnnotation));
         builder.Append(" = ");
         builder.Append(MovedAnnotation);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldParent));
         builder.Append(" = ");
         builder.Append(OldParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         return true;
     }
 }
@@ -1538,27 +1665,27 @@ public record AnnotationMovedInSameParent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedAnnotation));
         builder.Append(" = ");
         builder.Append(MovedAnnotation);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         return true;
     }
 }
@@ -1579,37 +1706,37 @@ public record AnnotationMovedAndReplacedFromOtherParent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewParent));
         builder.Append(" = ");
         builder.Append(NewParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedAnnotation));
         builder.Append(" = ");
         builder.Append(MovedAnnotation);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldParent));
         builder.Append(" = ");
         builder.Append(OldParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedAnnotation));
         builder.Append(" = ");
         builder.Append(ReplacedAnnotation);
-        
+
         return true;
     }
 }
@@ -1627,32 +1754,32 @@ public record AnnotationMovedAndReplacedInSameParent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedAnnotation));
         builder.Append(" = ");
         builder.Append(MovedAnnotation);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedAnnotation));
         builder.Append(" = ");
         builder.Append(ReplacedAnnotation);
-        
+
         return true;
     }
 }
@@ -1680,27 +1807,27 @@ public record ReferenceAdded(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewTarget));
         builder.Append(" = ");
         builder.Append(NewTarget);
-        
+
         return true;
     }
 }
@@ -1717,27 +1844,27 @@ public record ReferenceDeleted(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(DeletedTarget));
         builder.Append(" = ");
         builder.Append(DeletedTarget);
-        
+
         return true;
     }
 }
@@ -1755,32 +1882,32 @@ public record ReferenceChanged(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewTarget));
         builder.Append(" = ");
         builder.Append(NewTarget);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedTarget));
         builder.Append(" = ");
         builder.Append(ReplacedTarget);
-        
+
         return true;
     }
 }
@@ -1804,42 +1931,42 @@ public record EntryMovedFromOtherReference(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewParent));
         builder.Append(" = ");
         builder.Append(NewParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewReference));
         builder.Append(" = ");
         builder.Append(NewReference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldParent));
         builder.Append(" = ");
         builder.Append(OldParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldReference));
         builder.Append(" = ");
         builder.Append(OldReference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedEntry));
         builder.Append(" = ");
         builder.Append(MovedEntry);
-        
+
         return true;
     }
 }
@@ -1860,37 +1987,37 @@ public record EntryMovedFromOtherReferenceInSameParent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewReference));
         builder.Append(" = ");
         builder.Append(NewReference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldReference));
         builder.Append(" = ");
         builder.Append(OldReference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedEntry));
         builder.Append(" = ");
         builder.Append(MovedEntry);
-        
+
         return true;
     }
 }
@@ -1908,32 +2035,32 @@ public record EntryMovedInSameReference(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedEntry));
         builder.Append(" = ");
         builder.Append(MovedEntry);
-        
+
         return true;
     }
 }
@@ -1958,47 +2085,47 @@ public record EntryMovedAndReplacedFromOtherReference(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewParent));
         builder.Append(" = ");
         builder.Append(NewParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewReference));
         builder.Append(" = ");
         builder.Append(NewReference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldParent));
         builder.Append(" = ");
         builder.Append(OldParent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldReference));
         builder.Append(" = ");
         builder.Append(OldReference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedEntry));
         builder.Append(" = ");
         builder.Append(MovedEntry);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedEntry));
         builder.Append(" = ");
         builder.Append(ReplacedEntry);
-        
+
         return true;
     }
 }
@@ -2020,42 +2147,42 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewReference));
         builder.Append(" = ");
         builder.Append(NewReference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldReference));
         builder.Append(" = ");
         builder.Append(OldReference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedEntry));
         builder.Append(" = ");
         builder.Append(MovedEntry);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedEntry));
         builder.Append(" = ");
         builder.Append(ReplacedEntry);
-        
+
         return true;
     }
 }
@@ -2074,37 +2201,37 @@ public record EntryMovedAndReplacedInSameReference(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewIndex));
         builder.Append(" = ");
         builder.Append(NewIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(OldIndex));
         builder.Append(" = ");
         builder.Append(OldIndex);
-        
+
         builder.Append(", ");
         builder.Append(nameof(MovedEntry));
         builder.Append(" = ");
         builder.Append(MovedEntry);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedEntry));
         builder.Append(" = ");
         builder.Append(ReplacedEntry);
-        
+
         return true;
     }
 }
@@ -2122,32 +2249,32 @@ public record ReferenceResolveInfoAdded(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewResolveInfo));
         builder.Append(" = ");
         builder.Append(NewResolveInfo);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Target));
         builder.Append(" = ");
         builder.Append(Target);
-        
+
         return true;
     }
 }
@@ -2165,32 +2292,32 @@ public record ReferenceResolveInfoDeleted(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Target));
         builder.Append(" = ");
         builder.Append(Target);
-        
+
         builder.Append(", ");
         builder.Append(nameof(DeletedResolveInfo));
         builder.Append(" = ");
         builder.Append(DeletedResolveInfo);
-        
+
         return true;
     }
 }
@@ -2209,37 +2336,37 @@ public record ReferenceResolveInfoChanged(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewResolveInfo));
         builder.Append(" = ");
         builder.Append(NewResolveInfo);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Target));
         builder.Append(" = ");
         builder.Append(Target);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedResolveInfo));
         builder.Append(" = ");
         builder.Append(ReplacedResolveInfo);
-        
+
         return true;
     }
 }
@@ -2257,32 +2384,32 @@ public record ReferenceTargetAdded(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewTarget));
         builder.Append(" = ");
         builder.Append(NewTarget);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ResolveInfo));
         builder.Append(" = ");
         builder.Append(ResolveInfo);
-        
+
         return true;
     }
 }
@@ -2300,32 +2427,32 @@ public record ReferenceTargetDeleted(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ResolveInfo));
         builder.Append(" = ");
         builder.Append(ResolveInfo);
-        
+
         builder.Append(", ");
         builder.Append(nameof(DeletedTarget));
         builder.Append(" = ");
         builder.Append(DeletedTarget);
-        
+
         return true;
     }
 }
@@ -2344,37 +2471,37 @@ public record ReferenceTargetChanged(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Parent));
         builder.Append(" = ");
         builder.Append(Parent);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Reference));
         builder.Append(" = ");
         builder.Append(Reference);
-        
+
         builder.Append(", ");
         builder.Append(nameof(Index));
         builder.Append(" = ");
         builder.Append(Index);
-        
+
         builder.Append(", ");
         builder.Append(nameof(NewTarget));
         builder.Append(" = ");
         builder.Append(NewTarget);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ResolveInfo));
         builder.Append(" = ");
         builder.Append(ResolveInfo);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ReplacedTarget));
         builder.Append(" = ");
         builder.Append(ReplacedTarget);
-        
+
         return true;
     }
 }
@@ -2389,6 +2516,9 @@ public record CompositeEvent(
     ProtocolMessage? Message)
     : IDeltaEvent
 {
+    public ParticipationId InternalParticipationId { get; set; }
+    public string Id => string.Join("--", Events.Select(e => e.Id));
+
     /// <inheritdoc />
     public virtual bool Equals(CompositeEvent? other)
     {
@@ -2433,17 +2563,18 @@ public record CompositeEvent(
             first = false;
             builder.Append(node);
         }
+
         builder.Append("], ");
-        
+
         builder.Append(nameof(EventSequenceNumber));
         builder.Append(" = ");
         builder.Append(EventSequenceNumber);
         builder.Append(", ");
-        
+
         builder.Append(nameof(Message));
         builder.Append(" = ");
         builder.Append(Message);
-        
+
         return true;
     }
 }
@@ -2457,7 +2588,7 @@ public record NoOpEvent(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         return true;
     }
 }
@@ -2472,12 +2603,12 @@ public record Error(
     protected override bool PrintMembers(StringBuilder builder)
     {
         base.PrintMembers(builder);
-        
+
         builder.Append(", ");
         builder.Append(nameof(ErrorCode));
         builder.Append(" = ");
         builder.Append(ErrorCode);
-        
+
         return true;
     }
 }
