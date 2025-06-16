@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1.Event.Partition;
 using M2;
 using M3;
 using System.Collections;
@@ -299,9 +300,17 @@ public class LenientNode : NodeBase, INode
 
 public class LenientPartition : LenientNode, IPartitionInstance
 {
+    private readonly PartitionEventHandler _eventHandler;
     public LenientPartition(NodeId id, Classifier? classifier) : base(id, classifier)
     {
+        _eventHandler = new PartitionEventHandler(this);
     }
+
+    /// <inheritdoc />
+    public IPartitionPublisher GetPublisher() => _eventHandler;
+
+    /// <inheritdoc />
+    public IPartitionCommander GetCommander() => _eventHandler;
 
     public Concept GetConcept() => (Concept)GetClassifier();
 }
