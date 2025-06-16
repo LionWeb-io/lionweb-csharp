@@ -21,22 +21,27 @@ namespace LionWeb.Core.M1.Event;
 /// if the event passes <see cref="Filter{TSubscribedEvent}"/>.
 public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
     : IDisposable, IPublisher<TEvent>
-    where TEvent : IEvent
+    where TEvent : class, IEvent
     where TPublisher : IPublisher<TEvent>
 {
     private readonly TPublisher? _localPublisher = localPublisher;
     private readonly Dictionary<object, EventHandler<TEvent>> _forwardingHandlers = [];
 
     /// <inheritdoc />
-    public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent
+    public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent
     {
         if (_localPublisher == null)
             return;
 
         EventHandler<TEvent> forwardingHandler = (sender, @event) =>
         {
-            if (@event is TSubscribedEvent r && Filter<TSubscribedEvent>(@event))
-                handler(sender, r);
+            if (@event is not TSubscribedEvent s)
+                return;
+
+            var r = Filter<TSubscribedEvent>(s);
+            Console.WriteLine($"Forwarding event id {@event.EventId}: {r?.EventId}");
+            if (r is not null)
+                handler(sender, s);
         };
 
         _forwardingHandlers.Add(handler, forwardingHandler);
@@ -45,7 +50,7 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
     }
 
     /// <inheritdoc />
-    public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent
+    public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent
     {
         if (_localPublisher == null)
             return;
@@ -76,13 +81,13 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
     /// <param name="event">Event to check.</param>
     /// <typeparam name="TSubscribedEvent">Requested type of event.</typeparam>
     /// <returns><c>true</c> if <paramref name="@event"/> should be forwarded to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>; <c>false</c> otherwise.</returns>
-    protected abstract bool Filter<TSubscribedEvent>(TEvent @event) where TSubscribedEvent : TEvent;
+    protected abstract TSubscribedEvent? Filter<TSubscribedEvent>(TEvent @event) where TSubscribedEvent : class, TEvent;
 }
 
 /// Suppresses all events with <see cref="RegisterEventId">registered event ids</see>.
 public abstract class EventIdFilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
     : FilteringEventForwarder<TEvent, TPublisher>(localPublisher)
-    where TEvent : IEvent where TPublisher : IPublisher<TEvent>
+    where TEvent : class, IEvent where TPublisher : IPublisher<TEvent>
 {
     private readonly HashSet<IEventId> _eventIds = [];
 
@@ -95,10 +100,9 @@ public abstract class EventIdFilteringEventForwarder<TEvent, TPublisher>(TPublis
         _eventIds.Remove(eventId);
 
     /// <inheritdoc />
-    protected override bool Filter<TSubscribedEvent>(TEvent @event)
+    protected override TSubscribedEvent? Filter<TSubscribedEvent>(TEvent @event)  where TSubscribedEvent : class
     {
         var result = !_eventIds.Contains(@event.EventId);
-        Console.WriteLine($"Forwarding event id {@event.EventId}: {result}");
-        return result;
+        return result ? @event as TSubscribedEvent : null;
     }
 }

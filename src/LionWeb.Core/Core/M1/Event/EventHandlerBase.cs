@@ -20,13 +20,11 @@ namespace LionWeb.Core.M1.Event;
 using Forest;
 using Partition;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Utilities;
 
 public abstract class EventHandlerBase
 {
     protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
-    public abstract string ParticipationId { protected get; set; }
 
     private static ILookup<Type, Type> InitAllSubtypes()
     {
@@ -60,25 +58,16 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     private event EventHandler<TEvent>? Event;
 
     // Unique per instance
-    public override string ParticipationId
-    {
-        protected get => _participationId;
-        set
-        {
-            Console.WriteLine($"ParticipationId({RuntimeHelpers.GetHashCode(this)}): {value}-");
-            _participationId = value + "-";
-        }
-    }
+    private readonly EventId _eventIdBase;
 
     private int _nextId = 0;
-    private string _participationId;
 
     /// <inheritdoc cref="EventHandlerBase"/>
     /// <param name="sender">Optional sender of the events.</param>
     protected EventHandlerBase(object? sender)
     {
         _sender = sender ?? this;
-        ParticipationId = sender as string ?? IdUtils.NewId();
+        _eventIdBase = sender as string ?? IdUtils.NewId();
     }
 
     /// <inheritdoc />
@@ -92,10 +81,10 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
         _eventIds
             .TryDequeue(out var registeredEventId)
             ? registeredEventId
-            : new ParticipationEventId(ParticipationId, (_nextId++).ToString());
+            : new NumericEventId(_eventIdBase, _nextId++);
 
     /// <inheritdoc />
-    public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent
+    public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent
     {
         RegisterSubscribedEvents<TSubscribedEvent>();
 
@@ -126,7 +115,7 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     }
 
     /// <inheritdoc />
-    public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent
+    public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent
     {
         if (!_handlers.Remove(handler, out var writeHandler))
             return;
@@ -155,5 +144,7 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
         Event != null &&
         eventTypes.Any(eventType => _subscribedEvents.TryGetValue(eventType, out var count) && count > 0);
 }
+
+public record NumericEventId(string Base, int Id) : IEventId;
 
 public record ParticipationEventId(ParticipationId ParticipationId, CommandId CommandId) : IEventId;

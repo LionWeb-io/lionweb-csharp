@@ -126,7 +126,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     #region Remote
 
     private void OnRemoteNewPartition(object? sender, PartitionAddedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var newPartition = (INode)@event.NewPartition;
 
@@ -140,7 +140,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         });
 
     private void OnRemotePartitionDeleted(object? sender, PartitionDeletedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localPartition = (IPartitionInstance)Lookup(@event.DeletedPartition.GetId());
             _localForest.RemovePartitions([localPartition]);

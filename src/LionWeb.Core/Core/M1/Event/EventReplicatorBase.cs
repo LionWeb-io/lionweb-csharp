@@ -34,9 +34,9 @@ using Utilities;
 /// Therefore, two instances with different <i>locals</i> can replicate each other, keeping both <i>locals</i> in sync.
 /// </para>
 public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFilteringEventForwarder<TEvent, TPublisher>
-    where TEvent : IEvent where TPublisher : IPublisher<TEvent>
+    where TEvent : class, IEvent where TPublisher : IPublisher<TEvent>
 {
-    private readonly ICommander<TEvent>? _localCommander;
+    protected readonly ICommander<TEvent>? _localCommander;
     private readonly List<TPublisher> _publishers = [];
 
     protected readonly Dictionary<NodeId, IReadableNode> NodeById;
@@ -96,7 +96,7 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
 
     /// Uses <see cref="EventIdFilteringEventForwarder{TEvent,TPublisher}"/> and <see cref="ICommander{TEvent}.RegisterEventId"/>
     /// to suppress forwarding events raised during executing <paramref name="action"/>. 
-    protected void SuppressEventForwarding(Action action)
+    protected virtual void SuppressEventForwarding(TEvent @event, Action action)
     {
         IEventId? eventId = null;
         if (_localCommander != null)

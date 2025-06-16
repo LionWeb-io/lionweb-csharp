@@ -102,6 +102,25 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         publisher.Subscribe<IPartitionEvent>(LocalHandler);
     }
 
+    /// <see cref="EventReplicatorBase{TEvent,TPublisher}.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
+    /// and <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">unsubscribes</see> from it.
+    public override void Dispose()
+    {
+        base.Dispose();
+
+        UnregisterNode(_localPartition);
+
+        var localPublisher = _localPartition.GetPublisher();
+        if (localPublisher == null)
+            return;
+
+        localPublisher.Unsubscribe<IPartitionEvent>(LocalHandler);
+
+        GC.SuppressFinalize(this);
+    }
+
+    #region Local
+
     private void LocalHandler(object? sender, IPartitionEvent @event)
     {
         // Console.WriteLine($"{this.GetType()}: Received event: {@event}");
@@ -121,25 +140,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 break;
         }
     }
-
-    /// <see cref="EventReplicatorBase{TEvent,TPublisher}.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
-    /// and <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">unsubscribes</see> from it.
-    public override void Dispose()
-    {
-        base.Dispose();
-
-        UnregisterNode(_localPartition);
-
-        var localPublisher = _localPartition.GetPublisher();
-        if (localPublisher == null)
-            return;
-
-        localPublisher.Unsubscribe<IPartitionEvent>(LocalHandler);
-
-        GC.SuppressFinalize(this);
-    }
-
-    #region Local
 
     private void OnLocalChildAdded(object? sender, ChildAddedEvent @event) =>
         RegisterNode(@event.NewChild);
@@ -161,20 +161,20 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     #region Properties
 
     private void OnRemotePropertyAdded(object? sender, PropertyAddedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             Console.WriteLine($"Node {@event.Node.PrintIdentity()}: Setting {@event.Property} to {@event.NewValue}");
             Lookup(@event.Node.GetId()).Set(@event.Property, @event.NewValue);
         });
 
     private void OnRemotePropertyDeleted(object? sender, PropertyDeletedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             Lookup(@event.Node.GetId()).Set(@event.Property, null);
         });
 
     private void OnRemotePropertyChanged(object? sender, PropertyChangedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             Lookup(@event.Node.GetId()).Set(@event.Property, @event.NewValue);
         });
@@ -184,7 +184,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     #region Children
 
     private void OnRemoteChildAdded(object? sender, ChildAddedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
             var newChildNode = (INode)@event.NewChild;
@@ -198,7 +198,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         });
 
     private void OnRemoteChildDeleted(object? sender, ChildDeletedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
 
@@ -218,7 +218,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         });
 
     private void OnRemoteChildReplaced(object? sender, ChildReplacedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
 
@@ -242,7 +242,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private void OnRemoteChildMovedFromOtherContainment(object? sender,
         ChildMovedFromOtherContainmentEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localNewParent = Lookup(@event.NewParent.GetId());
             var nodeToInsert = LookupOpt(@event.MovedChild.GetId()) ?? Clone((INode)@event.MovedChild);
@@ -253,7 +253,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(object? sender,
         ChildMovedFromOtherContainmentInSameParentEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
             var newValue = InsertContainment(localParent, @event.NewContainment, @event.NewIndex,
@@ -264,7 +264,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private void OnRemoteChildMovedInSameContainment(object? sender,
         ChildMovedInSameContainmentEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
             INode nodeToInsert = Lookup(@event.MovedChild.GetId());
@@ -309,7 +309,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     #region Annotations
 
     private void OnRemoteAnnotationAdded(object? sender, AnnotationAddedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
             var clone = Clone((INode)@event.NewAnnotation);
@@ -317,7 +317,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         });
 
     private void OnRemoteAnnotationDeleted(object? sender, AnnotationDeletedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
             var localDeleted = Lookup(@event.DeletedAnnotation.GetId());
@@ -326,7 +326,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private void OnRemoteAnnotationMovedFromOtherParent(object? sender,
         AnnotationMovedFromOtherParentEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localNewParent = Lookup(@event.NewParent.GetId());
             var moved = LookupOpt(@event.MovedAnnotation.GetId()) ?? Clone((INode)@event.MovedAnnotation);
@@ -335,7 +335,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private void OnRemoteAnnotationMovedInSameParent(object? sender,
         AnnotationMovedInSameParentEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
             INode nodeToInsert = Lookup(@event.MovedAnnotation.GetId());
@@ -347,7 +347,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     #region References
 
     private void OnRemoteReferenceAdded(object? sender, ReferenceAddedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
             INode target = Lookup(@event.NewTarget.Reference.GetId());
@@ -357,7 +357,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         });
 
     private void OnRemoteReferenceDeleted(object? sender, ReferenceDeletedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
 
@@ -377,7 +377,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         });
 
     private void OnRemoteReferenceChanged(object? sender, ReferenceChangedEvent @event) =>
-        SuppressEventForwarding(() =>
+        SuppressEventForwarding(@event, () =>
         {
             var localParent = Lookup(@event.Parent.GetId());
 

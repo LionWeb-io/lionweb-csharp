@@ -27,9 +27,9 @@ public interface IPublisher<in TEvent> where TEvent : IEvent
     /// Events raised by this publisher that are <i>not</i> compatible with <typeparamref name="TSubscribedEvent"/>
     /// will <i>not</i> reach <paramref name="handler"/>.
     /// </typeparam> 
-    void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent;
+    void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent;
 
     /// Unregisters <paramref name="handler"/> from notification of events.
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
-    void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : TEvent;
+    void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent;
 }
