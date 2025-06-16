@@ -144,11 +144,11 @@ public class WebSocketTests
 
         public void Send(Action<string> action)
         {
-            var commandToEventMapper = new DeltaCommandToDeltaEventMapper(_name, _sharedNodeMap);
+            var commandToEventMapper = new PartitionEventToDeltaEventMapper(new ConstParticipationIdProvider(), new EventSequenceNumberProvider(), lionWebVersion);
 
-            _publisher.Subscribe<IPartitionEvent>((sender, deltaContent) =>
+            _publisher.Subscribe<IPartitionEvent>((sender, partitionEvent) =>
             {
-                var @event = commandToEventMapper.Map((IDeltaCommand)deltaContent);
+                var @event = commandToEventMapper.Map(partitionEvent);
 
                 Console.WriteLine($"{_name} sending event: {@event}");
                 var deltaSerializer = new DeltaSerializer();
@@ -284,4 +284,15 @@ class WebSocketClient(string name)
         await _clientWebSocket.SendAsync(new ArraySegment<byte>(Encoding.UTF8.GetBytes(msg)), WebSocketMessageType.Text,
             true, CancellationToken.None);
     }
+}
+
+public class ConstParticipationIdProvider : IParticipationIdProvider
+{
+    public string ParticipationId => "abc";
+}
+
+public class EventSequenceNumberProvider : IEventSequenceNumberProvider
+{
+    private long next = 0;
+    public long Create() => ++next;
 }
