@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Serialization;
 
+using Delta.Event;
 using M1;
 using M1.Event.Partition;
 using M3;

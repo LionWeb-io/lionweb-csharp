@@ -18,15 +18,11 @@
 namespace LionWeb.Core.Test.Delta;
 
 using Core.Serialization;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
+using Core.Serialization.Delta;
+using Core.Serialization.Delta.Event;
 using TargetNode = NodeId;
 using CommandId = NodeId;
 using QueryId = NodeId;
-using FreeId = NodeId;
-using MessageKind = NodeId;
-using MessageDataKey = NodeId;
 
 public abstract class JsonSerializationTestsBase
 {
@@ -71,10 +67,10 @@ public abstract class JsonSerializationTestsBase
     private string CreateKey() =>
         (++_nextKey).ToString();
 
-    protected ProtocolMessage CreateProtocolMessage() =>
-        new ProtocolMessage("MyKind", "MyMessage",
+    protected ProtocolMessage[] CreateProtocolMessages() =>
+        [new ProtocolMessage("MyKind", "MyMessage",
             [new ProtocolMessageData("key0", "value0"), new ProtocolMessageData("key1", "value1")]
-        );
+        )];
 
     protected String CreatePropertyValue() =>
         (++_nextPropertyValue).ToString();
@@ -87,4 +83,30 @@ public abstract class JsonSerializationTestsBase
 
     protected Int32 CreateIndex() =>
         ++_nextIndex;
+    
+
+    private int _nextCommandId = 0;
+
+    protected CommandId CreateCommandId() =>
+        (++_nextCommandId).ToString();
+    
+    private long _nextSequence = 0;
+
+    protected long NextSequence() =>
+        _nextSequence++;
+
+    protected CommandSource[] CreateOrigin() =>
+    [
+        CreateCommandSource(),
+        CreateCommandSource()
+    ];
+
+    private CommandSource CreateCommandSource() =>
+        new CommandSource("myParticipation", CreateTargetNode());
+    
+    
+    private int _nextQueryId = 0;
+
+    protected QueryId CreateQueryId() =>
+        (++_nextQueryId).ToString();
 }

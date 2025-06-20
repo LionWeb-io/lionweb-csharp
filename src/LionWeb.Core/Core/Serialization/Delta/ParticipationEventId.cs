@@ -15,9 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-global using NodeId = string;
-global using PropertyValue = string;
-global using ResolveInfo = string;
-global using MetaPointerKey = string;
-global using Index = int;
-global using EventId = string;
+namespace LionWeb.Core.Serialization.Delta;
+
+using M1.Event;
+using CommandId = NodeId;
+using ParticipationId = NodeId;
+
+public record ParticipationEventId(ParticipationId ParticipationId, CommandId CommandId) : IEventId;

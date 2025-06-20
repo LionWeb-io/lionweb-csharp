@@ -146,5 +146,3 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
 }
 
 public record NumericEventId(string Base, int Id) : IEventId;
-
-public record ParticipationEventId(ParticipationId ParticipationId, CommandId CommandId) : IEventId;

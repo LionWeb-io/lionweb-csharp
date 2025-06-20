@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.Listener;
 
 using Core.Serialization;
+using Core.Serialization.Delta.Command;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
@@ -25,7 +26,6 @@ using M1.Event;
 using M1.Event.Partition;
 using M3;
 using Comparer = Core.Utilities.Comparer;
-using NodeId = string;
 
 public abstract class EventTestsBase
 {

@@ -17,10 +17,13 @@
 
 namespace LionWeb.Core.Serialization;
 
+using Delta;
+using Delta.Command;
 using M1;
 using M1.Event;
 using M1.Event.Partition;
 using M3;
+using CommandId = NodeId;
 
 public class PartitionEventToDeltaCommandMapper
 {

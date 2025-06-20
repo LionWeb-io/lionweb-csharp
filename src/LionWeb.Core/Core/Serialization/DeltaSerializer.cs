@@ -17,6 +17,10 @@
 
 namespace LionWeb.Core.Serialization;
 
+using Delta;
+using Delta.Command;
+using Delta.Event;
+using Delta.Query;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;

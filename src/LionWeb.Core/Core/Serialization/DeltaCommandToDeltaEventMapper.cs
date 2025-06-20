@@ -17,10 +17,12 @@
 
 namespace LionWeb.Core.Serialization;
 
+using Delta.Command;
+using Delta.Event;
 using M1;
 using M2;
 using M3;
-using ParticipationId = string;
+using ParticipationId = NodeId;
 
 public class DeltaCommandToDeltaEventMapper
 {

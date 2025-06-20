@@ -18,9 +18,9 @@
 namespace LionWeb.Core.Test.Delta;
 
 using Core.Serialization;
+using Core.Serialization.Delta.Event;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using Listener;
 using M1;
 using M1.Event;
 using M1.Event.Partition;
