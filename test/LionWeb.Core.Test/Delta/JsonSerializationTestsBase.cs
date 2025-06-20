@@ -41,72 +41,74 @@ public abstract class JsonSerializationTestsBase
         Assert.AreEqual(input, deserialized);
     }
 
-    protected TargetNode CreateTargetNode() =>
+    protected TargetNode TargetNode() =>
         (++_nextNodeId).ToString();
 
-    protected DeltaSerializationChunk CreateChunk() =>
+    protected TargetNode[] Descendants() =>
+        [TargetNode(), TargetNode()];
+
+    protected DeltaSerializationChunk Chunk() =>
         new DeltaSerializationChunk([
-            CreateNode(),
-            CreateNode()
+            Node(),
+            Node()
         ]);
 
-    private SerializedNode CreateNode() =>
+    private SerializedNode Node() =>
         new SerializedNode
         {
-            Id = CreateTargetNode(),
-            Classifier = CreateMetaPointer(),
+            Id = TargetNode(),
+            Classifier = MetaPointer(),
             Properties = [],
             Containments = [],
             References = [],
             Annotations = []
         };
 
-    protected MetaPointer CreateMetaPointer() =>
+    protected MetaPointer MetaPointer() =>
         new MetaPointer("myLang", "v0", CreateKey());
 
     private string CreateKey() =>
         (++_nextKey).ToString();
 
-    protected ProtocolMessage[] CreateProtocolMessages() =>
-        [new ProtocolMessage("MyKind", "MyMessage",
+    protected ProtocolMessage[] ProtocolMessages() =>
+    [
+        new ProtocolMessage("MyKind", "MyMessage",
             [new ProtocolMessageData("key0", "value0"), new ProtocolMessageData("key1", "value1")]
-        )];
+        )
+    ];
 
-    protected String CreatePropertyValue() =>
+    protected String PropertyValue() =>
         (++_nextPropertyValue).ToString();
 
-    protected SerializedReferenceTarget CreateTarget() =>
-        new SerializedReferenceTarget() { Reference = CreateTargetNode(), ResolveInfo = CreateResolveInfo() };
-
-    protected String CreateResolveInfo() =>
+    protected String ResolveInfo() =>
         $"resolve{++_nextResolveInfo}";
 
-    protected Int32 CreateIndex() =>
+    protected Int32 Index() =>
         ++_nextIndex;
-    
+
 
     private int _nextCommandId = 0;
 
-    protected CommandId CreateCommandId() =>
+    protected CommandId CommandId() =>
         (++_nextCommandId).ToString();
-    
+
     private long _nextSequence = 0;
 
-    protected long NextSequence() =>
+    protected long Sequence() =>
         _nextSequence++;
 
-    protected CommandSource[] CreateOrigin() =>
+    protected CommandSource[] Origin() =>
     [
         CreateCommandSource(),
         CreateCommandSource()
     ];
 
     private CommandSource CreateCommandSource() =>
-        new CommandSource("myParticipation", CreateTargetNode());
-    
-    
+        new CommandSource("myParticipation", TargetNode());
+
+
     private int _nextQueryId = 0;
 
-    protected QueryId CreateQueryId() =>
+    protected QueryId QueryId() =>
         (++_nextQueryId).ToString();
 }

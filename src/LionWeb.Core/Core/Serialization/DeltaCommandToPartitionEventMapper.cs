@@ -70,7 +70,7 @@ public class DeltaCommandToPartitionEventMapper
 
     private PropertyAddedEvent OnAddProperty(AddProperty addPropertyEvent)
     {
-        var parent = ToNode(addPropertyEvent.Parent);
+        var parent = ToNode(addPropertyEvent.Node);
         var property = ToProperty(addPropertyEvent.Property, parent);
         return new PropertyAddedEvent(
             parent,
@@ -82,7 +82,7 @@ public class DeltaCommandToPartitionEventMapper
 
     private PropertyDeletedEvent OnDeleteProperty(DeleteProperty deletePropertyEvent)
     {
-        var parent = ToNode(deletePropertyEvent.Parent);
+        var parent = ToNode(deletePropertyEvent.Node);
         var property = ToProperty(deletePropertyEvent.Property, parent);
         return new PropertyDeletedEvent(
             parent,
@@ -94,7 +94,7 @@ public class DeltaCommandToPartitionEventMapper
 
     private PropertyChangedEvent OnChangeProperty(ChangeProperty changePropertyEvent)
     {
-        var parent = ToNode(changePropertyEvent.Parent);
+        var parent = ToNode(changePropertyEvent.Node);
         var property = ToProperty(changePropertyEvent.Property, parent);
         return new PropertyChangedEvent(
             parent,
@@ -278,7 +278,7 @@ public class DeltaCommandToPartitionEventMapper
             parent,
             reference,
             addReferenceEvent.Index,
-            ToTarget(addReferenceEvent.NewTarget),
+            ToTarget(addReferenceEvent.NewTarget, addReferenceEvent.NewResolveInfo),
             ToEventId(addReferenceEvent)
         );
     }
@@ -304,7 +304,7 @@ public class DeltaCommandToPartitionEventMapper
             parent,
             reference,
             changeReferenceEvent.Index,
-            ToTarget(changeReferenceEvent.NewTarget),
+            ToTarget(changeReferenceEvent.NewTarget,  changeReferenceEvent.NewResolveInfo),
             new ReferenceTarget(null, parent.Get(reference) as IReadableNode),
             ToEventId(changeReferenceEvent)
         );
@@ -313,20 +313,20 @@ public class DeltaCommandToPartitionEventMapper
     private Reference ToReference(MetaPointer deltaReference, IReadableNode node) =>
         ToFeature<Reference>(deltaReference, node);
 
-    private IReferenceTarget ToTarget(SerializedReferenceTarget serializedTarget)
+    private IReferenceTarget ToTarget(TargetNode? targetNode, ResolveInfo? resolveInfo)
     {
         IReadableNode? target = null;
-        if (serializedTarget.Reference != null &&
-            _sharedNodeMap.TryGetValue(serializedTarget.Reference, out var node))
+        if (targetNode != null &&
+            _sharedNodeMap.TryGetValue(targetNode, out var node))
             target = node;
 
-        return new ReferenceTarget(serializedTarget.ResolveInfo, target);
+        return new ReferenceTarget(resolveInfo, target);
     }
 
     #endregion
 
 
-    private static IEventId ToEventId(ISingleDeltaCommand command) =>
+    private static IEventId ToEventId(IDeltaCommand command) =>
         new ParticipationEventId(command.InternalParticipationId, command.CommandId);
 
     private IWritableNode ToNode(TargetNode nodeId)

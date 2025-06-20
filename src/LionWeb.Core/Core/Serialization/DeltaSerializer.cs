@@ -45,18 +45,18 @@ public class DeltaProtocolTypeResolver : DefaultJsonTypeInfoResolver
     {
         private static readonly List<JsonDerivedType> _queries = [];
         private static readonly List<JsonDerivedType> _commands = [];
-        private static readonly List<JsonDerivedType> _singleCommands = [];
+        // private static readonly List<JsonDerivedType> _singleCommands = [];
         private static readonly List<JsonDerivedType> _events = [];
-        private static readonly List<JsonDerivedType> _singleEvents = [];
+        // private static readonly List<JsonDerivedType> _singleEvents = [];
         private static readonly List<JsonDerivedType> _all = [];
 
         static DeltaProtocolTypeResolver()
         {
             Fill(_queries, typeof(IDeltaQuery));
             Fill(_commands, typeof(IDeltaCommand));
-            Fill(_singleCommands, typeof(ISingleDeltaCommand));
+            // Fill(_singleCommands, typeof(ISingleDeltaCommand));
             Fill(_events, typeof(IDeltaEvent));
-            Fill(_singleEvents, typeof(ISingleDeltaEvent));
+            // Fill(_singleEvents, typeof(ISingleDeltaEvent));
             Fill(_all, typeof(IDeltaContent));
         }
 
@@ -87,18 +87,18 @@ public class DeltaProtocolTypeResolver : DefaultJsonTypeInfoResolver
             {
                 FillDerived(jsonPolymorphismOptions, _commands);
                 jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
-            } else if (jsonTypeInfo.Type == typeof(ISingleDeltaCommand))
-            {
-                FillDerived(jsonPolymorphismOptions, _singleCommands);
-                jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
+            // } else if (jsonTypeInfo.Type == typeof(ISingleDeltaCommand))
+            // {
+            //     FillDerived(jsonPolymorphismOptions, _singleCommands);
+            //     jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
             } else if (jsonTypeInfo.Type == typeof(IDeltaEvent))
             {
                 FillDerived(jsonPolymorphismOptions, _events);
                 jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
-            } else if (jsonTypeInfo.Type == typeof(ISingleDeltaEvent))
-            {
-                FillDerived(jsonPolymorphismOptions, _singleEvents);
-                jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
+            // } else if (jsonTypeInfo.Type == typeof(ISingleDeltaEvent))
+            // {
+            //     FillDerived(jsonPolymorphismOptions, _singleEvents);
+            //     jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
             }
 
             return jsonTypeInfo;

@@ -133,9 +133,9 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     [TestMethod]
     public void PropertyAdded_Different_Self()
     {
-        var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", 1, [new CommandSource("x", "y")],
+        var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")], 1,
             CreateProtocolMessages("msgA"));
-        var b = new PropertyAdded("b", new MetaPointer("myLang", "v0", "key"), "vv", 1, [new CommandSource("x", "y")],
+        var b = new PropertyAdded("b", new MetaPointer("myLang", "v0", "key"), "vv",  [new CommandSource("x", "y")], 1,
             CreateProtocolMessages("msgA"));
 
         Assert.IsFalse(a.Equals(b));
@@ -145,9 +145,9 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     [TestMethod]
     public void PropertyAdded_Different_Generic()
     {
-        var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", 1, [new CommandSource("x", "y")],
+        var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")], 1,
             CreateProtocolMessages("msgA"));
-        var b = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", 1, [new CommandSource("z", "y")],
+        var b = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("z", "y")], 1,
             CreateProtocolMessages("msgA"));
 
         Assert.IsFalse(a.Equals(b));
@@ -157,9 +157,9 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     [TestMethod]
     public void PropertyAdded_Same()
     {
-        var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", 1, [new CommandSource("x", "y")],
+        var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")], 1,
             CreateProtocolMessages("msgA"));
-        var b = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", 1, [new CommandSource("x", "y")],
+        var b = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")], 1,
             CreateProtocolMessages("msgA"));
 
         Assert.IsTrue(a.Equals(b));
@@ -171,12 +171,12 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     {
         var a = new CompositeEvent(
         [
-            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", 0, [new CommandSource("x", "y")],
+            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")], 0,
                 CreateProtocolMessages("msgA")),
         ], 1, CreateProtocolMessages("msgAA"));
         var b = new CompositeEvent(
         [
-            new PropertyDeleted("b", new MetaPointer("myLang", "v0", "key"), "vv", 0, [new CommandSource("x", "y")],
+            new PropertyDeleted("b", new MetaPointer("myLang", "v0", "key"), "vv",  [new CommandSource("x", "y")], 0,
                 CreateProtocolMessages("msgA")),
         ], 1, CreateProtocolMessages("msgAA"));
 
@@ -189,12 +189,12 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     {
         var a = new CompositeEvent(
         [
-            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", 0, [new CommandSource("x", "y")],
+            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")], 0,
                 CreateProtocolMessages("msgA")),
         ], 1, CreateProtocolMessages("msgAA"));
         var b = new CompositeEvent(
         [
-            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", 0, [new CommandSource("x", "z")],
+            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "z")], 0,
                 CreateProtocolMessages("msgA")),
         ], 1, CreateProtocolMessages("msgAA"));
 
@@ -207,12 +207,12 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     {
         var a = new CompositeEvent(
         [
-            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", 0, [new CommandSource("x", "y")],
+            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")], 0,
                 CreateProtocolMessages("msgA")),
         ], 1, CreateProtocolMessages("msgAA"));
         var b = new CompositeEvent(
         [
-            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", 0, [new CommandSource("x", "y")],
+            new PropertyDeleted("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")], 0,
                 CreateProtocolMessages("msgA")),
         ], 1, CreateProtocolMessages("msgAA"));
 
@@ -227,8 +227,8 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     [TestMethod]
     public void SubscribePartitionRequest_Different_Self()
     {
-        var a = new SubscribePartitionRequest("a", "x", CreateProtocolMessages("msgA"));
-        var b = new SubscribePartitionRequest("b", "x", CreateProtocolMessages("msgA"));
+        var a = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgA"));
+        var b = new SubscribeToPartitionContentsRequest("b", "x", CreateProtocolMessages("msgA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -237,8 +237,8 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     [TestMethod]
     public void SubscribePartitionRequest_Different_Generic()
     {
-        var a = new SubscribePartitionRequest("a", "x", CreateProtocolMessages("msgA"));
-        var b = new SubscribePartitionRequest("a", "x", CreateProtocolMessages("msgB"));
+        var a = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgA"));
+        var b = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgB"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -247,8 +247,8 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     [TestMethod]
     public void SubscribePartitionRequest_Same()
     {
-        var a = new SubscribePartitionRequest("a", "x", CreateProtocolMessages("msgA"));
-        var b = new SubscribePartitionRequest("a", "x", CreateProtocolMessages("msgA"));
+        var a = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgA"));
+        var b = new SubscribeToPartitionContentsRequest("a", "x", CreateProtocolMessages("msgA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());

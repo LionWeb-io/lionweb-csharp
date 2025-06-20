@@ -24,6 +24,7 @@ using M1.Event;
 using M1.Event.Partition;
 using M3;
 using ParticipationId = NodeId;
+using TargetNode = NodeId;
 using EventSequenceNumber = long;
 
 public class PartitionEventToDeltaEventMapper
@@ -71,9 +72,9 @@ public class PartitionEventToDeltaEventMapper
             propertyAddedEvent.Node.GetId(),
             propertyAddedEvent.Property.ToMetaPointer(),
             ToDelta(propertyAddedEvent.Node, propertyAddedEvent.Property, propertyAddedEvent.NewValue)!,
-            NewEventSequenceNumber(),
             ToCommandSources(propertyAddedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private PropertyDeleted OnPropertyDeleted(PropertyDeletedEvent propertyDeletedEvent) =>
@@ -81,9 +82,9 @@ public class PartitionEventToDeltaEventMapper
             propertyDeletedEvent.Node.GetId(),
             propertyDeletedEvent.Property.ToMetaPointer(),
             ToDelta(propertyDeletedEvent.Node, propertyDeletedEvent.Property, propertyDeletedEvent.OldValue)!,
-            NewEventSequenceNumber(),
             ToCommandSources(propertyDeletedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private PropertyChanged OnPropertyChanged(PropertyChangedEvent propertyChangedEvent) =>
@@ -92,9 +93,9 @@ public class PartitionEventToDeltaEventMapper
             propertyChangedEvent.Property.ToMetaPointer(),
             ToDelta(propertyChangedEvent.Node, propertyChangedEvent.Property, propertyChangedEvent.NewValue)!,
             ToDelta(propertyChangedEvent.Node, propertyChangedEvent.Property, propertyChangedEvent.OldValue)!,
-            NewEventSequenceNumber(),
             ToCommandSources(propertyChangedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private PropertyValue? ToDelta(IReadableNode parent, Property property, Object newValue) =>
@@ -107,35 +108,37 @@ public class PartitionEventToDeltaEventMapper
     private ChildAdded OnChildAdded(ChildAddedEvent childAddedEvent) =>
         new(
             childAddedEvent.Parent.GetId(),
+            ToDeltaChunk(childAddedEvent.NewChild),
             childAddedEvent.Containment.ToMetaPointer(),
             childAddedEvent.Index,
-            ToDeltaChunk(childAddedEvent.NewChild),
-            NewEventSequenceNumber(),
             ToCommandSources(childAddedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private ChildDeleted OnChildDeleted(ChildDeletedEvent childDeletedEvent) =>
         new(
+            childDeletedEvent.DeletedChild.GetId(),
+            ToDescendants(childDeletedEvent.DeletedChild),
             childDeletedEvent.Parent.GetId(),
             childDeletedEvent.Containment.ToMetaPointer(),
             childDeletedEvent.Index,
-            ToDeltaChunk(childDeletedEvent.DeletedChild),
-            NewEventSequenceNumber(),
             ToCommandSources(childDeletedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private ChildReplaced OnChildReplaced(ChildReplacedEvent childReplacedEvent) =>
         new(
+            ToDeltaChunk(childReplacedEvent.NewChild),
+            childReplacedEvent.ReplacedChild.GetId(),
+            ToDescendants(childReplacedEvent.ReplacedChild),
             childReplacedEvent.Parent.GetId(),
             childReplacedEvent.Containment.ToMetaPointer(),
             childReplacedEvent.Index,
-            ToDeltaChunk(childReplacedEvent.NewChild),
-            ToDeltaChunk(childReplacedEvent.ReplacedChild),
-            NewEventSequenceNumber(),
             ToCommandSources(childReplacedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private ChildMovedFromOtherContainment
@@ -148,9 +151,9 @@ public class PartitionEventToDeltaEventMapper
             childMovedEvent.OldParent.GetId(),
             childMovedEvent.OldContainment.ToMetaPointer(),
             childMovedEvent.OldIndex,
-            NewEventSequenceNumber(),
             ToCommandSources(childMovedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private ChildMovedFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(
@@ -162,9 +165,9 @@ public class PartitionEventToDeltaEventMapper
             childMovedEvent.Parent.GetId(),
             childMovedEvent.OldContainment.ToMetaPointer(),
             childMovedEvent.OldIndex,
-            NewEventSequenceNumber(),
             ToCommandSources(childMovedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private ChildMovedInSameContainment OnChildMovedInSameContainment(ChildMovedInSameContainmentEvent childMovedEvent) =>
@@ -174,9 +177,9 @@ public class PartitionEventToDeltaEventMapper
             childMovedEvent.Parent.GetId(),
             childMovedEvent.Containment.ToMetaPointer(),
             childMovedEvent.OldIndex,
-            NewEventSequenceNumber(),
             ToCommandSources(childMovedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     #endregion
@@ -186,21 +189,22 @@ public class PartitionEventToDeltaEventMapper
     private AnnotationAdded OnAnnotationAdded(AnnotationAddedEvent annotationAddedEvent) =>
         new(
             annotationAddedEvent.Parent.GetId(),
-            annotationAddedEvent.Index,
             ToDeltaChunk(annotationAddedEvent.NewAnnotation),
-            NewEventSequenceNumber(),
+            annotationAddedEvent.Index,
             ToCommandSources(annotationAddedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private AnnotationDeleted OnAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
         new(
+            annotationDeletedEvent.DeletedAnnotation.GetId(),
+            ToDescendants(annotationDeletedEvent.DeletedAnnotation),
             annotationDeletedEvent.Parent.GetId(),
             annotationDeletedEvent.Index,
-            ToDeltaChunk(annotationDeletedEvent.DeletedAnnotation),
-            NewEventSequenceNumber(),
             ToCommandSources(annotationDeletedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private AnnotationMovedFromOtherParent
@@ -211,9 +215,9 @@ public class PartitionEventToDeltaEventMapper
             annotationMovedEvent.MovedAnnotation.GetId(),
             annotationMovedEvent.OldParent.GetId(),
             annotationMovedEvent.OldIndex,
-            NewEventSequenceNumber(),
             ToCommandSources(annotationMovedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private AnnotationMovedInSameParent OnAnnotationMovedInSameParent(AnnotationMovedInSameParentEvent annotationMovedEvent) =>
@@ -222,9 +226,9 @@ public class PartitionEventToDeltaEventMapper
             annotationMovedEvent.MovedAnnotation.GetId(),
             annotationMovedEvent.Parent.GetId(),
             annotationMovedEvent.OldIndex,
-            NewEventSequenceNumber(),
             ToCommandSources(annotationMovedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     #endregion
@@ -236,10 +240,11 @@ public class PartitionEventToDeltaEventMapper
             referenceAddedEvent.Parent.GetId(),
             referenceAddedEvent.Reference.ToMetaPointer(),
             referenceAddedEvent.Index,
-            ToDelta(referenceAddedEvent.NewTarget),
-            NewEventSequenceNumber(),
+            referenceAddedEvent.NewTarget.Reference?.GetId(),
+            referenceAddedEvent.NewTarget.ResolveInfo,
             ToCommandSources(referenceAddedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private ReferenceDeleted OnReferenceDeleted(ReferenceDeletedEvent referenceDeletedEvent) =>
@@ -247,10 +252,11 @@ public class PartitionEventToDeltaEventMapper
             referenceDeletedEvent.Parent.GetId(),
             referenceDeletedEvent.Reference.ToMetaPointer(),
             referenceDeletedEvent.Index,
-            ToDelta(referenceDeletedEvent.DeletedTarget),
-            NewEventSequenceNumber(),
+            referenceDeletedEvent.DeletedTarget.Reference?.GetId(),
+            referenceDeletedEvent.DeletedTarget.ResolveInfo,
             ToCommandSources(referenceDeletedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
 
     private ReferenceChanged OnReferenceChanged(ReferenceChangedEvent referenceChangedEvent) =>
@@ -258,15 +264,14 @@ public class PartitionEventToDeltaEventMapper
             referenceChangedEvent.Parent.GetId(),
             referenceChangedEvent.Reference.ToMetaPointer(),
             referenceChangedEvent.Index,
-            ToDelta(referenceChangedEvent.NewTarget),
-            ToDelta(referenceChangedEvent.ReplacedTarget),
-            NewEventSequenceNumber(),
+            referenceChangedEvent.NewTarget.Reference?.GetId(),
+            referenceChangedEvent.NewTarget.ResolveInfo,
+            referenceChangedEvent.OldTarget.Reference?.GetId(),
+            referenceChangedEvent.OldTarget.ResolveInfo,
             ToCommandSources(referenceChangedEvent),
-            null
+            NewEventSequenceNumber(),
+            []
         );
-
-    private SerializedReferenceTarget ToDelta(IReferenceTarget target) =>
-        new SerializedReferenceTarget { Reference = target.Reference?.GetId(), ResolveInfo = target.ResolveInfo };
 
     #endregion
 
@@ -275,6 +280,9 @@ public class PartitionEventToDeltaEventMapper
         var serializer = new Serializer(_lionWebVersion);
         return new DeltaSerializationChunk(serializer.Serialize(M1Extensions.Descendants(node, true, true)).ToArray());
     }
+
+    private TargetNode[] ToDescendants(IReadableNode node) =>
+        M1Extensions.Descendants(node, false, true).Select(n => n.GetId()).ToArray();
 
     private EventSequenceNumber NewEventSequenceNumber() =>
         _eventSequenceNumberProvider.Create();

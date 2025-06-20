@@ -70,7 +70,7 @@ public class DeltaEventToPartitionEventMapper
 
     private PropertyAddedEvent OnPropertyAdded(PropertyAdded propertyAddedEvent)
     {
-        var parent = ToNode(propertyAddedEvent.Parent);
+        var parent = ToNode(propertyAddedEvent.Node);
         var property = ToProperty(propertyAddedEvent.Property, parent);
         return new PropertyAddedEvent(
             parent,
@@ -82,7 +82,7 @@ public class DeltaEventToPartitionEventMapper
 
     private PropertyDeletedEvent OnPropertyDeleted(PropertyDeleted propertyDeletedEvent)
     {
-        var parent = ToNode(propertyDeletedEvent.Parent);
+        var parent = ToNode(propertyDeletedEvent.Node);
         var property = ToProperty(propertyDeletedEvent.Property, parent);
         return new PropertyDeletedEvent(
             parent,
@@ -94,7 +94,7 @@ public class DeltaEventToPartitionEventMapper
 
     private PropertyChangedEvent OnPropertyChanged(PropertyChanged propertyChangedEvent)
     {
-        var parent = ToNode(propertyChangedEvent.Parent);
+        var parent = ToNode(propertyChangedEvent.Node);
         var property = ToProperty(propertyChangedEvent.Property, parent);
         return new PropertyChangedEvent(
             parent,
@@ -278,7 +278,7 @@ public class DeltaEventToPartitionEventMapper
             parent,
             reference,
             referenceAddedEvent.Index,
-            ToTarget(referenceAddedEvent.NewTarget),
+            ToTarget(referenceAddedEvent.NewTarget, referenceAddedEvent.NewResolveInfo),
             ToEventId(referenceAddedEvent)
         );
     }
@@ -291,7 +291,7 @@ public class DeltaEventToPartitionEventMapper
             parent,
             reference,
             referenceDeletedEvent.Index,
-            ToTarget(referenceDeletedEvent.DeletedTarget),
+            ToTarget(referenceDeletedEvent.DeletedTarget, referenceDeletedEvent.DeletedResolveInfo),
             ToEventId(referenceDeletedEvent)
         );
     }
@@ -304,8 +304,8 @@ public class DeltaEventToPartitionEventMapper
             parent,
             reference,
             referenceChangedEvent.Index,
-            ToTarget(referenceChangedEvent.NewTarget),
-            ToTarget(referenceChangedEvent.ReplacedTarget),
+            ToTarget(referenceChangedEvent.NewTarget,  referenceChangedEvent.NewResolveInfo),
+            ToTarget(referenceChangedEvent.OldTarget,  referenceChangedEvent.OldResolveInfo),
             ToEventId(referenceChangedEvent)
         );
     }
@@ -313,20 +313,20 @@ public class DeltaEventToPartitionEventMapper
     private Reference ToReference(MetaPointer deltaReference, IReadableNode node) =>
         ToFeature<Reference>(deltaReference, node);
 
-    private IReferenceTarget ToTarget(SerializedReferenceTarget serializedTarget)
+    private IReferenceTarget ToTarget(TargetNode? targetNode, ResolveInfo? resolveInfo)
     {
         IReadableNode? target = null;
-        if (serializedTarget.Reference != null &&
-            _sharedNodeMap.TryGetValue(serializedTarget.Reference, out var node))
+        if (targetNode != null &&
+            _sharedNodeMap.TryGetValue(targetNode, out var node))
             target = node;
 
-        return new ReferenceTarget(serializedTarget.ResolveInfo, target);
+        return new ReferenceTarget(resolveInfo, target);
     }
 
     #endregion
 
 
-    private static IEventId ToEventId(ISingleDeltaEvent deltaEvent) =>
+    private static IEventId ToEventId(IDeltaEvent deltaEvent) =>
         new ParticipationEventId(deltaEvent.InternalParticipationId,
             string.Join("_", deltaEvent.OriginCommands.Select(c => c.CommandId)));
 

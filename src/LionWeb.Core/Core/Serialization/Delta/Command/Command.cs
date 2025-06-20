@@ -32,7 +32,10 @@ public interface IDeltaCommand : IDeltaContent
     CommandId? CommandId { get; }
 }
 
-public abstract record DeltaCommandBase(CommandId? CommandId, ProtocolMessage[] ProtocolMessages) : DeltaContentBase(ProtocolMessages), IDeltaCommand
+public abstract record DeltaCommandBase(
+    CommandId? CommandId,
+    ProtocolMessage[] ProtocolMessages
+) : DeltaContentBase(ProtocolMessages), IDeltaCommand
 {
     /// <inheritdoc />
     public override string Id => CommandId;
@@ -67,22 +70,17 @@ public abstract record DeltaCommandBase(CommandId? CommandId, ProtocolMessage[] 
     {
         base.PrintMembers(builder);
         builder.Append(", ");
-        
+
         builder.Append(nameof(CommandId));
         builder.Append(" = ");
         builder.Append(CommandId);
-    
+
         return true;
     }
 }
 
-public interface ISingleDeltaCommand : IDeltaCommand
-{
-    new CommandId CommandId { get; }
-    CommandId? IDeltaCommand.CommandId => CommandId;
-}
-
-public record CommandResponse(CommandId CommandId, ProtocolMessage[] ProtocolMessages) : DeltaContentBase(ProtocolMessages)
+public record CommandResponse(CommandId CommandId, ProtocolMessage[] ProtocolMessages)
+    : DeltaContentBase(ProtocolMessages)
 {
     /// <inheritdoc />
     public override string Id => CommandId;
@@ -90,29 +88,36 @@ public record CommandResponse(CommandId CommandId, ProtocolMessage[] ProtocolMes
 
 #region Partitions
 
-public interface IPartitionCommand : ISingleDeltaCommand;
+public interface IPartitionCommand : IDeltaCommand;
 
-public record AddPartition(DeltaSerializationChunk NewPartition, CommandId CommandId, ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(CommandId, ProtocolMessages), IPartitionCommand;
+public record AddPartition(
+    DeltaSerializationChunk NewPartition,
+    CommandId CommandId,
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IPartitionCommand;
 
-public record DeletePartition(TargetNode DeletedPartition, CommandId CommandId, ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(CommandId, ProtocolMessages), IPartitionCommand;
+public record DeletePartition(
+    TargetNode DeletedPartition,
+    CommandId CommandId,
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IPartitionCommand;
 
 #endregion
 
 #region Nodes
 
-public interface INodeCommand : ISingleDeltaCommand;
+public interface INodeCommand : IDeltaCommand;
 
 public record ChangeClassifier(
     TargetNode Node,
     MetaPointer NewClassifier,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), INodeCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), INodeCommand;
 
 #endregion
 
-public interface IFeatureCommand : ISingleDeltaCommand;
+public interface IFeatureCommand : IDeltaCommand;
 
 #region Properties
 
@@ -123,22 +128,36 @@ public interface IPropertyCommand : IFeatureCommand
 };
 
 public record AddProperty(
-    TargetNode Parent,
+    TargetNode Node,
     MetaPointer Property,
     PropertyValue NewValue,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand
+{
+    public TargetNode Parent => Node;
+}
 
-public record DeleteProperty(TargetNode Parent, MetaPointer Property, CommandId CommandId, ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand;
+public record DeleteProperty(
+    TargetNode Node,
+    MetaPointer Property,
+    CommandId CommandId,
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand
+{
+    public TargetNode Parent => Node;
+}
 
 public record ChangeProperty(
-    TargetNode Parent,
+    TargetNode Node,
     MetaPointer Property,
     PropertyValue NewValue,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand
+{
+    public TargetNode Parent => Node;
+}
 
 #endregion
 
@@ -148,27 +167,31 @@ public interface IContainmentCommand : IFeatureCommand;
 
 public record AddChild(
     TargetNode Parent,
+    DeltaSerializationChunk NewChild,
     MetaPointer Containment,
     Index Index,
-    DeltaSerializationChunk NewChild,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
 
 public record DeleteChild(
     TargetNode Parent,
     MetaPointer Containment,
     Index Index,
+    TargetNode DeletedChild,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
 
 public record ReplaceChild(
+    DeltaSerializationChunk NewChild,
     TargetNode Parent,
     MetaPointer Containment,
     Index Index,
-    DeltaSerializationChunk NewChild,
+    TargetNode ReplacedChild,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
 
 public record MoveChildFromOtherContainment(
     TargetNode NewParent,
@@ -176,90 +199,113 @@ public record MoveChildFromOtherContainment(
     Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
 
 public record MoveChildFromOtherContainmentInSameParent(
     MetaPointer NewContainment,
     Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
 
 public record MoveChildInSameContainment(
     Index NewIndex,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
 
 public record MoveAndReplaceChildFromOtherContainment(
     TargetNode NewParent,
     MetaPointer NewContainment,
     Index NewIndex,
+    TargetNode ReplacedChild,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
 
 public record MoveAndReplaceChildFromOtherContainmentInSameParent(
     MetaPointer NewContainment,
     Index NewIndex,
+    TargetNode ReplacedChild,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
 
 public record MoveAndReplaceChildInSameContainment(
     Index NewIndex,
+    TargetNode ReplacedChild,
     TargetNode MovedChild,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
 
 #endregion
 
 #region Annotations
 
-public interface IAnnotationCommand : ISingleDeltaCommand;
+public interface IAnnotationCommand : IDeltaCommand;
 
 public record AddAnnotation(
     TargetNode Parent,
-    Index Index,
     DeltaSerializationChunk NewAnnotation,
+    Index Index,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
 
-public record DeleteAnnotation(TargetNode Parent, Index Index, CommandId CommandId, ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
-
-public record ReplaceAnnotation(
+public record DeleteAnnotation(
     TargetNode Parent,
     Index Index,
-    DeltaSerializationChunk NewAnnotation,
+    TargetNode DeletedAnnotation,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
+
+public record ReplaceAnnotation(
+    DeltaSerializationChunk NewAnnotation,
+    TargetNode Parent,
+    Index Index,
+    TargetNode ReplacedAnnotation,
+    CommandId CommandId,
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
 
 public record MoveAnnotationFromOtherParent(
     TargetNode NewParent,
     Index NewIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
 
 public record MoveAnnotationInSameParent(
     Index NewIndex,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
 
 public record MoveAndReplaceAnnotationFromOtherParent(
     TargetNode NewParent,
     Index NewIndex,
+    TargetNode ReplacedAnnotation,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
 
 public record MoveAndReplaceAnnotationInSameParent(
     Index NewIndex,
+    TargetNode ReplacedAnnotation,
     TargetNode MovedAnnotation,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
 
 #endregion
 
@@ -271,25 +317,33 @@ public record AddReference(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    SerializedReferenceTarget NewTarget,
+    TargetNode? NewTarget,
+    ResolveInfo? NewResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record DeleteReference(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
+    TargetNode? DeletedTarget,
+    ResolveInfo? DeletedResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record ChangeReference(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    SerializedReferenceTarget NewTarget,
+    TargetNode? OldTarget,
+    ResolveInfo? OldResolveInfo,
+    TargetNode? NewTarget,
+    ResolveInfo? NewResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record MoveEntryFromOtherReference(
     TargetNode NewParent,
@@ -298,8 +352,11 @@ public record MoveEntryFromOtherReference(
     TargetNode OldParent,
     MetaPointer OldReference,
     Index OldIndex,
+    TargetNode? MovedTarget,
+    ResolveInfo? MovedResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record MoveEntryFromOtherReferenceInSameParent(
     TargetNode Parent,
@@ -307,96 +364,133 @@ public record MoveEntryFromOtherReferenceInSameParent(
     Index NewIndex,
     MetaPointer OldReference,
     Index OldIndex,
+    TargetNode? MovedTarget,
+    ResolveInfo? MovedResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record MoveEntryInSameReference(
     TargetNode Parent,
     MetaPointer Reference,
     Index NewIndex,
     Index OldIndex,
+    TargetNode? MovedTarget,
+    ResolveInfo? MovedResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record MoveAndReplaceEntryFromOtherReference(
     TargetNode NewParent,
     MetaPointer NewReference,
     Index NewIndex,
+    TargetNode? ReplacedTarget,
+    ResolveInfo? ReplacedResolveInfo,
     TargetNode OldParent,
     MetaPointer OldReference,
     Index OldIndex,
+    TargetNode? MovedTarget,
+    ResolveInfo? MovedResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record MoveAndReplaceEntryFromOtherReferenceInSameParent(
     TargetNode Parent,
     MetaPointer NewReference,
     Index NewIndex,
+    TargetNode? ReplacedTarget,
+    ResolveInfo? ReplacedResolveInfo,
     MetaPointer OldReference,
     Index OldIndex,
+    TargetNode? MovedTarget,
+    ResolveInfo? MovedResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record MoveAndReplaceEntryInSameReference(
     TargetNode Parent,
     MetaPointer Reference,
-    Index NewIndex,
     Index OldIndex,
+    TargetNode? MovedTarget,
+    ResolveInfo? MovedResolveInfo,
+    Index NewIndex,
+    TargetNode? ReplacedTarget,
+    ResolveInfo? ReplacedResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record AddReferenceResolveInfo(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
+    TargetNode Target,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record DeleteReferenceResolveInfo(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
+    TargetNode Target,
+    ResolveInfo DeletedResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record ChangeReferenceResolveInfo(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
+    TargetNode? Target,
+    ResolveInfo OldResolveInfo,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record AddReferenceTarget(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
+    ResolveInfo ResolveInfo,
     TargetNode NewTarget,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record DeleteReferenceTarget(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
+    TargetNode DeletedTarget,
+    ResolveInfo ResolveInfo,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 public record ChangeReferenceTarget(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
+    TargetNode OldTarget,
+    ResolveInfo? ResolveInfo,
     TargetNode NewTarget,
     CommandId CommandId,
-    ProtocolMessage[] ProtocolMessages) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
 #endregion
 
-public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage[] ProtocolMessages)
-    : DeltaCommandBase(null, ProtocolMessages)
+public record CompositeCommand(
+    IDeltaCommand[] Parts,
+    ProtocolMessage[] ProtocolMessages
+) : DeltaCommandBase(null, ProtocolMessages)
 {
     /// <inheritdoc />
     public virtual bool Equals(CompositeCommand? other)
@@ -411,7 +505,7 @@ public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage[]
             return true;
         }
 
-        return base.Equals(other) && Commands.SequenceEqual(other.Commands);
+        return base.Equals(other) && Parts.SequenceEqual(other.Parts);
     }
 
     /// <inheritdoc />
@@ -419,7 +513,7 @@ public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage[]
     {
         var hashCode = new HashCode();
         hashCode.Add(base.GetHashCode());
-        foreach (var command in Commands)
+        foreach (var command in Parts)
         {
             hashCode.Add(command);
         }
@@ -432,10 +526,10 @@ public record CompositeCommand(ISingleDeltaCommand[] Commands, ProtocolMessage[]
     {
         base.PrintMembers(builder);
         builder.Append(", ");
-        builder.Append(nameof(Commands));
+        builder.Append(nameof(Parts));
         builder.Append(" = [");
         bool first = true;
-        foreach (var command in Commands)
+        foreach (var command in Parts)
         {
             if (!first)
             {

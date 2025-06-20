@@ -58,45 +58,23 @@ public class DeltaCommandToDeltaEventMapper
     public IDeltaEvent Map(IDeltaCommand deltaCommand) =>
         deltaCommand switch
         {
-            AddProperty a => new PropertyAdded(a.Parent, a.Property, a.NewValue, NextSequence(), OriginCommands(a),
-                null),
-            DeleteProperty a => new PropertyDeleted(a.Parent, a.Property, null, NextSequence(), OriginCommands(a),
-                null),
-            ChangeProperty a => new PropertyChanged(a.Parent, a.Property, a.NewValue, null, NextSequence(),
-                OriginCommands(a), null),
-            AddChild a => new ChildAdded(a.Parent, a.Containment, a.Index, a.NewChild, NextSequence(),
-                OriginCommands(a), null),
-            DeleteChild a => new ChildDeleted(a.Parent, a.Containment, a.Index, new([]), NextSequence(),
-                OriginCommands(a), null),
-            ReplaceChild a => new ChildReplaced(a.Parent, a.Containment, a.Index, a.NewChild, new([]), NextSequence(),
-                OriginCommands(a), null),
-            MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewParent, a.NewContainment,
-                a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild),
-                NextSequence(), OriginCommands(a), null),
-            MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(
-                a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild),
-                GetIndex(a.MovedChild), NextSequence(), OriginCommands(a), null),
-            MoveChildInSameContainment a => new ChildMovedInSameContainment(a.NewIndex, a.MovedChild,
-                GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), NextSequence(),
-                OriginCommands(a), null),
-            AddAnnotation a => new AnnotationAdded(a.Parent, a.Index, a.NewAnnotation, NextSequence(),
-                OriginCommands(a), null),
-            DeleteAnnotation a => new AnnotationDeleted(a.Parent, a.Index, new([]), NextSequence(), OriginCommands(a),
-                null),
-            ReplaceAnnotation a => new AnnotationReplaced(a.Parent, a.Index, a.NewAnnotation, new([]), NextSequence(),
-                OriginCommands(a), null),
-            MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.NewIndex,
-                a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), NextSequence(),
-                OriginCommands(a), null),
-            MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation,
-                GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), NextSequence(), OriginCommands(a),
-                null),
-            AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewTarget, NextSequence(),
-                OriginCommands(a), null),
-            DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, new(), NextSequence(),
-                OriginCommands(a), null),
-            ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewTarget, new(),
-                NextSequence(), OriginCommands(a), null),
+            AddProperty a => new PropertyAdded(a.Node, a.Property, a.NewValue, OriginCommands(a), NextSequence(), []),
+            DeleteProperty a => new PropertyDeleted(a.Node, a.Property, null, OriginCommands(a), NextSequence(), []),
+            ChangeProperty a => new PropertyChanged(a.Node, a.Property, a.NewValue, null, OriginCommands(a), NextSequence(), []),
+            AddChild a => new ChildAdded(a.Parent, a.NewChild, a.Containment, a.Index, OriginCommands(a), NextSequence(), []),
+            DeleteChild a => new ChildDeleted(a.DeletedChild, [], a.Parent, a.Containment, a.Index, OriginCommands(a), NextSequence(), []),
+            ReplaceChild a => new ChildReplaced(a.NewChild, a.ReplacedChild, [], a.Parent, a.Containment, a.Index , OriginCommands(a), NextSequence(), []),
+            MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), NextSequence(), []),
+            MoveChildFromOtherContainmentInSameParent a => new ChildMovedFromOtherContainmentInSameParent(a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), NextSequence(), []),
+            MoveChildInSameContainment a => new ChildMovedInSameContainment(a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), NextSequence(), []),
+            AddAnnotation a => new AnnotationAdded(a.Parent, a.NewAnnotation, a.Index, OriginCommands(a), NextSequence(), []),
+            DeleteAnnotation a => new AnnotationDeleted(a.DeletedAnnotation, [], a.Parent, a.Index, OriginCommands(a), NextSequence(), []),
+            ReplaceAnnotation a => new AnnotationReplaced(a.NewAnnotation,a.ReplacedAnnotation, [], a.Parent, a.Index, OriginCommands(a), NextSequence(), []),
+            MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), NextSequence(), []),
+            MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), NextSequence(), []),
+            AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewTarget, a.NewResolveInfo, OriginCommands(a), NextSequence(), []),
+            DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, a.DeletedTarget, a.DeletedResolveInfo, OriginCommands(a), NextSequence(), []),
+            ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewTarget, a.NewResolveInfo, a.OldTarget, a.OldResolveInfo, OriginCommands(a), NextSequence(), []),
         };
 
     private NodeId GetParent(NodeId childId)
@@ -133,6 +111,6 @@ public class DeltaCommandToDeltaEventMapper
     private long NextSequence() =>
         _nextSequence++;
 
-    private CommandSource[] OriginCommands(ISingleDeltaCommand a) =>
+    private CommandSource[] OriginCommands(IDeltaCommand a) =>
         [new CommandSource(_participationId, a.CommandId)];
 }

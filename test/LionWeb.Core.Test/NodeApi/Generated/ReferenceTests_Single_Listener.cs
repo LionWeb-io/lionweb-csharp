@@ -134,7 +134,7 @@ public class ReferenceTests_Single_Listener
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.ReplacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.OldTarget);
             Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         });
 
@@ -165,7 +165,7 @@ public class ReferenceTests_Single_Listener
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.ReplacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.OldTarget);
             Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         });
 
@@ -268,7 +268,7 @@ public class ReferenceTests_Single_Listener
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.ReplacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.OldTarget);
             Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         });
 
@@ -299,7 +299,7 @@ public class ReferenceTests_Single_Listener
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.ReplacedTarget);
+            Assert.AreEqual(new ReferenceTarget(null, oldTarget), args.OldTarget);
             Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         });
 

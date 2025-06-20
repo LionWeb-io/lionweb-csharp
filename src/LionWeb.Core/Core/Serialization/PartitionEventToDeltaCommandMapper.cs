@@ -69,7 +69,7 @@ public class PartitionEventToDeltaCommandMapper
             propertyAddedEvent.Property.ToMetaPointer(),
             ToDelta(propertyAddedEvent.Node, propertyAddedEvent.Property, propertyAddedEvent.NewValue)!,
             ToCommandId(propertyAddedEvent),
-            null
+            []
         );
 
     private DeleteProperty OnPropertyDeleted(PropertyDeletedEvent propertyDeletedEvent) =>
@@ -77,7 +77,7 @@ public class PartitionEventToDeltaCommandMapper
             propertyDeletedEvent.Node.GetId(),
             propertyDeletedEvent.Property.ToMetaPointer(),
             ToCommandId(propertyDeletedEvent),
-            null
+            []
         );
 
     private ChangeProperty OnPropertyChanged(PropertyChangedEvent propertyChangedEvent) =>
@@ -86,7 +86,7 @@ public class PartitionEventToDeltaCommandMapper
             propertyChangedEvent.Property.ToMetaPointer(),
             ToDelta(propertyChangedEvent.Node, propertyChangedEvent.Property, propertyChangedEvent.NewValue)!,
             ToCommandId(propertyChangedEvent),
-            null
+            []
         );
 
     private PropertyValue? ToDelta(IReadableNode parent, Property property, Object newValue) =>
@@ -99,11 +99,11 @@ public class PartitionEventToDeltaCommandMapper
     private AddChild OnChildAdded(ChildAddedEvent childAddedEvent) =>
         new(
             childAddedEvent.Parent.GetId(),
+            ToDeltaChunk(childAddedEvent.NewChild),
             childAddedEvent.Containment.ToMetaPointer(),
             childAddedEvent.Index,
-            ToDeltaChunk(childAddedEvent.NewChild),
             ToCommandId(childAddedEvent),
-            null
+            []
         );
 
     private DeleteChild OnChildDeleted(ChildDeletedEvent childDeletedEvent) =>
@@ -111,18 +111,20 @@ public class PartitionEventToDeltaCommandMapper
             childDeletedEvent.Parent.GetId(),
             childDeletedEvent.Containment.ToMetaPointer(),
             childDeletedEvent.Index,
+            childDeletedEvent.DeletedChild.GetId(),
             ToCommandId(childDeletedEvent),
-            null
+            []
         );
 
     private ReplaceChild OnChildReplaced(ChildReplacedEvent childReplacedEvent) =>
         new(
+            ToDeltaChunk(childReplacedEvent.NewChild),
             childReplacedEvent.Parent.GetId(),
             childReplacedEvent.Containment.ToMetaPointer(),
             childReplacedEvent.Index,
-            ToDeltaChunk(childReplacedEvent.NewChild),
+            childReplacedEvent.ReplacedChild.GetId(),
             ToCommandId(childReplacedEvent),
-            null
+            []
         );
 
     private MoveChildFromOtherContainment
@@ -133,7 +135,7 @@ public class PartitionEventToDeltaCommandMapper
             childMovedEvent.NewIndex,
             childMovedEvent.MovedChild.GetId(),
             ToCommandId(childMovedEvent),
-            null
+            []
         );
 
     private MoveChildFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(
@@ -143,7 +145,7 @@ public class PartitionEventToDeltaCommandMapper
             childMovedEvent.NewIndex,
             childMovedEvent.MovedChild.GetId(),
             ToCommandId(childMovedEvent),
-            null
+            []
         );
 
     private MoveChildInSameContainment OnChildMovedInSameContainment(ChildMovedInSameContainmentEvent childMovedEvent) =>
@@ -151,7 +153,7 @@ public class PartitionEventToDeltaCommandMapper
             childMovedEvent.NewIndex,
             childMovedEvent.MovedChild.GetId(),
             ToCommandId(childMovedEvent),
-            null
+            []
         );
 
     #endregion
@@ -161,18 +163,19 @@ public class PartitionEventToDeltaCommandMapper
     private AddAnnotation OnAnnotationAdded(AnnotationAddedEvent annotationAddedEvent) =>
         new(
             annotationAddedEvent.Parent.GetId(),
-            annotationAddedEvent.Index,
             ToDeltaChunk(annotationAddedEvent.NewAnnotation),
+            annotationAddedEvent.Index,
             ToCommandId(annotationAddedEvent),
-            null
+            []
         );
 
     private DeleteAnnotation OnAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
         new(
             annotationDeletedEvent.Parent.GetId(),
             annotationDeletedEvent.Index,
+            annotationDeletedEvent.DeletedAnnotation.GetId(),
             ToCommandId(annotationDeletedEvent),
-            null
+            []
         );
 
     private MoveAnnotationFromOtherParent
@@ -182,7 +185,7 @@ public class PartitionEventToDeltaCommandMapper
             annotationMovedEvent.NewIndex,
             annotationMovedEvent.MovedAnnotation.GetId(),
             ToCommandId(annotationMovedEvent),
-            null
+            []
         );
 
     private MoveAnnotationInSameParent OnAnnotationMovedInSameParent(AnnotationMovedInSameParentEvent annotationMovedEvent) =>
@@ -190,7 +193,7 @@ public class PartitionEventToDeltaCommandMapper
             annotationMovedEvent.NewIndex,
             annotationMovedEvent.MovedAnnotation.GetId(),
             ToCommandId(annotationMovedEvent),
-            null
+            []
         );
 
     #endregion
@@ -202,9 +205,10 @@ public class PartitionEventToDeltaCommandMapper
             referenceAddedEvent.Parent.GetId(),
             referenceAddedEvent.Reference.ToMetaPointer(),
             referenceAddedEvent.Index,
-            ToDelta(referenceAddedEvent.NewTarget),
+            referenceAddedEvent.NewTarget.Reference?.GetId(),
+            referenceAddedEvent.NewTarget.ResolveInfo,
             ToCommandId(referenceAddedEvent),
-            null
+            []
         );
 
     private DeleteReference OnReferenceDeleted(ReferenceDeletedEvent referenceDeletedEvent) =>
@@ -212,8 +216,10 @@ public class PartitionEventToDeltaCommandMapper
             referenceDeletedEvent.Parent.GetId(),
             referenceDeletedEvent.Reference.ToMetaPointer(),
             referenceDeletedEvent.Index,
+            referenceDeletedEvent.DeletedTarget.Reference?.GetId(),
+            referenceDeletedEvent.DeletedTarget.ResolveInfo,
             ToCommandId(referenceDeletedEvent),
-            null
+            []
         );
 
     private ChangeReference OnReferenceChanged(ReferenceChangedEvent referenceChangedEvent) =>
@@ -221,9 +227,12 @@ public class PartitionEventToDeltaCommandMapper
             referenceChangedEvent.Parent.GetId(),
             referenceChangedEvent.Reference.ToMetaPointer(),
             referenceChangedEvent.Index,
-            ToDelta(referenceChangedEvent.NewTarget),
+            referenceChangedEvent.OldTarget.Reference?.GetId(),
+            referenceChangedEvent.OldTarget.ResolveInfo,
+            referenceChangedEvent.NewTarget.Reference?.GetId(),
+            referenceChangedEvent.NewTarget.ResolveInfo,
             ToCommandId(referenceChangedEvent),
-            null
+            []
         );
 
     private SerializedReferenceTarget ToDelta(IReferenceTarget target) =>

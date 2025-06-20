@@ -322,13 +322,13 @@ public record ReferenceDeletedEvent(
 /// <param name="Reference"></param>
 /// <param name="Index"></param>
 /// <param name="NewTarget"></param>
-/// <param name="ReplacedTarget"></param>
+/// <param name="OldTarget"></param>
 public record ReferenceChangedEvent(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     IReferenceTarget NewTarget,
-    IReferenceTarget ReplacedTarget,
+    IReferenceTarget OldTarget,
     IEventId EventId) : APartitionEvent(EventId);
 
 /// <param name="NewParent"></param>
