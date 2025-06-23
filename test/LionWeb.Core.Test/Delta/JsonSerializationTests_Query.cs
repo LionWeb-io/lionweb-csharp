@@ -17,78 +17,76 @@
 
 namespace LionWeb.Core.Test.Delta;
 
-using Core.Serialization.Delta.Query;
-
 [TestClass]
-public class JsonSerializationTests_Query : JsonSerializationTestsBase
+public class JsonSerializationTests_Query : JsonSerializationTestsQueryBase
 {
     [TestMethod]
     public void SubscribeToChangingPartitionsRequest()
     {
-        var input = new SubscribeToChangingPartitionsRequest(true, false, false, QueryId(), ProtocolMessages());
+        var input = CreateSubscribeToChangingPartitionsRequest();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void SubscribeToChangingPartitionsResponse()
     {
-        var input = new SubscribeToChangingPartitionsResponse(QueryId(), ProtocolMessages());
+        var input = CreateSubscribeToChangingPartitionsResponse();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void SubscribeToPartitionContentsRequest()
     {
-        var input = new SubscribeToPartitionContentsRequest(TargetNode(), QueryId(), ProtocolMessages());
+        var input = CreateSubscribeToPartitionContentsRequest();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void SubscribeToPartitionContentsResponse()
     {
-        var input = new SubscribeToPartitionContentsResponse(Chunk(), QueryId(), ProtocolMessages());
+        var input = CreateSubscribeToPartitionContentsResponse();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void UnsubscribeFromPartitionContentsRequest()
     {
-        var input = new UnsubscribeFromPartitionContentsRequest(TargetNode(), QueryId(), ProtocolMessages());
+        var input = CreateUnsubscribeFromPartitionContentsRequest();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void UnsubscribeFromPartitionContentsResponse()
     {
-        var input = new UnsubscribeFromPartitionContentsResponse(QueryId(), ProtocolMessages());
+        var input = CreateUnsubscribeFromPartitionContentsResponse();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void GetAvailableIdsRequest()
     {
-        var input = new GetAvailableIdsRequest(3, QueryId(), ProtocolMessages());
+        var input = CreateGetAvailableIdsRequest();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void GetAvailableIdsResponse()
     {
-        var input = new GetAvailableIdsResponse([TargetNode(), TargetNode()], QueryId(), ProtocolMessages());
+        var input = CreateGetAvailableIdsResponse();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ListPartitionsRequest()
     {
-        var input = new ListPartitionsRequest(QueryId(), ProtocolMessages());
+        var input = CreateListPartitionsRequest();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ListPartitionsResponse()
     {
-        var input = new ListPartitionsResponse(Chunk(), QueryId(), ProtocolMessages());
+        var input = CreateListPartitionsResponse();
         AssertSerialization(input);
     }
 }

@@ -17,15 +17,13 @@
 
 namespace LionWeb.Core.Test.Delta;
 
-using Core.Serialization.Delta.Command;
-
 [TestClass]
-public class JsonSerializationTests_Command : JsonSerializationTestsBase
+public class JsonSerializationTests_Command : JsonSerializationTestsCommandBase
 {
     [TestMethod]
     public void CommandResponse()
     {
-        var input = new CommandResponse(CommandId(), ProtocolMessages());
+        var input = CreateCommandResponse();
         AssertSerialization(input);
     }
 
@@ -34,14 +32,14 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddPartition()
     {
-        var input = new AddPartition(Chunk(), CommandId(), ProtocolMessages());
+        var input = CreateAddPartition();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeletePartition()
     {
-        var input = new DeletePartition(TargetNode(), CommandId(), ProtocolMessages());
+        var input = CreateDeletePartition();
         AssertSerialization(input);
     }
 
@@ -52,7 +50,7 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void ChangeClassifier()
     {
-        var input = new ChangeClassifier(TargetNode(), MetaPointer(), CommandId(), ProtocolMessages());
+        var input = CreateChangeClassifier();
         AssertSerialization(input);
     }
 
@@ -63,21 +61,21 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddProperty()
     {
-        var input = new AddProperty(TargetNode(), MetaPointer(), PropertyValue(), CommandId(), ProtocolMessages());
+        var input = CreateAddProperty();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeleteProperty()
     {
-        var input = new DeleteProperty(TargetNode(), MetaPointer(), CommandId(), ProtocolMessages());
+        var input = CreateDeleteProperty();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ChangeProperty()
     {
-        var input = new ChangeProperty(TargetNode(), MetaPointer(), PropertyValue(), CommandId(), ProtocolMessages());
+        var input = CreateChangeProperty();
         AssertSerialization(input);
     }
 
@@ -88,70 +86,63 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddChild()
     {
-        var input = new AddChild(TargetNode(), Chunk(), MetaPointer(), Index(), CommandId(), ProtocolMessages());
+        var input = CreateAddChild();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeleteChild()
     {
-        var input = new DeleteChild(TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+        var input = CreateDeleteChild();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ReplaceChild()
     {
-        var input = new ReplaceChild(Chunk(), TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+        var input = CreateReplaceChild();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveChildFromOtherContainment()
     {
-        var input = new MoveChildFromOtherContainment(TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+        var input = CreateMoveChildFromOtherContainment();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveChildFromOtherContainmentInSameParent()
     {
-        var input = new MoveChildFromOtherContainmentInSameParent(MetaPointer(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+        var input = CreateMoveChildFromOtherContainmentInSameParent();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveChildInSameContainment()
     {
-        var input = new MoveChildInSameContainment(Index(), TargetNode(), CommandId(), ProtocolMessages());
+        var input = CreateMoveChildInSameContainment();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAndReplaceChildFromOtherContainment()
     {
-        var input = new MoveAndReplaceChildFromOtherContainment(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            TargetNode(), CommandId(), ProtocolMessages());
+        var input = CreateMoveAndReplaceChildFromOtherContainment();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAndReplaceChildFromOtherContainmentInSameParent()
     {
-        var input = new MoveAndReplaceChildFromOtherContainmentInSameParent(MetaPointer(), Index(), TargetNode(),
-            TargetNode(), CommandId(), ProtocolMessages());
+        var input = CreateMoveAndReplaceChildFromOtherContainmentInSameParent();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAndReplaceChildInSameContainment()
     {
-        var input = new MoveAndReplaceChildInSameContainment(Index(), TargetNode(), TargetNode(), CommandId(),
-            ProtocolMessages());
+        var input = CreateMoveAndReplaceChildInSameContainment();
         AssertSerialization(input);
     }
 
@@ -162,53 +153,49 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddAnnotation()
     {
-        var input = new AddAnnotation(TargetNode(), Chunk(), Index(), CommandId(), ProtocolMessages());
+        var input = CreateAddAnnotation();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeleteAnnotation()
     {
-        var input = new DeleteAnnotation(TargetNode(), Index(), TargetNode(), CommandId(), ProtocolMessages());
+        var input = CreateDeleteAnnotation();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ReplaceAnnotation()
     {
-        var input = new ReplaceAnnotation(Chunk(), TargetNode(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+        var input = CreateReplaceAnnotation();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAnnotationFromOtherParent()
     {
-        var input = new MoveAnnotationFromOtherParent(TargetNode(), Index(), TargetNode(), CommandId(),
-            ProtocolMessages());
+        var input = CreateMoveAnnotationFromOtherParent();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAnnotationInSameParent()
     {
-        var input = new MoveAnnotationInSameParent(Index(), TargetNode(), CommandId(), ProtocolMessages());
+        var input = CreateMoveAnnotationInSameParent();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAndReplaceAnnotationFromOtherParent()
     {
-        var input = new MoveAndReplaceAnnotationFromOtherParent(TargetNode(), Index(), TargetNode(), TargetNode(),
-            CommandId(), ProtocolMessages());
+        var input = CreateMoveAndReplaceAnnotationFromOtherParent();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAndReplaceAnnotationInSameParent()
     {
-        var input = new MoveAndReplaceAnnotationInSameParent(Index(), TargetNode(), TargetNode(), CommandId(),
-            ProtocolMessages());
+        var input = CreateMoveAndReplaceAnnotationInSameParent();
         AssertSerialization(input);
     }
 
@@ -219,122 +206,105 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void AddReference()
     {
-        var input = new AddReference(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
-            ProtocolMessages());
+        var input = CreateAddReference();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeleteReference()
     {
-        var input = new DeleteReference(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
-            ProtocolMessages());
+        var input = CreateDeleteReference();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ChangeReference()
     {
-        var input = new ChangeReference(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(),
-            ResolveInfo(), CommandId(), ProtocolMessages());
+        var input = CreateChangeReference();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveEntryFromOtherReference()
     {
-        var input = new MoveEntryFromOtherReference(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(),
-            Index(), TargetNode(), ResolveInfo(), CommandId(), ProtocolMessages());
+        var input = CreateMoveEntryFromOtherReference();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveEntryFromOtherReferenceInSameParent()
     {
-        var input = new MoveEntryFromOtherReferenceInSameParent(TargetNode(), MetaPointer(), Index(), MetaPointer(),
-            Index(), TargetNode(), ResolveInfo(), CommandId(), ProtocolMessages());
+        var input = CreateMoveEntryFromOtherReferenceInSameParent();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveEntryInSameReference()
     {
-        var input = new MoveEntryInSameReference(TargetNode(), MetaPointer(), Index(), Index(), TargetNode(),
-            ResolveInfo(), CommandId(), ProtocolMessages());
+        var input = CreateMoveEntryInSameReference();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAndReplaceEntryFromOtherReference()
     {
-        var input = new MoveAndReplaceEntryFromOtherReference(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            ResolveInfo(), TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
-            ProtocolMessages());
+        var input = CreateMoveAndReplaceEntryFromOtherReference();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAndReplaceEntryFromOtherReferenceInSameParent()
     {
-        var input = new MoveAndReplaceEntryFromOtherReferenceInSameParent(TargetNode(), MetaPointer(), Index(),
-            TargetNode(), ResolveInfo(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
-            ProtocolMessages());
+        var input = CreateMoveAndReplaceEntryFromOtherReferenceInSameParent();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void MoveAndReplaceEntryInSameReference()
     {
-        var input = new MoveAndReplaceEntryInSameReference(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            ResolveInfo(), Index(), TargetNode(), ResolveInfo(), CommandId(), ProtocolMessages());
+        var input = CreateMoveAndReplaceEntryInSameReference();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void AddReferenceResolveInfo()
     {
-        var input = new AddReferenceResolveInfo(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            CommandId(), ProtocolMessages());
+        var input = CreateAddReferenceResolveInfo();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeleteReferenceResolveInfo()
     {
-        var input = new DeleteReferenceResolveInfo(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            CommandId(), ProtocolMessages());
+        var input = CreateDeleteReferenceResolveInfo();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ChangeReferenceResolveInfo()
     {
-        var input = new ChangeReferenceResolveInfo(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            ResolveInfo(), CommandId(), ProtocolMessages());
+        var input = CreateChangeReferenceResolveInfo();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void AddReferenceTarget()
     {
-        var input = new AddReferenceTarget(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(),
-            CommandId(), ProtocolMessages());
+        var input = CreateAddReferenceTarget();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void DeleteReferenceTarget()
     {
-        var input = new DeleteReferenceTarget(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            CommandId(), ProtocolMessages());
+        var input = CreateDeleteReferenceTarget();
         AssertSerialization(input);
     }
 
     [TestMethod]
     public void ChangeReferenceTarget()
     {
-        var input = new ChangeReferenceTarget(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            TargetNode(), CommandId(), ProtocolMessages());
+        var input = CreateChangeReferenceTarget();
         AssertSerialization(input);
     }
 
@@ -343,13 +313,7 @@ public class JsonSerializationTests_Command : JsonSerializationTestsBase
     [TestMethod]
     public void CompositeCommand()
     {
-        var input = new CompositeCommand([
-            new DeleteProperty(TargetNode(), MetaPointer(), CommandId(), ProtocolMessages()),
-            new DeleteChild(TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(), ProtocolMessages()),
-            new DeleteAnnotation(TargetNode(), Index(), TargetNode(), CommandId(), ProtocolMessages()),
-            new DeleteReference(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
-                ProtocolMessages())
-        ], ProtocolMessages());
+        var input = CreateCompositeCommand();
         AssertSerialization(input);
     }
 }
