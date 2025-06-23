@@ -15,8 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable CoVariantArrayConversion
+
 namespace LionWeb.Core.Serialization.Delta;
 
+using System.Diagnostics;
 using System.Text;
 using TargetNode = NodeId;
 using CommandId = NodeId;
@@ -58,44 +61,28 @@ public record DeltaSerializationChunk(SerializedNode[] Nodes)
             return true;
         }
 
-        return Nodes.SequenceEqual(other.Nodes);
+        return Nodes.ArrayEquals(other.Nodes);
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
-        foreach (var node in Nodes)
-        {
-            hashCode.Add(node);
-        }
-
-        return HashCode.Combine(Nodes);
+        hashCode.ArrayHashCode(Nodes);
+        return hashCode.ToHashCode();
     }
 
     protected virtual bool PrintMembers(StringBuilder builder)
     {
         builder.Append(nameof(Nodes));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var node in Nodes)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(node);
-        }
-
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Nodes);
 
         return true;
     }
 }
 
-public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageData[] Data)
+public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageData[]? Data)
 {
     /// <inheritdoc />
     public virtual bool Equals(ProtocolMessage? other)
@@ -112,7 +99,7 @@ public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageD
 
         return string.Equals(Kind, other.Kind, StringComparison.InvariantCulture) &&
                string.Equals(Message, other.Message, StringComparison.InvariantCulture) &&
-               Data.SequenceEqual(other.Data);
+               Data.ArrayEquals(other.Data);
     }
 
     /// <inheritdoc />
@@ -121,11 +108,7 @@ public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageD
         var hashCode = new HashCode();
         hashCode.Add(Kind, StringComparer.InvariantCulture);
         hashCode.Add(Message, StringComparer.InvariantCulture);
-        foreach (var data in Data)
-        {
-            hashCode.Add(data);
-        }
-
+        hashCode.ArrayHashCode(Data);
         return hashCode.ToHashCode();
     }
 
@@ -142,41 +125,56 @@ public record ProtocolMessage(MessageKind Kind, string Message, ProtocolMessageD
         builder.Append(", ");
 
         builder.Append(nameof(Data));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var data in Data)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(data);
-        }
-
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Data);
 
         return true;
     }
 }
 
-public record ProtocolMessageData(MessageDataKey Key, string Value);
+public record ProtocolMessageData(MessageDataKey Key, string Value)
+{
+    /// <inheritdoc />
+    public virtual bool Equals(ProtocolMessageData? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return string.Equals(Key, other.Key, StringComparison.InvariantCulture) &&
+               string.Equals(Value, other.Value, StringComparison.InvariantCulture);
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(Key, StringComparer.InvariantCulture);
+        hashCode.Add(Value, StringComparer.InvariantCulture);
+        return hashCode.ToHashCode();
+    }
+}
 
 public interface IDeltaContent
 {
-    ProtocolMessage[] ProtocolMessages { get; }
+    ProtocolMessage[]? ProtocolMessages { get; }
     ParticipationId InternalParticipationId { get; set; }
     public bool RequiresParticipationId => true;
 
     string Id { get; }
 }
 
-public abstract record DeltaContentBase(ProtocolMessage[] ProtocolMessages) : IDeltaContent
+public abstract record DeltaContentBase(ProtocolMessage[]? ProtocolMessages) : IDeltaContent
 {
     public ParticipationId InternalParticipationId { get; set; }
     public abstract string Id { get; }
-    
+
     /// <inheritdoc />
     public virtual bool Equals(DeltaContentBase? other)
     {
@@ -190,39 +188,76 @@ public abstract record DeltaContentBase(ProtocolMessage[] ProtocolMessages) : ID
             return true;
         }
 
-        return ProtocolMessages.SequenceEqual(other.ProtocolMessages);
+        return ProtocolMessages.ArrayEquals(other.ProtocolMessages);
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
-        foreach (var message in ProtocolMessages)
-        {
-            hashCode.Add(message);
-        }
-
+        hashCode.ArrayHashCode(ProtocolMessages);
         return hashCode.ToHashCode();
     }
 
     protected virtual bool PrintMembers(StringBuilder builder)
     {
         builder.Append(nameof(ProtocolMessages));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var message in ProtocolMessages)
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(ProtocolMessages);
+
+        return true;
+    }
+}
+
+internal static class ArrayEqualsExtensions
+{
+    public static bool ArrayEquals(this object[]? left, object[]? right)
+    {
+        if (left == null || right == null)
         {
-            if (!first)
+            return left == right;
+        }
+
+        return left.SequenceEqual(right);
+    }
+
+    public static void ArrayHashCode(this ref HashCode hashCode, object[]? arr)
+    {
+        if (arr == null)
+        {
+            return;
+        }
+
+        foreach (var item in arr)
+        {
+            hashCode.Add(item);
+        }
+    }
+
+    public static void ArrayPrintMembers(this StringBuilder builder, object[]? arr)
+    {
+        if (arr == null)
+        {
+            builder.Append("null");
+            return;
+        }
+
+        builder.Append('[');
+
+        bool first = true;
+        foreach (var item in arr)
+        {
+            if (first)
+            {
+                first = false;
+            } else
             {
                 builder.Append(", ");
             }
 
-            first = false;
-            builder.Append(message);
+            builder.Append(item);
         }
 
         builder.Append(']');
-
-        return true;
     }
 }

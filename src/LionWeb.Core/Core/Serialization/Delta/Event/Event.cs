@@ -15,6 +15,8 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable CoVariantArrayConversion
+
 namespace LionWeb.Core.Serialization.Delta.Event;
 
 using System.Text;
@@ -34,13 +36,13 @@ public interface IDeltaEvent : IDeltaContent
 {
     EventSequenceNumber SequenceNumber { get; }
 
-    CommandSource[] OriginCommands { get; }
+    CommandSource[]? OriginCommands { get; }
 }
 
 public abstract record DeltaEventBase(
     EventSequenceNumber SequenceNumber,
-    CommandSource[] OriginCommands,
-    ProtocolMessage[] ProtocolMessages
+    CommandSource[]? OriginCommands,
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaContentBase(ProtocolMessages), IDeltaEvent
 {
     /// <inheritdoc />
@@ -59,8 +61,9 @@ public abstract record DeltaEventBase(
             return true;
         }
 
-        return base.Equals(other) && SequenceNumber == other.SequenceNumber &&
-               OriginCommands.SequenceEqual(other.OriginCommands);
+        return base.Equals(other) &&
+               SequenceNumber == other.SequenceNumber &&
+               OriginCommands.ArrayEquals(other.OriginCommands);
     }
 
     /// <inheritdoc />
@@ -69,10 +72,7 @@ public abstract record DeltaEventBase(
         var hashCode = new HashCode();
         hashCode.Add(base.GetHashCode());
         hashCode.Add(SequenceNumber);
-        foreach (var command in OriginCommands)
-        {
-            hashCode.Add(command);
-        }
+        hashCode.ArrayHashCode(OriginCommands);
 
         return hashCode.ToHashCode();
     }
@@ -89,20 +89,8 @@ public abstract record DeltaEventBase(
         builder.Append(", ");
 
         builder.Append(nameof(OriginCommands));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var command in OriginCommands)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(command);
-        }
-
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(OriginCommands);
 
         return true;
     }
@@ -114,17 +102,17 @@ public interface IPartitionDeltaEvent : IDeltaEvent;
 
 public record PartitionAdded(
     DeltaSerializationChunk NewPartition,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPartitionDeltaEvent;
 
 public record PartitionDeleted(
     TargetNode DeletedPartition,
     TargetNode[] DeletedDescendants,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPartitionDeltaEvent
 {
     /// <inheritdoc />
@@ -142,7 +130,7 @@ public record PartitionDeleted(
 
         return base.Equals(other) &&
                string.Equals(DeletedPartition, other.DeletedPartition, StringComparison.InvariantCulture) &&
-               DeletedDescendants.SequenceEqual(other.DeletedDescendants);
+               DeletedDescendants.ArrayEquals(other.DeletedDescendants);
     }
 
     /// <inheritdoc />
@@ -151,10 +139,7 @@ public record PartitionDeleted(
         var hashCode = new HashCode();
         hashCode.Add(base.GetHashCode());
         hashCode.Add(DeletedPartition, StringComparer.InvariantCulture);
-        foreach (var descendants in DeletedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
+        hashCode.ArrayHashCode(DeletedDescendants);
 
         return hashCode.ToHashCode();
     }
@@ -171,20 +156,8 @@ public record PartitionDeleted(
         builder.Append(", ");
 
         builder.Append(nameof(DeletedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in DeletedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(DeletedDescendants);
 
         return true;
     }
@@ -200,9 +173,9 @@ public record ClassifierChanged(
     TargetNode Node,
     MetaPointer NewClassifier,
     MetaPointer OldClassifier,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), INodeEvent;
 
 #endregion
@@ -227,9 +200,9 @@ public record PropertyAdded(
     TargetNode Node,
     MetaPointer Property,
     PropertyValue NewValue,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent
 {
     /// <inheritdoc />
@@ -240,9 +213,9 @@ public record PropertyDeleted(
     TargetNode Node,
     MetaPointer Property,
     PropertyValue OldValue,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent
 {
     /// <inheritdoc />
@@ -254,9 +227,9 @@ public record PropertyChanged(
     MetaPointer Property,
     PropertyValue NewValue,
     PropertyValue OldValue,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent
 {
     /// <inheritdoc />
@@ -280,9 +253,9 @@ public record ChildAdded(
     DeltaSerializationChunk NewChild,
     MetaPointer Containment,
     Index Index,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent;
 
 public record ChildDeleted(
@@ -291,9 +264,9 @@ public record ChildDeleted(
     TargetNode Parent,
     MetaPointer Containment,
     Index Index,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
@@ -311,9 +284,10 @@ public record ChildDeleted(
 
         return base.Equals(other) &&
                string.Equals(DeletedChild, other.DeletedChild, StringComparison.InvariantCulture) &&
-               DeletedDescendants.SequenceEqual(other.DeletedDescendants) &&
+               DeletedDescendants.ArrayEquals(other.DeletedDescendants) &&
                string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) &&
-               Containment.Equals(other.Containment) && Index == other.Index;
+               Containment.Equals(other.Containment) &&
+               Index == other.Index;
     }
 
     /// <inheritdoc />
@@ -322,11 +296,7 @@ public record ChildDeleted(
         var hashCode = new HashCode();
         hashCode.Add(base.GetHashCode());
         hashCode.Add(DeletedChild, StringComparer.InvariantCulture);
-        foreach (var descendants in DeletedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
-
+        hashCode.ArrayHashCode(DeletedDescendants);
         hashCode.Add(Parent, StringComparer.InvariantCulture);
         hashCode.Add(Containment);
         hashCode.Add(Index);
@@ -345,20 +315,9 @@ public record ChildDeleted(
         builder.Append(", ");
 
         builder.Append(nameof(DeletedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in DeletedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append("], ");
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(DeletedDescendants);
+        builder.Append(", ");
 
         builder.Append(nameof(Parent));
         builder.Append(" = ");
@@ -385,9 +344,9 @@ public record ChildReplaced(
     TargetNode Parent,
     MetaPointer Containment,
     Index Index,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
@@ -403,11 +362,13 @@ public record ChildReplaced(
             return true;
         }
 
-        return base.Equals(other) && NewChild.Equals(other.NewChild) &&
+        return base.Equals(other) &&
+               NewChild.Equals(other.NewChild) &&
                string.Equals(ReplacedChild, other.ReplacedChild, StringComparison.InvariantCulture) &&
-               ReplacedDescendants.SequenceEqual(other.ReplacedDescendants) &&
+               ReplacedDescendants.ArrayEquals(other.ReplacedDescendants) &&
                string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) &&
-               Containment.Equals(other.Containment) && Index == other.Index;
+               Containment.Equals(other.Containment) &&
+               Index == other.Index;
     }
 
     /// <inheritdoc />
@@ -417,11 +378,7 @@ public record ChildReplaced(
         hashCode.Add(base.GetHashCode());
         hashCode.Add(NewChild);
         hashCode.Add(ReplacedChild, StringComparer.InvariantCulture);
-        foreach (var descendants in ReplacedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
-
+        hashCode.ArrayHashCode(ReplacedDescendants);
         hashCode.Add(Parent, StringComparer.InvariantCulture);
         hashCode.Add(Containment);
         hashCode.Add(Index);
@@ -445,20 +402,9 @@ public record ChildReplaced(
         builder.Append(", ");
 
         builder.Append(nameof(ReplacedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in ReplacedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append("], ");
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(ReplacedDescendants);
+        builder.Append(", ");
 
         builder.Append(nameof(Parent));
         builder.Append(" = ");
@@ -486,9 +432,9 @@ public record ChildMovedFromOtherContainment(
     TargetNode OldParent,
     MetaPointer OldContainment,
     Index OldIndex,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
@@ -505,9 +451,9 @@ public record ChildMovedFromOtherContainmentInSameParent(
     TargetNode Parent,
     MetaPointer OldContainment,
     Index OldIndex,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
@@ -520,9 +466,9 @@ public record ChildMovedInSameContainment(
     TargetNode Parent,
     MetaPointer Containment,
     Index OldIndex,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages),
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages),
     IContainmentEvent;
 
 public record ChildMovedAndReplacedFromOtherContainment(
@@ -535,9 +481,9 @@ public record ChildMovedAndReplacedFromOtherContainment(
     Index OldIndex,
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
@@ -559,13 +505,16 @@ public record ChildMovedAndReplacedFromOtherContainment(
             return true;
         }
 
-        return base.Equals(other) && string.Equals(NewParent, other.NewParent, StringComparison.InvariantCulture) &&
-               NewContainment.Equals(other.NewContainment) && NewIndex == other.NewIndex &&
+        return base.Equals(other) &&
+               string.Equals(NewParent, other.NewParent, StringComparison.InvariantCulture) &&
+               NewContainment.Equals(other.NewContainment) &&
+               NewIndex == other.NewIndex &&
                string.Equals(MovedChild, other.MovedChild, StringComparison.InvariantCulture) &&
                string.Equals(OldParent, other.OldParent, StringComparison.InvariantCulture) &&
-               OldContainment.Equals(other.OldContainment) && OldIndex == other.OldIndex &&
+               OldContainment.Equals(other.OldContainment) &&
+               OldIndex == other.OldIndex &&
                string.Equals(ReplacedChild, other.ReplacedChild, StringComparison.InvariantCulture) &&
-               ReplacedDescendants.SequenceEqual(other.ReplacedDescendants);
+               ReplacedDescendants.ArrayEquals(other.ReplacedDescendants);
     }
 
     /// <inheritdoc />
@@ -581,10 +530,7 @@ public record ChildMovedAndReplacedFromOtherContainment(
         hashCode.Add(OldContainment);
         hashCode.Add(OldIndex);
         hashCode.Add(ReplacedChild, StringComparer.InvariantCulture);
-        foreach (var descendants in ReplacedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
+        hashCode.ArrayHashCode(ReplacedDescendants);
 
         return hashCode.ToHashCode();
     }
@@ -631,20 +577,8 @@ public record ChildMovedAndReplacedFromOtherContainment(
         builder.Append(", ");
 
         builder.Append(nameof(ReplacedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in ReplacedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(ReplacedDescendants);
 
         return true;
     }
@@ -659,9 +593,9 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
     Index OldIndex,
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
@@ -680,12 +614,15 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
             return true;
         }
 
-        return base.Equals(other) && NewContainment.Equals(other.NewContainment) && NewIndex == other.NewIndex &&
+        return base.Equals(other) &&
+               NewContainment.Equals(other.NewContainment) &&
+               NewIndex == other.NewIndex &&
                string.Equals(MovedChild, other.MovedChild, StringComparison.InvariantCulture) &&
                string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) &&
-               OldContainment.Equals(other.OldContainment) && OldIndex == other.OldIndex &&
+               OldContainment.Equals(other.OldContainment) &&
+               OldIndex == other.OldIndex &&
                string.Equals(ReplacedChild, other.ReplacedChild, StringComparison.InvariantCulture) &&
-               ReplacedDescendants.SequenceEqual(other.ReplacedDescendants);
+               ReplacedDescendants.ArrayEquals(other.ReplacedDescendants);
     }
 
     /// <inheritdoc />
@@ -700,10 +637,7 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
         hashCode.Add(OldContainment);
         hashCode.Add(OldIndex);
         hashCode.Add(ReplacedChild, StringComparer.InvariantCulture);
-        foreach (var descendants in ReplacedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
+        hashCode.ArrayHashCode(ReplacedDescendants);
 
         return hashCode.ToHashCode();
     }
@@ -750,20 +684,8 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
         builder.Append(", ");
 
         builder.Append(nameof(ReplacedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in ReplacedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(ReplacedDescendants);
 
         return true;
     }
@@ -777,9 +699,9 @@ public record ChildMovedAndReplacedInSameContainment(
     Index OldIndex,
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
@@ -795,12 +717,14 @@ public record ChildMovedAndReplacedInSameContainment(
             return true;
         }
 
-        return base.Equals(other) && NewIndex == other.NewIndex &&
+        return base.Equals(other) &&
+               NewIndex == other.NewIndex &&
                string.Equals(MovedChild, other.MovedChild, StringComparison.InvariantCulture) &&
                string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) &&
-               Containment.Equals(other.Containment) && OldIndex == other.OldIndex &&
+               Containment.Equals(other.Containment) &&
+               OldIndex == other.OldIndex &&
                string.Equals(ReplacedChild, other.ReplacedChild, StringComparison.InvariantCulture) &&
-               ReplacedDescendants.SequenceEqual(other.ReplacedDescendants);
+               ReplacedDescendants.ArrayEquals(other.ReplacedDescendants);
     }
 
     /// <inheritdoc />
@@ -814,10 +738,7 @@ public record ChildMovedAndReplacedInSameContainment(
         hashCode.Add(Containment);
         hashCode.Add(OldIndex);
         hashCode.Add(ReplacedChild, StringComparer.InvariantCulture);
-        foreach (var descendants in ReplacedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
+        hashCode.ArrayHashCode(ReplacedDescendants);
 
         return hashCode.ToHashCode();
     }
@@ -859,20 +780,8 @@ public record ChildMovedAndReplacedInSameContainment(
         builder.Append(", ");
 
         builder.Append(nameof(ReplacedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in ReplacedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(ReplacedDescendants);
 
         return true;
     }
@@ -891,9 +800,9 @@ public record AnnotationAdded(
     TargetNode Parent,
     DeltaSerializationChunk NewAnnotation,
     Index Index,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent;
 
 public record AnnotationDeleted(
@@ -901,9 +810,9 @@ public record AnnotationDeleted(
     TargetNode[] DeletedDescendants,
     TargetNode Parent,
     Index Index,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -921,8 +830,9 @@ public record AnnotationDeleted(
 
         return base.Equals(other) &&
                string.Equals(DeletedAnnotation, other.DeletedAnnotation, StringComparison.InvariantCulture) &&
-               DeletedDescendants.SequenceEqual(other.DeletedDescendants) &&
-               string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) && Index == other.Index;
+               DeletedDescendants.ArrayEquals(other.DeletedDescendants) &&
+               string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) &&
+               Index == other.Index;
     }
 
     /// <inheritdoc />
@@ -931,11 +841,7 @@ public record AnnotationDeleted(
         var hashCode = new HashCode();
         hashCode.Add(base.GetHashCode());
         hashCode.Add(DeletedAnnotation, StringComparer.InvariantCulture);
-        foreach (var descendants in DeletedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
-
+        hashCode.ArrayHashCode(DeletedDescendants);
         hashCode.Add(Parent, StringComparer.InvariantCulture);
         hashCode.Add(Index);
         return hashCode.ToHashCode();
@@ -953,20 +859,9 @@ public record AnnotationDeleted(
         builder.Append(", ");
 
         builder.Append(nameof(DeletedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in DeletedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append("], ");
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(DeletedDescendants);
+        builder.Append(", ");
 
         builder.Append(nameof(Parent));
         builder.Append(" = ");
@@ -987,9 +882,9 @@ public record AnnotationReplaced(
     TargetNode[] ReplacedDescendants,
     TargetNode Parent,
     Index Index,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -1005,10 +900,12 @@ public record AnnotationReplaced(
             return true;
         }
 
-        return base.Equals(other) && NewAnnotation.Equals(other.NewAnnotation) &&
+        return base.Equals(other) &&
+               NewAnnotation.Equals(other.NewAnnotation) &&
                string.Equals(ReplacedAnnotation, other.ReplacedAnnotation, StringComparison.InvariantCulture) &&
-               ReplacedDescendants.SequenceEqual(other.ReplacedDescendants) &&
-               string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) && Index == other.Index;
+               ReplacedDescendants.ArrayEquals(other.ReplacedDescendants) &&
+               string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) &&
+               Index == other.Index;
     }
 
     /// <inheritdoc />
@@ -1018,11 +915,7 @@ public record AnnotationReplaced(
         hashCode.Add(base.GetHashCode());
         hashCode.Add(NewAnnotation);
         hashCode.Add(ReplacedAnnotation, StringComparer.InvariantCulture);
-        foreach (var descendants in ReplacedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
-
+        hashCode.ArrayHashCode(ReplacedDescendants);
         hashCode.Add(Parent, StringComparer.InvariantCulture);
         hashCode.Add(Index);
         return hashCode.ToHashCode();
@@ -1040,20 +933,9 @@ public record AnnotationReplaced(
         builder.Append(", ");
 
         builder.Append(nameof(ReplacedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in ReplacedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append("], ");
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(ReplacedDescendants);
+        builder.Append(", ");
 
         builder.Append(nameof(Parent));
         builder.Append(" = ");
@@ -1074,9 +956,9 @@ public record AnnotationMovedFromOtherParent(
     TargetNode MovedAnnotation,
     TargetNode OldParent,
     Index OldIndex,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -1088,9 +970,9 @@ public record AnnotationMovedInSameParent(
     TargetNode MovedAnnotation,
     TargetNode Parent,
     Index OldIndex,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent;
 
 public record AnnotationMovedAndReplacedFromOtherParent(
@@ -1101,9 +983,9 @@ public record AnnotationMovedAndReplacedFromOtherParent(
     Index OldIndex,
     TargetNode ReplacedAnnotation,
     TargetNode[] ReplacedDescendants,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -1122,13 +1004,14 @@ public record AnnotationMovedAndReplacedFromOtherParent(
             return true;
         }
 
-        return base.Equals(other) && string.Equals(NewParent, other.NewParent, StringComparison.InvariantCulture) &&
+        return base.Equals(other) &&
+               string.Equals(NewParent, other.NewParent, StringComparison.InvariantCulture) &&
                NewIndex == other.NewIndex &&
                string.Equals(MovedAnnotation, other.MovedAnnotation, StringComparison.InvariantCulture) &&
                string.Equals(OldParent, other.OldParent, StringComparison.InvariantCulture) &&
                OldIndex == other.OldIndex &&
                string.Equals(ReplacedAnnotation, other.ReplacedAnnotation, StringComparison.InvariantCulture) &&
-               ReplacedDescendants.SequenceEqual(other.ReplacedDescendants);
+               ReplacedDescendants.ArrayEquals(other.ReplacedDescendants);
     }
 
     /// <inheritdoc />
@@ -1142,10 +1025,7 @@ public record AnnotationMovedAndReplacedFromOtherParent(
         hashCode.Add(OldParent, StringComparer.InvariantCulture);
         hashCode.Add(OldIndex);
         hashCode.Add(ReplacedAnnotation, StringComparer.InvariantCulture);
-        foreach (var descendants in ReplacedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
+        hashCode.ArrayHashCode(ReplacedDescendants);
 
         return hashCode.ToHashCode();
     }
@@ -1187,20 +1067,8 @@ public record AnnotationMovedAndReplacedFromOtherParent(
         builder.Append(", ");
 
         builder.Append(nameof(ReplacedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in ReplacedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(ReplacedDescendants);
 
         return true;
     }
@@ -1213,9 +1081,9 @@ public record AnnotationMovedAndReplacedInSameParent(
     Index OldIndex,
     TargetNode ReplacedAnnotation,
     TargetNode[] ReplacedDescendants,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
@@ -1231,11 +1099,13 @@ public record AnnotationMovedAndReplacedInSameParent(
             return true;
         }
 
-        return base.Equals(other) && NewIndex == other.NewIndex &&
+        return base.Equals(other) &&
+               NewIndex == other.NewIndex &&
                string.Equals(MovedAnnotation, other.MovedAnnotation, StringComparison.InvariantCulture) &&
-               string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) && OldIndex == other.OldIndex &&
+               string.Equals(Parent, other.Parent, StringComparison.InvariantCulture) &&
+               OldIndex == other.OldIndex &&
                string.Equals(ReplacedAnnotation, other.ReplacedAnnotation, StringComparison.InvariantCulture) &&
-               ReplacedDescendants.SequenceEqual(other.ReplacedDescendants);
+               ReplacedDescendants.ArrayEquals(other.ReplacedDescendants);
     }
 
     /// <inheritdoc />
@@ -1248,10 +1118,7 @@ public record AnnotationMovedAndReplacedInSameParent(
         hashCode.Add(Parent, StringComparer.InvariantCulture);
         hashCode.Add(OldIndex);
         hashCode.Add(ReplacedAnnotation, StringComparer.InvariantCulture);
-        foreach (var descendants in ReplacedDescendants)
-        {
-            hashCode.Add(descendants);
-        }
+        hashCode.ArrayHashCode(ReplacedDescendants);
 
         return hashCode.ToHashCode();
     }
@@ -1288,20 +1155,8 @@ public record AnnotationMovedAndReplacedInSameParent(
         builder.Append(", ");
 
         builder.Append(nameof(ReplacedDescendants));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var descendants in ReplacedDescendants)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-
-            first = false;
-            builder.Append(descendants);
-        }
-
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(ReplacedDescendants);
 
         return true;
     }
@@ -1325,9 +1180,9 @@ public record ReferenceAdded(
     Index Index,
     TargetNode? NewTarget,
     ResolveInfo? NewResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceDeleted(
@@ -1336,9 +1191,9 @@ public record ReferenceDeleted(
     Index Index,
     TargetNode? DeletedTarget,
     ResolveInfo? DeletedResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceChanged(
@@ -1349,9 +1204,9 @@ public record ReferenceChanged(
     ResolveInfo? NewResolveInfo,
     TargetNode? OldTarget,
     ResolveInfo? OldResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record EntryMovedFromOtherReference(
@@ -1363,9 +1218,9 @@ public record EntryMovedFromOtherReference(
     Index OldIndex,
     TargetNode? Target,
     ResolveInfo? ResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
@@ -1383,9 +1238,9 @@ public record EntryMovedFromOtherReferenceInSameParent(
     Index OldIndex,
     TargetNode? TargetNode,
     ResolveInfo? ResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
@@ -1399,9 +1254,9 @@ public record EntryMovedInSameReference(
     Index NewIndex,
     TargetNode? Target,
     ResolveInfo? ResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record EntryMovedAndReplacedFromOtherReference(
@@ -1415,9 +1270,9 @@ public record EntryMovedAndReplacedFromOtherReference(
     Index OldIndex,
     TargetNode? ReplacedTarget,
     ResolveInfo? ReplacedResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
@@ -1437,9 +1292,9 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParent(
     Index OldIndex,
     TargetNode? ReplacedTarget,
     ResolveInfo? ReplacedResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
@@ -1455,9 +1310,9 @@ public record EntryMovedAndReplacedInSameReference(
     Index OldIndex,
     TargetNode? ReplacedTarget,
     ResolveInfo? ReplacedResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceResolveInfoAdded(
@@ -1466,9 +1321,9 @@ public record ReferenceResolveInfoAdded(
     Index Index,
     ResolveInfo NewResolveInfo,
     TargetNode Target,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceResolveInfoDeleted(
@@ -1477,9 +1332,9 @@ public record ReferenceResolveInfoDeleted(
     Index Index,
     TargetNode Target,
     ResolveInfo DeletedResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceResolveInfoChanged(
@@ -1489,9 +1344,9 @@ public record ReferenceResolveInfoChanged(
     ResolveInfo NewResolveInfo,
     TargetNode? Target,
     ResolveInfo ReplacedResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceTargetAdded(
@@ -1500,9 +1355,9 @@ public record ReferenceTargetAdded(
     Index Index,
     TargetNode NewTarget,
     ResolveInfo ResolveInfo,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceTargetDeleted(
@@ -1511,9 +1366,9 @@ public record ReferenceTargetDeleted(
     Index Index,
     ResolveInfo ResolveInfo,
     TargetNode DeletedTarget,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceTargetChanged(
@@ -1523,9 +1378,9 @@ public record ReferenceTargetChanged(
     TargetNode NewTarget,
     ResolveInfo? ResolveInfo,
     TargetNode ReplacedTarget,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
 
 #endregion
@@ -1535,7 +1390,7 @@ public record ReferenceTargetChanged(
 public record CompositeEvent(
     IDeltaEvent[] Parts,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, [], ProtocolMessages)
 {
     /// <inheritdoc />
@@ -1554,7 +1409,9 @@ public record CompositeEvent(
             return true;
         }
 
-        return base.Equals(other) && Parts.SequenceEqual(other.Parts) && SequenceNumber == other.SequenceNumber;
+        return base.Equals(other) &&
+               Parts.ArrayEquals(other.Parts) &&
+               SequenceNumber == other.SequenceNumber;
     }
 
     /// <inheritdoc />
@@ -1562,11 +1419,7 @@ public record CompositeEvent(
     {
         var hashCode = new HashCode();
         hashCode.Add(base.GetHashCode());
-        foreach (var @event in Parts)
-        {
-            hashCode.Add(@event);
-        }
-
+        hashCode.ArrayHashCode(Parts);
         hashCode.Add(SequenceNumber);
 
         return hashCode.ToHashCode();
@@ -1579,20 +1432,9 @@ public record CompositeEvent(
         builder.Append(", ");
 
         builder.Append(nameof(Parts));
-        builder.Append(" = [");
-        bool firstEvent = true;
-        foreach (var node in Parts)
-        {
-            if (!firstEvent)
-            {
-                builder.Append(", ");
-            }
-
-            firstEvent = false;
-            builder.Append(node);
-        }
-
-        builder.Append("], ");
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Parts);
+        builder.Append(", ");
 
         builder.Append(nameof(SequenceNumber));
         builder.Append(" = ");
@@ -1603,17 +1445,17 @@ public record CompositeEvent(
 }
 
 public record NoOpEvent(
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages);
 
 public record Error(
     ErrorCode ErrorCode,
     string Message,
-    CommandSource[] OriginCommands,
+    CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
-    ProtocolMessage[] ProtocolMessages
+    ProtocolMessage[]? ProtocolMessages
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages);
 
 #endregion

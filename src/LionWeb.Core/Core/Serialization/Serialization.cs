@@ -15,8 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable CoVariantArrayConversion
 namespace LionWeb.Core.Serialization;
 
+using Delta;
 using System.Text;
 
 /// <summary>
@@ -40,26 +42,39 @@ public record SerializationChunk
 
         return string.Equals(SerializationFormatVersion, other.SerializationFormatVersion,
                    StringComparison.InvariantCulture) &&
-               Languages.SequenceEqual(other.Languages) &&
-               Nodes.SequenceEqual(other.Nodes);
+               Languages.ArrayEquals(other.Languages) &&
+               Nodes.ArrayEquals(other.Nodes);
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
+        
         hashCode.Add(SerializationFormatVersion, StringComparer.InvariantCulture);
-        foreach (var language in Languages)
-        {
-            hashCode.Add(language);
-        }
-
-        foreach (var node in Nodes)
-        {
-            hashCode.Add(node);
-        }
+        hashCode.ArrayHashCode(Languages);
+        hashCode.ArrayHashCode(Nodes);
 
         return hashCode.ToHashCode();
+    }
+
+    protected virtual bool PrintMembers(StringBuilder builder)
+    {
+        builder.Append(nameof(SerializationFormatVersion));
+        builder.Append(" = ");
+        builder.Append(SerializationFormatVersion);
+        builder.Append(", ");
+
+        builder.Append(nameof(Languages));
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Languages);
+        builder.Append(", ");
+
+        builder.Append(nameof(Nodes));
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Nodes);
+
+        return true;
     }
 
     public required string SerializationFormatVersion { get; init; }
@@ -90,10 +105,10 @@ public record SerializedNode
 
         return string.Equals(Id, other.Id, StringComparison.InvariantCulture) &&
                Classifier.Equals(other.Classifier) &&
-               Properties.SequenceEqual(other.Properties) &&
-               Containments.SequenceEqual(other.Containments) &&
-               References.SequenceEqual(other.References) &&
-               Annotations.SequenceEqual(other.Annotations) &&
+               Properties.ArrayEquals(other.Properties) &&
+               Containments.ArrayEquals(other.Containments) &&
+               References.ArrayEquals(other.References) &&
+               Annotations.ArrayEquals(other.Annotations) &&
                string.Equals(Parent, other.Parent, StringComparison.InvariantCulture);
     }
 
@@ -101,29 +116,15 @@ public record SerializedNode
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
+        
         hashCode.Add(Id, StringComparer.InvariantCulture);
         hashCode.Add(Classifier);
-        foreach (var property in Properties)
-        {
-            hashCode.Add(property);
-        }
-
-        foreach (var containment in Containments)
-        {
-            hashCode.Add(containment);
-        }
-
-        foreach (var reference in References)
-        {
-            hashCode.Add(reference);
-        }
-
-        foreach (var annotation in Annotations)
-        {
-            hashCode.Add(annotation);
-        }
-
+        hashCode.ArrayHashCode(Properties);
+        hashCode.ArrayHashCode(Containments);
+        hashCode.ArrayHashCode(References);
+        hashCode.ArrayHashCode(Annotations);
         hashCode.Add(Parent, StringComparer.InvariantCulture);
+        
         return hashCode.ToHashCode();
     }
 
@@ -140,60 +141,24 @@ public record SerializedNode
         builder.Append(", ");
 
         builder.Append(nameof(Properties));
-        builder.Append(" = [");
-        bool firstProperty = true;
-        foreach (var property in Properties)
-        {
-            if (!firstProperty)
-            {
-                builder.Append(", ");
-            }
-            firstProperty = false;
-            builder.Append(property);
-        }
-        builder.Append("], ");
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Properties);
+        builder.Append(", ");
 
         builder.Append(nameof(Containments));
-        builder.Append(" = [");
-        bool firstContainment = true;
-        foreach (var containment in Containments)
-        {
-            if (!firstContainment)
-            {
-                builder.Append(", ");
-            }
-            firstContainment = false;
-            builder.Append(containment);
-        }
-        builder.Append("], ");
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Containments);
+        builder.Append(", ");
 
         builder.Append(nameof(References));
-        builder.Append(" = [");
-        bool firstReference = true;
-        foreach (var reference in References)
-        {
-            if (!firstReference)
-            {
-                builder.Append(", ");
-            }
-            firstReference = false;
-            builder.Append(reference);
-        }
-        builder.Append("], ");
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(References);
+        builder.Append(", ");
 
         builder.Append(nameof(Annotations));
-        builder.Append(" = [");
-        bool firstAnnotation = true;
-        foreach (var annotation in Annotations)
-        {
-            if (!firstAnnotation)
-            {
-                builder.Append(", ");
-            }
-            firstAnnotation = false;
-            builder.Append(annotation);
-        }
-        builder.Append("], ");
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Annotations);
+        builder.Append(", ");
 
         builder.Append(nameof(Parent));
         builder.Append(" = ");
@@ -235,18 +200,16 @@ public record SerializedContainment
         }
 
         return Containment.Equals(other.Containment) &&
-               Children.SequenceEqual(other.Children);
+               Children.ArrayEquals(other.Children);
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
+        
         hashCode.Add(Containment);
-        foreach (var child in Children)
-        {
-            hashCode.Add(child);
-        }
+        hashCode.ArrayHashCode(Children);
 
         return hashCode.ToHashCode();
     }
@@ -259,18 +222,8 @@ public record SerializedContainment
         builder.Append(", ");
 
         builder.Append(nameof(Children));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var child in Children)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-            first = false;
-            builder.Append(child);
-        }
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Children);
         
         return true;
     }
@@ -300,18 +253,17 @@ public record SerializedReference
             return true;
         }
 
-        return Reference.Equals(other.Reference) && Targets.SequenceEqual(other.Targets);
+        return Reference.Equals(other.Reference) &&
+               Targets.ArrayEquals(other.Targets);
     }
 
     /// <inheritdoc />
     public override int GetHashCode()
     {
         var hashCode = new HashCode();
+        
         hashCode.Add(Reference);
-        foreach (var target in Targets)
-        {
-            hashCode.Add(target);
-        }
+        hashCode.ArrayHashCode(Targets);
 
         return hashCode.ToHashCode();
     }
@@ -324,18 +276,8 @@ public record SerializedReference
         builder.Append(", ");
 
         builder.Append(nameof(Targets));
-        builder.Append(" = [");
-        bool first = true;
-        foreach (var target in Targets)
-        {
-            if (!first)
-            {
-                builder.Append(", ");
-            }
-            first = false;
-            builder.Append(target);
-        }
-        builder.Append(']');
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Targets);
         
         return true;
     }

@@ -24,6 +24,15 @@ using Core.Serialization.Delta.Query;
 [TestClass]
 public class DeltaToStringTests : JsonSerializationTestsBase
 {
+    [TestMethod]
+    public void NoMessages()
+    {
+        var input = new CommandResponse(CommandId(), null);
+        Assert.AreEqual(
+            "CommandResponse { ProtocolMessages = null, CommandId = 1 }",
+            input.ToString());
+    }
+    
     #region Command
 
     [TestMethod]
