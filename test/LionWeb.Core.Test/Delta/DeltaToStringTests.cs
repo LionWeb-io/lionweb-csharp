@@ -22,7 +22,7 @@ using Core.Serialization.Delta.Event;
 using Core.Serialization.Delta.Query;
 
 [TestClass]
-public class DeltaToStringTests : JsonSerializationTestsBase
+public class DeltaToStringTests : JsonTestsBase
 {
     [TestMethod]
     public void NoMessages()
@@ -50,7 +50,7 @@ public class DeltaToStringTests : JsonSerializationTestsBase
         var input = new AddProperty(TargetNode(), MetaPointer(), PropertyValue(), CommandId(),
             ProtocolMessages());
         Assert.AreEqual(
-            "AddProperty { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 1, Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, NewValue = 1, Parent = 1 }",
+            "AddProperty { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 1, Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, NewValue = 1 }",
             input.ToString());
     }
 
@@ -61,9 +61,9 @@ public class DeltaToStringTests : JsonSerializationTestsBase
             new DeleteProperty(TargetNode(), MetaPointer(), CommandId(), ProtocolMessages()),
             new DeleteChild(TargetNode(), MetaPointer(), Index(), TargetNode(), CommandId(),
                 ProtocolMessages()),
-        ], ProtocolMessages());
+        ], CommandId(), ProtocolMessages());
         Assert.AreEqual(
-            "CompositeCommand { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = , Parts = [DeleteProperty { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 1, Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, Parent = 1 }, DeleteChild { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 2, Parent = 2, Containment = MetaPointer { Language = myLang, Version = v0, Key = 2 }, Index = 1, DeletedChild = 3 }] }",
+            "CompositeCommand { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 3, Parts = [DeleteProperty { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 1, Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 } }, DeleteChild { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 2, Parent = 2, Containment = MetaPointer { Language = myLang, Version = v0, Key = 2 }, Index = 1, DeletedChild = 3 }] }",
             input.ToString());
     }
 
@@ -76,7 +76,7 @@ public class DeltaToStringTests : JsonSerializationTestsBase
     {
         var input = new PropertyAdded(TargetNode(), MetaPointer(), PropertyValue(), Origin(), Sequence(), ProtocolMessages());
         Assert.AreEqual(
-            "PropertyAdded { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 2 }, CommandSource { ParticipationId = myParticipation, CommandId = 3 }], Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, NewValue = 1, Parent = 1 }",
+            "PropertyAdded { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 2 }, CommandSource { ParticipationId = myParticipation, CommandId = 3 }], Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, NewValue = 1 }",
             input.ToString());
     }
 
@@ -91,7 +91,7 @@ public class DeltaToStringTests : JsonSerializationTestsBase
                 ProtocolMessages()),
         ], Sequence(), ProtocolMessages());
         Assert.AreEqual(
-            "CompositeEvent { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [], Parts = [PropertyDeleted { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 2 }, CommandSource { ParticipationId = myParticipation, CommandId = 3 }], Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, OldValue = 1, Parent = 1 }, ChildDeleted { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 6 }, CommandSource { ParticipationId = myParticipation, CommandId = 7 }], DeletedChild = 4, DeletedDescendants = [], Parent = 5, Containment = MetaPointer { Language = myLang, Version = v0, Key = 2 }, Index = 1 }], SequenceNumber = 0 }",
+            "CompositeEvent { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, Parts = [PropertyDeleted { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 2 }, CommandSource { ParticipationId = myParticipation, CommandId = 3 }], Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, OldValue = 1 }, ChildDeleted { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 6 }, CommandSource { ParticipationId = myParticipation, CommandId = 7 }], DeletedChild = 4, DeletedDescendants = [], Parent = 5, Containment = MetaPointer { Language = myLang, Version = v0, Key = 2 }, Index = 1 }] }",
             input.ToString());
     }
 

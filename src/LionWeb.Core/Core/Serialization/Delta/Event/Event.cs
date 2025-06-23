@@ -20,6 +20,7 @@
 namespace LionWeb.Core.Serialization.Delta.Event;
 
 using System.Text;
+using System.Text.Json.Serialization;
 using TargetNode = NodeId;
 using CommandId = NodeId;
 using ParticipationId = NodeId;
@@ -46,7 +47,14 @@ public abstract record DeltaEventBase(
 ) : DeltaContentBase(ProtocolMessages), IDeltaEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     public override string Id => string.Join("__", OriginCommands.Select(x => x.ToString()));
+
+    /// <inheritdoc />
+    public virtual EventSequenceNumber SequenceNumber { get; init; } = SequenceNumber;
+
+    /// <inheritdoc />
+    public virtual CommandSource[]? OriginCommands { get; init; } = OriginCommands;
 
     /// <inheritdoc />
     public virtual bool Equals(DeltaEventBase? other)
@@ -183,6 +191,8 @@ public record ClassifierChanged(
 public interface IFeatureEvent : IDeltaEvent
 {
     TargetNode Parent { get; }
+    
+    [JsonIgnore]
     MetaPointer Feature { get; }
 };
 
@@ -190,9 +200,16 @@ public interface IFeatureEvent : IDeltaEvent
 
 public interface IPropertyEvent : IFeatureEvent
 {
+    TargetNode Node { get; }
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    TargetNode IFeatureEvent.Parent => Node;
+
     MetaPointer Property { get; }
 
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IFeatureEvent.Feature => Property;
 };
 
@@ -203,11 +220,7 @@ public record PropertyAdded(
     CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent
-{
-    /// <inheritdoc />
-    public TargetNode Parent => Node;
-}
+) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent;
 
 public record PropertyDeleted(
     TargetNode Node,
@@ -216,11 +229,7 @@ public record PropertyDeleted(
     CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent
-{
-    /// <inheritdoc />
-    public TargetNode Parent => Node;
-}
+) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent;
 
 public record PropertyChanged(
     TargetNode Node,
@@ -230,11 +239,7 @@ public record PropertyChanged(
     CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent
-{
-    /// <inheritdoc />
-    public TargetNode Parent => Node;
-}
+) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent;
 
 #endregion
 
@@ -242,9 +247,11 @@ public record PropertyChanged(
 
 public interface IContainmentEvent : IFeatureEvent
 {
+    [JsonIgnore]
     MetaPointer Containment { get; }
 
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IFeatureEvent.Feature => Containment;
 };
 
@@ -438,9 +445,11 @@ public record ChildMovedFromOtherContainment(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     public TargetNode Parent => NewParent;
 
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IContainmentEvent.Containment => NewContainment;
 }
 
@@ -457,6 +466,7 @@ public record ChildMovedFromOtherContainmentInSameParent(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IContainmentEvent.Containment => NewContainment;
 }
 
@@ -487,9 +497,11 @@ public record ChildMovedAndReplacedFromOtherContainment(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     public TargetNode Parent => NewParent;
 
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IContainmentEvent.Containment => NewContainment;
 
     /// <inheritdoc />
@@ -599,6 +611,7 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IContainmentEvent.Containment => NewContainment;
 
     /// <inheritdoc />
@@ -962,6 +975,7 @@ public record AnnotationMovedFromOtherParent(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     TargetNode IAnnotationEvent.Parent => NewParent;
 }
 
@@ -989,6 +1003,7 @@ public record AnnotationMovedAndReplacedFromOtherParent(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     TargetNode IAnnotationEvent.Parent => NewParent;
 
     /// <inheritdoc />
@@ -1171,6 +1186,7 @@ public interface IReferenceEvent : IFeatureEvent
     MetaPointer Reference { get; }
 
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IFeatureEvent.Feature => Reference;
 };
 
@@ -1224,9 +1240,11 @@ public record EntryMovedFromOtherReference(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     public TargetNode Parent => NewParent;
 
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
@@ -1236,7 +1254,7 @@ public record EntryMovedFromOtherReferenceInSameParent(
     Index NewIndex,
     MetaPointer OldReference,
     Index OldIndex,
-    TargetNode? TargetNode,
+    TargetNode? Target,
     ResolveInfo? ResolveInfo,
     CommandSource[]? OriginCommands,
     EventSequenceNumber SequenceNumber,
@@ -1244,6 +1262,7 @@ public record EntryMovedFromOtherReferenceInSameParent(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
@@ -1276,9 +1295,11 @@ public record EntryMovedAndReplacedFromOtherReference(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     public TargetNode Parent => NewParent;
 
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
@@ -1298,6 +1319,7 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParent(
 ) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
+    [JsonIgnore]
     MetaPointer IReferenceEvent.Reference => NewReference;
 }
 
@@ -1387,14 +1409,30 @@ public record ReferenceTargetChanged(
 
 #region Miscellaneous
 
-public record CompositeEvent(
-    IDeltaEvent[] Parts,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, [], ProtocolMessages)
+public record CompositeEvent : DeltaEventBase
 {
+    public CompositeEvent(IDeltaEvent[] Parts,
+        EventSequenceNumber SequenceNumber,
+        ProtocolMessage[]? ProtocolMessages) : base(SequenceNumber, null, ProtocolMessages)
+    {
+        this.Parts = Parts;
+        this.SequenceNumber = SequenceNumber;
+    }
+
     /// <inheritdoc />
+    [JsonIgnore]
     public override string Id => string.Join("--", Parts.Select(e => e.Id));
+
+    public IDeltaEvent[] Parts { get; init; }
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override EventSequenceNumber SequenceNumber { get; init; }
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override CommandSource[]? OriginCommands => 
+        Parts.SelectMany(e => e.OriginCommands ?? []).ToArray();
 
     /// <inheritdoc />
     public virtual bool Equals(CompositeEvent? other)
@@ -1428,17 +1466,22 @@ public record CompositeEvent(
     /// <inheritdoc />
     protected override bool PrintMembers(StringBuilder builder)
     {
-        base.PrintMembers(builder);
-        builder.Append(", ");
-
-        builder.Append(nameof(Parts));
+        // do NOT call base.PrintMembers(), as we omit OriginCommands
+        
+        builder.Append(nameof(ProtocolMessages));
         builder.Append(" = ");
-        builder.ArrayPrintMembers(Parts);
+        builder.ArrayPrintMembers(ProtocolMessages);
+        
         builder.Append(", ");
 
         builder.Append(nameof(SequenceNumber));
         builder.Append(" = ");
         builder.Append(SequenceNumber);
+        builder.Append(", ");
+
+        builder.Append(nameof(Parts));
+        builder.Append(" = ");
+        builder.ArrayPrintMembers(Parts);
 
         return true;
     }

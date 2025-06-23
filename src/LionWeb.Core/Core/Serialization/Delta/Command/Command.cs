@@ -19,6 +19,7 @@
 namespace LionWeb.Core.Serialization.Delta.Command;
 
 using System.Text;
+using System.Text.Json.Serialization;
 using TargetNode = NodeId;
 using CommandId = NodeId;
 using ParticipationId = NodeId;
@@ -39,6 +40,7 @@ public abstract record DeltaCommandBase(
 ) : DeltaContentBase(ProtocolMessages), IDeltaCommand
 {
     /// <inheritdoc />
+    [JsonIgnore]
     public override string Id => CommandId;
 
     /// <inheritdoc />
@@ -85,6 +87,7 @@ public record CommandResponse(CommandId CommandId, ProtocolMessage[]? ProtocolMe
     : DeltaContentBase(ProtocolMessages)
 {
     /// <inheritdoc />
+    [JsonIgnore]
     public override string Id => CommandId;
 }
 
@@ -125,7 +128,8 @@ public interface IFeatureCommand : IDeltaCommand;
 
 public interface IPropertyCommand : IFeatureCommand
 {
-    TargetNode Parent { get; }
+    TargetNode Node { get; }
+
     MetaPointer Property { get; }
 };
 
@@ -135,20 +139,14 @@ public record AddProperty(
     PropertyValue NewValue,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand
-{
-    public TargetNode Parent => Node;
-}
+) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand;
 
 public record DeleteProperty(
     TargetNode Node,
     MetaPointer Property,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand
-{
-    public TargetNode Parent => Node;
-}
+) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand;
 
 public record ChangeProperty(
     TargetNode Node,
@@ -156,10 +154,7 @@ public record ChangeProperty(
     PropertyValue NewValue,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand
-{
-    public TargetNode Parent => Node;
-}
+) : DeltaCommandBase(CommandId, ProtocolMessages), IPropertyCommand;
 
 #endregion
 
@@ -491,8 +486,9 @@ public record ChangeReferenceTarget(
 
 public record CompositeCommand(
     IDeltaCommand[] Parts,
+    CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(null, ProtocolMessages)
+) : DeltaCommandBase(CommandId, ProtocolMessages)
 {
     /// <inheritdoc />
     public virtual bool Equals(CompositeCommand? other)

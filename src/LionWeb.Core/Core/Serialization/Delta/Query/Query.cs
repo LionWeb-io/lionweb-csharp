@@ -19,6 +19,7 @@
 namespace LionWeb.Core.Serialization.Delta.Query;
 
 using System.Text;
+using System.Text.Json.Serialization;
 using TargetNode = NodeId;
 using CommandId = NodeId;
 using ParticipationId = NodeId;
@@ -43,6 +44,7 @@ public abstract record DeltaQueryBase(
 ) : DeltaContentBase(ProtocolMessages)
 {
     /// <inheritdoc />
+    [JsonIgnore]
     public override string Id => QueryId;
 
     /// <inheritdoc />

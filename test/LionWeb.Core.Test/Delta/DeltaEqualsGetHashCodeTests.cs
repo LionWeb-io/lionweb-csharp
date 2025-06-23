@@ -24,7 +24,7 @@ using Core.Serialization.Delta.Event;
 using Core.Serialization.Delta.Query;
 
 [TestClass]
-public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
+public class DeltaEqualsGetHashCodeTests : JsonTestsBase
 {
     #region Command
 
@@ -89,10 +89,10 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     {
         var a = new CompositeCommand([
             new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+        ], "cc", CreateProtocolMessages("msgAA"));
         var b = new CompositeCommand([
             new DeleteProperty("b", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+        ], "cc", CreateProtocolMessages("msgAA"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -103,10 +103,10 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     {
         var a = new CompositeCommand([
             new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+        ], "cc", CreateProtocolMessages("msgAA"));
         var b = new CompositeCommand([
             new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgBB"));
+        ], "cc", CreateProtocolMessages("msgBB"));
 
         Assert.IsFalse(a.Equals(b));
         Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
@@ -117,10 +117,10 @@ public class DeltaEqualsGetHashCodeTests : JsonSerializationTestsBase
     {
         var a = new CompositeCommand([
             new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+        ], "cc", CreateProtocolMessages("msgAA"));
         var b = new CompositeCommand([
             new DeleteProperty("a", new MetaPointer("myLang", "v0", "key"), "x", CreateProtocolMessages("msgA")),
-        ], CreateProtocolMessages("msgAA"));
+        ], "cc", CreateProtocolMessages("msgAA"));
 
         Assert.IsTrue(a.Equals(b));
         Assert.AreEqual(a.GetHashCode(), b.GetHashCode());

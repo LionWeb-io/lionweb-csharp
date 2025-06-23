@@ -21,6 +21,7 @@ namespace LionWeb.Core.Serialization.Delta;
 
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json.Serialization;
 using TargetNode = NodeId;
 using CommandId = NodeId;
 using ParticipationId = NodeId;
@@ -164,16 +165,26 @@ public record ProtocolMessageData(MessageDataKey Key, string Value)
 public interface IDeltaContent
 {
     ProtocolMessage[]? ProtocolMessages { get; }
+
+    [JsonIgnore]
     ParticipationId InternalParticipationId { get; set; }
+
+    [JsonIgnore]
     public bool RequiresParticipationId => true;
 
+    [JsonIgnore]
     string Id { get; }
 }
 
 public abstract record DeltaContentBase(ProtocolMessage[]? ProtocolMessages) : IDeltaContent
 {
+    [JsonIgnore]
     public ParticipationId InternalParticipationId { get; set; }
+
+    [JsonIgnore]
     public abstract string Id { get; }
+
+    public virtual ProtocolMessage[]? ProtocolMessages { get; init; } = ProtocolMessages;
 
     /// <inheritdoc />
     public virtual bool Equals(DeltaContentBase? other)

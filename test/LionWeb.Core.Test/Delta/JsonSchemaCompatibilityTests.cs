@@ -17,8 +17,39 @@
 
 namespace LionWeb.Core.Test.Delta;
 
+using Core.Serialization;
+using Core.Serialization.Delta;
+using Json.Schema;
+using System.Text.Json.Nodes;
+
 [TestClass]
-public class JsonSchemaCompatibilityTests : JsonSerializationTestsBase
+public class JsonSchemaCompatibilityTests : JsonTestsBase
 {
+    private static IEnumerable<object[]> GetTestData() => CollectAllMessages();
     
+    private static JsonSchema JsonSchema { get; }
+
+    static JsonSchemaCompatibilityTests()
+    {
+        using Stream? schemaStream =
+            typeof(JsonSchemaCompatibilityTests).Assembly.GetManifestResourceStream("LionWeb.Core.Test.resources.delta.schema.json");
+        Assert.IsNotNull(schemaStream);
+        JsonSchema = JsonSchema.FromStream(schemaStream).Result;
+    }
+
+    [TestMethod]
+    [DynamicData(nameof(GetTestData), DynamicDataSourceType.Method)]
+    public void SchemaCompatibility(IDeltaContent delta)
+    {
+        var deltaSerializer = new DeltaSerializer();
+        var serialized = deltaSerializer.Serialize(delta);
+
+        var jsonNode = JsonNode.Parse(serialized);
+        Assert.IsNotNull(jsonNode);
+        EvaluationResults evaluationResults = JsonSchema.Evaluate(jsonNode, new EvaluationOptions()
+        {
+            OutputFormat = OutputFormat.List
+        });
+        Assert.IsTrue(evaluationResults.IsValid, serialized);
+    }
 }
