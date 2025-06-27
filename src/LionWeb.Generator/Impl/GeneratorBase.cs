@@ -35,15 +35,17 @@ public abstract class GeneratorBase
     protected readonly INames _names;
 
     protected readonly LionWebVersions _lionWebVersion;
+    protected readonly GeneratorConfig _config;
     protected readonly ILionCoreLanguage _m3;
     protected readonly IBuiltInsLanguage _builtIns;
 
     /// <inheritdoc cref="GeneratorBase"/>
-    protected GeneratorBase(INames names, LionWebVersions lionWebVersion)
+    protected GeneratorBase(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
     {
         lionWebVersion.AssureCompatible(names.Language.LionWebVersion);
         _names = names;
         _lionWebVersion = lionWebVersion;
+        _config = config;
         _m3 = lionWebVersion.LionCore;
         _builtIns = lionWebVersion.BuiltIns;
     }
@@ -64,17 +66,17 @@ public abstract class GeneratorBase
 
     /// Roslyn type of <paramref name="entity"/> (also registered with <see cref="INames.UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.
-    protected TypeSyntax AsType(LanguageEntity entity, bool disambiguate = false) =>
+    protected TypeSyntax AsType(LanguageEntity entity, bool disambiguate = false, bool writeable = false) =>
         entity switch
         {
-            Classifier c => AsType(c, disambiguate),
+            Classifier c => AsType(c, disambiguate, writeable),
             Datatype d => _names.AsType(d, disambiguate),
             _ => throw new ArgumentException($"unsupported entity: {entity}", nameof(entity))
         };
 
-    /// <inheritdoc cref="INames.AsType(Classifier, bool)"/>
-    protected TypeSyntax AsType(Classifier classifier, bool disambiguate = false) =>
-        _names.AsType(classifier, disambiguate);
+    /// <inheritdoc cref="INames.AsType(Classifier, bool, bool)"/>
+    protected TypeSyntax AsType(Classifier classifier, bool disambiguate = false, bool writeable = false) =>
+        _names.AsType(classifier, disambiguate, writeable);
 
     /// <returns><c>AddMyLink</c></returns>
     protected ExpressionSyntax LinkAdd(Link link) =>
@@ -108,6 +110,25 @@ public abstract class GeneratorBase
     /// <returns><c>MyLang.Instance.MyStructuredDataType_MyField</c></returns>
     protected MemberAccessExpressionSyntax MetaProperty(Field field) =>
         MemberAccess(_names.MetaProperty(field.GetLanguage()), _names.AsProperty(field));
+
+    /// <returns><code>
+    /// /// keyed.@KeyedDescription.documentation
+    /// /// &lt;seealso cref="keyed.@KeyedDescription.seeAlso"/&gt;
+    /// </code></returns>
+    protected List<XmlNodeSyntax> XdocKeyed(IKeyed keyed)
+    {
+        List<XmlNodeSyntax> result = [];
+        
+        var keyedDocumentation = VersionSpecifics.GetKeyedDocumentation(keyed);
+        if (keyedDocumentation != null)
+            result.AddRange(XdocLine(keyedDocumentation));
+
+        var keyedSeeAlso = VersionSpecifics.GetKeyedSeeAlso(keyed).OfType<IKeyed>().ToList();
+        if (keyedSeeAlso.Count != 0)
+            result.AddRange(keyedSeeAlso.Select(k => _names.AsName(k)).SelectMany(XdocSeeAlso));
+
+        return result;
+    }
 
     /// <returns><c>[LionCoreMetaPointer(Language = typeof(MyLangNameLanguage), Key = "keyedKey")]</c></returns>
     protected AttributeSyntax MetaPointerAttribute(IKeyed keyed)
@@ -148,4 +169,8 @@ public abstract class GeneratorBase
                 AttributeArgument(s.AsLiteral())
             )));
     }
+    
+    /// <returns><c>TryGetMyFeature</c></returns>
+    protected string FeatureTryGet(Feature feature) =>
+        $"TryGet{feature.Name.ToFirstUpper()}";
 }

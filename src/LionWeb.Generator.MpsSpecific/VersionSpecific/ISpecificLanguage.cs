@@ -25,9 +25,9 @@ public interface ISpecificLanguage : Language
 {
     static ISpecificLanguage Get(LionWebVersions lionWebVersion) => lionWebVersion switch
     {
-        IVersion2023_1 => LionWeb.Generator.VersionSpecific.V2023_1.SpecificLanguage.Instance,
-        IVersion2024_1 => LionWeb.Generator.VersionSpecific.V2024_1.SpecificLanguage.Instance,
-        IVersion2024_1_Compatible => LionWeb.Generator.VersionSpecific.V2024_1.SpecificLanguage.Instance,
+        IVersion2023_1 => Specific.V2023_1.SpecificLanguage.Instance,
+        IVersion2024_1 => Specific.V2024_1.SpecificLanguage.Instance,
+        IVersion2024_1_Compatible => Specific.V2024_1.SpecificLanguage.Instance,
         _ => throw new UnsupportedVersionException(lionWebVersion)
     };
     
@@ -40,6 +40,10 @@ public interface ISpecificLanguage : Language
     Annotation ConceptDescription { get; }
     Property ConceptDescription_conceptAlias { get; }
     Property ConceptDescription_conceptShortDescription { get; }
+    Property ConceptDescription_helpUrl { get; }
+    Annotation KeyedDescription { get; }
+    Property KeyedDescription_documentation { get; }
+    Reference KeyedDescription_seeAlso { get; }
     Annotation Deprecated { get; }
     Property Deprecated_build { get; }
     Property Deprecated_comment { get; }

@@ -13,6 +13,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using @base = string;
 
 [LionCoreLanguage(Key = "class", Version = "struct")]
@@ -187,6 +188,14 @@ public partial class @out : @struct
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetDefault([NotNullWhenAttribute(true)] out @if? @default)
+	{
+		@default = _default;
+		return _default != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
         public @out SetDefault(@if value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.out_default);
@@ -261,6 +270,14 @@ public partial class @record : AnnotationInstanceBase, @interface
         [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-prop")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public @enum String { get => _string ?? throw new UnsetFeatureException(ClassLanguage.Instance.interface_string); set => SetString(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetString([NotNullWhenAttribute(true)] out @enum? @string)
+	{
+		@string = _string;
+		return _string != null;
+	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  @interface @interface.SetString(@enum value) => SetString(value);
@@ -283,6 +300,13 @@ public partial class @record : AnnotationInstanceBase, @interface
         [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-cont")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
 	public @interface Double { get => _double ?? throw new UnsetFeatureException(ClassLanguage.Instance.record_double); set => SetDouble(value); }
+
+	/// <remarks>Required Single Containment</remarks>
+        public bool TryGetDouble([NotNullWhenAttribute(true)] out @interface? @double)
+	{
+		@double = _double;
+		return _double != null;
+	}
 
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -402,6 +426,14 @@ public partial class @struct : ConceptInstanceBase, @interface
         [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-prop")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public @enum String { get => _string ?? throw new UnsetFeatureException(ClassLanguage.Instance.interface_string); set => SetString(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetString([NotNullWhenAttribute(true)] out @enum? @string)
+	{
+		@string = _string;
+		return _string != null;
+	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  @interface @interface.SetString(@enum value) => SetString(value);
@@ -424,6 +456,13 @@ public partial class @struct : ConceptInstanceBase, @interface
         [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-reference")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public @record Ref { get => _ref ?? throw new UnsetFeatureException(ClassLanguage.Instance.struct_ref); set => SetRef(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+        public bool TryGetRef([NotNullWhenAttribute(true)] out @record? @ref)
+	{
+		@ref = _ref;
+		return _ref != null;
+	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>

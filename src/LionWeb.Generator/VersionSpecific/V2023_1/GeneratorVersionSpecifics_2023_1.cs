@@ -24,6 +24,7 @@ using Core.M2;
 using Core.M3;
 using Core.Utilities;
 using Core.VersionSpecific.V2023_1;
+using Io.Lionweb.Mps.Specific.V2023_1;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -64,11 +65,33 @@ internal class GeneratorVersionSpecifics_2023_1 : IGeneratorVersionSpecifics
         _ => null
     };
 
-    public string? GetConceptShortDescription(Classifier classifier) => classifier
-        .GetAnnotations()
-        .OfType<ConceptDescription>()
-        .FirstOrDefault(cd => cd.ConceptShortDescription != null)
+    public string? GetConceptShortDescription(Classifier classifier) => 
+        GetConceptDescription(classifier)
         ?.ConceptShortDescription;
+
+    public string? GetConceptHelpUrl(Classifier classifier) =>
+        GetConceptDescription(classifier)
+            ?.HelpUrl;
+
+    public string? GetKeyedDocumentation(IKeyed keyed) =>
+        GetKeyedDescription(keyed)
+            ?.Documentation;
+
+    public IReadOnlyList<IReadableNode> GetKeyedSeeAlso(IKeyed keyed) =>
+        GetKeyedDescription(keyed)
+            ?.SeeAlso ?? [];
+
+    private static ConceptDescription? GetConceptDescription(Classifier classifier) =>
+        classifier
+            .GetAnnotations()
+            .OfType<ConceptDescription>()
+            .FirstOrDefault();
+
+    private static KeyedDescription? GetKeyedDescription(IKeyed keyed) =>
+        keyed
+            .GetAnnotations()
+            .OfType<KeyedDescription>()
+            .FirstOrDefault();
 
     public bool IsDeprecated(Classifier classifier) =>
         classifier.EqualsIdentity(SpecificLanguage.Instance.Deprecated);

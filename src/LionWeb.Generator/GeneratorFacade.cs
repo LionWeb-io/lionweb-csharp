@@ -47,7 +47,7 @@ public class GeneratorFacade
     {
         if (_compilationUnit == null)
         {
-            var generator = new DefinitionGenerator(Names, LionWebVersion);
+            var generator = new DefinitionGenerator(Names, LionWebVersion, Config);
             _compilationUnit = generator.DefinitionFile();
         }
 
@@ -59,6 +59,9 @@ public class GeneratorFacade
 
     /// Version of LionWeb standard to use for generation.
     public LionWebVersions LionWebVersion { get; init; } = LionWebVersions.Current;
+    
+    /// <inheritdoc cref="GeneratorConfig"/>
+    public GeneratorConfig Config { get; init; } = new();
 
     /// Stores the output of <see cref="Generate"/> to the file at <paramref name="path"/>.
     public void Persist(string path)
@@ -70,12 +73,17 @@ public class GeneratorFacade
                 value: FormattingOptions.IndentStyle.Smart)
             .WithChangedOption(CSharpFormattingOptions.WrappingKeepStatementsOnSingleLine, value: false)
             .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInAnonymousTypes, value: true)
-            .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInObjectInit, value: true)
-            .WithChangedOption(FormattingOptions.NewLine, LanguageNames.CSharp, value: "\r\n");
+            .WithChangedOption(CSharpFormattingOptions.NewLineForMembersInObjectInit, value: true);
         var compilationUnit = (CompilationUnitSyntax)Formatter.Format(Generate(), workspace, options);
 
         using var streamWriter = new StreamWriter(path, false);
-        compilationUnit.WriteTo(streamWriter);
+        streamWriter.Write(compilationUnit.GetText().ToString().ReplaceLineEndings());
+        /*
+         * Note: .GetText().ToString() probably nullifies any optimization gains through streaming,
+         * but it's the only way (that I found) to actually replace line endings.
+         * (E.g., setting the option (FormattingOptions.NewLine, LanguageNames.CSharp, value: "\n"))
+         *  – or any variation of that – does nothing!)
+         */
     }
 
     /// Compiles the output of <see cref="Generate"/> and returns all diagnostic messages.
@@ -88,7 +96,7 @@ public class GeneratorFacade
             .Append(MetadataReference.CreateFromFile(typeof(Stack<>).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(ISet<>).Assembly.Location))
             .Append(MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location));
-        var compilation = CSharpCompilation.Create("foo", new[] { tree }, refApis);
+        var compilation = CSharpCompilation.Create("foo", [tree], refApis);
         var diagnostics = compilation.GetDiagnostics();
         return diagnostics;
     }

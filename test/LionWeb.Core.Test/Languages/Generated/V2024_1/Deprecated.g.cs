@@ -13,6 +13,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using DeprDatatype = string;
 
 [LionCoreLanguage(Key = "MDkzNjAxODQtODU5OC00NGU3LTliZjUtZmIxY2U0NWE0ODBh", Version = "0")]
@@ -184,6 +185,14 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Multiple Containment</remarks>
         [Obsolete("deprChild comment")]
+	public bool TryGetDeprChild([NotNullWhenAttribute(true)] out IReadOnlyList<DeprIface> deprChild)
+	{
+		deprChild = _deprChild;
+		return _deprChild.Count != 0;
+	}
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        [Obsolete("deprChild comment")]
 	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes)
 	{
 		var safeNodes = nodes?.ToList();
@@ -229,6 +238,14 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Property</remarks>
         [Obsolete("deprProp comment")]
+	public bool TryGetDeprProp([NotNullWhenAttribute(true)] out string? deprProp)
+	{
+		deprProp = _deprProp;
+		return _deprProp != null;
+	}
+
+	/// <remarks>Optional Property</remarks>
+        [Obsolete("deprProp comment")]
 	public DeprConcept SetDeprProp(string? value)
 	{
 		PropertyEventEmitter evt = new(DeprecatedLanguage.Instance.DeprConcept_deprProp, this, value, _deprProp);
@@ -246,6 +263,14 @@ public partial class DeprConcept : ConceptInstanceBase
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	[Obsolete("deprRef comment")]
 	public DeprAnnotation DeprRef { get => _deprRef ?? throw new UnsetFeatureException(DeprecatedLanguage.Instance.DeprConcept_deprRef); set => SetDeprRef(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+        [Obsolete("deprRef comment")]
+	public bool TryGetDeprRef([NotNullWhenAttribute(true)] out DeprAnnotation? deprRef)
+	{
+		deprRef = _deprRef;
+		return _deprRef != null;
+	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>

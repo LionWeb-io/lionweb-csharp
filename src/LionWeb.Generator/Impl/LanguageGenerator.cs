@@ -48,7 +48,8 @@ using Property = Core.M3.Property;
 /// - EnumerationLiteral properties
 /// </summary>
 /// <seealso cref="LanguageConstructorGenerator"/>
-public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : LanguageGeneratorBase(names, lionWebVersion)
+public class LanguageGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    : LanguageGeneratorBase(names, lionWebVersion, config)
 {
     private IdentifierNameSyntax FactoryInterfaceType => _names.FactoryInterfaceType;
 
@@ -66,14 +67,15 @@ public class LanguageGenerator(INames names, LionWebVersions lionWebVersion) : L
             .WithMembers(List(new List<MemberDeclarationSyntax>
                 {
                     GenLanguageInstance(),
-                    new LanguageConstructorGenerator(_names, _lionWebVersion).GenConstructor(),
+                    new LanguageConstructorGenerator(_names, _lionWebVersion, _config).GenConstructor(),
                     GenEntities(),
                     GenDependsOn()
                 }
                 .Concat(LanguageKeyMembers())
                 .Concat(LanguageNameMembers())
                 .Concat(LanguageVersionFieldMembers())
-                .Concat(Language.Entities.Ordered().SelectMany(EntityLanguageMembers))));
+                .Concat(Language.Entities.Ordered().SelectMany(EntityLanguageMembers))))
+            .Xdoc(XdocKeyed(_names.Language));
 
     private FieldDeclarationSyntax GenLanguageInstance() =>
         Field("Instance", LanguageType,

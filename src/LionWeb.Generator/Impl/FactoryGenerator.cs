@@ -29,7 +29,8 @@ using static AstExtensions;
 /// <summary>
 /// Generates Factory class.
 /// </summary>
-public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
+public class FactoryGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    : GeneratorBase(names, lionWebVersion, config)
 {
     private string FactoryName => _names.FactoryName;
     private string FactoryInterfaceName => _names.FactoryInterfaceName;
@@ -42,7 +43,9 @@ public class FactoryGenerator(INames names, LionWebVersions lionWebVersion) : Ge
             .Ordered();
 
     private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
-    private IEnumerable<StructuredDataType> StructuredDataTypes => Language.Entities.OfType<StructuredDataType>().Ordered();
+
+    private IEnumerable<StructuredDataType> StructuredDataTypes =>
+        Language.Entities.OfType<StructuredDataType>().Ordered();
 
     /// <inheritdoc cref="FactoryGenerator"/>
     public IEnumerable<TypeDeclarationSyntax> FactoryTypes() =>

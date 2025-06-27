@@ -46,6 +46,9 @@ internal interface IGeneratorVersionSpecifics : IVersionSpecifics
     TypeSyntax? AsType(Datatype datatype, Dictionary<Language, string> namespaceMappings);
     
     string? GetConceptShortDescription(Classifier classifier);
+    string? GetConceptHelpUrl(Classifier classifier);
+    string? GetKeyedDocumentation(IKeyed keyed);
+    IReadOnlyList<IReadableNode> GetKeyedSeeAlso(IKeyed keyed);
     bool IsDeprecated(Classifier classifier);
     string? GetDeprecatedComment(IReadableNode annotation);
 }

@@ -13,6 +13,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "WithEnum", Version = "1")]
 public partial class WithEnumLanguage : LanguageBase<IWithEnumFactory>
@@ -111,6 +112,14 @@ public partial class EnumHolder : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(WithEnumLanguage), Key = "enumValue")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public MyEnum EnumValue { get => _enumValue ?? throw new UnsetFeatureException(WithEnumLanguage.Instance.EnumHolder_enumValue); set => SetEnumValue(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetEnumValue([NotNullWhenAttribute(true)] out MyEnum? enumValue)
+	{
+		enumValue = _enumValue;
+		return _enumValue != null;
+	}
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>

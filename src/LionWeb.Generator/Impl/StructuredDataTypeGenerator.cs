@@ -28,8 +28,12 @@ using static AstExtensions;
 /// <summary>
 /// Generates StructuredDataType readonly record structs.
 /// </summary>
-public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, LionWebVersions lionWebVersion)
-    : GeneratorBase(names, lionWebVersion)
+public class StructuredDataTypeGenerator(
+    StructuredDataType sdt,
+    INames names,
+    LionWebVersions lionWebVersion,
+    GeneratorConfig config)
+    : GeneratorBase(names, lionWebVersion, config)
 {
     private string SdtName => sdt.Name.PrefixKeyword();
     private IEnumerable<Field> Fields => sdt.Fields.Ordered();
@@ -80,21 +84,23 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
         Constructor(
                 SdtName,
                 Fields
-                    .Select(f => Param(_names.ParamField(f), NullableType(AsType(f.Type))))
+                    .Select(f => Param(_names.FieldParam(f), NullableType(AsType(f.Type))))
                     .ToArray()
             )
             .WithModifiers(AsModifiers(SyntaxKind.InternalKeyword))
             .WithBody(AsStatements(Fields.Select(InternalFieldInitializer)));
 
     private StatementSyntax InternalFieldInitializer(Field field) =>
-        Assignment(FieldField(field).ToString(), IdentifierName(_names.ParamField(field)));
+        Assignment(FieldField(field).ToString(), IdentifierName(_names.FieldParam(field)));
 
     #endregion
 
-    private MemberDeclarationSyntax GenGetStructuredDataType() =>
-        Method("GetStructuredDataType", AsType(typeof(StructuredDataType)), exprBody: MetaProperty())
+    private MemberDeclarationSyntax GenGetStructuredDataType()
+    {
+        return Method("GetStructuredDataType", AsType(typeof(StructuredDataType)), exprBody: MetaProperty())
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocInheritDoc());
+    }
 
     private MemberAccessExpressionSyntax MetaProperty() =>
         MemberAccess(MemberAccess(LanguageType, IdentifierName("Instance")), _names.AsProperty(sdt));
@@ -169,6 +175,17 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
                 TriviaList()
             ));
 
+    private BinaryExpressionSyntax LazyFieldNotNull(Field field, ExpressionSyntax condition) =>
+        BinaryExpression(
+            SyntaxKind.LogicalAndExpression,
+            condition,
+            BinaryExpression(
+                SyntaxKind.NotEqualsExpression,
+                LazyFieldValue(field),
+                Null()
+            )
+        );
+
     private InvocationExpressionSyntax GenEqualsIdentityField(Field field) =>
         InvocationExpression(MemberAccess(MetaProperty(field), IdentifierName("EqualsIdentity")),
             AsArguments([IdentifierName("field")])
@@ -206,4 +223,11 @@ public class StructuredDataTypeGenerator(StructuredDataType sdt, INames names, L
 
         return [memberField, property];
     }
+
+    private MemberAccessExpressionSyntax LazyFieldValue(Field field) =>
+        MemberAccessExpression(
+            SyntaxKind.SimpleMemberAccessExpression,
+            FieldField(field),
+            IdentifierName("Value")
+        );
 }

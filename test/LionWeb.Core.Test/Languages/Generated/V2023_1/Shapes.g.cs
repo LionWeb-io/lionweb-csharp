@@ -14,6 +14,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Time = string;
 
 [LionCoreLanguage(Key = "key-Shapes", Version = "1")]
@@ -335,6 +336,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	public IReadOnlyList<MaterialGroup> AltGroups { get => _altGroups.AsReadOnly(); init => AddAltGroups(value); }
 
 	/// <remarks>Optional Multiple Containment</remarks>
+        public bool TryGetAltGroups([NotNullWhenAttribute(true)] out IReadOnlyList<MaterialGroup> altGroups)
+	{
+		altGroups = _altGroups;
+		return _altGroups.Count != 0;
+	}
+
+	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes)
 	{
 		var safeNodes = nodes?.ToList();
@@ -376,6 +384,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	public MaterialGroup? DefaultGroup { get => _defaultGroup; set => SetDefaultGroup(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
+        public bool TryGetDefaultGroup([NotNullWhenAttribute(true)] out MaterialGroup? defaultGroup)
+	{
+		defaultGroup = _defaultGroup;
+		return _defaultGroup != null;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
         public BillOfMaterials SetDefaultGroup(MaterialGroup? value)
 	{
 		ContainmentSingleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_defaultGroup, this, value, _defaultGroup);
@@ -392,6 +407,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-groups")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
 	public IReadOnlyList<MaterialGroup> Groups { get => _groups.AsReadOnly(); init => AddGroups(value); }
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public bool TryGetGroups([NotNullWhenAttribute(true)] out IReadOnlyList<MaterialGroup> groups)
+	{
+		groups = _groups;
+		return _groups.Count != 0;
+	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes)
@@ -433,6 +455,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-materials")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public IReadOnlyList<IShape> Materials { get => _materials.AsReadOnly(); init => AddMaterials(value); }
+
+	/// <remarks>Optional Multiple Reference</remarks>
+        public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
+	{
+		materials = _materials;
+		return _materials.Count != 0;
+	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
         public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes)
@@ -633,6 +662,13 @@ public partial class Circle : Shape
 	public Coord Center { get => _center ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Circle_center); set => SetCenter(value); }
 
 	/// <remarks>Required Single Containment</remarks>
+        public bool TryGetCenter([NotNullWhenAttribute(true)] out Coord? center)
+	{
+		center = _center;
+		return _center != null;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public Circle SetCenter(Coord value)
 	{
@@ -652,6 +688,13 @@ public partial class Circle : Shape
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-r")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public int R { get => _r ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Circle_r); set => SetR(value); }
+
+	/// <remarks>Required Property</remarks>
+        public bool TryGetR([NotNullWhenAttribute(true)] out int? r)
+	{
+		r = _r;
+		return _r != null;
+	}
 
 	/// <remarks>Required Property</remarks>
         public Circle SetR(int value)
@@ -768,6 +811,13 @@ public partial class CompositeShape : Shape
 	public IReadOnlyList<IShape> DisabledParts { get => AsNonEmptyReadOnly(_disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts); init => AddDisabledParts(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
+        public bool TryGetDisabledParts([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> disabledParts)
+	{
+		disabledParts = _disabledParts;
+		return _disabledParts.Count != 0;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
         public CompositeShape AddDisabledParts(IEnumerable<IShape> nodes)
 	{
@@ -816,6 +866,13 @@ public partial class CompositeShape : Shape
 	public IShape EvilPart { get => _evilPart ?? throw new UnsetFeatureException(ShapesLanguage.Instance.CompositeShape_evilPart); set => SetEvilPart(value); }
 
 	/// <remarks>Required Single Containment</remarks>
+        public bool TryGetEvilPart([NotNullWhenAttribute(true)] out IShape? evilPart)
+	{
+		evilPart = _evilPart;
+		return _evilPart != null;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public CompositeShape SetEvilPart(IShape value)
 	{
@@ -835,6 +892,13 @@ public partial class CompositeShape : Shape
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-parts")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
 	public IReadOnlyList<IShape> Parts { get => AsNonEmptyReadOnly(_parts, ShapesLanguage.Instance.CompositeShape_parts); init => AddParts(value); }
+
+	/// <remarks>Required Multiple Containment</remarks>
+        public bool TryGetParts([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> parts)
+	{
+		parts = _parts;
+		return _parts.Count != 0;
+	}
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
@@ -1018,6 +1082,13 @@ public partial class Coord : ConceptInstanceBase
 	public int X { get => _x ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_x); set => SetX(value); }
 
 	/// <remarks>Required Property</remarks>
+        public bool TryGetX([NotNullWhenAttribute(true)] out int? x)
+	{
+		x = _x;
+		return _x != null;
+	}
+
+	/// <remarks>Required Property</remarks>
         public Coord SetX(int value)
 	{
 		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_x, this, value, _x);
@@ -1035,6 +1106,13 @@ public partial class Coord : ConceptInstanceBase
 	public int Y { get => _y ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_y); set => SetY(value); }
 
 	/// <remarks>Required Property</remarks>
+        public bool TryGetY([NotNullWhenAttribute(true)] out int? y)
+	{
+		y = _y;
+		return _y != null;
+	}
+
+	/// <remarks>Required Property</remarks>
         public Coord SetY(int value)
 	{
 		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_y, this, value, _y);
@@ -1050,6 +1128,13 @@ public partial class Coord : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-z")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public int Z { get => _z ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Coord_z); set => SetZ(value); }
+
+	/// <remarks>Required Property</remarks>
+        public bool TryGetZ([NotNullWhenAttribute(true)] out int? z)
+	{
+		z = _z;
+		return _z != null;
+	}
 
 	/// <remarks>Required Property</remarks>
         public Coord SetZ(int value)
@@ -1158,6 +1243,13 @@ public partial class Documentation : AnnotationInstanceBase
 	public bool? Technical { get => _technical; set => SetTechnical(value); }
 
 	/// <remarks>Optional Property</remarks>
+        public bool TryGetTechnical([NotNullWhenAttribute(true)] out bool? technical)
+	{
+		technical = _technical;
+		return _technical != null;
+	}
+
+	/// <remarks>Optional Property</remarks>
         public Documentation SetTechnical(bool? value)
 	{
 		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Documentation_technical, this, value, _technical);
@@ -1172,6 +1264,13 @@ public partial class Documentation : AnnotationInstanceBase
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-text")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
 	public string? Text { get => _text; set => SetText(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public bool TryGetText([NotNullWhenAttribute(true)] out string? text)
+	{
+		text = _text;
+		return _text != null;
+	}
 
 	/// <remarks>Optional Property</remarks>
         public Documentation SetText(string? value)
@@ -1261,6 +1360,13 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	public Documentation? Documentation { get => _documentation; set => SetDocumentation(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
+        public bool TryGetDocumentation([NotNullWhenAttribute(true)] out Documentation? documentation)
+	{
+		documentation = _documentation;
+		return _documentation != null;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
         public Geometry SetDocumentation(Documentation? value)
 	{
 		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.Geometry_documentation, this, value, _documentation);
@@ -1277,6 +1383,13 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shapes")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
 	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes)
+	{
+		shapes = _shapes;
+		return _shapes.Count != 0;
+	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public Geometry AddShapes(IEnumerable<IShape> nodes)
@@ -1454,6 +1567,13 @@ public partial class Line : Shape, INamedWritable
 	public Coord End { get => _end ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Line_end); set => SetEnd(value); }
 
 	/// <remarks>Required Single Containment</remarks>
+        public bool TryGetEnd([NotNullWhenAttribute(true)] out Coord? end)
+	{
+		end = _end;
+		return _end != null;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public Line SetEnd(Coord value)
 	{
@@ -1474,6 +1594,13 @@ public partial class Line : Shape, INamedWritable
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-start")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
 	public Coord Start { get => _start ?? throw new UnsetFeatureException(ShapesLanguage.Instance.Line_start); set => SetStart(value); }
+
+	/// <remarks>Required Single Containment</remarks>
+        public bool TryGetStart([NotNullWhenAttribute(true)] out Coord? start)
+	{
+		start = _start;
+		return _start != null;
+	}
 
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -1601,6 +1728,13 @@ public partial class MaterialGroup : ConceptInstanceBase
 	public IShape? DefaultShape { get => _defaultShape; set => SetDefaultShape(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
+        public bool TryGetDefaultShape([NotNullWhenAttribute(true)] out IShape? defaultShape)
+	{
+		defaultShape = _defaultShape;
+		return _defaultShape != null;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
         public MaterialGroup SetDefaultShape(IShape? value)
 	{
 		ContainmentSingleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_defaultShape, this, value, _defaultShape);
@@ -1618,6 +1752,13 @@ public partial class MaterialGroup : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-group-materials")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public IReadOnlyList<IShape> Materials { get => AsNonEmptyReadOnly(_materials, ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
+
+	/// <remarks>Required Multiple Reference</remarks>
+        public bool TryGetMaterials([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> materials)
+	{
+		materials = _materials;
+		return _materials.Count != 0;
+	}
 
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
@@ -1666,6 +1807,13 @@ public partial class MaterialGroup : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-matter-state")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
 	public MatterState? MatterState { get => _matterState; set => SetMatterState(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public bool TryGetMatterState([NotNullWhenAttribute(true)] out MatterState? matterState)
+	{
+		matterState = _matterState;
+		return _matterState != null;
+	}
 
 	/// <remarks>Optional Property</remarks>
         public MaterialGroup SetMatterState(MatterState? value)
@@ -1801,6 +1949,13 @@ public partial class OffsetDuplicate : Shape
 	public Shape? AltSource { get => _altSource; set => SetAltSource(value); }
 
 	/// <remarks>Optional Single Reference</remarks>
+        public bool TryGetAltSource([NotNullWhenAttribute(true)] out Shape? altSource)
+	{
+		altSource = _altSource;
+		return _altSource != null;
+	}
+
+	/// <remarks>Optional Single Reference</remarks>
         public OffsetDuplicate SetAltSource(Shape? value)
 	{
 		ReferenceSingleEventEmitter evt = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource);
@@ -1815,6 +1970,13 @@ public partial class OffsetDuplicate : Shape
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-docs")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
 	public Documentation? Docs { get => _docs; set => SetDocs(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public bool TryGetDocs([NotNullWhenAttribute(true)] out Documentation? docs)
+	{
+		docs = _docs;
+		return _docs != null;
+	}
 
 	/// <remarks>Optional Single Containment</remarks>
         public OffsetDuplicate SetDocs(Documentation? value)
@@ -1837,6 +1999,13 @@ public partial class OffsetDuplicate : Shape
 	public Coord Offset { get => _offset ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_offset); set => SetOffset(value); }
 
 	/// <remarks>Required Single Containment</remarks>
+        public bool TryGetOffset([NotNullWhenAttribute(true)] out Coord? offset)
+	{
+		offset = _offset;
+		return _offset != null;
+	}
+
+	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public OffsetDuplicate SetOffset(Coord value)
 	{
@@ -1857,6 +2026,13 @@ public partial class OffsetDuplicate : Shape
 	public Documentation? SecretDocs { get => _secretDocs; set => SetSecretDocs(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
+        public bool TryGetSecretDocs([NotNullWhenAttribute(true)] out Documentation? secretDocs)
+	{
+		secretDocs = _secretDocs;
+		return _secretDocs != null;
+	}
+
+	/// <remarks>Optional Single Containment</remarks>
         public OffsetDuplicate SetSecretDocs(Documentation? value)
 	{
 		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, this, value, _secretDocs);
@@ -1875,6 +2051,13 @@ public partial class OffsetDuplicate : Shape
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-source")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
 	public Shape Source { get => _source ?? throw new UnsetFeatureException(ShapesLanguage.Instance.OffsetDuplicate_source); set => SetSource(value); }
+
+	/// <remarks>Required Single Reference</remarks>
+        public bool TryGetSource([NotNullWhenAttribute(true)] out Shape? source)
+	{
+		source = _source;
+		return _source != null;
+	}
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -2065,6 +2248,13 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	public IReadOnlyList<IShape> Shapes { get => _shapes.AsReadOnly(); init => AddShapes(value); }
 
 	/// <remarks>Optional Multiple Reference</remarks>
+        public bool TryGetShapes([NotNullWhenAttribute(true)] out IReadOnlyList<IShape> shapes)
+	{
+		shapes = _shapes;
+		return _shapes.Count != 0;
+	}
+
+	/// <remarks>Optional Multiple Reference</remarks>
         public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes)
 	{
 		var safeNodes = nodes?.ToList();
@@ -2166,6 +2356,14 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         [LionCoreMetaPointer(Language = typeof(LionWeb.Core.VersionSpecific.V2023_1.BuiltInsLanguage_2023_1), Key = "LionCore-builtins-INamed-name")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public string Name { get => _name ?? throw new UnsetFeatureException(_builtIns.INamed_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
+	{
+		name = _name;
+		return _name != null;
+	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  INamedWritable INamedWritable.SetName(string value) => SetName(value);
@@ -2186,6 +2384,13 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-fixpoints")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
 	public IReadOnlyList<Coord> Fixpoints { get => _fixpoints.AsReadOnly(); init => AddFixpoints(value); }
+
+	/// <remarks>Optional Multiple Containment</remarks>
+        public bool TryGetFixpoints([NotNullWhenAttribute(true)] out IReadOnlyList<Coord> fixpoints)
+	{
+		fixpoints = _fixpoints;
+		return _fixpoints.Count != 0;
+	}
 /// <remarks>Optional Multiple Containment</remarks>
  IShape IShape.AddFixpoints(IEnumerable<Coord> nodes) => AddFixpoints(nodes);
 	/// <remarks>Optional Multiple Containment</remarks>
@@ -2232,6 +2437,14 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-uuid")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public string Uuid { get => _uuid ?? throw new UnsetFeatureException(ShapesLanguage.Instance.IShape_uuid); set => SetUuid(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetUuid([NotNullWhenAttribute(true)] out string? uuid)
+	{
+		uuid = _uuid;
+		return _uuid != null;
+	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
  IShape IShape.SetUuid(string value) => SetUuid(value);
@@ -2252,6 +2465,13 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shape-docs")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
 	public Documentation? ShapeDocs { get => _shapeDocs; set => SetShapeDocs(value); }
+
+	/// <remarks>Optional Single Containment</remarks>
+        public bool TryGetShapeDocs([NotNullWhenAttribute(true)] out Documentation? shapeDocs)
+	{
+		shapeDocs = _shapeDocs;
+		return _shapeDocs != null;
+	}
 
 	/// <remarks>Optional Single Containment</remarks>
         public Shape SetShapeDocs(Documentation? value)

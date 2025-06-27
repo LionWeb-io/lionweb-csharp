@@ -85,8 +85,8 @@ public partial interface BaseContainmentIface : INode
 	/// <remarks>Required Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(MixedBaseContainmentLangLanguage), Key = "key-baseContainmentIface-cont")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
-	public NodeBase Cont { get; set; }
+	public INode Cont { get; set; }
 
 	/// <remarks>Required Single Containment</remarks>
-        public BaseContainmentIface SetCont(NodeBase value);
+        public BaseContainmentIface SetCont(INode value);
 }

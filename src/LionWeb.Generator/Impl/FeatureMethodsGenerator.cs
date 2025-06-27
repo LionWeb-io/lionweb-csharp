@@ -35,8 +35,8 @@ using Property = Core.M3.Property;
 /// - SetInternal()
 /// - CollectAllSetFeatures()
 /// </summary>
-public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion)
-    : ClassifierGeneratorBase(names, lionWebVersion)
+public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    : ClassifierGeneratorBase(names, lionWebVersion, config)
 {
     /// <inheritdoc cref="FeatureMethodsGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> FeatureMethods()
@@ -251,7 +251,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private DeclarationPatternSyntax AsTypePattern(Feature feature) =>
         DeclarationPattern(
-            AsType(feature.GetFeatureType(), true),
+            AsType(feature.GetFeatureType(), true, feature is Containment),
             SingleVariableDesignation(Identifier("v"))
         );
 
@@ -261,6 +261,14 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private ThrowStatementSyntax GenThrowInvalidValueException() =>
         ThrowStatement(
             NewCall([IdentifierName("feature"), IdentifierName("value")], AsType(typeof(InvalidValueException)))
+        );
+
+    private LocalDeclarationStatementSyntax EnumerableVar(Link link) =>
+        Variable("enumerable", Var(), AsNodesCall(link));
+
+    private LocalDeclarationStatementSyntax EnumerableToListVar(Link link) =>
+        Variable("enumerable", Var(),
+            InvocationExpression(MemberAccess(AsNodesCall(link), IdentifierName("ToList")))
         );
 
     private LocalDeclarationStatementSyntax SafeNodesVar(Link link) =>
@@ -277,6 +285,16 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             FeatureField(containment),
             MetaProperty(containment)
         ));
+
+    private ExpressionStatementSyntax LinkAddCall(Link link) =>
+        ExpressionStatement(InvocationExpression(LinkAdd(link),
+            AsArguments([IdentifierName("enumerable")])
+        ));
+
+    private ExpressionStatementSyntax ClearCall(Reference reference) =>
+        ExpressionStatement(
+            InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear")))
+        );
 
     private CastExpressionSyntax CastValueType(Feature feature) =>
         CastExpression(NullableType(AsType(feature.GetFeatureType(), true)), IdentifierName("value"));

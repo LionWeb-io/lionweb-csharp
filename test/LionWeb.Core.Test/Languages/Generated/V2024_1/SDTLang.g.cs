@@ -13,6 +13,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-SDTLang", Version = "0")]
 public partial class SDTLangLanguage : LanguageBase<ISDTLangFactory>
@@ -256,6 +257,14 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetA([NotNullWhenAttribute(true)] out A? a)
+	{
+		a = _a;
+		return _a != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
         public SDTConcept SetA(A value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_A);
@@ -273,6 +282,14 @@ public partial class SDTConcept : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTamountField")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public Amount Amount { get => _amount ?? throw new UnsetFeatureException(SDTLangLanguage.Instance.SDTConcept_amount); set => SetAmount(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetAmount([NotNullWhenAttribute(true)] out Amount? amount)
+	{
+		amount = _amount;
+		return _amount != null;
+	}
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -296,6 +313,14 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetComplex([NotNullWhenAttribute(true)] out ComplexNumber? complex)
+	{
+		complex = _complex;
+		return _complex != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
         public SDTConcept SetComplex(ComplexNumber value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_complex);
@@ -311,6 +336,13 @@ public partial class SDTConcept : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(SDTLangLanguage), Key = "key-SDTDecimalField")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
 	public Decimal? Decimal { get => _decimal; set => SetDecimal(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public bool TryGetDecimal([NotNullWhenAttribute(true)] out Decimal? @decimal)
+	{
+		@decimal = _decimal;
+		return _decimal != null;
+	}
 
 	/// <remarks>Optional Property</remarks>
         public SDTConcept SetDecimal(Decimal? value)

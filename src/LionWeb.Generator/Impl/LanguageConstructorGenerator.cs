@@ -29,8 +29,8 @@ using Property = Core.M3.Property;
 /// <summary>
 /// Generates constructor of Language class.
 /// </summary>
-public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebVersion)
-    : LanguageGeneratorBase(names, lionWebVersion)
+public class LanguageConstructorGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    : LanguageGeneratorBase(names, lionWebVersion, config)
 {
     /// <inheritdoc cref="LanguageConstructorGenerator"/>
     public ConstructorDeclarationSyntax GenConstructor() =>

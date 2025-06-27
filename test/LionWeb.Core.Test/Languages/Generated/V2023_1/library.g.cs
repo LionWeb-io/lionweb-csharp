@@ -13,6 +13,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "library", Version = "1")]
 public partial class LibraryLanguage : LanguageBase<ILibraryFactory>
@@ -185,6 +186,13 @@ public partial class Book : ConceptInstanceBase
 	public Writer Author { get => _author ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_author); set => SetAuthor(value); }
 
 	/// <remarks>Required Single Reference</remarks>
+        public bool TryGetAuthor([NotNullWhenAttribute(true)] out Writer? author)
+	{
+		author = _author;
+		return _author != null;
+	}
+
+	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public Book SetAuthor(Writer value)
 	{
@@ -202,6 +210,13 @@ public partial class Book : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "pages")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public int Pages { get => _pages ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Book_pages); set => SetPages(value); }
+
+	/// <remarks>Required Property</remarks>
+        public bool TryGetPages([NotNullWhenAttribute(true)] out int? pages)
+	{
+		pages = _pages;
+		return _pages != null;
+	}
 
 	/// <remarks>Required Property</remarks>
         public Book SetPages(int value)
@@ -223,6 +238,14 @@ public partial class Book : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetTitle([NotNullWhenAttribute(true)] out string? title)
+	{
+		title = _title;
+		return _title != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
         public Book SetTitle(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
@@ -238,6 +261,13 @@ public partial class Book : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "type")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = true, Multiple = false)]
 	public BookType? Type { get => _type; set => SetType(value); }
+
+	/// <remarks>Optional Property</remarks>
+        public bool TryGetType([NotNullWhenAttribute(true)] out BookType? @type)
+	{
+		@type = _type;
+		return _type != null;
+	}
 
 	/// <remarks>Optional Property</remarks>
         public Book SetType(BookType? value)
@@ -368,6 +398,14 @@ public partial class GuideBookWriter : Writer
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetCountries([NotNullWhenAttribute(true)] out string? countries)
+	{
+		countries = _countries;
+		return _countries != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
         public GuideBookWriter SetCountries(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.GuideBookWriter_countries);
@@ -438,6 +476,13 @@ public partial class Library : ConceptInstanceBase
 	public IReadOnlyList<Book> Books { get => AsNonEmptyReadOnly(_books, LibraryLanguage.Instance.Library_books); init => AddBooks(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
+        public bool TryGetBooks([NotNullWhenAttribute(true)] out IReadOnlyList<Book> books)
+	{
+		books = _books;
+		return _books.Count != 0;
+	}
+
+	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
         public Library AddBooks(IEnumerable<Book> nodes)
 	{
@@ -484,6 +529,14 @@ public partial class Library : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Library_name")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Library_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
+	{
+		name = _name;
+		return _name != null;
+	}
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
@@ -605,6 +658,14 @@ public partial class SpecialistBookWriter : Writer
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetSubject([NotNullWhenAttribute(true)] out string? subject)
+	{
+		subject = _subject;
+		return _subject != null;
+	}
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
         public SpecialistBookWriter SetSubject(string value)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.SpecialistBookWriter_subject);
@@ -674,6 +735,14 @@ public partial class Writer : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(LibraryLanguage), Key = "library_Writer_name")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public string Name { get => _name ?? throw new UnsetFeatureException(LibraryLanguage.Instance.Writer_name); set => SetName(value); }
+
+	/// <remarks>Required Property</remarks>
+    	/// <exception cref = "InvalidValueException">If set to null</exception>
+        public bool TryGetName([NotNullWhenAttribute(true)] out string? name)
+	{
+		name = _name;
+		return _name != null;
+	}
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>

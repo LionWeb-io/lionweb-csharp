@@ -30,13 +30,16 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 
 // use https://roslynquoter.azurewebsites.net/ to learn how to build C# ASTs
 
-public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) : GeneratorBase(names, lionWebVersion)
+public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+    : GeneratorBase(names, lionWebVersion, config)
 {
     private IEnumerable<Enumeration> Enumerations => Language.Entities.OfType<Enumeration>().Ordered();
 
     private IEnumerable<Classifier> Classifiers => Language.Entities.OfType<Classifier>().Ordered();
 
-    private IEnumerable<StructuredDataType> StructuredDataTypes => Language.Entities.OfType<StructuredDataType>().Ordered();
+    private IEnumerable<StructuredDataType> StructuredDataTypes =>
+        Language.Entities.OfType<StructuredDataType>().Ordered();
+
     public CompilationUnitSyntax DefinitionFile() =>
         CompilationUnit()
             .WithMembers(List<MemberDeclarationSyntax>([
@@ -45,14 +48,15 @@ public class DefinitionGenerator(INames names, LionWebVersions lionWebVersion) :
                         .WithMembers(List(
                             new List<MemberDeclarationSyntax>
                                 {
-                                    new LanguageGenerator(_names, _lionWebVersion).LanguageClass()
+                                    new LanguageGenerator(_names, _lionWebVersion, _config).LanguageClass()
                                 }
-                                .Concat(new FactoryGenerator(_names, _lionWebVersion).FactoryTypes())
-                                .Concat(Classifiers.Select(
-                                    c => new ClassifierGenerator(c, _names, _lionWebVersion).ClassifierType()))
+                                .Concat(new FactoryGenerator(_names, _lionWebVersion, _config).FactoryTypes())
+                                .Concat(Classifiers.Select(c =>
+                                    new ClassifierGenerator(c, _names, _lionWebVersion, _config).ClassifierType()))
                                 .Concat(Enumerations.Select(e =>
-                                    new EnumGenerator(e, _names, _lionWebVersion).EnumType()))
-                                .Concat(StructuredDataTypes.Select(s => new StructuredDataTypeGenerator(s, _names, _lionWebVersion).SdtType()))
+                                    new EnumGenerator(e, _names, _lionWebVersion, _config).EnumType()))
+                                .Concat(StructuredDataTypes.Select(s =>
+                                    new StructuredDataTypeGenerator(s, _names, _lionWebVersion, _config).SdtType()))
                         ))
                         .WithUsings(List(CollectUsings()))
                 ])

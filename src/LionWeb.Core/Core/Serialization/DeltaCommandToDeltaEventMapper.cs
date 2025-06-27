@@ -46,6 +46,7 @@ public class DeltaCommandToDeltaEventMapper
                 LanguageEntity l => l.ToMetaPointer(),
                 Feature feat => feat.ToMetaPointer(),
                 EnumerationLiteral l => l.GetEnumeration().ToMetaPointer(),
+                Field f => f.ToMetaPointer(),
                 _ => throw new NotImplementedException(keyed.GetType().Name)
             };
 

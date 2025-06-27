@@ -30,7 +30,10 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 public abstract class LanguageGeneratorBase : GeneratorBase
 {
     /// <inheritdoc cref="LanguageGeneratorBase"/>
-    protected LanguageGeneratorBase(INames names, LionWebVersions lionWebVersion) : base(names, lionWebVersion) { }
+    protected LanguageGeneratorBase(INames names, LionWebVersions lionWebVersion, GeneratorConfig config)
+        : base(names, lionWebVersion, config)
+    {
+    }
 
     /// <inheritdoc cref="INames.LanguageName"/>
     protected string LanguageName => _names.LanguageName(_names.Language);

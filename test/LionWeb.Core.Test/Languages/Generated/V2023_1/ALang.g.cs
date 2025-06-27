@@ -13,6 +13,7 @@ using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 [LionCoreLanguage(Key = "key-ALang", Version = "1")]
 public partial class ALangLanguage : LanguageBase<IALangFactory>
@@ -113,6 +114,13 @@ public partial class AConcept : ConceptInstanceBase
         [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-BRef")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
 	public LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? BRef { get => _bRef; set => SetBRef(value); }
+
+	/// <remarks>Optional Single Reference</remarks>
+        public bool TryGetBRef([NotNullWhenAttribute(true)] out LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? bRef)
+	{
+		bRef = _bRef;
+		return _bRef != null;
+	}
 
 	/// <remarks>Optional Single Reference</remarks>
         public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? value)
