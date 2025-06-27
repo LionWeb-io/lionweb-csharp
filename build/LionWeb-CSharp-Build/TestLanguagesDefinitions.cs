@@ -32,6 +32,7 @@ public class TestLanguagesDefinitions
     public Language TinyRefLang { get; private set; }
     public Language? SdtLang { get; private set; }
     public Language? KeywordLang { get; private set; }
+    public Language? StructureNameLang { get; private set; }
 
     public List<Language> MixedLangs { get; private set; } = [];
 
@@ -46,6 +47,7 @@ public class TestLanguagesDefinitions
             CreateSdtLang();
             CreateMixedLangs();
             CreateKeywordLang();
+            CreateStructureNameLang();
         }
     }
 
@@ -281,40 +283,38 @@ public class TestLanguagesDefinitions
     {
         var keywordLang = new DynamicLanguage("id-keyword-lang", _lionWebVersion)
         {
-            Name = "class",
-            Key = "class",
-            Version = "struct"
+            Name = "class", Key = "class", Version = "struct"
         };
-        
+
         var iface = keywordLang.Interface("id-keyword-iface", "key-keyword-iface", "interface");
         var iface2 = keywordLang.Interface("id-keyword-iface2", "key-keyword-iface2", "partial")
             .Extending(iface);
-        
+
         var concept = keywordLang.Concept("id-keyword-concept", "key-keyword-concept", "struct")
-                .Implementing(iface);
+            .Implementing(iface);
         var concept2 = keywordLang.Concept("id-keyword-concept2", "key-keyword-concept2", "out")
             .Extending(concept);
-        
+
         var ann = keywordLang.Annotation("id-keyword-ann", "key-keyword-ann", "record")
-                .Implementing(iface);
+            .Implementing(iface);
         var ann2 = keywordLang.Annotation("id-keyword-ann2", "key-keyword-ann2", "var")
             .Extending(ann);
 
         var enm = keywordLang.Enumeration("id-keyword-enm", "key-keyword-enm", "enum");
         var lit = enm.EnumerationLiteral("id-keyword-enmA", "key-keyword-enmA", "internal");
-        
+
         var prim = keywordLang.PrimitiveType("id-keyword-prim", "key-keyword-prim", "base");
-        
+
         var sdt = keywordLang.StructuredDataType("id-keyword-sdt", "key-keyword-sdt", "if");
         var field = sdt.Field("id-keyword-field", "key-keyword-field", "namespace")
-                .OfType(_lionWebVersion.BuiltIns.String);
-        
+            .OfType(_lionWebVersion.BuiltIns.String);
+
         var reference = concept.Reference("id-keyword-reference", "key-keyword-reference", "ref")
             .OfType(ann);
 
         var cont = ann.Containment("id-keyword-cont", "key-keyword-cont", "double")
             .OfType(iface);
-        
+
         var prop = iface.Property("id-keyword-prop", "key-keyword-prop", "string")
             .OfType(enm);
 
@@ -324,5 +324,118 @@ public class TestLanguagesDefinitions
         KeywordLang = keywordLang;
     }
 
+    private void CreateStructureNameLang()
+    {
+        var lang = new DynamicLanguage("id-structure-name-lang", _lionWebVersion)
+        {
+            Name = "StructureName", Key = "structure-name", Version = "1"
+        };
 
+        var partition = lang.Concept("id-partition", "key-partition", "ConceptPartition")
+            .IsPartition(true);
+
+        partition.Property("id-property-string-optional", "key-property-string-optional", "propertyStringOptional")
+            .OfType(_lionWebVersion.BuiltIns.String)
+            .IsOptional(true);
+        partition.Property("id-property-string-required", "key-property-string-required", "propertyStringRequired")
+            .OfType(_lionWebVersion.BuiltIns.String)
+            .IsOptional(false);
+
+        partition.Property("id-property-integer-optional", "key-property-integer-optional", "propertyIntegerOptional")
+            .OfType(_lionWebVersion.BuiltIns.Integer)
+            .IsOptional(true);
+        partition.Property("id-property-integer-required", "key-property-integer-required", "propertyIntegerRequired")
+            .OfType(_lionWebVersion.BuiltIns.Integer)
+            .IsOptional(false);
+
+        partition.Property("id-property-boolean-optional", "key-property-boolean-optional", "propertyBooleanOptional")
+            .OfType(_lionWebVersion.BuiltIns.Boolean)
+            .IsOptional(true);
+        partition.Property("id-property-boolean-required", "key-property-boolean-required", "propertyBooleanRequired")
+            .OfType(_lionWebVersion.BuiltIns.Boolean)
+            .IsOptional(false);
+
+        var dec = lang.StructuredDataType("id-sdt-decimal", "key-sdt-decimal", "SdtDecimal");
+        dec.Field("id-field-decimal-whole", "key-field-decimal-whole", "fieldWhole")
+            .OfType(_lionWebVersion.BuiltIns.Integer);
+        dec.Field("id-field-decimal-fraction", "key-field-decimal-fraction", "fieldFraction")
+            .OfType(_lionWebVersion.BuiltIns.Integer);
+
+        var sdt = lang.StructuredDataType("id-sdt-nested", "key-sdt-neested", "SdtNested");
+        sdt.Field("id-field-nested-decimal", "key-field-nested-decimal", "fieldDecimal").OfType(dec);
+        sdt.Field("id-field-nested-string", "key-field-nested-string", "fieldString")
+            .OfType(_lionWebVersion.BuiltIns.String);
+        sdt.Field("id-field-nested-boolean", "key-field-nested-boolean", "fieldBoolean")
+            .OfType(_lionWebVersion.BuiltIns.Boolean);
+
+        partition.Property("id-property-sdt-optional", "key-property-sdt-optional", "propertySdtOptional")
+            .OfType(sdt)
+            .IsOptional(true);
+        partition.Property("id-property-sdt-required", "key-property-sdt-required", "propertySdtRequired")
+            .OfType(sdt)
+            .IsOptional(false);
+
+        var iface = lang.Interface("id-interface", "key-interface", "InterfaceIface")
+            .Extending(_lionWebVersion.BuiltIns.INamed);
+
+        partition.Containment("id-containment-optional-single", "key-containment-optional-single",
+                "ContainmentOptionalSingle")
+            .OfType(iface)
+            .IsOptional(true)
+            .IsMultiple(false);
+        partition.Containment("id-containment-required-single", "key-containment-required-single",
+                "ContainmentRequiredSingle")
+            .OfType(iface)
+            .IsOptional(false)
+            .IsMultiple(false);
+        partition.Containment("id-containment-optional-multiple", "key-containment-optional-multiple",
+                "ContainmentOptionalMultiple")
+            .OfType(iface)
+            .IsOptional(true)
+            .IsMultiple(true);
+        partition.Containment("id-containment-required-multiple", "key-containment-required-multiple",
+                "ContainmentRequiredMultiple")
+            .OfType(iface)
+            .IsOptional(false)
+            .IsMultiple(true);
+
+        partition.Reference("id-reference-optional-single", "key-reference-optional-single",
+                "ReferenceOptionalSingle")
+            .OfType(iface)
+            .IsOptional(true)
+            .IsMultiple(false);
+        partition.Reference("id-reference-required-single", "key-reference-required-single",
+                "ReferenceRequiredSingle")
+            .OfType(iface)
+            .IsOptional(false)
+            .IsMultiple(false);
+        partition.Reference("id-reference-optional-multiple", "key-reference-optional-multiple",
+                "ReferenceOptionalMultiple")
+            .OfType(iface)
+            .IsOptional(true)
+            .IsMultiple(true);
+        partition.Reference("id-reference-required-multiple", "key-reference-required-multiple",
+                "ReferenceRequiredMultiple")
+            .OfType(iface)
+            .IsOptional(false)
+            .IsMultiple(true);
+
+        var concept = lang.Concept("id-concept", "key-concept", "ConceptConcept")
+            .Implementing(iface);
+        concept.Containment("id-containment-optional-multiple-conceptNested", "key-containment-optional-multiple-conceptNested",
+                "ContainmentOptionalMultipleConceptNested")
+            .OfType(iface)
+            .IsOptional(true)
+            .IsMultiple(true);
+
+        var annotation = lang.Annotation("id-annotation", "key-annotation", "AnnotationAnnotation")
+            .Implementing(iface);
+        annotation.Containment("id-containment-optional-multiple-annotationNested", "key-containment-optional-multiple-annotationNested",
+                "ContainmentOptionalMultipleAnnotationNested")
+            .OfType(iface)
+            .IsOptional(true)
+            .IsMultiple(true);
+
+        StructureNameLang = lang;
+    }
 }
