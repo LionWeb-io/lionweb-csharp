@@ -27,9 +27,9 @@ using LionWeb.Generator.Names;
 foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
 {
     ShapesDefinition._lionWebVersion = lionWebVersion;
-    
+
     Console.WriteLine($"\n### LionWeb specification version: {lionWebVersion}\n");
-    
+
     SerializeLanguagesLocally(lionWebVersion, "lioncore", lionWebVersion.LionCore);
     SerializeLanguagesLocally(lionWebVersion, "shapes", ShapesDefinition.Language);
 
@@ -51,7 +51,6 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var bLang = testLanguagesDefinitions.BLang;
     var tinyRefLang = testLanguagesDefinitions.TinyRefLang;
     var keywordLang = testLanguagesDefinitions.KeywordLang;
-    var structureNameLang = testLanguagesDefinitions.StructureNameLang;
 
     string prefix = $"LionWeb.Core.Test.Languages.Generated.V{lionWebVersion.VersionString.Replace('.', '_')}";
     List<Names> names =
@@ -72,9 +71,6 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     if(keywordLang != null)
         names.Add(new(keywordLang, $"@namespace.@int.@public"));
 
-    if(structureNameLang != null)
-        names.Add(new(structureNameLang, $"{prefix}.StructureNameLang"));
-    
     names.AddRange(testLanguagesDefinitions
         .MixedLangs
         .Select(l =>
