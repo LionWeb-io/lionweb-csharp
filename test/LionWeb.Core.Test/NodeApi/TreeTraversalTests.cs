@@ -17,8 +17,10 @@
 
 namespace LionWeb.Core.Test.NodeApi;
 
+using Languages.Generated.V2024_1.TestLanguage;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
+using M3;
 
 [TestClass]
 public class TreeTraversalTests
@@ -519,7 +521,8 @@ public class TreeTraversalTests
         var node = new CompositeShape("n") { Parts = [childA], EvilPart = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB, ann }, node.Children(true, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB, ann },
+            node.Children(true, true).ToList());
     }
 
     #endregion
@@ -685,7 +688,8 @@ public class TreeTraversalTests
         var childA = new Line("cA");
         var childB = new Documentation("cB");
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
-        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB }, node.Descendants(true, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB },
+            node.Descendants(true, false).ToList());
     }
 
     [TestMethod]
@@ -725,7 +729,8 @@ public class TreeTraversalTests
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB }, node.Descendants(true, false).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB },
+            node.Descendants(true, false).ToList());
     }
 
     [TestMethod]
@@ -747,7 +752,8 @@ public class TreeTraversalTests
         var node = new Geometry("n") { Shapes = [childA], Documentation = childB };
         var ann = new BillOfMaterials("a");
         node.AddAnnotations([ann]);
-        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB, ann }, node.Descendants(true, true).ToList());
+        CollectionAssert.AreEquivalent(new List<INode> { node, childA, childB, ann },
+            node.Descendants(true, true).ToList());
     }
 
     #endregion
@@ -1010,6 +1016,88 @@ public class TreeTraversalTests
     }
 
     #endregion
+
+    #endregion
+
+    #region partition
+
+    [TestMethod]
+    public void Partition_NoParent_Self()
+    {
+        var node = new Geometry("p");
+
+        Assert.AreSame(node, node.GetPartition());
+    }
+
+    [TestMethod]
+    public void Partition_NoParent_None()
+    {
+        var node = new Circle("p");
+
+        Assert.IsNull(node.GetPartition());
+    }
+
+    [TestMethod]
+    public void Partition_Parent_Parent()
+    {
+        var node = new LinkTestConcept("p");
+        var partition = new LinkTestConcept("parent") { Containment_0_1 = node };
+
+        Assert.AreSame(partition, node.GetPartition());
+    }
+
+    [TestMethod]
+    public void Partition_Parent_None()
+    {
+        var node = new Coord("c");
+        _ = new Circle("p") { Center = node };
+
+        Assert.IsNull(node.GetPartition());
+    }
+
+    [TestMethod]
+    public void Partition_NotSelf_Parent_Parent()
+    {
+        var node = new Circle("p");
+        var partition = new Geometry("partition") { Shapes = [node] };
+
+        Assert.AreSame(partition, node.GetPartition());
+    }
+
+    [TestMethod]
+    public void Partition_Ancestor()
+    {
+        var node = new LinkTestConcept("p");
+        var partition =
+            new LinkTestConcept("parent") { Containment_0_1 = new LinkTestConcept("middle") { Containment_1 = node } };
+
+        Assert.AreSame(partition, node.GetPartition());
+    }
+
+    [TestMethod]
+    public void Partition_NotRoot()
+    {
+        var lang = new DynamicLanguage("lang", LionWebVersions.Current)
+        {
+            Name = "lang", Key = "lang", Version = "lang"
+        };
+        var iface = lang.Interface("iface", "iface", "iface");
+        var cont = iface.Containment("cont", "cont", "cont").IsMultiple(false).IsOptional(true).OfType(iface);
+        var root = lang.Concept("root", "root", "root").IsPartition(false).Implementing(iface);
+        var partition = lang.Concept("partition", "partition", "partition").IsPartition(true).Implementing(iface);
+
+        var r = lang.GetFactory().CreateNode("rootInstance", root);
+        DynamicPartitionInstance p =
+            (DynamicPartitionInstance)lang.GetFactory().CreateNode("partitionInstance", partition);
+        var c = lang.GetFactory().CreateNode("childPartitionInstance", partition);
+        var l = lang.GetFactory().CreateNode("leafInstance", partition);
+
+        r.Set(cont, p);
+        p.Set(cont, c);
+        c.Set(cont, l);
+
+        Assert.AreSame(p, l.GetPartition());
+    }
 
     #endregion
 }

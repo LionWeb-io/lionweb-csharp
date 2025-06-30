@@ -337,8 +337,14 @@ public static class M1Extensions
         }
     }
     
+    /// <summary>
+    /// Returns the highest ancestor that's a <see cref="IPartitionInstance"/>, might be <paramref name="self"/>.
+    /// It's NOT guaranteed that the returned node is also the root,
+    /// i.e. the returned node MAY have a <see cref="IReadableNode.GetParent">parent</see>.
+    /// </summary>
+    /// <param name="self">Base node to get partition of.</param>
     public static IPartitionInstance? GetPartition(this IReadableNode self) =>
-     self as IPartitionInstance ?? self.GetParent()?.GetPartition();
+     self.GetParent()?.GetPartition() ?? self as IPartitionInstance;
 
     private static List<INode> GetContainmentNodes(INode self)
     {
