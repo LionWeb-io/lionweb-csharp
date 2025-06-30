@@ -45,6 +45,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var specificLanguage = ISpecificLanguage.Get(lionWebVersion);
     var deprecatedLang = DeserializeExternalLanguage(lionWebVersion, "deprecated", specificLanguage).First();
     deprecatedLang.Name = "Deprecated";
+    var testLanguage = DeserializeExternalLanguage(lionWebVersion, "testLanguage", specificLanguage).First();
     var shapesLanguage = ShapesDefinition.Language;
     shapesLanguage.Name = "Shapes";
     var aLang = testLanguagesDefinitions.ALang;
@@ -63,6 +64,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(bLang, $"{prefix}.Circular.B") { NamespaceMappings = { [aLang] = $"{prefix}.Circular.A" } },
         new(tinyRefLang, $"{prefix}.TinyRefLang"),
         new(deprecatedLang, $"{prefix}.DeprecatedLang"),
+        new(testLanguage, $"{prefix}.TestLanguage"),
     ];
     
     if(sdtLang != null)
