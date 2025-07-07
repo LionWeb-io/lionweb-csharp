@@ -17,6 +17,7 @@
 
 namespace LionWeb.Protocol.Delta;
 
+using Message;
 using System.Text.Json;
 
 public class DeltaSerializer

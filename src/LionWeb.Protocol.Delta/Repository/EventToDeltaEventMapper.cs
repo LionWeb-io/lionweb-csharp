@@ -15,23 +15,25 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Command;
+namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.M1.Event;
+using Core.M1.Event.Partition;
+using Message.Event;
 
-public class DeltaCommandToEventMapper
+public class EventToDeltaEventMapper
 {
-    private readonly DeltaCommandToPartitionEventMapper _partitionMapper;
+    private readonly PartitionEventToDeltaEventMapper _partitionMapper;
 
-    public DeltaCommandToEventMapper(DeltaCommandToPartitionEventMapper partitionMapper)
+    public EventToDeltaEventMapper(PartitionEventToDeltaEventMapper partitionMapper)
     {
         _partitionMapper = partitionMapper;
     }
 
-    public IEvent Map(IDeltaCommand command) =>
-        command switch
+    public IDeltaEvent Map(IEvent @event) =>
+        @event switch
         {
-            IPartitionCommand c => _partitionMapper.Map(c),
-            _ => throw new NotImplementedException(command.GetType().Name)
+            IPartitionEvent e => _partitionMapper.Map(e),
+            _ => throw new NotImplementedException(@event.GetType().Name)
         };
 }

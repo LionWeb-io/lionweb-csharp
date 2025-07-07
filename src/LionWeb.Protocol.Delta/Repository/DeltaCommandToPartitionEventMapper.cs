@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Command;
+namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
 using Core.M1;
@@ -24,6 +24,8 @@ using Core.M1.Event.Partition;
 using Core.M2;
 using Core.M3;
 using Core.Serialization;
+using Message;
+using Message.Command;
 
 public class DeltaCommandToPartitionEventMapper
 {

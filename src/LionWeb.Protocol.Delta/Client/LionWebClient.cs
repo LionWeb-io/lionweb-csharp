@@ -17,13 +17,14 @@
 
 namespace LionWeb.Protocol.Delta.Client;
 
-using Command;
 using Core;
 using Core.M1;
 using Core.M1.Event;
 using Core.M3;
-using Event;
-using Query;
+using Message;
+using Message.Command;
+using Message.Event;
+using Message.Query;
 using System.Diagnostics;
 
 public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
@@ -48,8 +49,9 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                 .WithLanguages(languages)
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
-        Dictionary<CompressedMetaPointer, IKeyed>
-            sharedKeyedMap = DeltaCommandToDeltaEventMapper.BuildSharedKeyMap(languages);
+        
+        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        
         _eventReceiver = new DeltaProtocolPartitionEventReceiver(
             PartitionEventHandler,
             SharedNodeMap,
@@ -58,6 +60,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         );
     }
 
+    /// <inheritdoc />
     public override async Task Send(IDeltaContent deltaContent)
     {
         if (deltaContent.RequiresParticipationId)
@@ -70,6 +73,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         await _connector.Send(deltaContent);
     }
 
+    /// <inheritdoc />
     public override void Receive(IDeltaContent content)
     {
         try

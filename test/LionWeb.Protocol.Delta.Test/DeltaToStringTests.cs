@@ -17,9 +17,9 @@
 
 namespace LionWeb.Protocol.Delta.Test;
 
-using Command;
-using Event;
-using Query;
+using Message.Command;
+using Message.Event;
+using Message.Query;
 
 [TestClass]
 public class DeltaToStringTests : JsonTestsBase

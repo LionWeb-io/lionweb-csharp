@@ -15,19 +15,20 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Command;
+namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
 using Core.M1.Event.Partition;
 using Core.M3;
+using Message.Event;
 
-public class DeltaProtocolPartitionCommandReceiver
+public class DeltaProtocolPartitionEventReceiver
 {
     private readonly PartitionEventHandler _eventHandler;
-    private readonly DeltaCommandToPartitionEventMapper _mapper;
+    private readonly DeltaEventToPartitionEventMapper _mapper;
 
-    public DeltaProtocolPartitionCommandReceiver(
+    public DeltaProtocolPartitionEventReceiver(
         PartitionEventHandler eventHandler,
         Dictionary<NodeId, IReadableNode> sharedNodeMap,
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
@@ -35,12 +36,14 @@ public class DeltaProtocolPartitionCommandReceiver
     )
     {
         _eventHandler = eventHandler;
-        _mapper = new DeltaCommandToPartitionEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
+        _mapper = new DeltaEventToPartitionEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
-    public void Receive(IDeltaCommand deltaCommand)
+
+    public void Receive(IDeltaEvent deltaEvent)
     {
-        IPartitionEvent partitionCommand = _mapper.Map(deltaCommand);
-        _eventHandler.Raise(partitionCommand);
+        IPartitionEvent partitionEvent = _mapper.Map(deltaEvent);
+
+        _eventHandler.Raise(partitionEvent);
     }
 }

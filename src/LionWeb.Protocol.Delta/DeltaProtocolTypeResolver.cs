@@ -17,9 +17,10 @@
 
 namespace LionWeb.Protocol.Delta;
 
-using Command;
-using Event;
-using Query;
+using Message;
+using Message.Command;
+using Message.Event;
+using Message.Query;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;

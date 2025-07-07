@@ -16,7 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable CoVariantArrayConversion
-namespace LionWeb.Protocol.Delta.Query;
+namespace LionWeb.Protocol.Delta.Message.Query;
 
 using Core.Serialization;
 using System.Text;

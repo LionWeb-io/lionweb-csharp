@@ -17,7 +17,7 @@
 
 namespace LionWeb.Protocol.Delta.Test.Listener;
 
-using Command;
+using Client;
 
 public class CommandIdProvider : ICommandIdProvider
 {

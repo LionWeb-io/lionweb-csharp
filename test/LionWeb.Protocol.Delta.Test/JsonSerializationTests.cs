@@ -17,7 +17,8 @@
 
 namespace LionWeb.Protocol.Delta.Test;
 
-using Event;
+using Message;
+using Message.Event;
 
 [TestClass]
 public class JsonSerializationTests : JsonTestsBase

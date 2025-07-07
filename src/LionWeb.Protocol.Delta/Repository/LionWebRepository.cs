@@ -17,12 +17,13 @@
 
 namespace LionWeb.Protocol.Delta.Repository;
 
-using Command;
 using Core;
 using Core.M1;
 using Core.M3;
-using Event;
-using Query;
+using Message;
+using Message.Command;
+using Message.Event;
+using Message.Query;
 using System.Diagnostics;
 
 public interface IDeltaRepositoryConnector : IRepositoryConnector<IDeltaContent>;
@@ -45,8 +46,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
 
-        Dictionary<CompressedMetaPointer, IKeyed>
-            sharedKeyedMap = DeltaCommandToDeltaEventMapper.BuildSharedKeyMap(languages);
+        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        
         _commandReceiver = new DeltaProtocolPartitionCommandReceiver(
             PartitionEventHandler,
             SharedNodeMap,
@@ -147,11 +148,14 @@ public class LionWebTestRepository(
 
 public class ExceptionParticipationIdProvider : IParticipationIdProvider
 {
+    /// <inheritdoc />
     public string ParticipationId => throw new NotImplementedException();
 }
 
 public class EventSequenceNumberProvider : IEventSequenceNumberProvider
 {
     private long next = 0;
+
+    /// <inheritdoc />
     public long Create() => ++next;
 }

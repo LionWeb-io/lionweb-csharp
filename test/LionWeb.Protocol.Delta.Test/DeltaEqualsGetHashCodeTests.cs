@@ -17,10 +17,11 @@
 
 namespace LionWeb.Protocol.Delta.Test;
 
-using Command;
 using Core.Serialization;
-using Event;
-using Query;
+using Message;
+using Message.Command;
+using Message.Event;
+using Message.Query;
 
 [TestClass]
 public class DeltaEqualsGetHashCodeTests : JsonTestsBase

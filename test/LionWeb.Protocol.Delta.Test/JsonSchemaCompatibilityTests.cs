@@ -18,6 +18,7 @@
 namespace LionWeb.Protocol.Delta.Test;
 
 using Json.Schema;
+using Message;
 using System.Text.Json.Nodes;
 
 [TestClass]

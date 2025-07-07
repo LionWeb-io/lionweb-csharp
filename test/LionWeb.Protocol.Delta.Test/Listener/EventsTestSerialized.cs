@@ -17,14 +17,13 @@
 
 namespace LionWeb.Protocol.Delta.Test.Listener;
 
-using Command;
+using Client;
 using Core;
 using Core.M1;
 using Core.M1.Event.Partition;
 using Core.M3;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Listener;
-using Event;
 
 [TestClass]
 public class EventsTestSerialized : EventTestsBase
@@ -36,7 +35,7 @@ public class EventsTestSerialized : EventTestsBase
         var lionWebVersion = LionWebVersions.v2024_1;
         List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaCommandToDeltaEventMapper.BuildSharedKeyMap(languages);
+        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
         Dictionary<NodeId, IReadableNode> sharedNodeMap = [];
 

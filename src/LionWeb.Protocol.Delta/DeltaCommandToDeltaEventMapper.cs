@@ -17,13 +17,11 @@
 
 namespace LionWeb.Protocol.Delta;
 
-using Command;
 using Core;
-using Core.M1;
 using Core.M2;
-using Core.M3;
 using Core.Serialization;
-using Event;
+using Message.Command;
+using Message.Event;
 
 public class DeltaCommandToDeltaEventMapper
 {
@@ -34,27 +32,6 @@ public class DeltaCommandToDeltaEventMapper
     {
         _sharedNodeMap = sharedNodeMap;
         _participationId = participationId;
-    }
-
-    public static Dictionary<CompressedMetaPointer, IKeyed> BuildSharedKeyMap(IEnumerable<Language> languages)
-    {
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = [];
-
-        foreach (IKeyed keyed in languages.SelectMany(l => M1Extensions.Descendants<IKeyed>(l)))
-        {
-            var metaPointer = keyed switch
-            {
-                LanguageEntity l => l.ToMetaPointer(),
-                Feature feat => feat.ToMetaPointer(),
-                EnumerationLiteral l => l.GetEnumeration().ToMetaPointer(),
-                Field f => f.ToMetaPointer(),
-                _ => throw new NotImplementedException(keyed.GetType().Name)
-            };
-
-            sharedKeyedMap[CompressedMetaPointer.Create(metaPointer, true)] = keyed;
-        }
-
-        return sharedKeyedMap;
     }
 
     public IDeltaEvent Map(IDeltaCommand deltaCommand) =>

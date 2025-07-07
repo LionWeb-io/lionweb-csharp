@@ -17,20 +17,11 @@
 
 // ReSharper disable CoVariantArrayConversion
 
-namespace LionWeb.Protocol.Delta.Event;
+namespace LionWeb.Protocol.Delta.Message.Event;
 
 using Core.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
-using TargetNode = NodeId;
-using CommandId = NodeId;
-using ParticipationId = NodeId;
-using QueryId = NodeId;
-using FreeId = NodeId;
-using MessageKind = NodeId;
-using MessageDataKey = NodeId;
-using EventSequenceNumber = long;
-using ErrorCode = NodeId;
 
 public record CommandSource(ParticipationId ParticipationId, CommandId CommandId);
 

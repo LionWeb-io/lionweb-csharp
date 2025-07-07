@@ -30,3 +30,4 @@ global using MessageKind = string;
 global using MessageDataKey = string;
 global using EventSequenceNumber = long;
 global using SemanticPropertyValue = object;
+global using ErrorCode = string;

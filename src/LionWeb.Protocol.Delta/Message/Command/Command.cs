@@ -17,7 +17,7 @@
 
 // ReSharper disable CoVariantArrayConversion
 
-namespace LionWeb.Protocol.Delta.Command;
+namespace LionWeb.Protocol.Delta.Message.Command;
 
 using Core.Serialization;
 using System.Text;
