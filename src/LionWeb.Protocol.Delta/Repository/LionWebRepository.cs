@@ -26,10 +26,6 @@ using Message.Event;
 using Message.Query;
 using System.Diagnostics;
 
-public interface IDeltaRepositoryConnector : IRepositoryConnector<IDeltaContent>;
-
-public interface IDeltaMessageContext : IMessageContext<IDeltaContent>;
-
 public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
     private readonly DeltaProtocolPartitionCommandReceiver _commandReceiver;
@@ -47,7 +43,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             ;
 
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
-        
+
         _commandReceiver = new DeltaProtocolPartitionCommandReceiver(
             PartitionEventHandler,
             SharedNodeMap,
@@ -114,8 +110,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                         $"{_name}: ignoring received: {content.GetType()}({content.InternalParticipationId})");
                     break;
             }
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Debug.WriteLine(e);
         }
@@ -150,12 +145,4 @@ public class ExceptionParticipationIdProvider : IParticipationIdProvider
 {
     /// <inheritdoc />
     public string ParticipationId => throw new NotImplementedException();
-}
-
-public class EventSequenceNumberProvider : IEventSequenceNumberProvider
-{
-    private long next = 0;
-
-    /// <inheritdoc />
-    public long Create() => ++next;
 }

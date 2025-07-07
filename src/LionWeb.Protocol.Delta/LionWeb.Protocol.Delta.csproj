@@ -10,6 +10,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="LionWeb.Protocol.Delta.Test" />
+    </ItemGroup>
+
+    <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\" />
         <None Include="LICENSE" Pack="true" PackagePath="\" />
     </ItemGroup>

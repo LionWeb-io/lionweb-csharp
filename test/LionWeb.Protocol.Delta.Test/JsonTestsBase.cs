@@ -29,9 +29,9 @@ public abstract class JsonTestsBase
     private static int _nextKey;
     private static int _nextPropertyValue;
     private static int _nextResolveInfo;
-    private static int _nextIndex;
+    private static Index _nextIndex;
     private static int _nextQueryId;
-    private static long _nextSequence;
+    private static EventSequenceNumber _nextSequence;
     private static int _nextCommandId;
 
     protected JsonTestsBase()
@@ -48,16 +48,33 @@ public abstract class JsonTestsBase
 
     #region Query
 
-    protected static SubscribeToChangingPartitionsRequest CreateSubscribeToChangingPartitionsRequest() => new(true, false, false, QueryId(), ProtocolMessages());
-    protected static SubscribeToChangingPartitionsResponse CreateSubscribeToChangingPartitionsResponse() => new(QueryId(), ProtocolMessages());
-    protected static SubscribeToPartitionContentsRequest CreateSubscribeToPartitionContentsRequest() => new(TargetNode(), QueryId(), ProtocolMessages());
-    protected static SubscribeToPartitionContentsResponse CreateSubscribeToPartitionContentsResponse() => new(Chunk(), QueryId(), ProtocolMessages());
-    protected static UnsubscribeFromPartitionContentsRequest CreateUnsubscribeFromPartitionContentsRequest() => new(TargetNode(), QueryId(), ProtocolMessages());
-    protected static UnsubscribeFromPartitionContentsResponse CreateUnsubscribeFromPartitionContentsResponse() => new(QueryId(), ProtocolMessages());
+    protected static SubscribeToChangingPartitionsRequest CreateSubscribeToChangingPartitionsRequest() =>
+        new(true, false, false, QueryId(), ProtocolMessages());
+
+    protected static SubscribeToChangingPartitionsResponse CreateSubscribeToChangingPartitionsResponse() =>
+        new(QueryId(), ProtocolMessages());
+
+    protected static SubscribeToPartitionContentsRequest CreateSubscribeToPartitionContentsRequest() =>
+        new(TargetNode(), QueryId(), ProtocolMessages());
+
+    protected static SubscribeToPartitionContentsResponse CreateSubscribeToPartitionContentsResponse() =>
+        new(Chunk(), QueryId(), ProtocolMessages());
+
+    protected static UnsubscribeFromPartitionContentsRequest CreateUnsubscribeFromPartitionContentsRequest() =>
+        new(TargetNode(), QueryId(), ProtocolMessages());
+
+    protected static UnsubscribeFromPartitionContentsResponse CreateUnsubscribeFromPartitionContentsResponse() =>
+        new(QueryId(), ProtocolMessages());
+
     protected static GetAvailableIdsRequest CreateGetAvailableIdsRequest() => new(3, QueryId(), ProtocolMessages());
-    protected static GetAvailableIdsResponse CreateGetAvailableIdsResponse() => new([TargetNode(), TargetNode()], QueryId(), ProtocolMessages());
+
+    protected static GetAvailableIdsResponse CreateGetAvailableIdsResponse() =>
+        new([TargetNode(), TargetNode()], QueryId(), ProtocolMessages());
+
     protected static ListPartitionsRequest CreateListPartitionsRequest() => new(QueryId(), ProtocolMessages());
-    protected static ListPartitionsResponse CreateListPartitionsResponse() => new(Chunk(), QueryId(), ProtocolMessages());
+
+    protected static ListPartitionsResponse CreateListPartitionsResponse() =>
+        new(Chunk(), QueryId(), ProtocolMessages());
 
     protected static IEnumerable<object[]> CollectQueryMessages() =>
     [
@@ -76,7 +93,7 @@ public abstract class JsonTestsBase
     #endregion
 
     #region Command
-    
+
     #region Partitions
 
     protected static CommandResponse CreateCommandResponse() =>
@@ -253,7 +270,7 @@ public abstract class JsonTestsBase
             CreateDeleteReference()
         ], CommandId(), ProtocolMessages());
 
-    
+
     protected static IEnumerable<object[]> CollectCommandMessages() =>
     [
         [CreateCommandResponse()],
@@ -300,178 +317,205 @@ public abstract class JsonTestsBase
     #endregion
 
     #region Event
+
     #region Partitions
 
     protected static PartitionAdded CreatePartitionAdded() =>
-        new(Chunk(), Origin(), Sequence(), ProtocolMessages());
+        new(Chunk(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static PartitionDeleted CreatePartitionDeleted() =>
-        new(TargetNode(), Descendants(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), Descendants(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     #endregion
 
     #region Nodes
 
     protected static ClassifierChanged CreateClassifierChanged() =>
-        new(TargetNode(), MetaPointer(), MetaPointer(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(TargetNode(), MetaPointer(), MetaPointer(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     #endregion
 
     #region Properties
 
     protected static PropertyAdded CreatePropertyAdded() =>
-        new(TargetNode(), MetaPointer(), PropertyValue(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(TargetNode(), MetaPointer(), PropertyValue(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static PropertyDeleted CreatePropertyDeleted() =>
-        new(TargetNode(), MetaPointer(), PropertyValue(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(TargetNode(), MetaPointer(), PropertyValue(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static PropertyChanged CreatePropertyChanged() =>
-        new(TargetNode(), MetaPointer(), PropertyValue(), PropertyValue(), Origin(),
-            Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), PropertyValue(), PropertyValue(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     #endregion
 
     #region Children
 
     protected static ChildAdded CreateChildAdded() =>
-        new(TargetNode(), Chunk(), MetaPointer(), Index(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(TargetNode(), Chunk(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ChildDeleted CreateChildDeleted() =>
-        new(TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(), Origin(),
-            Sequence(), ProtocolMessages());
+        new(TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ChildReplaced CreateChildReplaced() =>
-        new(Chunk(), TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(),
-            Origin(), Sequence(), ProtocolMessages());
+        new(Chunk(), TargetNode(), Descendants(), TargetNode(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ChildMovedFromOtherContainment CreateChildMovedFromOtherContainment() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), TargetNode(),
-            MetaPointer(), Index(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(),
+            ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static ChildMovedFromOtherContainmentInSameParent CreateChildMovedFromOtherContainmentInSameParent() =>
-        new(MetaPointer(), Index(), TargetNode(), TargetNode(),
-            MetaPointer(), Index(), Origin(), Sequence(), ProtocolMessages());
+        new(MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ChildMovedInSameContainment CreateChildMovedInSameContainment() =>
-        new(Index(), TargetNode(), TargetNode(), MetaPointer(), Index(),
-            Origin(), Sequence(), ProtocolMessages());
+        new(Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ChildMovedAndReplacedFromOtherContainment CreateChildMovedAndReplacedFromOtherContainment() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            TargetNode(), MetaPointer(), Index(), TargetNode(), Descendants(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(),
+            Descendants(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static ChildMovedAndReplacedFromOtherContainmentInSameParent
         CreateChildMovedAndReplacedFromOtherContainmentInSameParent() =>
-        new(MetaPointer(), Index(), TargetNode(),
-            TargetNode(), MetaPointer(), Index(), TargetNode(), Descendants(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(MetaPointer(), Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(), Descendants(),
+            Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static ChildMovedAndReplacedInSameContainment CreateChildMovedAndReplacedInSameContainment() =>
-        new(Index(), TargetNode(), TargetNode(), MetaPointer(),
-            Index(), TargetNode(), Descendants(), Origin(), Sequence(), ProtocolMessages());
+        new(Index(), TargetNode(), TargetNode(), MetaPointer(), Index(), TargetNode(), Descendants(), Origin(),
+            ProtocolMessages()) { SequenceNumber = Sequence() };
 
     #endregion
 
     #region Annotations
 
     protected static AnnotationAdded CreateAnnotationAdded() =>
-        new(TargetNode(), Chunk(), Index(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), Chunk(), Index(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static AnnotationDeleted CreateAnnotationDeleted() =>
-        new(TargetNode(), Descendants(), TargetNode(), Index(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(TargetNode(), Descendants(), TargetNode(), Index(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static AnnotationReplaced CreateAnnotationReplaced() =>
-        new(Chunk(), TargetNode(), Descendants(), TargetNode(), Index(), Origin(),
-            Sequence(), ProtocolMessages());
+        new(Chunk(), TargetNode(), Descendants(), TargetNode(), Index(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static AnnotationMovedFromOtherParent CreateAnnotationMovedFromOtherParent() =>
-        new(TargetNode(), Index(), TargetNode(), TargetNode(), Index(),
-            Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), Index(), TargetNode(), TargetNode(), Index(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static AnnotationMovedInSameParent CreateAnnotationMovedInSameParent() =>
-        new(Index(), TargetNode(), TargetNode(), Index(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(Index(), TargetNode(), TargetNode(), Index(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static AnnotationMovedAndReplacedFromOtherParent CreateAnnotationMovedAndReplacedFromOtherParent() =>
-        new(TargetNode(), Index(), TargetNode(), TargetNode(),
-            Index(), TargetNode(), Descendants(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), Index(), TargetNode(), TargetNode(), Index(), TargetNode(), Descendants(), Origin(),
+            ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static AnnotationMovedAndReplacedInSameParent CreateAnnotationMovedAndReplacedInSameParent() =>
-        new(Index(), TargetNode(), TargetNode(), Index(),
-            TargetNode(), Descendants(), Origin(), Sequence(), ProtocolMessages());
+        new(Index(), TargetNode(), TargetNode(), Index(), TargetNode(), Descendants(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     #endregion
 
     #region References
 
     protected static ReferenceAdded CreateReferenceAdded() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(),
-            Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ReferenceDeleted CreateReferenceDeleted() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(),
-            Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ReferenceChanged CreateReferenceChanged() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            TargetNode(), ResolveInfo(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(), ResolveInfo(), Origin(),
+            ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static EntryMovedFromOtherReference CreateEntryMovedFromOtherReference() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(),
-            Index(), TargetNode(), ResolveInfo(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
+            Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static EntryMovedFromOtherReferenceInSameParent CreateEntryMovedFromOtherReferenceInSameParent() =>
-        new(TargetNode(), MetaPointer(), Index(), MetaPointer(),
-            Index(), TargetNode(), ResolveInfo(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(),
+            ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static EntryMovedInSameReference CreateEntryMovedInSameReference() =>
-        new(TargetNode(), MetaPointer(), Index(), Index(), TargetNode(),
-            ResolveInfo(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static EntryMovedAndReplacedFromOtherReference CreateEntryMovedAndReplacedFromOtherReference() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            ResolveInfo(), TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(), MetaPointer(), Index(),
+            TargetNode(), ResolveInfo(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static EntryMovedAndReplacedFromOtherReferenceInSameParent
         CreateEntryMovedAndReplacedFromOtherReferenceInSameParent() =>
-        new(TargetNode(), MetaPointer(), Index(),
-            TargetNode(), ResolveInfo(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), Sequence(),
-            ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), MetaPointer(), Index(), TargetNode(),
+            ResolveInfo(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static EntryMovedAndReplacedInSameReference CreateEntryMovedAndReplacedInSameReference() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
-            ResolveInfo(), Index(), TargetNode(), ResolveInfo(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Index(), TargetNode(), ResolveInfo(),
+            Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static ReferenceResolveInfoAdded CreateReferenceResolveInfoAdded() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(),
-            Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ReferenceResolveInfoDeleted CreateReferenceResolveInfoDeleted() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ReferenceResolveInfoChanged CreateReferenceResolveInfoChanged() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(),
-            ResolveInfo(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(), ResolveInfo(), Origin(),
+            ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static ReferenceTargetAdded CreateReferenceTargetAdded() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ReferenceTargetDeleted CreateReferenceTargetDeleted() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(),
-            Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(), Origin(), ProtocolMessages())
+        {
+            SequenceNumber = Sequence()
+        };
 
     protected static ReferenceTargetChanged CreateReferenceTargetChanged() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
-            TargetNode(), Origin(), Sequence(), ProtocolMessages());
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), TargetNode(), Origin(),
+            ProtocolMessages()) { SequenceNumber = Sequence() };
 
     #endregion
 
@@ -484,13 +528,13 @@ public abstract class JsonTestsBase
             CreateChildDeleted(),
             CreateAnnotationDeleted(),
             CreateReferenceDeleted()
-        ], Sequence(), ProtocolMessages());
+        ], ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static NoOpEvent CreateNoOpEvent() =>
-        new(Origin(), Sequence(), ProtocolMessages());
+        new(Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static Error CreateError() =>
-        new("myError", "very nice message", Origin(), Sequence(), ProtocolMessages());
+        new("myError", "very nice message", Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     #endregion
 
@@ -537,7 +581,6 @@ public abstract class JsonTestsBase
         [CreateNoOpEvent()],
         [CreateError()]
     ];
-  
 
     #endregion
 
@@ -572,7 +615,7 @@ public abstract class JsonTestsBase
     protected static MetaPointer MetaPointer() =>
         new MetaPointer("myLang", "v0", CreateKey());
 
-    private static string CreateKey() =>
+    private static NodeId CreateKey() =>
         (++_nextKey).ToString();
 
     protected static ProtocolMessage[] ProtocolMessages() =>
@@ -588,14 +631,14 @@ public abstract class JsonTestsBase
     protected static ResolveInfo ResolveInfo() =>
         $"resolve{++_nextResolveInfo}";
 
-    protected static Int32 Index() =>
+    protected static Index Index() =>
         ++_nextIndex;
 
 
     protected static CommandId CommandId() =>
         (++_nextCommandId).ToString();
 
-    protected static long Sequence() =>
+    protected static EventSequenceNumber Sequence() =>
         _nextSequence++;
 
     protected static CommandSource[] Origin() =>

@@ -27,23 +27,23 @@ public record CommandSource(ParticipationId ParticipationId, CommandId CommandId
 
 public interface IDeltaEvent : IDeltaContent
 {
-    EventSequenceNumber SequenceNumber { get; }
+    public const EventSequenceNumber DefaultEventSequenceNumber = -1;
+    
+    EventSequenceNumber SequenceNumber { get; set; }
 
     CommandSource[]? OriginCommands { get; }
 }
 
 public abstract record DeltaEventBase(
-    EventSequenceNumber SequenceNumber,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaContentBase(ProtocolMessages), IDeltaEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaContentBase(ProtocolMessages), IDeltaEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
     public override string Id => string.Join("__", OriginCommands.Select(x => x.ToString()));
 
     /// <inheritdoc />
-    public virtual EventSequenceNumber SequenceNumber { get; init; } = SequenceNumber;
+    public virtual EventSequenceNumber SequenceNumber { get; set; } = IDeltaEvent.DefaultEventSequenceNumber;
 
     /// <inheritdoc />
     public virtual CommandSource[]? OriginCommands { get; init; } = OriginCommands;
@@ -62,7 +62,6 @@ public abstract record DeltaEventBase(
         }
 
         return base.Equals(other) &&
-               SequenceNumber == other.SequenceNumber &&
                OriginCommands.ArrayEquals(other.OriginCommands);
     }
 
@@ -71,7 +70,6 @@ public abstract record DeltaEventBase(
     {
         var hashCode = new HashCode();
         hashCode.Add(base.GetHashCode());
-        hashCode.Add(SequenceNumber);
         hashCode.ArrayHashCode(OriginCommands);
 
         return hashCode.ToHashCode();
@@ -103,17 +101,13 @@ public interface IPartitionDeltaEvent : IDeltaEvent;
 public record PartitionAdded(
     DeltaSerializationChunk NewPartition,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPartitionDeltaEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPartitionDeltaEvent;
 
 public record PartitionDeleted(
     TargetNode DeletedPartition,
     TargetNode[] DeletedDescendants,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPartitionDeltaEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPartitionDeltaEvent
 {
     /// <inheritdoc />
     public virtual bool Equals(PartitionDeleted? other)
@@ -174,9 +168,7 @@ public record ClassifierChanged(
     MetaPointer NewClassifier,
     MetaPointer OldClassifier,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), INodeEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), INodeEvent;
 
 #endregion
 
@@ -210,18 +202,14 @@ public record PropertyAdded(
     MetaPointer Property,
     PropertyValue NewValue,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPropertyEvent;
 
 public record PropertyDeleted(
     TargetNode Node,
     MetaPointer Property,
     PropertyValue OldValue,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPropertyEvent;
 
 public record PropertyChanged(
     TargetNode Node,
@@ -229,9 +217,7 @@ public record PropertyChanged(
     PropertyValue NewValue,
     PropertyValue OldValue,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IPropertyEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IPropertyEvent;
 
 #endregion
 
@@ -253,9 +239,7 @@ public record ChildAdded(
     MetaPointer Containment,
     Index Index,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent;
 
 public record ChildDeleted(
     TargetNode DeletedChild,
@@ -264,9 +248,7 @@ public record ChildDeleted(
     MetaPointer Containment,
     Index Index,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
     public virtual bool Equals(ChildDeleted? other)
@@ -344,9 +326,7 @@ public record ChildReplaced(
     MetaPointer Containment,
     Index Index,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
     public virtual bool Equals(ChildReplaced? other)
@@ -432,9 +412,7 @@ public record ChildMovedFromOtherContainment(
     MetaPointer OldContainment,
     Index OldIndex,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -453,9 +431,7 @@ public record ChildMovedFromOtherContainmentInSameParent(
     MetaPointer OldContainment,
     Index OldIndex,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -469,8 +445,7 @@ public record ChildMovedInSameContainment(
     MetaPointer Containment,
     Index OldIndex,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages),
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages),
     IContainmentEvent;
 
 public record ChildMovedAndReplacedFromOtherContainment(
@@ -484,9 +459,7 @@ public record ChildMovedAndReplacedFromOtherContainment(
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -598,9 +571,7 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParent(
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -705,9 +676,7 @@ public record ChildMovedAndReplacedInSameContainment(
     TargetNode ReplacedChild,
     TargetNode[] ReplacedDescendants,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IContainmentEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IContainmentEvent
 {
     /// <inheritdoc />
     public virtual bool Equals(ChildMovedAndReplacedInSameContainment? other)
@@ -806,9 +775,7 @@ public record AnnotationAdded(
     DeltaSerializationChunk NewAnnotation,
     Index Index,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent;
 
 public record AnnotationDeleted(
     TargetNode DeletedAnnotation,
@@ -816,9 +783,7 @@ public record AnnotationDeleted(
     TargetNode Parent,
     Index Index,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
     public virtual bool Equals(AnnotationDeleted? other)
@@ -888,9 +853,7 @@ public record AnnotationReplaced(
     TargetNode Parent,
     Index Index,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
     public virtual bool Equals(AnnotationReplaced? other)
@@ -962,9 +925,7 @@ public record AnnotationMovedFromOtherParent(
     TargetNode OldParent,
     Index OldIndex,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -977,9 +938,7 @@ public record AnnotationMovedInSameParent(
     TargetNode Parent,
     Index OldIndex,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent;
 
 public record AnnotationMovedAndReplacedFromOtherParent(
     TargetNode NewParent,
@@ -990,9 +949,7 @@ public record AnnotationMovedAndReplacedFromOtherParent(
     TargetNode ReplacedAnnotation,
     TargetNode[] ReplacedDescendants,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -1089,9 +1046,7 @@ public record AnnotationMovedAndReplacedInSameParent(
     TargetNode ReplacedAnnotation,
     TargetNode[] ReplacedDescendants,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IAnnotationEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IAnnotationEvent
 {
     /// <inheritdoc />
     public virtual bool Equals(AnnotationMovedAndReplacedInSameParent? other)
@@ -1189,9 +1144,7 @@ public record ReferenceAdded(
     TargetNode? NewTarget,
     ResolveInfo? NewResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceDeleted(
     TargetNode Parent,
@@ -1200,9 +1153,7 @@ public record ReferenceDeleted(
     TargetNode? DeletedTarget,
     ResolveInfo? DeletedResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceChanged(
     TargetNode Parent,
@@ -1213,9 +1164,7 @@ public record ReferenceChanged(
     TargetNode? OldTarget,
     ResolveInfo? OldResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record EntryMovedFromOtherReference(
     TargetNode NewParent,
@@ -1227,9 +1176,7 @@ public record EntryMovedFromOtherReference(
     TargetNode? Target,
     ResolveInfo? ResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -1249,9 +1196,7 @@ public record EntryMovedFromOtherReferenceInSameParent(
     TargetNode? Target,
     ResolveInfo? ResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -1266,9 +1211,7 @@ public record EntryMovedInSameReference(
     TargetNode? Target,
     ResolveInfo? ResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record EntryMovedAndReplacedFromOtherReference(
     TargetNode NewParent,
@@ -1282,9 +1225,7 @@ public record EntryMovedAndReplacedFromOtherReference(
     TargetNode? ReplacedTarget,
     ResolveInfo? ReplacedResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -1306,9 +1247,7 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParent(
     TargetNode? ReplacedTarget,
     ResolveInfo? ReplacedResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -1325,9 +1264,7 @@ public record EntryMovedAndReplacedInSameReference(
     TargetNode? ReplacedTarget,
     ResolveInfo? ReplacedResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceResolveInfoAdded(
     TargetNode Parent,
@@ -1336,9 +1273,7 @@ public record ReferenceResolveInfoAdded(
     ResolveInfo NewResolveInfo,
     TargetNode Target,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceResolveInfoDeleted(
     TargetNode Parent,
@@ -1347,9 +1282,7 @@ public record ReferenceResolveInfoDeleted(
     TargetNode Target,
     ResolveInfo DeletedResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceResolveInfoChanged(
     TargetNode Parent,
@@ -1359,9 +1292,7 @@ public record ReferenceResolveInfoChanged(
     TargetNode? Target,
     ResolveInfo ReplacedResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceTargetAdded(
     TargetNode Parent,
@@ -1370,9 +1301,7 @@ public record ReferenceTargetAdded(
     TargetNode NewTarget,
     ResolveInfo ResolveInfo,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceTargetDeleted(
     TargetNode Parent,
@@ -1381,9 +1310,7 @@ public record ReferenceTargetDeleted(
     ResolveInfo ResolveInfo,
     TargetNode DeletedTarget,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 public record ReferenceTargetChanged(
     TargetNode Parent,
@@ -1393,9 +1320,7 @@ public record ReferenceTargetChanged(
     ResolveInfo? ResolveInfo,
     TargetNode ReplacedTarget,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages), IReferenceEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
 #endregion
 
@@ -1404,11 +1329,9 @@ public record ReferenceTargetChanged(
 public record CompositeEvent : DeltaEventBase
 {
     public CompositeEvent(IDeltaEvent[] Parts,
-        EventSequenceNumber SequenceNumber,
-        ProtocolMessage[]? ProtocolMessages) : base(SequenceNumber, null, ProtocolMessages)
+        ProtocolMessage[]? ProtocolMessages) : base(null, ProtocolMessages)
     {
         this.Parts = Parts;
-        this.SequenceNumber = SequenceNumber;
     }
 
     /// <inheritdoc />
@@ -1419,7 +1342,7 @@ public record CompositeEvent : DeltaEventBase
 
     /// <inheritdoc />
     [JsonIgnore]
-    public override EventSequenceNumber SequenceNumber { get; init; }
+    public override EventSequenceNumber SequenceNumber { get; set; } = IDeltaEvent.DefaultEventSequenceNumber;
 
     /// <inheritdoc />
     [JsonIgnore]
@@ -1481,16 +1404,12 @@ public record CompositeEvent : DeltaEventBase
 
 public record NoOpEvent(
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages);
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages);
 
 public record Error(
     ErrorCode ErrorCode,
     string Message,
     CommandSource[]? OriginCommands,
-    EventSequenceNumber SequenceNumber,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaEventBase(SequenceNumber, OriginCommands, ProtocolMessages);
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages);
 
 #endregion

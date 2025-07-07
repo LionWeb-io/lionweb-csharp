@@ -21,22 +21,35 @@ using Core;
 using Core.M1;
 using Core.M1.Event;
 using Core.M3;
+using Core.Utilities;
 using Message;
 using Message.Command;
 using Message.Event;
 using Message.Query;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 
 public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
 
-public interface IEventClientConnector : IClientConnector<IEvent> 
+public interface IEventClientConnector : IClientConnector<IEvent>
 {
     IEvent IClientConnector<IEvent>.Convert(IEvent internalEvent) => internalEvent;
 }
 
 public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
-    protected DeltaProtocolPartitionEventReceiver _eventReceiver;
+    private readonly DeltaProtocolPartitionEventReceiver _eventReceiver;
+    
+    private readonly ConcurrentDictionary<EventSequenceNumber, IDeltaEvent> _unprocessedEvents = [];
+    private readonly ConcurrentDictionary<CommandId, bool> _ownCommands = [];
+
+    #region EventSequenceNumber
+
+    private EventSequenceNumber _nextEventSequenceNumber = 0;
+    private void IncrementEventSequenceNumber() => Interlocked.Increment(ref _nextEventSequenceNumber);
+    private EventSequenceNumber EventSequenceNumber => Interlocked.Read(ref _nextEventSequenceNumber);
+
+    #endregion
 
     public LionWebClient(LionWebVersions lionWebVersion,
         List<Language> languages,
@@ -49,9 +62,9 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                 .WithLanguages(languages)
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
-        
+
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
-        
+
         _eventReceiver = new DeltaProtocolPartitionEventReceiver(
             PartitionEventHandler,
             SharedNodeMap,
@@ -61,50 +74,41 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     }
 
     /// <inheritdoc />
-    public override async Task Send(IDeltaContent deltaContent)
+    public override async Task SignOn() =>
+        await Send(new SignOnRequest(_lionWebVersion.VersionString, IdUtils.NewId(), null));
+
+    /// <inheritdoc />
+    public override async Task SignOff() =>
+        await Send(new SignOffRequest(IdUtils.NewId(), null));
+
+    /// <inheritdoc />
+    protected override async Task Send(IDeltaContent deltaContent)
     {
         if (deltaContent.RequiresParticipationId)
-            deltaContent.InternalParticipationId = _participationId;
+            deltaContent.InternalParticipationId = ParticipationId;
 
         if (deltaContent is IDeltaCommand { CommandId: { } commandId })
-            _ownCommands.TryAdd(commandId, 1);
+            _ownCommands.TryAdd(commandId, true);
 
         Debug.WriteLine($"{_name}: sending: {deltaContent.GetType()}");
         await _connector.Send(deltaContent);
     }
 
     /// <inheritdoc />
-    public override void Receive(IDeltaContent content)
+    protected override void Receive(IDeltaContent content)
     {
         try
         {
-            Interlocked.Increment(ref _messageCount);
             switch (content)
             {
                 case IDeltaEvent deltaEvent:
-                    CommandSource? commandSource = null;
-                    if (deltaEvent is IDeltaEvent singleDeltaEvent)
-                    {
-                        commandSource = singleDeltaEvent.OriginCommands.FirstOrDefault();
-                        if (singleDeltaEvent.OriginCommands.All(cmd =>
-                                _participationId == cmd.ParticipationId &&
-                                _ownCommands.TryRemove(cmd.CommandId, out _)))
-                        {
-                            Debug.WriteLine(
-                                $"{_name}: ignoring own event: {deltaEvent.GetType()}({commandSource},{deltaEvent.SequenceNumber})");
-                            return;
-                        }
-                    }
+                    ReceiveEvent(deltaEvent);
 
-                    Debug.WriteLine(
-                        $"{_name}: received event: {deltaEvent.GetType()}({commandSource},{deltaEvent.SequenceNumber})");
-                    deltaEvent.InternalParticipationId = commandSource?.ParticipationId;
-                    _eventReceiver.Receive(deltaEvent);
                     break;
 
                 case SignOnResponse signOnResponse:
                     Debug.WriteLine($"{_name}: received {nameof(SignOnResponse)}: {signOnResponse})");
-                    _participationId = signOnResponse.ParticipationId;
+                    ParticipationId = signOnResponse.ParticipationId;
                     break;
 
                 default:
@@ -112,11 +116,51 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                         $"{_name}: ignoring received: {content.GetType()}({content.InternalParticipationId})");
                     break;
             }
-        }
-        catch (Exception e)
+        } catch (Exception e)
         {
             Debug.WriteLine(e);
         }
+    }
+
+    private void ReceiveEvent(IDeltaEvent deltaEvent)
+    {
+        CommandSource? commandSource = deltaEvent.OriginCommands.FirstOrDefault();
+
+        Debug.WriteLine(
+            $"{_name}: received event: {deltaEvent.GetType()}({commandSource},{deltaEvent.SequenceNumber})");
+
+        deltaEvent.InternalParticipationId = commandSource?.ParticipationId;
+
+        if (EventSequenceNumber == deltaEvent.SequenceNumber)
+        {
+            ProcessEvent(deltaEvent);
+        } else
+        {
+            _unprocessedEvents[deltaEvent.SequenceNumber] = deltaEvent;
+        }
+
+        while (_unprocessedEvents.TryRemove(EventSequenceNumber, out var nextEvent))
+        {
+            ProcessEvent(nextEvent);
+        }
+    }
+
+    private void ProcessEvent(IDeltaEvent deltaEvent)
+    {
+        IncrementEventSequenceNumber();
+
+        var originCommands = deltaEvent.OriginCommands ?? [];
+        var commandSource = originCommands.FirstOrDefault();
+        if (originCommands.All(cmd =>
+                ParticipationId == cmd.ParticipationId &&
+                _ownCommands.TryRemove(cmd.CommandId, out _)))
+        {
+            Debug.WriteLine(
+                $"{_name}: ignoring own event: {deltaEvent.GetType()}({commandSource},{deltaEvent.SequenceNumber})");
+            return;
+        }
+
+        _eventReceiver.Receive(deltaEvent);
     }
 }
 
@@ -130,6 +174,13 @@ public class LionWebTestClient(
 {
     private const int SleepInterval = 100;
 
+    #region MessageCount
+
+    private long _messageCount;
+
+    public long MessageCount => Interlocked.Read(ref _messageCount);
+    private void IncrementMessageCount() => Interlocked.Increment(ref _messageCount);
+
     private void WaitForCount(long count)
     {
         while (MessageCount < count)
@@ -140,10 +191,21 @@ public class LionWebTestClient(
 
     public void WaitForReplies(int delta) =>
         WaitForCount(MessageCount + delta);
+
+    #endregion
+
+    /// <inheritdoc />
+    protected override void Receive(IDeltaContent content)
+    {
+        IncrementMessageCount();
+        base.Receive(content);
+    }
 }
 
 public class CommandIdProvider : ICommandIdProvider
 {
     private int nextId = 0;
+
+    /// <inheritdoc />
     public string Create() => (++nextId).ToString();
 }

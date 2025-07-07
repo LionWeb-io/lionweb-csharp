@@ -20,24 +20,27 @@ namespace LionWeb.Protocol.Delta.Client;
 using Core;
 using Core.M1.Event.Partition;
 using Core.M3;
-using System.Collections.Concurrent;
 
 public abstract class LionWebClientBase<T>
 {
+    protected readonly LionWebVersions _lionWebVersion;
     protected readonly string _name;
     protected readonly IClientConnector<T> _connector;
-    protected readonly ConcurrentDictionary<String, int> _ownCommands = [];
     protected readonly Dictionary<string, IReadableNode> SharedNodeMap;
     protected readonly PartitionEventHandler PartitionEventHandler;
 
-    protected ParticipationId? _participationId;
-    protected long _messageCount;
+    private ParticipationId? _participationId;
 
-    public long MessageCount => Interlocked.Read(ref _messageCount);
+    protected internal ParticipationId ParticipationId
+    {
+        get => _participationId ?? throw new InvalidOperationException($"{nameof(ParticipationId)} not set");
+        set => _participationId = value;
+    }
 
     public LionWebClientBase(LionWebVersions lionWebVersion, List<Language> languages, string name,
         IPartitionInstance partition, IClientConnector<T> connector)
     {
+        _lionWebVersion = lionWebVersion;
         _name = name;
         _connector = connector;
 
@@ -51,6 +54,12 @@ public abstract class LionWebClientBase<T>
         connector.Receive += (_, content) => Receive(content);
     }
 
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>
+    public abstract Task SignOn();
+    
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOffRequest"/>
+    public abstract Task SignOff();
+
     private void SendPartitionEventToRepository(object? sender, IPartitionEvent? partitionEvent)
     {
         if (partitionEvent == null)
@@ -61,6 +70,7 @@ public abstract class LionWebClientBase<T>
         Send(converted);
     }
 
-    public abstract Task Send(T deltaContent);
-    public abstract void Receive(T deltaContent);
+    protected abstract Task Send(T deltaContent);
+
+    protected abstract void Receive(T deltaContent);
 }

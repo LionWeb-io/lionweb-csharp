@@ -24,7 +24,7 @@ public interface IRepositoryConnector<T>
     Task Send(IClientInfo clientInfo, T content);
     Task SendAll(T content);
     event EventHandler<IMessageContext<T>> Receive;
-    T Convert(IEvent @event);
+    T Convert(IEvent internalEvent);
 }
 
 public interface IMessageContext<T>
@@ -36,4 +36,6 @@ public interface IMessageContext<T>
 public interface IClientInfo
 {
     ParticipationId ParticipationId { get; }
+    
+    EventSequenceNumber GetAndIncrementSequenceNumber();
 }
