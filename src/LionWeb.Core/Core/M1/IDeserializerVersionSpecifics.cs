@@ -24,7 +24,7 @@ using VersionSpecific.V2024_1_Compatible;
 using VersionSpecific.V2024_1;
 
 /// Externalized logic of <see cref="IDeserializer"/>, specific to one version of LionWeb standard.
-internal interface IDeserializerVersionSpecifics : IVersionSpecifics
+public interface IDeserializerVersionSpecifics : IVersionSpecifics
 {
     /// <summary>
     /// Creates an instance of <see cref="IDeserializerVersionSpecifics"/> that implements <paramref name="lionWebVersion"/>.

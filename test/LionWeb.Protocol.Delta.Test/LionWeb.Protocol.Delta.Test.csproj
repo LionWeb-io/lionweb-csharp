@@ -1,13 +1,14 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <RootNamespace>LionWeb.Core.Test</RootNamespace>
+        <RootNamespace>LionWeb.Protocol.Delta.Test</RootNamespace>
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
         <NoWarn>1591</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="JsonSchema.Net" />
         <PackageReference Include="Microsoft.NET.Test.Sdk"/>
         <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
         <PackageReference Include="MSTest.TestAdapter"/>
@@ -16,18 +17,15 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Languages/defChunks/*.json" />
-        <Content Include="Languages/defChunks/**">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
+      <ProjectReference Include="..\..\src\LionWeb.Protocol.Delta\LionWeb.Protocol.Delta.csproj" />
+      <ProjectReference Include="..\LionWeb.Core.Test\LionWeb.Core.Test.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
         <EmbeddedResource Include="resources/*.json" />
         <Content Include="resources/*.json">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
-    </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
     </ItemGroup>
 
 </Project>

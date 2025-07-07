@@ -72,7 +72,7 @@ public interface IDeserializer
     /// Version of LionWeb standard to use.
     public LionWebVersions LionWebVersion { get; }
     
-    internal IDeserializerVersionSpecifics VersionSpecifics { get; }
+    public IDeserializerVersionSpecifics VersionSpecifics { get; }
 }
 
 /// <inheritdoc />

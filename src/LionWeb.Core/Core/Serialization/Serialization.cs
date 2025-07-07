@@ -18,7 +18,6 @@
 // ReSharper disable CoVariantArrayConversion
 namespace LionWeb.Core.Serialization;
 
-using Delta;
 using System.Text;
 
 /// <summary>

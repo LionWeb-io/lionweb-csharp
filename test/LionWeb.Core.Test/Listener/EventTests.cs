@@ -17,16 +17,10 @@
 
 namespace LionWeb.Core.Test.Listener;
 
-using Core.Serialization;
-using Core.Serialization.Delta;
-using Core.Serialization.Delta.Command;
-using Core.Serialization.Delta.Event;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1;
 using M1.Event;
 using M1.Event.Partition;
-using M3;
 using Comparer = Core.Utilities.Comparer;
 
 public abstract class EventTestsBase
@@ -678,96 +672,4 @@ public class EventsTest : EventTestsBase
 
         return clone;
     }
-}
-
-[TestClass]
-public class EventsTestSerialized : EventTestsBase
-{
-    protected override Geometry CreateReplicator(Geometry node)
-    {
-        var clone = Clone(node);
-
-        var lionWebVersion = LionWebVersions.v2024_1;
-        List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
-
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaCommandToDeltaEventMapper.BuildSharedKeyMap(languages);
-
-        Dictionary<NodeId, IReadableNode> sharedNodeMap = [];
-
-        var partitionEventHandler = new PartitionEventHandler(null);
-
-        var deserializerBuilder = new DeserializerBuilder()
-                .WithLionWebVersion(lionWebVersion)
-                .WithLanguages(languages)
-            ;
-
-        var eventReceiver = new DeltaProtocolPartitionEventReceiver(
-            partitionEventHandler,
-            sharedNodeMap,
-            sharedKeyedMap,
-            deserializerBuilder
-        );
-
-        var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, partitionEvent) =>
-        {
-            var deltaCommand = new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionEvent);
-            eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
-        });
-
-        var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
-        replicator.ReplicateFrom(partitionEventHandler);
-        return clone;
-    }
-}
-
-[TestClass]
-public class EventsTestJson : EventTestsBase
-{
-    protected override Geometry CreateReplicator(Geometry node)
-    {
-        var clone = Clone(node);
-
-        var lionWebVersion = LionWebVersions.v2024_1;
-        List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
-
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaCommandToDeltaEventMapper.BuildSharedKeyMap(languages);
-
-        Dictionary<NodeId, IReadableNode> sharedNodeMap = [];
-
-        var partitionEventHandler = new PartitionEventHandler(null);
-
-        var deserializerBuilder = new DeserializerBuilder()
-                .WithLionWebVersion(lionWebVersion)
-                .WithLanguages(languages)
-            ;
-
-        var eventReceiver = new DeltaProtocolPartitionEventReceiver(
-            partitionEventHandler,
-            sharedNodeMap,
-            sharedKeyedMap,
-            deserializerBuilder
-        );
-
-        var deltaSerializer = new DeltaSerializer();
-
-        var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, partitionEvent) =>
-        {
-            var command = new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionEvent);
-            var json = deltaSerializer.Serialize(command);
-            var deserialized = deltaSerializer.Deserialize<IDeltaCommand>(json);
-            eventReceiver.Receive(commandToEventMapper.Map(deserialized));
-        });
-
-        var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
-        replicator.ReplicateFrom(partitionEventHandler);
-        return clone;
-    }
-}
-
-public class CommandIdProvider : ICommandIdProvider
-{
-    private int nextId = 0;
-    public string Create() => (++nextId).ToString();
 }
