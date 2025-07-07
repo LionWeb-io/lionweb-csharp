@@ -133,6 +133,7 @@ public class LionWebTestRepository(
     {
         while (MessageCount < count)
         {
+            Debug.WriteLine($"{_name}: {nameof(MessageCount)}: {MessageCount} vs. {nameof(count)}: {count}");
             Thread.Sleep(SleepInterval);
         }
     }

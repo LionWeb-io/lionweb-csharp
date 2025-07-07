@@ -32,7 +32,13 @@ public abstract class ContainmentMultipleEventEmitterBase<T> : ContainmentEventE
     protected ContainmentMultipleEventEmitterBase(Containment containment, NodeBase destinationParent, List<T>? newValues) :
         base(containment, destinationParent)
     {
-        NewValues = newValues?.ToDictionary<T, T, OldContainmentInfo?>(k => k, _ => null) ?? [];
+        try
+        {
+            NewValues = newValues?.ToDictionary<T, T, OldContainmentInfo?>(k => k, _ => null) ?? [];
+        } catch (ArgumentException e)
+        {
+            throw new ArgumentException(string.Join(",",newValues?.Select(n => n.GetId()) ?? []), e);
+        }
     }
 
     /// <inheritdoc />

@@ -74,12 +74,29 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     }
 
     /// <inheritdoc />
-    public override async Task SignOn() =>
-        await Send(new SignOnRequest(_lionWebVersion.VersionString, IdUtils.NewId(), null));
+    public override async Task<SignOnResponse> SignOn()
+    {
+        var signOnResponse = await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString,
+            IdUtils.NewId(), null));
+        ParticipationId = signOnResponse.ParticipationId;
+        return signOnResponse;
+    }
 
     /// <inheritdoc />
-    public override async Task SignOff() =>
-        await Send(new SignOffRequest(IdUtils.NewId(), null));
+    public override async Task<SignOffResponse> SignOff() =>
+        await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(IdUtils.NewId(), null));
+
+
+    private readonly ConcurrentDictionary<QueryId, TaskCompletionSource<IDeltaQueryResponse>> _queryResponses = [];
+    
+    private async Task<TResponse> Query<TResponse, TRequest>(TRequest request) where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest 
+    {
+        var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
+        _queryResponses[request.QueryId] = tcs;
+        await Send(request);
+        var response = await tcs.Task;
+        return response as TResponse ?? throw new ArgumentException(response.GetType().Name);
+    }
 
     /// <inheritdoc />
     protected override async Task Send(IDeltaContent deltaContent)
@@ -106,9 +123,15 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
                     break;
 
-                case SignOnResponse signOnResponse:
-                    Debug.WriteLine($"{_name}: received {nameof(SignOnResponse)}: {signOnResponse})");
-                    ParticipationId = signOnResponse.ParticipationId;
+                case IDeltaQueryResponse response:
+                    Debug.WriteLine($"{_name}: received response: {response})");
+                    if (_queryResponses.TryRemove(response.QueryId, out var tcs))
+                    {
+                        // Debug.WriteLine($"{_name}: trying to set result");
+                        var x = tcs.TrySetResult(response);
+                        // Debug.WriteLine($"{_name}: tried to set result: {x}");
+                    }
+
                     break;
 
                 default:
@@ -124,10 +147,10 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
     private void ReceiveEvent(IDeltaEvent deltaEvent)
     {
-        CommandSource? commandSource = deltaEvent.OriginCommands.FirstOrDefault();
-
         Debug.WriteLine(
-            $"{_name}: received event: {deltaEvent.GetType()}({commandSource},{deltaEvent.SequenceNumber})");
+            $"{_name}: received event: {deltaEvent.GetType()}({deltaEvent.OriginCommands},{deltaEvent.SequenceNumber})");
+
+        CommandSource? commandSource = deltaEvent.OriginCommands.FirstOrDefault();
 
         deltaEvent.InternalParticipationId = commandSource?.ParticipationId;
 
@@ -160,7 +183,10 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             return;
         }
 
-        _eventReceiver.Receive(deltaEvent);
+        lock (_eventReceiver)
+        {
+            _eventReceiver.Receive(deltaEvent);
+        }
     }
 }
 

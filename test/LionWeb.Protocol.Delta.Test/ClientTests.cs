@@ -46,7 +46,7 @@ public class ClientTests
         List<Language> languages = [ShapesLanguage.Instance];
 
         _repositoryConnector = new DeltaRepositoryConnector(lionWebVersion);
-        _clientInfo = new ClientInfo { ParticipationId = "client" };
+        _clientInfo = new ClientInfo { ParticipationId = "clientParticipation" };
         _clientConnector = new(lionWebVersion,
             content => _repositoryConnector.ReceiveFromClient(new DeltaMessageContext(_clientInfo, content)));
         _repositoryConnector.Sender = content => _clientConnector.ReceiveFromRepository(content);
@@ -66,6 +66,14 @@ public class ClientTests
         _clientPartition.Documentation = new Documentation("doc");
 
         AssertEquals(_clientPartition, _repositoryPartition);
+    }
+
+    [TestMethod]
+    public async Task SignOn()
+    {
+        var signOnResponse = await _client.SignOn();
+        
+        Assert.AreEqual("clientParticipation", signOnResponse.ParticipationId);
     }
 
     [TestMethod]

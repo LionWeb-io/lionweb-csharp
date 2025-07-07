@@ -336,7 +336,7 @@ public class DeltaEventToPartitionEventMapper
             return w;
 
         // TODO change to correct exception 
-        throw new NotImplementedException();
+        throw new NotImplementedException(nodeId);
     }
 
     private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
