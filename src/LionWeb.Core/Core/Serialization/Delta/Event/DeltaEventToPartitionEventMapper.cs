@@ -15,10 +15,8 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Serialization;
+namespace LionWeb.Core.Serialization.Delta.Event;
 
-using Delta;
-using Delta.Event;
 using M1;
 using M1.Event;
 using M1.Event.Partition;

@@ -16,8 +16,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable CoVariantArrayConversion
+
 namespace LionWeb.Core.Serialization.Delta.Command;
 
+using M3;
 using System.Text;
 using System.Text.Json.Serialization;
 using TargetNode = NodeId;
@@ -170,6 +172,16 @@ public record AddChild(
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
 ) : DeltaCommandBase(CommandId, ProtocolMessages), IContainmentCommand;
+
+public record NodeAddChild(
+    TargetNode Parent,
+    DeltaSerializationChunk NewChild,
+    IReadableNode NewChildNode,
+    MetaPointer Containment,
+    Containment ContainmentNode,
+    Index Index,
+    CommandId CommandId,
+    ProtocolMessage[]? ProtocolMessages) : AddChild(Parent, NewChild, Containment, Index, CommandId, ProtocolMessages);
 
 public record DeleteChild(
     TargetNode Parent,
