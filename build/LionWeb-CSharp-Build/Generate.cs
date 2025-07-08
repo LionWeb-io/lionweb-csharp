@@ -48,6 +48,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     // var specificLanguage = DeserializeExternalLanguage(lionWebVersion, "MpsSpecific-metamodel-annotated").First();
     var deprecatedLang = DeserializeExternalLanguage(lionWebVersion, "deprecated", specificLanguage).First();
     deprecatedLang.Name = "Deprecated";
+    var testLanguage = DeserializeExternalLanguage(lionWebVersion, "testLanguage", specificLanguage).First();
     var shapesLanguage = ShapesDefinition.Language;
     shapesLanguage.Name = "Shapes";
     var aLang = testLanguagesDefinitions.ALang;
@@ -75,6 +76,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(multiInheritLang, $"{prefix}.MultiInheritLang"),
         new(namedLang, $"{prefix}.NamedLang"),
         new(namedLangReadInterfaces, $"{prefix}.NamedLangReadInterfaces"),
+        new(testLanguage, $"{prefix}.TestLanguage"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
         // new(specificLanguage, $"Io.Lionweb.Mps.Specific.{lionWebVersionNamespace}")
