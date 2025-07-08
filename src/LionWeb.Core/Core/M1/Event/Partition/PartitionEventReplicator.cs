@@ -68,9 +68,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             case ChildMovedInSameContainmentEvent a:
                 OnRemoteChildMovedInSameContainment(sender, a);
                 break;
-            case ChildMovedAndReplacedFromOtherContainmentEvent a:
-                OnRemoteChildMovedAndReplacedFromOtherContainment(sender, a);
-                break;
             case AnnotationAddedEvent a:
                 OnRemoteAnnotationAdded(sender, a);
                 break;
@@ -253,16 +250,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
             localNewParent.Set(childMovedEvent.NewContainment, newValue);
         });
-
-    private void OnRemoteChildMovedAndReplacedFromOtherContainment(object? sender,
-        ChildMovedAndReplacedFromOtherContainmentEvent childMovedAndReplacedEvent) => SuppressEventForwarding(childMovedAndReplacedEvent, () =>
-    {
-        var localNewParent = Lookup(childMovedAndReplacedEvent.NewParent.GetId());
-        var nodeToInsert = LookupOpt(childMovedAndReplacedEvent.MovedChild.GetId()) ?? Clone((INode)childMovedAndReplacedEvent.MovedChild);
-        var newValue = InsertContainment(localNewParent, childMovedAndReplacedEvent.NewContainment, childMovedAndReplacedEvent.NewIndex, nodeToInsert);
-        
-        localNewParent.Set(childMovedAndReplacedEvent.NewContainment, newValue);
-    });
 
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(object? sender,
         ChildMovedFromOtherContainmentInSameParentEvent childMovedEvent) =>

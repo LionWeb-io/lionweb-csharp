@@ -56,7 +56,6 @@ public class DeltaCommandToPartitionEventMapper
             MoveChildFromOtherContainment a => OnMoveChildFromOtherContainment(a),
             MoveChildFromOtherContainmentInSameParent a => OnMoveChildFromOtherContainmentInSameParent(a),
             MoveChildInSameContainment a => OnMoveChildInSameContainment(a),
-            MoveAndReplaceChildFromOtherContainment a => OnMoveAndReplaceChildFromOtherContainment(a),
             AddAnnotation a => OnAddAnnotation(a),
             DeleteAnnotation a => OnDeleteAnnotation(a),
             MoveAnnotationFromOtherParent a => OnMoveAnnotationFromOtherParent(a),
@@ -173,30 +172,6 @@ public class DeltaCommandToPartitionEventMapper
             oldContainment,
             0, // TODO FIXME
             ToEventId(moveChildEvent)
-        );
-    }
-    
-    private ChildMovedAndReplacedFromOtherContainmentEvent OnMoveAndReplaceChildFromOtherContainment(MoveAndReplaceChildFromOtherContainment moveAndReplaceChildEvent)
-    {
-        var movedChild = ToNode(moveAndReplaceChildEvent.MovedChild);
-        var oldParent = (IWritableNode)movedChild.GetParent();
-        var oldContainment = oldParent.GetContainmentOf(movedChild);
-
-        var newParent = ToNode(moveAndReplaceChildEvent.NewParent);
-        var newContainment = ToContainment(moveAndReplaceChildEvent.NewContainment, newParent);
-        
-        var replacedChild = ToNode(moveAndReplaceChildEvent.ReplacedChild);
-
-        return new ChildMovedAndReplacedFromOtherContainmentEvent(
-            newParent, 
-            newContainment, 
-            moveAndReplaceChildEvent.NewIndex,
-            movedChild,
-            oldParent,
-            oldContainment,
-            0,
-            replacedChild,
-            ToEventId(moveAndReplaceChildEvent)
         );
     }
 
