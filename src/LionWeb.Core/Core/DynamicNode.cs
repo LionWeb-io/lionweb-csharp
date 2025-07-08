@@ -34,7 +34,7 @@ public class DynamicNode : NodeBase
     /// <param name="id"><c>this</c> node's <see cref="IReadableNode.GetId">id</see>.</param>
     /// <param name="classifier"><c>this</c> node's <see cref="IReadableNode.GetClassifier()">classifier</see>.</param>
     /// <exception cref="InvalidIdException">If <paramref name="id"/> is not a <see cref="IReadableNode.GetId">valid identifier</see>.</exception>
-    public DynamicNode(string id, Classifier classifier) : base(id)
+    public DynamicNode(NodeId id, Classifier classifier) : base(id)
     {
         _classifier = classifier;
     }
@@ -232,7 +232,7 @@ public class DynamicNode : NodeBase
 public class DynamicAnnotationInstance : DynamicNode, IAnnotationInstance<INode>
 {
     /// <inheritdoc />
-    public DynamicAnnotationInstance(string id, Annotation annotation) : base(id, annotation) { }
+    public DynamicAnnotationInstance(NodeId id, Annotation annotation) : base(id, annotation) { }
 
     /// <inheritdoc cref="IAnnotationInstance.GetAnnotation" />
     public Annotation GetAnnotation() => (Annotation)base.GetClassifier();
@@ -243,7 +243,7 @@ public class DynamicAnnotationInstance : DynamicNode, IAnnotationInstance<INode>
 public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 {
     /// <inheritdoc />
-    public DynamicConceptInstance(string id, Concept concept) : base(id, concept) { }
+    public DynamicConceptInstance(NodeId id, Concept concept) : base(id, concept) { }
 
     /// <inheritdoc cref="IConceptInstance.GetConcept()" />
     public Concept GetConcept() => (Concept)base.GetClassifier();

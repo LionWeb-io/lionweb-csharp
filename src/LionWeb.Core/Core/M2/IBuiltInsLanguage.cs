@@ -27,7 +27,7 @@ using System.Diagnostics.CodeAnalysis;
 public interface IBuiltInsLanguage : Language
 {
     /// Key of all LionWeb BuiltIns language implementations.
-    public const string LanguageKey = "LionCore-builtins";
+    public const MetaPointerKey LanguageKey = "LionCore-builtins";
 
     /// Name of all LionWeb BuiltIns language implementations.
     protected const string LanguageName = "LionCore_builtins";

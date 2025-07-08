@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
-using CompressedReference = (CompressedMetaPointer, List<(ICompressedId?, string?)>);
+using CompressedReference = (CompressedMetaPointer, List<(ICompressedId?, ResolveInfo?)>);
 
 /// <summary>
 /// Converts <see cref="SerializedNode">SerializedNodes</see> into <see cref="IReadableNode">IReadableNodes</see>.

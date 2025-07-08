@@ -69,7 +69,7 @@ public class LenientNode : NodeBase, INode
     /// <param name="id"><c>this</c> node's <see cref="IReadableNode.GetId">id</see>.</param>
     /// <param name="classifier"><c>this</c> node's <see cref="IReadableNode.GetClassifier()">classifier</see>.</param>
     /// <exception cref="InvalidIdException">If <paramref name="id"/> is not a <see cref="IReadableNode.GetId">valid identifier</see>.</exception>
-    public LenientNode(string id, Classifier? classifier) : base(id)
+    public LenientNode(NodeId id, Classifier? classifier) : base(id)
     {
         _classifier = classifier;
     }
@@ -280,7 +280,7 @@ public class LenientNode : NodeBase, INode
                     RemoveFeature(key);
                     return true;
                 case IList list:
-                    int index = list.IndexOf(child);
+                    Index index = list.IndexOf(child);
                     if (index == -1)
                         return false;
 
@@ -311,7 +311,7 @@ public class LenientNode : NodeBase, INode
     }
 
     /// <inheritdoc />
-    public override void InsertAnnotations(int index, IEnumerable<INode> annotations)
+    public override void InsertAnnotations(Index index, IEnumerable<INode> annotations)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();

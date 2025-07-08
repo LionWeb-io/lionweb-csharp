@@ -52,14 +52,14 @@ using System.Security.Cryptography;
 public class Hasher
 {
     private readonly IList<IReadableNode> _nodes;
-    private readonly Func<IReadableNode, Feature, object?, string?> _datatypeConverter;
+    private readonly Func<IReadableNode, Feature, object?, PropertyValue?> _datatypeConverter;
 
     /// We need to treat internal and external references differently.
     /// However, we might encounter a node first as reference target, and only later as actual node
     /// (turning it into an internal reference).
     /// Thus, we hash the index in this lookup table for each reference (<see cref="LookupReferenceIndex"/>).
     /// At the end, we attach all external node ids in order of their index.
-    private readonly Dictionary<string, ReferenceIndex> _referenceIndices = [];
+    private readonly Dictionary<NodeId, ReferenceIndex> _referenceIndices = [];
 
     private int _nextReferenceIndex = 0;
 

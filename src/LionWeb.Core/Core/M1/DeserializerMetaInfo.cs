@@ -55,7 +55,7 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
         }
     }
 
-    internal INode? Instantiate(string id, MetaPointer metaPointer)
+    internal INode? Instantiate(NodeId id, MetaPointer metaPointer)
     {
         var compressedMetaPointer = Compress(metaPointer);
         if (!LookupClassifier(compressedMetaPointer, out var classifier))
@@ -123,7 +123,7 @@ public class DeserializerMetaInfo(IDeserializerHandler handler)
         return true;
     }
 
-    internal ICompressedId Compress(string id) =>
+    internal ICompressedId Compress(NodeId id) =>
         ICompressedId.Create(id, CompressedIdConfig);
 
     private CompressedMetaPointer Compress(MetaPointer metaPointer) =>

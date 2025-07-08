@@ -15,22 +15,9 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1;
-
-using M3;
-
-/// Delegates all calls to <paramref name="delegateHandler"/>.
-public class SerializerDelegatingHandler(ISerializerHandler delegateHandler) : ISerializerHandler
-{
-    /// <inheritdoc />
-    public virtual Language? DuplicateUsedLanguage(Language a, Language b) =>
-        delegateHandler.DuplicateUsedLanguage(a, b);
-
-    /// <inheritdoc />
-    public virtual void DuplicateNodeId(IReadableNode n) =>
-        delegateHandler.DuplicateNodeId(n);
-
-    /// <inheritdoc />
-    public virtual PropertyValue? UnknownDatatype(IReadableNode node, Feature property, object? value) =>
-        delegateHandler.UnknownDatatype(node, property, value);
-}
+global using NodeId = string;
+global using PropertyValue = string;
+global using ResolveInfo = string;
+global using MetaPointerKey = string;
+global using Index = int;
+global using EventId = string;

@@ -32,6 +32,6 @@ public class SerializerExceptionHandler : ISerializerHandler
             $"different languages with same key '{a?.Key ?? b?.Key}' / version '{a?.Version ?? b?.Version}': {a}, {b}");
 
     /// <inheritdoc />
-    public string? UnknownDatatype(IReadableNode node, Feature property, object? value) =>
+    public PropertyValue? UnknownDatatype(IReadableNode node, Feature property, object? value) =>
         throw new SerializerException($"unsupported property: {property}");
 }

@@ -79,7 +79,7 @@ public sealed class BuiltInsLanguage_2024_1 : LanguageBase<BuiltInsFactory_2024_
     public override string Name => IBuiltInsLanguage.LanguageName;
 
     /// <inheritdoc />
-    public override string Key => IBuiltInsLanguage.LanguageKey;
+    public override MetaPointerKey Key => IBuiltInsLanguage.LanguageKey;
 
     /// <inheritdoc />
     public override string Version => LionWebVersion.VersionString;
@@ -145,7 +145,7 @@ public sealed class BuiltInsFactory_2024_1 : INodeFactory
     }
 
     /// <inheritdoc />
-    public INode CreateNode(string id, Classifier classifier) =>
+    public INode CreateNode(NodeId id, Classifier classifier) =>
         throw new UnsupportedClassifierException(classifier);
 
     /// <inheritdoc />

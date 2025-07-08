@@ -27,7 +27,7 @@ public class DeserializerDelegatingHandler(IDeserializerHandler delegateHandler)
         delegateHandler.UnknownClassifier(classifier, id);
 
     /// <inheritdoc />
-    public virtual string? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
+    public virtual NodeId? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
         delegateHandler.DuplicateNodeId(nodeId, existingNode, node);
 
     /// <inheritdoc />
@@ -59,20 +59,20 @@ public class DeserializerDelegatingHandler(IDeserializerHandler delegateHandler)
         => delegateHandler.DuplicateContainment(containedNode, newParent, existingParent);
 
     /// <inheritdoc />
-    public virtual Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration, Feature property, IReadableNode node) =>
+    public virtual Enum? UnknownEnumerationLiteral(MetaPointerKey key, Enumeration enumeration, Feature property, IReadableNode node) =>
         delegateHandler.UnknownEnumerationLiteral(key, enumeration, property, node);
 
     /// <inheritdoc />
     public virtual Field?
-        UnknownField(string key, StructuredDataType structuredDataType, Feature property, IReadableNode node) =>
+        UnknownField(MetaPointerKey key, StructuredDataType structuredDataType, Feature property, IReadableNode node) =>
         delegateHandler.UnknownField(key, structuredDataType, property, node);
 
     /// <inheritdoc />
-    public virtual object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property, IReadableNode node) =>
+    public virtual object? UnknownDatatype(PropertyValue? value, LanguageEntity datatype, Feature property, IReadableNode node) =>
         delegateHandler.UnknownDatatype(value, datatype, property, node);
 
     /// <inheritdoc />
-    public virtual object? InvalidPropertyValue<TValue>(string? value, Feature property, ICompressedId nodeId) =>
+    public virtual object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, ICompressedId nodeId) =>
         delegateHandler.InvalidPropertyValue<TValue>(value, property, nodeId);
 
     /// <inheritdoc />
@@ -80,7 +80,7 @@ public class DeserializerDelegatingHandler(IDeserializerHandler delegateHandler)
         delegateHandler.UnresolvableChild(childId, containment, node);
 
     /// <inheritdoc />
-    public virtual IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, string? resolveInfo, Feature reference,
+    public virtual IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo, Feature reference,
         IReadableNode node) => delegateHandler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
 
     /// <inheritdoc />

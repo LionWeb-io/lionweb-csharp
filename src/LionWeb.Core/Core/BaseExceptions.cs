@@ -53,7 +53,7 @@ public abstract class LionWebExceptionBase : ArgumentException
 /// Trying to create a <see cref="ReadableNodeBase{T}"/> with <see cref="IReadableNode.GetId">invalid id</see>.
 /// </summary>
 /// <param name="id">Invalid id.</param>
-public class InvalidIdException(string? id) : LionWebExceptionBase($"Invalid node id: {id}", "id");
+public class InvalidIdException(NodeId? id) : LionWebExceptionBase($"Invalid node id: {id}", "id");
 
 /// <summary>
 /// Trying to set a <see cref="Feature"/> to an unsupported value.

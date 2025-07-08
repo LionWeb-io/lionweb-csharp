@@ -69,7 +69,7 @@ public static class Textualizer
         string PropertyAsString(Property property)
             => $"{Name(property)} = {ValueAsString(node.Get(property))}";
 
-        string ReferenceInfo(INode target)
+        ResolveInfo ReferenceInfo(INode target)
             => target switch
             {
                 INamed named when named.GetNodeName() is  { } s => $" ({s})",

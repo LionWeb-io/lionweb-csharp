@@ -400,7 +400,7 @@ public sealed class LionCoreLanguage_2025_1 : LanguageBase<LionCoreFactory_2025_
     public override string Name => ILionCoreLanguage.LanguageName;
 
     /// <inheritdoc />
-    public override string Key => ILionCoreLanguage.LanguageKey;
+    public override MetaPointerKey Key => ILionCoreLanguage.LanguageKey;
 
     /// <inheritdoc />
     public override string Version => LionWebVersion.VersionString;
