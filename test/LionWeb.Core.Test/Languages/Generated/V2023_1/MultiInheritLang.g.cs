@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.MultiInheritLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -130,9 +131,12 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
         public AbstractConcept SetIfaceContainment(INode value)
 	{
 		AssureNotNull(value, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
+		ContainmentSingleEventEmitter<INode> evt = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment);
+		evt.CollectOldData();
 		SetParentNull(_ifaceContainment);
 		AttachChild(value);
 		_ifaceContainment = value;
+		evt.RaiseEvent();
 		return this;
 	}
 

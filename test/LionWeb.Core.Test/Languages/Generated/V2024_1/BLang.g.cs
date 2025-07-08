@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -127,7 +128,10 @@ public partial class BConcept : ConceptInstanceBase
         public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum value)
 	{
 		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
+		PropertyEventEmitter evt = new(BLangLanguage.Instance.BConcept_AEnumProp, this, value, _aEnumProp);
+		evt.CollectOldData();
 		_aEnumProp = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -147,7 +151,10 @@ public partial class BConcept : ConceptInstanceBase
 	/// <remarks>Optional Single Reference</remarks>
         public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? value)
 	{
+		ReferenceSingleEventEmitter evt = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef);
+		evt.CollectOldData();
 		_aRef = value;
+		evt.RaiseEvent();
 		return this;
 	}
 

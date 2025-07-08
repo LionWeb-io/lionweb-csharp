@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -136,7 +137,10 @@ public partial class AConcept : ConceptInstanceBase
     	/// <remarks>Optional Single Reference</remarks>
         public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept? value)
 	{
+		ReferenceSingleEventEmitter evt = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef);
+		evt.CollectOldData();
 		_bRef = value;
+		evt.RaiseEvent();
 		return this;
 	}
 

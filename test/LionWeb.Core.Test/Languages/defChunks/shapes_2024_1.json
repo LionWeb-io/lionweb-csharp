@@ -540,7 +540,7 @@
             "version": "2024.1",
             "key": "Concept-partition"
           },
-          "value": "false"
+          "value": "true"
         }
       ],
       "containments": [
@@ -1890,7 +1890,7 @@
             "version": "2024.1",
             "key": "Concept-partition"
           },
-          "value": "false"
+          "value": "true"
         }
       ],
       "containments": [

@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.WithEnum.M2;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -125,7 +126,10 @@ public partial class EnumHolder : ConceptInstanceBase
         public EnumHolder SetEnumValue(MyEnum value)
 	{
 		AssureNotNull(value, WithEnumLanguage.Instance.EnumHolder_enumValue);
+		PropertyEventEmitter evt = new(WithEnumLanguage.Instance.EnumHolder_enumValue, this, value, _enumValue);
+		evt.CollectOldData();
 		_enumValue = value;
+		evt.RaiseEvent();
 		return this;
 	}
 

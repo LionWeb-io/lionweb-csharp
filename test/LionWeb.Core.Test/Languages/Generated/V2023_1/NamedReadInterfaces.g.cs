@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.NamedLangReadInterfaces;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -197,7 +198,10 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
         public NamedAbstractConcept SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		evt.CollectOldData();
 		_name = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -276,7 +280,10 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
         public NamedAnn SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		evt.CollectOldData();
 		_name = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -355,7 +362,10 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
         public NamedConcept SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		evt.CollectOldData();
 		_name = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -450,7 +460,10 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
         public NamedIfaceAnn SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		evt.CollectOldData();
 		_name = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -529,7 +542,10 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
         public NamedIfaceConcept SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		evt.CollectOldData();
 		_name = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
