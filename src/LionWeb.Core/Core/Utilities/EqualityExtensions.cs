@@ -320,3 +320,15 @@ public class KeyedIdentityComparer : IEqualityComparer<IKeyed>
         _ => 0
     };
 }
+
+/// Compares nodes by id.
+public class NodeIdComparer : IEqualityComparer<IReadableNode>
+{
+    /// <inheritdoc />
+    public bool Equals(IReadableNode? x, IReadableNode? y) =>
+        x?.GetId() == y?.GetId();
+
+    /// <inheritdoc />
+    public int GetHashCode(IReadableNode obj) =>
+        obj.GetId().GetHashCode();
+}

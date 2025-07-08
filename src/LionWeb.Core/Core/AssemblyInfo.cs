@@ -1,6 +1,6 @@
-// Copyright 2024 TRUMPF Laser SE and other contributors
+﻿// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 // 
@@ -15,5 +15,6 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-global using Microsoft.VisualStudio.TestTools.UnitTesting;
-global using NodeId = string;
+using System.Runtime.CompilerServices;
+
+[assembly: InternalsVisibleTo("LionWeb.Core.Test")]
