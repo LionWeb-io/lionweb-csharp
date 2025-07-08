@@ -26,7 +26,7 @@ using VersionSpecific.V2025_1_Compatible;
 using VersionSpecific.V2025_1;
 
 /// Externalized logic of <see cref="IDeserializer"/>, specific to one version of LionWeb standard.
-internal interface IDeserializerVersionSpecifics : IVersionSpecifics
+public interface IDeserializerVersionSpecifics : IVersionSpecifics
 {
     /// <summary>
     /// Creates an instance of <see cref="IDeserializerVersionSpecifics"/> that implements <paramref name="lionWebVersion"/>.
@@ -47,7 +47,7 @@ internal interface IDeserializerVersionSpecifics : IVersionSpecifics
 
     /// Converts the low-level string representation <paramref name="value"/> of <paramref name="property"/> into the internal LionWeb-C# representation.
     /// <seealso cref="Deserializer.DeserializeProperties"/>
-    object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype, string? value);
+    object? ConvertDatatype(IReadableNode node, Feature property, LanguageEntity datatype, PropertyValue? value);
 }
 
 internal abstract class DeserializerVersionSpecificsBase<T, H>(
@@ -65,8 +65,8 @@ internal abstract class DeserializerVersionSpecificsBase<T, H>(
 
     public abstract void RegisterBuiltins();
 
-    public abstract object? ConvertDatatype(IWritableNode node, Feature property, LanguageEntity datatype,
-        string? value);
+    public abstract object? ConvertDatatype(IReadableNode node, Feature property, LanguageEntity datatype,
+        PropertyValue? value);
 
     protected void RegisterLanguage(Language language)
     {
@@ -81,7 +81,7 @@ internal abstract class DeserializerVersionSpecificsBase<T, H>(
         }
     }
 
-    protected Enum? ConvertEnumeration(IWritableNode nodeId, Feature property, Enumeration enumeration, string value)
+    protected Enum? ConvertEnumeration(IReadableNode nodeId, Feature property, Enumeration enumeration, PropertyValue value)
     {
         var literal = enumeration.Literals.FirstOrDefault(literal => literal.Key == value);
 

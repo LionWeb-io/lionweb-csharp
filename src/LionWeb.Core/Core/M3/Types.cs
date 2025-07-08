@@ -29,14 +29,14 @@ public interface IKeyed : INamed
 {
     /// A Key must be a valid <see cref="IReadableNode.GetId">identifier</see>.
     /// It must be unique within its language.
-    public string Key { get; }
+    public MetaPointerKey Key { get; }
 
     /// <summary>
     /// Gets the <see cref="Key"/>.
     /// </summary>
     /// <param name="key">Value of <see cref="Key"/> if set, or <c>null</c>.</param>
     /// <returns><c>true</c> if <see cref="Key"/> is set; <c>false</c> otherwise.</returns>
-    bool TryGetKey([NotNullWhen(true)] out string? key);
+    bool TryGetKey([NotNullWhen(true)] out MetaPointerKey? key);
 }
 
 /// A Feature represents a characteristic or some form of data associated with a particular <see cref="Classifier"/>.

@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1.Event.Partition;
 using M2;
 using M3;
 using System.Collections;
@@ -69,7 +70,7 @@ public class LenientNode : NodeBase, INode
     /// <param name="id"><c>this</c> node's <see cref="IReadableNode.GetId">id</see>.</param>
     /// <param name="classifier"><c>this</c> node's <see cref="IReadableNode.GetClassifier()">classifier</see>.</param>
     /// <exception cref="InvalidIdException">If <paramref name="id"/> is not a <see cref="IReadableNode.GetId">valid identifier</see>.</exception>
-    public LenientNode(string id, Classifier? classifier) : base(id)
+    public LenientNode(NodeId id, Classifier? classifier) : base(id)
     {
         _classifier = classifier;
     }
@@ -126,7 +127,8 @@ public class LenientNode : NodeBase, INode
         return false;
     }
 
-    public bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
+    /// <inheritdoc />
+    public override bool TryGet(Feature feature, [NotNullWhen(true)] out object? value)
     {
         if (feature == null)
         {
@@ -186,7 +188,7 @@ public class LenientNode : NodeBase, INode
         if (feature == null)
         {
             var enumerable = M2Extensions.AsNodes<INode>(value).ToList();
-            RemoveSelfParent(_annotations.ToList(), _annotations, null);
+            RemoveSelfParent(_annotations.ToList(), _annotations, null, null);
             AddAnnotations(enumerable);
             return true;
         }
@@ -261,7 +263,7 @@ public class LenientNode : NodeBase, INode
                 SetParentNull(n);
                 return;
             case List<INode> oldList:
-                RemoveSelfParent(oldList.ToList(), oldList, c);
+                RemoveSelfParent(oldList.ToList(), oldList, c, null);
                 return;
         }
     }
@@ -280,7 +282,7 @@ public class LenientNode : NodeBase, INode
                     RemoveFeature(key);
                     return true;
                 case IList list:
-                    int index = list.IndexOf(child);
+                    Index index = list.IndexOf(child);
                     if (index == -1)
                         return false;
 
@@ -311,7 +313,7 @@ public class LenientNode : NodeBase, INode
     }
 
     /// <inheritdoc />
-    public override void InsertAnnotations(int index, IEnumerable<INode> annotations)
+    public override void InsertAnnotations(Index index, IEnumerable<INode> annotations)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
@@ -320,7 +322,7 @@ public class LenientNode : NodeBase, INode
 
     /// <inheritdoc />
     public override bool RemoveAnnotations(IEnumerable<INode> annotations) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null);
+        RemoveSelfParent(annotations?.ToList(), _annotations, null, null);
 
     private IEnumerable<Feature> FeatureKeys => _featureValues.Select(f => f.feature);
 
@@ -361,4 +363,22 @@ public class LenientNode : NodeBase, INode
             _featureValues.Add((featureToSet, value));
         }
     }
+}
+
+public class LenientPartition : LenientNode, IPartitionInstance
+{
+    private readonly PartitionEventHandler _eventHandler;
+    public LenientPartition(NodeId id, Classifier? classifier) : base(id, classifier)
+    {
+        _eventHandler = new PartitionEventHandler(this);
+    }
+
+    /// <inheritdoc />
+    public IPartitionPublisher GetPublisher() => _eventHandler;
+
+    /// <inheritdoc />
+    public IPartitionCommander GetCommander() => _eventHandler;
+
+    /// <inheritdoc />
+    public Concept GetConcept() => (Concept)GetClassifier();
 }

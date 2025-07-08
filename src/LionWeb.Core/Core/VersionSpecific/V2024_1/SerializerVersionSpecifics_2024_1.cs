@@ -26,7 +26,7 @@ internal class SerializerVersionSpecifics_2024_1 : SerializerVersionSpecificsBas
 {
     public override LionWebVersions Version => LionWebVersions.v2024_1;
 
-    public override string? ConvertDatatype(IReadableNode node, Feature property, object? value) =>
+    public override PropertyValue? ConvertDatatype(IReadableNode node, Feature property, object? value) =>
         value switch
         {
             null => null,
@@ -36,7 +36,7 @@ internal class SerializerVersionSpecifics_2024_1 : SerializerVersionSpecificsBas
             _ => _handler?.UnknownDatatype(node, property, value)
         };
 
-    private string ConvertStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
+    private PropertyValue ConvertStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt) =>
         SerializeStructuredDataType(node, feature, sdt).ToJsonString();
 
     private JsonObject SerializeStructuredDataType(IReadableNode node, Feature feature, IStructuredDataTypeInstance sdt)
@@ -50,7 +50,7 @@ internal class SerializerVersionSpecifics_2024_1 : SerializerVersionSpecificsBas
         );
     }
 
-    private KeyValuePair<string, JsonNode?> SerializeField(IReadableNode node, Feature feature,
+    private KeyValuePair<MetaPointerKey, JsonNode?> SerializeField(IReadableNode node, Feature feature,
         IStructuredDataTypeInstance sdt, Field field)
     {
         var key = field.Key;

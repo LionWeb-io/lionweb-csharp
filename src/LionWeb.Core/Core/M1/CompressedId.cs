@@ -40,7 +40,7 @@ public class DuplicateIdChecker
 public interface ICompressedId
 {
     /// The original node id, if available.
-    public string? Original { get; }
+    public NodeId? Original { get; }
 
     /// <summary>
     /// Creates either a new <see cref="CompressedId"/> or <see cref="UncompressedId"/>.
@@ -48,7 +48,7 @@ public interface ICompressedId
     /// <param name="id">Node id to compress.</param>
     /// <param name="config">Whether to store the uncompressed original. Uses more memory, but eases debugging.</param>
     /// <returns>The newly created compressed id.</returns>
-    public static ICompressedId Create(string id, CompressedIdConfig config)
+    public static ICompressedId Create(NodeId id, CompressedIdConfig config)
     {
         if (config.Compress)
         {
@@ -62,8 +62,8 @@ public interface ICompressedId
 
     /// <param name="id">Id to compress.</param>
     /// <param name="keepOriginal">Whether we keep the original around.</param>
-    [Obsolete(message: "Use Create(string id, CompressedIdConfig config) instead.")]
-    public static ICompressedId Create(string id, bool keepOriginal) =>
+    [Obsolete(message: "Use Create(NodeId id, CompressedIdConfig config) instead.")]
+    public static ICompressedId Create(NodeId id, bool keepOriginal) =>
         Create(id, new CompressedIdConfig(KeepOriginal: keepOriginal));
 }
 
@@ -113,10 +113,10 @@ public record CompressedIdConfig
 /// </para>
 /// </summary>
 /// <param name="original">Original, uncompressed id.</param>
-public readonly struct UncompressedId(string original) : ICompressedId, IEquatable<UncompressedId>
+public readonly struct UncompressedId(NodeId original) : ICompressedId, IEquatable<UncompressedId>
 {
     /// <inheritdoc />
-    public string Original => original;
+    public NodeId Original => original;
 
     /// <inheritdoc />
     public override string ToString() =>
@@ -153,7 +153,7 @@ public readonly struct UncompressedId(string original) : ICompressedId, IEquatab
 /// </summary>
 public readonly struct CompressedId : ICompressedId, IEquatable<CompressedId>
 {
-    internal CompressedId(byte[] identifier, string? original)
+    internal CompressedId(byte[] identifier, NodeId? original)
     {
         Identifier = identifier;
         Original = original;
@@ -162,7 +162,7 @@ public readonly struct CompressedId : ICompressedId, IEquatable<CompressedId>
     private byte[] Identifier { get; }
 
     /// The original node id, if available.
-    public string? Original { get; }
+    public NodeId? Original { get; }
 
     /// <inheritdoc />
     public override string ToString() =>
@@ -234,7 +234,7 @@ public readonly struct CompressedMetaPointer : IEquatable<CompressedMetaPointer>
     /// <param name="metaPointer">MetaPointer id to compress.</param>
     /// <param name="keepOriginal">Whether to store the uncompressed original. Uses more memory, but eases debugging.</param>
     /// <returns>The newly created compressed MetaPointer.</returns>
-    [Obsolete(message: "Use Create(string id, CompressedIdConfig config) instead.")]
+    [Obsolete(message: "Use Create(NodeId id, CompressedIdConfig config) instead.")]
     public static CompressedMetaPointer Create(MetaPointer metaPointer, bool keepOriginal) =>
         Create(metaPointer, new CompressedIdConfig(KeepOriginal: keepOriginal));
 

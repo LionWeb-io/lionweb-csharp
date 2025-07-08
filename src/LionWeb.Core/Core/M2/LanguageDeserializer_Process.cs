@@ -32,6 +32,6 @@ public partial class LanguageDeserializer
         ProcessInternal(serializedNode, id => CreateNodeWithProperties(serializedNode, id));
     }
 
-    private DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, string id) =>
+    private DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, NodeId id) =>
         _languageVersionSpecifics.CreateNodeWithProperties(serializedNode, id);
 }

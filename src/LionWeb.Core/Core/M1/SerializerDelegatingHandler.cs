@@ -31,6 +31,6 @@ public class SerializerDelegatingHandler(ISerializerHandler delegateHandler) : I
         delegateHandler.DuplicateNodeId(n);
 
     /// <inheritdoc />
-    public virtual string? UnknownDatatype(IReadableNode node, Feature property, object? value) =>
+    public virtual PropertyValue? UnknownDatatype(IReadableNode node, Feature property, object? value) =>
         delegateHandler.UnknownDatatype(node, property, value);
 }

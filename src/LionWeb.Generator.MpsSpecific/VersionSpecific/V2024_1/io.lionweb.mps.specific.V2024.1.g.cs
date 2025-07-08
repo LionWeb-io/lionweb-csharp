@@ -6,6 +6,7 @@
 #nullable enable
 namespace Io.Lionweb.Mps.Specific.V2024_1;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -174,7 +175,10 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public ConceptDescription SetConceptAlias(string? value)
 	{
+		PropertyEventEmitter evt = new(SpecificLanguage.Instance.ConceptDescription_conceptAlias, this, value, _conceptAlias);
+		evt.CollectOldData();
 		_conceptAlias = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -194,7 +198,10 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public ConceptDescription SetConceptShortDescription(string? value)
 	{
+		PropertyEventEmitter evt = new(SpecificLanguage.Instance.ConceptDescription_conceptShortDescription, this, value, _conceptShortDescription);
+		evt.CollectOldData();
 		_conceptShortDescription = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -214,7 +221,10 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public ConceptDescription SetHelpUrl(string? value)
 	{
+		PropertyEventEmitter evt = new(SpecificLanguage.Instance.ConceptDescription_helpUrl, this, value, _helpUrl);
+		evt.CollectOldData();
 		_helpUrl = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -295,11 +305,11 @@ public partial class ConceptDescription : AnnotationInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (TryGetConceptAlias(out _))
+		if (_conceptAlias != default)
 			result.Add(SpecificLanguage.Instance.ConceptDescription_conceptAlias);
-		if (TryGetConceptShortDescription(out _))
+		if (_conceptShortDescription != default)
 			result.Add(SpecificLanguage.Instance.ConceptDescription_conceptShortDescription);
-		if (TryGetHelpUrl(out _))
+		if (_helpUrl != default)
 			result.Add(SpecificLanguage.Instance.ConceptDescription_helpUrl);
 		return result;
 	}
@@ -324,7 +334,10 @@ public partial class Deprecated : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Deprecated SetBuild(string? value)
 	{
+		PropertyEventEmitter evt = new(SpecificLanguage.Instance.Deprecated_build, this, value, _build);
+		evt.CollectOldData();
 		_build = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -344,7 +357,10 @@ public partial class Deprecated : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Deprecated SetComment(string? value)
 	{
+		PropertyEventEmitter evt = new(SpecificLanguage.Instance.Deprecated_comment, this, value, _comment);
+		evt.CollectOldData();
 		_comment = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -408,9 +424,9 @@ public partial class Deprecated : AnnotationInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (TryGetBuild(out _))
+		if (_build != default)
 			result.Add(SpecificLanguage.Instance.Deprecated_build);
-		if (TryGetComment(out _))
+		if (_comment != default)
 			result.Add(SpecificLanguage.Instance.Deprecated_comment);
 		return result;
 	}
@@ -435,7 +451,10 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public KeyedDescription SetDocumentation(string? value)
 	{
+		PropertyEventEmitter evt = new(SpecificLanguage.Instance.KeyedDescription_documentation, this, value, _documentation);
+		evt.CollectOldData();
 		_documentation = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -458,7 +477,10 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+		ReferenceAddMultipleEventEmitter<IReadableNode> evt = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso.Count);
+		evt.CollectOldData();
 		_seeAlso.AddRange(safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -469,7 +491,10 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+		ReferenceAddMultipleEventEmitter<IReadableNode> evt = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, index);
+		evt.CollectOldData();
 		_seeAlso.InsertRange(index, safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -479,7 +504,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		RemoveAll(safeNodes, _seeAlso);
+		RemoveAll(safeNodes, _seeAlso, ReferenceRemover<IReadableNode>(SpecificLanguage.Instance.KeyedDescription_seeAlso));
 		return this;
 	}
 
@@ -527,9 +552,14 @@ public partial class KeyedDescription : AnnotationInstanceBase
 
 		if (SpecificLanguage.Instance.KeyedDescription_seeAlso.EqualsIdentity(feature))
 		{
-			var enumerable = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value);
+			var safeNodes = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value).ToList();
+			AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+			AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
+			ReferenceSetEventEmitter<IReadableNode> evt = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso);
+			evt.CollectOldData();
 			_seeAlso.Clear();
-			AddSeeAlso(enumerable);
+			_seeAlso.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -540,9 +570,9 @@ public partial class KeyedDescription : AnnotationInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (TryGetDocumentation(out _))
+		if (_documentation != default)
 			result.Add(SpecificLanguage.Instance.KeyedDescription_documentation);
-		if (TryGetSeeAlso(out _))
+		if (_seeAlso.Count != 0)
 			result.Add(SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		return result;
 	}
@@ -567,7 +597,10 @@ public partial class ShortDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public ShortDescription SetDescription(string? value)
 	{
+		PropertyEventEmitter evt = new(SpecificLanguage.Instance.ShortDescription_description, this, value, _description);
+		evt.CollectOldData();
 		_description = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -614,7 +647,7 @@ public partial class ShortDescription : AnnotationInstanceBase
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (TryGetDescription(out _))
+		if (_description != default)
 			result.Add(SpecificLanguage.Instance.ShortDescription_description);
 		return result;
 	}
@@ -646,7 +679,10 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
         public VirtualPackage SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		evt.CollectOldData();
 		_name = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -693,7 +729,7 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{
 		List<Feature> result = base.CollectAllSetFeatures().ToList();
-		if (TryGetName(out _))
+		if (_name != default)
 			result.Add(_builtIns.INamed_name);
 		return result;
 	}

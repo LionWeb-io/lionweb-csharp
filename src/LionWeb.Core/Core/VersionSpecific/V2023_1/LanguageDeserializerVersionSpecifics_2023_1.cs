@@ -31,22 +31,22 @@ internal class LanguageDeserializerVersionSpecifics_2023_1(
 {
     public override LionWebVersions Version => LionWebVersions.v2023_1;
 
-    public override DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, string id) =>
+    public override DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, NodeId id) =>
         new NodeCreator_2023_1(this, serializedNode, id).Create();
 
     public override void InstallLanguageContainments(SerializedNode serializedNode, IReadableNode node,
-        ILookup<string, IKeyed> serializedContainmentsLookup) =>
+        ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup) =>
         new ContainmentsInstaller_2023_1(this, serializedNode, node, serializedContainmentsLookup).Install();
 
     public override void InstallLanguageReferences(SerializedNode serializedNode, IReadableNode node,
-        ILookup<string, IKeyed?> serializedReferencesLookup) =>
+        ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup) =>
         new ReferencesInstaller_2023_1(this, serializedNode, node, serializedReferencesLookup).Install();
 }
 
 internal class NodeCreator_2023_1(
     LanguageDeserializerVersionSpecifics_2023_1 versionSpecifics,
     SerializedNode serializedNode,
-    string id)
+    NodeId id)
     : NodeCreatorBase(versionSpecifics, serializedNode, id)
 {
     protected override IVersion2023_1 Version => LionWebVersions.v2023_1;
@@ -56,7 +56,7 @@ internal class ContainmentsInstaller_2023_1(
     LanguageDeserializerVersionSpecificsBase versionSpecifics,
     SerializedNode serializedNode,
     IReadableNode node,
-    ILookup<string, IKeyed> serializedContainmentsLookup)
+    ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup)
     : ContainmentsInstallerBase(versionSpecifics, serializedNode, node, serializedContainmentsLookup)
 {
     protected override IVersion2023_1 Version => LionWebVersions.v2023_1;
@@ -66,7 +66,7 @@ internal class ReferencesInstaller_2023_1(
     LanguageDeserializerVersionSpecificsBase versionSpecifics,
     SerializedNode serializedNode,
     IReadableNode node,
-    ILookup<string, IKeyed?> serializedReferencesLookup)
+    ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup)
     : ReferencesInstallerBase(versionSpecifics, serializedNode, node, serializedReferencesLookup)
 {
     protected override IVersion2023_1 Version => LionWebVersions.v2023_1;

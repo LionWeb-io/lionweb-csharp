@@ -38,8 +38,8 @@ internal class DeserializerVersionSpecifics_2024_1<T, H>(
     public override void RegisterBuiltins() =>
         RegisterLanguage(BuiltInsLanguage_2024_1.Instance);
 
-    public override object? ConvertDatatype(IWritableNode node, Feature property,
-        LanguageEntity datatype, string? value)
+    public override object? ConvertDatatype(IReadableNode node, Feature property,
+        LanguageEntity datatype, PropertyValue? value)
     {
         var convertedValue = (datatype, value) switch
         {
@@ -52,8 +52,8 @@ internal class DeserializerVersionSpecifics_2024_1<T, H>(
         return convertedValue;
     }
 
-    protected virtual object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype,
-        string value)
+    protected virtual object? ConvertPrimitiveType(IReadableNode node, Feature property, PrimitiveType datatype,
+        PropertyValue value)
     {
         ICompressedId compressedId = _metaInfo.Compress(node.GetId());
         return datatype switch
@@ -70,8 +70,8 @@ internal class DeserializerVersionSpecifics_2024_1<T, H>(
         };
     }
 
-    private IStructuredDataTypeInstance? ConvertStructuredDataType(IWritableNode node, Feature property,
-        StructuredDataType sdt, string s)
+    private IStructuredDataTypeInstance? ConvertStructuredDataType(IReadableNode node, Feature property,
+        StructuredDataType sdt, PropertyValue s)
     {
         try
         {
@@ -85,7 +85,7 @@ internal class DeserializerVersionSpecifics_2024_1<T, H>(
         }
     }
 
-    private IStructuredDataTypeInstance? ConvertStructuredDataType(IWritableNode node, Feature property,
+    private IStructuredDataTypeInstance? ConvertStructuredDataType(IReadableNode node, Feature property,
         StructuredDataType sdt, JsonObject jsonObject)
     {
         var fieldValues = new FieldValues();

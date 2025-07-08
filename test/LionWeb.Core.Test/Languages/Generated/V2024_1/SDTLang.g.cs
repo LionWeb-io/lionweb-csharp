@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.SDTLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -267,7 +268,10 @@ public partial class SDTConcept : ConceptInstanceBase
         public SDTConcept SetA(A value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_A);
+		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_A, this, value, _a);
+		evt.CollectOldData();
 		_a = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -292,7 +296,10 @@ public partial class SDTConcept : ConceptInstanceBase
         public SDTConcept SetAmount(Amount value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_amount);
+		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_amount, this, value, _amount);
+		evt.CollectOldData();
 		_amount = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -317,7 +324,10 @@ public partial class SDTConcept : ConceptInstanceBase
         public SDTConcept SetComplex(ComplexNumber value)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_complex);
+		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_complex, this, value, _complex);
+		evt.CollectOldData();
 		_complex = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -337,7 +347,10 @@ public partial class SDTConcept : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         public SDTConcept SetDecimal(Decimal? value)
 	{
+		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_decimal, this, value, _decimal);
+		evt.CollectOldData();
 		_decimal = value;
+		evt.RaiseEvent();
 		return this;
 	}
 

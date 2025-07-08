@@ -564,7 +564,7 @@
             "version": "2023.1",
             "key": "Concept-partition"
           },
-          "value": "false"
+          "value": "true"
         }
       ],
       "containments": [
@@ -1946,7 +1946,7 @@
             "version": "2023.1",
             "key": "Concept-partition"
           },
-          "value": "false"
+          "value": "true"
         }
       ],
       "containments": [

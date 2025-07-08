@@ -35,7 +35,8 @@ internal class DeserializerVersionSpecifics_2024_1_Compatible<T, H>(
 {
     public override LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
 
-    protected override object? ConvertPrimitiveType(IWritableNode node, Feature property, PrimitiveType datatype, string value)
+    protected override object? ConvertPrimitiveType(IReadableNode node, Feature property, PrimitiveType datatype,
+        PropertyValue value)
     {
         ICompressedId compressedId = _metaInfo.Compress(node.GetId());
         return datatype switch

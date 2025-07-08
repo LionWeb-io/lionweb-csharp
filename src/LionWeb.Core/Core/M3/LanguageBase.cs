@@ -24,7 +24,7 @@ using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
 /// <inheritdoc cref="Language"/>
-public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lionWebVersion)
+public abstract class LanguageBase<TNodeFactory>(NodeId id, LionWebVersions lionWebVersion)
     : ReadableNodeBase<IReadableNode>(id, null), Language<TNodeFactory>
     where TNodeFactory : INodeFactory
 {
@@ -121,10 +121,10 @@ public abstract class LanguageBase<TNodeFactory>(string id, LionWebVersions lion
     }
 
     /// <inheritdoc />
-    public abstract string Key { get; }
+    public abstract MetaPointerKey Key { get; }
 
     /// <inheritdoc />
-    public bool TryGetKey([NotNullWhen(true)] out string? key)
+    public bool TryGetKey([NotNullWhen(true)] out MetaPointerKey? key)
     {
         key = Key;
         return key != null;
@@ -167,10 +167,10 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
         new Lazy<ILionCoreLanguage>(() => _language.LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
-    protected IKeyedBase(string id, TLanguage language) : this(id, language, language) { }
+    protected IKeyedBase(NodeId id, TLanguage language) : this(id, language, language) { }
 
     /// <inheritdoc />
-    protected IKeyedBase(string id, IKeyed parent, TLanguage language) : base(id, parent)
+    protected IKeyedBase(NodeId id, IKeyed parent, TLanguage language) : base(id, parent)
     {
         _language = language;
     }
@@ -223,10 +223,10 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
     }
 
     /// <inheritdoc />
-    public required string Key { get; init; }
+    public required MetaPointerKey Key { get; init; }
 
     /// <inheritdoc />
-    public bool TryGetKey([NotNullWhen(true)] out string? key)
+    public bool TryGetKey([NotNullWhen(true)] out MetaPointerKey? key)
     {
         key = Key;
         return key != null;
@@ -240,7 +240,7 @@ public abstract class IKeyedBase<TLanguage> : ReadableNodeBase<IReadableNode>, I
 }
 
 /// <inheritdoc cref="Classifier"/>
-public abstract class ClassifierBase<TLanguage>(string id, TLanguage parent)
+public abstract class ClassifierBase<TLanguage>(NodeId id, TLanguage parent)
     : IKeyedBase<TLanguage>(id, parent), Classifier
     where TLanguage : Language
 {
@@ -287,7 +287,7 @@ public abstract class ClassifierBase<TLanguage>(string id, TLanguage parent)
 }
 
 /// <inheritdoc cref="Annotation"/>
-public class AnnotationBase<TLanguage>(string id, TLanguage parent) : ClassifierBase<TLanguage>(id, parent), Annotation
+public class AnnotationBase<TLanguage>(NodeId id, TLanguage parent) : ClassifierBase<TLanguage>(id, parent), Annotation
     where TLanguage : Language
 {
     /// <inheritdoc />
@@ -365,7 +365,7 @@ public class AnnotationBase<TLanguage>(string id, TLanguage parent) : Classifier
 }
 
 /// <inheritdoc cref="Concept"/>
-public class ConceptBase<TLanguage>(string id, TLanguage parent) : ClassifierBase<TLanguage>(id, parent), Concept
+public class ConceptBase<TLanguage>(NodeId id, TLanguage parent) : ClassifierBase<TLanguage>(id, parent), Concept
     where TLanguage : Language
 {
     /// <inheritdoc />
@@ -452,7 +452,7 @@ public class ConceptBase<TLanguage>(string id, TLanguage parent) : ClassifierBas
 }
 
 /// <inheritdoc cref="Interface"/>
-public class InterfaceBase<TLanguage>(string id, TLanguage parent) : ClassifierBase<TLanguage>(id, parent), Interface
+public class InterfaceBase<TLanguage>(NodeId id, TLanguage parent) : ClassifierBase<TLanguage>(id, parent), Interface
     where TLanguage : Language
 {
     /// <inheritdoc />
@@ -503,7 +503,7 @@ public class InterfaceBase<TLanguage>(string id, TLanguage parent) : ClassifierB
 /// <inheritdoc cref="Feature"/>
 public abstract class FeatureBase<TLanguage> : IKeyedBase<TLanguage>, Feature where TLanguage : Language
 {
-    internal FeatureBase(string id, Classifier parent, TLanguage language) : base(id, parent, language)
+    internal FeatureBase(NodeId id, Classifier parent, TLanguage language) : base(id, parent, language)
     {
     }
 
@@ -548,7 +548,7 @@ public abstract class FeatureBase<TLanguage> : IKeyedBase<TLanguage>, Feature wh
 /// <inheritdoc cref="Link"/>
 public abstract class LinkBase<TLanguage> : FeatureBase<TLanguage>, Link where TLanguage : Language
 {
-    internal LinkBase(string id, Classifier parent, TLanguage language) : base(id, parent, language)
+    internal LinkBase(NodeId id, Classifier parent, TLanguage language) : base(id, parent, language)
     {
     }
 
@@ -613,7 +613,7 @@ public abstract class LinkBase<TLanguage> : FeatureBase<TLanguage>, Link where T
 public class ReferenceBase<TLanguage> : LinkBase<TLanguage>, Reference where TLanguage : Language
 {
     /// <inheritdoc />
-    public ReferenceBase(string id, Classifier parent, TLanguage language) : base(id, parent, language)
+    public ReferenceBase(NodeId id, Classifier parent, TLanguage language) : base(id, parent, language)
     {
     }
 
@@ -635,7 +635,7 @@ public class ReferenceBase<TLanguage> : LinkBase<TLanguage>, Reference where TLa
 public class ContainmentBase<TLanguage> : LinkBase<TLanguage>, Containment where TLanguage : Language
 {
     /// <inheritdoc />
-    public ContainmentBase(string id, Classifier parent, TLanguage language) : base(id, parent, language)
+    public ContainmentBase(NodeId id, Classifier parent, TLanguage language) : base(id, parent, language)
     {
     }
 
@@ -657,7 +657,7 @@ public class ContainmentBase<TLanguage> : LinkBase<TLanguage>, Containment where
 public class PropertyBase<TLanguage> : FeatureBase<TLanguage>, Property where TLanguage : Language
 {
     /// <inheritdoc />
-    public PropertyBase(string id, Classifier parent, TLanguage language) : base(id, parent, language)
+    public PropertyBase(NodeId id, Classifier parent, TLanguage language) : base(id, parent, language)
     {
     }
 
@@ -713,7 +713,7 @@ public class PropertyBase<TLanguage> : FeatureBase<TLanguage>, Property where TL
 public abstract class DatatypeBase<TLanguage> : IKeyedBase<TLanguage>, Datatype where TLanguage : Language
 {
     /// <inheritdoc />
-    protected DatatypeBase(string id, TLanguage parent) : base(id, parent)
+    protected DatatypeBase(NodeId id, TLanguage parent) : base(id, parent)
     {
     }
 }
@@ -722,7 +722,7 @@ public abstract class DatatypeBase<TLanguage> : IKeyedBase<TLanguage>, Datatype 
 public class PrimitiveTypeBase<TLanguage> : DatatypeBase<TLanguage>, PrimitiveType where TLanguage : Language
 {
     /// <inheritdoc />
-    public PrimitiveTypeBase(string id, TLanguage parent) : base(id, parent)
+    public PrimitiveTypeBase(NodeId id, TLanguage parent) : base(id, parent)
     {
     }
 
@@ -744,7 +744,7 @@ public class PrimitiveTypeBase<TLanguage> : DatatypeBase<TLanguage>, PrimitiveTy
 public class EnumerationBase<TLanguage> : DatatypeBase<TLanguage>, Enumeration where TLanguage : Language
 {
     /// <inheritdoc />
-    public EnumerationBase(string id, TLanguage parent) : base(id, parent)
+    public EnumerationBase(NodeId id, TLanguage parent) : base(id, parent)
     {
     }
 
@@ -796,7 +796,7 @@ public class EnumerationBase<TLanguage> : DatatypeBase<TLanguage>, Enumeration w
 public class EnumerationLiteralBase<TLanguage> : IKeyedBase<TLanguage>, EnumerationLiteral where TLanguage : Language
 {
     /// <inheritdoc />
-    public EnumerationLiteralBase(string id, Enumeration parent, TLanguage language) : base(id, parent, language)
+    public EnumerationLiteralBase(NodeId id, Enumeration parent, TLanguage language) : base(id, parent, language)
     {
     }
 
@@ -823,7 +823,7 @@ public class StructuredDataTypeBase<TLanguage> : DatatypeBase<TLanguage>, Struct
             (ILionCoreLanguageWithStructuredDataType)_language.LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
-    public StructuredDataTypeBase(string id, TLanguage parent) : base(id, parent)
+    public StructuredDataTypeBase(NodeId id, TLanguage parent) : base(id, parent)
     {
     }
 
@@ -880,7 +880,7 @@ public class FieldBase<TLanguage> : IKeyedBase<TLanguage>, Field where TLanguage
             (ILionCoreLanguageWithStructuredDataType)_language.LionWebVersion.LionCore).Value;
 
     /// <inheritdoc />
-    public FieldBase(string id, StructuredDataType parent, TLanguage language) : base(id, parent, language)
+    public FieldBase(NodeId id, StructuredDataType parent, TLanguage language) : base(id, parent, language)
     {
     }
 

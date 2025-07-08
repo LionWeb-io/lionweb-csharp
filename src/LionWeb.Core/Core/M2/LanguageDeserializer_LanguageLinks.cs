@@ -41,7 +41,7 @@ public partial class LanguageDeserializer
         if (!_deserializedNodesById.TryGetValue(Compress(serializedNode.Id), out var node))
             return;
 
-        ILookup<string, IKeyed> serializedContainmentsLookup = serializedNode
+        ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup = serializedNode
             .Containments
             .SelectMany(containment => containment
                 .Children
@@ -69,7 +69,7 @@ public partial class LanguageDeserializer
         if (!_deserializedNodesById.TryGetValue(Compress(serializedNode.Id), out var node))
             return;
 
-        ILookup<string, IKeyed?> serializedReferencesLookup = serializedNode
+        ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup = serializedNode
             .References
             .SelectMany(reference => reference.Targets.Select(target => (reference, target)))
             .ToLookup(pair => pair.reference.Reference.Key,

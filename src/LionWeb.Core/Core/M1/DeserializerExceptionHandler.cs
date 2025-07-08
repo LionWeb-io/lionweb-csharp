@@ -28,7 +28,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
         throw new UnsupportedClassifierException(classifier, $"On node with id={id}: ");
 
     /// <inheritdoc />
-    public virtual string? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
+    public virtual NodeId? DuplicateNodeId(ICompressedId nodeId, IReadableNode existingNode, IReadableNode node) =>
         throw new DeserializerException($"Duplicate node with id={existingNode.GetId()}");
 
     /// <inheritdoc />
@@ -78,25 +78,25 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     #region properties
 
     /// <inheritdoc />
-    public virtual Enum? UnknownEnumerationLiteral(string key, Enumeration enumeration,
+    public virtual Enum? UnknownEnumerationLiteral(MetaPointerKey key, Enumeration enumeration,
         Feature property, IReadableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: unknown enumeration literal for enumeration {enumeration} with key {key}");
 
     /// <inheritdoc />
-    public Field? UnknownField(string key, StructuredDataType structuredDataType, Feature property,
+    public Field? UnknownField(MetaPointerKey key, StructuredDataType structuredDataType, Feature property,
         IReadableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: unknown field for structured datatype {structuredDataType} with key {key}");
 
     /// <inheritdoc />
-    public virtual object? UnknownDatatype(string? value, LanguageEntity datatype, Feature property,
+    public virtual object? UnknownDatatype(PropertyValue? value, LanguageEntity datatype, Feature property,
         IReadableNode node) =>
         throw new DeserializerException(
             $"On node with id={node.GetId()}: unknown property type {property /*.Type*/} with value {value}");
 
     /// <inheritdoc />
-    public virtual object? InvalidPropertyValue<TValue>(string? value, Feature property, ICompressedId nodeId) =>
+    public virtual object? InvalidPropertyValue<TValue>(PropertyValue? value, Feature property, ICompressedId nodeId) =>
         throw new DeserializerException(
             $"On node with id={nodeId}: invalid property value '{value}' for property {property}");
 
@@ -110,7 +110,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
 
     /// <inheritdoc />
     public virtual IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId,
-        string? resolveInfo,
+        ResolveInfo? resolveInfo,
         Feature reference,
         IReadableNode node) =>
         throw new DeserializerException(

@@ -18,6 +18,7 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
+using Core.M1.Event.Partition;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
@@ -67,7 +68,7 @@ public class ClassifierGenerator(
         bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
         bases.AddRange(AddINamedWritableInterface(annotation.Extends));
 
-        return ClassifierClass(bases, GenGetClassifier("GetAnnotation", typeof(Annotation)));
+        return ClassifierClass(bases, [GenGetClassifier("GetAnnotation", typeof(Annotation))]);
     }
 
     private ClassDeclarationSyntax ClassifierConcept(Concept concept)
@@ -85,10 +86,26 @@ public class ClassifierGenerator(
         bases.AddRange(Interfaces.Select(i => AsType(i, writeable: true)));
         bases.AddRange(AddINamedWritableInterface(concept.Extends));
 
+        List<MemberDeclarationSyntax> additionalMembers = [GenGetClassifier("GetConcept", typeof(Concept))];
+        List<StatementSyntax>? additionalConstructorStatements = [];
+
         if (concept.Partition)
+        {
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
-        return ClassifierClass(bases, GenGetClassifier("GetConcept", typeof(Concept)));
+            additionalMembers.AddRange([
+                Field("_eventHandler", AsType(typeof(PartitionEventHandler)))
+                    .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
+                Method("GetPublisher", NullableType(AsType(typeof(IPartitionPublisher))), exprBody: IdentifierName("_eventHandler"))
+                    .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword)),
+                Method("GetCommander", NullableType(AsType(typeof(IPartitionCommander))), exprBody: IdentifierName("_eventHandler"))
+                    .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+            ]);
+            
+            additionalConstructorStatements.Add(Assignment("_eventHandler", NewCall([This()])));
+        }
+
+        return ClassifierClass(bases, additionalMembers, additionalConstructorStatements);
     }
 
     private IEnumerable<TypeSyntax> AddINamedWritableInterface(Classifier? extends)
@@ -109,7 +126,8 @@ public class ClassifierGenerator(
         return [];
     }
 
-    private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases, MethodDeclarationSyntax genGetClassifier)
+    private ClassDeclarationSyntax ClassifierClass(List<TypeSyntax> bases,
+        List<MemberDeclarationSyntax> additionalMembers, List<StatementSyntax>? additionalConstructorStatements = null)
     {
         List<SyntaxKind> modifiers = [SyntaxKind.PublicKeyword];
         if (classifier is Concept { Abstract: true })
@@ -126,10 +144,10 @@ public class ClassifierGenerator(
             .WithMembers(List(
                 FeaturesToImplement(classifier)
                     .SelectMany(f => new FeatureGenerator(classifier, f, _names, _lionWebVersion, _config).Members())
-                    .Concat(new List<MemberDeclarationSyntax> { GenConstructor(), genGetClassifier })
+                    .Append(GenConstructor(additionalConstructorStatements ?? []))
+                    .Concat(additionalMembers)
                     .Concat(new FeatureMethodsGenerator(classifier, _names, _lionWebVersion, _config).FeatureMethods())
-                    .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion, _config)
-                        .ContainmentMethods())
+                    .Concat(new ContainmentMethodsGenerator(classifier, _names, _lionWebVersion, _config).ContainmentMethods())
             ))
             .Xdoc(XdocDefault());
     }
@@ -158,10 +176,10 @@ public class ClassifierGenerator(
             .Ordered();
 
 
-    private ConstructorDeclarationSyntax GenConstructor() =>
+    private ConstructorDeclarationSyntax GenConstructor(IEnumerable<StatementSyntax> statements) =>
         Constructor(ClassifierName, Param("id", AsType(typeof(string))))
             .WithInitializer(Initializer("id"))
-            .WithBody(AsStatements([]));
+            .WithBody(AsStatements(statements));
 
     private MethodDeclarationSyntax GenGetClassifier(string methodName, Type returnType) =>
         Method(methodName, AsType(returnType), exprBody: MetaProperty())

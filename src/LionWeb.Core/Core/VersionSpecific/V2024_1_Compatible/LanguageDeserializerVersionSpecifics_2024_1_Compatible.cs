@@ -30,22 +30,22 @@ internal class LanguageDeserializerVersionSpecifics_2024_1_Compatible(
     ILanguageDeserializerHandler handler)
     : LanguageDeserializerVersionSpecifics_2024_1(deserializer, handler)
 {
-    public override DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, string id) =>
+    public override DynamicIKeyed CreateNodeWithProperties(SerializedNode serializedNode, NodeId id) =>
         new NodeCreator_2024_1_Compatible(this, serializedNode, id).Create();
 
     public override void InstallLanguageContainments(SerializedNode serializedNode, IReadableNode node,
-        ILookup<string, IKeyed> serializedContainmentsLookup) =>
+        ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup) =>
         new ContainmentsInstaller_2024_1_Compatible(this, serializedNode, node, serializedContainmentsLookup).Install();
 
     public override void InstallLanguageReferences(SerializedNode serializedNode, IReadableNode node,
-        ILookup<string, IKeyed?> serializedReferencesLookup) =>
+        ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup) =>
         new ReferencesInstaller_2024_1_Compatible(this, serializedNode, node, serializedReferencesLookup).Install();
 }
 
 internal class NodeCreator_2024_1_Compatible(
     LanguageDeserializerVersionSpecifics_2024_1 versionSpecifics,
     SerializedNode serializedNode,
-    string id)
+    NodeId id)
     : NodeCreator_2024_1(versionSpecifics, serializedNode, id)
 {
     protected override LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
@@ -55,7 +55,7 @@ internal class ContainmentsInstaller_2024_1_Compatible(
     LanguageDeserializerVersionSpecificsBase versionSpecifics,
     SerializedNode serializedNode,
     IReadableNode node,
-    ILookup<string, IKeyed> serializedContainmentsLookup)
+    ILookup<MetaPointerKey, IKeyed> serializedContainmentsLookup)
     : ContainmentsInstaller_2024_1(versionSpecifics, serializedNode, node, serializedContainmentsLookup)
 {
     protected override LionWebVersions Version => LionWebVersions.v2024_1_Compatible;
@@ -65,7 +65,7 @@ internal class ReferencesInstaller_2024_1_Compatible(
     LanguageDeserializerVersionSpecificsBase versionSpecifics,
     SerializedNode serializedNode,
     IReadableNode node,
-    ILookup<string, IKeyed?> serializedReferencesLookup)
+    ILookup<MetaPointerKey, IKeyed?> serializedReferencesLookup)
     : ReferencesInstaller_2024_1(versionSpecifics, serializedNode, node, serializedReferencesLookup)
 {
     protected override LionWebVersions Version => LionWebVersions.v2024_1_Compatible;

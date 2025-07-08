@@ -27,7 +27,7 @@ using VersionSpecific.V2025_1_Compatible;
 using VersionSpecific.V2025_1;
 
 /// Externalized logic of <see cref="ISerializer"/>, specific to one version of LionWeb standard.
-internal interface ISerializerVersionSpecifics : IVersionSpecifics
+public interface ISerializerVersionSpecifics : IVersionSpecifics
 {
     /// <summary>
     /// Creates an instance of <see cref="ISerializerVersionSpecifics"/> that implements <paramref name="lionWebVersion"/>.
@@ -50,7 +50,7 @@ internal interface ISerializerVersionSpecifics : IVersionSpecifics
     SerializedProperty SerializeProperty(IReadableNode node, Feature property, object? value);
     
     /// Converts <paramref name="value"/> from <paramref name="node"/>'s <paramref name="property"/> to the string representation as used in a <see cref="SerializeProperty"/>.
-    public string? ConvertDatatype(IReadableNode node, Feature property, object? value);
+    public PropertyValue? ConvertDatatype(IReadableNode node, Feature property, object? value);
 }
 
 internal abstract class SerializerVersionSpecificsBase : ISerializerVersionSpecifics
@@ -69,9 +69,9 @@ internal abstract class SerializerVersionSpecificsBase : ISerializerVersionSpeci
     public SerializedProperty SerializeProperty(IReadableNode node, Feature property, object? value) =>
         new SerializedProperty { Property = property.ToMetaPointer(), Value = ConvertDatatype(node, property, value) };
 
-    public abstract string? ConvertDatatype(IReadableNode node, Feature property, object? value);
+    public abstract PropertyValue? ConvertDatatype(IReadableNode node, Feature property, object? value);
 
-    protected string? ConvertEnumeration(Enum e)
+    protected PropertyValue? ConvertEnumeration(Enum e)
     {
         var lionCoreMetaPointer = AttributeExtensions.GetAttributeOfType<LionCoreMetaPointer>(e);
 
@@ -95,7 +95,7 @@ internal abstract class SerializerVersionSpecificsBase : ISerializerVersionSpeci
     /// Serializes the given <paramref name="value">runtime value</paramref> as a string,
     /// conforming to the LionWeb JSON serialization format.
     /// </summary>
-    protected string? ConvertPrimitiveType(object value) => value switch
+    protected PropertyValue? ConvertPrimitiveType(object value) => value switch
     {
         null => null,
         bool boolean => boolean ? "true" : "false",

@@ -22,7 +22,7 @@ namespace LionWeb.Core.M1;
 using M2;
 using M3;
 using Serialization;
-using CompressedReference = (CompressedMetaPointer, List<(ICompressedId?, string?)>);
+using CompressedReference = (CompressedMetaPointer, List<(ICompressedId?, ResolveInfo?)>);
 
 /// <inheritdoc />
 /// <typeparam name="T">Type of node to return</typeparam>
@@ -68,6 +68,9 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get => _versionSpecifics.Version; }
 
+    /// <inheritdoc />
+    IDeserializerVersionSpecifics IDeserializer.VersionSpecifics => _versionSpecifics;
+
     /// How to store compressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
     public CompressedIdConfig CompressedIdConfig
     {
@@ -101,7 +104,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
 
     /// Takes care of <see cref="IDeserializerHandler.SkipDeserializingDependentNode"/>
     /// and <see cref="IDeserializerHandler.DuplicateNodeId"/>.
-    protected ICompressedId? ProcessInternal(SerializedNode serializedNode, Func<string, T?> instantiator)
+    protected ICompressedId? ProcessInternal(SerializedNode serializedNode, Func<NodeId, T?> instantiator)
     {
         var id = serializedNode.Id;
 
@@ -171,7 +174,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// 3. By resolveInfo in <see cref="ILionCoreLanguage"/>
     /// 4. By resolveInfo in <see cref="IBuiltInsLanguage"/>
     /// 5. By resolveInfo vs. name in <see cref="_deserializedNodesById"/> (depending on <see cref="ResolveInfoHandling"/>)
-    protected IReadableNode? FindReferenceTarget(ICompressedId? targetId, string? resolveInfo) =>
+    protected IReadableNode? FindReferenceTarget(ICompressedId? targetId, ResolveInfo? resolveInfo) =>
         (targetId, resolveInfo) switch
         {
             ({ } tid, _) =>
@@ -186,7 +189,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
             _ => null
         };
 
-    private IKeyed? ResolveResolveInfo(string resolveInfo, string prefix, Language language)
+    private IKeyed? ResolveResolveInfo(ResolveInfo resolveInfo, string prefix, Language language)
     {
         var remainingResolveInfo = resolveInfo[prefix.Length..];
         var parts = remainingResolveInfo.Split(".");
@@ -268,7 +271,7 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     }
 
     private IReadableNode? FindReferenceTarget(IReadableNode node, Feature reference, ICompressedId? targetId,
-        string? resolveInfo) =>
+        ResolveInfo? resolveInfo) =>
         FindReferenceTarget(targetId, resolveInfo) ??
         _handler.UnresolvableReferenceTarget(targetId, resolveInfo, reference, node);
 
@@ -309,11 +312,11 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     }
 
     /// Compresses <paramref name="id"/>.
-    protected internal ICompressedId Compress(string id) =>
+    protected internal ICompressedId Compress(NodeId id) =>
         ICompressedId.Create(id, CompressedIdConfig);
 
     /// Compresses <paramref name="id"/> if not <c>null</c>.
-    protected internal ICompressedId? CompressOpt(string? id) =>
+    protected internal ICompressedId? CompressOpt(NodeId? id) =>
         id != null ? ICompressedId.Create(id, CompressedIdConfig) : null;
 
     /// Compresses <paramref name="metaPointer"/>.

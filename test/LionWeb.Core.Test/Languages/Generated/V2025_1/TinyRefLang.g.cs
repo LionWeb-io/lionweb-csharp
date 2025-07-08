@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.TinyRefLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -117,7 +118,10 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
         public MyConcept SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		evt.CollectOldData();
 		_name = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -142,7 +146,10 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		ReferenceAddMultipleEventEmitter<INamed> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef.Count);
+		evt.CollectOldData();
 		_multivaluedRef.AddRange(safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -155,7 +162,10 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+		ReferenceAddMultipleEventEmitter<INamed> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, index);
+		evt.CollectOldData();
 		_multivaluedRef.InsertRange(index, safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -167,7 +177,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		AssureNotNull(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNonEmpty(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
 		AssureNotClearing(safeNodes, _multivaluedRef, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-		RemoveAll(safeNodes, _multivaluedRef);
+		RemoveAll(safeNodes, _multivaluedRef, ReferenceRemover<INamed>(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef));
 		return this;
 	}
 
@@ -191,7 +201,10 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
         public MyConcept SetSingularRef(INamed value)
 	{
 		AssureNotNull(value, TinyRefLangLanguage.Instance.MyConcept_singularRef);
+		ReferenceSingleEventEmitter evt = new(TinyRefLangLanguage.Instance.MyConcept_singularRef, this, value, _singularRef);
+		evt.CollectOldData();
 		_singularRef = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -245,10 +258,13 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 
 		if (TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.EqualsIdentity(feature))
 		{
-			var enumerable = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(value).ToList();
-			AssureNonEmpty(enumerable, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+			var safeNodes = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(value).ToList();
+			AssureNonEmpty(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
+			ReferenceSetEventEmitter<INamed> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef);
+			evt.CollectOldData();
 			_multivaluedRef.Clear();
-			AddMultivaluedRef(enumerable);
+			_multivaluedRef.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 

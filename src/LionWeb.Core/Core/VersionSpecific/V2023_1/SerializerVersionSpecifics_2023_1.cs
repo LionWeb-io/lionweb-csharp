@@ -24,7 +24,7 @@ internal class SerializerVersionSpecifics_2023_1 : SerializerVersionSpecificsBas
 {
     public override LionWebVersions Version => LionWebVersions.v2023_1;
 
-    public override string? ConvertDatatype(IReadableNode node, Feature property, object? value) =>
+    public override PropertyValue? ConvertDatatype(IReadableNode node, Feature property, object? value) =>
         value switch
         {
             null => null,

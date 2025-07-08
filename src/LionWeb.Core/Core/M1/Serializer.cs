@@ -315,7 +315,7 @@ public class Serializer : ISerializer
         };
     }
 
-    private static string ConcatResolveInfo(IReadableNode target, string prefix) =>
+    private static ResolveInfo ConcatResolveInfo(IReadableNode target, string prefix) =>
         prefix + target switch
         {
             Feature f => f.GetFeatureClassifier().Name,
@@ -336,7 +336,7 @@ public class Serializer : ISerializer
 
     #endregion
 
-    private string SerializeAnnotationTarget(IReadableNode annotation) =>
+    private NodeId SerializeAnnotationTarget(IReadableNode annotation) =>
         annotation.GetId();
 
     private SerializedLanguageReference SerializeLanguageReference(Language language) =>
@@ -344,7 +344,7 @@ public class Serializer : ISerializer
 
     #region Helpers
 
-    private ICompressedId Compress(string id) =>
+    private ICompressedId Compress(NodeId id) =>
         ICompressedId.Create(id, CompressedIdConfig);
 
     /// Compares features with special handling for LionCore features (only compared by key).

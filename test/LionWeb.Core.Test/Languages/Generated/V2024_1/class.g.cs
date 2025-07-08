@@ -6,6 +6,7 @@
 #nullable enable
 namespace @namespace.@int.@public.V2024_1;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -198,7 +199,10 @@ public partial class @out : @struct
         public @out SetDefault(@if value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.out_default);
+		PropertyEventEmitter evt = new(ClassLanguage.Instance.out_default, this, value, _default);
+		evt.CollectOldData();
 		_default = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -282,7 +286,10 @@ public partial class @record : AnnotationInstanceBase, @interface
         public @record SetString(@enum value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
+		PropertyEventEmitter evt = new(ClassLanguage.Instance.interface_string, this, value, _string);
+		evt.CollectOldData();
 		_string = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -306,9 +313,12 @@ public partial class @record : AnnotationInstanceBase, @interface
         public @record SetDouble(@interface value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.record_double);
+		ContainmentSingleEventEmitter<@interface> evt = new(ClassLanguage.Instance.record_double, this, value, _double);
+		evt.CollectOldData();
 		SetParentNull(_double);
 		AttachChild(value);
 		_double = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -432,7 +442,10 @@ public partial class @struct : ConceptInstanceBase, @interface
         public @struct SetString(@enum value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
+		PropertyEventEmitter evt = new(ClassLanguage.Instance.interface_string, this, value, _string);
+		evt.CollectOldData();
 		_string = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -456,7 +469,10 @@ public partial class @struct : ConceptInstanceBase, @interface
         public @struct SetRef(@record value)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
+		ReferenceSingleEventEmitter evt = new(ClassLanguage.Instance.struct_ref, this, value, _ref);
+		evt.CollectOldData();
 		_ref = value;
+		evt.RaiseEvent();
 		return this;
 	}
 

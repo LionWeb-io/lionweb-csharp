@@ -35,7 +35,7 @@ public class SerializerIgnoringHandler : ISerializerHandler
     }
 
     /// <inheritdoc />
-    public string? UnknownDatatype(IReadableNode node, Feature property, object? value)
+    public PropertyValue? UnknownDatatype(IReadableNode node, Feature property, object? value)
     {
         LogMessage($"unsupported property: {property}");
         return null;

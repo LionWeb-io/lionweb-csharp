@@ -6,6 +6,8 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event.Partition;
+using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -343,7 +345,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		_altGroups.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.BillOfMaterials_altGroups));
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, null);
+		evt.CollectOldData();
+		_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -354,14 +362,18 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		AssureNoSelfMove(index, safeNodes, _altGroups);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, index);
+		evt.CollectOldData();
 		_altGroups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
+		evt.RaiseEvent();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials RemoveAltGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
+		RemoveSelfParent(nodes?.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups, ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_altGroups));
 		return this;
 	}
 
@@ -381,9 +393,12 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	/// <remarks>Optional Single Containment</remarks>
         public BillOfMaterials SetDefaultGroup(MaterialGroup? value)
 	{
+		ContainmentSingleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_defaultGroup, this, value, _defaultGroup);
+		evt.CollectOldData();
 		SetParentNull(_defaultGroup);
 		AttachChild(value);
 		_defaultGroup = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -403,7 +418,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		_groups.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.BillOfMaterials_groups));
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
+		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, null);
+		evt.CollectOldData();
+		_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -414,14 +435,18 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		AssureNoSelfMove(index, safeNodes, _groups);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
+		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, index);
+		evt.CollectOldData();
 		_groups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
+		evt.RaiseEvent();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public BillOfMaterials RemoveGroups(IEnumerable<MaterialGroup> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
+		RemoveSelfParent(nodes?.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups, ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_groups));
 		return this;
 	}
 
@@ -444,7 +469,10 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials.Count);
+		evt.CollectOldData();
 		_materials.AddRange(safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -455,7 +483,10 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, index);
+		evt.CollectOldData();
 		_materials.InsertRange(index, safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -465,7 +496,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		RemoveAll(safeNodes, _materials);
+		RemoveAll(safeNodes, _materials, ReferenceRemover<IShape>(ShapesLanguage.Instance.BillOfMaterials_materials));
 		return this;
 	}
 
@@ -514,9 +545,12 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.MaterialGroup>(value);
+			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.MaterialGroup>(value).ToList();
+			ContainmentSetEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups);
+			evt.CollectOldData();
 			RemoveSelfParent(_altGroups.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-			AddAltGroups(enumerable);
+			_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -533,17 +567,25 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.MaterialGroup>(value);
+			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.MaterialGroup>(value).ToList();
+			ContainmentSetEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups);
+			evt.CollectOldData();
 			RemoveSelfParent(_groups.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
-			AddGroups(enumerable);
+			_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
+			evt.RaiseEvent();
 			return true;
 		}
 
 		if (ShapesLanguage.Instance.BillOfMaterials_materials.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value);
+			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
+			AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
+			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials);
+			evt.CollectOldData();
 			_materials.Clear();
-			AddMaterials(enumerable);
+			_materials.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -631,9 +673,12 @@ public partial class Circle : Shape
         public Circle SetCenter(Coord value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.Circle_center);
+		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.Circle_center, this, value, _center);
+		evt.CollectOldData();
 		SetParentNull(_center);
 		AttachChild(value);
 		_center = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -654,7 +699,10 @@ public partial class Circle : Shape
 	/// <remarks>Required Property</remarks>
         public Circle SetR(int value)
 	{
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Circle_r, this, value, _r);
+		evt.CollectOldData();
 		_r = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -775,7 +823,10 @@ public partial class CompositeShape : Shape
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, null);
+		evt.CollectOldData();
 		_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -788,7 +839,10 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		AssureNoSelfMove(index, safeNodes, _disabledParts);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, index);
+		evt.CollectOldData();
 		_disabledParts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -799,7 +853,7 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		AssureNotClearing(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		RemoveSelfParent(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
+		RemoveSelfParent(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts, ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_disabledParts));
 		return this;
 	}
 
@@ -823,9 +877,12 @@ public partial class CompositeShape : Shape
         public CompositeShape SetEvilPart(IShape value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.CompositeShape_evilPart);
+		ContainmentSingleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_evilPart, this, value, _evilPart);
+		evt.CollectOldData();
 		SetParentNull(_evilPart);
 		AttachChild(value);
 		_evilPart = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -849,7 +906,10 @@ public partial class CompositeShape : Shape
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, null);
+		evt.CollectOldData();
 		_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -862,7 +922,10 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
 		AssureNoSelfMove(index, safeNodes, _parts);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, index);
+		evt.CollectOldData();
 		_parts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -873,7 +936,7 @@ public partial class CompositeShape : Shape
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
 		AssureNotClearing(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
-		RemoveSelfParent(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
+		RemoveSelfParent(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts, ContainmentRemover<IShape>(ShapesLanguage.Instance.CompositeShape_parts));
 		return this;
 	}
 
@@ -916,10 +979,13 @@ public partial class CompositeShape : Shape
 			return true;
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
-			AssureNonEmpty(enumerable, ShapesLanguage.Instance.CompositeShape_disabledParts);
+			var safeNodes = ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
+			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
+			ContainmentSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts);
+			evt.CollectOldData();
 			RemoveSelfParent(_disabledParts.ToList(), _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-			AddDisabledParts(enumerable);
+			_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -936,10 +1002,13 @@ public partial class CompositeShape : Shape
 
 		if (ShapesLanguage.Instance.CompositeShape_parts.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
-			AssureNonEmpty(enumerable, ShapesLanguage.Instance.CompositeShape_parts);
+			var safeNodes = ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
+			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
+			ContainmentSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts);
+			evt.CollectOldData();
 			RemoveSelfParent(_parts.ToList(), _parts, ShapesLanguage.Instance.CompositeShape_parts);
-			AddParts(enumerable);
+			_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -1022,7 +1091,10 @@ public partial class Coord : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Coord SetX(int value)
 	{
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_x, this, value, _x);
+		evt.CollectOldData();
 		_x = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1043,7 +1115,10 @@ public partial class Coord : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Coord SetY(int value)
 	{
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_y, this, value, _y);
+		evt.CollectOldData();
 		_y = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1064,7 +1139,10 @@ public partial class Coord : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Coord SetZ(int value)
 	{
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_z, this, value, _z);
+		evt.CollectOldData();
 		_z = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1174,7 +1252,10 @@ public partial class Documentation : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Documentation SetTechnical(bool? value)
 	{
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Documentation_technical, this, value, _technical);
+		evt.CollectOldData();
 		_technical = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1194,7 +1275,10 @@ public partial class Documentation : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Documentation SetText(string? value)
 	{
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Documentation_text, this, value, _text);
+		evt.CollectOldData();
 		_text = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1285,9 +1369,12 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	/// <remarks>Optional Single Containment</remarks>
         public Geometry SetDocumentation(Documentation? value)
 	{
+		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.Geometry_documentation, this, value, _documentation);
+		evt.CollectOldData();
 		SetParentNull(_documentation);
 		AttachChild(value);
 		_documentation = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1307,7 +1394,13 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	/// <remarks>Optional Multiple Containment</remarks>
         public Geometry AddShapes(IEnumerable<IShape> nodes)
 	{
-		_shapes.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.Geometry_shapes));
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, null);
+		evt.CollectOldData();
+		_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1318,23 +1411,31 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNoSelfMove(index, safeNodes, _shapes);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, index);
+		evt.CollectOldData();
 		_shapes.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
+		evt.RaiseEvent();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         public Geometry RemoveShapes(IEnumerable<IShape> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes);
+		RemoveSelfParent(nodes?.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes, ContainmentRemover<IShape>(ShapesLanguage.Instance.Geometry_shapes));
 		return this;
 	}
 
 	public Geometry(string id) : base(id)
 	{
+		_eventHandler = new(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
+	private readonly PartitionEventHandler _eventHandler;
+	public IPartitionPublisher? GetPublisher() => _eventHandler;
+	public IPartitionCommander? GetCommander() => _eventHandler;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -1373,9 +1474,12 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value);
+			var safeNodes = ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
+			ContainmentSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes);
+			evt.CollectOldData();
 			RemoveSelfParent(_shapes.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes);
-			AddShapes(enumerable);
+			_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -1474,9 +1578,12 @@ public partial class Line : Shape, INamedWritable
         public Line SetEnd(Coord value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.Line_end);
+		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.Line_end, this, value, _end);
+		evt.CollectOldData();
 		SetParentNull(_end);
 		AttachChild(value);
 		_end = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1500,9 +1607,12 @@ public partial class Line : Shape, INamedWritable
         public Line SetStart(Coord value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.Line_start);
+		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.Line_start, this, value, _start);
+		evt.CollectOldData();
 		SetParentNull(_start);
 		AttachChild(value);
 		_start = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1627,9 +1737,12 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <remarks>Optional Single Containment</remarks>
         public MaterialGroup SetDefaultShape(IShape? value)
 	{
+		ContainmentSingleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_defaultShape, this, value, _defaultShape);
+		evt.CollectOldData();
 		SetParentNull(_defaultShape);
 		AttachChild(value);
 		_defaultShape = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1654,7 +1767,10 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials.Count);
+		evt.CollectOldData();
 		_materials.AddRange(safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1667,7 +1783,10 @@ public partial class MaterialGroup : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, index);
+		evt.CollectOldData();
 		_materials.InsertRange(index, safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1679,7 +1798,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNotClearing(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		RemoveAll(safeNodes, _materials);
+		RemoveAll(safeNodes, _materials, ReferenceRemover<IShape>(ShapesLanguage.Instance.MaterialGroup_materials));
 		return this;
 	}
 
@@ -1699,7 +1818,10 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         public MaterialGroup SetMatterState(MatterState? value)
 	{
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.MaterialGroup_matterState, this, value, _matterState);
+		evt.CollectOldData();
 		_matterState = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1753,10 +1875,13 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 		if (ShapesLanguage.Instance.MaterialGroup_materials.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
-			AssureNonEmpty(enumerable, ShapesLanguage.Instance.MaterialGroup_materials);
+			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
+			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
+			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials);
+			evt.CollectOldData();
 			_materials.Clear();
-			AddMaterials(enumerable);
+			_materials.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -1833,7 +1958,10 @@ public partial class OffsetDuplicate : Shape
 	/// <remarks>Optional Single Reference</remarks>
         public OffsetDuplicate SetAltSource(Shape? value)
 	{
+		ReferenceSingleEventEmitter evt = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource);
+		evt.CollectOldData();
 		_altSource = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1853,9 +1981,12 @@ public partial class OffsetDuplicate : Shape
 	/// <remarks>Optional Single Containment</remarks>
         public OffsetDuplicate SetDocs(Documentation? value)
 	{
+		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.OffsetDuplicate_docs, this, value, _docs);
+		evt.CollectOldData();
 		SetParentNull(_docs);
 		AttachChild(value);
 		_docs = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1879,9 +2010,12 @@ public partial class OffsetDuplicate : Shape
         public OffsetDuplicate SetOffset(Coord value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_offset);
+		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.OffsetDuplicate_offset, this, value, _offset);
+		evt.CollectOldData();
 		SetParentNull(_offset);
 		AttachChild(value);
 		_offset = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1901,9 +2035,12 @@ public partial class OffsetDuplicate : Shape
 	/// <remarks>Optional Single Containment</remarks>
         public OffsetDuplicate SetSecretDocs(Documentation? value)
 	{
+		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, this, value, _secretDocs);
+		evt.CollectOldData();
 		SetParentNull(_secretDocs);
 		AttachChild(value);
 		_secretDocs = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -1927,7 +2064,10 @@ public partial class OffsetDuplicate : Shape
         public OffsetDuplicate SetSource(Shape value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_source);
+		ReferenceSingleEventEmitter evt = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, value, _source);
+		evt.CollectOldData();
 		_source = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2120,7 +2260,10 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes.Count);
+		evt.CollectOldData();
 		_shapes.AddRange(safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2131,7 +2274,10 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, index);
+		evt.CollectOldData();
 		_shapes.InsertRange(index, safeNodes);
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2141,16 +2287,20 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		RemoveAll(safeNodes, _shapes);
+		RemoveAll(safeNodes, _shapes, ReferenceRemover<IShape>(ShapesLanguage.Instance.ReferenceGeometry_shapes));
 		return this;
 	}
 
 	public ReferenceGeometry(string id) : base(id)
 	{
+		_eventHandler = new(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
+	private readonly PartitionEventHandler _eventHandler;
+	public IPartitionPublisher? GetPublisher() => _eventHandler;
+	public IPartitionCommander? GetCommander() => _eventHandler;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out Object? result)
 	{
@@ -2172,9 +2322,14 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value);
+			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
+			AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
+			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes);
+			evt.CollectOldData();
 			_shapes.Clear();
-			AddShapes(enumerable);
+			_shapes.AddRange(safeNodes);
+			evt.RaiseEvent();
 			return true;
 		}
 
@@ -2217,7 +2372,10 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public Shape SetName(string value)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		evt.CollectOldData();
 		_name = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2238,7 +2396,13 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <remarks>Optional Multiple Containment</remarks>
         public Shape AddFixpoints(IEnumerable<Coord> nodes)
 	{
-		_fixpoints.AddRange(SetSelfParent(nodes?.ToList(), ShapesLanguage.Instance.IShape_fixpoints));
+		var safeNodes = nodes?.ToList();
+		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
+		ContainmentAddMultipleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, null);
+		evt.CollectOldData();
+		_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
+		evt.RaiseEvent();
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
@@ -2250,7 +2414,11 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		AssureNoSelfMove(index, safeNodes, _fixpoints);
+		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
+		ContainmentAddMultipleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, index);
+		evt.CollectOldData();
 		_fixpoints.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
+		evt.RaiseEvent();
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
@@ -2258,7 +2426,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <remarks>Optional Multiple Containment</remarks>
         public Shape RemoveFixpoints(IEnumerable<Coord> nodes)
 	{
-		RemoveSelfParent(nodes?.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
+		RemoveSelfParent(nodes?.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints, ContainmentRemover<Coord>(ShapesLanguage.Instance.IShape_fixpoints));
 		return this;
 	}
 
@@ -2285,7 +2453,10 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
         public Shape SetUuid(string value)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.IShape_uuid);
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.IShape_uuid, this, value, _uuid);
+		evt.CollectOldData();
 		_uuid = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2305,9 +2476,12 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <remarks>Optional Single Containment</remarks>
         public Shape SetShapeDocs(Documentation? value)
 	{
+		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.Shape_shapeDocs, this, value, _shapeDocs);
+		evt.CollectOldData();
 		SetParentNull(_shapeDocs);
 		AttachChild(value);
 		_shapeDocs = value;
+		evt.RaiseEvent();
 		return this;
 	}
 
@@ -2367,9 +2541,12 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature))
 		{
-			var enumerable = ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.Coord>(value);
+			var safeNodes = ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.Coord>(value).ToList();
+			ContainmentSetEventEmitter<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints);
+			evt.CollectOldData();
 			RemoveSelfParent(_fixpoints.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
-			AddFixpoints(enumerable);
+			_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
+			evt.RaiseEvent();
 			return true;
 		}
 
