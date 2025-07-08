@@ -21,7 +21,10 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
+using static AstExtensions;
 
 /// <summary>
 /// Common base class for all generators for concept/annotation classes and interface interfaces.
@@ -52,4 +55,41 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
                 .Where(c => c is Concept or Annotation)
                 .SelectMany(InterfaceFeatures)
             );
+
+    protected ExpressionStatementSyntax AssureNotNullCall(Link link) =>
+        ExpressionStatement(Call("AssureNotNull",
+            IdentifierName("safeNodes"),
+            MetaProperty(link)
+        ));
+
+    protected ExpressionStatementSyntax AssureNotNullMembersCall(Link link) =>
+        ExpressionStatement(Call("AssureNotNullMembers",
+            IdentifierName("safeNodes"),
+            MetaProperty(link)
+        ));
+
+    protected ExpressionStatementSyntax EventCollectOldDataCall() =>
+        ExpressionStatement(
+            InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("CollectOldData"))));
+
+    protected ExpressionStatementSyntax EventRaiseEventCall() =>
+        ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("RaiseEvent"))));
+
+    protected ExpressionStatementSyntax OptionalAddRangeCall(Containment containment) =>
+        ExpressionStatement(InvocationExpression(
+            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
+            AsArguments([
+                Call("SetSelfParent", IdentifierName("safeNodes"), MetaProperty(containment))
+            ])
+        ));
+
+    protected ExpressionStatementSyntax RequiredAddRangeCall(Containment containment) =>
+        ExpressionStatement(InvocationExpression(
+            MemberAccess(FeatureField(containment), IdentifierName("AddRange")),
+            AsArguments([
+                Call("SetSelfParent", IdentifierName("safeNodes"),
+                    MetaProperty(containment)
+                )
+            ])
+        ));
 }
