@@ -487,12 +487,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             MetaProperty(link)
         ));
 
-    private ExpressionStatementSyntax AssureNotNullCall(Link link) =>
-        ExpressionStatement(Call("AssureNotNull",
-            IdentifierName("safeNodes"),
-            MetaProperty(link)
-        ));
-
     private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
         ExpressionStatement(Call("AssureNonEmpty",
             IdentifierName("safeNodes"),
@@ -520,11 +514,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private static LocalDeclarationStatementSyntax SafeNodesVariable() =>
         Variable("safeNodes", Var(), OptionalNodesToList());
-
-    private static LocalDeclarationStatementSyntax NotNullSafeNodesVariable() =>
-        Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(IdentifierName("nodes"), IdentifierName("ToList")))
-        );
 
     private static ConditionalAccessExpressionSyntax OptionalNodesToList() =>
         ConditionalAccessExpression(IdentifierName("nodes"),

@@ -51,6 +51,6 @@ public class ReferenceTests_VersionSpecifics : DynamicNodeTestsBase
         Lang(versionIface).GetFactory().CreateNode(id, Lang(versionIface).ClassifierByKey("key-Line")) as DynamicNode ??
         throw new AssertFailedException();
 
-    private Feature ReferenceGeometry_shapes(Type versionIface) =>
+    private new Feature ReferenceGeometry_shapes(Type versionIface) =>
         Lang(versionIface).ClassifierByKey("key-ReferenceGeometry").FeatureByKey("key-shapes-references");
 }

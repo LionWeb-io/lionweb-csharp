@@ -137,7 +137,7 @@ public class CustomClonerTests : ClonerTestsBase
         {
         }
 
-        public static IEnumerable<INode> Clone(IEnumerable<INode> nodes)
+        public static new IEnumerable<INode> Clone(IEnumerable<INode> nodes)
         {
             HashSet<INode> hashSet;
             if (nodes is HashSet<INode> set)
