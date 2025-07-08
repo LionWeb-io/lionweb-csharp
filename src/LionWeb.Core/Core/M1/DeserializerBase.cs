@@ -68,6 +68,9 @@ public abstract class DeserializerBase<T, H> : IDeserializer<T>
     /// <inheritdoc />
     public LionWebVersions LionWebVersion { get => _versionSpecifics.Version; }
 
+    /// <inheritdoc />
+    IDeserializerVersionSpecifics IDeserializer.VersionSpecifics => _versionSpecifics;
+
     /// How to store compressed <see cref="IReadableNode.GetId()">node ids</see> and <see cref="MetaPointer">MetaPointers</see> during deserialization.
     public CompressedIdConfig CompressedIdConfig
     {

@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1.Event.Partition;
 using M2;
 using M3;
 using System.Collections;
@@ -122,13 +123,29 @@ public class DynamicNode : NodeBase
 
     private bool SetProperty(Property property, object? value)
     {
+        var commander = GetPartitionCommander();
+        _settings.TryGetValue(property, out var oldValue);
         if (value == null && property.Optional)
         {
             _settings.Remove(property);
+            if (oldValue != null)
+            {
+                commander?.Raise(new PropertyDeletedEvent(this, property, oldValue, commander.CreateEventId()));
+            }
+
             return true;
         }
 
-        _settings[property] = VersionSpecifics.PrepareSetProperty(property, value);
+        var newValue = VersionSpecifics.PrepareSetProperty(property, value);
+        if (oldValue != null)
+        {
+            commander?.Raise(new PropertyChangedEvent(this, property, newValue, oldValue, commander.CreateEventId()));
+        } else
+        {
+            commander?.Raise(new PropertyAddedEvent(this, property, newValue, commander.CreateEventId()));
+        }
+
+        _settings[property] = newValue;
         return true;
     }
 
@@ -172,7 +189,7 @@ public class DynamicNode : NodeBase
                 AssureOptionalCount(value, enumerable, containment);
 
                 if (_settings.TryGetValue(containment, out var oldValue) && oldValue is List<INode> oldList)
-                    RemoveSelfParent(oldList?.ToList(), oldList, containment);
+                    RemoveSelfParent(oldList?.ToList(), oldList, containment, null);
 
                 SetSelfParent(enumerable, containment);
                 UpdateSettings(enumerable, containment);
@@ -253,6 +270,17 @@ public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
 public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
 {
+    private readonly PartitionEventHandler _eventHandler;
+
     /// <inheritdoc />
-    public DynamicPartitionInstance(string id, Concept concept) : base(id, concept) { }
+    public DynamicPartitionInstance(NodeId id, Concept concept) : base(id, concept)
+    {
+        _eventHandler = new PartitionEventHandler(this);
+    }
+
+    /// <inheritdoc />
+    public IPartitionPublisher GetPublisher() => _eventHandler;
+
+    /// <inheritdoc />
+    public IPartitionCommander GetCommander() => _eventHandler;
 }

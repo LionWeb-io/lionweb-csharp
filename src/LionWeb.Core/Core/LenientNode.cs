@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1.Event.Partition;
 using M2;
 using M3;
 using System.Collections;
@@ -186,7 +187,7 @@ public class LenientNode : NodeBase, INode
         if (feature == null)
         {
             var enumerable = M2Extensions.AsNodes<INode>(value).ToList();
-            RemoveSelfParent(_annotations.ToList(), _annotations, null);
+            RemoveSelfParent(_annotations.ToList(), _annotations, null, null);
             AddAnnotations(enumerable);
             return true;
         }
@@ -261,7 +262,7 @@ public class LenientNode : NodeBase, INode
                 SetParentNull(n);
                 return;
             case List<INode> oldList:
-                RemoveSelfParent(oldList.ToList(), oldList, c);
+                RemoveSelfParent(oldList.ToList(), oldList, c, null);
                 return;
         }
     }
@@ -320,7 +321,7 @@ public class LenientNode : NodeBase, INode
 
     /// <inheritdoc />
     public override bool RemoveAnnotations(IEnumerable<INode> annotations) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null);
+        RemoveSelfParent(annotations?.ToList(), _annotations, null, null);
 
     private IEnumerable<Feature> FeatureKeys => _featureValues.Select(f => f.feature);
 
@@ -361,4 +362,22 @@ public class LenientNode : NodeBase, INode
             _featureValues.Add((featureToSet, value));
         }
     }
+}
+
+public class LenientPartition : LenientNode, IPartitionInstance
+{
+    private readonly PartitionEventHandler _eventHandler;
+    public LenientPartition(NodeId id, Classifier? classifier) : base(id, classifier)
+    {
+        _eventHandler = new PartitionEventHandler(this);
+    }
+
+    /// <inheritdoc />
+    public IPartitionPublisher GetPublisher() => _eventHandler;
+
+    /// <inheritdoc />
+    public IPartitionCommander GetCommander() => _eventHandler;
+
+    /// <inheritdoc />
+    public Concept GetConcept() => (Concept)GetClassifier();
 }
