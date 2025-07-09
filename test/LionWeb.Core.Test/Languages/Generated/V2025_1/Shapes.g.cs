@@ -380,7 +380,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	private MaterialGroup? _defaultGroup = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-default-group")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
 	public MaterialGroup? DefaultGroup { get => _defaultGroup; set => SetDefaultGroup(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -807,7 +807,7 @@ public partial class CompositeShape : Shape
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If DisabledParts is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-disabled-parts")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = true)]
 	public IReadOnlyList<IShape> DisabledParts { get => AsNonEmptyReadOnly(_disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts); init => AddDisabledParts(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
@@ -890,7 +890,7 @@ public partial class CompositeShape : Shape
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Parts is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-parts")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = true)]
 	public IReadOnlyList<IShape> Parts { get => AsNonEmptyReadOnly(_parts, ShapesLanguage.Instance.CompositeShape_parts); init => AddParts(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
@@ -1356,7 +1356,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	private Documentation? _documentation = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-documentation")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
 	public Documentation? Documentation { get => _documentation; set => SetDocumentation(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -1724,7 +1724,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	private IShape? _defaultShape = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-default-shape")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
 	public IShape? DefaultShape { get => _defaultShape; set => SetDefaultShape(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -1750,7 +1750,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Materials is empty</exception>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-group-materials")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
 	public IReadOnlyList<IShape> Materials { get => AsNonEmptyReadOnly(_materials, ShapesLanguage.Instance.MaterialGroup_materials); init => AddMaterials(value); }
 
 	/// <remarks>Required Multiple Reference</remarks>
@@ -1945,7 +1945,7 @@ public partial class OffsetDuplicate : Shape
 	private Shape? _altSource = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-alt-source")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public Shape? AltSource { get => _altSource; set => SetAltSource(value); }
 
 	/// <remarks>Optional Single Reference</remarks>
@@ -1968,7 +1968,7 @@ public partial class OffsetDuplicate : Shape
 	private Documentation? _docs = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-docs")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
 	public Documentation? Docs { get => _docs; set => SetDocs(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -2022,7 +2022,7 @@ public partial class OffsetDuplicate : Shape
 	private Documentation? _secretDocs = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-secret-docs")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
 	public Documentation? SecretDocs { get => _secretDocs; set => SetSecretDocs(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -2463,7 +2463,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	private Documentation? _shapeDocs = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-shape-docs")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
 	public Documentation? ShapeDocs { get => _shapeDocs; set => SetShapeDocs(value); }
 
 	/// <remarks>Optional Single Containment</remarks>

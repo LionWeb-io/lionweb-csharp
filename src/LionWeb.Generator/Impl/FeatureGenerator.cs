@@ -629,7 +629,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 )
             ),
             ("Optional", feature.Optional.AsLiteral()),
-            ("Multiple", (feature is Link { Optional: true }).AsLiteral())
+            ("Multiple", (feature is Link { Multiple: true }).AsLiteral())
         ]);
 
     private PropertyDeclarationSyntax AbstractSingleRequiredFeatureProperty()

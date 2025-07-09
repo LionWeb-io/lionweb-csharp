@@ -118,7 +118,7 @@ public partial class AConcept : ConceptInstanceBase
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(ALangLanguage), Key = "key-BRef")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept? BRef { get => _bRef; set => SetBRef(value); }
 
 	/// bRef desc

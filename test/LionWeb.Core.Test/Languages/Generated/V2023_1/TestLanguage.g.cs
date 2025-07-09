@@ -626,7 +626,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	private LinkTestConcept? _containment_0_1 = null;
 	/// <remarks>Optional Single Containment</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-containment_0_1")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = true, Multiple = false)]
 	public LinkTestConcept? Containment_0_1 { get => _containment_0_1; set => SetContainment_0_1(value); }
 
 	/// <remarks>Optional Single Containment</remarks>
@@ -729,7 +729,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Containment_1_n is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-containment_1_n")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = true)]
 	public IReadOnlyList<LinkTestConcept> Containment_1_n { get => AsNonEmptyReadOnly(_containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n); init => AddContainment_1_n(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
@@ -782,7 +782,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	private LinkTestConcept? _reference_0_1 = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_0_1")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public LinkTestConcept? Reference_0_1 { get => _reference_0_1; set => SetReference_0_1(value); }
 
 	/// <remarks>Optional Single Reference</remarks>
@@ -883,7 +883,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "UnsetFeatureException">If Reference_1_n is empty</exception>
         [LionCoreMetaPointer(Language = typeof(TestLanguageLanguage), Key = "LinkTestConcept-reference_1_n")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = false)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = false, Multiple = true)]
 	public IReadOnlyList<LinkTestConcept> Reference_1_n { get => AsNonEmptyReadOnly(_reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n); init => AddReference_1_n(value); }
 
 	/// <remarks>Required Multiple Reference</remarks>

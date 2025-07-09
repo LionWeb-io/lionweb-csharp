@@ -138,7 +138,7 @@ public partial class BConcept : ConceptInstanceBase
 	private LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? _aRef = null;
 	/// <remarks>Optional Single Reference</remarks>
         [LionCoreMetaPointer(Language = typeof(BLangLanguage), Key = "key-ARef")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = true)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Reference, Optional = true, Multiple = false)]
 	public LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? ARef { get => _aRef; set => SetARef(value); }
 
 	/// <remarks>Optional Single Reference</remarks>
