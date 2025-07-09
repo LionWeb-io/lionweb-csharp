@@ -95,7 +95,7 @@ public partial class Container : ConceptInstanceBase
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "UnsetFeatureException">If Libraries is empty</exception>
         [LionCoreMetaPointer(Language = typeof(MultiLanguage), Key = "libraries")]
-	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = false)]
+	[LionCoreFeature(Kind = LionCoreFeatureKind.Containment, Optional = false, Multiple = true)]
 	public IReadOnlyList<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> Libraries { get => AsNonEmptyReadOnly(_libraries, MultiLanguage.Instance.Container_libraries); init => AddLibraries(value); }
 
 	/// <remarks>Required Multiple Containment</remarks>
