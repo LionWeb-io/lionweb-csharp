@@ -295,12 +295,14 @@ public abstract class EventTestsBase
     {
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
-        var node = new Geometry("a") { Shapes = [origin] };
+        var replaced = new Circle("replaced");
+        var node = new Geometry("a") { Shapes = [origin, replaced] };
 
         var clone = CreateReplicator(node);
 
-        node.InsertShapes(0, [moved]);
-
+        node.RemoveShapes([replaced]);
+        node.InsertShapes(1, [moved]);
+        
         AssertEquals([node], [clone]);
     }
 
