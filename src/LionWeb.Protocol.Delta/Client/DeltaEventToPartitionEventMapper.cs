@@ -194,7 +194,7 @@ public class DeltaEventToPartitionEventMapper
             movedChild,
             oldParent, 
             oldContainment, 
-            0,
+            childMovedAndReplacedEvent.OldIndex,
             replacedChild,
             ToEventId(childMovedAndReplacedEvent)
             );

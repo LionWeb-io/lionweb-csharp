@@ -194,7 +194,7 @@ public class DeltaCommandToPartitionEventMapper
             movedChild,
             oldParent,
             oldContainment,
-            0,
+            0, // TODO FIXME
             replacedChild,
             ToEventId(moveAndReplaceChildEvent)
         );
