@@ -23,6 +23,7 @@ global using Index = int;
 global using EventId = string;
 global using CommandId = string;
 global using ParticipationId = string;
+global using ClientId = string;
 global using TargetNode = string;
 global using QueryId = string;
 global using FreeId = string;

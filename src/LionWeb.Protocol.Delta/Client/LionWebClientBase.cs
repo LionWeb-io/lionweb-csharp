@@ -30,11 +30,18 @@ public abstract class LionWebClientBase<T>
     protected readonly PartitionEventHandler PartitionEventHandler;
 
     private ParticipationId? _participationId;
+    private readonly ClientId? _clientId;
 
     protected internal ParticipationId ParticipationId
     {
         get => _participationId ?? throw new InvalidOperationException($"{nameof(ParticipationId)} not set");
         set => _participationId = value;
+    }
+
+    public ClientId ClientId
+    {
+        get => _clientId ?? _name;
+        init => _clientId = value;
     }
 
     public LionWebClientBase(LionWebVersions lionWebVersion, List<Language> languages, string name,
