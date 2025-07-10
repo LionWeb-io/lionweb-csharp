@@ -15,8 +15,9 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Test;
+namespace LionWeb.Protocol.Delta.Test.Json;
 
+using Core;
 using Core.Serialization;
 using Message;
 using Message.Command;
@@ -76,6 +77,24 @@ public abstract class JsonTestsBase
     protected static ListPartitionsResponse CreateListPartitionsResponse() =>
         new(Chunk(), QueryId(), ProtocolMessages());
 
+    protected static SignOnRequest CreateSignOnRequest() =>
+        new(LionWebVersions.v2025_1.VersionString, ClientId(), QueryId(), ProtocolMessages());
+
+    protected static SignOnResponse CreateSignOnResponse() =>
+        new(ParticipationId(), QueryId(), ProtocolMessages());
+
+    protected static SignOffRequest CreateSignOffRequest() =>
+        new(QueryId(), ProtocolMessages());
+
+    protected static SignOffResponse CreateSignOffResponse() =>
+        new(QueryId(), ProtocolMessages());
+
+    protected static ReconnectRequest CreateReconnectRequest() =>
+        new(ParticipationId(), Sequence(), QueryId(), ProtocolMessages());
+
+    protected static ReconnectResponse CreateReconnectResponse() =>
+        new(Sequence(), QueryId(), ProtocolMessages());
+    
     protected static IEnumerable<object[]> CollectQueryMessages() =>
     [
         [CreateSubscribeToChangingPartitionsRequest()],
@@ -87,7 +106,13 @@ public abstract class JsonTestsBase
         [CreateGetAvailableIdsRequest()],
         [CreateGetAvailableIdsResponse()],
         [CreateListPartitionsRequest()],
-        [CreateListPartitionsResponse()]
+        [CreateListPartitionsResponse()],
+        [CreateSignOnRequest()],
+        [CreateSignOnResponse()],
+        [CreateSignOffRequest()],
+        [CreateSignOffResponse()],
+        [CreateReconnectRequest()],
+        [CreateReconnectResponse()]
     ];
 
     #endregion
@@ -648,8 +673,13 @@ public abstract class JsonTestsBase
     ];
 
     private static CommandSource CreateCommandSource() =>
-        new CommandSource("myParticipation", TargetNode());
+        new CommandSource(ParticipationId(), TargetNode());
 
+    private static ParticipationId ParticipationId() =>
+        "myParticipation";
+
+    private static ClientId ClientId() =>
+        "iAmTheClient";
 
     protected static QueryId QueryId() =>
         (++_nextQueryId).ToString();
