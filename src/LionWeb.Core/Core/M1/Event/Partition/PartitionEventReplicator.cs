@@ -260,7 +260,19 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         var localNewParent = Lookup(childMovedAndReplacedEvent.NewParent.GetId());
         var nodeToInsert = LookupOpt(childMovedAndReplacedEvent.MovedChild.GetId()) ?? Clone((INode)childMovedAndReplacedEvent.MovedChild);
         var newValue = InsertContainment(localNewParent, childMovedAndReplacedEvent.NewContainment, childMovedAndReplacedEvent.NewIndex, nodeToInsert);
-        
+
+        if (childMovedAndReplacedEvent.NewContainment.Multiple)
+        {
+            var existingChildren = localNewParent.Get(childMovedAndReplacedEvent.NewContainment);
+            if (existingChildren is IList l)
+            {
+                var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                var removeIndex = childMovedAndReplacedEvent.NewIndex + 1;
+                children.RemoveAt(removeIndex);
+                newValue = children;
+            }
+        }
+
         localNewParent.Set(childMovedAndReplacedEvent.NewContainment, newValue);
     });
 
