@@ -28,15 +28,15 @@ using RightIndex = Index;
 /// The lists should be passed to the constructor of implementing classes.
 public interface IListComparer
 {
-    /// <summary>
-    /// Creates a default implementation.
-    /// </summary>
-    /// <param name="left"></param>
-    /// <param name="right"></param>
-    /// <typeparam name="T"></typeparam>
-    /// <returns></returns>
+    /// Creates a default implementation that compares two lists,
+    /// and returns the minimum number of <see cref="IListChange{T}">changes</see>
+    /// to convert <paramref name="left"/> into <paramref name="right"/>. 
     static IListComparer<T> Create<T>(List<T> left, List<T> right) where T : notnull =>
         new MoveDetector<T>(new ListComparer<T>(left, right));
+    
+    /// <inheritdoc cref="Create{T}"/>
+    static IListComparer<T> CreateForNodes<T>(List<T> left, List<T> right) where T : IReadableNode =>
+        new MoveDetector<T>(new ListComparer<T>(left, right, new NodeIdComparer<T>()));
 }
 
 /// <inheritdoc />

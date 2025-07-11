@@ -37,7 +37,7 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
         if (!IsActive())
             return;
 
-        var listComparer = IListComparer.Create(storage, safeNodes);
+        var listComparer = IListComparer.CreateForNodes(storage, safeNodes);
         _changes = listComparer.Compare();
     }
 

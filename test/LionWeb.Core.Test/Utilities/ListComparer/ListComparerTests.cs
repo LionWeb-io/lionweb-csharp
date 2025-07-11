@@ -274,7 +274,7 @@ public class ListComparerTests : AbsoluteIndexListComparerTestsBase
         var b = new Line("x");
 
 
-        var comparer = new ListComparer<INode>([a, b], [b, a], new NodeIdComparer());
+        var comparer = new ListComparer<INode>([a, b], [b, a], new NodeIdComparer<INode>());
         var changes = comparer.Compare();
         CollectionAssert.AreEqual(
             new List<IListChange<INode>> { },

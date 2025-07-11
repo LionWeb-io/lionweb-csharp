@@ -38,7 +38,7 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
         if (!IsActive() || setValues == null)
             return;
 
-        var listComparer = IListComparer.Create(existingValues, setValues);
+        var listComparer = IListComparer.CreateForNodes(existingValues, setValues);
         _changes = listComparer.Compare();
     }
 

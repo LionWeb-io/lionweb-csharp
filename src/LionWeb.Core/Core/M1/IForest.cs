@@ -50,7 +50,7 @@ public class Forest : IForest
     /// <inheritdoc cref="IForest"/>
     public Forest()
     {
-        _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer());
+        _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
         _eventHandler = new ForestEventHandler(this);
     }
 
