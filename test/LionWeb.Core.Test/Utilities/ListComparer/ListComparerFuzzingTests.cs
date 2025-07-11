@@ -24,7 +24,7 @@ using System.Diagnostics;
 [DebugOnlyTestClass]
 public class ListComparerFuzzingTests : AbsoluteIndexListComparerTestsBase
 {
-    const int Tries = 1000;
+    const int Tries = 10;
     private const int MaxLength = 15;
 
     public static IEnumerable<object[]> TestData

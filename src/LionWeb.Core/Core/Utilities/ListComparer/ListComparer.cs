@@ -37,8 +37,8 @@ public class ListComparer<T> : IListComparer<T> where T : notnull
     private readonly Cost[,] _reverseMatrix;
 
     private Cost _editCost;
-    private readonly SortedList<RightIndex, (T, RightIndex)> _added = [];
-    private readonly SortedList<LeftIndex, (T, LeftIndex)> _deleted = [];
+    private readonly SortedList<RightIndex, ListAdded<T>> _added = [];
+    private readonly SortedList<LeftIndex, ListDeleted<T>> _deleted = [];
 
     /// <summary>
     /// Compares two lists, and returns the minimum number of <see cref="IListChange{T}">changes</see>
@@ -67,14 +67,9 @@ public class ListComparer<T> : IListComparer<T> where T : notnull
     }
 
     private List<IListChange<T>> CollectChanges() =>
-        _deleted
-            .Values
-            .Select(IListChange<T> (c) => new ListDeleted<T>(c.Item1, c.Item2))
-            .Concat(_added
-                .Values
-                .Select(IListChange<T> (c) => new ListAdded<T>(c.Item1, c.Item2))
-            )
-            .ToList();
+        ((IEnumerable<IListChange<T>>)_deleted.Values)
+        .Concat(_added.Values)
+        .ToList();
 
     private void CompareInternal()
     {
@@ -190,10 +185,10 @@ public class ListComparer<T> : IListComparer<T> where T : notnull
     }
 
     private void Delete(T leftElement, LeftIndex leftIndex) =>
-        _deleted.Add(leftIndex, (leftElement, leftIndex));
+        _deleted.Add(leftIndex, new ListDeleted<T>(leftElement, leftIndex));
 
     private void Add(T rightElement, RightIndex rightIndex) =>
-        _added.Add(rightIndex, (rightElement, rightIndex));
+        _added.Add(rightIndex, new ListAdded<T>(rightElement, rightIndex));
 
     private void FwdDpa(LeftIndex lowerBoundLeft, LeftIndex upperBoundLeft, RightIndex lowerBoundRight,
         RightIndex upperBoundRight)
