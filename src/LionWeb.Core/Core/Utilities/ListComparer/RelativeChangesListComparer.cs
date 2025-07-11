@@ -20,7 +20,7 @@ namespace LionWeb.Core.Utilities.ListComparer;
 public class RelativeChangesListComparer<T> : IListComparer<T>
 {
     private readonly IListComparer<T> _listComparer;
-    private List<IListComparer<T>.IChange> _allChanges;
+    private List<IListChange<T>> _allChanges;
     
     public RelativeChangesListComparer(List<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
         : this(new ListComparer<T>(left, right, comparer))
@@ -32,7 +32,7 @@ public class RelativeChangesListComparer<T> : IListComparer<T>
         _listComparer = listComparer;
     }
     
-    public List<IListComparer<T>.IChange> Compare()
+    public List<IListChange<T>> Compare()
     {
         _allChanges = _listComparer.Compare();
         Console.WriteLine("allChanges: \n" + string.Join("\n", _allChanges));
@@ -40,18 +40,18 @@ public class RelativeChangesListComparer<T> : IListComparer<T>
         var sorted = SortChangesToLeft(_allChanges);
         Console.WriteLine("Changes sorted to left: \n" + string.Join("\n", _allChanges));
         
-        List<IListComparer<T>.IChange> result = ShiftDeleted(sorted).ToList();
+        List<IListChange<T>> result = ShiftDeleted(sorted).ToList();
 
         Console.WriteLine("\nbeforeMoveAdjustment: \n" + string.Join("\n", result));
         return result;
     }
 
-    private IEnumerable<IListComparer<T>.IChange> SortChangesToLeft(List<IListComparer<T>.IChange> inputChanges) =>
+    private IEnumerable<IListChange<T>> SortChangesToLeft(List<IListChange<T>> inputChanges) =>
             inputChanges
-                .OrderBy(c => c is IListComparer<T>.Deleted ? 0 : 1)
+                .OrderBy(c => c is ListDeleted<T> ? 0 : 1)
                 .ThenBy(c => c.Index);
 
-    private IEnumerable<IListComparer<T>.IChange> ShiftDeleted(IEnumerable<IListComparer<T>.IChange> sorted)
+    private IEnumerable<IListChange<T>> ShiftDeleted(IEnumerable<IListChange<T>> sorted)
     {
         int shift = 0;
 
@@ -59,7 +59,7 @@ public class RelativeChangesListComparer<T> : IListComparer<T>
         {
             Console.WriteLine("\ncurrent: " + change);
             
-            if (change is IListComparer<T>.Deleted)
+            if (change is ListDeleted<T>)
             {
                 change.Index += shift;
                 shift--;

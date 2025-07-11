@@ -19,16 +19,16 @@ namespace LionWeb.Core.Utilities.ListComparer;
 
 public class MoveDetector<T> : IListComparer<T>
 {
-    private readonly List<IListComparer<T>.IChange> _changes;
+    private readonly List<IListChange<T>> _changes;
 
-    public MoveDetector(List<IListComparer<T>.IChange> changes)
+    public MoveDetector(List<IListChange<T>> changes)
     {
         _changes = changes;
     }
 
-    public List<IListComparer<T>.IChange> Compare()
+    public List<IListChange<T>> Compare()
     {
-        List<IListComparer<T>.Moved> movingChanges = [];
+        List<ListMoved<T>> movingChanges = [];
         
         // Extract moves from the list of changes
         for (var i = 0; i < _changes.Count; i++)
@@ -36,19 +36,19 @@ public class MoveDetector<T> : IListComparer<T>
             var currentResult = _changes[i];
             bool isAMove = false;
             
-            if (currentResult is IListComparer<T>.Deleted d)
+            if (currentResult is ListDeleted<T> d)
             {
                 for (var j = i + 1; j < _changes.Count; j++)
                 {
                     var partner = _changes[j];
-                    if (partner is IListComparer<T>.Added partnerAdd && d.Element.Equals(partnerAdd.Element))
+                    if (partner is ListAdded<T> partnerAdd && d.Element.Equals(partnerAdd.Element))
                     {
                         Console.WriteLine("\nCouple detected as a move: " + d + " " + partnerAdd);
                         
                         for (var k = j - 1; k > i; k--)
                         {
                             var intermediate = _changes[k];
-                            if (intermediate is IListComparer<T>.Added interAdd)
+                            if (intermediate is ListAdded<T> interAdd)
                                 if (interAdd.RightIndex > d.LeftIndex && interAdd.RightIndex < partnerAdd.RightIndex)
                                 {
                                     interAdd.RightIndex += 1;
@@ -58,14 +58,14 @@ public class MoveDetector<T> : IListComparer<T>
                                 {
                                     d.LeftIndex += 1;
                                 }
-                            if (intermediate is IListComparer<T>.Deleted interDel)
+                            if (intermediate is ListDeleted<T> interDel)
                             {
                                 interDel.LeftIndex += 1;
                                 _changes[k] = interDel;
                             }   
                         }
                         
-                        movingChanges.Add(new IListComparer<T>.Moved(d.Element, d.LeftIndex, 
+                        movingChanges.Add(new ListMoved<T>(d.Element, d.LeftIndex, 
                                             partnerAdd.Element, partnerAdd.RightIndex));
                         _changes.RemoveAt(j);
                         isAMove = true;

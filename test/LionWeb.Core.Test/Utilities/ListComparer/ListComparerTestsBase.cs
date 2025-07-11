@@ -28,7 +28,7 @@ public abstract class ListComparerTestsBase
     protected const int Replace = 2;
     protected const int Move = 3;
 
-    protected virtual List<IListComparer<char>.IChange> AssertCompare(string left, string right)
+    protected virtual List<IListChange<char>> AssertCompare(string left, string right)
     {
         var comparer = CreateComparer(left, right);
         var changes = comparer.Compare();
@@ -40,10 +40,10 @@ public abstract class ListComparerTestsBase
         {
             var line = change switch
             {
-                IListComparer<char>.Added added => previous.DAdd(added.Index, added.Element),
-                IListComparer<char>.Deleted deleted => previous.DRemove(deleted.Index),
-                IListComparer<char>.Replaced replaced => previous.DReplace(replaced.Index, replaced.RightElement),
-                IListComparer<char>.Moved moved => previous.DMove(moved.LeftIndex, moved.RightIndex, moved.RightElement),
+                ListAdded<char> added => previous.DAdd(added.Index, added.Element),
+                ListDeleted<char> deleted => previous.DRemove(deleted.Index),
+                ListReplaced<char> replaced => previous.DReplace(replaced.Index, replaced.RightElement),
+                ListMoved<char> moved => previous.DMove(moved.LeftIndex, moved.RightIndex, moved.RightElement),
             };
 
             previous = line;
@@ -68,12 +68,12 @@ public abstract class ListComparerTestsBase
         var changes = AssertCompare(left, right);
 
         CollectionAssert.AreEqual(
-            results.Select(r => (IListComparer<char>.IChange)(r.changeKind switch
+            results.Select(r => (IListChange<char>)(r.changeKind switch
             {
-                Add => new IListComparer<char>.Added(r.left, r.leftIndex),
-                Delete => new IListComparer<char>.Deleted(r.left, r.leftIndex),
-                Replace => new IListComparer<char>.Replaced(r.left, r.leftIndex, (char)r.right),
-                Move => new IListComparer<char>.Moved(
+                Add => new ListAdded<char>(r.left, r.leftIndex),
+                Delete => new ListDeleted<char>(r.left, r.leftIndex),
+                Replace => new ListReplaced<char>(r.left, r.leftIndex, (char)r.right),
+                Move => new ListMoved<char>(
                     r.left,
                     r.leftIndex,
                     (char)(r.right ?? r.left),

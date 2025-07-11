@@ -21,7 +21,7 @@ using Core.Utilities.ListComparer;
 
 public abstract class AbsoluteIndexListComparerTestsBase : ListComparerTestsBase
 {
-    protected override List<IListComparer<char>.IChange> AssertCompare(string left, string right)
+    protected override List<IListChange<char>> AssertCompare(string left, string right)
     {
         var comparer = CreateComparer(left, right);
         var changes = comparer.Compare();
@@ -32,7 +32,7 @@ public abstract class AbsoluteIndexListComparerTestsBase : ListComparerTestsBase
         var previous = left;
 
         int deleteDelta = 0;
-        foreach (var deleted in changes.OfType<IListComparer<char>.Deleted>())
+        foreach (var deleted in changes.OfType<ListDeleted<char>>())
         {
             var line = previous.Remove(deleted.Index - deleteDelta, 1);
             deleteDelta++;
@@ -43,7 +43,7 @@ public abstract class AbsoluteIndexListComparerTestsBase : ListComparerTestsBase
             steps.Add("   " + deleted + "\n" + line + "\n" + index);
         }
 
-        foreach (var added in changes.OfType<IListComparer<char>.Added>().OrderBy(a => a.Index))
+        foreach (var added in changes.OfType<ListAdded<char>>().OrderBy(a => a.Index))
         {
             var line = added.Index <= previous.Length 
                 ? previous.Insert(added.Index, added.Element.ToString())

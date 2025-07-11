@@ -25,7 +25,7 @@ using Utilities.ListComparer;
 /// <typeparam name="T">Type of nodes of the represented <see cref="Reference"/>.</typeparam>
 public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> where T : IReadableNode
 {
-    private readonly List<IListComparer<T>.IChange> _changes = [];
+    private readonly List<IListChange<T>> _changes = [];
 
     /// <param name="reference">Represented <see cref="Reference"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="reference"/>.</param>
@@ -54,18 +54,18 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
         {
             switch (change)
             {
-                case IListComparer<T>.Added added:
+                case ListAdded<T> added:
                     IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
                     PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, added.RightIndex, newTarget,
                         PartitionCommander.CreateEventId()));
                     break;
-                case IListComparer<T>.Moved moved:
+                case ListMoved<T> moved:
                     IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
                     PartitionCommander.Raise(new EntryMovedInSameReferenceEvent(DestinationParent, Reference, moved.RightIndex,
                         moved.LeftIndex, target,
                         PartitionCommander.CreateEventId()));
                     break;
-                case IListComparer<T>.Deleted deleted:
+                case ListDeleted<T> deleted:
                     IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
                     PartitionCommander.Raise(new ReferenceDeletedEvent(DestinationParent, Reference, deleted.LeftIndex,
                         deletedTarget, PartitionCommander.CreateEventId()));

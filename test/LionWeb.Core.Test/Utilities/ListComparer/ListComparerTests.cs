@@ -240,10 +240,10 @@ public class ListComparerTests : AbsoluteIndexListComparerTestsBase
         var comparer = new ListComparer<INode>([a, b], [b, a]);
         var changes = comparer.Compare();
         CollectionAssert.AreEqual(
-            new List<IListComparer<INode>.IChange>
+            new List<IListChange<INode>>
             {
-                new IListComparer<INode>.Deleted(a, 0),
-                new IListComparer<INode>.Added(a, 1),
+                new ListDeleted<INode>(a, 0),
+                new ListAdded<INode>(a, 1),
             },
             changes
         );
@@ -258,10 +258,10 @@ public class ListComparerTests : AbsoluteIndexListComparerTestsBase
         var comparer = new ListComparer<INode>([a, b], [b, a]);
         var changes = comparer.Compare();
         CollectionAssert.AreEqual(
-            new List<IListComparer<INode>.IChange>
+            new List<IListChange<INode>>
             {
-                new IListComparer<INode>.Deleted(a, 0),
-                new IListComparer<INode>.Added(a, 1),
+                new ListDeleted<INode>(a, 0),
+                new ListAdded<INode>(a, 1),
             },
             changes
         );
@@ -277,7 +277,7 @@ public class ListComparerTests : AbsoluteIndexListComparerTestsBase
         var comparer = new ListComparer<INode>([a, b], [b, a], new NodeIdComparer());
         var changes = comparer.Compare();
         CollectionAssert.AreEqual(
-            new List<IListComparer<INode>.IChange> { },
+            new List<IListChange<INode>> { },
             changes
         );
     }

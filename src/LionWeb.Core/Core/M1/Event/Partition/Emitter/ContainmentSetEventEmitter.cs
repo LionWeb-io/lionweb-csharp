@@ -25,7 +25,7 @@ using Utilities.ListComparer;
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
 public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase<T> where T : INode
 {
-    private readonly List<IListComparer<T>.IChange> _changes = [];
+    private readonly List<IListChange<T>> _changes = [];
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
@@ -55,7 +55,7 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
         {
             switch (change)
             {
-                case IListComparer<T>.Added added:
+                case ListAdded<T> added:
                     switch (NewValues[added.Element])
                     {
                         case null:
@@ -84,11 +84,11 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
 
                     break;
 
-                case IListComparer<T>.Moved moved:
+                case ListMoved<T> moved:
                     PartitionCommander.Raise(new ChildMovedInSameContainmentEvent(moved.RightIndex, moved.LeftElement,
                         DestinationParent, Containment, moved.LeftIndex, PartitionCommander.CreateEventId()));
                     break;
-                case IListComparer<T>.Deleted deleted:
+                case ListDeleted<T> deleted:
                     PartitionCommander.Raise(new ChildDeletedEvent(deleted.Element, DestinationParent, Containment,
                         deleted.LeftIndex, PartitionCommander.CreateEventId()));
                     break;

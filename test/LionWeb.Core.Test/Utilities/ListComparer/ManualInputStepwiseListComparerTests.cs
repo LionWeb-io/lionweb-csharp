@@ -22,17 +22,17 @@ using LionWeb.Core.Utilities.ListComparer;
 [TestClass]
 public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
 {
-    private List<IListComparer<char>.IChange> _inputChanges = [];
+    private List<IListChange<char>> _inputChanges = [];
 
     [TestMethod]
     public void AddEveryOther()
     {
         _inputChanges =
         [
-            new IListComparer<char>.Added('B', 1),
-            new IListComparer<char>.Added('D', 3),
-            new IListComparer<char>.Added('G', 6),
-            new IListComparer<char>.Added('K', 10)
+            new ListAdded<char>('B', 1),
+            new ListAdded<char>('D', 3),
+            new ListAdded<char>('G', 6),
+            new ListAdded<char>('K', 10)
         ];
 
         AssertCompare(
@@ -52,10 +52,10 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
     {
         _inputChanges =
         [
-            new IListComparer<char>.Added('K', 10),
-            new IListComparer<char>.Added('G', 6),
-            new IListComparer<char>.Added('D', 3),
-            new IListComparer<char>.Added('B', 1),
+            new ListAdded<char>('K', 10),
+            new ListAdded<char>('G', 6),
+            new ListAdded<char>('D', 3),
+            new ListAdded<char>('B', 1),
         ];
 
         AssertCompare(
@@ -75,10 +75,10 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
     {
         _inputChanges =
         [
-            new IListComparer<char>.Added('D', 2),
-            new IListComparer<char>.Deleted('B', 1),
-            new IListComparer<char>.Added('H', 5),
-            new IListComparer<char>.Deleted('F', 4),
+            new ListAdded<char>('D', 2),
+            new ListDeleted<char>('B', 1),
+            new ListAdded<char>('H', 5),
+            new ListDeleted<char>('F', 4),
         ];
 
     AssertCompare(
@@ -98,10 +98,10 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
     {
         _inputChanges =
         [
-            new IListComparer<char>.Added('H', 5),
-            new IListComparer<char>.Deleted('B', 1),
-            new IListComparer<char>.Added('D', 2),
-            new IListComparer<char>.Deleted('F', 4),
+            new ListAdded<char>('H', 5),
+            new ListDeleted<char>('B', 1),
+            new ListAdded<char>('D', 2),
+            new ListDeleted<char>('F', 4),
         ];
 
     AssertCompare(
@@ -121,10 +121,10 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
     {
         _inputChanges =
         [
-            new IListComparer<char>.Added('H', 5),
-            new IListComparer<char>.Added('D', 2),
-            new IListComparer<char>.Deleted('B', 1),
-            new IListComparer<char>.Deleted('F', 4),
+            new ListAdded<char>('H', 5),
+            new ListAdded<char>('D', 2),
+            new ListDeleted<char>('B', 1),
+            new ListDeleted<char>('F', 4),
         ];
 
     AssertCompare(
@@ -144,9 +144,9 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
     {
         _inputChanges =
         [
-            new IListComparer<char>.Added('D', 2),
-            new IListComparer<char>.Added('H', 5),
-            new IListComparer<char>.Deleted('F', 3),
+            new ListAdded<char>('D', 2),
+            new ListAdded<char>('H', 5),
+            new ListDeleted<char>('F', 3),
         ];
         
         AssertCompare(
@@ -165,12 +165,12 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
     {
         _inputChanges =
         [
-            new IListComparer<char>.Added('X', 2),
-            new IListComparer<char>.Added('G', 4),
-            new IListComparer<char>.Added('H', 5),
-            new IListComparer<char>.Deleted('D', 3),
-            new IListComparer<char>.Deleted('E', 4),
-            new IListComparer<char>.Deleted('F', 5),
+            new ListAdded<char>('X', 2),
+            new ListAdded<char>('G', 4),
+            new ListAdded<char>('H', 5),
+            new ListDeleted<char>('D', 3),
+            new ListDeleted<char>('E', 4),
+            new ListDeleted<char>('F', 5),
         ];
         
         AssertCompare(
@@ -190,14 +190,14 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
 
     class DummyListComparer : IListComparer<char>
     {
-        private readonly List<IListComparer<char>.IChange> _changes;
+        private readonly List<IListChange<char>> _changes;
 
-        public DummyListComparer(List<IListComparer<char>.IChange> changes)
+        public DummyListComparer(List<IListChange<char>> changes)
         {
             _changes = changes;
         }
 
-        public List<IListComparer<char>.IChange> Compare() => _changes;
+        public List<IListChange<char>> Compare() => _changes;
     }
 
     protected internal override IListComparer<char> CreateComparer(string left, string right) =>

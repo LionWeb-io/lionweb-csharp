@@ -24,7 +24,7 @@ using Utilities.ListComparer;
 /// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
 public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
 {
-    private readonly List<IListComparer<INode>.IChange> _changes = [];
+    private readonly List<IListChange<INode>> _changes = [];
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="setValues">Newly set values.</param>
@@ -52,7 +52,7 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
         {
             switch (change)
             {
-                case IListComparer<INode>.Added added:
+                case ListAdded<INode> added:
                     switch (NewValues[added.Element])
                     {
                         case null:
@@ -75,12 +75,12 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
 
                     break;
 
-                case IListComparer<INode>.Moved moved:
+                case ListMoved<INode> moved:
                     PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(moved.RightIndex, moved.LeftElement,
                         DestinationParent, moved.LeftIndex, PartitionCommander.CreateEventId()));
                     break;
 
-                case IListComparer<INode>.Deleted deleted:
+                case ListDeleted<INode> deleted:
                     PartitionCommander.Raise(new AnnotationDeletedEvent(deleted.Element, DestinationParent, deleted.LeftIndex,
                         PartitionCommander.CreateEventId()));
                     break;

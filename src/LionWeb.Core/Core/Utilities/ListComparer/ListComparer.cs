@@ -44,7 +44,7 @@ public class ListComparer<T> : IListComparer<T>
     private readonly SortedList<LeftIndex, (T, LeftIndex)> _deleted = [];
 
     /// <summary>
-    /// Compares two lists, and returns the minimum number of <see cref="IListComparer{T}.IChange">changes</see>
+    /// Compares two lists, and returns the minimum number of <see cref="IListChange{T}">changes</see>
     /// to convert <paramref name="left"/> into <paramref name="right"/>. 
     /// </summary>
     public ListComparer(List<T> left, List<T> right, IEqualityComparer<T>? comparer = null)
@@ -66,7 +66,7 @@ public class ListComparer<T> : IListComparer<T>
     }
 
     /// <inheritdoc />
-    public List<IListComparer<T>.IChange> Compare()
+    public List<IListChange<T>> Compare()
     {
         // Console.WriteLine("Hirschberg" + " running.");
         CompareInternal();
@@ -89,13 +89,13 @@ public class ListComparer<T> : IListComparer<T>
         }
     }
 
-    private List<IListComparer<T>.IChange> CollectChanges() =>
+    private List<IListChange<T>> CollectChanges() =>
         _deleted
             .Values
-            .Select(c => (IListComparer<T>.IChange)new IListComparer<T>.Deleted(c.Item1, c.Item2))
+            .Select(c => (IListChange<T>)new ListDeleted<T>(c.Item1, c.Item2))
             .Concat(_added
                 .Values
-                .Select(c => (IListComparer<T>.IChange)new IListComparer<T>.Added(c.Item1, c.Item2))
+                .Select(c => (IListChange<T>)new ListAdded<T>(c.Item1, c.Item2))
             )
             .ToList();
 
