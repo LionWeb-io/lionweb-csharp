@@ -52,12 +52,12 @@ public interface IListComparer<T> : IListComparer where T : notnull
 public interface IListChange;
 
 /// <inheritdoc cref="IListChange" />
-public interface IListChange<out T> : IListChange, ICloneable where T : notnull
+public interface IListChange<out T> : IListChange where T : notnull
 {
     /// Changed element.
     T Element { get; }
 
-    /// Index of the changed element at this point in the change list.
+    /// Index of the changed element at this point in the list of changes.
     Index Index { get; set; }
 };
 
@@ -73,7 +73,6 @@ public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T> wh
 
     /// <inheritdoc cref="Index"/>
     public RightIndex RightIndex { get; set; } = RightIndex;
-    object ICloneable.Clone() => this with { };
 }
 
 /// <paramref name="Element"/> deleted from <paramref name="LeftIndex"/>.
@@ -88,7 +87,6 @@ public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T> wh
 
     /// <inheritdoc cref="Index"/>
     public LeftIndex LeftIndex { get; set; } = LeftIndex;
-    object ICloneable.Clone() => this with { };
 }
 
 /// <paramref name="LeftElement"/> moved from <paramref name="LeftIndex"/> to <paramref name="RightIndex"/>.
@@ -97,7 +95,10 @@ public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T> wh
 public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
     : IListChange<T> where T : notnull
 {
+    /// Index of <see cref="RightElement"/> at this point in the list of changes.
     public RightIndex RightIndex { get; set; } = RightIndex;
+
+    /// Index of <see cref="LeftElement"/> at this point in the list of changes.
     public LeftIndex LeftIndex { get; set; } = LeftIndex;
 
     /// Changed <see cref="LeftElement"/>.
@@ -115,8 +116,6 @@ public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, R
                 RightIndex = value;
         }
     }
-
-    object ICloneable.Clone() => this with { };
 }
 
 /// <paramref name="LeftElement"/> at <paramref name="LeftIndex"/> replaced by <paramref name="RightElement"/>.
@@ -133,6 +132,4 @@ public record struct ListReplaced<T>(T LeftElement, LeftIndex LeftIndex, T Right
         get => LeftIndex;
         set => LeftIndex = value;
     }
-
-    object ICloneable.Clone() => this with { };
 }
