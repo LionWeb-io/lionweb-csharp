@@ -1,7 +1,7 @@
 ﻿// Copyright 2024 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
-// you may not use this file except in compliance with the License.
+// you may not use this file except in compliance -with the License.
 // You may obtain a copy of the License at
 // 
 //     http://www.apache.org/licenses/LICENSE-2.0
@@ -37,9 +37,6 @@ public class ListComparer<T> : IListComparer<T>
     private readonly Cost[,] _reverseMatrix;
 
     private Cost _editCost;
-    private int _cellsComputed;
-    private readonly List<T> _alignLeft;
-    private readonly List<T> _alignRight;
     private readonly SortedList<RightIndex, (T, RightIndex)> _added = [];
     private readonly SortedList<LeftIndex, (T, LeftIndex)> _deleted = [];
 
@@ -60,9 +57,6 @@ public class ListComparer<T> : IListComparer<T>
         _reverseMatrix = new Cost[rightSize, rightSize];
 
         _editCost = Cost.Default;
-        _cellsComputed = 0;
-        _alignLeft = [];
-        _alignRight = [];
     }
 
     /// <inheritdoc />
@@ -92,8 +86,6 @@ public class ListComparer<T> : IListComparer<T>
         Align(0, _left.Count, 0, _right.Count);
     }
 
-    private T CreateEmpty() => default!;
-
     private void Align(LeftIndex lowerBoundLeft, LeftIndex upperBoundLeft, RightIndex lowerBoundRight,
         RightIndex upperBoundRight)
     {
@@ -104,9 +96,7 @@ public class ListComparer<T> : IListComparer<T>
             // left is empty
             for (RightIndex rightIndex = lowerBoundRight; rightIndex < upperBoundRight; rightIndex++)
             {
-                _alignLeft.Add(CreateEmpty());
                 T rightElement = _right[rightIndex];
-                _alignRight.Add(rightElement);
                 Add(rightElement, rightIndex);
                 _matrix[lowerBoundLeft, rightIndex + 1] = Cost.Align;
             }
@@ -120,8 +110,6 @@ public class ListComparer<T> : IListComparer<T>
             for (LeftIndex leftIndex = lowerBoundLeft; leftIndex < upperBoundLeft; leftIndex++)
             {
                 T leftElement = _left[leftIndex];
-                _alignLeft.Add(leftElement);
-                _alignRight.Add(CreateEmpty());
                 Delete(leftElement, leftIndex);
                 _matrix[leftIndex + 1, upperBoundRight] = Cost.Align;
             }
@@ -143,22 +131,16 @@ public class ListComparer<T> : IListComparer<T>
                 T rightElement = _right[rightIndex];
                 if (rightIndex == memo)
                 {
-                    _alignLeft.Add(leftElement);
                     if (!Equals(leftElement, rightElement))
                     {
                         Delete(leftElement, lowerBoundLeft);
                     }
-                } else
-                {
-                    _alignLeft.Add(CreateEmpty());
                 }
 
                 if (!Equals(leftElement, rightElement))
                 {
                     Add(rightElement, rightIndex);
                 }
-
-                _alignRight.Add(rightElement);
 
                 if (rightIndex < memo)
                     _matrix[lowerBoundLeft, rightIndex + 1] = Cost.Align;
@@ -218,14 +200,12 @@ public class ListComparer<T> : IListComparer<T>
     {
         _forwardMatrix[lowerBoundLeft % 2, lowerBoundRight] = Cost.Zero;
         StoreCell(lowerBoundLeft, lowerBoundRight);
-        _cellsComputed++;
 
         // Setup the first row
         for (RightIndex rightIndex = lowerBoundRight + 1; rightIndex <= upperBoundRight; rightIndex++)
         {
             _forwardMatrix[lowerBoundLeft % 2, rightIndex] = _forwardMatrix[lowerBoundLeft % 2, rightIndex - 1].Inc();
             StoreCell(lowerBoundLeft, rightIndex);
-            _cellsComputed++;
         }
 
         for (LeftIndex leftIndex = lowerBoundLeft + 1; leftIndex <= upperBoundLeft; leftIndex++)
@@ -237,7 +217,6 @@ public class ListComparer<T> : IListComparer<T>
 
             _forwardMatrix[leftIndex % 2, lowerBoundRight] = _forwardMatrix[(leftIndex - 1) % 2, lowerBoundRight].Inc();
             StoreCell(leftIndex, lowerBoundRight);
-            _cellsComputed++;
             for (RightIndex rightIndex = lowerBoundRight + 1; rightIndex <= upperBoundRight; rightIndex++)
             {
                 Cost a = _forwardMatrix[(leftIndex - 1) % 2, rightIndex]
@@ -252,7 +231,6 @@ public class ListComparer<T> : IListComparer<T>
 
                 _forwardMatrix[leftIndex % 2, rightIndex] = Min(a, b, c);
                 StoreCell(leftIndex, rightIndex);
-                _cellsComputed++;
             }
         }
     }
@@ -262,14 +240,12 @@ public class ListComparer<T> : IListComparer<T>
     {
         _reverseMatrix[upperBoundLeft % 2, upperBoundRight] = Cost.Zero;
         StoreCell(upperBoundLeft, upperBoundRight);
-        _cellsComputed++;
 
         // Setup the first row
         for (RightIndex rightIndex = upperBoundRight - 1; rightIndex >= lowerBoundRight; rightIndex--)
         {
             _reverseMatrix[upperBoundLeft % 2, rightIndex] = _reverseMatrix[upperBoundLeft % 2, rightIndex + 1].Inc();
             StoreCell(upperBoundLeft, rightIndex);
-            _cellsComputed++;
         }
 
         for (LeftIndex leftIndex = upperBoundLeft - 1; leftIndex >= lowerBoundLeft; leftIndex--)
@@ -281,7 +257,7 @@ public class ListComparer<T> : IListComparer<T>
 
             _reverseMatrix[leftIndex % 2, upperBoundRight] = _reverseMatrix[(leftIndex + 1) % 2, upperBoundRight].Inc();
             StoreCell(leftIndex, upperBoundRight);
-            _cellsComputed++;
+            
             for (RightIndex rightIndex = upperBoundRight - 1; rightIndex >= lowerBoundRight; rightIndex--)
             {
                 Cost a = _reverseMatrix[(leftIndex + 1) % 2, rightIndex]
@@ -296,7 +272,6 @@ public class ListComparer<T> : IListComparer<T>
 
                 _reverseMatrix[leftIndex % 2, rightIndex] = Min(a, b, c);
                 StoreCell(leftIndex, rightIndex);
-                _cellsComputed++;
             }
         }
     }
@@ -315,10 +290,6 @@ public class ListComparer<T> : IListComparer<T>
             col = Cost.Align;
         _matrix[leftIndex, rightIndex] = col;
     }
-
-
-    private string TraceBack() =>
-        string.Join(",", _alignLeft) + "\n" + string.Join(",", _alignRight);
 
     private bool Equals(T left, T right) =>
         _comparer.Equals(left, right);
