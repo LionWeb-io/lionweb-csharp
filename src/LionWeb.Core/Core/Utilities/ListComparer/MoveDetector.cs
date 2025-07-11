@@ -46,9 +46,9 @@ public class MoveDetector<T>(IListComparer<T> comparer) : IListComparer<T> where
 
         return sorted.Select(change =>
         {
-            if (change is ListDeleted<T>)
+            if (change is ListDeleted<T> deleted)
             {
-                change.Index += shift;
+                deleted.LeftIndex += shift;
                 shift--;
             }
 

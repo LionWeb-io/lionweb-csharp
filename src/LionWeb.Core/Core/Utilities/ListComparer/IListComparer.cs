@@ -33,7 +33,7 @@ public interface IListComparer
     /// to convert <paramref name="left"/> into <paramref name="right"/>. 
     static IListComparer<T> Create<T>(List<T> left, List<T> right) where T : notnull =>
         new MoveDetector<T>(new ListComparer<T>(left, right));
-    
+
     /// <inheritdoc cref="Create{T}"/>
     static IListComparer<T> CreateForNodes<T>(List<T> left, List<T> right) where T : IReadableNode =>
         new MoveDetector<T>(new ListComparer<T>(left, right, new NodeIdComparer<T>()));
@@ -49,27 +49,17 @@ public interface IListComparer<T> : IListComparer where T : notnull
 }
 
 /// A change to a list.
-public interface IListChange;
-
-/// <inheritdoc cref="IListChange" />
-public interface IListChange<out T> : IListChange where T : notnull
+public interface IListChange<T> where T : notnull
 {
-    /// Changed element.
-    T Element { get; }
-
     /// Index of the changed element at this point in the list of changes.
-    Index Index { get; set; }
+    Index Index { get; }
 };
 
 /// <paramref name="Element"/> added at <paramref name="RightIndex"/>.
 public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T> where T : notnull
 {
     /// <inheritdoc />
-    public Index Index
-    {
-        get => RightIndex;
-        set => RightIndex = value;
-    }
+    public Index Index => RightIndex;
 
     /// <inheritdoc cref="Index"/>
     public RightIndex RightIndex { get; set; } = RightIndex;
@@ -79,11 +69,7 @@ public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T> wh
 public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T> where T : notnull
 {
     /// <inheritdoc />
-    public Index Index
-    {
-        get => LeftIndex;
-        set => LeftIndex = value;
-    }
+    public Index Index => LeftIndex;
 
     /// <inheritdoc cref="Index"/>
     public LeftIndex LeftIndex { get; set; } = LeftIndex;
@@ -105,17 +91,7 @@ public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, R
     public T Element => LeftElement;
 
     /// Index of the left-most of (<see cref="LeftIndex"/>, <see cref="RightIndex"/>).
-    public Index Index
-    {
-        get => LeftIndex < RightIndex ? LeftIndex : RightIndex;
-        set
-        {
-            if (LeftIndex < RightIndex)
-                LeftIndex = value;
-            else
-                RightIndex = value;
-        }
-    }
+    public Index Index => Math.Min(LeftIndex, RightIndex);
 }
 
 /// <paramref name="LeftElement"/> at <paramref name="LeftIndex"/> replaced by <paramref name="RightElement"/>.
@@ -127,9 +103,5 @@ public record struct ListReplaced<T>(T LeftElement, LeftIndex LeftIndex, T Right
     public T Element => LeftElement;
 
     /// <inheritdoc />
-    public Index Index
-    {
-        get => LeftIndex;
-        set => LeftIndex = value;
-    }
+    public Index Index => LeftIndex;
 }
