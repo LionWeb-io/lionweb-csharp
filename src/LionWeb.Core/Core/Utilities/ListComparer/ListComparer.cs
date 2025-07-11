@@ -68,25 +68,8 @@ public class ListComparer<T> : IListComparer<T>
     /// <inheritdoc />
     public List<IListChange<T>> Compare()
     {
-        // Console.WriteLine("Hirschberg" + " running.");
         CompareInternal();
-        // Console.WriteLine("Hirschberg" + " done. Cost=" + _editCost + "\n");
-        // Console.WriteLine(TraceBack());
-        // Console.WriteLine("\n" + "Cells computed = " + _cellsComputed);
-        //
-        // Console.WriteLine($"added:\n  {Join(_added)}");
-        // Console.WriteLine($"deleted:\n  {Join(_deleted)}");
-
-        var result = CollectChanges();
-
-        // Console.WriteLine($"\nchanges:\n  {string.Join("\n  ", result)}");
-
-        return result;
-
-        string Join(SortedList<int, (T, int)> list)
-        {
-            return string.Join("\n  ", list.Values.Select(v => $"{v.Item1} @ {v.Item2}"));
-        }
+        return CollectChanges();
     }
 
     private List<IListChange<T>> CollectChanges() =>

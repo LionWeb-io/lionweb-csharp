@@ -50,12 +50,14 @@ public interface IListChange<out T> : IListChange, ICloneable
     /// Changed element.
     T Element { get; }
 
+    /// Index of the changed element at this point in the change list.
     Index Index { get; set; }
 };
 
 /// <paramref name="Element"/> added at <paramref name="RightIndex"/>.
 public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T>
 {
+    /// <inheritdoc />
     public Index Index
     {
         get => RightIndex;
@@ -69,13 +71,14 @@ public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T>
 /// <paramref name="Element"/> deleted from <paramref name="LeftIndex"/>.
 public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T>
 {
+    /// <inheritdoc />
     public Index Index
     {
         get => LeftIndex;
         set => LeftIndex = value;
     }
 
-    public virtual LeftIndex LeftIndex { get; set; } = LeftIndex;
+    public LeftIndex LeftIndex { get; set; } = LeftIndex;
     object ICloneable.Clone() => this with { };
 }
 
@@ -90,15 +93,18 @@ public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, R
     /// Changed <see cref="LeftElement"/>.
     public T Element => LeftElement;
 
+    /// <inheritdoc />
     public Index Index
     {
         get => LeftIndex < RightIndex ? LeftIndex : RightIndex;
-        set => SetIndex(value);
+        set
+        {
+            if (LeftIndex < RightIndex)
+                LeftIndex = value;
+            else
+                RightIndex = value;
+        }
     }
-
-    private LeftIndex SetIndex(Index value) => LeftIndex < RightIndex ? LeftIndex = value : RightIndex = value;
-
-    public Index RightEdge => LeftIndex > RightIndex ? LeftIndex : RightIndex;
 
     public bool MoveLeftToRight => LeftIndex < RightIndex;
     public bool MoveRightToLeft => RightIndex < LeftIndex;
@@ -112,6 +118,7 @@ public record struct ListReplaced<T>(T LeftElement, LeftIndex LeftIndex, T Right
     /// Changed <see cref="LeftElement"/>.
     public T Element => LeftElement;
 
+    /// <inheritdoc />
     public Index Index
     {
         get => LeftIndex;

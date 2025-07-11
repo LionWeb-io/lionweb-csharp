@@ -31,7 +31,8 @@ public class RelativeChangesListComparer<T> : IListComparer<T>
     {
         _listComparer = listComparer;
     }
-    
+
+    /// <inheritdoc />
     public List<IListChange<T>> Compare()
     {
         _allChanges = _listComparer.Compare();
