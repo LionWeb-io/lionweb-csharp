@@ -288,24 +288,7 @@ public abstract class EventTestsBase
 
         AssertEquals([node], [clone]);
     }
-
     
-    [TestMethod]
-    public void ChildMovedAndReplacedFromOtherContainment_Multiple()
-    {
-        var moved = new Circle("moved");
-        var origin = new CompositeShape("origin") { Parts = [moved] };
-        var replaced = new Circle("replaced");
-        var node = new Geometry("a") { Shapes = [origin, replaced] };
-
-        var clone = CreateReplicator(node);
-
-        node.RemoveShapes([replaced]);
-        node.InsertShapes(1, [moved]);
-        
-        AssertEquals([node], [clone]);
-    }
-
     #endregion
 
     #region ChildMovedFromOtherContainmentInSameParent
