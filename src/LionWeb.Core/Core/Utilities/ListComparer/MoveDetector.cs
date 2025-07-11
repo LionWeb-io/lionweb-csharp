@@ -17,10 +17,11 @@
 
 namespace LionWeb.Core.Utilities.ListComparer;
 
-/// Turns a fitting pair of <see cref="ListDeleted{T}"/> and <see cref="ListAdded{T}"/> into one <see cref="ListMoved{T}"/>. 
+/// Turns a fitting pair of <see cref="ListDeleted{T}"/> and <see cref="ListAdded{T}"/>
+/// into one <see cref="ListMoved{T}"/>. 
 public class MoveDetector<T> : IListComparer<T> where T : notnull
 {
-    private readonly List<IListChange<T>> _changes;
+    private List<IListChange<T>> _changes;
 
     public MoveDetector(List<IListChange<T>> changes)
     {
@@ -30,10 +31,35 @@ public class MoveDetector<T> : IListComparer<T> where T : notnull
     /// <inheritdoc />
     public List<IListChange<T>> Compare()
     {
+        var sorted = SortChangesToLeft();
+        
+        _changes = ShiftDeleted(sorted).ToList();
+        
         List<ListMoved<T>> movingChanges = ExtractMovingChanges();
         AddMovesToTail(movingChanges);
 
         return _changes;
+    }
+    
+    private IEnumerable<IListChange<T>> SortChangesToLeft() =>
+        _changes
+            .OrderBy(c => c is ListDeleted<T> ? 0 : 1)
+            .ThenBy(c => c.Index);
+
+    private IEnumerable<IListChange<T>> ShiftDeleted(IEnumerable<IListChange<T>> sorted)
+    {
+        Index shift = 0;
+
+        return sorted.Select(change =>
+        {
+            if (change is ListDeleted<T>)
+            {
+                change.Index += shift;
+                shift--;
+            }
+            
+            return change;
+        });
     }
 
     private List<ListMoved<T>> ExtractMovingChanges()
@@ -111,7 +137,7 @@ public class MoveDetector<T> : IListComparer<T> where T : notnull
         }
     }
 
-    private static void AdjustOtherMoves(List<ListMoved<T>> movingChanges, Index current, ListMoved<T> currentChange)
+    private void AdjustOtherMoves(List<ListMoved<T>> movingChanges, Index current, ListMoved<T> currentChange)
     {
         for (var j = current + 1; j < movingChanges.Count; j++)
         {

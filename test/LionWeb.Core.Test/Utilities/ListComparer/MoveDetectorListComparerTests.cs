@@ -463,5 +463,5 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             ]
         );
     protected internal override IListComparer<char> CreateComparer(string left, string right)
-        => new MoveDetector<char>(new RelativeChangesListComparer<char>(left.ToList(), right.ToList()).Compare());
+        => new MoveDetector<char>(new ListComparer<char>(left.ToList(), right.ToList()).Compare());
 }

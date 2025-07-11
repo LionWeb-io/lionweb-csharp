@@ -28,8 +28,15 @@ using RightIndex = Index;
 /// The lists should be passed to the constructor of implementing classes.
 public interface IListComparer
 {
+    /// <summary>
+    /// Creates a default implementation.
+    /// </summary>
+    /// <param name="left"></param>
+    /// <param name="right"></param>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
     static IListComparer<T> Create<T>(List<T> left, List<T> right) where T : notnull =>
-        new MoveDetector<T>(new RelativeChangesListComparer<T>(left, right).Compare());
+        new MoveDetector<T>(new ListComparer<T>(left, right).Compare());
 }
 
 /// <inheritdoc />
@@ -85,7 +92,8 @@ public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T> wh
 /// <paramref name="LeftElement"/> moved from <paramref name="LeftIndex"/> to <paramref name="RightIndex"/>.
 /// We report <paramref name="RightElement"/> separately because it might not be identical to <paramref name="LeftElement"/>
 /// (if we use a custom <see cref="IEqualityComparer{T}"/>).
-public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex) : IListChange<T> where T : notnull
+public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
+    : IListChange<T> where T : notnull
 {
     public RightIndex RightIndex { get; set; } = RightIndex;
     public LeftIndex LeftIndex { get; set; } = LeftIndex;
@@ -110,7 +118,9 @@ public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, R
 }
 
 /// <paramref name="LeftElement"/> at <paramref name="LeftIndex"/> replaced by <paramref name="RightElement"/>.
-public record struct ListReplaced<T>(T LeftElement, LeftIndex LeftIndex, T RightElement) : IListChange<T> where T : notnull
+/// <remarks>Not used yet.</remarks>
+public record struct ListReplaced<T>(T LeftElement, LeftIndex LeftIndex, T RightElement)
+    : IListChange<T> where T : notnull
 {
     /// Changed <see cref="LeftElement"/>.
     public T Element => LeftElement;

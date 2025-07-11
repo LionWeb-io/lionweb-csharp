@@ -53,34 +53,6 @@ public class ListComparerFuzzingTests : AbsoluteIndexListComparerTestsBase
 
 [DebugOnlyTestClass]
 // [TestClass]
-public class RelativeChangesFuzzingTests : ListComparerTestsBase
-{
-    const int Tries = 1000;
-    private const int MaxLength = 15;
-
-    public static IEnumerable<object[]> TestData
-    {
-        get => Enumerable.Range(0, Tries).Select(i => new object[]
-        {
-            StringRandomizer.Random(new Random().Next(MaxLength)),
-            StringRandomizer.Random(new Random().Next(MaxLength)),
-        });
-    }
-
-    [TestMethod]
-    [DynamicData(nameof(TestData))]
-    public void Fuzz(string left, string right)
-        => AssertCompare(left, right);
-
-    [TestMethod]
-    public void Ex0() => AssertCompare("bRaMC1I0P2tFS", "0RYG");
-
-    protected internal override IListComparer<char> CreateComparer(string left, string right)
-        => new RelativeChangesListComparer<char>(left.ToList(), right.ToList());
-}
-
-[DebugOnlyTestClass]
-// [TestClass]
 public class MoveDetectorFuzzingTests : ListComparerTestsBase
 {
     const int Tries = 10;
@@ -135,7 +107,7 @@ public class MoveDetectorFuzzingTests : ListComparerTestsBase
         => AssertCompare(left, right);
 
     protected internal override IListComparer<char> CreateComparer(string left, string right)
-        => new MoveDetector<char>(new RelativeChangesListComparer<char>(left.ToList(), right.ToList()).Compare());
+        => new MoveDetector<char>(new ListComparer<char>(left.ToList(), right.ToList()).Compare());
 }
 
 internal class DebugOnlyTestClassAttribute : TestClassAttribute
