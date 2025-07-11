@@ -28,13 +28,13 @@ using RightIndex = Index;
 /// The lists should be passed to the constructor of implementing classes.
 public interface IListComparer
 {
-    static IListComparer<T> Create<T>(List<T> left, List<T> right) =>
+    static IListComparer<T> Create<T>(List<T> left, List<T> right) where T : notnull =>
         new MoveDetector<T>(new RelativeChangesListComparer<T>(left, right).Compare());
 }
 
 /// <inheritdoc />
 /// <typeparam name="T">Type of elements of the compared lists.</typeparam>
-public interface IListComparer<T> : IListComparer
+public interface IListComparer<T> : IListComparer where T : notnull
 {
     /// Compares the two lists passed to the constructor.
     /// <returns>All changes that convert the <i>left</i> list to the <i>right</i> list.</returns>
@@ -45,7 +45,7 @@ public interface IListComparer<T> : IListComparer
 public interface IListChange;
 
 /// <inheritdoc cref="IListChange" />
-public interface IListChange<out T> : IListChange, ICloneable
+public interface IListChange<out T> : IListChange, ICloneable where T : notnull
 {
     /// Changed element.
     T Element { get; }
@@ -55,7 +55,7 @@ public interface IListChange<out T> : IListChange, ICloneable
 };
 
 /// <paramref name="Element"/> added at <paramref name="RightIndex"/>.
-public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T>
+public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T> where T : notnull
 {
     /// <inheritdoc />
     public Index Index
@@ -69,7 +69,7 @@ public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T>
 }
 
 /// <paramref name="Element"/> deleted from <paramref name="LeftIndex"/>.
-public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T>
+public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T> where T : notnull
 {
     /// <inheritdoc />
     public Index Index
@@ -85,7 +85,7 @@ public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T>
 /// <paramref name="LeftElement"/> moved from <paramref name="LeftIndex"/> to <paramref name="RightIndex"/>.
 /// We report <paramref name="RightElement"/> separately because it might not be identical to <paramref name="LeftElement"/>
 /// (if we use a custom <see cref="IEqualityComparer{T}"/>).
-public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex) : IListChange<T>
+public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex) : IListChange<T> where T : notnull
 {
     public RightIndex RightIndex { get; set; } = RightIndex;
     public LeftIndex LeftIndex { get; set; } = LeftIndex;
@@ -113,7 +113,7 @@ public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, R
 }
 
 /// <paramref name="LeftElement"/> at <paramref name="LeftIndex"/> replaced by <paramref name="RightElement"/>.
-public record struct ListReplaced<T>(T LeftElement, LeftIndex LeftIndex, T RightElement) : IListChange<T>
+public record struct ListReplaced<T>(T LeftElement, LeftIndex LeftIndex, T RightElement) : IListChange<T> where T : notnull
 {
     /// Changed <see cref="LeftElement"/>.
     public T Element => LeftElement;

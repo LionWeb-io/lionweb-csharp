@@ -26,7 +26,7 @@ using RightIndex = Index;
 /// Implements the Hirschberg O(n) space algorithm for finding an alignment.
 /// Inspired by David Powell's Java implementation at https://github.com/drpowell/AlignDemo/blob/master/Hirschberg.java
 /// </remarks>
-public class ListComparer<T> : IListComparer<T>
+public class ListComparer<T> : IListComparer<T> where T : notnull
 {
     private readonly List<T> _left;
     private readonly List<T> _right;

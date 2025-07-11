@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Utilities.ListComparer;
 
-public class MoveDetector<T> : IListComparer<T>
+public class MoveDetector<T> : IListComparer<T> where T : notnull
 {
     private readonly List<IListChange<T>> _changes;
 

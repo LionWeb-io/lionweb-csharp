@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Utilities.ListComparer;
 
-public class RelativeChangesListComparer<T> : IListComparer<T>
+public class RelativeChangesListComparer<T> : IListComparer<T> where T : notnull
 {
     private readonly IListComparer<T> _listComparer;
     private List<IListChange<T>> _allChanges;
