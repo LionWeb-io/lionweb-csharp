@@ -142,10 +142,13 @@ public interface IDeltaQueryParticipation : IDeltaQuery;
 
 public record SignOnRequest(
     string DeltaProtocolVersion,
+    ClientId ClientId,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
 ) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryParticipation, IDeltaQueryRequest
 {
+    /// <inheritdoc />
+    [JsonIgnore]
     public bool RequiresParticipationId => false;
 }
 
