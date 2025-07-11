@@ -322,13 +322,13 @@ public class KeyedIdentityComparer : IEqualityComparer<IKeyed>
 }
 
 /// Compares nodes by id.
-public class NodeIdComparer : IEqualityComparer<IReadableNode>
+public class NodeIdComparer<T> : IEqualityComparer<T> where T : IReadableNode
 {
     /// <inheritdoc />
-    public bool Equals(IReadableNode? x, IReadableNode? y) =>
+    public bool Equals(T? x, T? y) =>
         x?.GetId() == y?.GetId();
 
     /// <inheritdoc />
-    public int GetHashCode(IReadableNode obj) =>
+    public int GetHashCode(T obj) =>
         obj.GetId().GetHashCode();
 }

@@ -125,7 +125,9 @@ internal static class StringRandomizer
     public static string RandomLength() =>
         Random(_defaultRandom.Next(500));
 
-    public static string Random(int length) =>
-        new string(Enumerable.Repeat(_chars, length)
+    public static string Random(int length, string? chars = _chars) =>
+        new string(Enumerable.Repeat(chars, length)
             .Select(s => s[_defaultRandom.Next(s.Length)]).ToArray());
+    
+    public static char RandomChar(string? chars = _chars) => chars[_defaultRandom.Next(chars.Length)];
 }
