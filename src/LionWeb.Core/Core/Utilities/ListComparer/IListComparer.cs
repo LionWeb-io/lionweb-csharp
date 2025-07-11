@@ -53,18 +53,8 @@ public interface IListChange<out T> : IListChange, ICloneable
     Index Index { get; set; }
 };
 
-public interface ILeftListChange<out T> : IListChange<T>
-{
-    LeftIndex LeftIndex { get; set; }
-}
-
-public interface IRightListChange<out T> : IListChange<T>
-{
-    RightIndex RightIndex { get; set; }
-}
-
 /// <paramref name="Element"/> added at <paramref name="RightIndex"/>.
-public record ListAdded<T>(T Element, RightIndex RightIndex) : IRightListChange<T>
+public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T>
 {
     public Index Index
     {
@@ -77,7 +67,7 @@ public record ListAdded<T>(T Element, RightIndex RightIndex) : IRightListChange<
 }
 
 /// <paramref name="Element"/> deleted from <paramref name="LeftIndex"/>.
-public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : ILeftListChange<T>
+public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T>
 {
     public Index Index
     {
@@ -92,8 +82,7 @@ public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : ILeftListChange<T
 /// <paramref name="LeftElement"/> moved from <paramref name="LeftIndex"/> to <paramref name="RightIndex"/>.
 /// We report <paramref name="RightElement"/> separately because it might not be identical to <paramref name="LeftElement"/>
 /// (if we use a custom <see cref="IEqualityComparer{T}"/>).
-public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex)
-    : ILeftListChange<T>, IRightListChange<T>
+public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, RightIndex RightIndex) : IListChange<T>
 {
     public RightIndex RightIndex { get; set; } = RightIndex;
     public LeftIndex LeftIndex { get; set; } = LeftIndex;
@@ -118,7 +107,7 @@ public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, R
 }
 
 /// <paramref name="LeftElement"/> at <paramref name="LeftIndex"/> replaced by <paramref name="RightElement"/>.
-public record struct ListReplaced<T>(T LeftElement, LeftIndex LeftIndex, T RightElement) : ILeftListChange<T>
+public record struct ListReplaced<T>(T LeftElement, LeftIndex LeftIndex, T RightElement) : IListChange<T>
 {
     /// Changed <see cref="LeftElement"/>.
     public T Element => LeftElement;
