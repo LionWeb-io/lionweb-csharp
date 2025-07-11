@@ -15,10 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Utilities;
+namespace LionWeb.Core.Test.Utilities.ListComparer;
 
-using Core.Utilities;
+using Core.Utilities.ListComparer;
 using Serialization;
+using System.Diagnostics;
 
 [DebugOnlyTestClass]
 public class ListComparerFuzzingTests : AbsoluteIndexListComparerTestsBase
@@ -135,4 +136,27 @@ public class MoveDetectorFuzzingTests : ListComparerTestsBase
 
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new MoveDetector<char>(new RelativeChangesListComparer<char>(left.ToList(), right.ToList()).Compare());
+}
+
+internal class DebugOnlyTestClassAttribute : TestClassAttribute
+{
+    public override TestMethodAttribute? GetTestMethodAttribute(TestMethodAttribute? testMethodAttribute)
+    {
+        if (!Debugger.IsAttached)
+            return new DummyTestMethodAttribute();
+        
+        return base.GetTestMethodAttribute(testMethodAttribute);
+    }
+}
+
+internal class DummyTestMethodAttribute : TestMethodAttribute
+{
+    public override TestResult[] Execute(ITestMethod testMethod) =>
+    [
+        new TestResult
+        {
+            Outcome = UnitTestOutcome.Inconclusive,
+            TestContextMessages = "This test can only be run with a debugger attached."
+        }
+    ];
 }

@@ -15,10 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Utilities;
+namespace LionWeb.Core.Test.Utilities.ListComparer;
 
 using Core.Utilities;
-using Languages.Generated.V2023_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2;
+using LionWeb.Core.Utilities.ListComparer;
 using System.Diagnostics;
 
 [TestClass]
@@ -266,15 +267,6 @@ public class ListComparerTests : AbsoluteIndexListComparerTestsBase
         );
     }
 
-    private class NodeIdComparer : IEqualityComparer<INode>
-    {
-        public bool Equals(INode? x, INode? y) =>
-            x?.GetId() == y?.GetId();
-
-        public int GetHashCode(INode obj) =>
-            obj.GetId().GetHashCode();
-    }
-
     [TestMethod]
     public void SwapTwoNodes_SameId_CustomComparer()
     {
@@ -316,73 +308,4 @@ public class ListComparerTests : AbsoluteIndexListComparerTestsBase
 
     protected internal override IListComparer<char> CreateComparer(string left, string right)
         => new ListComparer<char>(left.ToList(), right.ToList());
-}
-
-public abstract class AbsoluteIndexListComparerTestsBase : ListComparerTestsBase
-{
-    protected override List<IListComparer<char>.IChange> AssertCompare(string left, string right)
-    {
-        var comparer = CreateComparer(left, right);
-        var changes = comparer.Compare();
-
-        Console.WriteLine("originalChanges: \n" + string.Join("\n", changes));
-
-        List<string> steps = [left, IndexString(left)];
-        var previous = left;
-
-        int deleteDelta = 0;
-        foreach (var deleted in changes.OfType<IListComparer<char>.Deleted>())
-        {
-            var line = previous.Remove(deleted.Index - deleteDelta, 1);
-            deleteDelta++;
-
-            previous = line;
-
-            var index = IndexString(line);
-            steps.Add("   " + deleted + "\n" + line + "\n" + index);
-        }
-
-        foreach (var added in changes.OfType<IListComparer<char>.Added>().OrderBy(a => a.Index))
-        {
-            var line = added.Index <= previous.Length 
-                    ? previous.Insert(added.Index, added.Element.ToString())
-                    : previous + added.Element.ToString();
-
-            previous = line;
-
-            var index = IndexString(line);
-            steps.Add("   " + added + "\n" + line + "\n" + index);
-        }
-
-        steps.Add(right);
-
-        TestContext.WriteLine(string.Join("\n", steps));
-
-        Assert.AreEqual(right, previous);
-
-        return changes;
-    }
-}
-
-internal class DebugOnlyTestClassAttribute : TestClassAttribute
-{
-    public override TestMethodAttribute? GetTestMethodAttribute(TestMethodAttribute? testMethodAttribute)
-    {
-        if (!Debugger.IsAttached)
-            return new DummyTestMethodAttribute();
-        
-        return base.GetTestMethodAttribute(testMethodAttribute);
-    }
-}
-
-internal class DummyTestMethodAttribute : TestMethodAttribute
-{
-    public override TestResult[] Execute(ITestMethod testMethod) =>
-    [
-        new TestResult
-            {
-                Outcome = UnitTestOutcome.Inconclusive,
-                TestContextMessages = "This test can only be run with a debugger attached."
-            }
-    ];
 }

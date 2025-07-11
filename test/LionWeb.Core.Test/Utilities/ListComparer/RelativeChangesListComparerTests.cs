@@ -15,10 +15,9 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Utilities;
+namespace LionWeb.Core.Test.Utilities.ListComparer;
 
-using Core.Utilities;
-using Languages.Generated.V2024_1.SDTLang;
+using LionWeb.Core.Utilities.ListComparer;
 
 [TestClass]
 public class RelativeChangesListComparerTests : ListComparerTestsBase

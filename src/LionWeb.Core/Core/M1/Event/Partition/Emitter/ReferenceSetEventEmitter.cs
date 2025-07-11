@@ -19,7 +19,7 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 
 using M3;
 using System.Diagnostics.CodeAnalysis;
-using Utilities;
+using Utilities.ListComparer;
 
 /// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Reference"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Reference"/>.</typeparam>
