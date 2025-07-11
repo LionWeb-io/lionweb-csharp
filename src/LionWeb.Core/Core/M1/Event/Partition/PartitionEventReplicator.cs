@@ -68,6 +68,9 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             case ChildMovedInSameContainmentEvent a:
                 OnRemoteChildMovedInSameContainment(sender, a);
                 break;
+            case ChildMovedAndReplacedFromOtherContainmentEvent a:
+                OnRemoteChildMovedAndReplacedFromOtherContainment(sender, a);
+                break;
             case AnnotationAddedEvent a:
                 OnRemoteAnnotationAdded(sender, a);
                 break;
@@ -251,6 +254,16 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             localNewParent.Set(childMovedEvent.NewContainment, newValue);
         });
 
+    private void OnRemoteChildMovedAndReplacedFromOtherContainment(object? sender,
+        ChildMovedAndReplacedFromOtherContainmentEvent childMovedAndReplacedEvent) => SuppressEventForwarding(childMovedAndReplacedEvent, () =>
+    {
+        var localNewParent = Lookup(childMovedAndReplacedEvent.NewParent.GetId());
+        var nodeToReplace = LookupOpt(childMovedAndReplacedEvent.MovedChild.GetId()) ?? Clone((INode)childMovedAndReplacedEvent.MovedChild);
+        var newValue = ReplaceContainment(localNewParent, childMovedAndReplacedEvent.NewContainment, childMovedAndReplacedEvent.NewIndex, nodeToReplace);
+
+        localNewParent.Set(childMovedAndReplacedEvent.NewContainment, newValue);
+    });
+
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(object? sender,
         ChildMovedFromOtherContainmentInSameParentEvent childMovedEvent) =>
         SuppressEventForwarding(childMovedEvent, () =>
@@ -280,6 +293,30 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
             localParent.Set(childMovedEvent.Containment, newValue);
         });
+    
+    private object ReplaceContainment(INode localParent, Containment containment, Index index, INode nodeToReplace)
+    {
+        object newValue = nodeToReplace;
+        if (containment.Multiple)
+        {
+            if (localParent.CollectAllSetFeatures().Contains(containment))
+            {
+                var existingChildren = localParent.Get(containment);
+                if (existingChildren is IList l)
+                {
+                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                    children.Insert(index, nodeToReplace);
+                    children.RemoveAt(index + 1);
+                    newValue = children;
+                }
+            } else
+            {
+                newValue = new List<IWritableNode>() { nodeToReplace };
+            }
+        }
+
+        return newValue;
+    }
 
     private object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
     {

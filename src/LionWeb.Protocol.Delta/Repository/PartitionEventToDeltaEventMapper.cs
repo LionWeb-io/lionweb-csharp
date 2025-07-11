@@ -51,6 +51,7 @@ public class PartitionEventToDeltaEventMapper
             ChildMovedFromOtherContainmentEvent a => OnChildMovedFromOtherContainment(a),
             ChildMovedFromOtherContainmentInSameParentEvent a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainmentEvent a => OnChildMovedInSameContainment(a),
+            ChildMovedAndReplacedFromOtherContainmentEvent a => OnChildMovedAndReplacedFromOtherContainment(a), 
             AnnotationAddedEvent a => OnAnnotationAdded(a),
             AnnotationDeletedEvent a => OnAnnotationDeleted(a),
             AnnotationMovedFromOtherParentEvent a => OnAnnotationMovedFromOtherParent(a),
@@ -145,6 +146,22 @@ public class PartitionEventToDeltaEventMapper
             []
         );
 
+    private ChildMovedAndReplacedFromOtherContainment
+        OnChildMovedAndReplacedFromOtherContainment(ChildMovedAndReplacedFromOtherContainmentEvent childMovedAndReplacedEvent) =>
+        new(
+            childMovedAndReplacedEvent.NewParent.GetId(),
+            childMovedAndReplacedEvent.NewContainment.ToMetaPointer(),
+            childMovedAndReplacedEvent.NewIndex,
+            childMovedAndReplacedEvent.MovedChild.GetId(),
+            childMovedAndReplacedEvent.OldParent.GetId(),
+            childMovedAndReplacedEvent.OldContainment.ToMetaPointer(),
+            childMovedAndReplacedEvent.OldIndex,
+            childMovedAndReplacedEvent.ReplacedChild.GetId(),
+            ToDescendants(childMovedAndReplacedEvent.ReplacedChild),
+            ToCommandSources(childMovedAndReplacedEvent), 
+            []
+            );
+    
     private ChildMovedFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParentEvent childMovedEvent) =>
         new(
