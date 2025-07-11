@@ -41,7 +41,7 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
         if (!IsActive() || setValues == null)
             return;
 
-        var listComparer = new MoveDetector<T>(new StepwiseListComparer<T>(existingValues, setValues).Compare());
+        var listComparer = new MoveDetector<T>(new RelativeChangesListComparer<T>(existingValues, setValues).Compare());
         _changes = listComparer.Compare();
     }
 

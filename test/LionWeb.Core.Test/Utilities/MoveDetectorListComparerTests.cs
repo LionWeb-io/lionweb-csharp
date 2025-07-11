@@ -87,7 +87,6 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
                 new(Delete, 'F', 3),
                 new(Add, 'D', 2),
                 new(Add, 'H', 5),
-                new(Move, 'e', 3, 3),
             ]
         );
 
@@ -109,8 +108,8 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             "abdeFghjk",
             "abCdeghIjk",
             [
+                new(Delete, 'F', 4),
                 new(Add, 'C', 2),
-                new(Delete, 'F', 5),
                 new(Add, 'I', 7),
             ]
         );
@@ -124,7 +123,6 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
                 new(Delete, 'B', 1),
                 new(Delete, 'F', 3),
                 new(Add, 'D', 2),
-                new(Move, 'e', 3, 3),
             ]
         );
 
@@ -147,8 +145,8 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             [
                 new(Add, 'B', 1),
                 new(Add, 'D', 3),
-                new(Move, 'G', 6, 5),
                 new(Add, 'H', 7),
+                new(Move, 'G', 6, 5),
             ]
         );
 
@@ -158,10 +156,10 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             "acefGi",
             "aBcDeJfHi",
             [
+                new(Delete, 'G', 4),
                 new(Add, 'B', 1),
                 new(Add, 'D', 3),
                 new(Add, 'J', 5),
-                new(Delete, 'G', 7),
                 new(Add, 'H', 7),
             ]
         );
@@ -272,6 +270,78 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
                 new(Move, 'D', 8, 3),
             ]
         );
+    
+    [TestMethod]
+    public void MoveTwoSeparatedFarRightAndSwap() =>
+        AssertCompare(
+            "aBcDefghijkl",
+            "acefghiDBjkl",
+            [
+                new(Move, 'B', 1, 8),
+                new(Move, 'D', 2, 7),
+            ]
+        );
+
+    
+    [TestMethod]
+    public void MoveTwoSeparatedFarLeftAndSwap() =>
+        AssertCompare(
+            "acefghiBDjkl",
+            "aDcBefghijkl",
+            [
+                new(Move, 'B', 7, 2),
+                new(Move, 'D', 8, 1),
+            ]
+        );
+    
+    [TestMethod]
+    public void MoveThreeFarRight() =>
+        AssertCompare(
+            "aBCDefghijkl",
+            "aefghiBCDjkl",
+            [
+                new(Move, 'B', 1, 8),
+                new(Move, 'C', 1, 8),
+                new(Move, 'D', 1, 8),
+            ]
+        );
+
+    [TestMethod]
+    public void MoveThreeFarLeft() =>
+        AssertCompare(
+            "aefghiBCDjkl",
+            "aBCDefghijkl",
+            [
+                new(Move, 'B', 6, 1),
+                new(Move, 'C', 7, 2),
+                new(Move, 'D', 8, 3),
+            ]
+        );
+    
+    [TestMethod]
+    public void MoveThreeSeparatedFarLeftAndSwap() =>
+        AssertCompare(
+            "aefghijBCkDl",
+            "aDeBfCghijkl",
+            [
+                new(Move, 'B', 7, 2),
+                new(Move, 'C', 8, 4),
+                new(Move, 'D', 10, 1),
+            ]
+        );
+    
+    [TestMethod]
+    public void MoveThreeSeparatedFarRightAndSwap() =>
+        AssertCompare(
+            "aDeBfCghijkl",
+            "aefghijBCkDl",
+            [
+                new(Move, 'D', 1, 10),
+                new(Move, 'B', 2, 8),
+                new(Move, 'C', 3, 8),
+            ]
+        );
+
 
     [TestMethod]
     public void MoveOneFarRightDeleteAfter() =>
@@ -281,7 +351,6 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             [
                 new(Delete, 'K', 10),
                 new(Move, 'B', 1, 8),
-                new(Move, 'j', 9, 9),
             ]
         );
 
@@ -291,8 +360,8 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             "acdEfghiBjkl",
             "aBcdfghijkl",
             [
-                new(Move, 'B', 8, 1),
-                new(Delete, 'E', 4),
+                new(Delete, 'E', 3),
+                new(Move, 'B', 7, 1),
             ]
         );
 
@@ -316,6 +385,17 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
                 new(Move, 'H', 6, 2),
             ]
         );
+    
+    [TestMethod]
+    public void MoveTwoOppositeOverlapping() =>
+        AssertCompare(
+            "abCdefgHijkl",
+            "abdHefgiCjkl",
+            [
+                new(Move, 'C', 2, 8),
+                new(Move, 'H', 6, 3),
+            ]
+        );
 
     [TestMethod]
     public void Hirschberg() =>
@@ -323,6 +403,7 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             "AbcdEF",
             "bcdA",
             [
+                
                 new(Delete, 'E', 4),
                 new(Delete, 'F', 4),
                 new(Move, 'A', 0, 3),
@@ -353,8 +434,8 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             "abcDefgHij",
             "abceKfgiDj",
             [
+                new(Delete, 'H', 7),
                 new(Add, 'K', 5),
-                new(Delete, 'H', 8),
                 new(Move, 'D', 3, 8),
             ]
         );
@@ -365,7 +446,6 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             "abcDeKfgHij",
             "abcefgiDj",
             [
-                
                 new(Delete, 'K', 5),
                 new(Delete, 'H', 7),
                 new(Move, 'D', 3, 7),
@@ -383,5 +463,5 @@ public class MoveDetectorListComparerTests : ListComparerTestsBase
             ]
         );
     protected internal override IListComparer<char> CreateComparer(string left, string right)
-        => new MoveDetector<char>(new StepwiseListComparer<char>(left.ToList(), right.ToList()).Compare());
+        => new MoveDetector<char>(new RelativeChangesListComparer<char>(left.ToList(), right.ToList()).Compare());
 }

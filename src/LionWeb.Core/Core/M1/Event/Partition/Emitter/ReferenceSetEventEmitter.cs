@@ -37,7 +37,7 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
         if (!IsActive())
             return;
 
-        var listComparer = new MoveDetector<T>(new StepwiseListComparer<T>(storage, safeNodes).Compare());
+        var listComparer = new MoveDetector<T>(new RelativeChangesListComparer<T>(storage, safeNodes).Compare());
         _changes = listComparer.Compare();
     }
 

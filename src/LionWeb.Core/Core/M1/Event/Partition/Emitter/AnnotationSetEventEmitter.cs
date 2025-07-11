@@ -38,7 +38,7 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
         if (!IsActive() || setValues == null)
             return;
 
-        var listComparer = new MoveDetector<INode>(new StepwiseListComparer<INode>(existingValues, setValues).Compare());
+        var listComparer = new MoveDetector<INode>(new RelativeChangesListComparer<INode>(existingValues, setValues).Compare());
         _changes = listComparer.Compare();
     }
 

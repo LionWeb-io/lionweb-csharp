@@ -86,9 +86,9 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "acDegHi",
     [
                 new(Delete, 'B', 1),
+                new(Delete, 'F', 3),
                 new(Add, 'D', 2),
-                new(Delete, 'F', 4),
-                new(Add, 'H', 5),
+                new(Add, 'H', 5)
             ]
         );
     }
@@ -109,8 +109,8 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "acDegHi",
     [
                 new(Delete, 'B', 1),
+                new(Delete, 'F', 3),
                 new(Add, 'D', 2),
-                new(Delete, 'F', 4),
                 new(Add, 'H', 5),
             ]
         );
@@ -132,8 +132,8 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "acDegHi",
     [
                 new(Delete, 'B', 1),
+                new(Delete, 'F', 3),
                 new(Add, 'D', 2),
-                new(Delete, 'F', 4),
                 new(Add, 'H', 5),
             ]
         );
@@ -153,9 +153,9 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "aceFgi",
             "acDegHi",
             [
+                new(Delete, 'F', 3),
                 new(Add, 'D', 2),
-                new(Delete, 'F', 4),
-                new(Add, 'H', 5),
+                new(Add, 'H', 5)
             ]
         );
     }
@@ -177,10 +177,10 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
             "abcDEF",
             "abXcGH",
             [
+                new(Delete, 'D', 3),
+                new(Delete, 'E', 3),
+                new(Delete, 'F', 3),
                 new(Add, 'X', 2),
-                new(Delete, 'D', 4),
-                new(Delete, 'E', 4),
-                new(Delete, 'F', 4),
                 new(Add, 'G', 4),
                 new(Add, 'H', 5),
             ]
@@ -201,5 +201,5 @@ public class ManualInputStepwiseListComparerTests : ListComparerTestsBase
     }
 
     protected internal override IListComparer<char> CreateComparer(string left, string right) =>
-        new StepwiseListComparer<char>(Math.Max(left.Length, right.Length), left.Length, new DummyListComparer(_inputChanges));
+        new RelativeChangesListComparer<char>(new DummyListComparer(_inputChanges));
 }
