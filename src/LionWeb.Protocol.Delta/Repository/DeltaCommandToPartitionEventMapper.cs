@@ -26,6 +26,8 @@ using Core.M3;
 using Core.Serialization;
 using Message;
 using Message.Command;
+using System.Collections;
+using System.Diagnostics;
 
 public class DeltaCommandToPartitionEventMapper
 {
@@ -175,31 +177,32 @@ public class DeltaCommandToPartitionEventMapper
             ToEventId(moveChildEvent)
         );
     }
-    
-    private ChildMovedAndReplacedFromOtherContainmentEvent OnMoveAndReplaceChildFromOtherContainment(MoveAndReplaceChildFromOtherContainment moveAndReplaceChildEvent)
+
+    private ChildMovedAndReplacedFromOtherContainmentEvent OnMoveAndReplaceChildFromOtherContainment(MoveAndReplaceChildFromOtherContainment command)
     {
-        var movedChild = ToNode(moveAndReplaceChildEvent.MovedChild);
+        var movedChild = ToNode(command.MovedChild);
         var oldParent = (IWritableNode)movedChild.GetParent();
         var oldContainment = oldParent.GetContainmentOf(movedChild);
 
-        var newParent = ToNode(moveAndReplaceChildEvent.NewParent);
-        var newContainment = ToContainment(moveAndReplaceChildEvent.NewContainment, newParent);
-        
-        var replacedChild = ToNode(moveAndReplaceChildEvent.ReplacedChild);
+        var oldIndex = GetChildIndex(oldParent, oldContainment, movedChild);
+
+        var newParent = ToNode(command.NewParent);
+        var newContainment = ToContainment(command.NewContainment, newParent);
+        var replacedChild = ToNode(command.ReplacedChild);
 
         return new ChildMovedAndReplacedFromOtherContainmentEvent(
-            newParent, 
-            newContainment, 
-            moveAndReplaceChildEvent.NewIndex,
+            newParent,
+            newContainment,
+            command.NewIndex,
             movedChild,
             oldParent,
             oldContainment,
-            0, // TODO FIXME
+            oldIndex,
             replacedChild,
-            ToEventId(moveAndReplaceChildEvent)
+            ToEventId(command)
         );
     }
-
+    
     private ChildMovedFromOtherContainmentInSameParentEvent OnMoveChildFromOtherContainmentInSameParent(
         MoveChildFromOtherContainmentInSameParent moveChildEvent)
     {
@@ -231,6 +234,28 @@ public class DeltaCommandToPartitionEventMapper
             0, // TODO FIXME
             ToEventId(moveChildEvent)
         );
+    }
+    
+    private Index GetChildIndex(IWritableNode parent, Containment? containment, IWritableNode child)
+    {
+        var index = 0;
+        if (containment.Multiple)
+        {
+            if (parent.CollectAllSetFeatures().Contains(containment))
+            {
+                var existingChildren = parent.Get(containment);
+                if (existingChildren is IList l)
+                {
+                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                    index = children.IndexOf(child);
+                }
+            }
+        } else
+        {
+            index = 0;
+        }
+
+        return index;
     }
 
     private Containment ToContainment(MetaPointer deltaContainment, IReadableNode node) =>
@@ -329,7 +354,7 @@ public class DeltaCommandToPartitionEventMapper
             parent,
             reference,
             changeReferenceEvent.Index,
-            ToTarget(changeReferenceEvent.NewTarget,  changeReferenceEvent.NewResolveInfo),
+            ToTarget(changeReferenceEvent.NewTarget, changeReferenceEvent.NewResolveInfo),
             new ReferenceTarget(null, parent.Get(reference) as IReadableNode),
             ToEventId(changeReferenceEvent)
         );
