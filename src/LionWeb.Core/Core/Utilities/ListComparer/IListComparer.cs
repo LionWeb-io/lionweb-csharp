@@ -36,7 +36,7 @@ public interface IListComparer
     /// <typeparam name="T"></typeparam>
     /// <returns></returns>
     static IListComparer<T> Create<T>(List<T> left, List<T> right) where T : notnull =>
-        new MoveDetector<T>(new ListComparer<T>(left, right).Compare());
+        new MoveDetector<T>(new ListComparer<T>(left, right));
 }
 
 /// <inheritdoc />
@@ -71,6 +71,7 @@ public record ListAdded<T>(T Element, RightIndex RightIndex) : IListChange<T> wh
         set => RightIndex = value;
     }
 
+    /// <inheritdoc cref="Index"/>
     public RightIndex RightIndex { get; set; } = RightIndex;
     object ICloneable.Clone() => this with { };
 }
@@ -85,6 +86,7 @@ public record ListDeleted<T>(T Element, LeftIndex LeftIndex) : IListChange<T> wh
         set => LeftIndex = value;
     }
 
+    /// <inheritdoc cref="Index"/>
     public LeftIndex LeftIndex { get; set; } = LeftIndex;
     object ICloneable.Clone() => this with { };
 }
@@ -101,7 +103,7 @@ public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, R
     /// Changed <see cref="LeftElement"/>.
     public T Element => LeftElement;
 
-    /// <inheritdoc />
+    /// Index of the left-most of (<see cref="LeftIndex"/>, <see cref="RightIndex"/>).
     public Index Index
     {
         get => LeftIndex < RightIndex ? LeftIndex : RightIndex;

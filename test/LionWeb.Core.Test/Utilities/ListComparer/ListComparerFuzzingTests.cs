@@ -107,7 +107,7 @@ public class MoveDetectorFuzzingTests : ListComparerTestsBase
         => AssertCompare(left, right);
 
     protected internal override IListComparer<char> CreateComparer(string left, string right)
-        => new MoveDetector<char>(new ListComparer<char>(left.ToList(), right.ToList()).Compare());
+        => new MoveDetector<char>(new ListComparer<char>(left.ToList(), right.ToList()));
 }
 
 internal class DebugOnlyTestClassAttribute : TestClassAttribute
