@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Utilities.ListComparer;
 
+/// Turns a fitting pair of <see cref="ListDeleted{T}"/> and <see cref="ListAdded{T}"/> into one <see cref="ListMoved{T}"/>. 
 public class MoveDetector<T> : IListComparer<T> where T : notnull
 {
     private readonly List<IListChange<T>> _changes;
@@ -29,107 +30,139 @@ public class MoveDetector<T> : IListComparer<T> where T : notnull
     /// <inheritdoc />
     public List<IListChange<T>> Compare()
     {
-        List<ListMoved<T>> movingChanges = [];
-        
-        // Extract moves from the list of changes
-        for (var i = 0; i < _changes.Count; i++)
-        {
-            var currentResult = _changes[i];
-            bool isAMove = false;
-            
-            if (currentResult is ListDeleted<T> d)
-            {
-                for (var j = i + 1; j < _changes.Count; j++)
-                {
-                    var partner = _changes[j];
-                    if (partner is ListAdded<T> partnerAdd && d.Element.Equals(partnerAdd.Element))
-                    {
-                        Console.WriteLine("\nCouple detected as a move: " + d + " " + partnerAdd);
-                        
-                        for (var k = j - 1; k > i; k--)
-                        {
-                            var intermediate = _changes[k];
-                            if (intermediate is ListAdded<T> interAdd)
-                                if (interAdd.RightIndex > d.LeftIndex && interAdd.RightIndex < partnerAdd.RightIndex)
-                                {
-                                    interAdd.RightIndex += 1;
-                                    _changes[k] = interAdd;
-                                } 
-                                else if (interAdd.RightIndex <= d.LeftIndex)
-                                {
-                                    d.LeftIndex += 1;
-                                }
-                            if (intermediate is ListDeleted<T> interDel)
-                            {
-                                interDel.LeftIndex += 1;
-                                _changes[k] = interDel;
-                            }   
-                        }
-                        
-                        movingChanges.Add(new ListMoved<T>(d.Element, d.LeftIndex, 
-                                            partnerAdd.Element, partnerAdd.RightIndex));
-                        _changes.RemoveAt(j);
-                        isAMove = true;
-                        break;
-                    }
-                }
-            }
+        List<ListMoved<T>> movingChanges = ExtractMovingChanges();
+        AddMovesToTail(movingChanges);
 
-            if (isAMove) 
+        return _changes;
+    }
+
+    private List<ListMoved<T>> ExtractMovingChanges()
+    {
+        List<ListMoved<T>> movingChanges = [];
+
+        for (var deletedIndex = 0; deletedIndex < _changes.Count; deletedIndex++)
+        {
+            IListChange<T> currentChange = _changes[deletedIndex];
+
+            if (currentChange is not ListDeleted<T> deleted)
+                continue;
+
+            for (var addedIndex = deletedIndex + 1; addedIndex < _changes.Count; addedIndex++)
             {
-                _changes.RemoveAt(i);
-                i--;
-                Console.WriteLine("   after extracting this couple: \n" + string.Join("\n", _changes));
+                var partner = _changes[addedIndex];
+                if (partner is not ListAdded<T> added || !deleted.Element.Equals(added.Element))
+                    continue;
+
+                MoveIntermediates(addedIndex, deletedIndex, deleted, added);
+
+                movingChanges.Add(new ListMoved<T>(deleted.Element, deleted.LeftIndex, added.Element,
+                    added.RightIndex));
+                _changes.RemoveAt(addedIndex);
+                _changes.RemoveAt(deletedIndex);
+                deletedIndex--;
+                break;
             }
         }
-        
-        // Add moves to the tail of the changes list
-        for  (var i = 0; i < movingChanges.Count; i++)
+
+        return movingChanges;
+    }
+
+    private void MoveIntermediates(Index addedIndex, Index deletedIndex, ListDeleted<T> deleted, ListAdded<T> added)
+    {
+        for (var intermediateIndex = addedIndex - 1; intermediateIndex > deletedIndex; intermediateIndex--)
+        {
+            var intermediate = _changes[intermediateIndex];
+            if (intermediate is ListAdded<T> interAdd)
+            {
+                if (interAdd.RightIndex > deleted.LeftIndex &&
+                    interAdd.RightIndex < added.RightIndex)
+                {
+                    interAdd.RightIndex += 1;
+                    _changes[intermediateIndex] = interAdd;
+                    continue;
+                }
+
+                if (interAdd.RightIndex <= deleted.LeftIndex)
+                {
+                    deleted.LeftIndex += 1;
+                }
+
+                continue;
+            }
+
+            if (intermediate is ListDeleted<T> interDel)
+            {
+                interDel.LeftIndex += 1;
+                _changes[intermediateIndex] = interDel;
+            }
+        }
+    }
+
+    private void AddMovesToTail(List<ListMoved<T>> movingChanges)
+    {
+        for (var i = 0; i < movingChanges.Count; i++)
         {
             var currentChange = movingChanges[i];
-            
-            for (var j = i + 1; j < movingChanges.Count; j++)
-            {
-                if (currentChange.MoveLeftToRight)
-                {
-                    if (movingChanges[j].LeftIndex > currentChange.LeftIndex &&
-                        movingChanges[j].LeftIndex <= currentChange.RightIndex)
-                    {
-                        movingChanges[j].LeftIndex -= 1;
-                        if (movingChanges[j].MoveLeftToRight &&
-                            movingChanges[j].RightIndex > currentChange.RightIndex)
-                        {
-                            currentChange.RightIndex += 1;
-                        } 
-                        else if (movingChanges[j].MoveLeftToRight &&
-                                 movingChanges[j].RightIndex <= currentChange.RightIndex)
-                        {
-                            movingChanges[j].RightIndex -= 1;
-                        } 
-                        else if (movingChanges[j].MoveRightToLeft &&
-                                 movingChanges[j].RightIndex <= currentChange.LeftIndex)
-                        {
-                            currentChange.LeftIndex -= 1;
-                        }
-                        else if (movingChanges[j].MoveRightToLeft &&
-                                 movingChanges[j].RightIndex >= currentChange.LeftIndex)
-                        {
-                            movingChanges[j].RightIndex -= 1;
-                        }
-                    }
-                } 
-                else if (currentChange.MoveRightToLeft && movingChanges[j].MoveRightToLeft &&
-                         movingChanges[j].RightIndex <= currentChange.RightIndex)
-                {
-                    currentChange.RightIndex -= 1;
-                    currentChange.LeftIndex -= 1;
-                }
-            }
+
+            AdjustOtherMoves(movingChanges, i, currentChange);
+
             if (currentChange.LeftIndex != currentChange.RightIndex)
                 _changes.Add(currentChange);
         }
-        
-        Console.WriteLine("\nafter MoveDetector: \n" + string.Join("\n", _changes));
-        return _changes;
     }
+
+    private static void AdjustOtherMoves(List<ListMoved<T>> movingChanges, Index current, ListMoved<T> currentChange)
+    {
+        for (var j = current + 1; j < movingChanges.Count; j++)
+        {
+            if (ShouldMoveRightToLeft(currentChange) &&
+                ShouldMoveRightToLeft(movingChanges[j]) &&
+                movingChanges[j].RightIndex <= currentChange.RightIndex
+               )
+            {
+                currentChange.RightIndex -= 1;
+                currentChange.LeftIndex -= 1;
+                continue;
+            }
+
+            if (movingChanges[j].LeftIndex <= currentChange.LeftIndex ||
+                movingChanges[j].LeftIndex > currentChange.RightIndex)
+                continue;
+
+            movingChanges[j].LeftIndex -= 1;
+
+            if (ShouldMoveLeftToRight(movingChanges[j]))
+            {
+                if (movingChanges[j].RightIndex > currentChange.RightIndex)
+                {
+                    currentChange.RightIndex += 1;
+                    continue;
+                }
+
+                if (movingChanges[j].RightIndex <= currentChange.RightIndex)
+                {
+                    movingChanges[j].RightIndex -= 1;
+                }
+
+                continue;
+            }
+
+            if (ShouldMoveRightToLeft(movingChanges[j]))
+            {
+                if (movingChanges[j].RightIndex <= currentChange.LeftIndex)
+                {
+                    currentChange.LeftIndex -= 1;
+                    continue;
+                }
+
+                if (movingChanges[j].RightIndex >= currentChange.LeftIndex)
+                {
+                    movingChanges[j].RightIndex -= 1;
+                }
+            }
+        }
+    }
+
+    private static bool ShouldMoveLeftToRight(ListMoved<T> listMoved) => listMoved.LeftIndex < listMoved.RightIndex;
+    private static bool ShouldMoveRightToLeft(ListMoved<T> listMoved) => listMoved.RightIndex < listMoved.LeftIndex;
 }

@@ -69,10 +69,10 @@ public class ListComparer<T> : IListComparer<T> where T : notnull
     private List<IListChange<T>> CollectChanges() =>
         _deleted
             .Values
-            .Select(c => (IListChange<T>)new ListDeleted<T>(c.Item1, c.Item2))
+            .Select(IListChange<T> (c) => new ListDeleted<T>(c.Item1, c.Item2))
             .Concat(_added
                 .Values
-                .Select(c => (IListChange<T>)new ListAdded<T>(c.Item1, c.Item2))
+                .Select(IListChange<T> (c) => new ListAdded<T>(c.Item1, c.Item2))
             )
             .ToList();
 

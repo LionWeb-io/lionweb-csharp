@@ -106,9 +106,6 @@ public record ListMoved<T>(T LeftElement, LeftIndex LeftIndex, T RightElement, R
         }
     }
 
-    public bool MoveLeftToRight => LeftIndex < RightIndex;
-    public bool MoveRightToLeft => RightIndex < LeftIndex;
-
     object ICloneable.Clone() => this with { };
 }
 
