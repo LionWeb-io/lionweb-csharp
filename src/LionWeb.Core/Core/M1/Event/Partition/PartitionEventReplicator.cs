@@ -258,7 +258,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         ChildMovedAndReplacedFromOtherContainmentEvent childMovedAndReplacedEvent) => SuppressEventForwarding(childMovedAndReplacedEvent, () =>
     {
         var localNewParent = Lookup(childMovedAndReplacedEvent.NewParent.GetId());
-        var nodeToReplace = LookupOpt(childMovedAndReplacedEvent.MovedChild.GetId()) ?? Clone((INode)childMovedAndReplacedEvent.MovedChild);
+        var nodeToReplace = Lookup(childMovedAndReplacedEvent.MovedChild.GetId());
         var newValue = ReplaceContainment(localNewParent, childMovedAndReplacedEvent.NewContainment, childMovedAndReplacedEvent.NewIndex, nodeToReplace);
 
         localNewParent.Set(childMovedAndReplacedEvent.NewContainment, newValue);
