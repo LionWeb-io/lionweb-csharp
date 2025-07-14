@@ -122,7 +122,7 @@ public class DeltaCommandToPartitionEventMapper
     {
         var parent = ToNode(command.Parent);
         var containment = ToContainment(command.Containment, parent);
-        
+
         return new ChildAddedEvent(
             parent,
             Deserialize(command.NewChild),
@@ -136,7 +136,7 @@ public class DeltaCommandToPartitionEventMapper
     {
         var parent = ToNode(command.Parent);
         var containment = ToContainment(command.Containment, parent);
-        
+
         return new ChildDeletedEvent(
             M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[command.Index],
             parent,
@@ -168,7 +168,7 @@ public class DeltaCommandToPartitionEventMapper
         var oldContainment = oldParent.GetContainmentOf(movedChild);
         var newContainment = ToContainment(command.NewContainment, newParent);
         var oldIndex = GetChildIndex(oldParent, oldContainment, movedChild);
-        
+
         return new ChildMovedFromOtherContainmentEvent(
             newParent,
             newContainment,
@@ -176,7 +176,7 @@ public class DeltaCommandToPartitionEventMapper
             movedChild,
             oldParent,
             oldContainment,
-            oldIndex, 
+            oldIndex,
             ToEventId(command)
         );
     }
@@ -203,7 +203,7 @@ public class DeltaCommandToPartitionEventMapper
             ToEventId(command)
         );
     }
-    
+
     private ChildMovedFromOtherContainmentInSameParentEvent OnMoveChildFromOtherContainmentInSameParent(
         MoveChildFromOtherContainmentInSameParent command)
     {
@@ -212,14 +212,14 @@ public class DeltaCommandToPartitionEventMapper
         var oldContainment = parent.GetContainmentOf(movedChild);
         var newContainment = ToContainment(command.NewContainment, parent);
         var oldIndex = GetChildIndex(parent, oldContainment, movedChild);
-        
+
         return new ChildMovedFromOtherContainmentInSameParentEvent(
             newContainment,
             command.NewIndex,
             movedChild,
             parent,
             oldContainment,
-            oldIndex, 
+            oldIndex,
             ToEventId(command)
         );
     }
@@ -230,7 +230,7 @@ public class DeltaCommandToPartitionEventMapper
         var parent = (IWritableNode)movedChild.GetParent();
         var containment = parent.GetContainmentOf(movedChild);
         var oldIndex = GetChildIndex(parent, containment, movedChild);
-        
+
         return new ChildMovedInSameContainmentEvent(
             command.NewIndex,
             movedChild,
@@ -240,24 +240,18 @@ public class DeltaCommandToPartitionEventMapper
             ToEventId(command)
         );
     }
-    
+
     private Index GetChildIndex(IWritableNode parent, Containment? containment, IWritableNode child)
     {
         var index = 0;
+        
         if (containment.Multiple)
         {
-            if (parent.CollectAllSetFeatures().Contains(containment))
+            if (parent.TryGet(containment, out var existingChildren) && existingChildren is IList l)
             {
-                var existingChildren = parent.Get(containment);
-                if (existingChildren is IList l)
-                {
-                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    index = children.IndexOf(child);
-                }
+                var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                index = children.IndexOf(child);
             }
-        } else
-        {
-            index = 0;
         }
 
         return index;
