@@ -166,7 +166,8 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     private void OnRemotePropertyAdded(object? sender, PropertyAddedEvent propertyAddedEvent) =>
         SuppressEventForwarding(propertyAddedEvent, () =>
         {
-            Debug.WriteLine($"Node {propertyAddedEvent.Node.PrintIdentity()}: Setting {propertyAddedEvent.Property} to {propertyAddedEvent.NewValue}");
+            Debug.WriteLine(
+                $"Node {propertyAddedEvent.Node.PrintIdentity()}: Setting {propertyAddedEvent.Property} to {propertyAddedEvent.NewValue}");
             Lookup(propertyAddedEvent.Node.GetId()).Set(propertyAddedEvent.Property, propertyAddedEvent.NewValue);
         });
 
@@ -194,7 +195,8 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
             var clone = Clone(newChildNode);
 
-            Debug.WriteLine($"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {childAddedEvent.Containment} at {childAddedEvent.Index}");
+            Debug.WriteLine(
+                $"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {childAddedEvent.Containment} at {childAddedEvent.Index}");
             var newValue = InsertContainment(localParent, childAddedEvent.Containment, childAddedEvent.Index, clone);
 
             localParent.Set(childAddedEvent.Containment, newValue);
@@ -259,7 +261,8 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     {
         var localNewParent = Lookup(childMovedAndReplacedEvent.NewParent.GetId());
         var nodeToReplace = Lookup(childMovedAndReplacedEvent.MovedChild.GetId());
-        var newValue = ReplaceContainment(localNewParent, childMovedAndReplacedEvent.NewContainment, childMovedAndReplacedEvent.NewIndex, nodeToReplace);
+        var newValue = ReplaceContainment(localNewParent, childMovedAndReplacedEvent.NewContainment, childMovedAndReplacedEvent.NewIndex,
+            nodeToReplace);
 
         localNewParent.Set(childMovedAndReplacedEvent.NewContainment, newValue);
     });
@@ -294,22 +297,33 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             localParent.Set(childMovedEvent.Containment, newValue);
         });
 
-    private object ReplaceContainment(INode localParent, Containment containment, Index index, INode nodeToReplace)
+    private object ReplaceContainment(INode localParent, Containment containment, Index index, INode substituteNode)
     {
-        object newValue = nodeToReplace;
+        object newValue;
 
-        if (containment.Multiple)
+        if (localParent.TryGet(containment, out var existingChildren))
         {
-            if (localParent.TryGet(containment, out var existingChildren) && existingChildren is IList l)
+            if (existingChildren is IList l)
             {
                 var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                children.Insert(index, nodeToReplace);
+                children.Insert(index, substituteNode);
                 children.RemoveAt(index + 1);
                 newValue = children;
+                
+            } else if (existingChildren is IWritableNode _ && index == 0)
+            {
+                newValue = substituteNode;
+                
             } else
             {
-                newValue = new List<IWritableNode>() { nodeToReplace };
+                throw new InvalidValueException(containment, existingChildren);
             }
+        } else if (containment.Multiple)
+        {
+            newValue = new List<IWritableNode> { substituteNode };
+        } else
+        {
+            newValue = substituteNode;
         }
 
         return newValue;
