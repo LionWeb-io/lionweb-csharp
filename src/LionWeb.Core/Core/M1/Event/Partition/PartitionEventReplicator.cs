@@ -293,22 +293,19 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
             localParent.Set(childMovedEvent.Containment, newValue);
         });
-    
+
     private object ReplaceContainment(INode localParent, Containment containment, Index index, INode nodeToReplace)
     {
         object newValue = nodeToReplace;
+
         if (containment.Multiple)
         {
-            if (localParent.CollectAllSetFeatures().Contains(containment))
+            if (localParent.TryGet(containment, out var existingChildren) && existingChildren is IList l)
             {
-                var existingChildren = localParent.Get(containment);
-                if (existingChildren is IList l)
-                {
-                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.Insert(index, nodeToReplace);
-                    children.RemoveAt(index + 1);
-                    newValue = children;
-                }
+                var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                children.Insert(index, nodeToReplace);
+                children.RemoveAt(index + 1);
+                newValue = children;
             } else
             {
                 newValue = new List<IWritableNode>() { nodeToReplace };
