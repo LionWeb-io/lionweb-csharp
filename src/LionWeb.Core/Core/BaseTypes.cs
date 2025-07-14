@@ -24,7 +24,7 @@ using M2;
 using M3;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
+using Utilities;
 
 /// An interface that LionWeb AST nodes implement to provide <em>read</em> access.
 public interface IReadableNode
@@ -309,11 +309,8 @@ public interface IStructuredDataTypeInstance
 public interface INode : IWritableNode<INode>;
 
 /// Base implementation of <see cref="IReadableNode{T}"/>.
-public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
+public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
 {
-    [GeneratedRegex("^[a-zA-Z0-9_-]+$")]
-    private static partial Regex IdRegex();
-
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
     protected virtual IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
 
@@ -329,7 +326,7 @@ public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : I
     /// <exception cref="InvalidIdException">If <paramref name="id"/> is not a <see cref="IReadableNode.GetId">valid identifier</see>.</exception>
     protected ReadableNodeBase(NodeId id, T? parent)
     {
-        if (id == null || !IdRegex().IsMatch(id))
+        if (!IdUtils.IsValid(id))
             throw new InvalidIdException(id);
 
         _id = id;

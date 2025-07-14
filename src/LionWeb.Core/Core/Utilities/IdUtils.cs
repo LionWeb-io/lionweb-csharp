@@ -17,10 +17,13 @@
 
 namespace LionWeb.Core.Utilities;
 
+using System.Text;
+using System.Text.RegularExpressions;
+
 /// <summary>
 /// Utility methods for working with LionWeb-compliant IDs.
 /// </summary>
-public static class IdUtils
+public static partial class IdUtils
 {
     /// <returns>A generated, unique ID in base64url-format.</returns>
     public static NodeId NewId() =>
@@ -28,8 +31,23 @@ public static class IdUtils
 
     /// Encodes <paramref name="bytes"/> in base64url-format.
     public static NodeId EncodeBase64Url(byte[] bytes) =>
-        Convert.ToBase64String(bytes)
+        ToUrlEncoding(Convert.ToBase64String(bytes));
+
+    /// Encodes <paramref name="stringToEncode"/> in base64url-format.
+    public static NodeId EncodeBase64Url(string stringToEncode) =>
+        ToUrlEncoding(Convert.ToBase64String(Encoding.UTF8.GetBytes(stringToEncode)));
+
+    private static NodeId ToUrlEncoding(string base64Encoded) =>
+        base64Encoded
             .TrimEnd('=') // padding ='s can be safely removed
             .Replace("+", "-")
             .Replace("/", "_");
+
+
+    /// Checks whether <paramref name="nodeId"/> is a valid node id.
+    public static bool IsValid(NodeId nodeId) =>
+        nodeId != null! && IdRegex().IsMatch(nodeId);
+
+    [GeneratedRegex("^[a-zA-Z0-9_-]+$")]
+    private static partial Regex IdRegex();
 }
