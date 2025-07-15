@@ -20,6 +20,7 @@ namespace LionWeb.Protocol.Delta.Repository;
 using Core;
 using Core.M1.Event.Partition;
 using Core.M3;
+using Partition;
 
 public abstract class LionWebRepositoryBase<T>
 {

@@ -20,6 +20,7 @@ namespace LionWeb.Protocol.Delta.Repository;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Message.Event;
+using Partition;
 
 public class EventToDeltaEventMapper
 {

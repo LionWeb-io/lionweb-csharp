@@ -18,6 +18,7 @@
 namespace LionWeb.Protocol.Delta.Test;
 
 using Client;
+using Client.Partition;
 using Core;
 using Core.M1.Event;
 using Core.M3;
