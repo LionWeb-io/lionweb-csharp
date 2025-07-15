@@ -45,7 +45,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     private long nextFreeNodeId = 0;
 
     protected long _messageCount;
-    private readonly RewriteForestEventReplicator _replicator;
+    protected readonly RewriteForestEventReplicator _replicator;
     public long MessageCount => Interlocked.Read(ref _messageCount);
 
     public LionWebRepositoryBase(LionWebVersions lionWebVersion, List<Language> languages, string name,

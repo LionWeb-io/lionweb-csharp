@@ -25,7 +25,7 @@ using Core.M1.Event.Partition;
 using Partition;
 using System.Diagnostics;
 
-internal class RewriteForestEventReplicator(IForest localForest, SharedNodeMap sharedNodeMap)
+public class RewriteForestEventReplicator(IForest localForest, SharedNodeMap sharedNodeMap)
     : ForestEventReplicator(localForest, sharedNodeMap)
 {
     private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];

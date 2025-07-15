@@ -67,6 +67,7 @@ public class EventsTestJson : EventTestsBase
         });
 
         var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
+        sharedNodeMap.RegisterNode(clone);
         replicator.ReplicateFrom(partitionEventHandler);
         return clone;
     }

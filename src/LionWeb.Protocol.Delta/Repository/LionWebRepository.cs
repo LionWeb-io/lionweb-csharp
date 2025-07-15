@@ -48,7 +48,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             ForestEventHandler,
             SharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder
+            deserializerBuilder,
+            _replicator
         );
     }
 
@@ -161,6 +162,10 @@ public class LionWebTestRepository(
 
 public class ExceptionParticipationIdProvider : IParticipationIdProvider
 {
+    private int _nextParticipationId = 1000;
+    
     /// <inheritdoc />
-    public string ParticipationId => throw new NotImplementedException();
+    public string ParticipationId =>
+        $"participationId{++_nextParticipationId}";
+        // throw new NotImplementedException();
 }
