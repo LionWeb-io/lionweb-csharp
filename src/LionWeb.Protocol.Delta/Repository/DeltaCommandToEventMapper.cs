@@ -33,7 +33,7 @@ public class DeltaCommandToEventMapper
     public IEvent Map(IDeltaCommand command) =>
         command switch
         {
-            IForestDeltaCommand c => _partitionMapper.Map(c),
+            IPartitionCommand c => _partitionMapper.Map(c),
             
             _ => throw new NotImplementedException(command.GetType().Name)
         };

@@ -18,6 +18,7 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
+using Core.M1.Event;
 using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
@@ -35,7 +36,7 @@ public interface ILionWebClient
     public const string HeaderColor_End =  _unbold + _defaultColor;
 }
 
-public abstract class LionWebClientBase<T> : ILionWebClient
+public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 {
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly string _name;
@@ -45,6 +46,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient
 
     private ParticipationId? _participationId;
     private readonly ClientId? _clientId;
+    private readonly PartitionEventReplicator _replicator;
 
     protected internal ParticipationId ParticipationId
     {
@@ -67,12 +69,21 @@ public abstract class LionWebClientBase<T> : ILionWebClient
 
         SharedNodeMap = new();
         PartitionEventHandler = new PartitionEventHandler(name);
-        var replicator = new PartitionEventReplicator(partition, SharedNodeMap);
-        replicator.ReplicateFrom(PartitionEventHandler);
+        _replicator = new PartitionEventReplicator(partition, SharedNodeMap);
+        _replicator.ReplicateFrom(PartitionEventHandler);
 
-        replicator.Subscribe<IPartitionEvent>(SendPartitionEventToRepository);
+        _replicator.Subscribe<IPartitionEvent>(SendPartitionEventToRepository);
 
-        connector.ReceiveFromRepository += (_, content) => Receive(content);
+        _connector.Receive += OnReceive;
+    }
+
+    /// <inheritdoc />
+    public virtual void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _connector.Receive -= OnReceive;
+        _replicator.Dispose();
+        SharedNodeMap.Dispose();
     }
 
     private void OnReceive(object? _, T content) =>
@@ -89,7 +100,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsResponse"/></returns>
     public abstract Task GetAvailableIds(int count);
-    
+
     private void SendPartitionEventToRepository(object? sender, IPartitionEvent? partitionEvent)
     {
         if (partitionEvent == null)

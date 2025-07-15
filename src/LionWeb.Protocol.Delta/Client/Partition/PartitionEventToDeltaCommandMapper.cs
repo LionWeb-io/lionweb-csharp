@@ -18,27 +18,13 @@
 namespace LionWeb.Protocol.Delta.Client.Partition;
 
 using Core;
-using Core.M1;
-using Core.M1.Event;
 using Core.M1.Event.Partition;
-using Core.M3;
 using Core.Serialization;
-using Message;
 using Message.Command;
 
-public class PartitionEventToDeltaCommandMapper
+public class PartitionEventToDeltaCommandMapper(ICommandIdProvider commandIdProvider, LionWebVersions lionWebVersion)
+    : EventToDeltaCommandMapperBase(commandIdProvider, lionWebVersion)
 {
-    private readonly ICommandIdProvider _commandIdProvider;
-    private readonly LionWebVersions _lionWebVersion;
-    private readonly ISerializerVersionSpecifics _propertySerializer;
-
-    public PartitionEventToDeltaCommandMapper(ICommandIdProvider commandIdProvider, LionWebVersions lionWebVersion)
-    {
-        _commandIdProvider = commandIdProvider;
-        _lionWebVersion = lionWebVersion;
-        _propertySerializer = ISerializerVersionSpecifics.Create(lionWebVersion);
-    }
-
     public IDeltaCommand Map(IPartitionEvent partitionEvent) =>
         partitionEvent switch
         {
@@ -91,9 +77,6 @@ public class PartitionEventToDeltaCommandMapper
             ToCommandId(propertyChangedEvent),
             []
         );
-
-    private PropertyValue? ToDelta(IReadableNode parent, Property property, Object newValue) =>
-        _propertySerializer.SerializeProperty(parent, property, newValue).Value;
 
     #endregion
 
@@ -262,26 +245,5 @@ public class PartitionEventToDeltaCommandMapper
             []
         );
 
-    private SerializedReferenceTarget ToDelta(IReferenceTarget target) =>
-        new SerializedReferenceTarget { Reference = target.Reference?.GetId(), ResolveInfo = target.ResolveInfo };
-
     #endregion
-
-    private DeltaSerializationChunk ToDeltaChunk(IReadableNode node)
-    {
-        var serializer = new Serializer(_lionWebVersion);
-        return new DeltaSerializationChunk(serializer.Serialize(M1Extensions.Descendants(node, true, true)).ToArray());
-    }
-
-    private CommandId ToCommandId(IEvent @event) =>
-        @event.EventId switch
-        {
-            ParticipationEventId pei => pei.CommandId,
-            _ => _commandIdProvider.Create()
-        };
-}
-
-public interface ICommandIdProvider
-{
-    CommandId Create();
 }

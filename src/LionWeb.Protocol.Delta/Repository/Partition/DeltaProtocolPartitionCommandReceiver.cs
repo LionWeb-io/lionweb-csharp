@@ -17,11 +17,10 @@
 
 namespace LionWeb.Protocol.Delta.Repository.Partition;
 
-using LionWeb.Core;
-using LionWeb.Core.M1;
-using LionWeb.Core.M1.Event.Partition;
-using LionWeb.Core.M3;
-using LionWeb.Protocol.Delta.Message.Command;
+using Core.M1;
+using Core.M1.Event;
+using Core.M1.Event.Partition;
+using Message.Command;
 
 public class DeltaProtocolPartitionCommandReceiver
 {
@@ -31,7 +30,7 @@ public class DeltaProtocolPartitionCommandReceiver
     public DeltaProtocolPartitionCommandReceiver(
         PartitionEventHandler eventHandler,
         SharedNodeMap sharedNodeMap,
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
+        SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )
     {

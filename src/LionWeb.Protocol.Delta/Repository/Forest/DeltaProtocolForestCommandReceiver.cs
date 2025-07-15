@@ -15,31 +15,32 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Client;
+namespace LionWeb.Protocol.Delta.Repository.Forest;
 
+using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
-using Core.M1.Event.Partition;
-using Forest;
 using Message.Command;
-using Partition;
 
-public class EventToDeltaCommandMapper
+public class DeltaProtocolForestCommandReceiver
 {
-    private readonly PartitionEventToDeltaCommandMapper _partitionMapper;
-    private readonly ForestEventToDeltaCommandMapper _forestMapper;
+    private readonly ForestEventHandler _eventHandler;
+    private readonly DeltaCommandToForestEventMapper _mapper;
 
-    public EventToDeltaCommandMapper(PartitionEventToDeltaCommandMapper partitionMapper, ForestEventToDeltaCommandMapper forestMapper)
+    public DeltaProtocolForestCommandReceiver(
+        ForestEventHandler eventHandler,
+        SharedNodeMap sharedNodeMap,
+        SharedKeyedMap sharedKeyedMap,
+        DeserializerBuilder deserializerBuilder
+    )
     {
-        _partitionMapper = partitionMapper;
-        _forestMapper = forestMapper;
+        _eventHandler = eventHandler;
+        _mapper = new DeltaCommandToForestEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
-    public IDeltaCommand Map(IEvent @event) =>
-        @event switch
-        {
-            IPartitionEvent e => _partitionMapper.Map(e),
-            IForestEvent e => _forestMapper.Map(e),
-            _ => throw new NotImplementedException(@event.GetType().Name)
-        };
+    public void Receive(IDeltaCommand deltaCommand)
+    {
+        IForestEvent partitionCommand = _mapper.Map(deltaCommand);
+        _eventHandler.Raise(partitionCommand);
+    }
 }

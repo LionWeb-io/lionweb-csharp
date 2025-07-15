@@ -18,8 +18,10 @@
 namespace LionWeb.Protocol.Delta.Test;
 
 using Client;
+using Client.Forest;
 using Client.Partition;
 using Core;
+using Core.M1;
 using Core.M1.Event;
 using Core.M3;
 using Core.Serialization;
@@ -33,6 +35,7 @@ using Repository;
 public class ClientTests
 {
     private readonly DeltaRepositoryConnector _repositoryConnector;
+    private readonly IForest _repositoryForest;
     private readonly Geometry _repositoryPartition;
     private readonly LionWebTestRepository _repository;
 
@@ -52,8 +55,10 @@ public class ClientTests
             content => _repositoryConnector.ReceiveMessageFromClient(new DeltaMessageContext(_clientInfo, content)));
         _repositoryConnector.Sender = content => _clientConnector.ReceiveMessageFromRepository(content);
 
+        _repositoryForest = new Forest();
         _repositoryPartition = new Geometry("partition");
-        _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryPartition,
+        _repositoryForest.AddPartitions([_repositoryPartition]);
+        _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryForest,
             _repositoryConnector);
 
         _clientPartition = Clone(_repositoryPartition);
@@ -73,7 +78,7 @@ public class ClientTests
     public async Task SignOn()
     {
         var signOnResponse = await _client.SignOn();
-        
+
         Assert.AreEqual("clientParticipation", signOnResponse.ParticipationId);
     }
 
@@ -81,7 +86,7 @@ public class ClientTests
     public async Task GetAvailableIds()
     {
         var availableIdsResponse = await _client.GetAvailableIds(11);
-        
+
         Assert.AreEqual(11, availableIdsResponse.Ids.Length);
         foreach (var freeId in availableIdsResponse.Ids)
         {
@@ -96,14 +101,15 @@ public class ClientTests
 
         var usedNodeId = "repoProvidedId-6";
         _clientPartition.Documentation = new Documentation(usedNodeId);
-        
+
         var availableIdsResponse = await _client.GetAvailableIds(11);
-        
+
         Assert.AreEqual(11, availableIdsResponse.Ids.Length);
         foreach (var freeId in availableIdsResponse.Ids)
         {
             Assert.IsTrue(IdUtils.IsValid(freeId));
         }
+
         Assert.IsFalse(availableIdsResponse.Ids.Contains(usedNodeId));
     }
 
@@ -186,8 +192,11 @@ internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 
     public DeltaRepositoryConnector(LionWebVersions lionWebVersion)
     {
+        var commandIdProvider = new CommandIdProvider();
         _mapper = new EventToDeltaCommandMapper(
-            new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion));
+            new PartitionEventToDeltaCommandMapper(commandIdProvider, lionWebVersion),
+            new ForestEventToDeltaCommandMapper(commandIdProvider, lionWebVersion)
+        );
     }
 
     public Action<IDeltaContent> Sender { get; set; }
@@ -217,8 +226,11 @@ internal class DeltaClientConnector : IDeltaClientConnector
     public DeltaClientConnector(LionWebVersions lionWebVersion, Action<IDeltaContent> sender)
     {
         _sender = sender;
+        var commandIdProvider = new CommandIdProvider();
         _mapper = new EventToDeltaCommandMapper(
-            new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion));
+            new PartitionEventToDeltaCommandMapper(commandIdProvider, lionWebVersion),
+            new ForestEventToDeltaCommandMapper(commandIdProvider, lionWebVersion)
+        );
     }
 
     public Task SendToRepository(IDeltaContent content)

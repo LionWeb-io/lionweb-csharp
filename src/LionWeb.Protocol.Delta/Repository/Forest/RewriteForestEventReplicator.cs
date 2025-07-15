@@ -15,28 +15,33 @@
 // SPDX-FileCopyrightText: 2025 LionWeb Project
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Repository.Partition;
+namespace LionWeb.Protocol.Delta.Repository.Forest;
 
 using Core;
+using Core.M1;
 using Core.M1.Event;
+using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
+using Partition;
 using System.Diagnostics;
 
-internal class RewritePartitionEventReplicator(
-    IPartitionInstance localPartition,
-    SharedNodeMap sharedNodeMap = null)
-    : PartitionEventReplicator(localPartition, sharedNodeMap)
+internal class RewriteForestEventReplicator(IForest localForest, SharedNodeMap sharedNodeMap)
+    : ForestEventReplicator(localForest, sharedNodeMap)
 {
     private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];
-        
-    protected override void SuppressEventForwarding(IPartitionEvent partitionEvent, Action action)
+
+    protected override PartitionEventReplicator CreatePartitionEventReplicator(IPartitionInstance partition) =>
+        new RewritePartitionEventReplicator(partition, SharedNodeMap);
+
+    protected override void SuppressEventForwarding(IForestEvent forestEvent, Action action)
     {
         IEventId? eventId = null;
         if (_localCommander != null)
         {
             eventId = _localCommander.CreateEventId();
-            var originalEventId = partitionEvent.EventId;
+            var originalEventId = forestEvent.EventId;
             _originalEventIds[eventId] = originalEventId;
+            _localCommander.RegisterEventId(eventId);
             RegisterEventId(eventId);
         }
 
@@ -53,14 +58,15 @@ internal class RewritePartitionEventReplicator(
         }
     }
 
-    protected override TSubscribedEvent? Filter<TSubscribedEvent>(IPartitionEvent partitionEvent) where TSubscribedEvent : class
+    protected override TSubscribedEvent? Filter<TSubscribedEvent>(IForestEvent forestEvent)
+        where TSubscribedEvent : class
     {
-        IPartitionEvent? result = base.Filter<TSubscribedEvent>(partitionEvent);
+        IForestEvent? result = base.Filter<TSubscribedEvent>(forestEvent);
         Debug.WriteLine($"result: {result}");
-        if (_originalEventIds.TryGetValue(partitionEvent.EventId, out var originalId))
+        if (_originalEventIds.TryGetValue(forestEvent.EventId, out var originalId))
         {
             Debug.WriteLine($"originalId: {originalId}");
-            result = partitionEvent;
+            result = forestEvent;
             result.EventId = originalId;
         }
 

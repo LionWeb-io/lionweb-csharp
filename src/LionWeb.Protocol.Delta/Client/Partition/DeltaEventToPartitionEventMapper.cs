@@ -22,28 +22,14 @@ using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M2;
-using Core.M3;
-using Core.Serialization;
-using Message;
 using Message.Event;
 
-public class DeltaEventToPartitionEventMapper
+public class DeltaEventToPartitionEventMapper(
+    SharedNodeMap sharedNodeMap,
+    SharedKeyedMap sharedKeyedMap,
+    DeserializerBuilder deserializerBuilder)
+    : DeltaEventToEventMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
 {
-    private readonly SharedNodeMap _sharedNodeMap;
-    private readonly Dictionary<CompressedMetaPointer, IKeyed> _sharedKeyedMap;
-    private readonly DeserializerBuilder _deserializerBuilder;
-
-    public DeltaEventToPartitionEventMapper(
-        SharedNodeMap sharedNodeMap,
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
-        DeserializerBuilder deserializerBuilder
-    )
-    {
-        _sharedNodeMap = sharedNodeMap;
-        _sharedKeyedMap = sharedKeyedMap;
-        _deserializerBuilder = deserializerBuilder;
-    }
-
     public IPartitionEvent Map(IDeltaEvent deltaEvent) =>
         deltaEvent switch
         {
@@ -106,13 +92,6 @@ public class DeltaEventToPartitionEventMapper
             ToEventId(propertyChangedEvent)
         );
     }
-
-    private Property ToProperty(MetaPointer deltaProperty, IReadableNode node) =>
-        ToFeature<Property>(deltaProperty, node);
-
-    private SemanticPropertyValue ToPropertyValue(IReadableNode node, Property property, PropertyValue value) =>
-        _deserializerBuilder.Build().VersionSpecifics.ConvertDatatype(node, property, property.Type, value) ??
-        throw new InvalidValueException(property, value);
 
     #endregion
 
@@ -255,9 +234,6 @@ public class DeltaEventToPartitionEventMapper
         );
     }
 
-    private Containment ToContainment(MetaPointer deltaContainment, IReadableNode node) =>
-        ToFeature<Containment>(deltaContainment, node);
-
     #endregion
 
     #region Annotations
@@ -357,53 +333,5 @@ public class DeltaEventToPartitionEventMapper
         );
     }
 
-    private Reference ToReference(MetaPointer deltaReference, IReadableNode node) =>
-        ToFeature<Reference>(deltaReference, node);
-
-    private IReferenceTarget ToTarget(TargetNode? targetNode, ResolveInfo? resolveInfo)
-    {
-        IReadableNode? target = null;
-        if (targetNode != null &&
-            _sharedNodeMap.TryGetValue(targetNode, out var node))
-            target = node;
-
-        return new ReferenceTarget(resolveInfo, target);
-    }
-
     #endregion
-
-
-    private static IEventId ToEventId(IDeltaEvent deltaEvent) =>
-        new ParticipationEventId(deltaEvent.InternalParticipationId,
-            string.Join("_", deltaEvent.OriginCommands.Select(c => c.CommandId)));
-
-    private IWritableNode ToNode(TargetNode nodeId)
-    {
-        if (_sharedNodeMap.TryGetValue(nodeId, out var node) && node is IWritableNode w)
-            return w;
-
-        // TODO change to correct exception 
-        throw new NotImplementedException(nodeId);
-    }
-
-    private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
-    {
-        if (_sharedKeyedMap.TryGetValue(Compress(deltaReference), out var e) && e is T c)
-            return c;
-
-        throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
-    }
-
-    private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
-        CompressedMetaPointer.Create(metaPointer, true);
-
-    private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
-    {
-        var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
-        if (nodes is [IWritableNode w])
-            return w;
-
-        // TODO change to correct exception 
-        throw new NotImplementedException();
-    }
 }

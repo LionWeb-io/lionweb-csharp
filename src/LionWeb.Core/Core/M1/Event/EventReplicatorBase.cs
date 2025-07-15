@@ -39,13 +39,13 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     protected readonly ICommander<TEvent>? _localCommander;
     private readonly List<TPublisher> _publishers = [];
 
-    protected readonly SharedNodeMap NodeById;
+    protected readonly SharedNodeMap SharedNodeMap;
 
     protected EventReplicatorBase(TPublisher? localPublisher, ICommander<TEvent>? localCommander,
         SharedNodeMap sharedNodeMap = null) : base(localPublisher)
     {
         _localCommander = localCommander;
-        NodeById = sharedNodeMap ?? new();
+        SharedNodeMap = sharedNodeMap;
     }
 
     /// Replicate events raised by <paramref name="publisher"/>. 
@@ -62,7 +62,7 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
         {
             publisher.Unsubscribe<TEvent>(ProcessEvent);
         }
-        
+
         GC.SuppressFinalize(this);
     }
 
@@ -70,19 +70,14 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
 
     protected void RegisterNode(IReadableNode newNode)
     {
-        NodeById.RegisterNode(newNode);
-    }
-
-    protected void UnregisterNode(IReadableNode newNode)
-    {
-        NodeById.UnregisterNode(newNode);
+        SharedNodeMap.UnregisterNode(newNode);
     }
 
     protected virtual INode Lookup(NodeId remoteNodeId) =>
-        (INode)NodeById[remoteNodeId];
+        (INode)SharedNodeMap[remoteNodeId];
 
     protected virtual INode? LookupOpt(NodeId remoteNodeId) =>
-        (INode?)NodeById.GetValueOrDefault(remoteNodeId);
+        (INode?)SharedNodeMap.GetValueOrDefault(remoteNodeId);
 
     protected virtual INode Clone(INode remoteNode) =>
         new SameIdCloner(remoteNode.Descendants(true, true)).Clone()[remoteNode];

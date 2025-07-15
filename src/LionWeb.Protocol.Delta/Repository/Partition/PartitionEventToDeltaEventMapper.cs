@@ -18,27 +18,15 @@
 namespace LionWeb.Protocol.Delta.Repository.Partition;
 
 using Core;
-using Core.M1;
-using Core.M1.Event;
 using Core.M1.Event.Partition;
-using Core.M3;
 using Core.Serialization;
-using Message;
 using Message.Event;
 
-public class PartitionEventToDeltaEventMapper
+public class PartitionEventToDeltaEventMapper(
+    IParticipationIdProvider participationIdProvider,
+    LionWebVersions lionWebVersion)
+    : EventToDeltaEventMapperBase(participationIdProvider, lionWebVersion)
 {
-    private readonly IParticipationIdProvider _participationIdProvider;
-    private readonly LionWebVersions _lionWebVersion;
-    private readonly ISerializerVersionSpecifics _propertySerializer;
-
-    public PartitionEventToDeltaEventMapper(IParticipationIdProvider participationIdProvider, LionWebVersions lionWebVersion)
-    {
-        _lionWebVersion = lionWebVersion;
-        _participationIdProvider = participationIdProvider;
-        _propertySerializer = ISerializerVersionSpecifics.Create(lionWebVersion);
-    }
-
     public IDeltaEvent Map(IPartitionEvent partitionEvent) =>
         partitionEvent switch
         {
@@ -62,7 +50,7 @@ public class PartitionEventToDeltaEventMapper
             ReferenceChangedEvent a => OnReferenceChanged(a),
             _ => throw new NotImplementedException(partitionEvent.GetType().Name)
         };
-    
+
     #region Properties
 
     private PropertyAdded OnPropertyAdded(PropertyAddedEvent propertyAddedEvent) =>
@@ -92,9 +80,6 @@ public class PartitionEventToDeltaEventMapper
             ToCommandSources(propertyChangedEvent),
             []
         );
-
-    private PropertyValue? ToDelta(IReadableNode parent, Property property, Object newValue) =>
-        _propertySerializer.SerializeProperty(parent, property, newValue).Value;
 
     #endregion
 
@@ -192,7 +177,8 @@ public class PartitionEventToDeltaEventMapper
             []
         );
 
-    private ChildMovedInSameContainment OnChildMovedInSameContainment(ChildMovedInSameContainmentEvent childMovedEvent) =>
+    private ChildMovedInSameContainment
+        OnChildMovedInSameContainment(ChildMovedInSameContainmentEvent childMovedEvent) =>
         new(
             childMovedEvent.NewIndex,
             childMovedEvent.MovedChild.GetId(),
@@ -238,7 +224,8 @@ public class PartitionEventToDeltaEventMapper
             []
         );
 
-    private AnnotationMovedInSameParent OnAnnotationMovedInSameParent(AnnotationMovedInSameParentEvent annotationMovedEvent) =>
+    private AnnotationMovedInSameParent OnAnnotationMovedInSameParent(
+        AnnotationMovedInSameParentEvent annotationMovedEvent) =>
         new(
             annotationMovedEvent.NewIndex,
             annotationMovedEvent.MovedAnnotation.GetId(),
@@ -288,34 +275,4 @@ public class PartitionEventToDeltaEventMapper
         );
 
     #endregion
-
-    private DeltaSerializationChunk ToDeltaChunk(IReadableNode node)
-    {
-        var serializer = new Serializer(_lionWebVersion);
-        return new DeltaSerializationChunk(serializer.Serialize(M1Extensions.Descendants(node, true, true)).ToArray());
-    }
-
-    private TargetNode[] ToDescendants(IReadableNode node) =>
-        M1Extensions.Descendants(node, false, true).Select(n => n.GetId()).ToArray();
-
-    private CommandSource[] ToCommandSources(IEvent internalEvent)
-    {
-        ParticipationId participationId;
-        EventId commandId;
-        if (internalEvent.EventId is ParticipationEventId pei)
-        {
-            participationId = pei.ParticipationId;
-            commandId = pei.CommandId;
-        } else
-        {
-            participationId = _participationIdProvider.ParticipationId;
-            commandId = internalEvent.EventId.ToString();
-        }
-        return [new CommandSource(participationId, commandId)];
-    }
-}
-
-public interface IParticipationIdProvider
-{
-    ParticipationId ParticipationId { get; }
 }

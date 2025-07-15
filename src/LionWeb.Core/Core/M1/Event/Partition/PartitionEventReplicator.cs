@@ -102,7 +102,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private void Init()
     {
-        RegisterNode(_localPartition);
+        SharedNodeMap.RegisterNode(_localPartition);
 
         var publisher = _localPartition.GetPublisher();
         if (publisher == null)
@@ -111,13 +111,13 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         publisher.Subscribe<IPartitionEvent>(LocalHandler);
     }
 
-    /// <see cref="EventReplicatorBase{TEvent,TPublisher}.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
+    /// <see cref="SharedNodeMap.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
     /// and <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">unsubscribes</see> from it.
     public override void Dispose()
     {
         base.Dispose();
 
-        UnregisterNode(_localPartition);
+        SharedNodeMap.UnregisterNode(_localPartition);
 
         var localPublisher = _localPartition.GetPublisher();
         if (localPublisher == null)
@@ -150,16 +150,16 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     }
 
     private void OnLocalChildAdded(ChildAddedEvent childAddedEvent) =>
-        RegisterNode(childAddedEvent.NewChild);
+        SharedNodeMap.RegisterNode(childAddedEvent.NewChild);
 
     private void OnLocalChildDeleted(ChildDeletedEvent childDeletedEvent) =>
-        UnregisterNode(childDeletedEvent.DeletedChild);
+        SharedNodeMap.UnregisterNode(childDeletedEvent.DeletedChild);
 
     private void OnLocalAnnotationAdded(AnnotationAddedEvent annotationAddedEvent) =>
-        RegisterNode(annotationAddedEvent.NewAnnotation);
+        SharedNodeMap.RegisterNode(annotationAddedEvent.NewAnnotation);
 
     private void OnLocalAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
-        UnregisterNode(annotationDeletedEvent.DeletedAnnotation);
+        SharedNodeMap.UnregisterNode(annotationDeletedEvent.DeletedAnnotation);
 
     #endregion
 
@@ -241,8 +241,10 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         SuppressEventForwarding(childMovedEvent, () =>
         {
             var localNewParent = Lookup(childMovedEvent.NewParent.GetId());
-            var nodeToInsert = LookupOpt(childMovedEvent.MovedChild.GetId()) ?? Clone((INode)childMovedEvent.MovedChild);
-            var newValue = InsertContainment(localNewParent, childMovedEvent.NewContainment, childMovedEvent.NewIndex, nodeToInsert);
+            var nodeToInsert = LookupOpt(childMovedEvent.MovedChild.GetId()) ??
+                               Clone((INode)childMovedEvent.MovedChild);
+            var newValue = InsertContainment(localNewParent, childMovedEvent.NewContainment, childMovedEvent.NewIndex,
+                nodeToInsert);
 
             localNewParent.Set(childMovedEvent.NewContainment, newValue, childMovedEvent.EventId);
         });
@@ -393,7 +395,8 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         {
             var localParent = Lookup(referenceAddedEvent.Parent.GetId());
             INode target = Lookup(referenceAddedEvent.NewTarget.Reference.GetId());
-            var newValue = InsertReference(localParent, referenceAddedEvent.Reference, referenceAddedEvent.Index, target);
+            var newValue = InsertReference(localParent, referenceAddedEvent.Reference, referenceAddedEvent.Index,
+                target);
 
             localParent.Set(referenceAddedEvent.Reference, newValue, referenceAddedEvent.EventId);
         });

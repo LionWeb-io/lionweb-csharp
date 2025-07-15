@@ -18,10 +18,11 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
+using Core.M1;
 using Core.M1.Event;
-using Core.M1.Event.Partition;
+using Core.M1.Event.Forest;
 using Core.M3;
-using Partition;
+using Forest;
 
 public interface ILionWebRepository
 {
@@ -34,40 +35,53 @@ public interface ILionWebRepository
     public const string HeaderColor_End =  _unbold + _defaultColor;
 }
 
-public abstract class LionWebRepositoryBase<T>
+public abstract class LionWebRepositoryBase<T> : IDisposable
 {
     protected readonly string _name;
     protected readonly IRepositoryConnector<T> _connector;
-    protected readonly SharedNodeMap SharedNodeMap;
-    protected readonly PartitionEventHandler PartitionEventHandler;
+    protected readonly PartitionSharedNodeMap SharedNodeMap;
+    protected readonly ForestEventHandler ForestEventHandler;
 
     private long nextFreeNodeId = 0;
 
     protected long _messageCount;
+    private readonly RewriteForestEventReplicator _replicator;
     public long MessageCount => Interlocked.Read(ref _messageCount);
 
     public LionWebRepositoryBase(LionWebVersions lionWebVersion, List<Language> languages, string name,
-        IPartitionInstance partition, IRepositoryConnector<T> connector)
+        IForest forest, IRepositoryConnector<T> connector)
     {
         _name = name;
         _connector = connector;
 
         SharedNodeMap = new();
-        PartitionEventHandler = new PartitionEventHandler(name);
-        var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
-        replicator.ReplicateFrom(PartitionEventHandler);
+        ForestEventHandler = new ForestEventHandler(name);
+        _replicator = new RewriteForestEventReplicator(forest, SharedNodeMap);
+        _replicator.ReplicateFrom(ForestEventHandler);
 
-        replicator.Subscribe<IPartitionEvent>(SendPartitionEventToAllClients);
+        _replicator.Subscribe<IForestEvent>(SendEventToAllClients);
 
-        connector.ReceiveFromClient += (_, content) => Receive(content);
+        _connector.Receive += OnReceive;
     }
 
-    private void SendPartitionEventToAllClients(object? sender, IPartitionEvent? partitionEvent)
+    /// <inheritdoc />
+    public virtual void Dispose()
     {
-        if (partitionEvent == null)
+        GC.SuppressFinalize(this);
+        _connector.Receive -= OnReceive;
+        _replicator.Dispose();
+        SharedNodeMap.Dispose();
+    }
+
+    private void OnReceive(object? _, IMessageContext<T> content) =>
+        Receive(content);
+
+    private void SendEventToAllClients(object? sender, IEvent? internalEvent)
+    {
+        if (internalEvent == null)
             return;
 
-        var converted = _connector.Convert(partitionEvent);
+        var converted = _connector.Convert(internalEvent);
         SendAll(converted);
     }
 

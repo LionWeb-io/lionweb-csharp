@@ -24,18 +24,17 @@ using Message;
 using Message.Command;
 using Message.Event;
 using Message.Query;
-using Partition;
 using System.Diagnostics;
 
 public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
-    private readonly DeltaProtocolPartitionCommandReceiver _commandReceiver;
+    private readonly DeltaProtocolCommandReceiver _commandReceiver;
 
     public LionWebRepository(LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
-        IPartitionInstance partition,
-        IRepositoryConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, partition, connector)
+        IForest forest,
+        IRepositoryConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, forest, connector)
     {
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
@@ -43,14 +42,22 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
 
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
-        _commandReceiver = new DeltaProtocolPartitionCommandReceiver(
-            PartitionEventHandler,
+        _commandReceiver = new DeltaProtocolCommandReceiver(
+            ForestEventHandler,
             SharedNodeMap,
             sharedKeyedMap,
             deserializerBuilder
         );
+    }
+
+    /// <inheritdoc />
+    public override void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _commandReceiver.Dispose();
+        base.Dispose();
     }
 
     /// <inheritdoc />
@@ -99,12 +106,13 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                     Log($"received command: {command.GetType()}({command.CommandId})");
                     _commandReceiver.Receive(command);
                     break;
-                
+
                 case GetAvailableIdsRequest idsRequest:
                     Log(
                         $"received {nameof(GetAvailableIdsRequest)} for {messageContext.ClientInfo}: {idsRequest})");
                     await Send(messageContext.ClientInfo,
-                        new GetAvailableIdsResponse(GetFreeNodeIds(idsRequest.count).ToArray(), idsRequest.QueryId, null));
+                        new GetAvailableIdsResponse(GetFreeNodeIds(idsRequest.count).ToArray(), idsRequest.QueryId,
+                            null));
                     break;
 
                 case SignOnRequest signOnRequest:
@@ -130,9 +138,9 @@ public class LionWebTestRepository(
     LionWebVersions lionWebVersion,
     List<Language> languages,
     string name,
-    IPartitionInstance partition,
+    IForest forest,
     IRepositoryConnector<IDeltaContent> connector)
-    : LionWebRepository(lionWebVersion, languages, name, partition, connector)
+    : LionWebRepository(lionWebVersion, languages, name, forest, connector)
 {
     public int WaitCount { get; private set; }
 

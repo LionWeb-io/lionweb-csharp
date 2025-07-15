@@ -26,6 +26,8 @@ public abstract class EventHandlerBase
 {
     protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
 
+    public abstract void Raise(object @event);
+
     private static ILookup<Type, Type> InitAllSubtypes()
     {
         Type[] allTypes = Assembly
@@ -71,7 +73,8 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     public virtual IEventId CreateEventId() => new NumericEventId(_eventIdBase, _nextId++);
 
     /// <inheritdoc />
-    public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent
+    public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
+        where TSubscribedEvent : class, TEvent
     {
         RegisterSubscribedEvents<TSubscribedEvent>();
 
@@ -102,7 +105,8 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     }
 
     /// <inheritdoc />
-    public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent
+    public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
+        where TSubscribedEvent : class, TEvent
     {
         if (!_handlers.Remove(handler, out var writeHandler))
             return;
@@ -121,6 +125,10 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
             _subscribedEvents[subtype]--;
         }
     }
+
+    /// <inheritdoc />
+    public override void Raise(object @event) =>
+        Raise((TEvent)@event);
 
     /// <inheritdoc />
     public void Raise(TEvent @event) =>
