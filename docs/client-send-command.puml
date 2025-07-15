@@ -1,0 +1,54 @@
+@startuml
+hide footbox
+
+participant "ParentNode" as parentNode
+participant "ContainmentSingleEventEmitter" as emitter
+participant "PartitionEventHandler" as commander
+participant "PartitionEventReplicator" as replicator
+database "Shared\nNode\nMap" as sharedNodeMap
+participant "LionWebClient" as client
+participant "IClientConnector" as connector
+
+[-> parentNode++: SetContainment()
+    parentNode -> emitter ++: RaiseEvent()
+        emitter -> commander ++: CreateEventId()
+            commander -> commander: create new
+        return
+        emitter -> commander ++: Raise()
+            commander -> commander ++: writeHandler
+                commander -> replicator ++: LocalHandler
+                    replicator -> replicator ++: OnLocalChildAdded()
+                        replicator -> sharedNodeMap: RegisterNode()\nnewChild
+                    return
+                return
+                replicator -> replicator ++: forwardingHandler
+                    replicator -> replicator ++: Filter()
+                        replicator -> replicator: checkRegistered\nEventIds()\n<-- true
+                    return
+                    replicator -> client ++: SendPartitionEventToRepository()
+                        client -> client ++: Send()
+                            client -> client: StoreOwnCommandId()
+                            client ->> connector: Send()
+                        return
+                    return
+                return 
+            return
+        return
+    return
+return
+
+connector -> client ++: Receive(ChildAdded)
+    client -> client ++: ReceiveEvent()
+        client -> client: CheckEventSequenceNumber() <-- true
+        client -> client ++: ProcessEvent()
+            client -> client: IncrementEventSequenceNumber()
+            client -> client ++: CheckOwnEvent()
+                client -> client: CompareParticipationId()
+                client -> client: CheckOwnCommandIds()
+            return true
+        return
+        client -> client: CheckUnprocessedEvents() <-- false
+    return
+return
+
+@enduml
