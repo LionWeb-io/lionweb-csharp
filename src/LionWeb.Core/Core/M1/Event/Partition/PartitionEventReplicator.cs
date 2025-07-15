@@ -299,20 +299,21 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
         if (localParent.TryGet(containment, out var existingChildren))
         {
-            if (existingChildren is IList l)
+            switch (existingChildren)
             {
-                var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                children.Insert(index, substituteNode);
-                children.RemoveAt(index + 1);
-                newValue = children;
-                
-            } else if (existingChildren is IWritableNode _ && index == 0)
-            {
-                newValue = substituteNode;
-                
-            } else
-            {
-                throw new InvalidValueException(containment, existingChildren);
+                case IList l:
+                    {
+                        var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                        children.Insert(index, substituteNode);
+                        children.RemoveAt(index + 1);
+                        newValue = children;
+                        break;
+                    }
+                case IWritableNode _ when index == 0:
+                    newValue = substituteNode;
+                    break;
+                default:
+                    throw new InvalidValueException(containment, existingChildren);
             }
         } else if (containment.Multiple)
         {
