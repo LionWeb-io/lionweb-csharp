@@ -93,7 +93,7 @@ public class ClientTests
     {
         await _client.SignOn();
 
-        var usedNodeId = "repoProvidedId-16";
+        var usedNodeId = "repoProvidedId-6";
         _clientPartition.Documentation = new Documentation(usedNodeId);
         
         var availableIdsResponse = await _client.GetAvailableIds(11);

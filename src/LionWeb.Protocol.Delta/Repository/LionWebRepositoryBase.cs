@@ -28,7 +28,7 @@ public abstract class LionWebRepositoryBase<T>
     protected readonly Dictionary<string, IReadableNode> SharedNodeMap;
     protected readonly PartitionEventHandler PartitionEventHandler;
 
-    private long nextFreeNodeId = 12;
+    private long nextFreeNodeId = 0;
 
     protected long _messageCount;
     public long MessageCount => Interlocked.Read(ref _messageCount);
@@ -63,7 +63,7 @@ public abstract class LionWebRepositoryBase<T>
         int returnedCount = 0;
         while (returnedCount < count)
         {
-            NodeId nextId = "repoProvidedId-" + nextFreeNodeId++;
+            NodeId nextId = "repoProvidedId-" + ++nextFreeNodeId;
             if (!SharedNodeMap.ContainsKey(nextId))
             {
                 returnedCount++;
