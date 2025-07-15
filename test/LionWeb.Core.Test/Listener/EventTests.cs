@@ -291,6 +291,23 @@ public abstract class EventTestsBase
     }
     
     [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainment_Single_ReplaceWith()
+    {
+        var moved = new Documentation("moved");
+        var node = new Geometry("a")
+        {
+            Documentation = new Documentation("replaced"),
+            Shapes = [new Line("l") { ShapeDocs = moved }]
+        };
+        
+        var clone = CreateReplicator(node);
+
+        node.Documentation.ReplaceWith(moved);
+
+        AssertEquals([node], [clone]);
+    }
+    
+    [TestMethod]
     public void ChildMovedAndReplacedFromOtherContainment_Multiple()
     {
         var moved = new Circle("moved");
