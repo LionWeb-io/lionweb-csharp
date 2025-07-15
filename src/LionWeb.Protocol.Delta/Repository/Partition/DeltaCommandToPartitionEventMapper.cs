@@ -22,6 +22,7 @@ using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M2;
+using Core.M3;
 using Message.Command;
 using System.Collections;
 
