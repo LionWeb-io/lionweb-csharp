@@ -1486,6 +1486,51 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		return false;
 	}
 
+    /// <inheritdoc/>
+    protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (base.AddInternal(link, nodes))
+            return true;
+
+        if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(link))
+        {
+            AddShapes(nodes.Cast<IShape>());
+            return true;
+        }
+
+        return false;
+    }
+
+	/// <inheritdoc/>
+        protected override bool InsertInternal(Link? link, int index, IEnumerable<IReadableNode> nodes)
+	{
+		if (base.InsertInternal(link, index, nodes))
+			return true;
+
+		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(link))
+        {
+            InsertShapes(index, nodes.Cast<IShape>());
+			return true;
+		}
+
+		return false;
+	}
+    
+	/// <inheritdoc/>
+        protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+	{
+		if (base.RemoveInternal(link, nodes))
+			return true;
+
+		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(link))
+        {
+            RemoveShapes(nodes.Cast<IShape>());
+			return true;
+		}
+
+		return false;
+	}
+
 	/// <inheritdoc/>
         public override IEnumerable<Feature> CollectAllSetFeatures()
 	{

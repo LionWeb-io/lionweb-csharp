@@ -214,6 +214,10 @@ public interface IWritableNode : IReadableNode
     /// <exception cref="InvalidValueException">If <paramref name="value"/> does not adhere to <paramref name="feature"/>'s type or constraints</exception>
     /// <seealso cref="IReadableNode.Get"/>
     public void Set(Feature feature, object? value);
+
+    public void Add(Link? link, IEnumerable<IReadableNode> nodes);
+    public void Insert(Link? link, Index index, IEnumerable<IReadableNode> nodes);
+    public void Remove(Link? link, IEnumerable<IReadableNode> nodes);
 }
 
 /// The type-parametrized twin of the non-generic <see cref="IWritableNode"/> interface.
@@ -483,6 +487,69 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             RemoveSelfParent(_annotations.ToList(), _annotations, null);
             _annotations.AddRange(SetSelfParent(safeNodes, null));
             evt.RaiseEvent();
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public void Add(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (AddInternal(link, nodes))
+            return;
+
+        throw new UnknownFeatureException(GetClassifier(), link);
+    }
+
+    /// <inheritdoc cref="Add"/>
+    protected virtual bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            AddAnnotations(nodes.Cast<INode>());
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public void Insert(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    {
+        if (InsertInternal(link, index, nodes))
+            return;
+
+        throw new UnknownFeatureException(GetClassifier(), link);
+    }
+
+    /// <inheritdoc cref="Insert"/>
+    protected virtual bool InsertInternal(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            InsertAnnotations(index, nodes.Cast<INode>());
+            return true;
+        }
+
+        return false;
+    }
+
+    /// <inheritdoc />
+    public void Remove(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (RemoveInternal(link, nodes))
+            return;
+
+        throw new UnknownFeatureException(GetClassifier(), link);
+    }
+
+    /// <inheritdoc cref="Insert"/>
+    protected virtual bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            RemoveAnnotations(nodes.Cast<INode>());
             return true;
         }
 
