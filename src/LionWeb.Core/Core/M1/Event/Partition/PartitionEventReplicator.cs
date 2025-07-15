@@ -293,7 +293,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             localParent.Set(childMovedEvent.Containment, newValue);
         });
 
-    private object ReplaceContainment(INode localParent, Containment containment, Index index, INode substituteNode)
+    private static object ReplaceContainment(INode localParent, Containment containment, Index index, INode substituteNode)
     {
         object newValue;
 
@@ -326,7 +326,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         return newValue;
     }
 
-    private object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
+    private static object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
     {
         object newValue;
 
@@ -451,7 +451,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             localParent.Set(referenceChangedEvent.Reference, newValue);
         });
 
-    private object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
+    private static object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
     {
         object newValue = target;
         if (reference.Multiple)
