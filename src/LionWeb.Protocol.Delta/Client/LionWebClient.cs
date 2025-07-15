@@ -85,6 +85,9 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     public override async Task<SignOffResponse> SignOff() =>
         await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(IdUtils.NewId(), null));
 
+    /// <inheritdoc />
+    public override async Task<GetAvailableIdsResponse> GetAvailableIds(int count) => 
+        await Query<GetAvailableIdsResponse, GetAvailableIdsRequest>(new GetAvailableIdsRequest(count, IdUtils.NewId(), null));
 
     private readonly ConcurrentDictionary<QueryId, TaskCompletionSource<IDeltaQueryResponse>> _queryResponses = [];
     

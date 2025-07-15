@@ -62,11 +62,17 @@ public abstract class LionWebClientBase<T>
     }
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOnResponse"/></returns>
     public abstract Task SignOn();
     
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOffRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOffResponse"/></returns>
     public abstract Task SignOff();
 
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsResponse"/></returns>
+    public abstract Task GetAvailableIds(int count);
+    
     private void SendPartitionEventToRepository(object? sender, IPartitionEvent? partitionEvent)
     {
         if (partitionEvent == null)

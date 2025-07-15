@@ -97,6 +97,13 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                     Debug.WriteLine($"{_name}: received command: {command.GetType()}({command.CommandId})");
                     _commandReceiver.Receive(command);
                     break;
+                
+                case GetAvailableIdsRequest idsRequest:
+                    Debug.WriteLine(
+                        $"{_name}: received {nameof(GetAvailableIdsRequest)} for {messageContext.ClientInfo}: {idsRequest})");
+                    await Send(messageContext.ClientInfo,
+                        new GetAvailableIdsResponse(GetFreeNodeIds(idsRequest.count).ToArray(), idsRequest.QueryId, null));
+                    break;
 
                 case SignOnRequest signOnRequest:
                     Debug.WriteLine(

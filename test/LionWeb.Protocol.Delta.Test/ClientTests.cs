@@ -77,6 +77,36 @@ public class ClientTests
     }
 
     [TestMethod]
+    public async Task GetAvailableIds()
+    {
+        var availableIdsResponse = await _client.GetAvailableIds(11);
+        
+        Assert.AreEqual(11, availableIdsResponse.Ids.Length);
+        foreach (var freeId in availableIdsResponse.Ids)
+        {
+            Assert.IsTrue(IdUtils.IsValid(freeId));
+        }
+    }
+
+    [TestMethod]
+    public async Task GetAvailableIds_SomeAlreadyUsed()
+    {
+        await _client.SignOn();
+
+        var usedNodeId = "repoProvidedId-6";
+        _clientPartition.Documentation = new Documentation(usedNodeId);
+        
+        var availableIdsResponse = await _client.GetAvailableIds(11);
+        
+        Assert.AreEqual(11, availableIdsResponse.Ids.Length);
+        foreach (var freeId in availableIdsResponse.Ids)
+        {
+            Assert.IsTrue(IdUtils.IsValid(freeId));
+        }
+        Assert.IsFalse(availableIdsResponse.Ids.Contains(usedNodeId));
+    }
+
+    [TestMethod]
     public void InOrderEvents()
     {
         _repositoryConnector.SendAll(ChildAdded(0));

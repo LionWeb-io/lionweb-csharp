@@ -28,6 +28,8 @@ public abstract class LionWebRepositoryBase<T>
     protected readonly Dictionary<string, IReadableNode> SharedNodeMap;
     protected readonly PartitionEventHandler PartitionEventHandler;
 
+    private long nextFreeNodeId = 0;
+
     protected long _messageCount;
     public long MessageCount => Interlocked.Read(ref _messageCount);
 
@@ -36,7 +38,7 @@ public abstract class LionWebRepositoryBase<T>
     {
         _name = name;
         _connector = connector;
-        
+
         SharedNodeMap = [];
         PartitionEventHandler = new PartitionEventHandler(name);
         var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
@@ -54,6 +56,20 @@ public abstract class LionWebRepositoryBase<T>
 
         var converted = _connector.Convert(partitionEvent);
         SendAll(converted);
+    }
+
+    protected IEnumerable<FreeId> GetFreeNodeIds(int count)
+    {
+        int returnedCount = 0;
+        while (returnedCount < count)
+        {
+            NodeId nextId = "repoProvidedId-" + ++nextFreeNodeId;
+            if (!SharedNodeMap.ContainsKey(nextId))
+            {
+                returnedCount++;
+                yield return nextId;
+            }
+        }
     }
 
     protected abstract Task Send(IClientInfo clientInfo, T deltaContent);
