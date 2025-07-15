@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1;
 using M1.Event;
 using M1.Event.Partition;
 using Comparer = Core.Utilities.Comparer;
@@ -268,6 +269,59 @@ public abstract class EventTestsBase
         AssertEquals([node], [clone]);
     }
 
+    #endregion
+
+    #region ChildMovedAndReplacedFromOtherContainment
+
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainment_Single()
+    {
+        var moved = new Documentation("moved");
+        var node = new Geometry("a")
+        {
+            Documentation = new Documentation("replaced"),
+            Shapes = [new Line("l") { ShapeDocs = moved }]
+        };
+        
+        var clone = CreateReplicator(node);
+
+        node.Documentation = moved;
+
+        AssertEquals([node], [clone]);
+    }
+    
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainment_Single_ReplaceWith()
+    {
+        var moved = new Documentation("moved");
+        var node = new Geometry("a")
+        {
+            Documentation = new Documentation("replaced"),
+            Shapes = [new Line("l") { ShapeDocs = moved }]
+        };
+        
+        var clone = CreateReplicator(node);
+
+        node.Documentation.ReplaceWith(moved);
+
+        AssertEquals([node], [clone]);
+    }
+    
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainment_Multiple()
+    {
+        var moved = new Circle("moved");
+        var origin = new CompositeShape("origin") { Parts = [moved] };
+        var replaced = new Circle("replaced");
+        var node = new Geometry("a") { Shapes = [origin, replaced] };
+
+        var clone = CreateReplicator(node);
+
+        replaced.ReplaceWith(moved);
+
+        AssertEquals([node], [clone]);
+    }
+    
     #endregion
 
     #region ChildMovedFromOtherContainmentInSameParent

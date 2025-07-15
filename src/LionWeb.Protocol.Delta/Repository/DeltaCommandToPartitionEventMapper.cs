@@ -26,6 +26,7 @@ using Core.M3;
 using Core.Serialization;
 using Message;
 using Message.Command;
+using System.Collections;
 
 public class DeltaCommandToPartitionEventMapper
 {
@@ -56,6 +57,7 @@ public class DeltaCommandToPartitionEventMapper
             MoveChildFromOtherContainment a => OnMoveChildFromOtherContainment(a),
             MoveChildFromOtherContainmentInSameParent a => OnMoveChildFromOtherContainmentInSameParent(a),
             MoveChildInSameContainment a => OnMoveChildInSameContainment(a),
+            MoveAndReplaceChildFromOtherContainment a => OnMoveAndReplaceChildFromOtherContainment(a),
             AddAnnotation a => OnAddAnnotation(a),
             DeleteAnnotation a => OnDeleteAnnotation(a),
             MoveAnnotationFromOtherParent a => OnMoveAnnotationFromOtherParent(a),
@@ -116,96 +118,155 @@ public class DeltaCommandToPartitionEventMapper
 
     #region Children
 
-    private ChildAddedEvent OnAddChild(AddChild addChildEvent)
+    private ChildAddedEvent OnAddChild(AddChild command)
     {
-        var parent = ToNode(addChildEvent.Parent);
-        var containment = ToContainment(addChildEvent.Containment, parent);
+        var parent = ToNode(command.Parent);
+        var containment = ToContainment(command.Containment, parent);
+
         return new ChildAddedEvent(
             parent,
-            Deserialize(addChildEvent.NewChild),
+            Deserialize(command.NewChild),
             containment,
-            addChildEvent.Index,
-            ToEventId(addChildEvent)
+            command.Index,
+            ToEventId(command)
         );
     }
 
-    private ChildDeletedEvent OnDeleteChild(DeleteChild deleteChildEvent)
+    private ChildDeletedEvent OnDeleteChild(DeleteChild command)
     {
-        var parent = ToNode(deleteChildEvent.Parent);
-        var containment = ToContainment(deleteChildEvent.Containment, parent);
+        var parent = ToNode(command.Parent);
+        var containment = ToContainment(command.Containment, parent);
+
         return new ChildDeletedEvent(
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[deleteChildEvent.Index],
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[command.Index],
             parent,
             containment,
-            deleteChildEvent.Index,
-            ToEventId(deleteChildEvent)
+            command.Index,
+            ToEventId(command)
         );
     }
 
-    private ChildReplacedEvent OnReplaceChild(ReplaceChild replaceChildEvent)
+    private ChildReplacedEvent OnReplaceChild(ReplaceChild command)
     {
-        var parent = ToNode(replaceChildEvent.Parent);
-        var containment = ToContainment(replaceChildEvent.Containment, parent);
+        var parent = ToNode(command.Parent);
+        var containment = ToContainment(command.Containment, parent);
         return new ChildReplacedEvent(
-            Deserialize(replaceChildEvent.NewChild),
-            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[replaceChildEvent.Index],
+            Deserialize(command.NewChild),
+            M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[command.Index],
             parent,
             containment,
-            replaceChildEvent.Index,
-            ToEventId(replaceChildEvent)
+            command.Index,
+            ToEventId(command)
         );
     }
 
-    private ChildMovedFromOtherContainmentEvent OnMoveChildFromOtherContainment(MoveChildFromOtherContainment moveChildEvent)
+    private ChildMovedFromOtherContainmentEvent OnMoveChildFromOtherContainment(MoveChildFromOtherContainment command)
     {
-        var movedChild = ToNode(moveChildEvent.MovedChild);
+        var movedChild = ToNode(command.MovedChild);
         var oldParent = (IWritableNode)movedChild.GetParent();
-        var newParent = ToNode(moveChildEvent.NewParent);
+        var newParent = ToNode(command.NewParent);
         var oldContainment = oldParent.GetContainmentOf(movedChild);
-        var newContainment = ToContainment(moveChildEvent.NewContainment, newParent);
+        var newContainment = ToContainment(command.NewContainment, newParent);
+        var oldIndex = GetChildIndex(oldParent, oldContainment, movedChild);
+
         return new ChildMovedFromOtherContainmentEvent(
             newParent,
             newContainment,
-            moveChildEvent.NewIndex,
+            command.NewIndex,
             movedChild,
             oldParent,
             oldContainment,
-            0, // TODO FIXME
-            ToEventId(moveChildEvent)
+            oldIndex,
+            ToEventId(command)
+        );
+    }
+
+    private ChildMovedAndReplacedFromOtherContainmentEvent OnMoveAndReplaceChildFromOtherContainment(MoveAndReplaceChildFromOtherContainment command)
+    {
+        var movedChild = ToNode(command.MovedChild);
+        var oldParent = (IWritableNode)movedChild.GetParent();
+        var oldContainment = oldParent.GetContainmentOf(movedChild);
+        var newParent = ToNode(command.NewParent);
+        var newContainment = ToContainment(command.NewContainment, newParent);
+        var replacedChild = ToNode(command.ReplacedChild);
+        var oldIndex = GetChildIndex(oldParent, oldContainment, movedChild);
+
+        return new ChildMovedAndReplacedFromOtherContainmentEvent(
+            newParent,
+            newContainment,
+            command.NewIndex,
+            movedChild,
+            oldParent,
+            oldContainment,
+            oldIndex,
+            replacedChild,
+            ToEventId(command)
         );
     }
 
     private ChildMovedFromOtherContainmentInSameParentEvent OnMoveChildFromOtherContainmentInSameParent(
-        MoveChildFromOtherContainmentInSameParent moveChildEvent)
+        MoveChildFromOtherContainmentInSameParent command)
     {
-        var movedChild = ToNode(moveChildEvent.MovedChild);
+        var movedChild = ToNode(command.MovedChild);
         var parent = (IWritableNode)movedChild.GetParent();
         var oldContainment = parent.GetContainmentOf(movedChild);
-        var newContainment = ToContainment(moveChildEvent.NewContainment, parent);
+        var newContainment = ToContainment(command.NewContainment, parent);
+        var oldIndex = GetChildIndex(parent, oldContainment, movedChild);
+
         return new ChildMovedFromOtherContainmentInSameParentEvent(
             newContainment,
-            moveChildEvent.NewIndex,
+            command.NewIndex,
             movedChild,
             parent,
             oldContainment,
-            0, // TODO FIXME
-            ToEventId(moveChildEvent)
+            oldIndex,
+            ToEventId(command)
         );
     }
 
-    private ChildMovedInSameContainmentEvent OnMoveChildInSameContainment(MoveChildInSameContainment moveChildEvent)
+    private ChildMovedInSameContainmentEvent OnMoveChildInSameContainment(MoveChildInSameContainment command)
     {
-        var movedChild = ToNode(moveChildEvent.MovedChild);
+        var movedChild = ToNode(command.MovedChild);
         var parent = (IWritableNode)movedChild.GetParent();
         var containment = parent.GetContainmentOf(movedChild);
+        var oldIndex = GetChildIndex(parent, containment, movedChild);
+
         return new ChildMovedInSameContainmentEvent(
-            moveChildEvent.NewIndex,
+            command.NewIndex,
             movedChild,
             parent,
             containment,
-            0, // TODO FIXME
-            ToEventId(moveChildEvent)
+            oldIndex,
+            ToEventId(command)
         );
+    }
+
+    private Index GetChildIndex(IWritableNode parent, Containment? containment, IWritableNode child)
+    {
+        Index index;
+        
+        if (parent.TryGet(containment, out var existingChildren))
+        {
+            switch (existingChildren)
+            {
+                case IList l:
+                    {
+                        var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                        index = children.IndexOf(child);
+                        break;
+                    }
+                case IWritableNode _:
+                    index = 0;
+                    break;
+                default:
+                    throw new InvalidValueException(containment, existingChildren);
+            }
+        } else
+        {
+            throw new UnsetFeatureException(containment);
+        }
+
+        return index;
     }
 
     private Containment ToContainment(MetaPointer deltaContainment, IReadableNode node) =>
@@ -304,7 +365,7 @@ public class DeltaCommandToPartitionEventMapper
             parent,
             reference,
             changeReferenceEvent.Index,
-            ToTarget(changeReferenceEvent.NewTarget,  changeReferenceEvent.NewResolveInfo),
+            ToTarget(changeReferenceEvent.NewTarget, changeReferenceEvent.NewResolveInfo),
             new ReferenceTarget(null, parent.Get(reference) as IReadableNode),
             ToEventId(changeReferenceEvent)
         );
