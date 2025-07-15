@@ -1,0 +1,55 @@
+@startuml
+hide footbox
+
+participant "IRepository\nConnector" as connector
+participant "Repository" as repo
+participant "Delta\nProtocol\nCommand\nReceiver" as receiver
+participant "Partition\nEvent\nHandler" as partitionEventHandler
+participant "Rewrite\nPartition\nEvent\nReplicator" as replicator
+participant "Partition\nEvent\nHandler\n-- local\nCommander" as localCommander
+participant "Local\nParentNode" as localParent
+participant "Containment\nSingle\nEvent\nEmitter" as emitter
+database "Shared\nNode\nMap" as sharedNodeMap
+
+connector -> repo ++: Receive\n  (IMessageContext)
+    repo -> receiver ++: Receive\n  (AddChild)
+        receiver -> partitionEventHandler ++: Raise\n  (AddChild)
+            partitionEventHandler -> replicator ++: ProcessEvent\n  (AddChild)
+                replicator -> replicator ++: OnRemoveChildAdded()
+                    replicator -> replicator ++  #green: SuppressEventForwarding()
+                        replicator -> localCommander: RegisterEventId()
+                        replicator -> replicator: RegisterEventId()
+                        replicator -> localParent ++: Set()
+                            localParent -> emitter ++: RaiseEvent()
+                                emitter -> localCommander ++: CreateEventId()
+                                    localCommander -> localCommander: use registered\n  eventId
+                                return
+                                emitter -> localCommander ++: Raise\n  (ChildAddedEvent)
+                                    localCommander -> replicator ++: LocalHandler()
+                                        replicator -> replicator ++: OnLocalChildAdded()
+                                            replicator -> sharedNodeMap: RegisterNode\n  (newChild)
+                                              ' receiver: OnPartitionAdded()
+                                        return
+                                    return
+                                    localCommander -> replicator ++: forwardingHandler
+                                        replicator -> replicator ++: Filter()
+                                            replicator -> replicator: checkRegistered\nEventIds()\n<-- false
+                                            replicator -> replicator: checkOriginalEventIds()\n<-- true
+                                        return registeredEvent
+                                        replicator -> repo ++: SendPartitionEventToAllClients()
+                                            repo ->> connector: SendAll()
+                                        return
+                                    return
+                                return
+                            return
+                        return
+                        replicator -> replicator: UnregisterEventId()
+                    return
+                return
+            return
+        return
+    return
+return
+
+
+@enduml

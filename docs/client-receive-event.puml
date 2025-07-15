@@ -1,0 +1,70 @@
+@startuml
+hide footbox
+
+participant "IClientConnector" as connector
+participant "LionWebClient" as client
+participant "DeltaProtocolPartitionEventReceiver" as receiver
+participant "PartitionEventHandler" as eventHandler
+participant "PartitionEventReplicator" as replicator
+participant "Partition\nEvent\nHandler\n-- local\nCommander" as localCommander
+participant "ParentNode" as localParent
+participant "ContainmentSingleEventEmitter" as emitter
+database "Shared\nNode\nMap" as sharedNodeMap
+
+connector -> client ++: Receive(ChildAdded)
+    client -> client ++: ReceiveEvent()
+        client -> client: CheckEventSequenceNumber() <-- true
+        client -> client ++: ProcessEvent()
+            client -> client: IncrementEventSequenceNumber()
+            client -> client ++: CheckOwnEvent()
+                client -> client: CompareParticipationId()
+                client -> client: CheckOwnCommandIds()
+            return false
+            client -> client ++: lock
+                client -> receiver ++: Receive(ChildAdded)
+                    receiver -> eventHandler ++: Raise(ChildAddedEvent)
+                        eventHandler -> eventHandler ++: writeHandler
+                            eventHandler -> replicator ++: ProcessEvent()
+                                replicator -> replicator ++: OnRemoteChildAdded()
+                                    replicator -> replicator ++: SuppressEventForwarding()
+                                        replicator -> localCommander ++: CreateEventId()
+                                            localCommander -> localCommander: create new
+                                        return
+                                        replicator -> localCommander: RegisterEventId()
+                                        replicator -> replicator: RegisterEventId() 
+                                        replicator -> localParent ++: Set()
+                                            localParent -> emitter ++: RaiseEvent()
+                                                emitter -> localCommander ++: CreateEventId()
+                                                    localCommander -> localCommander: use registered\n  eventId
+                                                return
+                                                emitter -> localCommander ++: Raise\n  (ChildAddedEvent)
+                                                    localCommander -> localCommander ++: writeHandler
+                                                        localCommander -> replicator ++: LocalHandler()
+                                                            replicator -> replicator ++: OnLocalChildAdded()
+                                                                replicator -> sharedNodeMap: RegisterNode\n  (newChild)
+                                                                ' receiver: OnPartitionAdded()
+                                                            return
+                                                        return
+                                                    return
+                                                    localCommander -> replicator ++: forwardingHandler
+                                                        replicator -> replicator ++: Filter()
+                                                            replicator -> replicator: checkRegistered\nEventIds()\n<-- false
+                                                        return null
+                                                    return
+                                                return
+                                            return
+                                        return
+                                        replicator -> replicator: UnregisterEventId()
+                                    return
+                                return
+                            return
+                        return
+                    return
+                return
+            return
+        return
+        client -> client: CheckUnprocessedEvents() <-- false
+    return
+return
+
+@enduml
