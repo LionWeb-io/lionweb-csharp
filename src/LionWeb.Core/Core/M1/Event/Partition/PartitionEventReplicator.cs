@@ -328,22 +328,33 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
     {
-        object newValue = nodeToInsert;
-        if (containment.Multiple)
+        object newValue;
+
+        if (localParent.CollectAllSetFeatures().Contains(containment))
         {
-            if (localParent.CollectAllSetFeatures().Contains(containment))
+            var existingChildren = localParent.Get(containment);
+            switch (existingChildren)
             {
-                var existingChildren = localParent.Get(containment);
-                if (existingChildren is IList l)
-                {
-                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.Insert(index, nodeToInsert);
-                    newValue = children;
-                }
-            } else
-            {
-                newValue = new List<IWritableNode>() { nodeToInsert };
+                case IList l:
+                    {
+                        var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                        children.Insert(index, nodeToInsert);
+                        newValue = children;
+                        break;
+                    }
+                case IWritableNode _:
+                    newValue = nodeToInsert;
+                    break;
+                default:
+                    throw new InvalidValueException(containment, existingChildren);
             }
+        }
+        else if (containment.Multiple)
+        {
+            newValue = new List<IWritableNode> { nodeToInsert };
+        } else
+        {
+            newValue = nodeToInsert;
         }
 
         return newValue;
