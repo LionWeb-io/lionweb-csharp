@@ -15,11 +15,11 @@
 // SPDX-FileCopyrightText: 2025 LionWeb Project
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Repository;
+namespace LionWeb.Protocol.Delta.Repository.Partition;
 
-using Core;
-using Core.M1.Event;
-using Core.M1.Event.Partition;
+using LionWeb.Core;
+using LionWeb.Core.M1.Event;
+using LionWeb.Core.M1.Event.Partition;
 using System.Diagnostics;
 
 internal class RewritePartitionEventReplicator(

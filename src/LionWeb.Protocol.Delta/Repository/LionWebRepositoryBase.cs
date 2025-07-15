@@ -21,6 +21,7 @@ using Core;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M3;
+using Partition;
 
 public interface ILionWebRepository
 {

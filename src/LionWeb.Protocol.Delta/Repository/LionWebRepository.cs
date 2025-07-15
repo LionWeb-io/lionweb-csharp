@@ -24,6 +24,8 @@ using Message;
 using Message.Command;
 using Message.Event;
 using Message.Query;
+using Partition;
+using System.Diagnostics;
 
 public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
