@@ -57,9 +57,10 @@ public class ClientTests
 
         _repositoryForest = new Forest();
         _repositoryPartition = new Geometry("partition");
-        _repositoryForest.AddPartitions([_repositoryPartition]);
         _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryForest,
             _repositoryConnector);
+
+        _repositoryForest.AddPartitions([_repositoryPartition]);
 
         _clientPartition = Clone(_repositoryPartition);
         _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientPartition, _clientConnector);

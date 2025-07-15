@@ -71,11 +71,14 @@ public abstract class DeltaCommandToEventMapperBase
 
     protected IWritableNode ToNode(TargetNode nodeId)
     {
-        if (_sharedNodeMap.TryGetValue(nodeId, out var node) && node is IWritableNode w)
-            return w;
+        if (_sharedNodeMap.TryGetValue(nodeId, out var node))
+        {
+            if (node is IWritableNode w) return w;
+        throw new NotImplementedException($"node: {node}");
+        }
 
         // TODO change to correct exception 
-        throw new NotImplementedException();
+        throw new NotImplementedException($"nodeId: {nodeId}");
     }
 
     private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature

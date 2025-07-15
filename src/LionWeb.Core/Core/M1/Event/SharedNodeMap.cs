@@ -54,7 +54,7 @@ public class SharedNodeMap : IDisposable
     public bool TryGetValue(NodeId targetNode, [NotNullWhen(true)] out IReadableNode? node)
         => _map.TryGetValue(targetNode, out node);
 
-    public IEnumerable<IReadableNode>? Values => _map.Values;
+    public IEnumerable<IReadableNode> Values => _map.Values;
 
     public bool ContainsKey(NodeId nodeId)
         => _map.ContainsKey(nodeId);

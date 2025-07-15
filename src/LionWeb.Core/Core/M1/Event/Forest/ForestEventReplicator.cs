@@ -102,12 +102,13 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         PartitionEventReplicator replicator = CreatePartitionEventReplicator(partition);
         if (!_localPartitions.TryAdd(partition.GetId(), replicator))
             throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
+        SharedNodeMap.RegisterNode(partition);
     }
 
     protected virtual PartitionEventReplicator CreatePartitionEventReplicator(IPartitionInstance partition) =>
         new(partition, SharedNodeMap);
 
-    private PartitionEventReplicator LookupPartition(IPartitionInstance partition) =>
+    public PartitionEventReplicator LookupPartition(IPartitionInstance partition) =>
         _localPartitions[partition.GetId()];
 
     private void UnregisterPartition(IPartitionInstance partition)

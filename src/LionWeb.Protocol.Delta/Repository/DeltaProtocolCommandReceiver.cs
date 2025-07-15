@@ -32,18 +32,25 @@ public class DeltaProtocolCommandReceiver : IDisposable
 
     private readonly ForestEventHandler _forestEventHandler;
     private readonly PartitionSharedNodeMap _sharedNodeMap;
+    private readonly ForestEventReplicator _forestEventReplicator;
     private readonly DeltaCommandToForestEventMapper _forestMapper;
     private readonly DeltaCommandToPartitionEventMapper _partitionMapper;
 
     public DeltaProtocolCommandReceiver(ForestEventHandler forestEventHandler, PartitionSharedNodeMap sharedNodeMap,
-        SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder)
+        SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder, ForestEventReplicator forestEventReplicator)
     {
         _forestEventHandler = forestEventHandler;
         _sharedNodeMap = sharedNodeMap;
+        _forestEventReplicator = forestEventReplicator;
 
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
         _partitionMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
 
+        foreach (var partition in sharedNodeMap.Values.OfType<IPartitionInstance>())
+        {
+            OnPartitionAdded(null, partition);
+        }
+        
         sharedNodeMap.OnPartitionAdded += OnPartitionAdded;
         sharedNodeMap.OnPartitionRemoved += OnPartitionRemoved;
     }
@@ -56,8 +63,15 @@ public class DeltaProtocolCommandReceiver : IDisposable
         _sharedNodeMap.OnPartitionRemoved -= OnPartitionRemoved;
     }
 
-    private void OnPartitionAdded(object? _, IPartitionInstance partition) =>
-        _partitionEventHandlers[partition.GetId()] = new PartitionEventHandler(this);
+    private void OnPartitionAdded(object? _, IPartitionInstance partition)
+    {
+        var partitionEventHandler = new PartitionEventHandler(this);
+        var replicator = _forestEventReplicator.LookupPartition(partition);
+        if (_partitionEventHandlers.TryAdd(partition.GetId(), partitionEventHandler))
+        {
+            replicator.ReplicateFrom(partitionEventHandler);
+        }
+    }
 
     private void OnPartitionRemoved(object? _, IPartitionInstance partition) =>
         _partitionEventHandlers.Remove(partition.GetId());
@@ -67,20 +81,27 @@ public class DeltaProtocolCommandReceiver : IDisposable
         IEvent internalEvent;
         EventHandlerBase eventHandler;
 
-        if (deltaCommand is IPartitionCommand c)
+        switch (deltaCommand)
         {
-            internalEvent = _partitionMapper.Map(deltaCommand);
-            if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
-            {
-                eventHandler = _partitionEventHandlers[partition.GetId()];
-            } else
-            {
-                throw new InvalidOperationException();
-            }
-        } else
-        {
-            internalEvent = _forestMapper.Map(deltaCommand);
-            eventHandler = _forestEventHandler;
+            case IAnnotationCommand or IFeatureCommand or INodeCommand:
+                internalEvent = _partitionMapper.Map(deltaCommand);
+                if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
+                {
+                    eventHandler = _partitionEventHandlers[partition.GetId()];
+                } else
+                {
+                    throw new InvalidOperationException();
+                }
+
+                break;
+            
+            case IPartitionCommand:
+                internalEvent = _forestMapper.Map(deltaCommand);
+                eventHandler = _forestEventHandler;
+                break;
+            
+            default:
+                throw new InvalidOperationException(deltaCommand.ToString());
         }
 
         eventHandler.Raise(internalEvent);
