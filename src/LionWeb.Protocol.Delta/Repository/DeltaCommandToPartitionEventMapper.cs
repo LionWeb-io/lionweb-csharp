@@ -243,15 +243,27 @@ public class DeltaCommandToPartitionEventMapper
 
     private Index GetChildIndex(IWritableNode parent, Containment? containment, IWritableNode child)
     {
-        var index = 0;
+        Index index;
         
-        if (containment.Multiple)
+        if (parent.TryGet(containment, out var existingChildren))
         {
-            if (parent.TryGet(containment, out var existingChildren) && existingChildren is IList l)
+            switch (existingChildren)
             {
-                var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                index = children.IndexOf(child);
+                case IList l:
+                    {
+                        var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                        index = children.IndexOf(child);
+                        break;
+                    }
+                case IWritableNode _:
+                    index = 0;
+                    break;
+                default:
+                    throw new InvalidValueException(containment, existingChildren);
             }
+        } else
+        {
+            throw new UnsetFeatureException(containment);
         }
 
         return index;
