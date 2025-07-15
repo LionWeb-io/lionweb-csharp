@@ -20,9 +20,14 @@ namespace LionWeb.Core.M1.Event.Forest;
 /// All LionWeb events relating to a forest.
 public interface IForestEvent : IEvent;
 
+/// <inheritdoc />
 public abstract record AForestEvent(IEventId EventId) : IForestEvent
 {
+    /// <inheritdoc />
     public IEventId EventId { get; set; } = EventId;
+
+    /// <inheritdoc />
+    public abstract NodeId ContextNodeId { get; }
 }
 
 /// A partition has been deleted from this forest.
@@ -30,11 +35,19 @@ public abstract record AForestEvent(IEventId EventId) : IForestEvent
 public record PartitionDeletedEvent(
     IPartitionInstance DeletedPartition,
     IEventId EventId)
-    : AForestEvent(EventId);
+    : AForestEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => DeletedPartition.GetId();
+}
 
 /// A new partition has been added to this forrest.
 /// <param name="NewPartition">The newly added partition.</param>
 public record PartitionAddedEvent(
     IPartitionInstance NewPartition,
     IEventId EventId)
-    : AForestEvent(EventId);
+    : AForestEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewPartition.GetId();
+}

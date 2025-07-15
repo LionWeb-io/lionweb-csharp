@@ -1,0 +1,51 @@
+﻿// Copyright 2025 TRUMPF Laser SE and other contributors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License")
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// 
+// SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
+// SPDX-License-Identifier: Apache-2.0
+
+namespace LionWeb.Protocol.Delta.Client.Forest;
+
+using Core;
+using Core.M1;
+using Core.M1.Event;
+using Core.M1.Event.Forest;
+using Message.Event;
+
+public class DeltaEventToForestEventMapper(
+    SharedNodeMap sharedNodeMap,
+    SharedKeyedMap sharedKeyedMap,
+    DeserializerBuilder deserializerBuilder)
+    : DeltaEventToEventMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
+{
+    public IForestEvent Map(IDeltaEvent deltaEvent) =>
+        deltaEvent switch
+        {
+            PartitionAdded a => OnPartitionAdded(a),
+            PartitionDeleted a => OnPartitionDeleted(a),
+            _ => throw new NotImplementedException(deltaEvent.GetType().Name)
+        };
+
+    private PartitionAddedEvent OnPartitionAdded(PartitionAdded partitionAdded) =>
+        new(
+            (IPartitionInstance)Deserialize(partitionAdded.NewPartition),
+            ToEventId(partitionAdded)
+        );
+
+    private PartitionDeletedEvent OnPartitionDeleted(PartitionDeleted partitionDeleted) =>
+        new(
+            (IPartitionInstance)ToNode(partitionDeleted.DeletedPartition),
+            ToEventId(partitionDeleted)
+        );
+}

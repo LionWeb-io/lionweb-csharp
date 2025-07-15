@@ -15,38 +15,33 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Client.Partition;
+namespace LionWeb.Protocol.Delta.Client.Forest;
 
 using Core.M1;
 using Core.M1.Event;
-using Core.M1.Event.Partition;
+using Core.M1.Event.Forest;
 using Message.Event;
 
-public class DeltaProtocolPartitionEventReceiver : IDisposable
+public class DeltaProtocolForestEventReceiver
 {
-    private readonly PartitionEventHandler _eventHandler;
-    private readonly DeltaEventToPartitionEventMapper _mapper;
+    private readonly ForestEventHandler _eventHandler;
+    private readonly DeltaEventToForestEventMapper _mapper;
 
-    public DeltaProtocolPartitionEventReceiver(
-        PartitionEventHandler eventHandler,
+    public DeltaProtocolForestEventReceiver(
+        ForestEventHandler eventHandler,
         SharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )
     {
         _eventHandler = eventHandler;
-        _mapper = new DeltaEventToPartitionEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
+        _mapper = new DeltaEventToForestEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
-    /// <inheritdoc />
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-    }
 
     public void Receive(IDeltaEvent deltaEvent)
     {
-        IPartitionEvent partitionEvent = _mapper.Map(deltaEvent);
+        IForestEvent partitionEvent = _mapper.Map(deltaEvent);
 
         _eventHandler.Raise(partitionEvent);
     }

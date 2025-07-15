@@ -34,6 +34,7 @@ public class DeltaCommandToEventMapper
         command switch
         {
             IPartitionCommand c => _partitionMapper.Map(c),
+            
             _ => throw new NotImplementedException(command.GetType().Name)
         };
 }

@@ -22,6 +22,9 @@ public interface IEvent
 {
     /// Globally unique id of this event.
     IEventId EventId { get; set; }
+    
+    /// Id of the node that's part of the hosting partition.
+    NodeId ContextNodeId { get; }
 }
 
 /// Id of an internal event in the LionWeb event system.

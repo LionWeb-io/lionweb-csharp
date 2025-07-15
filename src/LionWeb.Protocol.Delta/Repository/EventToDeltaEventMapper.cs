@@ -18,23 +18,28 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.M1.Event;
+using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
+using Forest;
 using Message.Event;
 using Partition;
 
 public class EventToDeltaEventMapper
 {
     private readonly PartitionEventToDeltaEventMapper _partitionMapper;
+    private readonly ForestEventToDeltaEventMapper _forestMapper;
 
-    public EventToDeltaEventMapper(PartitionEventToDeltaEventMapper partitionMapper)
+    public EventToDeltaEventMapper(PartitionEventToDeltaEventMapper partitionMapper, ForestEventToDeltaEventMapper forestMapper)
     {
         _partitionMapper = partitionMapper;
+        _forestMapper = forestMapper;
     }
 
     public IDeltaEvent Map(IEvent @event) =>
         @event switch
         {
             IPartitionEvent e => _partitionMapper.Map(e),
+            IForestEvent e => _forestMapper.Map(e),
             _ => throw new NotImplementedException(@event.GetType().Name)
         };
 }

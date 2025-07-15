@@ -18,19 +18,21 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
+using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M3;
 
-public abstract class LionWebClientBase<T>
+public abstract class LionWebClientBase<T> : IDisposable
 {
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly string _name;
     protected readonly IClientConnector<T> _connector;
-    protected readonly Dictionary<string, IReadableNode> SharedNodeMap;
+    protected readonly SharedNodeMap SharedNodeMap;
     protected readonly PartitionEventHandler PartitionEventHandler;
 
     private ParticipationId? _participationId;
     private readonly ClientId? _clientId;
+    private readonly PartitionEventReplicator _replicator;
 
     protected internal ParticipationId ParticipationId
     {
@@ -51,20 +53,32 @@ public abstract class LionWebClientBase<T>
         _name = name;
         _connector = connector;
 
-        SharedNodeMap = [];
+        SharedNodeMap = new();
         PartitionEventHandler = new PartitionEventHandler(name);
-        var replicator = new PartitionEventReplicator(partition, SharedNodeMap);
-        replicator.ReplicateFrom(PartitionEventHandler);
+        _replicator = new PartitionEventReplicator(partition, SharedNodeMap);
+        _replicator.ReplicateFrom(PartitionEventHandler);
 
-        replicator.Subscribe<IPartitionEvent>(SendPartitionEventToRepository);
+        _replicator.Subscribe<IPartitionEvent>(SendPartitionEventToRepository);
 
-        connector.Receive += (_, content) => Receive(content);
+        _connector.Receive += OnReceive;
     }
+
+    /// <inheritdoc />
+    public virtual void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _connector.Receive -= OnReceive;
+        _replicator.Dispose();
+        SharedNodeMap.Dispose();
+    }
+
+    private void OnReceive(object? _, T content) =>
+        Receive(content);
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOnResponse"/></returns>
     public abstract Task SignOn();
-    
+
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOffRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOffResponse"/></returns>
     public abstract Task SignOff();
@@ -72,7 +86,7 @@ public abstract class LionWebClientBase<T>
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsResponse"/></returns>
     public abstract Task GetAvailableIds(int count);
-    
+
     private void SendPartitionEventToRepository(object? sender, IPartitionEvent? partitionEvent)
     {
         if (partitionEvent == null)

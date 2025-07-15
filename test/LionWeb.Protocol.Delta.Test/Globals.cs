@@ -32,3 +32,4 @@ global using MessageKind = string;
 global using MessageDataKey = string;
 global using EventSequenceNumber = long;
 global using SemanticPropertyValue = object;
+global using SharedKeyedMap = System.Collections.Generic.Dictionary<LionWeb.Core.M1.CompressedMetaPointer, LionWeb.Core.M3.IKeyed>;

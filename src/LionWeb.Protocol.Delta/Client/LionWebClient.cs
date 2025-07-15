@@ -64,7 +64,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
 
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
         _eventReceiver = new DeltaProtocolPartitionEventReceiver(
             PartitionEventHandler,
@@ -72,6 +72,14 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             sharedKeyedMap,
             deserializerBuilder
         );
+    }
+
+    /// <inheritdoc />
+    public override void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _eventReceiver.Dispose();
+        base.Dispose();
     }
 
     /// <inheritdoc />

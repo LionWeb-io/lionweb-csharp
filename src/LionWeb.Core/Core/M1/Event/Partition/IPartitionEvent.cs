@@ -24,9 +24,14 @@ using SemanticPropertyValue = object;
 /// All LionWeb events relating to a partition.
 public interface IPartitionEvent : IEvent;
 
+/// <inheritdoc />
 public abstract record APartitionEvent(IEventId EventId) : IPartitionEvent
 {
+    /// <inheritdoc />
     public IEventId EventId { get; set; } = EventId;
+
+    /// <inheritdoc />
+    public abstract NodeId ContextNodeId { get; }
 }
 
 #region Nodes
@@ -38,7 +43,11 @@ public record ClassifierChangedEvent(
     IWritableNode Node,
     Classifier NewClassifier,
     Classifier OldClassifier,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Node.GetId();
+}
 
 #endregion
 
@@ -52,7 +61,11 @@ public record PropertyAddedEvent(
     Property Property,
     SemanticPropertyValue NewValue,
     IEventId EventId)
-    : APartitionEvent(EventId);
+    : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Node.GetId();
+}
 
 /// <param name="Node"></param>
 /// <param name="Property"></param>
@@ -62,7 +75,11 @@ public record PropertyDeletedEvent(
     Property Property,
     SemanticPropertyValue OldValue,
     IEventId EventId)
-    : APartitionEvent(EventId);
+    : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Node.GetId();
+}
 
 /// <param name="Node"></param>
 /// <param name="Property"></param>
@@ -73,7 +90,11 @@ public record PropertyChangedEvent(
     Property Property,
     SemanticPropertyValue NewValue,
     SemanticPropertyValue OldValue,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Node.GetId();
+}
 
 #endregion
 
@@ -88,7 +109,11 @@ public record ChildAddedEvent(
     IWritableNode NewChild,
     Containment Containment,
     Index Index,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="DeletedChild"></param>
 /// <param name="Parent"></param>
@@ -99,7 +124,11 @@ public record ChildDeletedEvent(
     IWritableNode Parent,
     Containment Containment,
     Index Index,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewChild"></param>
 /// <param name="ReplacedChild"></param>
@@ -112,7 +141,11 @@ public record ChildReplacedEvent(
     IWritableNode Parent,
     Containment Containment,
     Index Index,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewContainment"></param>
@@ -129,7 +162,11 @@ public record ChildMovedFromOtherContainmentEvent(
     IWritableNode OldParent,
     Containment OldContainment,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="NewContainment"></param>
 /// <param name="NewIndex"></param>
@@ -144,7 +181,11 @@ public record ChildMovedFromOtherContainmentInSameParentEvent(
     IWritableNode Parent,
     Containment OldContainment,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedChild"></param>
@@ -157,7 +198,11 @@ public record ChildMovedInSameContainmentEvent(
     IWritableNode Parent,
     Containment Containment,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewContainment"></param>
@@ -175,7 +220,11 @@ public record ChildMovedAndReplacedFromOtherContainmentEvent(
     Containment OldContainment,
     Index OldIndex,
     IWritableNode ReplacedChild,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="NewContainment"></param>
 /// <param name="NewIndex"></param>
@@ -191,7 +240,11 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(
     Containment OldContainment,
     Index OldIndex,
     IWritableNode ReplacedChild,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedChild"></param>
@@ -205,7 +258,11 @@ public record ChildMovedAndReplacedInSameContainmentEvent(
     Containment Containment,
     IWritableNode ReplacedChild,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 #endregion
 
@@ -219,7 +276,11 @@ public record AnnotationAddedEvent(
     IWritableNode NewAnnotation,
     Index Index,
     IEventId EventId)
-    : APartitionEvent(EventId);
+    : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="DeletedAnnotation"></param>
 /// <param name="Parent"></param>
@@ -229,7 +290,11 @@ public record AnnotationDeletedEvent(
     IWritableNode Parent,
     Index Index,
     IEventId EventId)
-    : APartitionEvent(EventId);
+    : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewAnnotation"></param>
 /// <param name="ReplacedAnnotation"></param>
@@ -240,7 +305,11 @@ public record AnnotationReplacedEvent(
     IWritableNode ReplacedAnnotation,
     IWritableNode Parent,
     Index Index,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewIndex"></param>
@@ -253,7 +322,11 @@ public record AnnotationMovedFromOtherParentEvent(
     IWritableNode MovedAnnotation,
     IWritableNode OldParent,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedAnnotation"></param>
@@ -264,7 +337,11 @@ public record AnnotationMovedInSameParentEvent(
     IWritableNode MovedAnnotation,
     IWritableNode Parent,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewIndex"></param>
@@ -278,7 +355,11 @@ public record AnnotationMovedAndReplacedFromOtherParentEvent(
     IWritableNode OldParent,
     Index OldIndex,
     IWritableNode ReplacedAnnotation,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedAnnotation"></param>
@@ -290,7 +371,11 @@ public record AnnotationMovedAndReplacedInSameParentEvent(
     IWritableNode Parent,
     Index OldIndex,
     IWritableNode ReplacedAnnotation,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 #endregion
 
@@ -305,7 +390,11 @@ public record ReferenceAddedEvent(
     Reference Reference,
     Index Index,
     IReferenceTarget NewTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -316,7 +405,11 @@ public record ReferenceDeletedEvent(
     Reference Reference,
     Index Index,
     IReferenceTarget DeletedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -329,7 +422,11 @@ public record ReferenceChangedEvent(
     Index Index,
     IReferenceTarget NewTarget,
     IReferenceTarget OldTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewReference"></param>
@@ -346,7 +443,11 @@ public record EntryMovedFromOtherReferenceEvent(
     IWritableNode OldParent,
     Reference OldReference,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="NewReference"></param>
@@ -361,7 +462,11 @@ public record EntryMovedFromOtherReferenceInSameParentEvent(
     IReferenceTarget MovedTarget,
     Reference OldReference,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -374,7 +479,11 @@ public record EntryMovedInSameReferenceEvent(
     Index OldIndex,
     Index NewIndex,
     IReferenceTarget Target,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewReference"></param>
@@ -392,7 +501,11 @@ public record EntryMovedAndReplacedFromOtherReferenceEvent(
     Reference OldReference,
     Index OldIndex,
     IReferenceTarget ReplacedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="NewReference"></param>
@@ -408,7 +521,11 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParentEvent(
     Reference OldReference,
     Index OldIndex,
     IReferenceTarget ReplacedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -422,7 +539,11 @@ public record EntryMovedAndReplacedInSameReferenceEvent(
     IReferenceTarget MovedTarget,
     Index OldIndex,
     IReferenceTarget ReplacedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -435,7 +556,11 @@ public record ReferenceResolveInfoAddedEvent(
     Index Index,
     ResolveInfo NewResolveInfo,
     TargetNode Target,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -448,7 +573,11 @@ public record ReferenceResolveInfoDeletedEvent(
     Index Index,
     TargetNode Target,
     ResolveInfo DeletedResolveInfo,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -463,7 +592,11 @@ public record ReferenceResolveInfoChangedEvent(
     ResolveInfo NewResolveInfo,
     TargetNode? Target,
     ResolveInfo ReplacedResolveInfo,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -476,7 +609,11 @@ public record ReferenceTargetAddedEvent(
     Index Index,
     TargetNode NewTarget,
     ResolveInfo ResolveInfo,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -489,7 +626,11 @@ public record ReferenceTargetDeletedEvent(
     Index Index,
     ResolveInfo ResolveInfo,
     TargetNode DeletedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -504,6 +645,10 @@ public record ReferenceTargetChangedEvent(
     TargetNode NewTarget,
     ResolveInfo? ResolveInfo,
     TargetNode OldTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionEvent(EventId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 #endregion
