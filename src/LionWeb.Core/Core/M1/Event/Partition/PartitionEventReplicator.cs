@@ -309,6 +309,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 case IWritableNode _ when index == 0:
                     return substituteNode;
                 default:
+                    // when containment data is corrupted or assigned to an invalid value after its creation
                     throw new InvalidValueException(containment, existingChildren);
             }
         }
@@ -337,6 +338,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 case IWritableNode _:
                     return nodeToInsert;
                 default:
+                    // when containment data is corrupted or assigned to an invalid value after its creation 
                     throw new InvalidValueException(containment, existingChildren);
             }
         }
