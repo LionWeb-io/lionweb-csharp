@@ -293,60 +293,58 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             localParent.Set(childMovedEvent.Containment, newValue);
         });
 
-    private object ReplaceContainment(INode localParent, Containment containment, Index index, INode substituteNode)
+    private static object ReplaceContainment(INode localParent, Containment containment, Index index, INode substituteNode)
     {
-        object newValue;
-
         if (localParent.TryGet(containment, out var existingChildren))
         {
             switch (existingChildren)
             {
                 case IList l:
-                    {
-                        var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                        children.Insert(index, substituteNode);
-                        children.RemoveAt(index + 1);
-                        newValue = children;
-                        break;
-                    }
+                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                    children.Insert(index, substituteNode);
+                    children.RemoveAt(index + 1);
+                    return children;
                 case IWritableNode _ when index == 0:
-                    newValue = substituteNode;
-                    break;
+                    return substituteNode;
                 default:
+                    // when containment data is corrupted or assigned to an invalid value after its creation
                     throw new InvalidValueException(containment, existingChildren);
             }
-        } else if (containment.Multiple)
-        {
-            newValue = new List<IWritableNode> { substituteNode };
-        } else
-        {
-            newValue = substituteNode;
         }
 
-        return newValue;
-    }
-
-    private object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
-    {
-        object newValue = nodeToInsert;
         if (containment.Multiple)
         {
-            if (localParent.CollectAllSetFeatures().Contains(containment))
+            return new List<IWritableNode> { substituteNode };
+        }
+
+        return substituteNode;
+    }
+
+    private static object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
+    {
+        if (localParent.CollectAllSetFeatures().Contains(containment))
+        {
+            var existingChildren = localParent.Get(containment);
+            switch (existingChildren)
             {
-                var existingChildren = localParent.Get(containment);
-                if (existingChildren is IList l)
-                {
+                case IList l:
                     var children = new List<IWritableNode>(l.Cast<IWritableNode>());
                     children.Insert(index, nodeToInsert);
-                    newValue = children;
-                }
-            } else
-            {
-                newValue = new List<IWritableNode>() { nodeToInsert };
+                    return children;
+                case IWritableNode _:
+                    return nodeToInsert;
+                default:
+                    // when containment data is corrupted or assigned to an invalid value after its creation 
+                    throw new InvalidValueException(containment, existingChildren);
             }
         }
 
-        return newValue;
+        if (containment.Multiple)
+        {
+            return new List<IWritableNode> { nodeToInsert };
+        }
+
+        return nodeToInsert;
     }
 
     #endregion
@@ -440,7 +438,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             localParent.Set(referenceChangedEvent.Reference, newValue);
         });
 
-    private object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
+    private static object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
     {
         object newValue = target;
         if (reference.Multiple)
