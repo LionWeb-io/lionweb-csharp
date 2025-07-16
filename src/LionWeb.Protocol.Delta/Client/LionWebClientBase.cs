@@ -18,11 +18,9 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
-using Core.M1.Event;
 using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
-using Core.M1.Event.Partition;
 using Core.M3;
 
 public interface ILionWebClient
@@ -41,12 +39,12 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly string _name;
     protected readonly IClientConnector<T> _connector;
-    protected readonly SharedNodeMap SharedNodeMap;
-    protected readonly PartitionEventHandler PartitionEventHandler;
+    protected readonly PartitionSharedNodeMap SharedNodeMap;
+    protected readonly ForestEventHandler ForestEventHandler;
+    protected readonly ForestEventReplicator _replicator;
 
     private ParticipationId? _participationId;
     private readonly ClientId? _clientId;
-    private readonly PartitionEventReplicator _replicator;
 
     protected internal ParticipationId ParticipationId
     {
@@ -61,19 +59,18 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     }
 
     public LionWebClientBase(LionWebVersions lionWebVersion, List<Language> languages, string name,
-        IPartitionInstance partition, IClientConnector<T> connector)
+        IForest forest, IClientConnector<T> connector)
     {
         _lionWebVersion = lionWebVersion;
         _name = name;
         _connector = connector;
 
         SharedNodeMap = new();
-        PartitionEventHandler = new PartitionEventHandler(name);
-        _replicator = new PartitionEventReplicator(partition, SharedNodeMap);
-        _replicator.ReplicateFrom(PartitionEventHandler);
-        SharedNodeMap.RegisterNode(partition);
+        ForestEventHandler = new ForestEventHandler(name);
+        _replicator = new ForestEventReplicator(forest, SharedNodeMap);
+        _replicator.ReplicateFrom(ForestEventHandler);
 
-        _replicator.Subscribe<IPartitionEvent>(SendPartitionEventToRepository);
+        _replicator.Subscribe<IForestEvent>(SendEventToRepository);
 
         _connector.Receive += OnReceive;
     }
@@ -102,12 +99,12 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsResponse"/></returns>
     public abstract Task GetAvailableIds(int count);
 
-    private void SendPartitionEventToRepository(object? sender, IPartitionEvent? partitionEvent)
+    private void SendEventToRepository(object? sender, IEvent? internalEvent)
     {
-        if (partitionEvent == null)
+        if (internalEvent == null)
             return;
 
-        var converted = _connector.Convert(partitionEvent);
+        var converted = _connector.Convert(internalEvent);
 
         Send(converted);
     }

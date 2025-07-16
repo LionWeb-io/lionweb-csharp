@@ -26,7 +26,6 @@ using Message;
 using Message.Command;
 using Message.Event;
 using Message.Query;
-using Partition;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 
@@ -39,7 +38,7 @@ public interface IEventClientConnector : IClientConnector<IEvent>
 
 public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
-    private readonly DeltaProtocolPartitionEventReceiver _eventReceiver;
+    private readonly DeltaProtocolEventReceiver _eventReceiver;
     
     private readonly ConcurrentDictionary<EventSequenceNumber, IDeltaEvent> _unprocessedEvents = [];
     private readonly ConcurrentDictionary<CommandId, bool> _ownCommands = [];
@@ -55,8 +54,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     public LionWebClient(LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
-        IPartitionInstance partition,
-        IClientConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, partition, connector)
+        IForest forest,
+        IClientConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, forest, connector)
     {
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
@@ -66,11 +65,12 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
         SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
-        _eventReceiver = new DeltaProtocolPartitionEventReceiver(
-            PartitionEventHandler,
+        _eventReceiver = new DeltaProtocolEventReceiver(
+            ForestEventHandler,
             SharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder
+            deserializerBuilder,
+            _replicator
         );
     }
 
@@ -207,9 +207,9 @@ public class LionWebTestClient(
     LionWebVersions lionWebVersion,
     List<Language> languages,
     string name,
-    IPartitionInstance partition,
+    IForest forest,
     IDeltaClientConnector connector)
-    : LionWebClient(lionWebVersion, languages, name, partition, connector)
+    : LionWebClient(lionWebVersion, languages, name, forest, connector)
 {
     private const int SleepInterval = 100;
 

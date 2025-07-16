@@ -41,11 +41,11 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     protected readonly IRepositoryConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
     protected readonly ForestEventHandler ForestEventHandler;
+    protected readonly RewriteForestEventReplicator _replicator;
 
     private long nextFreeNodeId = 0;
 
     protected long _messageCount;
-    protected readonly RewriteForestEventReplicator _replicator;
     public long MessageCount => Interlocked.Read(ref _messageCount);
 
     public LionWebRepositoryBase(LionWebVersions lionWebVersion, List<Language> languages, string name,

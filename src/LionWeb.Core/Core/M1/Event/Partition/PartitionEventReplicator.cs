@@ -32,7 +32,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         localPartition.GetCommander(), sharedNodeMap)
     {
         _localPartition = localPartition;
-        Init();
+        // Init();
     }
 
     /// <inheritdoc />
@@ -100,9 +100,9 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         }
     }
 
-    private void Init()
+    public void Init()
     {
-        // SharedNodeMap.RegisterNode(_localPartition);
+        SharedNodeMap.RegisterNode(_localPartition);
 
         var publisher = _localPartition.GetPublisher();
         if (publisher == null)

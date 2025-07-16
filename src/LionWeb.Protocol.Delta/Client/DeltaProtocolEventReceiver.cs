@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Repository;
+namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
@@ -23,46 +23,45 @@ using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
 using Forest;
-using Message.Command;
+using Message.Event;
 using Partition;
 
-public class DeltaProtocolCommandReceiver : IDisposable
+public class DeltaProtocolEventReceiver : IDisposable
 {
     private readonly Dictionary<NodeId, PartitionEventHandler> _partitionEventHandlers = [];
-
+    
     private readonly ForestEventHandler _forestEventHandler;
     private readonly PartitionSharedNodeMap _sharedNodeMap;
+    private readonly SharedKeyedMap _sharedKeyedMap;
     private readonly ForestEventReplicator _forestEventReplicator;
     
-    private readonly DeltaCommandToForestEventMapper _forestMapper;
-    private readonly DeltaCommandToPartitionEventMapper _partitionMapper;
+    private readonly DeltaEventToForestEventMapper _forestMapper;
+    private readonly DeltaEventToPartitionEventMapper _partitionMapper;
 
-    public DeltaProtocolCommandReceiver(ForestEventHandler forestEventHandler, PartitionSharedNodeMap sharedNodeMap,
-        SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder, ForestEventReplicator forestEventReplicator)
+    public DeltaProtocolEventReceiver(ForestEventHandler forestEventHandler, PartitionSharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder, ForestEventReplicator forestEventReplicator)
     {
         _forestEventHandler = forestEventHandler;
         _sharedNodeMap = sharedNodeMap;
+        _sharedKeyedMap = sharedKeyedMap;
         _forestEventReplicator = forestEventReplicator;
 
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
         _partitionMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
-
+        
         foreach (var partition in sharedNodeMap.Values.OfType<IPartitionInstance>())
         {
             OnPartitionAdded(null, partition);
         }
         
         sharedNodeMap.OnPartitionAdded += OnPartitionAdded;
-        sharedNodeMap.OnPartitionRemoved += OnPartitionRemoved;
-    }
+        sharedNodeMap.OnPartitionRemoved += OnPartitionRemoved;    }
 
     /// <inheritdoc />
     public void Dispose()
     {
         GC.SuppressFinalize(this);
         _sharedNodeMap.OnPartitionAdded -= OnPartitionAdded;
-        _sharedNodeMap.OnPartitionRemoved -= OnPartitionRemoved;
-    }
+        _sharedNodeMap.OnPartitionRemoved -= OnPartitionRemoved;    }
 
     private void OnPartitionAdded(object? _, IPartitionInstance partition)
     {
@@ -74,18 +73,18 @@ public class DeltaProtocolCommandReceiver : IDisposable
         }
     }
 
-    private void OnPartitionRemoved(object? _, IPartitionInstance partition) =>
+    private void OnPartitionRemoved(object? sender, IPartitionInstance partition) =>
         _partitionEventHandlers.Remove(partition.GetId());
-
-    public void Receive(IDeltaCommand deltaCommand)
+    
+    public void Receive(IDeltaEvent deltaEvent)
     {
         IEvent internalEvent;
         EventHandlerBase eventHandler;
 
-        switch (deltaCommand)
+        switch (deltaEvent)
         {
-            case IAnnotationCommand or IFeatureCommand or INodeCommand:
-                internalEvent = _partitionMapper.Map(deltaCommand);
+            case IAnnotationEvent or IFeatureEvent or INodeEvent:
+                internalEvent = _partitionMapper.Map(deltaEvent);
                 if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
                 {
                     eventHandler = _partitionEventHandlers[partition.GetId()];
@@ -96,13 +95,13 @@ public class DeltaProtocolCommandReceiver : IDisposable
 
                 break;
             
-            case IPartitionCommand:
-                internalEvent = _forestMapper.Map(deltaCommand);
+            case IPartitionEvent:
+                internalEvent = _forestMapper.Map(deltaEvent);
                 eventHandler = _forestEventHandler;
                 break;
             
             default:
-                throw new InvalidOperationException(deltaCommand.ToString());
+                throw new InvalidOperationException(deltaEvent.ToString());
         }
 
         eventHandler.Raise(internalEvent);

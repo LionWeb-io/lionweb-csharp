@@ -38,6 +38,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{49B2FB80-3
 		docs\client-send-command.puml = docs\client-send-command.puml
 		docs\repository-receive-command.puml = docs\repository-receive-command.puml
 		docs\client-receive-event.puml = docs\client-receive-event.puml
+		docs\client-send-partition.puml = docs\client-send-partition.puml
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Generator", "src\LionWeb.Generator\LionWeb.Generator.csproj", "{D654BC85-5FF7-4186-BEF4-389472FB167D}"

@@ -78,14 +78,16 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     {
         RegisterSubscribedEvents<TSubscribedEvent>();
 
-        EventHandler<TEvent> writeHandler = (sender, args) =>
+        _handlers[handler] = WriteHandler;
+
+        Event += WriteHandler;
+        return;
+
+        void WriteHandler(object? sender, TEvent args)
         {
             if (args is TSubscribedEvent r)
                 handler.Invoke(sender, r);
-        };
-        _handlers[handler] = writeHandler;
-
-        Event += writeHandler;
+        }
     }
 
     private void RegisterSubscribedEvents<TSubscribedEvent>() where TSubscribedEvent : TEvent

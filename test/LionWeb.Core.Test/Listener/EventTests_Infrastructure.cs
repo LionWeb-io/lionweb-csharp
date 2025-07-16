@@ -95,8 +95,10 @@ public class EventTests_Infrastructure
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         var cloneReplicator = new PartitionEventReplicator(node, new());
-        
+        cloneReplicator.Init();
+  
         replicator.ReplicateFrom(cloneReplicator);
         cloneReplicator.ReplicateFrom(replicator);
 
@@ -124,8 +126,10 @@ public class EventTests_Infrastructure
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         var cloneReplicator = new PartitionEventReplicator(node, new());
-        
+        cloneReplicator.Init();
+     
         replicator.ReplicateFrom(cloneReplicator);
         cloneReplicator.ReplicateFrom(replicator);
 
