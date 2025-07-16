@@ -1,13 +1,17 @@
 @startuml
 hide footbox
 
-participant "ParentNode" as parentNode
-participant "ContainmentSingleEventEmitter" as emitter
-participant "PartitionEventHandler" as commander
-participant "PartitionEventReplicator" as replicator
-database "Shared\nNode\nMap" as sharedNodeMap
-participant "LionWebClient" as client
-participant "IClientConnector" as connector
+participant "Parent\nNode" as parentNode
+box internal events
+    participant "Containment\nSingle\nEvent\nEmitter" as emitter
+    participant "Partition\nEvent\nHandler" as commander
+end box
+box delta #lightblue
+    participant "Partition\nEvent\nReplicator" as replicator
+    database "Shared\nNode\nMap" as sharedNodeMap
+    participant "LionWeb\nClient" as client
+    participant "IClient\nConnector" as connector
+end box
 
 [-> parentNode++: SetContainment()
     parentNode -> emitter ++: RaiseEvent()
@@ -17,7 +21,7 @@ participant "IClientConnector" as connector
         emitter -> commander ++: Raise()
             commander -> commander ++: writeHandler
                 commander -> replicator ++: LocalHandler
-                    replicator -> replicator ++: OnLocalChildAdded()
+                    replicator -> replicator ++: OnLocal\n  ChildAdded()
                         replicator -> sharedNodeMap: RegisterNode()\nnewChild
                     return
                 return
@@ -25,9 +29,9 @@ participant "IClientConnector" as connector
                     replicator -> replicator ++: Filter()
                         replicator -> replicator: checkRegistered\nEventIds()\n<-- true
                     return
-                    replicator -> client ++: SendPartitionEventToRepository()
+                    replicator -> client ++: SendPartition\n  EventToRepository()
                         client -> client ++: Send()
-                            client -> client: StoreOwnCommandId()
+                            client -> client: StoreOwn\n  CommandId()
                             client ->> connector: Send()
                         return
                     return
@@ -39,15 +43,15 @@ return
 
 connector -> client ++: Receive(ChildAdded)
     client -> client ++: ReceiveEvent()
-        client -> client: CheckEventSequenceNumber() <-- true
+        client -> client: CheckEvent\n  SequenceNumber()\n  <-- true
         client -> client ++: ProcessEvent()
-            client -> client: IncrementEventSequenceNumber()
+            client -> client: IncrementEvent\n  SequenceNumber()
             client -> client ++: CheckOwnEvent()
-                client -> client: CompareParticipationId()
-                client -> client: CheckOwnCommandIds()
+                client -> client: Compare\n  ParticipationId()
+                client -> client: CheckOwn\n  CommandIds()
             return true
         return
-        client -> client: CheckUnprocessedEvents() <-- false
+        client -> client: CheckUnprocessed\n  Events()\n  <-- false
     return
 return
 
