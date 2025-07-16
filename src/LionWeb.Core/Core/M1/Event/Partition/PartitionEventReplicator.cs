@@ -300,12 +300,10 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             switch (existingChildren)
             {
                 case IList l:
-                    {
-                        var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                        children.Insert(index, substituteNode);
-                        children.RemoveAt(index + 1);
-                        return children;
-                    }
+                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                    children.Insert(index, substituteNode);
+                    children.RemoveAt(index + 1);
+                    return children;
                 case IWritableNode _ when index == 0:
                     return substituteNode;
                 default:
@@ -330,11 +328,9 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             switch (existingChildren)
             {
                 case IList l:
-                    {
-                        var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                        children.Insert(index, nodeToInsert);
-                        return children;
-                    }
+                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                    children.Insert(index, nodeToInsert);
+                    return children;
                 case IWritableNode _:
                     return nodeToInsert;
                 default:
