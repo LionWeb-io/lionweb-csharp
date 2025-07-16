@@ -1,32 +1,38 @@
 @startuml
 hide footbox
 
-participant "IClientConnector" as connector
-participant "LionWebClient" as client
-participant "DeltaProtocolPartitionEventReceiver" as receiver
-participant "PartitionEventHandler" as eventHandler
-participant "PartitionEventReplicator" as replicator
-participant "Partition\nEvent\nHandler\n-- local\nCommander" as localCommander
-participant "ParentNode" as localParent
-participant "ContainmentSingleEventEmitter" as emitter
-database "Shared\nNode\nMap" as sharedNodeMap
+box delta #lightblue
+    participant "IClient\nConnector" as connector
+    participant "LionWeb\nClient" as client
+    participant "Delta\nProtocol\nPartition\nEvent\nReceiver" as receiver
+    participant "Partition\nEvent\nHandler" as eventHandler
+    database "Shared\nNode\nMap" as sharedNodeMap
+    participant "Partition\nEvent\nReplicator" as replicator
+end box
 
-connector -> client ++: Receive(ChildAdded)
+participant "Parent\nNode" as localParent
+
+box internal events
+    participant "Partition\nEvent\nHandler\n-- local\nCommander" as localCommander
+    participant "Containment\nSingle\nEvent\nEmitter" as emitter
+end box
+
+connector -> client ++: Receive\n  (ChildAdded)
     client -> client ++: ReceiveEvent()
-        client -> client: CheckEventSequenceNumber() <-- true
+        client -> client: CheckEvent\n  SequenceNumber()\n   <-- true
         client -> client ++: ProcessEvent()
-            client -> client: IncrementEventSequenceNumber()
+            client -> client: IncrementEvent\n  SequenceNumber()
             client -> client ++: CheckOwnEvent()
                 client -> client: CompareParticipationId()
                 client -> client: CheckOwnCommandIds()
             return false
             client -> client ++: lock
-                client -> receiver ++: Receive(ChildAdded)
-                    receiver -> eventHandler ++: Raise(ChildAddedEvent)
+                client -> receiver ++: Receive\n  (ChildAdded)
+                    receiver -> eventHandler ++: Raise\n  (ChildAddedEvent)
                         eventHandler -> eventHandler ++: writeHandler
                             eventHandler -> replicator ++: ProcessEvent()
-                                replicator -> replicator ++: OnRemoteChildAdded()
-                                    replicator -> replicator ++: SuppressEventForwarding()
+                                replicator -> replicator ++: OnRemote\n  ChildAdded()
+                                    replicator -> replicator ++ #green: Suppress\n  EventForwarding()
                                         replicator -> localCommander ++: CreateEventId()
                                             localCommander -> localCommander: create new
                                         return
@@ -40,7 +46,7 @@ connector -> client ++: Receive(ChildAdded)
                                                 emitter -> localCommander ++: Raise\n  (ChildAddedEvent)
                                                     localCommander -> localCommander ++: writeHandler
                                                         localCommander -> replicator ++: LocalHandler()
-                                                            replicator -> replicator ++: OnLocalChildAdded()
+                                                            replicator -> replicator ++: OnLocal\n  ChildAdded()
                                                                 replicator -> sharedNodeMap: RegisterNode\n  (newChild)
                                                                 ' receiver: OnPartitionAdded()
                                                             return
@@ -63,7 +69,7 @@ connector -> client ++: Receive(ChildAdded)
                 return
             return
         return
-        client -> client: CheckUnprocessedEvents() <-- false
+        client -> client: Check\n  UnprocessedEvents()\n  <-- false
     return
 return
 
