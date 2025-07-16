@@ -295,8 +295,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     private static object ReplaceContainment(INode localParent, Containment containment, Index index, INode substituteNode)
     {
-        object newValue;
-
         if (localParent.TryGet(containment, out var existingChildren))
         {
             switch (existingChildren)
@@ -306,30 +304,25 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                         var children = new List<IWritableNode>(l.Cast<IWritableNode>());
                         children.Insert(index, substituteNode);
                         children.RemoveAt(index + 1);
-                        newValue = children;
-                        break;
+                        return children;
                     }
                 case IWritableNode _ when index == 0:
-                    newValue = substituteNode;
-                    break;
+                    return substituteNode;
                 default:
                     throw new InvalidValueException(containment, existingChildren);
             }
-        } else if (containment.Multiple)
-        {
-            newValue = new List<IWritableNode> { substituteNode };
-        } else
-        {
-            newValue = substituteNode;
         }
 
-        return newValue;
+        if (containment.Multiple)
+        {
+            return new List<IWritableNode> { substituteNode };
+        }
+
+        return substituteNode;
     }
 
     private static object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)
     {
-        object newValue;
-
         if (localParent.CollectAllSetFeatures().Contains(containment))
         {
             var existingChildren = localParent.Get(containment);
@@ -339,25 +332,21 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                     {
                         var children = new List<IWritableNode>(l.Cast<IWritableNode>());
                         children.Insert(index, nodeToInsert);
-                        newValue = children;
-                        break;
+                        return children;
                     }
                 case IWritableNode _:
-                    newValue = nodeToInsert;
-                    break;
+                    return nodeToInsert;
                 default:
                     throw new InvalidValueException(containment, existingChildren);
             }
         }
-        else if (containment.Multiple)
+
+        if (containment.Multiple)
         {
-            newValue = new List<IWritableNode> { nodeToInsert };
-        } else
-        {
-            newValue = nodeToInsert;
+            return new List<IWritableNode> { nodeToInsert };
         }
 
-        return newValue;
+        return nodeToInsert;
     }
 
     #endregion
