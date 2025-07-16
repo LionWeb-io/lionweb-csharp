@@ -40,6 +40,7 @@ public class ClientTests
     private readonly LionWebTestRepository _repository;
 
     private readonly DeltaClientConnector _clientConnector;
+    private readonly IForest _clientForest;
     private readonly Geometry _clientPartition;
     private readonly LionWebTestClient _client;
     private readonly IClientInfo _clientInfo;
@@ -60,11 +61,14 @@ public class ClientTests
         _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryForest,
             _repositoryConnector);
 
-        _repositoryForest.AddPartitions([_repositoryPartition]);
+        // _repositoryForest.AddPartitions([_repositoryPartition]);
 
+        _clientForest = new Forest();
         _clientPartition = Clone(_repositoryPartition);
-        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientPartition, _clientConnector);
+        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector);
         _client.ParticipationId = _clientInfo.ParticipationId;
+        
+        _clientForest.AddPartitions([_clientPartition]);
     }
 
     [TestMethod]

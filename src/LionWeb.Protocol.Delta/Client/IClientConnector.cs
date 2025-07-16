@@ -17,7 +17,7 @@
 
 namespace LionWeb.Protocol.Delta.Client;
 
-using LionWeb.Core.M1.Event;
+using Core.M1.Event;
 
 public interface IClientConnector<T> 
 {

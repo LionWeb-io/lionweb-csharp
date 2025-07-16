@@ -722,6 +722,7 @@ public class EventsTest : EventTestsBase
         var clone = Clone(node);
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
         return clone;

@@ -40,6 +40,7 @@ public class EventTests_MultiPartition
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> deletions = [];
@@ -67,6 +68,7 @@ public class EventTests_MultiPartition
         var clone = new Geometry("a") { Shapes = [] };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> originMoves = [];
@@ -96,6 +98,7 @@ public class EventTests_MultiPartition
         var clone = new Geometry("a") { Shapes = [] };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> originMoves = [];
@@ -122,6 +125,7 @@ public class EventTests_MultiPartition
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> deletions = [];
@@ -148,6 +152,7 @@ public class EventTests_MultiPartition
         var clone = new Geometry("a") { };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> originMoves = [];
@@ -186,6 +191,7 @@ public class EventTests_MultiPartition
         var clone = new Geometry("a") { Shapes = [cloneOrigin] };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> deletions = [];
@@ -215,6 +221,7 @@ public class EventTests_MultiPartition
         var clone = new Geometry("a") { };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> originMoves = [];
@@ -246,6 +253,7 @@ public class EventTests_MultiPartition
         var clone = new Geometry("a") { };
 
         var replicator = new PartitionEventReplicator(clone, new());
+        replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
         List<(EventId, IReadableNode)> originMoves = [];
