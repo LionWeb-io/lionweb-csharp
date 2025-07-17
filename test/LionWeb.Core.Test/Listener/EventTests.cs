@@ -237,6 +237,41 @@ public abstract class EventTestsBase
 
         AssertEquals([node], [clone]);
     }
+    
+    /// <summary>
+    /// This test triggers two events: ChildDeletedEvent, ChildAddedEvent
+    /// but it should trigger ChildReplacedEvent //TODO: requires fix !
+    /// </summary>
+    [TestMethod]
+    public void ChildReplaced_Multiple_First()
+    {
+        var node = new Geometry("a") { Shapes = [new Circle("replaced"), new Circle("child")]};
+
+        var clone = CreateReplicator(node);
+
+        var substituteNode = new Line("substituteNode");
+        node.Shapes[0].ReplaceWith(substituteNode);
+
+        AssertEquals([node], [clone]);
+    }
+
+    /// <summary>
+    /// This test triggers two events: ChildDeletedEvent, ChildAddedEvent
+    /// but it should trigger ChildReplacedEvent //TODO: requires fix !
+    /// </summary>
+    [TestMethod]
+    public void ChildReplaced_Multiple_Last()
+    {
+        var node = new Geometry("a") { Shapes = [new Circle("child"), new Circle("replaced")]};
+
+        var clone = CreateReplicator(node);
+
+        var substituteNode = new Line("substituteNode");
+        node.Shapes[^1].ReplaceWith(substituteNode);
+
+        AssertEquals([node], [clone]);
+    }
+
 
     #endregion
 
