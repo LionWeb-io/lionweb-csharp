@@ -15,97 +15,15 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-// ReSharper disable CoVariantArrayConversion
-
 namespace LionWeb.Protocol.Delta.Message.Command;
 
 using Core.Serialization;
-using System.Text;
-using System.Text.Json.Serialization;
 
-public interface IDeltaCommand : IDeltaContent
-{
-    CommandId? CommandId { get; }
-}
-
-public abstract record DeltaCommandBase(
-    CommandId? CommandId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaContentBase(ProtocolMessages), IDeltaCommand
-{
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override string Id => CommandId;
-
-    /// <inheritdoc />
-    public virtual bool Equals(DeltaCommandBase? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return base.Equals(other) &&
-               string.Equals(CommandId, other.CommandId, StringComparison.InvariantCulture);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        var hashCode = new HashCode();
-        hashCode.Add(base.GetHashCode());
-        hashCode.Add(CommandId, StringComparer.InvariantCulture);
-        return hashCode.ToHashCode();
-    }
-
-    /// <inheritdoc />
-    protected override bool PrintMembers(StringBuilder builder)
-    {
-        base.PrintMembers(builder);
-        builder.Append(", ");
-
-        builder.Append(nameof(CommandId));
-        builder.Append(" = ");
-        builder.Append(CommandId);
-
-        return true;
-    }
-}
-
-public record CommandResponse(CommandId CommandId, ProtocolMessage[]? ProtocolMessages)
-    : DeltaContentBase(ProtocolMessages)
-{
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override string Id => CommandId;
-}
-
-#region Partitions
-
-public interface IPartitionCommand : IDeltaCommand;
-
-public record AddPartition(
-    DeltaSerializationChunk NewPartition,
-    CommandId CommandId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages), IPartitionCommand;
-
-public record DeletePartition(
-    TargetNode DeletedPartition,
-    CommandId CommandId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages), IPartitionCommand;
-
-#endregion
+public interface IPartitionDeltaCommand : IDeltaCommand;
 
 #region Nodes
 
-public interface INodeCommand : IDeltaCommand;
+public interface INodeCommand : IPartitionDeltaCommand;
 
 public record ChangeClassifier(
     TargetNode Node,
@@ -116,7 +34,7 @@ public record ChangeClassifier(
 
 #endregion
 
-public interface IFeatureCommand : IDeltaCommand;
+public interface IFeatureCommand : IPartitionDeltaCommand;
 
 #region Properties
 
@@ -239,7 +157,7 @@ public record MoveAndReplaceChildInSameContainment(
 
 #region Annotations
 
-public interface IAnnotationCommand : IDeltaCommand;
+public interface IAnnotationCommand : IPartitionDeltaCommand;
 
 public record AddAnnotation(
     TargetNode Parent,
@@ -478,48 +396,3 @@ public record ChangeReferenceTarget(
 
 #endregion
 
-public record CompositeCommand(
-    IDeltaCommand[] Parts,
-    CommandId CommandId,
-    ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages)
-{
-    /// <inheritdoc />
-    public virtual bool Equals(CompositeCommand? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return base.Equals(other) &&
-               Parts.ArrayEquals(other.Parts);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        var hashCode = new HashCode();
-        hashCode.Add(base.GetHashCode());
-        hashCode.ArrayHashCode(Parts);
-
-        return hashCode.ToHashCode();
-    }
-
-    /// <inheritdoc />
-    protected override bool PrintMembers(StringBuilder builder)
-    {
-        base.PrintMembers(builder);
-        builder.Append(", ");
-        builder.Append(nameof(Parts));
-        builder.Append(" = ");
-        builder.ArrayPrintMembers(Parts);
-
-        return true;
-    }
-}
