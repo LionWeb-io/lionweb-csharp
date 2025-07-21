@@ -69,15 +69,14 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 break;
         }
 
-        await _connector.SendAll(deltaContent);
+        await _connector.SendToAllClients(deltaContent);
     }
 
     /// <inheritdoc />
     protected override async Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
     {
-        Debug.WriteLine($"{_name}: sending to {clientInfo}: {deltaContent.GetType()}");
-        await _connector.Send(clientInfo, deltaContent);
         Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
+        await _connector.SendToClient(clientInfo, deltaContent);
     }
 
     /// <inheritdoc />

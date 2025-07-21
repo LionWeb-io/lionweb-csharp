@@ -48,8 +48,8 @@ public class ClientTests
         _repositoryConnector = new DeltaRepositoryConnector(lionWebVersion);
         _clientInfo = new ClientInfo { ParticipationId = "clientParticipation" };
         _clientConnector = new(lionWebVersion,
-            content => _repositoryConnector.ReceiveFromClient(new DeltaMessageContext(_clientInfo, content)));
-        _repositoryConnector.Sender = content => _clientConnector.ReceiveFromRepository(content);
+            content => _repositoryConnector.ReceiveMessageFromClient(new DeltaMessageContext(_clientInfo, content)));
+        _repositoryConnector.Sender = content => _clientConnector.ReceiveMessageFromRepository(content);
 
         _repositoryPartition = new Geometry("partition");
         _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryPartition,
@@ -109,9 +109,9 @@ public class ClientTests
     [TestMethod]
     public void InOrderEvents()
     {
-        _repositoryConnector.SendAll(ChildAdded(0));
-        _repositoryConnector.SendAll(PropertyAdded(1));
-        _repositoryConnector.SendAll(PropertyChanged(2));
+        _repositoryConnector.SendToAllClients(ChildAdded(0));
+        _repositoryConnector.SendToAllClients(PropertyAdded(1));
+        _repositoryConnector.SendToAllClients(PropertyChanged(2));
 
         AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
             _clientPartition);
@@ -120,9 +120,9 @@ public class ClientTests
     [TestMethod]
     public void OutOfOrderEvents()
     {
-        _repositoryConnector.SendAll(PropertyAdded(1));
-        _repositoryConnector.SendAll(PropertyChanged(2));
-        _repositoryConnector.SendAll(ChildAdded(0));
+        _repositoryConnector.SendToAllClients(PropertyAdded(1));
+        _repositoryConnector.SendToAllClients(PropertyChanged(2));
+        _repositoryConnector.SendToAllClients(ChildAdded(0));
 
         AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
             _clientPartition);
@@ -191,20 +191,20 @@ internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 
     public Action<IDeltaContent> Sender { get; set; }
 
-    public Task Send(IClientInfo clientInfo, IDeltaContent content)
+    public Task SendToClient(IClientInfo clientInfo, IDeltaContent content)
     {
         Sender?.Invoke(content);
         return Task.CompletedTask;
     }
 
-    public Task SendAll(IDeltaContent content)
+    public Task SendToAllClients(IDeltaContent content)
     {
         Sender?.Invoke(content);
         return Task.CompletedTask;
     }
 
-    public event EventHandler<IMessageContext<IDeltaContent>>? Receive;
-    public void ReceiveFromClient(IDeltaMessageContext context) => Receive?.Invoke(null, context);
+    public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
+    public void ReceiveMessageFromClient(IDeltaMessageContext context) => ReceiveFromClient?.Invoke(null, context);
     public IDeltaContent Convert(IEvent internalEvent) => _mapper.Map(internalEvent);
 }
 
@@ -220,14 +220,14 @@ internal class DeltaClientConnector : IDeltaClientConnector
             new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion));
     }
 
-    public Task Send(IDeltaContent content)
+    public Task SendToRepository(IDeltaContent content)
     {
         _sender(content);
         return Task.CompletedTask;
     }
 
-    public event EventHandler<IDeltaContent>? Receive;
+    public event EventHandler<IDeltaContent>? ReceiveFromRepository;
 
-    public void ReceiveFromRepository(IDeltaContent context) => Receive?.Invoke(null, context);
+    public void ReceiveMessageFromRepository(IDeltaContent context) => ReceiveFromRepository?.Invoke(null, context);
     public IDeltaContent Convert(IEvent internalEvent) => _mapper.Map(internalEvent);
 }
