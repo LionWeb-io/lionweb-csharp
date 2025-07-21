@@ -73,14 +73,24 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     }
 
     /// <inheritdoc />
-    public void RegisterEventId(IEventId eventId)
-        => _eventIds.Enqueue(eventId);
+    public void RegisterEventId(IEventId eventId) // => _eventIds.Value!.Enqueue(eventId);
+    {
+        Console.WriteLine($"registering {eventId}");
+    _eventIds.Enqueue(eventId);
+    }
 
     /// <inheritdoc />
-    public virtual IEventId CreateEventId() =>
-        TryRegisteredEventId(out var registeredEventId)
-            ? registeredEventId
-            : new NumericEventId(_eventIdBase, _nextId++);
+    public virtual IEventId CreateEventId()
+    {
+        if (TryRegisteredEventId(out var registeredEventId))
+        {
+            Console.WriteLine($"found registered {registeredEventId}");
+            return registeredEventId;
+        } else
+        {
+            return new NumericEventId(_eventIdBase, _nextId++);
+        }
+    }
 
     protected internal bool TryRegisteredEventId([NotNullWhen(true)] out IEventId? eventId) =>
         _eventIds.TryDequeue(out eventId);
@@ -156,4 +166,30 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
 }
 
 /// Internal event id based on a string and an increasing number.
-public record NumericEventId(string Base, int Id) : IEventId;
+public record NumericEventId(string Base, int Id) : IEventId
+{
+    /// <inheritdoc />
+    public virtual bool Equals(NumericEventId? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return string.Equals(Base, other.Base, StringComparison.InvariantCulture) && Id == other.Id;
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(Base, StringComparer.InvariantCulture);
+        hashCode.Add(Id);
+        return hashCode.ToHashCode();
+    }
+}
