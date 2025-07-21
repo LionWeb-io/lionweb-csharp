@@ -30,9 +30,9 @@ public interface ILionWebClient
     private const string _bold = "\x1b[1m";
     private const string _unbold = "\x1b[22m";
     private const string _defaultColor = "\x1b[39m";
-    
+
     public const string HeaderColor_Start = _magenta + _bold;
-    public const string HeaderColor_End =  _unbold + _defaultColor;
+    public const string HeaderColor_End = _unbold + _defaultColor;
 }
 
 public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
@@ -90,7 +90,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     private void OnPartitionAdded(object? _, IPartitionInstance partition)
     {
-        var handler = new PartitionEventHandler(_name);
+        var handler = new PartitionEventHandler(_name) { ContainingForestEventHandler = ForestEventHandler };
         var replicator = new PartitionEventReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(handler);
         replicator.Subscribe<IPartitionEvent>(SendEventToRepository);

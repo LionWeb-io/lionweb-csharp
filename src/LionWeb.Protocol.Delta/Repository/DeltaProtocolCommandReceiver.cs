@@ -66,7 +66,10 @@ public class DeltaProtocolCommandReceiver : IDisposable
 
     private void OnPartitionAdded(object? _, IPartitionInstance partition)
     {
-        var partitionEventHandler = new PartitionEventHandler(this);
+        var partitionEventHandler = new PartitionEventHandler(this)
+        {
+            ContainingForestEventHandler = _forestEventHandler
+        };
         var replicator = _forestEventReplicator.LookupPartition(partition);
         if (_partitionEventHandlers.TryAdd(partition.GetId(), partitionEventHandler))
         {

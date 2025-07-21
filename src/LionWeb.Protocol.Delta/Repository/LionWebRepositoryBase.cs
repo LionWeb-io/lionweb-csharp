@@ -47,9 +47,6 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     private long nextFreeNodeId = 0;
 
-    protected long _messageCount;
-    public long MessageCount => Interlocked.Read(ref _messageCount);
-
     public LionWebRepositoryBase(LionWebVersions lionWebVersion, List<Language> languages, string name,
         IForest forest, IRepositoryConnector<T> connector)
     {
@@ -80,7 +77,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     private void OnPartitionAdded(object? _, IPartitionInstance partition)
     {
-        var handler = new PartitionEventHandler(_name);
+        var handler = new PartitionEventHandler(_name) { ContainingForestEventHandler = ForestEventHandler };
         var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(handler);
         replicator.Subscribe<IPartitionEvent>(SendEventToAllClients);
