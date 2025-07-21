@@ -21,10 +21,21 @@ using Core;
 using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
+using Core.M1.Event.Partition;
 using Core.M3;
-using System.Diagnostics;
 
-public abstract class LionWebClientBase<T> : IDisposable
+public interface ILionWebClient
+{
+    private const string _magenta = "\x1b[95m";
+    private const string _bold = "\x1b[1m";
+    private const string _unbold = "\x1b[22m";
+    private const string _defaultColor = "\x1b[39m";
+    
+    public const string HeaderColor_Start = _magenta + _bold;
+    public const string HeaderColor_End =  _unbold + _defaultColor;
+}
+
+public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 {
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly string _name;
@@ -97,7 +108,15 @@ public abstract class LionWebClientBase<T> : IDisposable
         var converted = _connector.Convert(internalEvent);
 
         Send(converted);
-        Debug.WriteLine("Sent to repository");
+        Log("Sent to repository");
+    }
+
+    protected virtual void Log(string message, bool header = false)
+    {
+        var prependedMessage = $"{_name}: {message}";
+        Console.WriteLine(header
+            ? $"{ILionWebClient.HeaderColor_Start}{prependedMessage}{ILionWebClient.HeaderColor_End}"
+            : prependedMessage);
     }
 
     protected abstract Task Send(T deltaContent);
