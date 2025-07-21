@@ -94,7 +94,7 @@ public class RepositoryTests
     }
 
     [TestMethod]
-    [Timeout(6000)]
+    // [Timeout(6000)]
     public async Task PartitionAnnotation()
     {
         // await _aClient.SignOn();

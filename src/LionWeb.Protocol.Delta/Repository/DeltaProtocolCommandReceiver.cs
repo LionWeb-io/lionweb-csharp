@@ -52,16 +52,24 @@ public class DeltaProtocolCommandReceiver : IDisposable
             OnPartitionAdded(null, partition);
         }
         
-        sharedNodeMap.OnPartitionAdded += OnPartitionAdded;
-        sharedNodeMap.OnPartitionRemoved += OnPartitionRemoved;
+        _forestEventHandler.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
+        _forestEventReplicator.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
+        
+        // sharedNodeMap.OnPartitionAdded += OnPartitionAdded;
+        // sharedNodeMap.OnPartitionRemoved += OnPartitionRemoved;
+    }
+
+    private void OnPartitionAdded(object? sender, PartitionAddedEvent e)
+    {
+        OnPartitionAdded(sender, e.NewPartition);
     }
 
     /// <inheritdoc />
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        _sharedNodeMap.OnPartitionAdded -= OnPartitionAdded;
-        _sharedNodeMap.OnPartitionRemoved -= OnPartitionRemoved;
+        // _sharedNodeMap.OnPartitionAdded -= OnPartitionAdded;
+        // _sharedNodeMap.OnPartitionRemoved -= OnPartitionRemoved;
     }
 
     private void OnPartitionAdded(object? _, IPartitionInstance partition)

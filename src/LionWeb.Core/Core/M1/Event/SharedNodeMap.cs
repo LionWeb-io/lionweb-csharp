@@ -87,8 +87,8 @@ public class PartitionSharedNodeMap : SharedNodeMap
 {
     private readonly Dictionary<NodeId, IPartitionInstance> _owningPartition = [];
 
-    public event EventHandler<IPartitionInstance>? OnPartitionAdded;
-    public event EventHandler<IPartitionInstance>? OnPartitionRemoved;
+    // public event EventHandler<IPartitionInstance>? OnPartitionAdded;
+    // public event EventHandler<IPartitionInstance>? OnPartitionRemoved;
 
     public PartitionSharedNodeMap()
     {
@@ -111,13 +111,15 @@ public class PartitionSharedNodeMap : SharedNodeMap
             return;
 
         _owningPartition[node.GetId()] = partition;
-        OnPartitionAdded?.Invoke(this, partition);
+        // if(!_owningPartition.ContainsValue(partition))
+        //     OnPartitionAdded?.Invoke(this, partition);
     }
 
     private void OnNodeRemoved(object? _, IReadableNode node)
     {
-        if (_owningPartition.Remove(node.GetId(), out var removed))
-            OnPartitionRemoved?.Invoke(this, removed);
+        _owningPartition.Remove(node.GetId());
+        // if (_owningPartition.Remove(node.GetId(), out var removed))
+        // OnPartitionRemoved?.Invoke(this, removed);
     }
 
     public bool TryGetPartition(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition)
