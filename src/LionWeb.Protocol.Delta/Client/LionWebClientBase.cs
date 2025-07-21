@@ -73,6 +73,8 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
         _replicator.Subscribe<IForestEvent>(SendEventToRepository);
 
+        SharedNodeMap.OnPartitionAdded += OnPartitionAdded;
+
         _connector.ReceiveFromRepository += OnReceiveFromRepository;
     }
 
@@ -80,9 +82,18 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
+        SharedNodeMap.OnPartitionAdded -= OnPartitionAdded;
         _connector.ReceiveFromRepository -= OnReceiveFromRepository;
         _replicator.Dispose();
         SharedNodeMap.Dispose();
+    }
+
+    private void OnPartitionAdded(object? _, IPartitionInstance partition)
+    {
+        var handler = new PartitionEventHandler(_name);
+        var replicator = new PartitionEventReplicator(partition, SharedNodeMap);
+        replicator.ReplicateFrom(handler);
+        replicator.Subscribe<IPartitionEvent>(SendEventToRepository);
     }
 
     private void OnReceiveFromRepository(object? _, T content) =>
