@@ -22,6 +22,7 @@ using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M3;
+using System.Diagnostics;
 
 public abstract class LionWebClientBase<T> : IDisposable
 {
@@ -96,6 +97,7 @@ public abstract class LionWebClientBase<T> : IDisposable
         var converted = _connector.Convert(internalEvent);
 
         Send(converted);
+        Debug.WriteLine("Sent to repository");
     }
 
     protected abstract Task Send(T deltaContent);

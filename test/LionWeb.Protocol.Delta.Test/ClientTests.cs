@@ -76,6 +76,8 @@ public class ClientTests
     {
         _clientPartition.Documentation = new Documentation("doc");
 
+        _repository.WaitForReceived(2);
+
         AssertEquals(_clientPartition, _repositoryPartition);
     }
 

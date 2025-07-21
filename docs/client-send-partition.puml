@@ -17,7 +17,7 @@ box delta #lightblue
     participant "IClient\nConnector" as connector
 end box
 
-[-> part **: SetContainment()
+[-> part **: new()
 [-> forest ++: AddPartitions(Partition)
     forest -> forestEventHandler ++: Raise(PartitionAddedEvent)
         forestEventHandler -> forestEventHandler ++: writeHandler
@@ -41,17 +41,17 @@ end box
                             return
                             partitionReplicator -> partitionPublisher: Subscribe()
                         return
-                        replicator -> replicator: StorePartitionInLocalPartitions()
+'                        replicator -> replicator: StorePartitionInLocalPartitions()
                     return
                 return
-                replicator -> replicator ++: forwardingHandler
-                    replicator -> replicator: check if eventIds contain event\n<-- false
-                    replicator -> client ++: SendEventToRepository()
-                        client -> client ++: Send()
-                            client -> client: RegisterCommand()
-                            client ->> connector: Send()
-                        return 
-                    return
+            return
+            replicator -> replicator ++: forwardingHandler
+                replicator -> replicator: check if eventIds contain event\n<-- true
+                replicator -> client ++: SendEventToRepository()
+                    client -> client ++: Send()
+                        client -> client: RegisterCommand()
+                        client ->> connector: Send()
+                    return 
                 return
             return
         return
