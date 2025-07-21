@@ -31,10 +31,9 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         base(localForest.GetPublisher(), localForest.GetCommander(), sharedNodeMap)
     {
         _localForest = localForest;
-        Init();
     }
 
-    private void Init()
+    public void Init()
     {
         foreach (var partition in _localForest.Partitions)
         {
@@ -103,7 +102,6 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         if (!_localPartitions.TryAdd(partition.GetId(), replicator))
             throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
         replicator.Init();
-        // SharedNodeMap.RegisterNode(partition);
     }
 
     protected virtual PartitionEventReplicator CreatePartitionEventReplicator(IPartitionInstance partition) =>

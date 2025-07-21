@@ -69,6 +69,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         SharedNodeMap = new();
         ForestEventHandler = new ForestEventHandler(name);
         _replicator = new ForestEventReplicator(forest, SharedNodeMap);
+        _replicator.Init();
         _replicator.ReplicateFrom(ForestEventHandler);
 
         _replicator.Subscribe<IForestEvent>(SendEventToRepository);

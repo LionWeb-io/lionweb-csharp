@@ -56,6 +56,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         SharedNodeMap = new();
         ForestEventHandler = new ForestEventHandler(name);
         _replicator = new RewriteForestEventReplicator(forest, SharedNodeMap);
+        _replicator.Init();
         _replicator.ReplicateFrom(ForestEventHandler);
 
         _replicator.Subscribe<IForestEvent>(SendEventToAllClients);
