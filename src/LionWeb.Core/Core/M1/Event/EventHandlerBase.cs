@@ -19,6 +19,7 @@ namespace LionWeb.Core.M1.Event;
 
 using Forest;
 using Partition;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Utilities;
 
@@ -54,7 +55,6 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     private readonly Dictionary<Type, int> _subscribedEvents = [];
     private readonly Dictionary<object, EventHandler<TEvent>> _handlers = [];
 
-    // private readonly AsyncLocal<Queue<string>> _eventIds = new(x => new Queue<string>()) { Value = new() };
     private readonly Queue<IEventId> _eventIds = new();
 
     private event EventHandler<TEvent>? Event;
@@ -74,16 +74,16 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
 
     /// <inheritdoc />
     public void RegisterEventId(IEventId eventId)
-        // => _eventIds.Value!.Enqueue(eventId);
         => _eventIds.Enqueue(eventId);
 
     /// <inheritdoc />
     public virtual IEventId CreateEventId() =>
-        // _eventIds.Value!
-        _eventIds
-            .TryDequeue(out var registeredEventId)
+        TryRegisteredEventId(out var registeredEventId)
             ? registeredEventId
             : new NumericEventId(_eventIdBase, _nextId++);
+
+    protected internal bool TryRegisteredEventId([NotNullWhen(true)] out IEventId? eventId) =>
+        _eventIds.TryDequeue(out eventId);
 
     /// <inheritdoc />
     public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)

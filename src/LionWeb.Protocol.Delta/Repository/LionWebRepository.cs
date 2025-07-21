@@ -98,7 +98,6 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             Log(
                 $"received {content.GetType().Name} for {messageContext.ClientInfo.ParticipationId}", true);
             Log(content.ToString());
-            Interlocked.Increment(ref _messageCount);
 
             switch (content)
             {
@@ -142,21 +141,34 @@ public class LionWebTestRepository(
     IRepositoryConnector<IDeltaContent> connector)
     : LionWebRepository(lionWebVersion, languages, name, forest, connector)
 {
-    public int WaitCount { get; private set; }
+    private const int _sleepInterval = 100;
+    
+    private long _messageCount;
+    private long MessageCount => Interlocked.Read(ref _messageCount);
+    private void IncrementMessageCount() => Interlocked.Increment(ref _messageCount);
+    private long WaitCount { get; set; }
 
-    private const int SleepInterval = 100;
 
-    private void WaitForCount(int count)
+    private void WaitForCount(long count)
     {
         while (MessageCount < count)
         {
             Log($"{nameof(MessageCount)}: {MessageCount} vs. {nameof(count)}: {count}");
-            Thread.Sleep(SleepInterval);
+            Thread.Sleep(_sleepInterval);
         }
     }
 
+    /// Wait until <paramref name="delta"/> <i>more</i> messages than at the last call have been received.
+    /// Counts any kind of <see cref="IDeltaContent">delta message</see>.
     public void WaitForReceived(int delta) =>
         WaitForCount(WaitCount += delta);
+
+    /// <inheritdoc />
+    protected override Task Receive(IMessageContext<IDeltaContent> messageContext)
+    {
+        IncrementMessageCount();
+        return base.Receive(messageContext);
+    }
 }
 
 public class ExceptionParticipationIdProvider : IParticipationIdProvider
