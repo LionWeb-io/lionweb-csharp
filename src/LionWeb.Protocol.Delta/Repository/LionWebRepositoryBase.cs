@@ -61,19 +61,19 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
         _replicator.Subscribe<IForestEvent>(SendEventToAllClients);
 
-        _connector.Receive += OnReceive;
+        _connector.ReceiveFromClient += OnReceiveFromClient;
     }
 
     /// <inheritdoc />
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
-        _connector.Receive -= OnReceive;
+        _connector.ReceiveFromClient -= OnReceiveFromClient;
         _replicator.Dispose();
         SharedNodeMap.Dispose();
     }
 
-    private void OnReceive(object? _, IMessageContext<T> content) =>
+    private void OnReceiveFromClient(object? _, IMessageContext<T> content) =>
         Receive(content);
 
     private void SendEventToAllClients(object? sender, IEvent? internalEvent)
