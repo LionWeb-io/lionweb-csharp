@@ -18,14 +18,28 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
-using Core.M1.Event.Partition;
+using Core.M1;
+using Core.M1.Event;
+using Core.M1.Event.Forest;
 using Core.M3;
+using Forest;
+
+public interface ILionWebRepository
+{
+    private const string _cyan = "\x1b[96m";
+    private const string _bold = "\x1b[1m";
+    private const string _unbold = "\x1b[22m";
+    private const string _defaultColor = "\x1b[39m";
+    
+    public const string HeaderColor_Start = _cyan + _bold;
+    public const string HeaderColor_End =  _unbold + _defaultColor;
+}
 
 public abstract class LionWebRepositoryBase<T>
 {
     protected readonly string _name;
     protected readonly IRepositoryConnector<T> _connector;
-    protected readonly Dictionary<string, IReadableNode> SharedNodeMap;
+    protected readonly SharedNodeMap SharedNodeMap;
     protected readonly PartitionEventHandler PartitionEventHandler;
 
     private long nextFreeNodeId = 0;
@@ -39,7 +53,7 @@ public abstract class LionWebRepositoryBase<T>
         _name = name;
         _connector = connector;
 
-        SharedNodeMap = [];
+        SharedNodeMap = new();
         PartitionEventHandler = new PartitionEventHandler(name);
         var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(PartitionEventHandler);
@@ -70,6 +84,14 @@ public abstract class LionWebRepositoryBase<T>
                 yield return nextId;
             }
         }
+    }
+
+    protected virtual void Log(string message, bool header = false)
+    {
+        var prependedMessage = $"{_name}: {message}";
+        Console.WriteLine(header
+            ? $"{ILionWebRepository.HeaderColor_Start}{prependedMessage}{ILionWebRepository.HeaderColor_End}"
+            : prependedMessage);
     }
 
     protected abstract Task Send(IClientInfo clientInfo, T deltaContent);
