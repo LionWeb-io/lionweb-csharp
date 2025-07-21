@@ -73,19 +73,19 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
         _replicator.Subscribe<IForestEvent>(SendEventToRepository);
 
-        _connector.Receive += OnReceive;
+        _connector.ReceiveFromRepository += OnReceiveFromRepository;
     }
 
     /// <inheritdoc />
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
-        _connector.Receive -= OnReceive;
+        _connector.ReceiveFromRepository -= OnReceiveFromRepository;
         _replicator.Dispose();
         SharedNodeMap.Dispose();
     }
 
-    private void OnReceive(object? _, T content) =>
+    private void OnReceiveFromRepository(object? _, T content) =>
         Receive(content);
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>

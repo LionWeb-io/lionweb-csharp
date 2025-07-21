@@ -21,9 +21,9 @@ using Core.M1.Event;
 
 public interface IRepositoryConnector<T>
 {
-    Task Send(IClientInfo clientInfo, T content);
-    Task SendAll(T content);
-    event EventHandler<IMessageContext<T>> Receive;
+    Task SendToClient(IClientInfo clientInfo, T content);
+    Task SendToAllClients(T content);
+    event EventHandler<IMessageContext<T>> ReceiveFromClient;
     T Convert(IEvent internalEvent);
 }
 
