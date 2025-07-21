@@ -69,14 +69,15 @@ public class ClientTests
         _client.ParticipationId = _clientInfo.ParticipationId;
         
         _clientForest.AddPartitions([_clientPartition]);
+        _repository.WaitForReceived(1);
     }
 
-    [TestMethod]
+    [TestMethod, Timeout(6000)]
     public void ConnectionWorks()
     {
         _clientPartition.Documentation = new Documentation("doc");
 
-        _repository.WaitForReceived(2);
+        _repository.WaitForReceived(1);
 
         AssertEquals(_clientPartition, _repositoryPartition);
     }
