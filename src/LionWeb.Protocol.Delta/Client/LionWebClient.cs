@@ -109,8 +109,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         if (deltaContent is IDeltaCommand { CommandId: { } commandId })
             _ownCommands.TryAdd(commandId, true);
 
-        Debug.WriteLine($"{_name}: sending: {deltaContent.GetType()}");
-        await _connector.Send(deltaContent);
+        Log($"sending: {deltaContent.GetType().Name}", true);
+        await _connector.SendToRepository(deltaContent);
     }
 
     /// <inheritdoc />
@@ -118,6 +118,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     {
         try
         {
+            Log($"received {content.GetType().Name}", true);
+            
             switch (content)
             {
                 case IDeltaEvent deltaEvent:
@@ -126,31 +128,31 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                     break;
 
                 case IDeltaQueryResponse response:
-                    Debug.WriteLine($"{_name}: received response: {response})");
+                    Log($"received response: {response})");
                     if (_queryResponses.TryRemove(response.QueryId, out var tcs))
                     {
-                        // Debug.WriteLine($"{_name}: trying to set result");
+                        // Log($"trying to set result");
                         var x = tcs.TrySetResult(response);
-                        // Debug.WriteLine($"{_name}: tried to set result: {x}");
+                        // Log($"tried to set result: {x}");
                     }
 
                     break;
 
                 default:
-                    Debug.WriteLine(
-                        $"{_name}: ignoring received: {content.GetType()}({content.InternalParticipationId})");
+                    Log(
+                        $"ignoring received: {content.GetType()}({content.InternalParticipationId})");
                     break;
             }
         } catch (Exception e)
         {
-            Debug.WriteLine(e);
+            Log(e.ToString());
         }
     }
 
     private void ReceiveEvent(IDeltaEvent deltaEvent)
     {
-        Debug.WriteLine(
-            $"{_name}: received event: {deltaEvent.GetType()}({deltaEvent.OriginCommands},{deltaEvent.SequenceNumber})");
+        Log(
+            $"received event: {deltaEvent.GetType()}({deltaEvent.OriginCommands},{deltaEvent.SequenceNumber})");
 
         CommandSource? commandSource = deltaEvent.OriginCommands.FirstOrDefault();
 
@@ -180,8 +182,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                 ParticipationId == cmd.ParticipationId &&
                 _ownCommands.TryRemove(cmd.CommandId, out _)))
         {
-            Debug.WriteLine(
-                $"{_name}: ignoring own event: {deltaEvent.GetType()}({commandSource},{deltaEvent.SequenceNumber})");
+            Log(
+                $"ignoring own event: {deltaEvent.GetType()}({commandSource},{deltaEvent.SequenceNumber})");
             return;
         }
 

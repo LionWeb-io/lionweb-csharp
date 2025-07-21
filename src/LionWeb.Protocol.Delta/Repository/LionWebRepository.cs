@@ -24,7 +24,6 @@ using Message;
 using Message.Command;
 using Message.Event;
 using Message.Query;
-using System.Diagnostics;
 
 public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
@@ -61,23 +60,23 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 var commandSource = deltaEvent is { OriginCommands: { } cmds }
                     ? cmds.First()
                     : null;
-                Debug.WriteLine(
-                    $"{_name}: sending event: {deltaEvent.GetType()}({commandSource},{deltaEvent.SequenceNumber})");
+                Log(
+                    $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})", true);
                 break;
 
             default:
-                Debug.WriteLine($"{_name}: sending: {deltaContent.GetType()}");
+                Log($"sending: {deltaContent.GetType().Name}", true);
                 break;
         }
 
-        await _connector.SendAll(deltaContent);
+        await _connector.SendToAllClients(deltaContent);
     }
 
     /// <inheritdoc />
     protected override async Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
     {
-        Debug.WriteLine($"{_name}: sending to {clientInfo}: {deltaContent.GetType()}");
-        await _connector.Send(clientInfo, deltaContent);
+        Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
+        await _connector.SendToClient(clientInfo, deltaContent);
     }
 
     /// <inheritdoc />
@@ -87,39 +86,40 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         {
             var content = messageContext.Content;
             content.InternalParticipationId = messageContext.ClientInfo.ParticipationId;
-            Debug.WriteLine(
-                $"{_name}: received {content.GetType().Name} for {messageContext.ClientInfo.ParticipationId}: {content})");
+            Log(
+                $"received {content.GetType().Name} for {messageContext.ClientInfo.ParticipationId}", true);
+            Log(content.ToString());
             Interlocked.Increment(ref _messageCount);
 
             switch (content)
             {
                 case IDeltaCommand command:
-                    Debug.WriteLine($"{_name}: received command: {command.GetType()}({command.CommandId})");
+                    Log($"received command: {command.GetType()}({command.CommandId})");
                     _commandReceiver.Receive(command);
                     break;
                 
                 case GetAvailableIdsRequest idsRequest:
-                    Debug.WriteLine(
-                        $"{_name}: received {nameof(GetAvailableIdsRequest)} for {messageContext.ClientInfo}: {idsRequest})");
+                    Log(
+                        $"received {nameof(GetAvailableIdsRequest)} for {messageContext.ClientInfo}: {idsRequest})");
                     await Send(messageContext.ClientInfo,
                         new GetAvailableIdsResponse(GetFreeNodeIds(idsRequest.count).ToArray(), idsRequest.QueryId, null));
                     break;
 
                 case SignOnRequest signOnRequest:
-                    Debug.WriteLine(
-                        $"{_name}: received {nameof(SignOnRequest)} for {messageContext.ClientInfo}: {signOnRequest})");
+                    Log(
+                        $"received {nameof(SignOnRequest)} for {messageContext.ClientInfo}: {signOnRequest})");
                     await Send(messageContext.ClientInfo,
                         new SignOnResponse(messageContext.ClientInfo.ParticipationId, signOnRequest.QueryId, null));
                     break;
 
                 default:
-                    Debug.WriteLine(
-                        $"{_name}: ignoring received: {content.GetType()}({content.InternalParticipationId})");
+                    Log(
+                        $"ignoring received: {content.GetType()}({content.InternalParticipationId})");
                     break;
             }
         } catch (Exception e)
         {
-            Debug.WriteLine(e);
+            Log(e.ToString());
         }
     }
 }
@@ -140,7 +140,7 @@ public class LionWebTestRepository(
     {
         while (MessageCount < count)
         {
-            Debug.WriteLine($"{_name}: {nameof(MessageCount)}: {MessageCount} vs. {nameof(count)}: {count}");
+            Log($"{nameof(MessageCount)}: {MessageCount} vs. {nameof(count)}: {count}");
             Thread.Sleep(SleepInterval);
         }
     }

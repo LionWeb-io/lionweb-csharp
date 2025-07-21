@@ -29,12 +29,12 @@ using Message.Event;
 
 public class DeltaEventToPartitionEventMapper
 {
-    private readonly Dictionary<NodeId, IReadableNode> _sharedNodeMap;
+    private readonly SharedNodeMap _sharedNodeMap;
     private readonly Dictionary<CompressedMetaPointer, IKeyed> _sharedKeyedMap;
     private readonly DeserializerBuilder _deserializerBuilder;
 
     public DeltaEventToPartitionEventMapper(
-        Dictionary<NodeId, IReadableNode> sharedNodeMap,
+        SharedNodeMap sharedNodeMap,
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )

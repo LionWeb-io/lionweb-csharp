@@ -21,8 +21,8 @@ using LionWeb.Core.M1.Event;
 
 public interface IClientConnector<T> 
 {
-    Task Send(T content);
-    event EventHandler<T> Receive;
+    Task SendToRepository(T content);
+    event EventHandler<T> ReceiveFromRepository;
 
     T Convert(IEvent internalEvent);
 }

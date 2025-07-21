@@ -30,12 +30,12 @@ using System.Collections;
 
 public class DeltaCommandToPartitionEventMapper
 {
-    private readonly Dictionary<NodeId, IReadableNode> _sharedNodeMap;
+    private readonly SharedNodeMap _sharedNodeMap;
     private readonly Dictionary<CompressedMetaPointer, IKeyed> _sharedKeyedMap;
     private readonly DeserializerBuilder _deserializerBuilder;
 
     public DeltaCommandToPartitionEventMapper(
-        Dictionary<NodeId, IReadableNode> sharedNodeMap,
+        SharedNodeMap sharedNodeMap,
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )

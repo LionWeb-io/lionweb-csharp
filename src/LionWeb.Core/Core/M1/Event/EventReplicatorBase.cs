@@ -39,10 +39,10 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     protected readonly ICommander<TEvent>? _localCommander;
     private readonly List<TPublisher> _publishers = [];
 
-    protected readonly Dictionary<NodeId, IReadableNode> NodeById;
+    protected readonly SharedNodeMap NodeById;
 
     protected EventReplicatorBase(TPublisher? localPublisher, ICommander<TEvent>? localCommander,
-        Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(localPublisher)
+        SharedNodeMap sharedNodeMap = null) : base(localPublisher)
     {
         _localCommander = localCommander;
         NodeById = sharedNodeMap ?? new();
@@ -70,19 +70,12 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
 
     protected void RegisterNode(IReadableNode newNode)
     {
-        foreach (var node in M1Extensions.Descendants(newNode, true, true))
-        {
-            if (!NodeById.TryAdd(node.GetId(), node))
-                throw new DuplicateNodeIdException(node, NodeById[node.GetId()]);
-        }
+        NodeById.RegisterNode(newNode);
     }
 
     protected void UnregisterNode(IReadableNode newNode)
     {
-        foreach (var node in M1Extensions.Descendants(newNode, true, true))
-        {
-            NodeById.Remove(node.GetId());
-        }
+        NodeById.UnregisterNode(newNode);
     }
 
     protected virtual INode Lookup(NodeId remoteNodeId) =>

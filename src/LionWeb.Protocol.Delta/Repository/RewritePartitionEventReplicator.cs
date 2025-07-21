@@ -24,7 +24,7 @@ using System.Diagnostics;
 
 internal class RewritePartitionEventReplicator(
     IPartitionInstance localPartition,
-    Dictionary<String, IReadableNode>? sharedNodeMap = null)
+    SharedNodeMap sharedNodeMap = null)
     : PartitionEventReplicator(localPartition, sharedNodeMap)
 {
     private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];

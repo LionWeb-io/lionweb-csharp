@@ -18,15 +18,29 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
+using Core.M1;
+using Core.M1.Event;
+using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
 using Core.M3;
 
-public abstract class LionWebClientBase<T>
+public interface ILionWebClient
+{
+    private const string _magenta = "\x1b[95m";
+    private const string _bold = "\x1b[1m";
+    private const string _unbold = "\x1b[22m";
+    private const string _defaultColor = "\x1b[39m";
+    
+    public const string HeaderColor_Start = _magenta + _bold;
+    public const string HeaderColor_End =  _unbold + _defaultColor;
+}
+
+public abstract class LionWebClientBase<T> : ILionWebClient
 {
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly string _name;
     protected readonly IClientConnector<T> _connector;
-    protected readonly Dictionary<string, IReadableNode> SharedNodeMap;
+    protected readonly SharedNodeMap SharedNodeMap;
     protected readonly PartitionEventHandler PartitionEventHandler;
 
     private ParticipationId? _participationId;
@@ -51,20 +65,23 @@ public abstract class LionWebClientBase<T>
         _name = name;
         _connector = connector;
 
-        SharedNodeMap = [];
+        SharedNodeMap = new();
         PartitionEventHandler = new PartitionEventHandler(name);
         var replicator = new PartitionEventReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(PartitionEventHandler);
 
         replicator.Subscribe<IPartitionEvent>(SendPartitionEventToRepository);
 
-        connector.Receive += (_, content) => Receive(content);
+        connector.ReceiveFromRepository += (_, content) => Receive(content);
     }
+
+    private void OnReceive(object? _, T content) =>
+        Receive(content);
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOnResponse"/></returns>
     public abstract Task SignOn();
-    
+
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOffRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOffResponse"/></returns>
     public abstract Task SignOff();
@@ -81,6 +98,14 @@ public abstract class LionWebClientBase<T>
         var converted = _connector.Convert(partitionEvent);
 
         Send(converted);
+    }
+
+    protected virtual void Log(string message, bool header = false)
+    {
+        var prependedMessage = $"{_name}: {message}";
+        Console.WriteLine(header
+            ? $"{ILionWebClient.HeaderColor_Start}{prependedMessage}{ILionWebClient.HeaderColor_End}"
+            : prependedMessage);
     }
 
     protected abstract Task Send(T deltaContent);
