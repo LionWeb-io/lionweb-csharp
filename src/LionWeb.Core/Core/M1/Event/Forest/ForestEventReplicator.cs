@@ -98,15 +98,23 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     private void RegisterPartition(IPartitionInstance partition)
     {
+        var handler = new PartitionEventHandler(this);
         PartitionEventReplicator replicator = CreatePartitionEventReplicator(partition);
         if (!_localPartitions.TryAdd(partition.GetId(), replicator))
             throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
         replicator.Init();
+        replicator.ReplicateFrom(handler);
     }
 
     protected virtual PartitionEventReplicator CreatePartitionEventReplicator(IPartitionInstance partition) =>
         new(partition, SharedNodeMap);
 
+    // public void RegisterPartition(IPartitionInstance partition, PartitionEventReplicator replicator)
+    // {
+    //     if (!_localPartitions.TryAdd(partition.GetId(), replicator))
+    //         throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
+    // }
+    
     public PartitionEventReplicator LookupPartition(IPartitionInstance partition) =>
         _localPartitions[partition.GetId()];
 
@@ -119,8 +127,10 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     #region Local
 
-    private void OnLocalNewPartition(object? sender, PartitionAddedEvent partitionAddedEvent) =>
+    private void OnLocalNewPartition(object? sender, PartitionAddedEvent partitionAddedEvent)
+    {
         RegisterPartition(partitionAddedEvent.NewPartition);
+    }
 
     private void OnLocalPartitionDeleted(object? sender, PartitionDeletedEvent partitionDeletedEvent) =>
         UnregisterPartition(partitionDeletedEvent.DeletedPartition);
