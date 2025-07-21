@@ -72,7 +72,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient
 
         replicator.Subscribe<IPartitionEvent>(SendPartitionEventToRepository);
 
-        connector.Receive += (_, content) => Receive(content);
+        connector.ReceiveFromRepository += (_, content) => Receive(content);
     }
 
     private void OnReceive(object? _, T content) =>

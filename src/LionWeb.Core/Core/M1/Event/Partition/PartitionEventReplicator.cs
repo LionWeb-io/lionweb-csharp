@@ -28,7 +28,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     private readonly IPartitionInstance _localPartition;
 
     public PartitionEventReplicator(IPartitionInstance localPartition,
-        Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) : base(localPartition.GetPublisher(),
+        SharedNodeMap sharedNodeMap = null) : base(localPartition.GetPublisher(),
         localPartition.GetCommander(), sharedNodeMap)
     {
         _localPartition = localPartition;

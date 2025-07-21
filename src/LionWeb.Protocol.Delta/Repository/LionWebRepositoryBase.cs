@@ -18,11 +18,9 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
-using Core.M1;
 using Core.M1.Event;
-using Core.M1.Event.Forest;
+using Core.M1.Event.Partition;
 using Core.M3;
-using Forest;
 
 public interface ILionWebRepository
 {
@@ -60,7 +58,7 @@ public abstract class LionWebRepositoryBase<T>
 
         replicator.Subscribe<IPartitionEvent>(SendPartitionEventToAllClients);
 
-        connector.Receive += (_, content) => Receive(content);
+        connector.ReceiveFromClient += (_, content) => Receive(content);
     }
 
     private void SendPartitionEventToAllClients(object? sender, IPartitionEvent? partitionEvent)

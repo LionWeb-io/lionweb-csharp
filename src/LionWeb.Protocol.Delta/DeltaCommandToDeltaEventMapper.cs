@@ -18,6 +18,7 @@
 namespace LionWeb.Protocol.Delta;
 
 using Core;
+using Core.M1.Event;
 using Core.M2;
 using Core.Serialization;
 using Message.Command;
@@ -25,10 +26,10 @@ using Message.Event;
 
 public class DeltaCommandToDeltaEventMapper
 {
-    private readonly Dictionary<NodeId, IReadableNode> _sharedNodeMap;
+    private readonly SharedNodeMap _sharedNodeMap;
     private readonly ParticipationId _participationId;
 
-    public DeltaCommandToDeltaEventMapper(ParticipationId participationId, Dictionary<NodeId, IReadableNode> sharedNodeMap)
+    public DeltaCommandToDeltaEventMapper(ParticipationId participationId, SharedNodeMap sharedNodeMap)
     {
         _sharedNodeMap = sharedNodeMap;
         _participationId = participationId;

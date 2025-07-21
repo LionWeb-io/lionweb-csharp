@@ -27,7 +27,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
     private readonly IForest _localForest;
     private readonly Dictionary<NodeId, PartitionEventReplicator> _localPartitions = [];
 
-    public ForestEventReplicator(IForest localForest, Dictionary<NodeId, IReadableNode>? sharedNodeMap = null) :
+    public ForestEventReplicator(IForest localForest, SharedNodeMap sharedNodeMap = null) :
         base(localForest.GetPublisher(), localForest.GetCommander(), sharedNodeMap)
     {
         _localForest = localForest;

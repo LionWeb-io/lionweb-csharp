@@ -17,8 +17,8 @@
 
 namespace LionWeb.Protocol.Delta.Client;
 
-using Core;
 using Core.M1;
+using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M3;
 using Message.Event;
@@ -30,7 +30,7 @@ public class DeltaProtocolPartitionEventReceiver
 
     public DeltaProtocolPartitionEventReceiver(
         PartitionEventHandler eventHandler,
-        Dictionary<NodeId, IReadableNode> sharedNodeMap,
+        SharedNodeMap sharedNodeMap,
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )

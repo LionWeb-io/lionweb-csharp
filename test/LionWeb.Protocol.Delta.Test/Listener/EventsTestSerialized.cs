@@ -20,6 +20,7 @@ namespace LionWeb.Protocol.Delta.Test.Listener;
 using Client;
 using Core;
 using Core.M1;
+using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M3;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
@@ -37,7 +38,7 @@ public class EventsTestSerialized : EventTestsBase
 
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
-        Dictionary<NodeId, IReadableNode> sharedNodeMap = [];
+        SharedNodeMap sharedNodeMap = new();
 
         var partitionEventHandler = new PartitionEventHandler(null);
 

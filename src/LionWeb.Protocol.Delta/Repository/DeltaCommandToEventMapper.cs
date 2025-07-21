@@ -19,7 +19,6 @@ namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.M1.Event;
 using Message.Command;
-using Partition;
 
 public class DeltaCommandToEventMapper
 {
