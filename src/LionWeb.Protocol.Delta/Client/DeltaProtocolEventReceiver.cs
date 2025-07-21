@@ -29,16 +29,18 @@ using Partition;
 public class DeltaProtocolEventReceiver : IDisposable
 {
     private readonly Dictionary<NodeId, PartitionEventHandler> _partitionEventHandlers = [];
-    
+
     private readonly ForestEventHandler _forestEventHandler;
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly SharedKeyedMap _sharedKeyedMap;
     private readonly ForestEventReplicator _forestEventReplicator;
-    
+
     private readonly DeltaEventToForestEventMapper _forestMapper;
     private readonly DeltaEventToPartitionEventMapper _partitionMapper;
 
-    public DeltaProtocolEventReceiver(ForestEventHandler forestEventHandler, PartitionSharedNodeMap sharedNodeMap, SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder, ForestEventReplicator forestEventReplicator)
+    public DeltaProtocolEventReceiver(ForestEventHandler forestEventHandler, PartitionSharedNodeMap sharedNodeMap,
+        SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder,
+        ForestEventReplicator forestEventReplicator)
     {
         _forestEventHandler = forestEventHandler;
         _sharedNodeMap = sharedNodeMap;
@@ -47,21 +49,23 @@ public class DeltaProtocolEventReceiver : IDisposable
 
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
         _partitionMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
-        
+
         foreach (var partition in sharedNodeMap.Values.OfType<IPartitionInstance>())
         {
             OnPartitionAdded(null, partition);
         }
-        
+
         sharedNodeMap.OnPartitionAdded += OnPartitionAdded;
-        sharedNodeMap.OnPartitionRemoved += OnPartitionRemoved;    }
+        sharedNodeMap.OnPartitionRemoved += OnPartitionRemoved;
+    }
 
     /// <inheritdoc />
     public void Dispose()
     {
         GC.SuppressFinalize(this);
         _sharedNodeMap.OnPartitionAdded -= OnPartitionAdded;
-        _sharedNodeMap.OnPartitionRemoved -= OnPartitionRemoved;    }
+        _sharedNodeMap.OnPartitionRemoved -= OnPartitionRemoved;
+    }
 
     private void OnPartitionAdded(object? _, IPartitionInstance partition)
     {
@@ -75,7 +79,7 @@ public class DeltaProtocolEventReceiver : IDisposable
 
     private void OnPartitionRemoved(object? sender, IPartitionInstance partition) =>
         _partitionEventHandlers.Remove(partition.GetId());
-    
+
     public void Receive(IDeltaEvent deltaEvent)
     {
         IEvent internalEvent;
@@ -83,7 +87,7 @@ public class DeltaProtocolEventReceiver : IDisposable
 
         switch (deltaEvent)
         {
-            case IAnnotationEvent or IFeatureEvent or INodeEvent:
+            case IPartitionDeltaEvent:
                 internalEvent = _partitionMapper.Map(deltaEvent);
                 if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
                 {
@@ -94,12 +98,12 @@ public class DeltaProtocolEventReceiver : IDisposable
                 }
 
                 break;
-            
-            case IPartitionEvent:
+
+            case IForestDeltaEvent:
                 internalEvent = _forestMapper.Map(deltaEvent);
                 eventHandler = _forestEventHandler;
                 break;
-            
+
             default:
                 throw new InvalidOperationException(deltaEvent.ToString());
         }
