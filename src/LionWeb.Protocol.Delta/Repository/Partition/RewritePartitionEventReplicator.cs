@@ -28,7 +28,7 @@ internal class RewritePartitionEventReplicator(
     : PartitionEventReplicator(localPartition, sharedNodeMap)
 {
     private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];
-        
+
     protected override void SuppressEventForwarding(IPartitionEvent partitionEvent, Action action)
     {
         IEventId? eventId = null;
@@ -36,7 +36,10 @@ internal class RewritePartitionEventReplicator(
         {
             eventId = _localCommander.CreateEventId();
             var originalEventId = partitionEvent.EventId;
+            Console.WriteLine($"putting into original: {eventId} = {originalEventId}");
+            Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
             _originalEventIds[eventId] = originalEventId;
+            Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
             RegisterEventId(eventId);
         }
 
@@ -48,18 +51,25 @@ internal class RewritePartitionEventReplicator(
             if (eventId != null)
             {
                 UnregisterEventId(eventId);
+                Console.WriteLine($"removing from original: {eventId}");
+                Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
                 _originalEventIds.Remove(eventId);
+                Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
             }
         }
     }
 
-    protected override TSubscribedEvent? Filter<TSubscribedEvent>(IPartitionEvent partitionEvent) where TSubscribedEvent : class
+    protected override TSubscribedEvent? Filter<TSubscribedEvent>(IPartitionEvent partitionEvent)
+        where TSubscribedEvent : class
     {
+        Console.WriteLine($"called from: {new StackTrace().ToString()}");
         IPartitionEvent? result = base.Filter<TSubscribedEvent>(partitionEvent);
-        Debug.WriteLine($"result: {result}");
+        Console.WriteLine($"filtered: {result}");
+        Console.WriteLine($"trying to get {partitionEvent.EventId}");
+        Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
         if (_originalEventIds.TryGetValue(partitionEvent.EventId, out var originalId))
         {
-            Debug.WriteLine($"originalId: {originalId}");
+            Console.WriteLine($"originalId: {originalId}");
             result = partitionEvent;
             result.EventId = originalId;
         }

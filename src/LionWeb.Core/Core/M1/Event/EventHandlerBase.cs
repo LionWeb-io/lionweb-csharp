@@ -147,4 +147,30 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
 }
 
 /// Internal event id based on a string and an increasing number.
-public record NumericEventId(string Base, int Id) : IEventId;
+public record NumericEventId(string Base, int Id) : IEventId
+{
+    /// <inheritdoc />
+    public virtual bool Equals(NumericEventId? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return string.Equals(Base, other.Base, StringComparison.InvariantCulture) && Id == other.Id;
+    }
+
+    /// <inheritdoc />
+    public override int GetHashCode()
+    {
+        var hashCode = new HashCode();
+        hashCode.Add(Base, StringComparer.InvariantCulture);
+        hashCode.Add(Id);
+        return hashCode.ToHashCode();
+    }
+}
