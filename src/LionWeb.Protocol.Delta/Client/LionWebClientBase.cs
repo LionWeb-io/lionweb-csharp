@@ -22,6 +22,7 @@ using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M3;
+using System.Diagnostics;
 
 public interface ILionWebClient
 {
@@ -107,6 +108,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         var converted = _connector.Convert(internalEvent);
 
         Send(converted);
+        Debug.WriteLine("Sent to repository");
     }
 
     protected virtual void Log(string message, bool header = false)
