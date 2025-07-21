@@ -84,7 +84,7 @@ public class DeltaProtocolCommandReceiver : IDisposable
 
         switch (deltaCommand)
         {
-            case IAnnotationCommand or IFeatureCommand or INodeCommand:
+            case IPartitionDeltaCommand:
                 internalEvent = _partitionMapper.Map(deltaCommand);
                 if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
                 {
@@ -96,7 +96,7 @@ public class DeltaProtocolCommandReceiver : IDisposable
 
                 break;
             
-            case IPartitionCommand:
+            case IForestDeltaCommand:
                 internalEvent = _forestMapper.Map(deltaCommand);
                 eventHandler = _forestEventHandler;
                 break;
