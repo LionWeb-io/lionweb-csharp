@@ -35,6 +35,17 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         // Init();
     }
 
+    public void Init()
+    {
+        SharedNodeMap.RegisterNode(_localPartition);
+
+        var publisher = _localPartition.GetPublisher();
+        if (publisher == null)
+            return;
+
+        publisher.Subscribe<IPartitionEvent>(LocalHandler);
+    }
+
     /// <inheritdoc />
     protected override void ProcessEvent(object? sender, IPartitionEvent? partitionEvent)
     {
@@ -98,17 +109,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             default:
                 throw new ArgumentException($"Can not process event due to unknown {partitionEvent}!");
         }
-    }
-
-    public void Init()
-    {
-        SharedNodeMap.RegisterNode(_localPartition);
-
-        var publisher = _localPartition.GetPublisher();
-        if (publisher == null)
-            return;
-
-        publisher.Subscribe<IPartitionEvent>(LocalHandler);
     }
 
     /// <see cref="SharedNodeMap.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
