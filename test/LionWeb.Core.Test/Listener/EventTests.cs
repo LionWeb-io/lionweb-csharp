@@ -359,6 +359,36 @@ public abstract class EventTestsBase
     
     #endregion
 
+    #region ChildMovedAndReplacedFromOtherContainmentInSameParent
+
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainmentInSameParent_Single()
+    {
+        var line = new Line("l") { Start = new Coord("moved"), End = new Coord("replaced") };
+        var node = new Geometry("a") { Shapes = [line] };
+        
+        var clone = CreateReplicator(node);
+        
+        line.End = line.Start;
+
+        AssertEquals([node], [clone]);
+    }
+    
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainmentInSameParent_Single_ReplaceWith()
+    {
+        var line = new Line("l") { Start = new Coord("moved"), End = new Coord("replaced") };
+        var node = new Geometry("a") { Shapes = [line] };
+        
+        var clone = CreateReplicator(node);
+
+        line.End.ReplaceWith(line.Start);
+        
+        AssertEquals([node], [clone]);
+    }
+
+    #endregion
+
     #region ChildMovedFromOtherContainmentInSameParent
 
     [TestMethod]

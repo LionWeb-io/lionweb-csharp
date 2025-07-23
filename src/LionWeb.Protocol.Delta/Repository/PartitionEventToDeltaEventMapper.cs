@@ -51,7 +51,8 @@ public class PartitionEventToDeltaEventMapper
             ChildMovedFromOtherContainmentEvent a => OnChildMovedFromOtherContainment(a),
             ChildMovedFromOtherContainmentInSameParentEvent a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainmentEvent a => OnChildMovedInSameContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentEvent a => OnChildMovedAndReplacedFromOtherContainment(a), 
+            ChildMovedAndReplacedFromOtherContainmentEvent a => OnChildMovedAndReplacedFromOtherContainment(a),
+            ChildMovedAndReplacedFromOtherContainmentInSameParentEvent a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
             AnnotationAddedEvent a => OnAnnotationAdded(a),
             AnnotationDeletedEvent a => OnAnnotationDeleted(a),
             AnnotationMovedFromOtherParentEvent a => OnAnnotationMovedFromOtherParent(a),
@@ -161,6 +162,22 @@ public class PartitionEventToDeltaEventMapper
             ToCommandSources(childMovedAndReplacedEvent), 
             []
             );
+
+    private ChildMovedAndReplacedFromOtherContainmentInSameParent
+        OnChildMovedAndReplacedFromOtherContainmentInSameParent(
+            ChildMovedAndReplacedFromOtherContainmentInSameParentEvent childMovedAndReplacedEvent) =>
+        new(
+            childMovedAndReplacedEvent.NewContainment.ToMetaPointer(),
+            childMovedAndReplacedEvent.NewIndex,
+            childMovedAndReplacedEvent.MovedChild.GetId(),
+            childMovedAndReplacedEvent.Parent.GetId(),
+            childMovedAndReplacedEvent.OldContainment.ToMetaPointer(),
+            childMovedAndReplacedEvent.OldIndex,
+            childMovedAndReplacedEvent.ReplacedChild.GetId(),
+            ToDescendants(childMovedAndReplacedEvent.ReplacedChild),
+            ToCommandSources(childMovedAndReplacedEvent),
+            []
+        );
     
     private ChildMovedFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParentEvent childMovedEvent) =>
