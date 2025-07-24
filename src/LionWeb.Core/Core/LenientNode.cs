@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1.Event;
 using M1.Event.Partition;
 using M2;
 using M3;
@@ -183,7 +184,7 @@ public class LenientNode : NodeBase, INode
     /// For containments, sets the target node as parent of the value, even if the value doesn't fit the containment's type.
     /// For containments, the target node MUST implement <see cref="INode"/>; for references, the target node MUST implement <see cref="IReadableNode"/>. 
     /// </summary>
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
         if (feature == null)
         {

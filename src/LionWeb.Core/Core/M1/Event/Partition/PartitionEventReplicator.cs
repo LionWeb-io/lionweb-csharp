@@ -204,7 +204,8 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 $"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {childAddedEvent.Containment} at {childAddedEvent.Index}");
             var newValue = InsertContainment(localParent, childAddedEvent.Containment, childAddedEvent.Index, clone);
 
-            localParent.Set(childAddedEvent.Containment, newValue);
+            //localParent.Set(childAddedEvent.Containment, newValue);
+            ((NodeBase)localParent).SetInternal(childAddedEvent.Containment, newValue, childAddedEvent.EventId);
         });
 
     private void OnRemoteChildDeleted(ChildDeletedEvent childDeletedEvent) =>

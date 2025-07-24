@@ -11,6 +11,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
+using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -154,9 +155,9 @@ public partial class EnumHolder : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (WithEnumLanguage.Instance.EnumHolder_enumValue.EqualsIdentity(feature))
 		{

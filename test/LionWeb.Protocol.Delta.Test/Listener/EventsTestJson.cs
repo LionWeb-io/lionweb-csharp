@@ -23,6 +23,7 @@ using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M3;
+using Core.Test.Languages.Generated.V2023_1.TestLanguage;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Listener;
 using Message.Command;
@@ -70,4 +71,6 @@ public class EventsTestJson : EventTestsBase
         replicator.ReplicateFrom(partitionEventHandler);
         return clone;
     }
+
+    protected override LinkTestConcept CreateReplicatorLinkTesConcept(LinkTestConcept node) => throw new NotImplementedException();
 }

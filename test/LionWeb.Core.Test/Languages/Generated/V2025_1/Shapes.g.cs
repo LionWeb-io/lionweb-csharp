@@ -12,6 +12,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
+using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -539,9 +540,9 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
 		{
@@ -733,9 +734,9 @@ public partial class Circle : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.Circle_center.EqualsIdentity(feature))
 		{
@@ -973,9 +974,9 @@ public partial class CompositeShape : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature))
 		{
@@ -1179,9 +1180,9 @@ public partial class Coord : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.Coord_x.EqualsIdentity(feature))
 		{
@@ -1309,9 +1310,9 @@ public partial class Documentation : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.Documentation_technical.EqualsIdentity(feature))
 		{
@@ -1457,9 +1458,9 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.Geometry_documentation.EqualsIdentity(feature))
 		{
@@ -1643,9 +1644,9 @@ public partial class Line : Shape, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.Line_end.EqualsIdentity(feature))
 		{
@@ -1858,9 +1859,9 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.MaterialGroup_defaultShape.EqualsIdentity(feature))
 		{
@@ -2116,9 +2117,9 @@ public partial class OffsetDuplicate : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.OffsetDuplicate_altSource.EqualsIdentity(feature))
 		{
@@ -2316,9 +2317,9 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
@@ -2524,9 +2525,9 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{

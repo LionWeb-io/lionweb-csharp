@@ -29,15 +29,18 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
 
     private OldContainmentInfo? _oldContainmentInfo;
 
+    private IEventId? _eventId;
+
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValue">Newly set value.</param>
     /// <param name="oldValue">Previous value of <paramref name="containment"/>.</param>
-    public ContainmentSingleEventEmitter(Containment containment, NodeBase destinationParent, T? newValue, T? oldValue)
+    public ContainmentSingleEventEmitter(Containment containment, NodeBase destinationParent, T? newValue, T? oldValue, IEventId? eventId = null)
         : base(containment, destinationParent)
     {
         _oldValue = oldValue;
         _newValue = newValue;
+        _eventId = eventId;
     }
 
     /// <inheritdoc />
@@ -73,8 +76,9 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
                 break;
 
             case (null, not null, null):
-                PartitionCommander.Raise(new ChildAddedEvent(DestinationParent, _newValue, Containment, 0,
-                    PartitionCommander.CreateEventId()));
+                /*PartitionCommander.Raise(new ChildAddedEvent(DestinationParent, _newValue, Containment, 0,
+                    PartitionCommander.CreateEventId()));*/
+                PartitionCommander.Raise(new ChildAddedEvent(DestinationParent, _newValue, Containment, 0, _eventId ?? PartitionCommander.CreateEventId()));
                 break;
 
             case (not null, not null, null):

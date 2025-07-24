@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M3;
 
+using M1.Event;
 using M2;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
@@ -97,7 +98,7 @@ public abstract class DynamicIKeyed(NodeId id, LionWebVersions lionWebVersion) :
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
         if (_builtIns.INamed_name == feature)
         {
@@ -159,9 +160,9 @@ public abstract class DynamicFeature : DynamicIKeyed, Feature
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -226,9 +227,9 @@ public class DynamicProperty(NodeId id, LionWebVersions lionWebVersion, DynamicC
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -300,9 +301,9 @@ public abstract class DynamicLink(NodeId id, DynamicClassifier? classifier, Lion
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -422,9 +423,9 @@ public abstract class DynamicClassifier(NodeId id, LionWebVersions lionWebVersio
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -514,9 +515,9 @@ public class DynamicConcept(NodeId id, LionWebVersions lionWebVersion, DynamicLa
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -634,9 +635,9 @@ public class DynamicAnnotation(NodeId id, LionWebVersions lionWebVersion, Dynami
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -717,9 +718,9 @@ public class DynamicInterface(NodeId id, LionWebVersions lionWebVersion, Dynamic
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -820,9 +821,9 @@ public class DynamicEnumeration(NodeId id, LionWebVersions lionWebVersion, Dynam
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -929,9 +930,9 @@ public class DynamicStructuredDataType(NodeId id, LionWebVersions lionWebVersion
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -1093,9 +1094,9 @@ public class DynamicField : DynamicIKeyed, Field
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;
@@ -1231,9 +1232,9 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
-        var result = base.SetInternal(feature, value);
+        var result = base.SetInternal(feature, value, null);
         if (result)
         {
             return result;

@@ -12,6 +12,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
+using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -471,9 +472,9 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1.EqualsIdentity(feature))
 		{
@@ -637,9 +638,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
-        public LinkTestConcept SetContainment_0_1(LinkTestConcept? value)
+        public LinkTestConcept SetContainment_0_1(LinkTestConcept? value, IEventId? eventId = null)
 	{
-		ContainmentSingleEventEmitter<LinkTestConcept> evt = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, this, value, _containment_0_1);
+		ContainmentSingleEventEmitter<LinkTestConcept> evt = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, this, value, _containment_0_1, eventId);
 		evt.CollectOldData();
 		SetParentNull(_containment_0_1);
 		AttachChild(value);
@@ -1008,9 +1009,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{

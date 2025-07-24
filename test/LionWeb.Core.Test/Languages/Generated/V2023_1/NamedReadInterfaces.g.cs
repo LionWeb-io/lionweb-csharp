@@ -11,6 +11,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
+using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -226,9 +227,9 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -308,9 +309,9 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -390,9 +391,9 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -488,9 +489,9 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
@@ -570,9 +571,9 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{

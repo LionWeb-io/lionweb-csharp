@@ -6,6 +6,7 @@
 #nullable enable
 namespace Io.Lionweb.Mps.Specific.V2024_1;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -261,9 +262,9 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (SpecificLanguage.Instance.ConceptDescription_conceptAlias.EqualsIdentity(feature))
 		{
@@ -391,9 +392,9 @@ public partial class Deprecated : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (SpecificLanguage.Instance.Deprecated_build.EqualsIdentity(feature))
 		{
@@ -535,9 +536,9 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (SpecificLanguage.Instance.KeyedDescription_documentation.EqualsIdentity(feature))
 		{
@@ -625,9 +626,9 @@ public partial class ShortDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (SpecificLanguage.Instance.ShortDescription_description.EqualsIdentity(feature))
 		{
@@ -707,9 +708,9 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+    public override bool SetInternal(Feature? feature, object? value, IEventId? eventId)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, null))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{

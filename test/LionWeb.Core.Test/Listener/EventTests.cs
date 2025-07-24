@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
+using Languages.Generated.V2023_1.TestLanguage;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 using M1.Event;
@@ -28,9 +29,14 @@ public abstract class EventTestsBase
 {
     protected abstract Geometry CreateReplicator(Geometry node);
 
+    protected abstract LinkTestConcept CreateReplicatorLinkTesConcept(LinkTestConcept node);
+
     protected Geometry Clone(Geometry node) =>
         (Geometry)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
 
+    protected LinkTestConcept Clone(LinkTestConcept node) =>
+        (LinkTestConcept)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
+    
     #region Properties
 
     [TestMethod]
@@ -120,6 +126,18 @@ public abstract class EventTestsBase
         Assert.AreNotSame(added, clone.Shapes[1]);
     }
 
+    [TestMethod]
+    public void ChildAdded_LinkTestConcept_Single()
+    {
+        var node = new LinkTestConcept("a");
+        
+        var clone = CreateReplicatorLinkTesConcept(node);
+        
+        node.Containment_0_1 = new LinkTestConcept("added");
+        
+        AssertEquals([node], [clone]);
+    }
+    
     [TestMethod]
     public void ChildAdded_Single()
     {
@@ -783,6 +801,16 @@ public abstract class EventTestsBase
 public class EventsTest : EventTestsBase
 {
     protected override Geometry CreateReplicator(Geometry node)
+    {
+        var clone = Clone(node);
+
+        var replicator = new PartitionEventReplicator(clone);
+        replicator.ReplicateFrom(node.GetPublisher());
+
+        return clone;
+    }
+
+    protected override LinkTestConcept CreateReplicatorLinkTesConcept(LinkTestConcept node)
     {
         var clone = Clone(node);
 

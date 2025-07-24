@@ -18,6 +18,7 @@
 namespace LionWeb.Core;
 
 using M1;
+using M1.Event;
 using M1.Event.Partition;
 using M1.Event.Partition.Emitter;
 using M2;
@@ -460,14 +461,14 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <inheritdoc />
     public void Set(Feature feature, object? value)
     {
-        if (SetInternal(feature, value))
+        if (SetInternal(feature, value, null))
             return;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
 
     /// <inheritdoc cref="IWritableNode.Set"/>
-    protected virtual bool SetInternal(Feature? feature, object? value)
+    public virtual bool SetInternal(Feature? feature, object? value, IEventId? eventId)
     {
         if (feature == null)
         {
