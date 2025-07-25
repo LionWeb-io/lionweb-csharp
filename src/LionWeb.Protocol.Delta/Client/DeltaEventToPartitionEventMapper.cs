@@ -57,6 +57,7 @@ public class DeltaEventToPartitionEventMapper
             ChildMovedFromOtherContainmentInSameParent a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainment a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainment a => OnChildMovedAndReplacedFromOtherContainment(a),
+            ChildMovedAndReplacedFromOtherContainmentInSameParent a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
             AnnotationAdded a => OnAnnotationAdded(a),
             AnnotationDeleted a => OnAnnotationDeleted(a),
             AnnotationMovedFromOtherParent a => OnAnnotationMovedFromOtherParent(a),
@@ -199,7 +200,28 @@ public class DeltaEventToPartitionEventMapper
             ToEventId(childMovedAndReplacedEvent)
             );
     }
+    
+    private ChildMovedAndReplacedFromOtherContainmentInSameParentEvent
+        OnChildMovedAndReplacedFromOtherContainmentInSameParent(ChildMovedAndReplacedFromOtherContainmentInSameParent childMovedAndReplaced)
+    {
+        var parent = ToNode(childMovedAndReplaced.Parent);
+        var movedChild = ToNode(childMovedAndReplaced.MovedChild);
+        var oldContainment = ToContainment(childMovedAndReplaced.OldContainment, parent);
+        var replacedChild = ToNode(childMovedAndReplaced.ReplacedChild);
+        var newContainment = ToContainment(childMovedAndReplaced.NewContainment, parent);
 
+        return new ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(
+            newContainment,
+            childMovedAndReplaced.NewIndex,
+            movedChild,
+            parent,
+            oldContainment,
+            childMovedAndReplaced.OldIndex,
+            replacedChild,
+            ToEventId(childMovedAndReplaced)
+        );
+    }
+    
     private ChildMovedFromOtherContainmentInSameParentEvent OnChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParent childMovedEvent)
     {

@@ -71,6 +71,9 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             case ChildMovedAndReplacedFromOtherContainmentEvent a:
                 OnRemoteChildMovedAndReplacedFromOtherContainment(a);
                 break;
+            case ChildMovedAndReplacedFromOtherContainmentInSameParentEvent a:
+                OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(a);
+                break;
             case AnnotationAddedEvent a:
                 OnRemoteAnnotationAdded(a);
                 break;
@@ -92,6 +95,8 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             case ReferenceChangedEvent a:
                 OnRemoteReferenceChanged(a);
                 break;
+            default:
+                throw new ArgumentException($"Can not process event due to unknown {partitionEvent}!");
         }
     }
 
@@ -252,6 +257,15 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         localNewParent.Set(childMovedAndReplacedEvent.NewContainment, newValue);
     });
 
+    private void OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(ChildMovedAndReplacedFromOtherContainmentInSameParentEvent childMovedAndReplacedEvent)
+    {
+        var parent = Lookup(childMovedAndReplacedEvent.Parent.GetId());
+        var substituteNode = Lookup(childMovedAndReplacedEvent.MovedChild.GetId());
+        var newValue = ReplaceContainment(parent, childMovedAndReplacedEvent.NewContainment, childMovedAndReplacedEvent.NewIndex, substituteNode);
+        
+        parent.Set(childMovedAndReplacedEvent.NewContainment, newValue);
+    }
+    
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(ChildMovedFromOtherContainmentInSameParentEvent childMovedEvent) =>
         SuppressEventForwarding(childMovedEvent, () =>
         {
