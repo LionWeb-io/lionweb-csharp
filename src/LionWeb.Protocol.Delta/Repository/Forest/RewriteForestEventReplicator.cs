@@ -41,7 +41,7 @@ public class RewriteForestEventReplicator(IForest localForest, SharedNodeMap sha
             eventId = _localCommander.CreateEventId();
             var originalEventId = forestEvent.EventId;
             _originalEventIds[eventId] = originalEventId;
-            _localCommander.RegisterEventId(eventId);
+            // _localCommander.RegisterEventId(eventId);
             RegisterEventId(eventId);
         }
 
