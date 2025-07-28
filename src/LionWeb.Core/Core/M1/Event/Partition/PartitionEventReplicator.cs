@@ -173,19 +173,19 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         {
             Debug.WriteLine(
                 $"Node {propertyAddedEvent.Node.PrintIdentity()}: Setting {propertyAddedEvent.Property} to {propertyAddedEvent.NewValue}");
-            Lookup(propertyAddedEvent.Node.GetId()).Set(propertyAddedEvent.Property, propertyAddedEvent.NewValue);
+            Lookup(propertyAddedEvent.Node.GetId()).Set(propertyAddedEvent.Property, propertyAddedEvent.NewValue, propertyAddedEvent.EventId);
         });
 
     private void OnRemotePropertyDeleted(PropertyDeletedEvent propertyDeletedEvent) =>
         SuppressEventForwarding(propertyDeletedEvent, () =>
         {
-            Lookup(propertyDeletedEvent.Node.GetId()).Set(propertyDeletedEvent.Property, null);
+            Lookup(propertyDeletedEvent.Node.GetId()).Set(propertyDeletedEvent.Property, null, propertyDeletedEvent.EventId);
         });
 
     private void OnRemotePropertyChanged(PropertyChangedEvent propertyChangedEvent) =>
         SuppressEventForwarding(propertyChangedEvent, () =>
         {
-            Lookup(propertyChangedEvent.Node.GetId()).Set(propertyChangedEvent.Property, propertyChangedEvent.NewValue);
+            Lookup(propertyChangedEvent.Node.GetId()).Set(propertyChangedEvent.Property, propertyChangedEvent.NewValue, propertyChangedEvent.EventId);
         });
 
     #endregion
@@ -204,7 +204,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 $"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {childAddedEvent.Containment} at {childAddedEvent.Index}");
             var newValue = InsertContainment(localParent, childAddedEvent.Containment, childAddedEvent.Index, clone);
 
-            localParent.Set(childAddedEvent.Containment, newValue);
+            localParent.Set(childAddedEvent.Containment, newValue, childAddedEvent.EventId);
         });
 
     private void OnRemoteChildDeleted(ChildDeletedEvent childDeletedEvent) =>
@@ -224,7 +224,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 }
             }
 
-            localParent.Set(childDeletedEvent.Containment, newValue);
+            localParent.Set(childDeletedEvent.Containment, newValue, childDeletedEvent.EventId);
         });
 
     private void OnRemoteChildReplaced(ChildReplacedEvent childReplacedEvent) =>
@@ -234,7 +234,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             var substituteNode = Clone((INode)childReplacedEvent.NewChild);
             var newValue = ReplaceContainment(localParent, childReplacedEvent.Containment, childReplacedEvent.Index, substituteNode);
 
-            localParent.Set(childReplacedEvent.Containment, newValue);
+            localParent.Set(childReplacedEvent.Containment, newValue, childReplacedEvent.EventId);
         });
 
     private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentEvent childMovedEvent) =>
@@ -244,7 +244,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             var nodeToInsert = LookupOpt(childMovedEvent.MovedChild.GetId()) ?? Clone((INode)childMovedEvent.MovedChild);
             var newValue = InsertContainment(localNewParent, childMovedEvent.NewContainment, childMovedEvent.NewIndex, nodeToInsert);
 
-            localNewParent.Set(childMovedEvent.NewContainment, newValue);
+            localNewParent.Set(childMovedEvent.NewContainment, newValue, childMovedEvent.EventId);
         });
 
     private void OnRemoteChildMovedAndReplacedFromOtherContainment(ChildMovedAndReplacedFromOtherContainmentEvent childMovedAndReplacedEvent) => SuppressEventForwarding(childMovedAndReplacedEvent, () =>
@@ -254,7 +254,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         var newValue = ReplaceContainment(localNewParent, childMovedAndReplacedEvent.NewContainment, childMovedAndReplacedEvent.NewIndex,
             substituteNode);
 
-        localNewParent.Set(childMovedAndReplacedEvent.NewContainment, newValue);
+        localNewParent.Set(childMovedAndReplacedEvent.NewContainment, newValue, childMovedAndReplacedEvent.EventId);
     });
 
     private void OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(ChildMovedAndReplacedFromOtherContainmentInSameParentEvent childMovedAndReplacedEvent)
@@ -273,7 +273,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             var newValue = InsertContainment(localParent, childMovedEvent.NewContainment, childMovedEvent.NewIndex,
                 Lookup(childMovedEvent.MovedChild.GetId()));
 
-            localParent.Set(childMovedEvent.NewContainment, newValue);
+            localParent.Set(childMovedEvent.NewContainment, newValue, childMovedEvent.EventId);
         });
 
     private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentEvent childMovedEvent) =>
@@ -291,7 +291,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 newValue = children;
             }
 
-            localParent.Set(childMovedEvent.Containment, newValue);
+            localParent.Set(childMovedEvent.Containment, newValue, childMovedEvent.EventId);
         });
 
     private static object ReplaceContainment(INode localParent, Containment containment, Index index, INode substituteNode)
@@ -357,7 +357,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         {
             var localParent = Lookup(annotationAddedEvent.Parent.GetId());
             var clone = Clone((INode)annotationAddedEvent.NewAnnotation);
-            localParent.InsertAnnotations(annotationAddedEvent.Index, [clone]);
+            localParent.InsertAnnotations(annotationAddedEvent.Index, [clone], annotationAddedEvent.EventId);
         });
 
     private void OnRemoteAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
@@ -365,7 +365,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         {
             var localParent = Lookup(annotationDeletedEvent.Parent.GetId());
             var localDeleted = Lookup(annotationDeletedEvent.DeletedAnnotation.GetId());
-            localParent.RemoveAnnotations([localDeleted]);
+            localParent.RemoveAnnotations([localDeleted], annotationDeletedEvent.EventId);
         });
 
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentEvent annotationMovedEvent) =>
@@ -373,7 +373,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         {
             var localNewParent = Lookup(annotationMovedEvent.NewParent.GetId());
             var moved = LookupOpt(annotationMovedEvent.MovedAnnotation.GetId()) ?? Clone((INode)annotationMovedEvent.MovedAnnotation);
-            localNewParent.InsertAnnotations(annotationMovedEvent.NewIndex, [moved]);
+            localNewParent.InsertAnnotations(annotationMovedEvent.NewIndex, [moved], annotationMovedEvent.EventId);
         });
 
     private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentEvent annotationMovedEvent) =>
@@ -381,7 +381,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         {
             var localParent = Lookup(annotationMovedEvent.Parent.GetId());
             INode nodeToInsert = Lookup(annotationMovedEvent.MovedAnnotation.GetId());
-            localParent.InsertAnnotations(annotationMovedEvent.NewIndex, [nodeToInsert]);
+            localParent.InsertAnnotations(annotationMovedEvent.NewIndex, [nodeToInsert], annotationMovedEvent.EventId);
         });
 
     #endregion
@@ -395,7 +395,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
             INode target = Lookup(referenceAddedEvent.NewTarget.Reference.GetId());
             var newValue = InsertReference(localParent, referenceAddedEvent.Reference, referenceAddedEvent.Index, target);
 
-            localParent.Set(referenceAddedEvent.Reference, newValue);
+            localParent.Set(referenceAddedEvent.Reference, newValue, referenceAddedEvent.EventId);
         });
 
     private void OnRemoteReferenceDeleted(ReferenceDeletedEvent referenceDeletedEvent) =>
@@ -415,7 +415,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 }
             }
 
-            localParent.Set(referenceDeletedEvent.Reference, newValue);
+            localParent.Set(referenceDeletedEvent.Reference, newValue, referenceDeletedEvent.EventId);
         });
 
     private void OnRemoteReferenceChanged(ReferenceChangedEvent referenceChangedEvent) =>
@@ -436,7 +436,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
                 }
             }
 
-            localParent.Set(referenceChangedEvent.Reference, newValue);
+            localParent.Set(referenceChangedEvent.Reference, newValue,  referenceChangedEvent.EventId);
         });
 
     private static object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)

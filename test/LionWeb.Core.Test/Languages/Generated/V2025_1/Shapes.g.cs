@@ -12,6 +12,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
+using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -539,7 +540,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -581,7 +582,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials);
+			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials, eventId);
 			evt.CollectOldData();
 			_materials.Clear();
 			_materials.AddRange(safeNodes);
@@ -733,7 +734,7 @@ public partial class Circle : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -973,7 +974,7 @@ public partial class CompositeShape : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1179,7 +1180,7 @@ public partial class Coord : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1309,7 +1310,7 @@ public partial class Documentation : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1457,7 +1458,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1643,7 +1644,7 @@ public partial class Line : Shape, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1858,7 +1859,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1877,7 +1878,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		{
 			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
-			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials);
+			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials, eventId);
 			evt.CollectOldData();
 			_materials.Clear();
 			_materials.AddRange(safeNodes);
@@ -2116,7 +2117,7 @@ public partial class OffsetDuplicate : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -2316,7 +2317,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -2325,7 +2326,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes);
+			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes, eventId);
 			evt.CollectOldData();
 			_shapes.Clear();
 			_shapes.AddRange(safeNodes);
@@ -2524,7 +2525,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;

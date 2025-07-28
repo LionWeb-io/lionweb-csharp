@@ -23,7 +23,7 @@ public abstract class ReferenceEventEmitterBase<T> : PartitionEventEmitterBase<T
 {
     protected readonly Reference Reference;
 
-    protected ReferenceEventEmitterBase(Reference reference, NodeBase destinationParent) : base(destinationParent)
+    protected ReferenceEventEmitterBase(Reference reference, NodeBase destinationParent, IEventId? eventId) : base(destinationParent, eventId)
     {
         Reference = reference;
     }

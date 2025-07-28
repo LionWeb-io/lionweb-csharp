@@ -94,8 +94,8 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
         IEventId? eventId = null;
         if (_localCommander != null)
         {
-            eventId = _localCommander.CreateEventId();
-            _localCommander.RegisterEventId(eventId);
+            eventId = @event.EventId;
+            // _localCommander.RegisterEventId(eventId);
             RegisterEventId(eventId);
         }
 

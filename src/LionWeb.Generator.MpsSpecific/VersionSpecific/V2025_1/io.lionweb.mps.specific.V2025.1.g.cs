@@ -6,6 +6,7 @@
 #nullable enable
 namespace Io.Lionweb.Mps.Specific.V2025_1;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -261,7 +262,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -391,7 +392,7 @@ public partial class Deprecated : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -535,7 +536,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -555,7 +556,7 @@ public partial class KeyedDescription : AnnotationInstanceBase
 			var safeNodes = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value).ToList();
 			AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 			AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-			ReferenceSetEventEmitter<IReadableNode> evt = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso);
+			ReferenceSetEventEmitter<IReadableNode> evt = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso, eventId);
 			evt.CollectOldData();
 			_seeAlso.Clear();
 			_seeAlso.AddRange(safeNodes);
@@ -625,7 +626,7 @@ public partial class ShortDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -707,7 +708,7 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;

@@ -34,10 +34,14 @@ public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly NodeBase DestinationParent;
 
+    protected readonly IEventId? EventId;
+
     /// <param name="destinationParent"> Owner of the represented <see cref="Feature"/>.</param>
-    protected PartitionEventEmitterBase(NodeBase destinationParent)
+    /// <param name="eventId"></param>
+    protected PartitionEventEmitterBase(NodeBase destinationParent, IEventId? eventId = null)
     {
         DestinationParent = destinationParent;
+        EventId = eventId;
         DestinationPartition = destinationParent.GetPartition();
         PartitionCommander = DestinationPartition?.GetCommander();
     }
@@ -53,4 +57,6 @@ public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
     /// </summary>
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected abstract bool IsActive();
+    
+    protected IEventId GetEventId() => EventId ?? PartitionCommander.CreateEventId();
 }

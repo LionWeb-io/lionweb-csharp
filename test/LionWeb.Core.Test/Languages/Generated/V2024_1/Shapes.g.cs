@@ -12,6 +12,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
+using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -391,9 +392,9 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
-        public BillOfMaterials SetDefaultGroup(MaterialGroup? value)
+        public BillOfMaterials SetDefaultGroup(MaterialGroup? value, IEventId? eventId = null)
 	{
-		ContainmentSingleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_defaultGroup, this, value, _defaultGroup);
+		ContainmentSingleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_defaultGroup, this, value, _defaultGroup, eventId);
 		evt.CollectOldData();
 		SetParentNull(_defaultGroup);
 		AttachChild(value);
@@ -539,14 +540,14 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_altGroups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(value).ToList();
-			ContainmentSetEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups);
+			ContainmentSetEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, eventId);
 			evt.CollectOldData();
 			RemoveSelfParent(_altGroups.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 			_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
@@ -557,8 +558,8 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		if (ShapesLanguage.Instance.BillOfMaterials_defaultGroup.EqualsIdentity(feature))
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup)
-			{
-				DefaultGroup = (LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup?)value;
+            {
+                SetDefaultGroup((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup?)value, eventId);
 				return true;
 			}
 
@@ -568,7 +569,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		if (ShapesLanguage.Instance.BillOfMaterials_groups.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_groups.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup>(value).ToList();
-			ContainmentSetEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups);
+			ContainmentSetEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, eventId);
 			evt.CollectOldData();
 			RemoveSelfParent(_groups.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups);
 			_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
@@ -581,7 +582,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 			var safeNodes = ShapesLanguage.Instance.BillOfMaterials_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials);
+			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials, eventId);
 			evt.CollectOldData();
 			_materials.Clear();
 			_materials.AddRange(safeNodes);
@@ -670,10 +671,10 @@ public partial class Circle : Shape
 
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Circle SetCenter(Coord value)
+        public Circle SetCenter(Coord value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.Circle_center);
-		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.Circle_center, this, value, _center);
+		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.Circle_center, this, value, _center, eventId);
 		evt.CollectOldData();
 		SetParentNull(_center);
 		AttachChild(value);
@@ -697,9 +698,9 @@ public partial class Circle : Shape
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Circle SetR(int value)
+        public Circle SetR(int value, IEventId? eventId = null)
 	{
-		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Circle_r, this, value, _r);
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Circle_r, this, value, _r, eventId);
 		evt.CollectOldData();
 		_r = value;
 		evt.RaiseEvent();
@@ -733,7 +734,7 @@ public partial class Circle : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -741,7 +742,7 @@ public partial class Circle : Shape
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord v)
 			{
-				Center = v;
+				SetCenter(v, eventId);
 				return true;
 			}
 
@@ -752,7 +753,7 @@ public partial class Circle : Shape
 		{
 			if (value is int v)
 			{
-				R = v;
+				SetR(v, eventId);
 				return true;
 			}
 
@@ -874,10 +875,10 @@ public partial class CompositeShape : Shape
 
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public CompositeShape SetEvilPart(IShape value)
+        public CompositeShape SetEvilPart(IShape value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.CompositeShape_evilPart);
-		ContainmentSingleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_evilPart, this, value, _evilPart);
+		ContainmentSingleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_evilPart, this, value, _evilPart, eventId);
 		evt.CollectOldData();
 		SetParentNull(_evilPart);
 		AttachChild(value);
@@ -973,7 +974,7 @@ public partial class CompositeShape : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -981,7 +982,7 @@ public partial class CompositeShape : Shape
 		{
 			var safeNodes = ShapesLanguage.Instance.CompositeShape_disabledParts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
-			ContainmentSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts);
+			ContainmentSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, eventId);
 			evt.CollectOldData();
 			RemoveSelfParent(_disabledParts.ToList(), _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
 			_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
@@ -993,7 +994,7 @@ public partial class CompositeShape : Shape
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape v)
 			{
-				EvilPart = v;
+				SetEvilPart(v, eventId);
 				return true;
 			}
 
@@ -1004,7 +1005,7 @@ public partial class CompositeShape : Shape
 		{
 			var safeNodes = ShapesLanguage.Instance.CompositeShape_parts.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
-			ContainmentSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts);
+			ContainmentSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, eventId);
 			evt.CollectOldData();
 			RemoveSelfParent(_parts.ToList(), _parts, ShapesLanguage.Instance.CompositeShape_parts);
 			_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
@@ -1089,9 +1090,9 @@ public partial class Coord : ConceptInstanceBase
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Coord SetX(int value)
+        public Coord SetX(int value, IEventId? eventId = null)
 	{
-		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_x, this, value, _x);
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_x, this, value, _x, eventId);
 		evt.CollectOldData();
 		_x = value;
 		evt.RaiseEvent();
@@ -1113,9 +1114,9 @@ public partial class Coord : ConceptInstanceBase
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Coord SetY(int value)
+        public Coord SetY(int value, IEventId? eventId = null)
 	{
-		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_y, this, value, _y);
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_y, this, value, _y, eventId);
 		evt.CollectOldData();
 		_y = value;
 		evt.RaiseEvent();
@@ -1137,9 +1138,9 @@ public partial class Coord : ConceptInstanceBase
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Coord SetZ(int value)
+        public Coord SetZ(int value, IEventId? eventId = null)
 	{
-		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_z, this, value, _z);
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Coord_z, this, value, _z, eventId);
 		evt.CollectOldData();
 		_z = value;
 		evt.RaiseEvent();
@@ -1179,7 +1180,7 @@ public partial class Coord : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1187,7 +1188,7 @@ public partial class Coord : ConceptInstanceBase
 		{
 			if (value is int v)
 			{
-				X = v;
+				SetX(v, eventId);
 				return true;
 			}
 
@@ -1198,7 +1199,7 @@ public partial class Coord : ConceptInstanceBase
 		{
 			if (value is int v)
 			{
-				Y = v;
+				SetY(v, eventId);
 				return true;
 			}
 
@@ -1209,7 +1210,7 @@ public partial class Coord : ConceptInstanceBase
 		{
 			if (value is int v)
 			{
-				Z = v;
+				SetZ(v, eventId);
 				return true;
 			}
 
@@ -1250,9 +1251,9 @@ public partial class Documentation : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public Documentation SetTechnical(bool? value)
+        public Documentation SetTechnical(bool? value, IEventId? eventId = null)
 	{
-		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Documentation_technical, this, value, _technical);
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Documentation_technical, this, value, _technical, eventId);
 		evt.CollectOldData();
 		_technical = value;
 		evt.RaiseEvent();
@@ -1273,9 +1274,9 @@ public partial class Documentation : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public Documentation SetText(string? value)
+        public Documentation SetText(string? value, IEventId? eventId = null)
 	{
-		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Documentation_text, this, value, _text);
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.Documentation_text, this, value, _text, eventId);
 		evt.CollectOldData();
 		_text = value;
 		evt.RaiseEvent();
@@ -1309,7 +1310,7 @@ public partial class Documentation : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1317,7 +1318,7 @@ public partial class Documentation : AnnotationInstanceBase
 		{
 			if (value is null or bool)
 			{
-				Technical = (bool?)value;
+				SetTechnical((bool?)value, eventId);
 				return true;
 			}
 
@@ -1328,7 +1329,7 @@ public partial class Documentation : AnnotationInstanceBase
 		{
 			if (value is null or string)
 			{
-				Text = (string?)value;
+				SetText((string?)value, eventId);
 				return true;
 			}
 
@@ -1367,9 +1368,9 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
-        public Geometry SetDocumentation(Documentation? value)
+        public Geometry SetDocumentation(Documentation? value, IEventId? eventId = null)
 	{
-		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.Geometry_documentation, this, value, _documentation);
+		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.Geometry_documentation, this, value, _documentation, eventId);
 		evt.CollectOldData();
 		SetParentNull(_documentation);
 		AttachChild(value);
@@ -1457,7 +1458,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1465,7 +1466,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation)
 			{
-				Documentation = (LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation?)value;
+				SetDocumentation((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation?)value, eventId);
 				return true;
 			}
 
@@ -1475,7 +1476,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value).ToList();
-			ContainmentSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes);
+			ContainmentSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, eventId);
 			evt.CollectOldData();
 			RemoveSelfParent(_shapes.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes);
 			_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
@@ -1575,10 +1576,10 @@ public partial class Line : Shape, INamedWritable
 
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Line SetEnd(Coord value)
+        public Line SetEnd(Coord value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.Line_end);
-		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.Line_end, this, value, _end);
+		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.Line_end, this, value, _end, eventId);
 		evt.CollectOldData();
 		SetParentNull(_end);
 		AttachChild(value);
@@ -1604,10 +1605,10 @@ public partial class Line : Shape, INamedWritable
 
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Line SetStart(Coord value)
+        public Line SetStart(Coord value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.Line_start);
-		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.Line_start, this, value, _start);
+		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.Line_start, this, value, _start, eventId);
 		evt.CollectOldData();
 		SetParentNull(_start);
 		AttachChild(value);
@@ -1643,15 +1644,15 @@ public partial class Line : Shape, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
 		if (ShapesLanguage.Instance.Line_end.EqualsIdentity(feature))
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord v)
-			{
-				End = v;
+            {
+                SetEnd(v, eventId);
 				return true;
 			}
 
@@ -1662,7 +1663,7 @@ public partial class Line : Shape, INamedWritable
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord v)
 			{
-				Start = v;
+				SetStart(v, eventId);
 				return true;
 			}
 
@@ -1735,9 +1736,9 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
-        public MaterialGroup SetDefaultShape(IShape? value)
+        public MaterialGroup SetDefaultShape(IShape? value, IEventId? eventId = null)
 	{
-		ContainmentSingleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_defaultShape, this, value, _defaultShape);
+		ContainmentSingleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_defaultShape, this, value, _defaultShape, eventId);
 		evt.CollectOldData();
 		SetParentNull(_defaultShape);
 		AttachChild(value);
@@ -1816,9 +1817,9 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public MaterialGroup SetMatterState(MatterState? value)
+        public MaterialGroup SetMatterState(MatterState? value, IEventId? eventId = null)
 	{
-		PropertyEventEmitter evt = new(ShapesLanguage.Instance.MaterialGroup_matterState, this, value, _matterState);
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.MaterialGroup_matterState, this, value, _matterState, eventId);
 		evt.CollectOldData();
 		_matterState = value;
 		evt.RaiseEvent();
@@ -1858,7 +1859,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1866,7 +1867,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape)
 			{
-				DefaultShape = (LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape?)value;
+				SetDefaultShape((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape?)value, eventId);
 				return true;
 			}
 
@@ -1877,7 +1878,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		{
 			var safeNodes = ShapesLanguage.Instance.MaterialGroup_materials.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value).ToList();
 			AssureNonEmpty(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
-			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials);
+			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials, eventId);
 			evt.CollectOldData();
 			_materials.Clear();
 			_materials.AddRange(safeNodes);
@@ -1889,7 +1890,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MatterState)
 			{
-				MatterState = (LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MatterState?)value;
+				SetMatterState((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MatterState?)value, eventId);
 				return true;
 			}
 
@@ -1956,9 +1957,9 @@ public partial class OffsetDuplicate : Shape
 	}
 
 	/// <remarks>Optional Single Reference</remarks>
-        public OffsetDuplicate SetAltSource(Shape? value)
+        public OffsetDuplicate SetAltSource(Shape? value, IEventId? eventId = null)
 	{
-		ReferenceSingleEventEmitter evt = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource);
+		ReferenceSingleEventEmitter evt = new(ShapesLanguage.Instance.OffsetDuplicate_altSource, this, value, _altSource, eventId);
 		evt.CollectOldData();
 		_altSource = value;
 		evt.RaiseEvent();
@@ -1979,9 +1980,9 @@ public partial class OffsetDuplicate : Shape
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
-        public OffsetDuplicate SetDocs(Documentation? value)
+        public OffsetDuplicate SetDocs(Documentation? value, IEventId? eventId = null)
 	{
-		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.OffsetDuplicate_docs, this, value, _docs);
+		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.OffsetDuplicate_docs, this, value, _docs, eventId);
 		evt.CollectOldData();
 		SetParentNull(_docs);
 		AttachChild(value);
@@ -2007,10 +2008,10 @@ public partial class OffsetDuplicate : Shape
 
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public OffsetDuplicate SetOffset(Coord value)
+        public OffsetDuplicate SetOffset(Coord value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_offset);
-		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.OffsetDuplicate_offset, this, value, _offset);
+		ContainmentSingleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.OffsetDuplicate_offset, this, value, _offset, eventId);
 		evt.CollectOldData();
 		SetParentNull(_offset);
 		AttachChild(value);
@@ -2033,9 +2034,9 @@ public partial class OffsetDuplicate : Shape
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
-        public OffsetDuplicate SetSecretDocs(Documentation? value)
+        public OffsetDuplicate SetSecretDocs(Documentation? value, IEventId? eventId = null)
 	{
-		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, this, value, _secretDocs);
+		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.OffsetDuplicate_secretDocs, this, value, _secretDocs, eventId);
 		evt.CollectOldData();
 		SetParentNull(_secretDocs);
 		AttachChild(value);
@@ -2061,10 +2062,10 @@ public partial class OffsetDuplicate : Shape
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public OffsetDuplicate SetSource(Shape value)
+        public OffsetDuplicate SetSource(Shape value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.OffsetDuplicate_source);
-		ReferenceSingleEventEmitter evt = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, value, _source);
+		ReferenceSingleEventEmitter evt = new(ShapesLanguage.Instance.OffsetDuplicate_source, this, value, _source, eventId);
 		evt.CollectOldData();
 		_source = value;
 		evt.RaiseEvent();
@@ -2116,7 +2117,7 @@ public partial class OffsetDuplicate : Shape
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -2124,7 +2125,7 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Shape)
 			{
-				AltSource = (LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Shape?)value;
+				SetAltSource((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Shape?)value, eventId);
 				return true;
 			}
 
@@ -2135,7 +2136,7 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation)
 			{
-				Docs = (LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation?)value;
+				SetDocs((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation?)value, eventId);
 				return true;
 			}
 
@@ -2146,7 +2147,7 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord v)
 			{
-				Offset = v;
+				SetOffset(v, eventId);
 				return true;
 			}
 
@@ -2157,7 +2158,7 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation)
 			{
-				SecretDocs = (LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation?)value;
+				SetSecretDocs((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation?)value, eventId);
 				return true;
 			}
 
@@ -2168,7 +2169,7 @@ public partial class OffsetDuplicate : Shape
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Shape v)
 			{
-				Source = v;
+				SetSource(v, eventId);
 				return true;
 			}
 
@@ -2316,7 +2317,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -2325,7 +2326,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 			var safeNodes = ShapesLanguage.Instance.ReferenceGeometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(value).ToList();
 			AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 			AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes);
+			ReferenceSetEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes, eventId);
 			evt.CollectOldData();
 			_shapes.Clear();
 			_shapes.AddRange(safeNodes);
@@ -2369,10 +2370,10 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
  INamedWritable INamedWritable.SetName(string value) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Shape SetName(string value)
+        public Shape SetName(string value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name);
+		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
 		evt.CollectOldData();
 		_name = value;
 		evt.RaiseEvent();
@@ -2450,10 +2451,10 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
  IShape IShape.SetUuid(string value) => SetUuid(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Shape SetUuid(string value)
+        public Shape SetUuid(string value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ShapesLanguage.Instance.IShape_uuid);
-		PropertyEventEmitter evt = new(ShapesLanguage.Instance.IShape_uuid, this, value, _uuid);
+		PropertyEventEmitter evt = new(ShapesLanguage.Instance.IShape_uuid, this, value, _uuid, eventId);
 		evt.CollectOldData();
 		_uuid = value;
 		evt.RaiseEvent();
@@ -2474,9 +2475,9 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 
 	/// <remarks>Optional Single Containment</remarks>
-        public Shape SetShapeDocs(Documentation? value)
+        public Shape SetShapeDocs(Documentation? value, IEventId? eventId = null)
 	{
-		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.Shape_shapeDocs, this, value, _shapeDocs);
+		ContainmentSingleEventEmitter<Documentation> evt = new(ShapesLanguage.Instance.Shape_shapeDocs, this, value, _shapeDocs, eventId);
 		evt.CollectOldData();
 		SetParentNull(_shapeDocs);
 		AttachChild(value);
@@ -2524,7 +2525,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -2532,7 +2533,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		{
 			if (value is string v)
 			{
-				Name = v;
+				SetName(v, eventId);
 				return true;
 			}
 
@@ -2542,7 +2543,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		if (ShapesLanguage.Instance.IShape_fixpoints.EqualsIdentity(feature))
 		{
 			var safeNodes = ShapesLanguage.Instance.IShape_fixpoints.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord>(value).ToList();
-			ContainmentSetEventEmitter<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints);
+			ContainmentSetEventEmitter<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, eventId);
 			evt.CollectOldData();
 			RemoveSelfParent(_fixpoints.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints);
 			_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
@@ -2554,7 +2555,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		{
 			if (value is string v)
 			{
-				Uuid = v;
+				SetUuid(v, eventId);
 				return true;
 			}
 
@@ -2565,7 +2566,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation)
 			{
-				ShapeDocs = (LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation?)value;
+				SetShapeDocs((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Documentation?)value, eventId);
 				return true;
 			}
 

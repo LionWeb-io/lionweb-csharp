@@ -31,8 +31,10 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
     /// <param name="destinationParent"> Owner of the represented <paramref name="reference"/>.</param>
     /// <param name="safeNodes">Newly added values.</param>
     /// <param name="storage">Values already present in <paramref name="reference"/>.</param>
-    public ReferenceSetEventEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes, List<T> storage) :
-        base(reference, destinationParent, safeNodes)
+    /// <param name="eventId"></param>
+    public ReferenceSetEventEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes, List<T> storage,
+        IEventId? eventId) :
+        base(reference, destinationParent, safeNodes, eventId)
     {
         if (!IsActive())
             return;
@@ -57,18 +59,18 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
                 case ListAdded<T> added:
                     IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
                     PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, added.RightIndex, newTarget,
-                        PartitionCommander.CreateEventId()));
+                        GetEventId()));
                     break;
                 case ListMoved<T> moved:
                     IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
                     PartitionCommander.Raise(new EntryMovedInSameReferenceEvent(DestinationParent, Reference, moved.RightIndex,
                         moved.LeftIndex, target,
-                        PartitionCommander.CreateEventId()));
+                        GetEventId()));
                     break;
                 case ListDeleted<T> deleted:
                     IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
                     PartitionCommander.Raise(new ReferenceDeletedEvent(DestinationParent, Reference, deleted.LeftIndex,
-                        deletedTarget, PartitionCommander.CreateEventId()));
+                        deletedTarget, GetEventId()));
                     break;
             }
         }

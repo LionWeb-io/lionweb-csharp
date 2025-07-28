@@ -29,15 +29,17 @@ public abstract class ContainmentMultipleEventEmitterBase<T> : ContainmentEventE
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValues">Newly set values.</param>
-    protected ContainmentMultipleEventEmitterBase(Containment containment, NodeBase destinationParent, List<T>? newValues) :
-        base(containment, destinationParent)
+    /// <param name="eventId"></param>
+    protected ContainmentMultipleEventEmitterBase(Containment containment, NodeBase destinationParent,
+        List<T>? newValues, IEventId? eventId = null) :
+        base(containment, destinationParent, eventId)
     {
         try
         {
             NewValues = newValues?.ToDictionary<T, T, OldContainmentInfo?>(k => k, _ => null) ?? [];
         } catch (ArgumentException e)
         {
-            throw new ArgumentException(string.Join(",",newValues?.Select(n => n.GetId()) ?? []), e);
+            throw new ArgumentException(string.Join(",", newValues?.Select(n => n.GetId()) ?? []), e);
         }
     }
 

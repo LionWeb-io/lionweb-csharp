@@ -29,7 +29,8 @@ public abstract class ContainmentEventEmitterBase<T> : PartitionEventEmitterBase
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
-    protected ContainmentEventEmitterBase(Containment containment, NodeBase destinationParent) : base(destinationParent)
+    /// <param name="eventId"></param>
+    protected ContainmentEventEmitterBase(Containment containment, NodeBase destinationParent, IEventId? eventId = null) : base(destinationParent, eventId)
     {
         Containment = containment;
     }

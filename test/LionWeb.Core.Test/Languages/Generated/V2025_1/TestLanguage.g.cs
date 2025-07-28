@@ -12,6 +12,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
+using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -471,7 +472,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1008,7 +1009,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -1084,7 +1085,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value).ToList();
 			AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 			AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-			ReferenceSetEventEmitter<LinkTestConcept> evt = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n);
+			ReferenceSetEventEmitter<LinkTestConcept> evt = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n, eventId);
 			evt.CollectOldData();
 			_reference_0_n.Clear();
 			_reference_0_n.AddRange(safeNodes);
@@ -1107,7 +1108,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		{
 			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.TestLanguage.LinkTestConcept>(value).ToList();
 			AssureNonEmpty(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-			ReferenceSetEventEmitter<LinkTestConcept> evt = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n);
+			ReferenceSetEventEmitter<LinkTestConcept> evt = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n, eventId);
 			evt.CollectOldData();
 			_reference_1_n.Clear();
 			_reference_1_n.AddRange(safeNodes);

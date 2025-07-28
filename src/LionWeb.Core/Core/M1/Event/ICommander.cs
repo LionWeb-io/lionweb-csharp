@@ -41,5 +41,5 @@ public interface ICommander<in TEvent> where TEvent : IEvent
     /// Allows callers to decide on the next event id used within their <i>asynchronous control flow</i>.
     /// </para>
     /// <seealso cref="AsyncLocal{T}"/>
-    void RegisterEventId(IEventId eventId);
+    // void RegisterEventId(IEventId eventId);
 }

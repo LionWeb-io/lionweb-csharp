@@ -11,6 +11,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
+using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -241,7 +242,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -260,7 +261,7 @@ public partial class MyConcept : ConceptInstanceBase, INamedWritable
 		{
 			var safeNodes = TinyRefLangLanguage.Instance.MyConcept_multivaluedRef.AsNodes<INamed>(value).ToList();
 			AssureNonEmpty(safeNodes, TinyRefLangLanguage.Instance.MyConcept_multivaluedRef);
-			ReferenceSetEventEmitter<INamed> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef);
+			ReferenceSetEventEmitter<INamed> evt = new(TinyRefLangLanguage.Instance.MyConcept_multivaluedRef, this, safeNodes, _multivaluedRef, eventId);
 			evt.CollectOldData();
 			_multivaluedRef.Clear();
 			_multivaluedRef.AddRange(safeNodes);

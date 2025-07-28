@@ -31,12 +31,10 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
     /// <param name="addedValues">Newly added values.</param>
     /// <param name="existingValues">Values already present in <see cref="IReadableNode.GetAnnotations"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <see cref="Annotation"/>s.</param>
-    public AnnotationAddMultipleEventEmitter(
-        NodeBase destinationParent,
+    /// <param name="eventId"></param>
+    public AnnotationAddMultipleEventEmitter(NodeBase destinationParent,
         List<INode>? addedValues,
-        List<INode> existingValues,
-        Index? startIndex = null
-    ) : base(destinationParent, addedValues)
+        List<INode> existingValues, Index? startIndex = null, IEventId? eventId = null) : base(destinationParent, addedValues, eventId)
     {
         _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
     }
@@ -53,11 +51,11 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
             {
                 case null:
                     PartitionCommander.Raise(new AnnotationAddedEvent(DestinationParent, added, _newIndex,
-                        PartitionCommander.CreateEventId()));
+                        GetEventId()));
                     break;
 
                 case not null when old.Parent != DestinationParent:
-                    var eventId = PartitionCommander.CreateEventId();
+                    var eventId = GetEventId();
                     var @event = new AnnotationMovedFromOtherParentEvent(DestinationParent, _newIndex, added, old.Parent,
                         old.Index, eventId);
                     RaiseOriginMoveEvent(old, @event);
@@ -71,7 +69,7 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
 
                 case not null when old.Parent == DestinationParent:
                     PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(_newIndex, added, DestinationParent,
-                        old.Index, PartitionCommander.CreateEventId()));
+                        old.Index, GetEventId()));
                     break;
 
                 default:

@@ -37,7 +37,7 @@ internal class RewritePartitionEventReplicator(
             eventId = _localCommander.CreateEventId();
             var originalEventId = partitionEvent.EventId;
             _originalEventIds[eventId] = originalEventId;
-            _localCommander.RegisterEventId(eventId);
+            // _localCommander.RegisterEventId(eventId);
             RegisterEventId(eventId);
         }
 

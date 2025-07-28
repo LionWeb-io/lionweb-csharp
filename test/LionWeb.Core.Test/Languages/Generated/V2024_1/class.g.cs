@@ -6,6 +6,7 @@
 #nullable enable
 namespace @namespace.@int.@public.V2024_1;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -227,7 +228,7 @@ public partial class @out : @struct
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, Object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -349,7 +350,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
@@ -503,7 +504,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;

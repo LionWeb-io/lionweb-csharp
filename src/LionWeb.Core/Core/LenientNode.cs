@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1.Event;
 using M1.Event.Partition;
 using M2;
 using M3;
@@ -183,7 +184,7 @@ public class LenientNode : NodeBase, INode
     /// For containments, sets the target node as parent of the value, even if the value doesn't fit the containment's type.
     /// For containments, the target node MUST implement <see cref="INode"/>; for references, the target node MUST implement <see cref="IReadableNode"/>. 
     /// </summary>
-    protected override bool SetInternal(Feature? feature, object? value)
+    protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
     {
         if (feature == null)
         {
@@ -306,14 +307,14 @@ public class LenientNode : NodeBase, INode
                 .Contains(child));
 
     /// <inheritdoc />
-    public override void AddAnnotations(IEnumerable<INode> annotations)
+    public override void AddAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null)
     {
         var safeAnnotations = annotations?.ToList();
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
     }
 
     /// <inheritdoc />
-    public override void InsertAnnotations(Index index, IEnumerable<INode> annotations)
+    public override void InsertAnnotations(Index index, IEnumerable<INode> annotations, IEventId? eventId = null)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
@@ -321,7 +322,7 @@ public class LenientNode : NodeBase, INode
     }
 
     /// <inheritdoc />
-    public override bool RemoveAnnotations(IEnumerable<INode> annotations) =>
+    public override bool RemoveAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null) =>
         RemoveSelfParent(annotations?.ToList(), _annotations, null, null);
 
     private IEnumerable<Feature> FeatureKeys => _featureValues.Select(f => f.feature);

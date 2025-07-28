@@ -21,6 +21,7 @@ using Core.Serialization;
 using Core.Utilities;
 using Languages.Generated.V2024_1.SDTLang;
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1.Event;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -505,7 +506,7 @@ public class HasherTests
 
         public void DetachFromParent() { }
 
-        public void Set(Feature feature, object? value) { }
+        public void Set(Feature feature, object? value, IEventId? eventId = null) { }
 
         public void SetParent(INode? parent) { }
 
@@ -513,11 +514,11 @@ public class HasherTests
 
         public Containment? GetContainmentOf(INode child) => null;
 
-        public void AddAnnotations(IEnumerable<INode> annotations) { }
+        public void AddAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null) { }
 
-        public void InsertAnnotations(int index, IEnumerable<INode> annotations) { }
+        public void InsertAnnotations(Int32 index, IEnumerable<INode> annotations, IEventId? eventId = null) { }
 
-        public bool RemoveAnnotations(IEnumerable<INode> annotations) => false;
+        public bool RemoveAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null) => false;
 
         public IReadOnlyList<Coord> Fixpoints { get => []; init { } }
 

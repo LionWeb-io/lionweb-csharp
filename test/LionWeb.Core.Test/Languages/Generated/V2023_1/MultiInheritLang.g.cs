@@ -11,6 +11,7 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
+using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -161,7 +162,7 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
 		if (base.SetInternal(feature, value))
 			return true;
