@@ -132,14 +132,6 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
             : prependedMessage);
     }
 
-    protected virtual void Log(string message, bool header = false)
-    {
-        var prependedMessage = $"{_name}: {message}";
-        Console.WriteLine(header
-            ? $"{ILionWebClient.HeaderColor_Start}{prependedMessage}{ILionWebClient.HeaderColor_End}"
-            : prependedMessage);
-    }
-
     protected abstract Task Send(T deltaContent);
 
     protected abstract void Receive(T deltaContent);
