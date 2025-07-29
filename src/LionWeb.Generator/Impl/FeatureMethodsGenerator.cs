@@ -18,6 +18,7 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
+using Core.M1.Event;
 using Core.M1.Event.Partition.Emitter;
 using Core.M2;
 using Core.M3;
@@ -85,7 +86,8 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private MethodDeclarationSyntax GenSetInternal() =>
         Method("SetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
-                Param("value", NullableType(AsType(typeof(object))))
+                Param("value", NullableType(PredefinedType(Token(SyntaxKind.ObjectKeyword)))),
+                ParamWithDefaultValue("eventId", NullableType(AsType(typeof(IEventId))), SyntaxKind.NullLiteralExpression)
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
@@ -229,7 +231,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             "evt",
             AsType(typeof(ContainmentSetEventEmitter<>), AsType(containment.GetFeatureType())),
             NewCall([
-                MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment)
+                MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("eventId")
             ])
         );
 
@@ -238,7 +240,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             "evt",
             AsType(typeof(ReferenceSetEventEmitter<>), AsType(reference.GetFeatureType())),
             NewCall([
-                MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference)
+                MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference), IdentifierName("eventId")
             ])
         );
 

@@ -19,6 +19,7 @@
 
 namespace LionWeb.Core.M2;
 
+using M1.Event;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
@@ -87,5 +88,5 @@ public interface INamedWritable : INamed, IWritableNode
     public new string Name { get; set; }
 
     /// <inheritdoc cref="INamed.Name"/>
-    public INamedWritable SetName(string value);
+    public INamedWritable SetName(string value, IEventId? eventId = null);
 }

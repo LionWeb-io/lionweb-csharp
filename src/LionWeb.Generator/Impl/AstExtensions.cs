@@ -134,6 +134,12 @@ public static class AstExtensions
     public static ParameterSyntax Param(string name, TypeSyntax? type) =>
         Parameter(Identifier(name))
             .WithType(type);
+    
+    /// <returns><c>type name = defaultValue</c></returns>
+    public static ParameterSyntax ParamWithDefaultValue(string name, TypeSyntax? type, SyntaxKind defaultValue) =>
+        Parameter(Identifier(name))
+            .WithType(type)
+            .WithDefault(EqualsValueClause(LiteralExpression(defaultValue)));
 
     /// <returns><c> : base(paramNames)</c></returns>
     public static ConstructorInitializerSyntax Initializer(params string[] paramNames) =>
