@@ -173,4 +173,8 @@ public abstract class GeneratorBase
     /// <returns><c>TryGetMyFeature</c></returns>
     protected string FeatureTryGet(Feature feature) =>
         $"TryGet{feature.Name.ToFirstUpper()}";
+    
+    /// <returns><c>SetMyFeature</c></returns>
+    protected string FeatureSet(Feature feature) =>
+        $"Set{feature.Name.ToFirstUpper()}";
 }

@@ -58,7 +58,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private MethodDeclarationSyntax GenGetInternal() =>
         Method("GetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
-                Param("result", NullableType(AsType(typeof(object))))
+                Param("result", NullableType(PredefinedType(Token(SyntaxKind.ObjectKeyword))))
                     .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
@@ -93,7 +93,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    IfStatement(ParseExpression("base.SetInternal(feature, value)"),
+                    IfStatement(ParseExpression("base.SetInternal(feature, value, eventId)"),
                         ReturnTrue())
                 }
                 .Concat(FeaturesToImplement(classifier).Select(GenSetInternal))
@@ -128,7 +128,9 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         IfStatement(
             IsPatternExpression(IdentifierName("value"), AsTypePattern(property)),
             AsStatements([
-                AssignToFeatureProperty(property, IdentifierName("v")),
+                ExpressionStatement(
+                    InvocationExpression(
+                        IdentifierName(FeatureSet(property)), AsArguments([IdentifierName("v"), IdentifierName("eventId")]))),
                 ReturnTrue()
             ])
         ),
@@ -140,7 +142,9 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         IfStatement(
             IsPatternExpression(IdentifierName("value"), NullOrTypePattern(property)),
             AsStatements([
-                AssignToFeatureProperty(property, CastValueType(property)),
+                ExpressionStatement(
+                    InvocationExpression(
+                        IdentifierName(FeatureSet(property)), AsArguments([CastValueType(property), IdentifierName("eventId")]))),
                 ReturnTrue()
             ])
         ),
@@ -152,7 +156,9 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         IfStatement(
             IsPatternExpression(IdentifierName("value"), AsTypePattern(link)),
             AsStatements([
-                AssignToFeatureProperty(link, IdentifierName("v")),
+                ExpressionStatement(
+                    InvocationExpression(
+                        IdentifierName(FeatureSet(link)), AsArguments([IdentifierName("v"), IdentifierName("eventId")]))),
                 ReturnTrue()
             ])
         ),
@@ -164,7 +170,9 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         IfStatement(
             IsPatternExpression(IdentifierName("value"), NullOrTypePattern(link)),
             AsStatements([
-                AssignToFeatureProperty(link, CastValueType(link)),
+                ExpressionStatement(
+                    InvocationExpression(
+                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link), IdentifierName("eventId")]))),
                 ReturnTrue()
             ])
         ),
