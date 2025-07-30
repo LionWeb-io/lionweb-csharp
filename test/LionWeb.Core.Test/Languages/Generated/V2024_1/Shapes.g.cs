@@ -6,13 +6,13 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M1.Event.Partition;
 using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
-using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -344,12 +344,12 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes)
+        public BillOfMaterials AddAltGroups(IEnumerable<MaterialGroup> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, null);
+		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, null, eventId);
 		evt.CollectOldData();
 		_altGroups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
 		evt.RaiseEvent();
@@ -357,14 +357,14 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials InsertAltGroups(int index, IEnumerable<MaterialGroup> nodes)
+        public BillOfMaterials InsertAltGroups(int index, IEnumerable<MaterialGroup> nodes, IEventId? eventId = null)
 	{
 		AssureInRange(index, _altGroups);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
 		AssureNoSelfMove(index, safeNodes, _altGroups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups);
-		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, index);
+		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_altGroups, this, safeNodes, _altGroups, index, eventId);
 		evt.CollectOldData();
 		_altGroups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_altGroups));
 		evt.RaiseEvent();
@@ -372,7 +372,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials RemoveAltGroups(IEnumerable<MaterialGroup> nodes)
+        public BillOfMaterials RemoveAltGroups(IEnumerable<MaterialGroup> nodes, IEventId? eventId = null)
 	{
 		RemoveSelfParent(nodes?.ToList(), _altGroups, ShapesLanguage.Instance.BillOfMaterials_altGroups, ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_altGroups));
 		return this;
@@ -417,12 +417,12 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes)
+        public BillOfMaterials AddGroups(IEnumerable<MaterialGroup> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
-		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, null);
+		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, null, eventId);
 		evt.CollectOldData();
 		_groups.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
 		evt.RaiseEvent();
@@ -430,14 +430,14 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials InsertGroups(int index, IEnumerable<MaterialGroup> nodes)
+        public BillOfMaterials InsertGroups(int index, IEnumerable<MaterialGroup> nodes, IEventId? eventId = null)
 	{
 		AssureInRange(index, _groups);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
 		AssureNoSelfMove(index, safeNodes, _groups);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups);
-		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, index);
+		ContainmentAddMultipleEventEmitter<MaterialGroup> evt = new(ShapesLanguage.Instance.BillOfMaterials_groups, this, safeNodes, _groups, index, eventId);
 		evt.CollectOldData();
 		_groups.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.BillOfMaterials_groups));
 		evt.RaiseEvent();
@@ -445,7 +445,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public BillOfMaterials RemoveGroups(IEnumerable<MaterialGroup> nodes)
+        public BillOfMaterials RemoveGroups(IEnumerable<MaterialGroup> nodes, IEventId? eventId = null)
 	{
 		RemoveSelfParent(nodes?.ToList(), _groups, ShapesLanguage.Instance.BillOfMaterials_groups, ContainmentRemover<MaterialGroup>(ShapesLanguage.Instance.BillOfMaterials_groups));
 		return this;
@@ -465,12 +465,12 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes)
+        public BillOfMaterials AddMaterials(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials.Count);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, _materials.Count, eventId);
 		evt.CollectOldData();
 		_materials.AddRange(safeNodes);
 		evt.RaiseEvent();
@@ -478,13 +478,13 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public BillOfMaterials InsertMaterials(int index, IEnumerable<IShape> nodes)
+        public BillOfMaterials InsertMaterials(int index, IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		AssureInRange(index, _materials);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
-		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, index);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.BillOfMaterials_materials, this, safeNodes, index, eventId);
 		evt.CollectOldData();
 		_materials.InsertRange(index, safeNodes);
 		evt.RaiseEvent();
@@ -492,7 +492,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public BillOfMaterials RemoveMaterials(IEnumerable<IShape> nodes)
+        public BillOfMaterials RemoveMaterials(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.BillOfMaterials_materials);
@@ -508,7 +508,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	/// <inheritdoc/>
         public override Annotation GetAnnotation() => ShapesLanguage.Instance.BillOfMaterials;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -542,7 +542,7 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.BillOfMaterials_altGroups.EqualsIdentity(feature))
 		{
@@ -558,8 +558,8 @@ public partial class BillOfMaterials : AnnotationInstanceBase
 		if (ShapesLanguage.Instance.BillOfMaterials_defaultGroup.EqualsIdentity(feature))
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup)
-            {
-                SetDefaultGroup((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup?)value, eventId);
+			{
+				SetDefaultGroup((LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.MaterialGroup?)value, eventId);
 				return true;
 			}
 
@@ -714,7 +714,7 @@ public partial class Circle : Shape
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Circle;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -736,7 +736,7 @@ public partial class Circle : Shape
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.Circle_center.EqualsIdentity(feature))
 		{
@@ -820,11 +820,11 @@ public partial class CompositeShape : Shape
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
-        public CompositeShape AddDisabledParts(IEnumerable<IShape> nodes)
+        public CompositeShape AddDisabledParts(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
-		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, null);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, null, eventId);
 		evt.CollectOldData();
 		_disabledParts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
 		evt.RaiseEvent();
@@ -834,13 +834,13 @@ public partial class CompositeShape : Shape
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both DisabledParts and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than DisabledParts.Count</exception>
-        public CompositeShape InsertDisabledParts(int index, IEnumerable<IShape> nodes)
+        public CompositeShape InsertDisabledParts(int index, IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		AssureInRange(index, _disabledParts);
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _disabledParts, ShapesLanguage.Instance.CompositeShape_disabledParts);
 		AssureNoSelfMove(index, safeNodes, _disabledParts);
-		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, index);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_disabledParts, this, safeNodes, _disabledParts, index, eventId);
 		evt.CollectOldData();
 		_disabledParts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts));
 		evt.RaiseEvent();
@@ -849,7 +849,7 @@ public partial class CompositeShape : Shape
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If DisabledParts would be empty</exception>
-        public CompositeShape RemoveDisabledParts(IEnumerable<IShape> nodes)
+        public CompositeShape RemoveDisabledParts(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_disabledParts);
@@ -903,11 +903,11 @@ public partial class CompositeShape : Shape
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
-        public CompositeShape AddParts(IEnumerable<IShape> nodes)
+        public CompositeShape AddParts(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
-		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, null);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, null, eventId);
 		evt.CollectOldData();
 		_parts.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
 		evt.RaiseEvent();
@@ -917,13 +917,13 @@ public partial class CompositeShape : Shape
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Parts and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Parts.Count</exception>
-        public CompositeShape InsertParts(int index, IEnumerable<IShape> nodes)
+        public CompositeShape InsertParts(int index, IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		AssureInRange(index, _parts);
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _parts, ShapesLanguage.Instance.CompositeShape_parts);
 		AssureNoSelfMove(index, safeNodes, _parts);
-		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, index);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.CompositeShape_parts, this, safeNodes, _parts, index, eventId);
 		evt.CollectOldData();
 		_parts.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.CompositeShape_parts));
 		evt.RaiseEvent();
@@ -932,7 +932,7 @@ public partial class CompositeShape : Shape
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If Parts would be empty</exception>
-        public CompositeShape RemoveParts(IEnumerable<IShape> nodes)
+        public CompositeShape RemoveParts(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.CompositeShape_parts);
@@ -948,7 +948,7 @@ public partial class CompositeShape : Shape
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.CompositeShape;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -976,7 +976,7 @@ public partial class CompositeShape : Shape
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.CompositeShape_disabledParts.EqualsIdentity(feature))
 		{
@@ -1154,7 +1154,7 @@ public partial class Coord : ConceptInstanceBase
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Coord;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -1182,7 +1182,7 @@ public partial class Coord : ConceptInstanceBase
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.Coord_x.EqualsIdentity(feature))
 		{
@@ -1290,7 +1290,7 @@ public partial class Documentation : AnnotationInstanceBase
 	/// <inheritdoc/>
         public override Annotation GetAnnotation() => ShapesLanguage.Instance.Documentation;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -1312,7 +1312,7 @@ public partial class Documentation : AnnotationInstanceBase
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.Documentation_technical.EqualsIdentity(feature))
 		{
@@ -1393,12 +1393,12 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Geometry AddShapes(IEnumerable<IShape> nodes)
+        public Geometry AddShapes(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
-		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, null);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, null, eventId);
 		evt.CollectOldData();
 		_shapes.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
 		evt.RaiseEvent();
@@ -1406,14 +1406,14 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Geometry InsertShapes(int index, IEnumerable<IShape> nodes)
+        public Geometry InsertShapes(int index, IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		AssureInRange(index, _shapes);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
 		AssureNoSelfMove(index, safeNodes, _shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.Geometry_shapes);
-		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, index);
+		ContainmentAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.Geometry_shapes, this, safeNodes, _shapes, index, eventId);
 		evt.CollectOldData();
 		_shapes.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.Geometry_shapes));
 		evt.RaiseEvent();
@@ -1421,7 +1421,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Geometry RemoveShapes(IEnumerable<IShape> nodes)
+        public Geometry RemoveShapes(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		RemoveSelfParent(nodes?.ToList(), _shapes, ShapesLanguage.Instance.Geometry_shapes, ContainmentRemover<IShape>(ShapesLanguage.Instance.Geometry_shapes));
 		return this;
@@ -1438,7 +1438,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	public IPartitionPublisher? GetPublisher() => _eventHandler;
 	public IPartitionCommander? GetCommander() => _eventHandler;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -1460,7 +1460,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.Geometry_documentation.EqualsIdentity(feature))
 		{
@@ -1542,18 +1542,18 @@ public partial interface IShape : INode
 	public IReadOnlyList<Coord> Fixpoints { get; init; }
 
 	/// <remarks>Optional Multiple Containment</remarks>
-        public IShape AddFixpoints(IEnumerable<Coord> nodes);
+        public IShape AddFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes);
+        public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes, IEventId? eventId = null);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public IShape RemoveFixpoints(IEnumerable<Coord> nodes);
+        public IShape RemoveFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null);
 	/// <remarks>Required Property</remarks>
         [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-uuid")]
 	[LionCoreFeature(Kind = LionCoreFeatureKind.Property, Optional = false, Multiple = false)]
 	public string Uuid { get; set; }
 
 	/// <remarks>Required Property</remarks>
-        public IShape SetUuid(string value);
+        public IShape SetUuid(string value, IEventId? eventId = null);
 }
 
 [LionCoreMetaPointer(Language = typeof(ShapesLanguage), Key = "key-Line")]
@@ -1624,7 +1624,7 @@ public partial class Line : Shape, INamedWritable
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Line;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -1646,13 +1646,13 @@ public partial class Line : Shape, INamedWritable
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.Line_end.EqualsIdentity(feature))
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.Coord v)
-            {
-                SetEnd(v, eventId);
+			{
+				SetEnd(v, eventId);
 				return true;
 			}
 
@@ -1763,12 +1763,12 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
-        public MaterialGroup AddMaterials(IEnumerable<IShape> nodes)
+        public MaterialGroup AddMaterials(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials.Count);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, _materials.Count, eventId);
 		evt.CollectOldData();
 		_materials.AddRange(safeNodes);
 		evt.RaiseEvent();
@@ -1778,13 +1778,13 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If both Materials and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Materials.Count</exception>
-        public MaterialGroup InsertMaterials(int index, IEnumerable<IShape> nodes)
+        public MaterialGroup InsertMaterials(int index, IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		AssureInRange(index, _materials);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
 		AssureNonEmpty(safeNodes, _materials, ShapesLanguage.Instance.MaterialGroup_materials);
-		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, index);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.MaterialGroup_materials, this, safeNodes, index, eventId);
 		evt.CollectOldData();
 		_materials.InsertRange(index, safeNodes);
 		evt.RaiseEvent();
@@ -1793,7 +1793,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Reference</remarks>
     	/// <exception cref = "InvalidValueException">If Materials would be empty</exception>
-        public MaterialGroup RemoveMaterials(IEnumerable<IShape> nodes)
+        public MaterialGroup RemoveMaterials(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.MaterialGroup_materials);
@@ -1833,7 +1833,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.MaterialGroup;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -1861,7 +1861,7 @@ public partial class MaterialGroup : ConceptInstanceBase
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.MaterialGroup_defaultShape.EqualsIdentity(feature))
 		{
@@ -2079,7 +2079,7 @@ public partial class OffsetDuplicate : Shape
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.OffsetDuplicate;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -2119,7 +2119,7 @@ public partial class OffsetDuplicate : Shape
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.OffsetDuplicate_altSource.EqualsIdentity(feature))
 		{
@@ -2256,12 +2256,12 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes)
+        public ReferenceGeometry AddShapes(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes.Count);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, _shapes.Count, eventId);
 		evt.CollectOldData();
 		_shapes.AddRange(safeNodes);
 		evt.RaiseEvent();
@@ -2269,13 +2269,13 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public ReferenceGeometry InsertShapes(int index, IEnumerable<IShape> nodes)
+        public ReferenceGeometry InsertShapes(int index, IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		AssureInRange(index, _shapes);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
-		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, index);
+		ReferenceAddMultipleEventEmitter<IShape> evt = new(ShapesLanguage.Instance.ReferenceGeometry_shapes, this, safeNodes, index, eventId);
 		evt.CollectOldData();
 		_shapes.InsertRange(index, safeNodes);
 		evt.RaiseEvent();
@@ -2283,7 +2283,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public ReferenceGeometry RemoveShapes(IEnumerable<IShape> nodes)
+        public ReferenceGeometry RemoveShapes(IEnumerable<IShape> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.ReferenceGeometry_shapes);
@@ -2303,7 +2303,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	public IPartitionPublisher? GetPublisher() => _eventHandler;
 	public IPartitionCommander? GetCommander() => _eventHandler;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -2319,7 +2319,7 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ShapesLanguage.Instance.ReferenceGeometry_shapes.EqualsIdentity(feature))
 		{
@@ -2367,7 +2367,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value, IEventId? eventId = null) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public Shape SetName(string value, IEventId? eventId = null)
@@ -2393,39 +2393,39 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 		return _fixpoints.Count != 0;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
- IShape IShape.AddFixpoints(IEnumerable<Coord> nodes) => AddFixpoints(nodes);
+ IShape IShape.AddFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null) => AddFixpoints(nodes);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Shape AddFixpoints(IEnumerable<Coord> nodes)
+        public Shape AddFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
-		ContainmentAddMultipleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, null);
+		ContainmentAddMultipleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, null, eventId);
 		evt.CollectOldData();
 		_fixpoints.AddRange(SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
 		evt.RaiseEvent();
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
- IShape IShape.InsertFixpoints(int index, IEnumerable<Coord> nodes) => InsertFixpoints(index, nodes);
+ IShape IShape.InsertFixpoints(int index, IEnumerable<Coord> nodes, IEventId? eventId = null) => InsertFixpoints(index, nodes);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Shape InsertFixpoints(int index, IEnumerable<Coord> nodes)
+        public Shape InsertFixpoints(int index, IEnumerable<Coord> nodes, IEventId? eventId = null)
 	{
 		AssureInRange(index, _fixpoints);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
 		AssureNoSelfMove(index, safeNodes, _fixpoints);
 		AssureNotNullMembers(safeNodes, ShapesLanguage.Instance.IShape_fixpoints);
-		ContainmentAddMultipleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, index);
+		ContainmentAddMultipleEventEmitter<Coord> evt = new(ShapesLanguage.Instance.IShape_fixpoints, this, safeNodes, _fixpoints, index, eventId);
 		evt.CollectOldData();
 		_fixpoints.InsertRange(index, SetSelfParent(safeNodes, ShapesLanguage.Instance.IShape_fixpoints));
 		evt.RaiseEvent();
 		return this;
 	}
 /// <remarks>Optional Multiple Containment</remarks>
- IShape IShape.RemoveFixpoints(IEnumerable<Coord> nodes) => RemoveFixpoints(nodes);
+ IShape IShape.RemoveFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null) => RemoveFixpoints(nodes);
 	/// <remarks>Optional Multiple Containment</remarks>
-        public Shape RemoveFixpoints(IEnumerable<Coord> nodes)
+        public Shape RemoveFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null)
 	{
 		RemoveSelfParent(nodes?.ToList(), _fixpoints, ShapesLanguage.Instance.IShape_fixpoints, ContainmentRemover<Coord>(ShapesLanguage.Instance.IShape_fixpoints));
 		return this;
@@ -2448,7 +2448,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- IShape IShape.SetUuid(string value) => SetUuid(value);
+ IShape IShape.SetUuid(string value, IEventId? eventId = null) => SetUuid(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         public Shape SetUuid(string value, IEventId? eventId = null)
@@ -2493,7 +2493,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Shape;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -2527,7 +2527,7 @@ public abstract partial class Shape : ConceptInstanceBase, INamedWritable, IShap
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{

@@ -6,12 +6,12 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseConceptLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
-using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -107,10 +107,10 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BaseConcept SetEnumProp(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedDirectEnumLang.DirectEnum value)
+        public BaseConcept SetEnumProp(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedDirectEnumLang.DirectEnum value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp);
-		PropertyEventEmitter evt = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp, this, value, _enumProp);
+		PropertyEventEmitter evt = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp, this, value, _enumProp, eventId);
 		evt.CollectOldData();
 		_enumProp = value;
 		evt.RaiseEvent();
@@ -135,10 +135,10 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BaseConcept SetSdtProp(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedDirectSdtLang.DirectSdt value)
+        public BaseConcept SetSdtProp(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedDirectSdtLang.DirectSdt value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp);
-		PropertyEventEmitter evt = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp, this, value, _sdtProp);
+		PropertyEventEmitter evt = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp, this, value, _sdtProp, eventId);
 		evt.CollectOldData();
 		_sdtProp = value;
 		evt.RaiseEvent();
@@ -161,13 +161,13 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 	}
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface.SetCont(INode value) => SetCont(value);
+ LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.BaseContainmentIface.SetCont(INode value, IEventId? eventId = null) => SetCont(value);
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BaseConcept SetCont(INode value)
+        public BaseConcept SetCont(INode value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
-		ContainmentSingleEventEmitter<INode> evt = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont, this, value, _cont);
+		ContainmentSingleEventEmitter<INode> evt = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont, this, value, _cont, eventId);
 		evt.CollectOldData();
 		SetParentNull(_cont);
 		AttachChild(value);
@@ -193,13 +193,13 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.BasePropertyIface LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.BasePropertyIface.SetProp(string value) => SetProp(value);
+ LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.BasePropertyIface LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.BasePropertyIface.SetProp(string value, IEventId? eventId = null) => SetProp(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BaseConcept SetProp(string value)
+        public BaseConcept SetProp(string value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop);
-		PropertyEventEmitter evt = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop, this, value, _prop);
+		PropertyEventEmitter evt = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop, this, value, _prop, eventId);
 		evt.CollectOldData();
 		_prop = value;
 		evt.RaiseEvent();
@@ -222,13 +222,13 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 	}
 /// <remarks>Required Single Reference</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface.SetRef(IReadableNode value) => SetRef(value);
+ LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.BaseReferenceIface.SetRef(IReadableNode value, IEventId? eventId = null) => SetRef(value);
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BaseConcept SetRef(IReadableNode value)
+        public BaseConcept SetRef(IReadableNode value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
-		ReferenceSingleEventEmitter evt = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, this, value, _ref);
+		ReferenceSingleEventEmitter evt = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, this, value, _ref, eventId);
 		evt.CollectOldData();
 		_ref = value;
 		evt.RaiseEvent();
@@ -242,7 +242,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 	/// <inheritdoc/>
         public override Concept GetConcept() => MixedBaseConceptLangLanguage.Instance.BaseConcept;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -282,13 +282,13 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp.EqualsIdentity(feature))
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedDirectEnumLang.DirectEnum v)
 			{
-				EnumProp = v;
+				SetEnumProp(v, eventId);
 				return true;
 			}
 
@@ -299,7 +299,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedDirectSdtLang.DirectSdt v)
 			{
-				SdtProp = v;
+				SetSdtProp(v, eventId);
 				return true;
 			}
 
@@ -310,7 +310,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 		{
 			if (value is INode v)
 			{
-				Cont = v;
+				SetCont(v, eventId);
 				return true;
 			}
 
@@ -321,7 +321,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 		{
 			if (value is string v)
 			{
-				Prop = v;
+				SetProp(v, eventId);
 				return true;
 			}
 
@@ -332,7 +332,7 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
 		{
 			if (value is IReadableNode v)
 			{
-				Ref = v;
+				SetRef(v, eventId);
 				return true;
 			}
 

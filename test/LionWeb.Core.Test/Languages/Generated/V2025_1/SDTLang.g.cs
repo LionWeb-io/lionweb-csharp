@@ -6,12 +6,12 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
-using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -266,10 +266,10 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetA(A value)
+        public SDTConcept SetA(A value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_A);
-		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_A, this, value, _a);
+		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_A, this, value, _a, eventId);
 		evt.CollectOldData();
 		_a = value;
 		evt.RaiseEvent();
@@ -294,10 +294,10 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetAmount(Amount value)
+        public SDTConcept SetAmount(Amount value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_amount);
-		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_amount, this, value, _amount);
+		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_amount, this, value, _amount, eventId);
 		evt.CollectOldData();
 		_amount = value;
 		evt.RaiseEvent();
@@ -322,10 +322,10 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetComplex(ComplexNumber value)
+        public SDTConcept SetComplex(ComplexNumber value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_complex);
-		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_complex, this, value, _complex);
+		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_complex, this, value, _complex, eventId);
 		evt.CollectOldData();
 		_complex = value;
 		evt.RaiseEvent();
@@ -346,9 +346,9 @@ public partial class SDTConcept : ConceptInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public SDTConcept SetDecimal(Decimal? value)
+        public SDTConcept SetDecimal(Decimal? value, IEventId? eventId = null)
 	{
-		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_decimal, this, value, _decimal);
+		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_decimal, this, value, _decimal, eventId);
 		evt.CollectOldData();
 		_decimal = value;
 		evt.RaiseEvent();
@@ -362,7 +362,7 @@ public partial class SDTConcept : ConceptInstanceBase
 	/// <inheritdoc/>
         public override Concept GetConcept() => SDTLangLanguage.Instance.SDTConcept;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -396,13 +396,13 @@ public partial class SDTConcept : ConceptInstanceBase
 	/// <inheritdoc/>
         protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (SDTLangLanguage.Instance.SDTConcept_A.EqualsIdentity(feature))
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.A v)
 			{
-				A = v;
+				SetA(v, eventId);
 				return true;
 			}
 
@@ -413,7 +413,7 @@ public partial class SDTConcept : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Amount v)
 			{
-				Amount = v;
+				SetAmount(v, eventId);
 				return true;
 			}
 
@@ -424,7 +424,7 @@ public partial class SDTConcept : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.ComplexNumber v)
 			{
-				Complex = v;
+				SetComplex(v, eventId);
 				return true;
 			}
 
@@ -435,7 +435,7 @@ public partial class SDTConcept : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Decimal)
 			{
-				Decimal = (LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Decimal?)value;
+				SetDecimal((LionWeb.Core.Test.Languages.Generated.V2025_1.SDTLang.Decimal?)value, eventId);
 				return true;
 			}
 

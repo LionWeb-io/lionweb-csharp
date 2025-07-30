@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBasePropertyLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -88,5 +89,5 @@ public partial interface BasePropertyIface : INode
 	public string Prop { get; set; }
 
 	/// <remarks>Required Property</remarks>
-        public BasePropertyIface SetProp(string value);
+        public BasePropertyIface SetProp(string value, IEventId? eventId = null);
 }
