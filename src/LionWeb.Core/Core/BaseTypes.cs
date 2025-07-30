@@ -860,8 +860,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
 
     /// Raises <see cref="ChildDeletedEvent"/> for <paramref name="containment"/>.
     protected Action<IPartitionCommander, Index, T, IEventId?> ContainmentRemover<T>(Containment containment) where T : INode =>
-        (commander, index, node, evntId) =>
-            commander.Raise(new ChildDeletedEvent(node, this, containment, index, evntId ?? commander.CreateEventId()));
+        (commander, index, node, eventId) =>
+            commander.Raise(new ChildDeletedEvent(node, this, containment, index, eventId ?? commander.CreateEventId()));
 
     /// Raises <see cref="AnnotationDeletedEvent"/>.
     private void AnnotationRemover(IPartitionCommander commander, Index index, INode node, IEventId? eventId = null) =>
