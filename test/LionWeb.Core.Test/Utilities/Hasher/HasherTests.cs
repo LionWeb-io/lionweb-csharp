@@ -521,16 +521,14 @@ public class HasherTests
         public bool RemoveAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null) => false;
 
         public IReadOnlyList<Coord> Fixpoints { get => []; init { } }
+        public IShape AddFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null) => this;
 
-        public IShape AddFixpoints(IEnumerable<Coord> nodes) => this;
+        public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes, IEventId? eventId = null) => this;
 
-        public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes) => this;
-
-        public IShape RemoveFixpoints(IEnumerable<Coord> nodes) => this;
-
+        public IShape RemoveFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null) => this;
+        
         public string Uuid { get => null; set { } }
-
-        public IShape SetUuid(string value) => this;
+        public IShape SetUuid(string value, IEventId? eventId = null) => this;
     }
 
     [TestMethod]
