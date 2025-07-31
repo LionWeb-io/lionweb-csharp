@@ -33,7 +33,7 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValue">Newly set value.</param>
     /// <param name="oldValue">Previous value of <paramref name="containment"/>.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
     public ContainmentSingleEventEmitter(Containment containment, NodeBase destinationParent, T? newValue, T? oldValue,
         IEventId? eventId = null)
         : base(containment, destinationParent, eventId)

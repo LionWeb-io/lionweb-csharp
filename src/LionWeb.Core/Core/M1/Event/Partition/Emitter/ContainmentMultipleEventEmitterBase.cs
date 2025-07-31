@@ -29,7 +29,7 @@ public abstract class ContainmentMultipleEventEmitterBase<T> : ContainmentEventE
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValues">Newly set values.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
     protected ContainmentMultipleEventEmitterBase(Containment containment, NodeBase destinationParent,
         List<T>? newValues, IEventId? eventId = null) :
         base(containment, destinationParent, eventId)

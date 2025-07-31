@@ -27,7 +27,7 @@ public abstract class AnnotationEventEmitterBase : PartitionEventEmitterBase<INo
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="newValues">Newly set values.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
     protected AnnotationEventEmitterBase(NodeBase destinationParent, List<INode>? newValues, IEventId? eventId = null) : base(destinationParent, eventId)
     {
         NewValues = newValues?.ToDictionary<INode, INode, OldAnnotationInfo?>(k => k, _ => null) ?? [];

@@ -29,7 +29,7 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <see cref="IReadableNode.GetAnnotations"/>.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
     public AnnotationSetEventEmitter(NodeBase destinationParent,
         List<INode>? setValues,
         List<INode> existingValues,

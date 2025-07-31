@@ -20,6 +20,7 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
+/// Encapsulates event-related logic and data for <i>adding</i> or <i>changing</i> or <i>deleting</i> of <see cref="Property"/>s.
 public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
 {
     private readonly Property _property;

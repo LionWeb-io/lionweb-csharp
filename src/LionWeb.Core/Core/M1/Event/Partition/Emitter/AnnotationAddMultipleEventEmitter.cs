@@ -31,7 +31,7 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
     /// <param name="addedValues">Newly added values.</param>
     /// <param name="existingValues">Values already present in <see cref="IReadableNode.GetAnnotations"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <see cref="Annotation"/>s.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
     public AnnotationAddMultipleEventEmitter(NodeBase destinationParent,
         List<INode>? addedValues,
         List<INode> existingValues, Index? startIndex = null, IEventId? eventId = null) : base(destinationParent, addedValues, eventId)

@@ -29,7 +29,7 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
     /// <param name="destinationParent"></param>
     /// <param name="safeNodes">Targets to raise events for.</param>
     /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
     /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
     public ReferenceAddMultipleEventEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes,
         Index startIndex, IEventId? eventId = null) : base(reference, destinationParent, safeNodes, eventId)
