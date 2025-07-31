@@ -515,7 +515,7 @@ public readonly record struct A : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (SDTLangLanguage.Instance.A_a2b.EqualsIdentity(field))
 			return A2b;
@@ -574,7 +574,7 @@ public readonly record struct Amount : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (SDTLangLanguage.Instance.Amount_currency.EqualsIdentity(field))
 			return Currency;
@@ -625,7 +625,7 @@ public readonly record struct B : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (SDTLangLanguage.Instance.B_b2d.EqualsIdentity(field))
 			return B2d;
@@ -682,7 +682,7 @@ public readonly record struct C : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (SDTLangLanguage.Instance.C_c2d.EqualsIdentity(field))
 			return C2d;
@@ -733,7 +733,7 @@ public readonly record struct ComplexNumber : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (SDTLangLanguage.Instance.ComplexNumber_imaginary.EqualsIdentity(field))
 			return Imaginary;
@@ -774,7 +774,7 @@ public readonly record struct D : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (SDTLangLanguage.Instance.D_name.EqualsIdentity(field))
 			return Name;
@@ -821,7 +821,7 @@ public readonly record struct Decimal : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (SDTLangLanguage.Instance.Decimal_frac.EqualsIdentity(field))
 			return Frac;
@@ -870,7 +870,7 @@ public readonly record struct E : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (SDTLangLanguage.Instance.E_e2f.EqualsIdentity(field))
 			return E2f;
@@ -911,7 +911,7 @@ public readonly record struct F : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (SDTLangLanguage.Instance.F_name.EqualsIdentity(field))
 			return Name;

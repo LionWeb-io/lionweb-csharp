@@ -592,7 +592,7 @@ public readonly record struct @if : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (ClassLanguage.Instance.if_namespace.EqualsIdentity(field))
 			return Namespace;
