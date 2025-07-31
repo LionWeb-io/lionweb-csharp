@@ -33,7 +33,7 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
     /// <param name="storage">Values already present in <paramref name="reference"/>.</param>
     /// <param name="eventId"></param>
     public ReferenceSetEventEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes, List<T> storage,
-        IEventId? eventId) :
+        IEventId? eventId = null) :
         base(reference, destinationParent, safeNodes, eventId)
     {
         if (!IsActive())
