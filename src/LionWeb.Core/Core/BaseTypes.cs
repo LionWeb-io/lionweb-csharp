@@ -179,7 +179,6 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="InsertAnnotations"/>
     /// <seealso cref="RemoveAnnotations"/>
     public void AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
-    // public void AddAnnotations(IEnumerable<IWritableNode> annotations);
 
     /// <summary>
     /// Inserts <see cref="Annotation">annotations</see> into <c>this</c> node's annotations at <paramref name="index"/>.
@@ -196,7 +195,6 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="AddAnnotations"/>
     /// <seealso cref="RemoveAnnotations"/>
     public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
-    // public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations);
 
     /// <summary>
     /// Removes <see cref="Annotation">annotations</see> to <c>this</c> node.
@@ -212,16 +210,13 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="AddAnnotations"/>
     /// <seealso cref="InsertAnnotations"/>
     public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null);
-    // public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations);
-
-
+    
     /// <summary>
     /// Sets the given <paramref name="feature"/> on <c>this</c> node to the given <paramref name="value"/>.
     /// </summary>
     /// <exception cref="InvalidValueException">If <paramref name="value"/> does not adhere to <paramref name="feature"/>'s type or constraints</exception>
     /// <seealso cref="IReadableNode.Get"/>
     public void Set(Feature feature, object? value, IEventId? eventId = null);
-    // public void Set(Feature feature, object? value);
 }
 
 public interface IEventableNode : IWritableNode
