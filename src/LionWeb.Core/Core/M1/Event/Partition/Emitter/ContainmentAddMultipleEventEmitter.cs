@@ -32,7 +32,7 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
     /// <param name="addedValues">Newly added values.</param>
     /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <paramref name="containment"/>.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
     public ContainmentAddMultipleEventEmitter(Containment containment,
         NodeBase destinationParent,
         List<T>? addedValues,

@@ -170,7 +170,7 @@ public interface IWritableNode : IReadableNode
     /// Adds <see cref="Annotation">annotations</see> to <c>this</c> node.
     /// </summary>
     /// <param name="annotations">Instances of <see cref="Annotation"/> to add.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <exception cref="InvalidValueException">
     /// If <paramref name="annotations"/> contains any node that's not an instance of <see cref="Annotation"/>,
     /// or the annotation cannot <see cref="Annotation.Annotates">annotate</see> <c>this</c> node.
@@ -185,7 +185,7 @@ public interface IWritableNode : IReadableNode
     /// </summary>
     /// <param name="index">Position to insert <paramref name="annotations"/> at.</param>
     /// <param name="annotations">Instances of <see cref="Annotation"/> to add.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <exception cref="ArgumentOutOfRangeException">If <c>this</c> node's annotations contains less than <paramref name="index"/> annotations.</exception>
     /// <exception cref="InvalidValueException">
     /// If <paramref name="annotations"/> contains any node that's not an instance of <see cref="Annotation"/>,
@@ -200,7 +200,7 @@ public interface IWritableNode : IReadableNode
     /// Removes <see cref="Annotation">annotations</see> to <c>this</c> node.
     /// </summary>
     /// <param name="annotations">Instances of <see cref="Annotation"/> to add.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <returns><c>true</c> if any of <paramref name="annotations"/> used to be annotations of <c>this</c> node and have been removed; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">
     /// If <paramref name="annotations"/> contains any node that's not an instance of <see cref="Annotation"/>,
@@ -767,7 +767,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     /// <param name="node">Node to remove from <paramref name="storage"/>.</param>
     /// <param name="storage">Storage potentially containing <paramref name="node"/>.</param>
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if <paramref name="node"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="node"/> is <c>null</c> or not an instance of <typeparamref name="T"/>.</exception>
@@ -786,7 +786,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     ///     Optional Action to call for each removed element of <paramref name="list"/>.
     ///     Only called if <see cref="GetPartitionCommander"/> is available.
     /// </param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
@@ -826,7 +826,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     ///     Optional Action to call for each removed element of <paramref name="safeNodes"/>.
     ///     Only called if <see cref="GetPartitionCommander"/> is available.
     /// </param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
     protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, Index, T, IEventId?>? remover, IEventId? eventId = null)
         where T : IReadableNode

@@ -34,7 +34,7 @@ public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly NodeBase DestinationParent;
 
-    /// The event ID associated with the event emitter (<see cref="IEventId"/>)
+    /// The event ID associated with the event emitter
     private readonly IEventId? _eventId;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Feature"/>.</param>

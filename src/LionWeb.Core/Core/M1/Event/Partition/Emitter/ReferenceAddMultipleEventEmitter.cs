@@ -26,7 +26,7 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
 
     /// Raises <see cref="ReferenceAddedEvent"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
     /// <param name="reference">Reference to raise events for.</param>
-    /// <param name="destinationParent"></param>
+    /// <param name="destinationParent">Owner of the represented <paramref name="reference"/> </param>
     /// <param name="safeNodes">Targets to raise events for.</param>
     /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
     /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
