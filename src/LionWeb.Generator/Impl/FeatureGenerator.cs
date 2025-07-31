@@ -254,7 +254,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         Variable(
             "evt",
             AsType(typeof(ReferenceSingleEventEmitter)),
-            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("eventId")])
         );
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
