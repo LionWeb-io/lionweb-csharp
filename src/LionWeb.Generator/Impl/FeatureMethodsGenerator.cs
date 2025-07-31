@@ -58,7 +58,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private MethodDeclarationSyntax GenGetInternal() =>
         Method("GetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
-                Param("result", NullableType(PredefinedType(Token(SyntaxKind.ObjectKeyword))))
+                Param("result", NullableType(AsType(typeof(object))))
                     .WithModifiers(AsModifiers(SyntaxKind.OutKeyword))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
@@ -86,7 +86,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private MethodDeclarationSyntax GenSetInternal() =>
         Method("SetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
-                Param("value", NullableType(PredefinedType(Token(SyntaxKind.ObjectKeyword)))),
+                Param("value", NullableType(AsType(typeof(object)))),
                 ParamWithDefaultValue("eventId", NullableType(AsType(typeof(IEventId))), SyntaxKind.NullLiteralExpression)
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
