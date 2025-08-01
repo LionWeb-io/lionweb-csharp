@@ -20,6 +20,7 @@ namespace LionWeb.Core.Test.Listener;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
+using M1.Event;
 using M1.Event.Forest;
 using Comparer = Core.Utilities.Comparer;
 
@@ -41,7 +42,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = new ForestEventReplicator(cloneForest, new());
+        var replicator = CreateReplicator(cloneForest);
         replicator.Init();
         replicator.ReplicateFrom(forest.GetPublisher());
         
@@ -66,7 +67,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = new ForestEventReplicator(cloneForest, new());
+        var replicator = CreateReplicator(cloneForest);
         replicator.Init();
         replicator.ReplicateFrom(forest.GetPublisher());
         
@@ -91,7 +92,7 @@ public class EventTests_Forest
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
 
-        var replicator = new ForestEventReplicator(cloneForest, new());
+        var replicator = CreateReplicator(cloneForest);
         replicator.Init();
         replicator.ReplicateFrom(forest.GetPublisher());
 
@@ -113,7 +114,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = new ForestEventReplicator(cloneForest, new());
+        var replicator = CreateReplicator(cloneForest);
         replicator.Init();
         replicator.ReplicateFrom(forest.GetPublisher());
 
@@ -128,9 +129,19 @@ public class EventTests_Forest
 
     #endregion
 
+    private static ForestEventReplicator CreateReplicator(Forest cloneForest) =>
+        new CloningForestEventReplicator(cloneForest, new());
+
     private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
     {
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
+}
+
+internal class CloningForestEventReplicator(IForest localForest, SharedNodeMap sharedNodeMap = null)
+    : ForestEventReplicator(localForest, sharedNodeMap)
+{
+    protected override INode AdjustRemoteNode(INode remoteNode) =>
+        SameIdCloner.Clone(remoteNode);
 }

@@ -39,7 +39,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var replicator = new PartitionEventReplicator(clone, new());
+        var replicator = CreateReplicator(clone);
         replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
@@ -67,7 +67,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        var replicator = new PartitionEventReplicator(clone, new());
+        var replicator = CreateReplicator(clone);
         replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
@@ -97,7 +97,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        var replicator = new PartitionEventReplicator(clone, new());
+        var replicator = CreateReplicator(clone);
         replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
@@ -124,7 +124,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
-        var replicator = new PartitionEventReplicator(clone, new());
+        var replicator = CreateReplicator(clone);
         replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
@@ -151,7 +151,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var replicator = new PartitionEventReplicator(clone, new());
+        var replicator = CreateReplicator(clone);
         replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
@@ -190,7 +190,7 @@ public class EventTests_MultiPartition
         cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
         var clone = new Geometry("a") { Shapes = [cloneOrigin] };
 
-        var replicator = new PartitionEventReplicator(clone, new());
+        var replicator = CreateReplicator(clone);
         replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
@@ -220,7 +220,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var replicator = new PartitionEventReplicator(clone, new());
+        var replicator = CreateReplicator(clone);
         replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
@@ -252,7 +252,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var replicator = new PartitionEventReplicator(clone, new());
+        var replicator = CreateReplicator(clone);
         replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 
@@ -275,6 +275,9 @@ public class EventTests_MultiPartition
     #endregion
 
     #endregion
+
+    private static PartitionEventReplicator CreateReplicator(Geometry clone) => 
+        new CloningPartitionEventReplicator(clone, new());
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {

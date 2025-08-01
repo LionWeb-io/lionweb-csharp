@@ -94,7 +94,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     private void OnPartitionAdded(object? _, PartitionAddedEvent partitionAddedEvent)
     {
         var partition = partitionAddedEvent.NewPartition;
-        var replicator = _replicator.LookupPartition(partition);
+        var replicator = _replicator.LookupPartitionReplicator(partition);
         replicator.Subscribe<IPartitionEvent>(SendEventToRepository);
     }
 

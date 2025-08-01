@@ -36,10 +36,7 @@ internal class RewritePartitionEventReplicator(
         {
             eventId = _localCommander.CreateEventId();
             var originalEventId = partitionEvent.EventId;
-            Console.WriteLine($"putting into original: {eventId} = {originalEventId}");
-            Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
             _originalEventIds[eventId] = originalEventId;
-            Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
             RegisterEventId(eventId);
         }
 
@@ -51,10 +48,7 @@ internal class RewritePartitionEventReplicator(
             if (eventId != null)
             {
                 UnregisterEventId(eventId);
-                Console.WriteLine($"removing from original: {eventId}");
-                Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
                 _originalEventIds.Remove(eventId);
-                Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
             }
         }
     }
@@ -62,14 +56,9 @@ internal class RewritePartitionEventReplicator(
     protected override TSubscribedEvent? Filter<TSubscribedEvent>(IPartitionEvent partitionEvent)
         where TSubscribedEvent : class
     {
-        Console.WriteLine($"called from: {new StackTrace().ToString()}");
         IPartitionEvent? result = base.Filter<TSubscribedEvent>(partitionEvent);
-        Console.WriteLine($"filtered: {result}");
-        Console.WriteLine($"trying to get {partitionEvent.EventId}");
-        Console.WriteLine($"{this.GetHashCode()} original keys: {string.Join(",", _originalEventIds.Keys)}");
         if (_originalEventIds.TryGetValue(partitionEvent.EventId, out var originalId))
         {
-            Console.WriteLine($"originalId: {originalId}");
             result = partitionEvent;
             result.EventId = originalId;
         }

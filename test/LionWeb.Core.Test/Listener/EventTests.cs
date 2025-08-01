@@ -21,7 +21,6 @@ using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 using M1.Event;
-using M1.Event.Partition;
 using Comparer = Core.Utilities.Comparer;
 
 public abstract class EventTestsBase
@@ -237,7 +236,7 @@ public abstract class EventTestsBase
 
         AssertEquals([node], [clone]);
     }
-    
+
     /// <summary>
     /// This test triggers two events: ChildDeletedEvent, ChildAddedEvent
     /// but it should trigger ChildReplacedEvent //TODO: requires fix !
@@ -245,7 +244,7 @@ public abstract class EventTestsBase
     [TestMethod]
     public void ChildReplaced_Multiple_First()
     {
-        var node = new Geometry("a") { Shapes = [new Circle("replaced"), new Circle("child")]};
+        var node = new Geometry("a") { Shapes = [new Circle("replaced"), new Circle("child")] };
 
         var clone = CreateReplicator(node);
 
@@ -262,7 +261,7 @@ public abstract class EventTestsBase
     [TestMethod]
     public void ChildReplaced_Multiple_Last()
     {
-        var node = new Geometry("a") { Shapes = [new Circle("child"), new Circle("replaced")]};
+        var node = new Geometry("a") { Shapes = [new Circle("child"), new Circle("replaced")] };
 
         var clone = CreateReplicator(node);
 
@@ -271,7 +270,6 @@ public abstract class EventTestsBase
 
         AssertEquals([node], [clone]);
     }
-
 
     #endregion
 
@@ -314,34 +312,32 @@ public abstract class EventTestsBase
         var moved = new Documentation("moved");
         var node = new Geometry("a")
         {
-            Documentation = new Documentation("replaced"),
-            Shapes = [new Line("l") { ShapeDocs = moved }]
+            Documentation = new Documentation("replaced"), Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        
+
         var clone = CreateReplicator(node);
 
         node.Documentation = moved;
 
         AssertEquals([node], [clone]);
     }
-    
+
     [TestMethod]
     public void ChildMovedAndReplacedFromOtherContainment_Single_ReplaceWith()
     {
         var moved = new Documentation("moved");
         var node = new Geometry("a")
         {
-            Documentation = new Documentation("replaced"),
-            Shapes = [new Line("l") { ShapeDocs = moved }]
+            Documentation = new Documentation("replaced"), Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        
+
         var clone = CreateReplicator(node);
 
         node.Documentation.ReplaceWith(moved);
 
         AssertEquals([node], [clone]);
     }
-    
+
     [TestMethod]
     public void ChildMovedAndReplacedFromOtherContainment_Multiple()
     {
@@ -356,7 +352,7 @@ public abstract class EventTestsBase
 
         AssertEquals([node], [clone]);
     }
-    
+
     #endregion
 
     #region ChildMovedAndReplacedFromOtherContainmentInSameParent
@@ -366,24 +362,24 @@ public abstract class EventTestsBase
     {
         var line = new Line("l") { Start = new Coord("moved"), End = new Coord("replaced") };
         var node = new Geometry("a") { Shapes = [line] };
-        
+
         var clone = CreateReplicator(node);
-        
+
         line.End = line.Start;
 
         AssertEquals([node], [clone]);
     }
-    
+
     [TestMethod]
     public void ChildMovedAndReplacedFromOtherContainmentInSameParent_Single_ReplaceWith()
     {
         var line = new Line("l") { Start = new Coord("moved"), End = new Coord("replaced") };
         var node = new Geometry("a") { Shapes = [line] };
-        
+
         var clone = CreateReplicator(node);
 
         line.End.ReplaceWith(line.Start);
-        
+
         AssertEquals([node], [clone]);
     }
 
@@ -786,7 +782,7 @@ public class EventsTest : EventTestsBase
     {
         var clone = Clone(node);
 
-        var replicator = new PartitionEventReplicator(clone, new());
+        var replicator = new CloningPartitionEventReplicator(clone, new());
         replicator.Init();
         replicator.ReplicateFrom(node.GetPublisher());
 

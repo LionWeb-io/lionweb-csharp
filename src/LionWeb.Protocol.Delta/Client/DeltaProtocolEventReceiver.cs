@@ -78,12 +78,12 @@ public class DeltaProtocolEventReceiver : IDisposable
     {
         var partitionEventForwarder = new PartitionEventForwarder(this)
         {
-            ContainingForestEventForwarder = _forestEventForwarder
+            // ContainingForestEventForwarder = _forestEventForwarder
         };
         if (!_partitionEventForwarders.TryAdd(partition.GetId(), partitionEventForwarder))
             return;
 
-        var replicator = _forestEventReplicator.LookupPartition(partition);
+        var replicator = _forestEventReplicator.LookupPartitionReplicator(partition);
         replicator.ReplicateFrom(partitionEventForwarder);
     }
 
@@ -102,8 +102,8 @@ public class DeltaProtocolEventReceiver : IDisposable
                 eventForwarder = _forestEventForwarder;
                 if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
                 {
-                    eventForwarder = _partitionEventForwarders[partition.GetId()];
-                    // eventHandler = _forestEventReplicator.LookupPartition(partition);
+                    // eventForwarder = _partitionEventForwarders[partition.GetId()];
+                    eventForwarder = _forestEventReplicator.LookupPartitionForwarder(partition);
                 } else
                 {
                     throw new InvalidOperationException();

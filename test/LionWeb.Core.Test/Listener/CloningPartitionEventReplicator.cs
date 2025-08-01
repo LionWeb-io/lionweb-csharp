@@ -15,23 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Partition;
+namespace LionWeb.Core.Test.Listener;
 
-using Forest;
+using M1.Event;
+using M1.Event.Partition;
 
-/// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionPublisher"/> events.
-/// <param name="sender">Optional sender of the events.</param>
-public class PartitionEventForwarder(object? sender)
-    : EventForwarderBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander
+internal class CloningPartitionEventReplicator(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap = null)
+    : PartitionEventReplicator(localPartition, sharedNodeMap)
 {
-    // public ForestEventForwarder? ContainingForestEventForwarder { get; init; }
-
-    /// <inheritdoc />
-    public override IEventId CreateEventId()
-    {
-        // if (ContainingForestEventHandler is not null && ContainingForestEventHandler.TryRegisteredEventId(out var eventId))
-        //     return eventId;
-        
-        return base.CreateEventId();
-    }
+    protected override INode AdjustRemoteNode(INode remoteNode) =>
+        SameIdCloner.Clone(remoteNode);
 }

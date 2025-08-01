@@ -81,7 +81,10 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     private void OnPartitionAdded(object? _, PartitionAddedEvent partitionAddedEvent)
     {
         var partition = partitionAddedEvent.NewPartition;
-        var forwarder = new PartitionEventForwarder(_name) { ContainingForestEventForwarder = ForestEventForwarder };
+        var forwarder = new PartitionEventForwarder(_name)
+        {
+            // ContainingForestEventForwarder = ForestEventForwarder
+        };
         var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(forwarder);
         replicator.Subscribe<IPartitionEvent>(SendEventToAllClients);

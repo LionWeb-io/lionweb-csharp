@@ -76,9 +76,9 @@ public class DeltaProtocolCommandReceiver : IDisposable
     {
         var partitionEventForwarder = new PartitionEventForwarder(this)
         {
-            ContainingForestEventForwarder = _forestEventForwarder
+            // ContainingForestEventForwarder = _forestEventForwarder
         };
-        var replicator = _forestEventReplicator.LookupPartition(partition);
+        var replicator = _forestEventReplicator.LookupPartitionReplicator(partition);
         if (_partitionEventForwarders.TryAdd(partition.GetId(), partitionEventForwarder))
         {
             replicator.ReplicateFrom(partitionEventForwarder);
