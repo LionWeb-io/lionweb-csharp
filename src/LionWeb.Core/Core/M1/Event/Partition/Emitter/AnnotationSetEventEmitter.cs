@@ -29,11 +29,11 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <see cref="IReadableNode.GetAnnotations"/>.</param>
-    public AnnotationSetEventEmitter(
-        NodeBase destinationParent,
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
+    public AnnotationSetEventEmitter(NodeBase destinationParent,
         List<INode>? setValues,
-        List<INode> existingValues
-    ) : base(destinationParent, setValues)
+        List<INode> existingValues,
+        IEventId? eventId = null) : base(destinationParent, setValues, eventId)
     {
         if (!IsActive() || setValues == null)
             return;
@@ -57,11 +57,11 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                     {
                         case null:
                             PartitionCommander.Raise(new AnnotationAddedEvent(DestinationParent, added.Element,
-                                added.RightIndex, PartitionCommander.CreateEventId()));
+                                added.RightIndex, GetEventId()));
                             break;
 
                         case { } old when old.Parent != DestinationParent:
-                            var eventId = PartitionCommander.CreateEventId();
+                            var eventId = GetEventId();
                             var @event = new AnnotationMovedFromOtherParentEvent(DestinationParent, added.RightIndex,
                                 added.Element, old.Parent, old.Index, eventId);
                             RaiseOriginMoveEvent(old, @event);
@@ -77,12 +77,12 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
 
                 case ListMoved<INode> moved:
                     PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(moved.RightIndex, moved.LeftElement,
-                        DestinationParent, moved.LeftIndex, PartitionCommander.CreateEventId()));
+                        DestinationParent, moved.LeftIndex, GetEventId()));
                     break;
 
                 case ListDeleted<INode> deleted:
                     PartitionCommander.Raise(new AnnotationDeletedEvent(deleted.Element, DestinationParent, deleted.LeftIndex,
-                        PartitionCommander.CreateEventId()));
+                        GetEventId()));
                     break;
             }
         }

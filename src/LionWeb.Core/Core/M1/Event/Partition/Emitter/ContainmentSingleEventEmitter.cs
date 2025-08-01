@@ -33,8 +33,10 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValue">Newly set value.</param>
     /// <param name="oldValue">Previous value of <paramref name="containment"/>.</param>
-    public ContainmentSingleEventEmitter(Containment containment, NodeBase destinationParent, T? newValue, T? oldValue)
-        : base(containment, destinationParent)
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
+    public ContainmentSingleEventEmitter(Containment containment, NodeBase destinationParent, T? newValue, T? oldValue,
+        IEventId? eventId = null)
+        : base(containment, destinationParent, eventId)
     {
         _oldValue = oldValue;
         _newValue = newValue;
@@ -69,31 +71,31 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
 
             case (not null, null, _):
                 PartitionCommander.Raise(new ChildDeletedEvent(_oldValue, DestinationParent, Containment, 0,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
 
             case (null, not null, null):
                 PartitionCommander.Raise(new ChildAddedEvent(DestinationParent, _newValue, Containment, 0,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
 
             case (not null, not null, null):
                 PartitionCommander.Raise(new ChildReplacedEvent(_newValue, _oldValue, DestinationParent, Containment, 0,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
                 PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentEvent(Containment, 0, _newValue,
                     DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
                 PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(Containment, 0,
                     _newValue, DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, _oldValue,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
 
             case (not null, not null, not null)
@@ -101,12 +103,12 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
                 PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentEvent(DestinationParent,
                     Containment, 0, _newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index, _oldValue,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent != DestinationParent:
-                var eventId = PartitionCommander.CreateEventId();
+                var eventId = GetEventId();
                 var @event = new ChildMovedFromOtherContainmentEvent(DestinationParent, Containment, 0, _newValue,
                     _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, eventId);
                 RaiseOriginMoveEvent(_oldContainmentInfo, @event);

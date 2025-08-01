@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1.Event;
 using M1.Event.Partition;
 using M2;
 using M3;
@@ -107,7 +108,7 @@ public class DynamicNode : NodeBase
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value)
+    protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
     {
         if (base.SetInternal(feature, value))
             return true;

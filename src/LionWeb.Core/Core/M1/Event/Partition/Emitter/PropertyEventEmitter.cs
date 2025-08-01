@@ -20,6 +20,7 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
+/// Encapsulates event-related logic and data for <i>adding</i> or <i>changing</i> or <i>deleting</i> of <see cref="Property"/>s.
 public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
 {
     private readonly Property _property;
@@ -29,8 +30,9 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
     /// Raises either <see cref="PropertyAddedEvent"/>, <see cref="PropertyDeletedEvent"/> or
     /// <see cref="PropertyChangedEvent"/> for <paramref name="property"/>,
     /// depending on <paramref name="oldValue"/> and <paramref name="newValue"/>.
-    public PropertyEventEmitter(Property property, NodeBase destinationParent, object? newValue, object? oldValue) :
-        base(destinationParent)
+    public PropertyEventEmitter(Property property, NodeBase destinationParent, object? newValue, object? oldValue,
+        IEventId? eventId = null) :
+        base(destinationParent, eventId)
     {
         _property = property;
         _newValue = newValue;
@@ -50,15 +52,15 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
         {
             case (null, { } v):
                 PartitionCommander.Raise(new PropertyAddedEvent(DestinationParent, _property, v,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
             case ({ } o, null):
                 PartitionCommander.Raise(new PropertyDeletedEvent(DestinationParent, _property, o,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
             case ({ } o, { } n):
                 PartitionCommander.Raise(new PropertyChangedEvent(DestinationParent, _property, n, o,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
         }
     }

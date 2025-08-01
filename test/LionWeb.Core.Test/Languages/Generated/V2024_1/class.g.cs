@@ -6,6 +6,7 @@
 #nullable enable
 namespace @namespace.@int.@public.V2024_1;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -172,7 +173,7 @@ public partial interface @interface : INode
 	public @enum String { get; set; }
 
 	/// <remarks>Required Property</remarks>
-        public @interface SetString(@enum value);
+        public @interface SetString(@enum value, IEventId? eventId = null);
 }
 
 [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-concept2")]
@@ -196,10 +197,10 @@ public partial class @out : @struct
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @out SetDefault(@if value)
+        public @out SetDefault(@if value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.out_default);
-		PropertyEventEmitter evt = new(ClassLanguage.Instance.out_default, this, value, _default);
+		PropertyEventEmitter evt = new(ClassLanguage.Instance.out_default, this, value, _default, eventId);
 		evt.CollectOldData();
 		_default = value;
 		evt.RaiseEvent();
@@ -213,7 +214,7 @@ public partial class @out : @struct
 	/// <inheritdoc/>
         public override Concept GetConcept() => ClassLanguage.Instance.@out;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -227,15 +228,15 @@ public partial class @out : @struct
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ClassLanguage.Instance.out_default.EqualsIdentity(feature))
 		{
 			if (value is @namespace.@int.@public.V2024_1.@if v)
 			{
-				Default = v;
+				SetDefault(v, eventId);
 				return true;
 			}
 
@@ -280,13 +281,13 @@ public partial class @record : AnnotationInstanceBase, @interface
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- @interface @interface.SetString(@enum value) => SetString(value);
+ @interface @interface.SetString(@enum value, IEventId? eventId = null) => SetString(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @record SetString(@enum value)
+        public @record SetString(@enum value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
-		PropertyEventEmitter evt = new(ClassLanguage.Instance.interface_string, this, value, _string);
+		PropertyEventEmitter evt = new(ClassLanguage.Instance.interface_string, this, value, _string, eventId);
 		evt.CollectOldData();
 		_string = value;
 		evt.RaiseEvent();
@@ -310,10 +311,10 @@ public partial class @record : AnnotationInstanceBase, @interface
 
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @record SetDouble(@interface value)
+        public @record SetDouble(@interface value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.record_double);
-		ContainmentSingleEventEmitter<@interface> evt = new(ClassLanguage.Instance.record_double, this, value, _double);
+		ContainmentSingleEventEmitter<@interface> evt = new(ClassLanguage.Instance.record_double, this, value, _double, eventId);
 		evt.CollectOldData();
 		SetParentNull(_double);
 		AttachChild(value);
@@ -329,7 +330,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 	/// <inheritdoc/>
         public override Annotation GetAnnotation() => ClassLanguage.Instance.@record;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -349,15 +350,15 @@ public partial class @record : AnnotationInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
 		{
 			if (value is @namespace.@int.@public.V2024_1.@enum v)
 			{
-				String = v;
+				SetString(v, eventId);
 				return true;
 			}
 
@@ -368,7 +369,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 		{
 			if (value is @namespace.@int.@public.V2024_1.@interface v)
 			{
-				Double = v;
+				SetDouble(v, eventId);
 				return true;
 			}
 
@@ -436,13 +437,13 @@ public partial class @struct : ConceptInstanceBase, @interface
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- @interface @interface.SetString(@enum value) => SetString(value);
+ @interface @interface.SetString(@enum value, IEventId? eventId = null) => SetString(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @struct SetString(@enum value)
+        public @struct SetString(@enum value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
-		PropertyEventEmitter evt = new(ClassLanguage.Instance.interface_string, this, value, _string);
+		PropertyEventEmitter evt = new(ClassLanguage.Instance.interface_string, this, value, _string, eventId);
 		evt.CollectOldData();
 		_string = value;
 		evt.RaiseEvent();
@@ -466,10 +467,10 @@ public partial class @struct : ConceptInstanceBase, @interface
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @struct SetRef(@record value)
+        public @struct SetRef(@record value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
-		ReferenceSingleEventEmitter evt = new(ClassLanguage.Instance.struct_ref, this, value, _ref);
+		ReferenceSingleEventEmitter evt = new(ClassLanguage.Instance.struct_ref, this, value, _ref, eventId);
 		evt.CollectOldData();
 		_ref = value;
 		evt.RaiseEvent();
@@ -483,7 +484,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 	/// <inheritdoc/>
         public override Concept GetConcept() => ClassLanguage.Instance.@struct;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -503,15 +504,15 @@ public partial class @struct : ConceptInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
 		{
 			if (value is @namespace.@int.@public.V2024_1.@enum v)
 			{
-				String = v;
+				SetString(v, eventId);
 				return true;
 			}
 
@@ -522,7 +523,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 		{
 			if (value is @namespace.@int.@public.V2024_1.@record v)
 			{
-				Ref = v;
+				SetRef(v, eventId);
 				return true;
 			}
 
@@ -591,7 +592,7 @@ public readonly record struct @if : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (ClassLanguage.Instance.if_namespace.EqualsIdentity(field))
 			return Namespace;

@@ -136,9 +136,6 @@ public class EventTests_Infrastructure
         
         Assert.AreEqual(0, ReplicatorEventIds(replicator).Count);
         Assert.AreEqual(0, ReplicatorEventIds(cloneReplicator).Count);
-        
-        Assert.AreEqual(0, CommanderEventIds(node.GetCommander()).Count());
-        Assert.AreEqual(0, CommanderEventIds(clone.GetCommander()).Count());
     }
 
     private static HashSet<IEventId> ReplicatorEventIds(PartitionEventReplicator replicator)
@@ -147,15 +144,6 @@ public class EventTests_Infrastructure
         var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_eventIds");
         var value = fieldInfo.GetValue(replicator);
         return (HashSet<IEventId>)value!;
-    }
-
-    private static IEnumerable<IEventId> CommanderEventIds(ICommander<IPartitionEvent> commander)
-    {
-        var type = typeof(EventHandlerBase<IPartitionEvent>);
-        var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_eventIds");
-        var value = fieldInfo.GetValue(commander);
-        // return (AsyncLocal<Queue<IEventId>>)value!;
-        return (Queue<IEventId>)value!;
     }
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

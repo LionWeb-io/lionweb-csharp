@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.MultiInheritLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -125,13 +126,13 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 	}
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- BaseIface BaseIface.SetIfaceContainment(INode value) => SetIfaceContainment(value);
+ BaseIface BaseIface.SetIfaceContainment(INode value, IEventId? eventId = null) => SetIfaceContainment(value);
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public AbstractConcept SetIfaceContainment(INode value)
+        public AbstractConcept SetIfaceContainment(INode value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
-		ContainmentSingleEventEmitter<INode> evt = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment);
+		ContainmentSingleEventEmitter<INode> evt = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment, eventId);
 		evt.CollectOldData();
 		SetParentNull(_ifaceContainment);
 		AttachChild(value);
@@ -147,7 +148,7 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 	/// <inheritdoc/>
         public override Concept GetConcept() => MultiInheritLangLanguage.Instance.AbstractConcept;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -161,15 +162,15 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment.EqualsIdentity(feature))
 		{
 			if (value is INode v)
 			{
-				IfaceContainment = v;
+				SetIfaceContainment(v, eventId);
 				return true;
 			}
 
@@ -224,7 +225,7 @@ public partial interface BaseIface : INode
 	public INode IfaceContainment { get; set; }
 
 	/// <remarks>Required Single Containment</remarks>
-        public BaseIface SetIfaceContainment(INode value);
+        public BaseIface SetIfaceContainment(INode value, IEventId? eventId = null);
 }
 
 [LionCoreMetaPointer(Language = typeof(MultiInheritLangLanguage), Key = "key-CombinedConcept")]

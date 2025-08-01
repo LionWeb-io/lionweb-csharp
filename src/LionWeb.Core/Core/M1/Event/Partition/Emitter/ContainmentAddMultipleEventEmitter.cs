@@ -32,13 +32,13 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
     /// <param name="addedValues">Newly added values.</param>
     /// <param name="existingValues">Values already present in <paramref name="containment"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <paramref name="containment"/>.</param>
-    public ContainmentAddMultipleEventEmitter(
-        Containment containment,
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
+    public ContainmentAddMultipleEventEmitter(Containment containment,
         NodeBase destinationParent,
         List<T>? addedValues,
         List<T> existingValues,
-        Index? startIndex = null
-    ) : base(containment, destinationParent, addedValues)
+        Index? startIndex = null,
+        IEventId? eventId = null) : base(containment, destinationParent, addedValues, eventId)
     {
         _existingValues = existingValues;
         _newIndex = startIndex ?? Math.Max(existingValues.Count, 0);
@@ -56,11 +56,11 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
             {
                 case null:
                     PartitionCommander.Raise(new ChildAddedEvent(DestinationParent, added, Containment, _newIndex,
-                        PartitionCommander.CreateEventId()));
+                        GetEventId()));
                     break;
 
                 case not null when old.Parent != DestinationParent:
-                    var eventId = PartitionCommander.CreateEventId();
+                    var eventId = GetEventId();
                     var @event = new ChildMovedFromOtherContainmentEvent(DestinationParent, Containment, _newIndex, added,
                         old.Parent, old.Containment, old.Index, eventId);
                     RaiseOriginMoveEvent(old, @event);
@@ -77,14 +77,14 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
                     if (old.Index != _newIndex)
                     {
                         PartitionCommander.Raise(new ChildMovedInSameContainmentEvent(_newIndex, added, DestinationParent,
-                            old.Containment, old.Index, PartitionCommander.CreateEventId()));
+                            old.Containment, old.Index, GetEventId()));
                     }
 
                     break;
 
                 case not null when old.Parent == DestinationParent && old.Containment != Containment:
                     PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentEvent(Containment, _newIndex,
-                        added, DestinationParent, old.Containment, old.Index, PartitionCommander.CreateEventId()));
+                        added, DestinationParent, old.Containment, old.Index, GetEventId()));
                     break;
 
                 default:

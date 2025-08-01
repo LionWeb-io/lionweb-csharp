@@ -26,11 +26,13 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
 
     /// Raises <see cref="ReferenceAddedEvent"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
     /// <param name="reference">Reference to raise events for.</param>
+    /// <param name="destinationParent">Owner of the represented <paramref name="reference"/> </param>
     /// <param name="safeNodes">Targets to raise events for.</param>
     /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
+    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
     /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
     public ReferenceAddMultipleEventEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes,
-        Index startIndex) : base(reference, destinationParent, safeNodes)
+        Index startIndex, IEventId? eventId = null) : base(reference, destinationParent, safeNodes, eventId)
     {
         _startIndex = startIndex;
     }
@@ -49,7 +51,7 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
         {
             IReferenceTarget newTarget = new ReferenceTarget(null, node);
             PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, index++, newTarget,
-                PartitionCommander.CreateEventId()));
+                GetEventId()));
         }
     }
 

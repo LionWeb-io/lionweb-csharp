@@ -21,6 +21,7 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Utilities;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
@@ -173,4 +174,8 @@ public abstract class GeneratorBase
     /// <returns><c>TryGetMyFeature</c></returns>
     protected string FeatureTryGet(Feature feature) =>
         $"TryGet{feature.Name.ToFirstUpper()}";
+    
+    /// <returns><c>SetMyFeature</c></returns>
+    protected string FeatureSet(Feature feature) =>
+        $"Set{feature.Name.ToFirstUpper()}";
 }

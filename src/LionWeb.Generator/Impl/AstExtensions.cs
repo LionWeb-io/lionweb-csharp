@@ -131,9 +131,15 @@ public static class AstExtensions
             .WithParameterList(ParameterList(SeparatedList(parameters)));
 
     /// <returns><c>type name</c></returns>
-    public static ParameterSyntax Param(string name, TypeSyntax? type) =>
+    public static ParameterSyntax Param(string name, TypeSyntax type) =>
         Parameter(Identifier(name))
             .WithType(type);
+    
+    /// <returns><c>type name = null</c></returns>
+    public static ParameterSyntax ParamWithDefaultNullValue(string name, TypeSyntax type) =>
+        Parameter(Identifier(name))
+            .WithType(NullableType(type))
+            .WithDefault(EqualsValueClause(LiteralExpression(SyntaxKind.NullLiteralExpression)));
 
     /// <returns><c> : base(paramNames)</c></returns>
     public static ConstructorInitializerSyntax Initializer(params string[] paramNames) =>

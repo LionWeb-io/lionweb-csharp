@@ -87,15 +87,13 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     protected virtual INode Clone(INode remoteNode) =>
         new SameIdCloner(remoteNode.Descendants(true, true)).Clone()[remoteNode];
 
-    /// Uses <see cref="EventIdFilteringEventForwarder{TEvent,TPublisher}"/> and <see cref="ICommander{TEvent}.RegisterEventId"/>
-    /// to suppress forwarding events raised during executing <paramref name="action"/>. 
+    /// Uses <see cref="EventIdFilteringEventForwarder{TEvent,TPublisher}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
     protected virtual void SuppressEventForwarding(TEvent @event, Action action)
     {
         IEventId? eventId = null;
         if (_localCommander != null)
         {
-            eventId = _localCommander.CreateEventId();
-            _localCommander.RegisterEventId(eventId);
+            eventId = @event.EventId;
             RegisterEventId(eventId);
         }
 

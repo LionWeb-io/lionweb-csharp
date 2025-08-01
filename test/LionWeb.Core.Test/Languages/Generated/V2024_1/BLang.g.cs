@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -125,10 +126,10 @@ public partial class BConcept : ConceptInstanceBase
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept.BRef"/>
     	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum value)
+        public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum value, IEventId? eventId = null)
 	{
 		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
-		PropertyEventEmitter evt = new(BLangLanguage.Instance.BConcept_AEnumProp, this, value, _aEnumProp);
+		PropertyEventEmitter evt = new(BLangLanguage.Instance.BConcept_AEnumProp, this, value, _aEnumProp, eventId);
 		evt.CollectOldData();
 		_aEnumProp = value;
 		evt.RaiseEvent();
@@ -149,9 +150,9 @@ public partial class BConcept : ConceptInstanceBase
 	}
 
 	/// <remarks>Optional Single Reference</remarks>
-        public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? value)
+        public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept? value, IEventId? eventId = null)
 	{
-		ReferenceSingleEventEmitter evt = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef);
+		ReferenceSingleEventEmitter evt = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, eventId);
 		evt.CollectOldData();
 		_aRef = value;
 		evt.RaiseEvent();
@@ -165,7 +166,7 @@ public partial class BConcept : ConceptInstanceBase
 	/// <inheritdoc/>
         public override Concept GetConcept() => BLangLanguage.Instance.BConcept;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -185,15 +186,15 @@ public partial class BConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, eventId))
 			return true;
 		if (BLangLanguage.Instance.BConcept_AEnumProp.EqualsIdentity(feature))
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AEnum v)
 			{
-				AEnumProp = v;
+				SetAEnumProp(v, eventId);
 				return true;
 			}
 
@@ -204,7 +205,7 @@ public partial class BConcept : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept)
 			{
-				ARef = (LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept?)value;
+				SetARef((LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.A.AConcept?)value, eventId);
 				return true;
 			}
 

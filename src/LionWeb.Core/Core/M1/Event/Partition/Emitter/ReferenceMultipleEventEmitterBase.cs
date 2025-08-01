@@ -23,7 +23,8 @@ public abstract class ReferenceMultipleEventEmitterBase<T> : ReferenceEventEmitt
 {
     protected readonly List<T> SafeNodes;
 
-    protected ReferenceMultipleEventEmitterBase(Reference reference, NodeBase destinationParent, List<T> safeNodes) : base(reference, destinationParent)
+    protected ReferenceMultipleEventEmitterBase(Reference reference, NodeBase destinationParent, List<T> safeNodes,
+        IEventId? eventId) : base(reference, destinationParent, eventId)
     {
         SafeNodes = safeNodes;
     }

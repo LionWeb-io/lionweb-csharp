@@ -29,7 +29,7 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
     /// <see cref="ReferenceChangedEvent"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
     public ReferenceSingleEventEmitter(Reference reference, NodeBase destinationParent, IReadableNode? newTarget,
-        IReadableNode? oldTarget) : base(reference, destinationParent)
+        IReadableNode? oldTarget, IEventId? eventId = null) : base(reference, destinationParent, eventId)
     {
         _newTarget = newTarget;
         _oldTarget = oldTarget;
@@ -49,18 +49,18 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
             case (null, { } v):
                 IReferenceTarget newTarget = new ReferenceTarget(null, v);
                 PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, 0, newTarget,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
             case ({ } o, null):
                 IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
                 PartitionCommander.Raise(new ReferenceDeletedEvent(DestinationParent, Reference, 0, deletedTarget,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
             case ({ } o, { } n):
                 IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
                 PartitionCommander.Raise(new ReferenceChangedEvent(DestinationParent, Reference, 0,
                     new ReferenceTarget(null, n), replacedTarget,
-                    PartitionCommander.CreateEventId()));
+                    GetEventId()));
                 break;
         }
     }

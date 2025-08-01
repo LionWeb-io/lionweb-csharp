@@ -43,8 +43,14 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var multiLanguage = DeserializeExternalLanguage(lionWebVersion, "multi", libraryLanguage).First();
     var withEnumLanguage = DeserializeExternalLanguage(lionWebVersion, "with-enum").First();
     withEnumLanguage.Name = "WithEnum";
+    // If we update MPS-Specific in MPS or source generators, we want to re-generate it. Otherwise, we use the shipped version.
+    // Follow the 3 steps below in order to generate MPS-specific languages.
+    // After the generation, content of the generated files should be manually copied to where it is needed:
+    // To the relevant sub folders in LionWeb.Generator.MpsSpecific/VersionSpecific
+    // Make sure the generated language class extends/implements the followings: LanguageBase<ISpecificFactory>, ISpecificLanguage
+    // 1) Comment out the line below  
     var specificLanguage = ISpecificLanguage.Get(lionWebVersion);
-    // If we update MPS-Specific in MPS, we want to re-generate it. Otherwise, we use the shipped version.
+    // 2) Uncomment the line below
     // var specificLanguage = DeserializeExternalLanguage(lionWebVersion, "MpsSpecific-metamodel-annotated").First();
     var deprecatedLang = DeserializeExternalLanguage(lionWebVersion, "deprecated", specificLanguage).First();
     deprecatedLang.Name = "Deprecated";
@@ -79,6 +85,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(testLanguage, $"{prefix}.TestLanguage"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
+        // Step 3: Uncomment the line below 
         // new(specificLanguage, $"Io.Lionweb.Mps.Specific.{lionWebVersionNamespace}")
     ];
     

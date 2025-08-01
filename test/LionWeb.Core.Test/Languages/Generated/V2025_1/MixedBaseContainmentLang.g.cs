@@ -6,6 +6,7 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang;
 using LionWeb.Core;
+using LionWeb.Core.M1.Event;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
@@ -88,5 +89,5 @@ public partial interface BaseContainmentIface : INode
 	public INode Cont { get; set; }
 
 	/// <remarks>Required Single Containment</remarks>
-        public BaseContainmentIface SetCont(INode value);
+        public BaseContainmentIface SetCont(INode value, IEventId? eventId = null);
 }
