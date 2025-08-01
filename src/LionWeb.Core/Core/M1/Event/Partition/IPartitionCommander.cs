@@ -21,5 +21,5 @@ using M3;
 
 /// Raises events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 /// <seealso cref="IPartitionPublisher"/>
-/// <seealso cref="PartitionEventHandler"/>
+/// <seealso cref="PartitionEventForwarder"/>
 public interface IPartitionCommander : ICommander<IPartitionEvent>;

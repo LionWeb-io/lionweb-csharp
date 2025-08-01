@@ -408,14 +408,14 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 
 	public DataTypeTestConcept(string id) : base(id)
 	{
-		_eventHandler = new(this);
+		_eventForwarder = new(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.DataTypeTestConcept;
-	private readonly PartitionEventHandler _eventHandler;
-	public IPartitionPublisher? GetPublisher() => _eventHandler;
-	public IPartitionCommander? GetCommander() => _eventHandler;
+	private readonly PartitionEventForwarder _eventForwarder;
+	public IPartitionPublisher? GetPublisher() => _eventForwarder;
+	public IPartitionCommander? GetCommander() => _eventForwarder;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -939,14 +939,14 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 	public LinkTestConcept(string id) : base(id)
 	{
-		_eventHandler = new(this);
+		_eventForwarder = new(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.LinkTestConcept;
-	private readonly PartitionEventHandler _eventHandler;
-	public IPartitionPublisher? GetPublisher() => _eventHandler;
-	public IPartitionCommander? GetCommander() => _eventHandler;
+	private readonly PartitionEventForwarder _eventForwarder;
+	public IPartitionPublisher? GetPublisher() => _eventForwarder;
+	public IPartitionCommander? GetCommander() => _eventForwarder;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{

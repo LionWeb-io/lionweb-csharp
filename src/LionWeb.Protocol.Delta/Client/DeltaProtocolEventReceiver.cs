@@ -28,9 +28,9 @@ using Partition;
 
 public class DeltaProtocolEventReceiver : IDisposable
 {
-    private readonly Dictionary<NodeId, PartitionEventHandler> _partitionEventHandlers = [];
+    private readonly Dictionary<NodeId, PartitionEventForwarder> _partitionEventForwarders = [];
 
-    private readonly ForestEventHandler _forestEventHandler;
+    private readonly ForestEventForwarder _forestEventForwarder;
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly SharedKeyedMap _sharedKeyedMap;
     private readonly ForestEventReplicator _forestEventReplicator;
@@ -38,11 +38,11 @@ public class DeltaProtocolEventReceiver : IDisposable
     private readonly DeltaEventToForestEventMapper _forestMapper;
     private readonly DeltaEventToPartitionEventMapper _partitionMapper;
 
-    public DeltaProtocolEventReceiver(ForestEventHandler forestEventHandler, PartitionSharedNodeMap sharedNodeMap,
+    public DeltaProtocolEventReceiver(ForestEventForwarder forestEventForwarder, PartitionSharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder,
         ForestEventReplicator forestEventReplicator)
     {
-        _forestEventHandler = forestEventHandler;
+        _forestEventForwarder = forestEventForwarder;
         _sharedNodeMap = sharedNodeMap;
         _sharedKeyedMap = sharedKeyedMap;
         _forestEventReplicator = forestEventReplicator;
@@ -55,7 +55,7 @@ public class DeltaProtocolEventReceiver : IDisposable
             OnPartitionAdded(null, partition);
         }
         
-        _forestEventHandler.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
+        _forestEventForwarder.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
 
         // sharedNodeMap.OnPartitionAdded += OnPartitionAdded;
         // sharedNodeMap.OnPartitionRemoved += OnPartitionRemoved;
@@ -76,32 +76,34 @@ public class DeltaProtocolEventReceiver : IDisposable
 
     private void OnPartitionAdded(object? _, IPartitionInstance partition)
     {
-        var partitionEventHandler = new PartitionEventHandler(this)
+        var partitionEventForwarder = new PartitionEventForwarder(this)
         {
-            ContainingForestEventHandler = _forestEventHandler
+            ContainingForestEventForwarder = _forestEventForwarder
         };
-        if (!_partitionEventHandlers.TryAdd(partition.GetId(), partitionEventHandler))
+        if (!_partitionEventForwarders.TryAdd(partition.GetId(), partitionEventForwarder))
             return;
 
         var replicator = _forestEventReplicator.LookupPartition(partition);
-        replicator.ReplicateFrom(partitionEventHandler);
+        replicator.ReplicateFrom(partitionEventForwarder);
     }
 
     private void OnPartitionRemoved(object? sender, IPartitionInstance partition) =>
-        _partitionEventHandlers.Remove(partition.GetId());
+        _partitionEventForwarders.Remove(partition.GetId());
 
     public void Receive(IDeltaEvent deltaEvent)
     {
         IEvent internalEvent;
-        EventHandlerBase eventHandler;
+        EventForwarderBase eventForwarder;
 
         switch (deltaEvent)
         {
             case IPartitionDeltaEvent:
                 internalEvent = _partitionMapper.Map(deltaEvent);
+                eventForwarder = _forestEventForwarder;
                 if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
                 {
-                    eventHandler = _partitionEventHandlers[partition.GetId()];
+                    eventForwarder = _partitionEventForwarders[partition.GetId()];
+                    // eventHandler = _forestEventReplicator.LookupPartition(partition);
                 } else
                 {
                     throw new InvalidOperationException();
@@ -111,13 +113,13 @@ public class DeltaProtocolEventReceiver : IDisposable
 
             case IForestDeltaEvent:
                 internalEvent = _forestMapper.Map(deltaEvent);
-                eventHandler = _forestEventHandler;
+                eventForwarder = _forestEventForwarder;
                 break;
 
             default:
                 throw new InvalidOperationException(deltaEvent.ToString());
         }
 
-        eventHandler.Raise(internalEvent);
+        eventForwarder.Raise(internalEvent);
     }
 }

@@ -21,10 +21,10 @@ using Forest;
 
 /// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionPublisher"/> events.
 /// <param name="sender">Optional sender of the events.</param>
-public class PartitionEventHandler(object? sender)
-    : EventHandlerBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander
+public class PartitionEventForwarder(object? sender)
+    : EventForwarderBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander
 {
-    public ForestEventHandler? ContainingForestEventHandler { get; init; }
+    public ForestEventForwarder? ContainingForestEventForwarder { get; init; }
 
     /// <inheritdoc />
     public override IEventId CreateEventId()

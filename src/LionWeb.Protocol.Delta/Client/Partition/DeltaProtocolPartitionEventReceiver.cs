@@ -24,17 +24,17 @@ using Message.Event;
 
 public class DeltaProtocolPartitionEventReceiver : IDisposable
 {
-    private readonly PartitionEventHandler _eventHandler;
+    private readonly PartitionEventForwarder _eventForwarder;
     private readonly DeltaEventToPartitionEventMapper _mapper;
 
     public DeltaProtocolPartitionEventReceiver(
-        PartitionEventHandler eventHandler,
+        PartitionEventForwarder eventForwarder,
         SharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )
     {
-        _eventHandler = eventHandler;
+        _eventForwarder = eventForwarder;
         _mapper = new DeltaEventToPartitionEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
@@ -48,6 +48,6 @@ public class DeltaProtocolPartitionEventReceiver : IDisposable
     {
         IPartitionEvent partitionEvent = _mapper.Map(deltaEvent);
 
-        _eventHandler.Raise(partitionEvent);
+        _eventForwarder.Raise(partitionEvent);
     }
 }

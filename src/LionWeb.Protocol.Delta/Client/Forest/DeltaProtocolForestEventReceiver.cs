@@ -24,17 +24,17 @@ using Message.Event;
 
 public class DeltaProtocolForestEventReceiver
 {
-    private readonly ForestEventHandler _eventHandler;
+    private readonly ForestEventForwarder _eventForwarder;
     private readonly DeltaEventToForestEventMapper _mapper;
 
     public DeltaProtocolForestEventReceiver(
-        ForestEventHandler eventHandler,
+        ForestEventForwarder eventForwarder,
         SharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )
     {
-        _eventHandler = eventHandler;
+        _eventForwarder = eventForwarder;
         _mapper = new DeltaEventToForestEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
@@ -43,6 +43,6 @@ public class DeltaProtocolForestEventReceiver
     {
         IForestEvent partitionEvent = _mapper.Map(deltaEvent);
 
-        _eventHandler.Raise(partitionEvent);
+        _eventForwarder.Raise(partitionEvent);
     }
 }

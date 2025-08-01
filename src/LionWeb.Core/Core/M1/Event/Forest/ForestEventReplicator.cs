@@ -98,12 +98,12 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     private void RegisterPartition(IPartitionInstance partition)
     {
-        var handler = new PartitionEventHandler(this);
+        var forwarder = new PartitionEventForwarder(this);
         PartitionEventReplicator replicator = CreatePartitionEventReplicator(partition);
         if (!_localPartitions.TryAdd(partition.GetId(), replicator))
             throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
         replicator.Init();
-        replicator.ReplicateFrom(handler);
+        replicator.ReplicateFrom(forwarder);
     }
 
     protected virtual PartitionEventReplicator CreatePartitionEventReplicator(IPartitionInstance partition) =>

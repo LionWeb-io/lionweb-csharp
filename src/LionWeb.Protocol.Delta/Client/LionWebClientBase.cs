@@ -41,7 +41,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected readonly string _name;
     protected readonly IClientConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
-    protected readonly ForestEventHandler ForestEventHandler;
+    protected readonly ForestEventForwarder ForestEventForwarder;
     protected readonly ForestEventReplicator _replicator;
 
     private ParticipationId? _participationId;
@@ -67,14 +67,14 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        ForestEventHandler = new ForestEventHandler(name);
+        ForestEventForwarder = new ForestEventForwarder(name);
         _replicator = new ForestEventReplicator(forest, SharedNodeMap);
         _replicator.Init();
-        _replicator.ReplicateFrom(ForestEventHandler);
+        _replicator.ReplicateFrom(ForestEventForwarder);
 
         _replicator.Subscribe<IForestEvent>(SendEventToRepository);
 
-        ForestEventHandler.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
+        ForestEventForwarder.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
         // _replicator.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
         // SharedNodeMap.OnPartitionAdded += OnPartitionAdded;
 

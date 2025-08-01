@@ -66,7 +66,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
         _eventReceiver = new DeltaProtocolEventReceiver(
-            ForestEventHandler,
+            ForestEventForwarder,
             SharedNodeMap,
             sharedKeyedMap,
             deserializerBuilder,

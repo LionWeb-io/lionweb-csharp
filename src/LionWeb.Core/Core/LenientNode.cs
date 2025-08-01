@@ -368,17 +368,17 @@ public class LenientNode : NodeBase, INode
 
 public class LenientPartition : LenientNode, IPartitionInstance
 {
-    private readonly PartitionEventHandler _eventHandler;
+    private readonly PartitionEventForwarder _eventForwarder;
     public LenientPartition(NodeId id, Classifier? classifier) : base(id, classifier)
     {
-        _eventHandler = new PartitionEventHandler(this);
+        _eventForwarder = new PartitionEventForwarder(this);
     }
 
     /// <inheritdoc />
-    public IPartitionPublisher GetPublisher() => _eventHandler;
+    public IPartitionPublisher GetPublisher() => _eventForwarder;
 
     /// <inheritdoc />
-    public IPartitionCommander GetCommander() => _eventHandler;
+    public IPartitionCommander GetCommander() => _eventForwarder;
 
     /// <inheritdoc />
     public Concept GetConcept() => (Concept)GetClassifier();

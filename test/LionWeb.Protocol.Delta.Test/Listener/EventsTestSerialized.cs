@@ -40,7 +40,7 @@ public class EventsTestSerialized : EventTestsBase
 
         SharedNodeMap sharedNodeMap = new();
 
-        var partitionEventHandler = new PartitionEventHandler(null);
+        var partitionEventForwarder = new PartitionEventForwarder(null);
 
         var deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
@@ -48,7 +48,7 @@ public class EventsTestSerialized : EventTestsBase
             ;
 
         var eventReceiver = new DeltaProtocolPartitionEventReceiver(
-            partitionEventHandler,
+            partitionEventForwarder,
             sharedNodeMap,
             sharedKeyedMap,
             deserializerBuilder
@@ -64,7 +64,7 @@ public class EventsTestSerialized : EventTestsBase
         var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
         replicator.Init();
         // sharedNodeMap.RegisterNode(clone);
-        replicator.ReplicateFrom(partitionEventHandler);
+        replicator.ReplicateFrom(partitionEventForwarder);
         return clone;
     }
 }

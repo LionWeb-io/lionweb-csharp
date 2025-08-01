@@ -42,7 +42,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     protected readonly string _name;
     protected readonly IRepositoryConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
-    protected readonly ForestEventHandler ForestEventHandler;
+    protected readonly ForestEventForwarder ForestEventForwarder;
     protected readonly RewriteForestEventReplicator _replicator;
 
     private long nextFreeNodeId = 0;
@@ -54,14 +54,14 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        ForestEventHandler = new ForestEventHandler(name);
+        ForestEventForwarder = new ForestEventForwarder(name);
         _replicator = new RewriteForestEventReplicator(forest, SharedNodeMap);
         _replicator.Init();
-        _replicator.ReplicateFrom(ForestEventHandler);
+        _replicator.ReplicateFrom(ForestEventForwarder);
 
         _replicator.Subscribe<IForestEvent>(SendEventToAllClients);
 
-        ForestEventHandler.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
+        ForestEventForwarder.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
         // _replicator.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
         // SharedNodeMap.OnPartitionAdded += OnPartitionAdded;
 
@@ -81,9 +81,9 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     private void OnPartitionAdded(object? _, PartitionAddedEvent partitionAddedEvent)
     {
         var partition = partitionAddedEvent.NewPartition;
-        var handler = new PartitionEventHandler(_name) { ContainingForestEventHandler = ForestEventHandler };
+        var forwarder = new PartitionEventForwarder(_name) { ContainingForestEventForwarder = ForestEventForwarder };
         var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
-        replicator.ReplicateFrom(handler);
+        replicator.ReplicateFrom(forwarder);
         replicator.Subscribe<IPartitionEvent>(SendEventToAllClients);
     }
 

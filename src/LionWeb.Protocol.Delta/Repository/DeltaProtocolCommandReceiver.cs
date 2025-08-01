@@ -28,19 +28,19 @@ using Partition;
 
 public class DeltaProtocolCommandReceiver : IDisposable
 {
-    private readonly Dictionary<NodeId, PartitionEventHandler> _partitionEventHandlers = [];
+    private readonly Dictionary<NodeId, PartitionEventForwarder> _partitionEventForwarders = [];
 
-    private readonly ForestEventHandler _forestEventHandler;
+    private readonly ForestEventForwarder _forestEventForwarder;
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly ForestEventReplicator _forestEventReplicator;
     
     private readonly DeltaCommandToForestEventMapper _forestMapper;
     private readonly DeltaCommandToPartitionEventMapper _partitionMapper;
 
-    public DeltaProtocolCommandReceiver(ForestEventHandler forestEventHandler, PartitionSharedNodeMap sharedNodeMap,
+    public DeltaProtocolCommandReceiver(ForestEventForwarder forestEventForwarder, PartitionSharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder, ForestEventReplicator forestEventReplicator)
     {
-        _forestEventHandler = forestEventHandler;
+        _forestEventForwarder = forestEventForwarder;
         _sharedNodeMap = sharedNodeMap;
         _forestEventReplicator = forestEventReplicator;
 
@@ -52,7 +52,7 @@ public class DeltaProtocolCommandReceiver : IDisposable
             OnPartitionAdded(null, partition);
         }
         
-        _forestEventHandler.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
+        _forestEventForwarder.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
         _forestEventReplicator.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
         
         // sharedNodeMap.OnPartitionAdded += OnPartitionAdded;
@@ -74,24 +74,24 @@ public class DeltaProtocolCommandReceiver : IDisposable
 
     private void OnPartitionAdded(object? _, IPartitionInstance partition)
     {
-        var partitionEventHandler = new PartitionEventHandler(this)
+        var partitionEventForwarder = new PartitionEventForwarder(this)
         {
-            ContainingForestEventHandler = _forestEventHandler
+            ContainingForestEventForwarder = _forestEventForwarder
         };
         var replicator = _forestEventReplicator.LookupPartition(partition);
-        if (_partitionEventHandlers.TryAdd(partition.GetId(), partitionEventHandler))
+        if (_partitionEventForwarders.TryAdd(partition.GetId(), partitionEventForwarder))
         {
-            replicator.ReplicateFrom(partitionEventHandler);
+            replicator.ReplicateFrom(partitionEventForwarder);
         }
     }
 
     private void OnPartitionRemoved(object? _, IPartitionInstance partition) =>
-        _partitionEventHandlers.Remove(partition.GetId());
+        _partitionEventForwarders.Remove(partition.GetId());
 
     public void Receive(IDeltaCommand deltaCommand)
     {
         IEvent internalEvent;
-        EventHandlerBase eventHandler;
+        EventForwarderBase eventForwarder;
 
         switch (deltaCommand)
         {
@@ -99,7 +99,7 @@ public class DeltaProtocolCommandReceiver : IDisposable
                 internalEvent = _partitionMapper.Map(deltaCommand);
                 if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
                 {
-                    eventHandler = _partitionEventHandlers[partition.GetId()];
+                    eventForwarder = _partitionEventForwarders[partition.GetId()];
                 } else
                 {
                     throw new InvalidOperationException();
@@ -109,13 +109,13 @@ public class DeltaProtocolCommandReceiver : IDisposable
             
             case IForestDeltaCommand:
                 internalEvent = _forestMapper.Map(deltaCommand);
-                eventHandler = _forestEventHandler;
+                eventForwarder = _forestEventForwarder;
                 break;
             
             default:
                 throw new InvalidOperationException(deltaCommand.ToString());
         }
 
-        eventHandler.Raise(internalEvent);
+        eventForwarder.Raise(internalEvent);
     }
 }

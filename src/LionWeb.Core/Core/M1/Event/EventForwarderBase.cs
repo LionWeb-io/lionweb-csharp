@@ -19,14 +19,15 @@ namespace LionWeb.Core.M1.Event;
 
 using Forest;
 using Partition;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Utilities;
 
-public abstract class EventHandlerBase
+/// Base class to forward all <see cref="Raise">raised</see> events.
+public abstract class EventForwarderBase
 {
     protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
 
+    /// Raises an <paramref name="@event"/> to forward.
     public abstract void Raise(object @event);
 
     private static ILookup<Type, Type> InitAllSubtypes()
@@ -47,7 +48,7 @@ public abstract class EventHandlerBase
 }
 
 /// Forwards <see cref="ICommander{TEvent}"/> commands to <see cref="IPublisher{TEvent}"/> events.
-public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TEvent>, IPublisher<TEvent>
+public abstract class EventForwarderBase<TEvent> : EventForwarderBase, ICommander<TEvent>, IPublisher<TEvent>
     where TEvent : IEvent
 {
     private readonly object _sender;
@@ -62,9 +63,9 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
 
     private int _nextId = 0;
 
-    /// <inheritdoc cref="EventHandlerBase"/>
+    /// <inheritdoc cref="EventForwarderBase"/>
     /// <param name="sender">Optional sender of the events.</param>
-    protected EventHandlerBase(object? sender)
+    protected EventForwarderBase(object? sender)
     {
         _sender = sender ?? this;
         _eventIdBase = sender as string ?? IdUtils.NewId();
@@ -72,9 +73,6 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
 
     /// <inheritdoc />
     public virtual IEventId CreateEventId() => new NumericEventId(_eventIdBase, _nextId++);
-
-    // protected internal bool TryRegisteredEventId([NotNullWhen(true)] out IEventId? eventId) =>
-    //     _eventIds.TryDequeue(out eventId);
 
     /// <inheritdoc />
     public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
