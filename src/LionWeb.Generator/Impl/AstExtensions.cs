@@ -131,7 +131,7 @@ public static class AstExtensions
             .WithParameterList(ParameterList(SeparatedList(parameters)));
 
     /// <returns><c>type name</c></returns>
-    public static ParameterSyntax Param(string name, TypeSyntax? type) =>
+    public static ParameterSyntax Param(string name, TypeSyntax type) =>
         Parameter(Identifier(name))
             .WithType(type);
     
