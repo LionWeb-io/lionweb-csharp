@@ -31,7 +31,7 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <paramref name="containment"/>.</param>
-    /// <param name="eventId"></param>
+    /// <param name="eventId">The event ID of the event emitted by this event emitter.</param>
     public ContainmentSetEventEmitter(Containment containment,
         NodeBase destinationParent,
         List<T>? setValues,

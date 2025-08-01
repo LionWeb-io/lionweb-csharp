@@ -783,8 +783,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     /// <param name="storage">Storage potentially containing members of <paramref name="list"/>.</param>
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
     /// <param name="remover">
-    ///     Optional Action to call for each removed element of <paramref name="list"/>.
-    ///     Only called if <see cref="GetPartitionCommander"/> is available.
+    /// Optional Action to call for each removed element of <paramref name="list"/>.
+    /// Only called if <see cref="GetPartitionCommander"/> is available.
     /// </param>
     /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
@@ -823,8 +823,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     /// <param name="safeNodes">Nodes to remove.</param>
     /// <param name="storage">Storage of nodes.</param>
     /// <param name="remover">
-    ///     Optional Action to call for each removed element of <paramref name="safeNodes"/>.
-    ///     Only called if <see cref="GetPartitionCommander"/> is available.
+    /// Optional Action to call for each removed element of <paramref name="safeNodes"/>.
+    /// Only called if <see cref="GetPartitionCommander"/> is available.
     /// </param>
     /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
