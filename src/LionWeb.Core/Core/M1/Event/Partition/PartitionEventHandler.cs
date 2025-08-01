@@ -29,8 +29,8 @@ public class PartitionEventHandler(object? sender)
     /// <inheritdoc />
     public override IEventId CreateEventId()
     {
-        if (ContainingForestEventHandler is not null && ContainingForestEventHandler.TryRegisteredEventId(out var eventId))
-            return eventId;
+        // if (ContainingForestEventHandler is not null && ContainingForestEventHandler.TryRegisteredEventId(out var eventId))
+        //     return eventId;
         
         return base.CreateEventId();
     }

@@ -146,7 +146,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
             var clone = (IPartitionInstance)Clone(newPartition);
 
-            _localForest.AddPartitions([clone]);
+            _localForest.AddPartitions([clone], partitionAddedEvent.EventId);
 
             var remoteListener = partitionAddedEvent.NewPartition.GetPublisher();
             if (remoteListener != null)
@@ -157,7 +157,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         SuppressEventForwarding(partitionDeletedEvent, () =>
         {
             var localPartition = (IPartitionInstance)Lookup(partitionDeletedEvent.DeletedPartition.GetId());
-            _localForest.RemovePartitions([localPartition]);
+            _localForest.RemovePartitions([localPartition],  partitionDeletedEvent.EventId);
         });
 
     #endregion

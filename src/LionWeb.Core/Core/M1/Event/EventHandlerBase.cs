@@ -73,8 +73,8 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     /// <inheritdoc />
     public virtual IEventId CreateEventId() => new NumericEventId(_eventIdBase, _nextId++);
 
-    protected internal bool TryRegisteredEventId([NotNullWhen(true)] out IEventId? eventId) =>
-        _eventIds.TryDequeue(out eventId);
+    // protected internal bool TryRegisteredEventId([NotNullWhen(true)] out IEventId? eventId) =>
+    //     _eventIds.TryDequeue(out eventId);
 
     /// <inheritdoc />
     public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)

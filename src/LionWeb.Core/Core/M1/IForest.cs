@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
+using Event;
 using Event.Forest;
 using Utilities;
 
@@ -29,10 +30,10 @@ public interface IForest
     public IReadOnlySet<IPartitionInstance> Partitions { get; }
 
     /// Adds <paramref name="partitions"/> to <c>this</c> forest.
-    public void AddPartitions(IEnumerable<IPartitionInstance> partitions);
+    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, IEventId? eventId = null);
 
     /// Removes <paramref name="partitions"/> from <c>this</c> forest.
-    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions);
+    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, IEventId? eventId = null);
 
     /// <c>this</c> forest's publisher, if any.
     IForestPublisher? GetPublisher();
@@ -58,22 +59,22 @@ public class Forest : IForest
     public IReadOnlySet<IPartitionInstance> Partitions => _partitions;
 
     /// <inheritdoc />
-    public void AddPartitions(IEnumerable<IPartitionInstance> partitions)
+    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, IEventId? eventId = null)
     {
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _eventHandler.Raise(new PartitionAddedEvent(partition, _eventHandler.CreateEventId()));
+                _eventHandler.Raise(new PartitionAddedEvent(partition, eventId ?? _eventHandler.CreateEventId()));
         }
     }
 
     /// <inheritdoc />
-    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions)
+    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, IEventId? eventId = null)
     {
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _eventHandler.Raise(new PartitionDeletedEvent(partition, _eventHandler.CreateEventId()));
+                _eventHandler.Raise(new PartitionDeletedEvent(partition, eventId ?? _eventHandler.CreateEventId()));
         }
     }
 
