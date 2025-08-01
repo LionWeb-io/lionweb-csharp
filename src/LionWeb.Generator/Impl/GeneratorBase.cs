@@ -63,7 +63,7 @@ public abstract class GeneratorBase
 
     /// <inheritdoc cref="INames.AsType(System.Type,Microsoft.CodeAnalysis.CSharp.Syntax.TypeSyntax?[])"/>
     protected TypeSyntax AsType(Type type, params TypeSyntax?[] generics) =>
-        type == typeof(object) ? PredefinedType(Token(SyntaxKind.ObjectKeyword)) : _names.AsType(type, generics);
+        _names.AsType(type, generics);
 
     /// Roslyn type of <paramref name="entity"/> (also registered with <see cref="INames.UsedTypes"/>).
     /// Returns FQN if <paramref name="disambiguate"/> is <c>true</c>.

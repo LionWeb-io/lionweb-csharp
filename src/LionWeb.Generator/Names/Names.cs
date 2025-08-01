@@ -116,6 +116,8 @@ public partial class Names : INames
             result = PredefinedType(Token(SyntaxKind.IntKeyword));
         else if (type == typeof(bool))
             result = PredefinedType(Token(SyntaxKind.BoolKeyword));
+        else if (type == typeof(object))
+            result = PredefinedType(Token(SyntaxKind.ObjectKeyword));
 
         else if (generics == null || generics.Length == 0)
         {
