@@ -87,7 +87,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         Method("SetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
                 Param("value", NullableType(AsType(typeof(object)))),
-                ParamWithDefaultValue("eventId", NullableType(AsType(typeof(IEventId))), SyntaxKind.NullLiteralExpression)
+                ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())

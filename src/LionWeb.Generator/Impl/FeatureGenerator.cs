@@ -747,7 +747,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         Method(FeatureSet().ToString(), AsType(classifier),
                 [
                     Param("value", AsType(feature.GetFeatureType(), writeable: writeable)), 
-                    ParamWithDefaultValue("eventId", NullableType(AsType(typeof(IEventId))), SyntaxKind.NullLiteralExpression)
+                    ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -824,7 +824,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private MethodDeclarationSyntax AbstractOptionalFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier), [
                 Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable))),
-                ParamWithDefaultValue("eventId", NullableType(AsType(typeof(IEventId))), SyntaxKind.NullLiteralExpression)
+                ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
@@ -852,7 +852,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         Method(LinkRemove(link).ToString(), AsType(classifier),
                 [
                     Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type))),
-                    ParamWithDefaultValue("eventId", NullableType(AsType(typeof(IEventId))), SyntaxKind.NullLiteralExpression)
+                    ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -881,7 +881,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         Method(LinkInsert(link).ToString(), AsType(classifier), [
                 Param("index", AsType(typeof(int))),
                 Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type))),
-                ParamWithDefaultValue("eventId", NullableType(AsType(typeof(IEventId))), SyntaxKind.NullLiteralExpression)
+                ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
@@ -908,7 +908,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         Method(LinkAdd(link).ToString(), AsType(classifier),
                 [
                     Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type))),
-                    ParamWithDefaultValue("eventId", NullableType(AsType(typeof(IEventId))), SyntaxKind.NullLiteralExpression)
+                    ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
