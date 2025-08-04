@@ -17,109 +17,83 @@
 
 namespace LionWeb.Protocol.Delta.Client;
 
-using Core;
 using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
-using Core.M1.Event.Partition;
 using Forest;
 using Message.Event;
 using Partition;
+using Repository;
 
-public class DeltaProtocolEventReceiver : IDisposable
+public class DeltaProtocolEventReceiver
+    : DeltaProtocolReceiverBase<IDeltaEvent, IPartitionDeltaEvent, IForestDeltaEvent>
 {
-    private readonly Dictionary<NodeId, PartitionEventForwarder> _partitionEventForwarders = [];
-
-    private readonly ForestEventForwarder _forestEventForwarder;
-    private readonly PartitionSharedNodeMap _sharedNodeMap;
-    private readonly SharedKeyedMap _sharedKeyedMap;
-    private readonly ForestEventReplicator _forestEventReplicator;
-
     private readonly DeltaEventToForestEventMapper _forestMapper;
     private readonly DeltaEventToPartitionEventMapper _partitionMapper;
 
-    public DeltaProtocolEventReceiver(ForestEventForwarder forestEventForwarder, PartitionSharedNodeMap sharedNodeMap,
-        SharedKeyedMap sharedKeyedMap, DeserializerBuilder deserializerBuilder,
+    public DeltaProtocolEventReceiver(
+        ForestEventForwarder forestEventForwarder,
+        PartitionSharedNodeMap sharedNodeMap,
+        SharedKeyedMap sharedKeyedMap,
+        DeserializerBuilder deserializerBuilder,
         ForestEventReplicator forestEventReplicator)
+        : base(forestEventForwarder, sharedNodeMap, forestEventReplicator)
     {
-        _forestEventForwarder = forestEventForwarder;
-        _sharedNodeMap = sharedNodeMap;
-        _sharedKeyedMap = sharedKeyedMap;
-        _forestEventReplicator = forestEventReplicator;
-
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
         _partitionMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
-
-        foreach (var partition in sharedNodeMap.Values.OfType<IPartitionInstance>())
-        {
-            OnPartitionAdded(null, partition);
-        }
-        
-        _forestEventForwarder.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
-
-        // sharedNodeMap.OnPartitionAdded += OnPartitionAdded;
-        // sharedNodeMap.OnPartitionRemoved += OnPartitionRemoved;
-    }
-
-    private void OnPartitionAdded(object? sender, PartitionAddedEvent e)
-    {
-        OnPartitionAdded(sender, e.NewPartition);
     }
 
     /// <inheritdoc />
-    public void Dispose()
-    {
-        GC.SuppressFinalize(this);
-        // _sharedNodeMap.OnPartitionAdded -= OnPartitionAdded;
-        // _sharedNodeMap.OnPartitionRemoved -= OnPartitionRemoved;
-    }
+    protected override IEvent MapPartition(IPartitionDeltaEvent partitionContent) =>
+        _partitionMapper.Map(partitionContent);
 
-    private void OnPartitionAdded(object? _, IPartitionInstance partition)
-    {
-        var partitionEventForwarder = new PartitionEventForwarder(this)
-        {
-            // ContainingForestEventForwarder = _forestEventForwarder
-        };
-        if (!_partitionEventForwarders.TryAdd(partition.GetId(), partitionEventForwarder))
-            return;
+    /// <inheritdoc />
+    protected override IEvent MapForest(IForestDeltaEvent forestContent) =>
+        _forestMapper.Map(forestContent);
 
-        var replicator = _forestEventReplicator.LookupPartitionReplicator(partition);
-        replicator.ReplicateFrom(partitionEventForwarder);
-    }
-
-    private void OnPartitionRemoved(object? sender, IPartitionInstance partition) =>
-        _partitionEventForwarders.Remove(partition.GetId());
-
-    public void Receive(IDeltaEvent deltaEvent)
-    {
-        IEvent internalEvent;
-        EventForwarderBase eventForwarder;
-
-        switch (deltaEvent)
-        {
-            case IPartitionDeltaEvent:
-                internalEvent = _partitionMapper.Map(deltaEvent);
-                eventForwarder = _forestEventForwarder;
-                if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
-                {
-                    // eventForwarder = _partitionEventForwarders[partition.GetId()];
-                    eventForwarder = _forestEventReplicator.LookupPartitionForwarder(partition);
-                } else
-                {
-                    throw new InvalidOperationException();
-                }
-
-                break;
-
-            case IForestDeltaEvent:
-                internalEvent = _forestMapper.Map(deltaEvent);
-                eventForwarder = _forestEventForwarder;
-                break;
-
-            default:
-                throw new InvalidOperationException(deltaEvent.ToString());
-        }
-
-        eventForwarder.Raise(internalEvent);
-    }
+    // private void OnPartitionAdded(object? _, IPartitionInstance partition)
+    // {
+    //     var partitionEventForwarder = new PartitionEventForwarder(this);
+    //     if (!_partitionEventForwarders.TryAdd(partition.GetId(), partitionEventForwarder))
+    //         return;
+    //
+    //     // var replicator = _forestEventReplicator.LookupPartitionReplicator(partition);
+    //     // replicator.ReplicateFrom(partitionEventForwarder);
+    // }
+    //
+    // private void OnPartitionRemoved(object? sender, IPartitionInstance partition) =>
+    //     _partitionEventForwarders.Remove(partition.GetId());
+    //
+    // private void Receive(IDeltaEvent deltaEvent)
+    // {
+    //     IEvent internalEvent;
+    //     EventForwarderBase eventForwarder;
+    //
+    //     switch (deltaEvent)
+    //     {
+    //         case IPartitionDeltaEvent:
+    //             internalEvent = _partitionMapper.Map(deltaEvent);
+    //             eventForwarder = _forestEventForwarder;
+    //             if (_sharedNodeMap.TryGetPartition(internalEvent.ContextNodeId, out var partition))
+    //             {
+    //                 // eventForwarder = _partitionEventForwarders[partition.GetId()];
+    //                 // eventForwarder = _forestEventReplicator.LookupPartitionForwarder(partition);
+    //             } else
+    //             {
+    //                 throw new InvalidOperationException();
+    //             }
+    //
+    //             break;
+    //
+    //         case IForestDeltaEvent:
+    //             internalEvent = _forestMapper.Map(deltaEvent);
+    //             eventForwarder = _forestEventForwarder;
+    //             break;
+    //
+    //         default:
+    //             throw new InvalidOperationException(deltaEvent.ToString());
+    //     }
+    //
+    //     eventForwarder.Raise(internalEvent);
+    // }
 }

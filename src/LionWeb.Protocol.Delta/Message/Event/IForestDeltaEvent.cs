@@ -20,7 +20,7 @@ namespace LionWeb.Protocol.Delta.Message.Event;
 using Core.Serialization;
 using System.Text;
 
-public interface IForestDeltaEvent : IDeltaEvent;
+public interface IForestDeltaEvent : IDeltaEvent, IDeltaContent;
 
 public record PartitionAdded(
     DeltaSerializationChunk NewPartition,

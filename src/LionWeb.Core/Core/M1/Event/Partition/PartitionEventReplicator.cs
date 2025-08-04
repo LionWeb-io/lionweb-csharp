@@ -46,71 +46,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         publisher.Subscribe<IPartitionEvent>(LocalHandler);
     }
 
-    /// <inheritdoc />
-    protected override void ProcessEvent(object? sender, IPartitionEvent? partitionEvent)
-    {
-        Debug.WriteLine($"{sender}: processing event {partitionEvent}");
-        switch (partitionEvent)
-        {
-            case PropertyAddedEvent a:
-                OnRemotePropertyAdded(a);
-                break;
-            case PropertyDeletedEvent a:
-                OnRemotePropertyDeleted(a);
-                break;
-            case PropertyChangedEvent a:
-                OnRemotePropertyChanged(a);
-                break;
-            case ChildAddedEvent a:
-                OnRemoteChildAdded(a);
-                break;
-            case ChildDeletedEvent a:
-                OnRemoteChildDeleted(a);
-                break;
-            case ChildReplacedEvent a:
-                OnRemoteChildReplaced(a);
-                break;
-            case ChildMovedFromOtherContainmentEvent a:
-                OnRemoteChildMovedFromOtherContainment(a);
-                break;
-            case ChildMovedFromOtherContainmentInSameParentEvent a:
-                OnRemoteChildMovedFromOtherContainmentInSameParent(a);
-                break;
-            case ChildMovedInSameContainmentEvent a:
-                OnRemoteChildMovedInSameContainment(a);
-                break;
-            case ChildMovedAndReplacedFromOtherContainmentEvent a:
-                OnRemoteChildMovedAndReplacedFromOtherContainment(a);
-                break;
-            case ChildMovedAndReplacedFromOtherContainmentInSameParentEvent a:
-                OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(a);
-                break;
-            case AnnotationAddedEvent a:
-                OnRemoteAnnotationAdded(a);
-                break;
-            case AnnotationDeletedEvent a:
-                OnRemoteAnnotationDeleted(a);
-                break;
-            case AnnotationMovedFromOtherParentEvent a:
-                OnRemoteAnnotationMovedFromOtherParent(a);
-                break;
-            case AnnotationMovedInSameParentEvent a:
-                OnRemoteAnnotationMovedInSameParent(a);
-                break;
-            case ReferenceAddedEvent a:
-                OnRemoteReferenceAdded(a);
-                break;
-            case ReferenceDeletedEvent a:
-                OnRemoteReferenceDeleted(a);
-                break;
-            case ReferenceChangedEvent a:
-                OnRemoteReferenceChanged(a);
-                break;
-            default:
-                throw new ArgumentException($"Can not process event due to unknown {partitionEvent}!");
-        }
-    }
-
     /// <see cref="SharedNodeMap.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
     /// and <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">unsubscribes</see> from it.
     public override void Dispose()
@@ -130,21 +65,21 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     #region Local
 
-    private void LocalHandler(object? sender, IPartitionEvent partitionEvent)
+    private void LocalHandler(object? _, IPartitionEvent partitionEvent)
     {
         switch (partitionEvent)
         {
-            case ChildAddedEvent a:
-                OnLocalChildAdded(a);
+            case ChildAddedEvent e:
+                OnLocalChildAdded(e);
                 break;
-            case ChildDeletedEvent a:
-                OnLocalChildDeleted(a);
+            case ChildDeletedEvent e:
+                OnLocalChildDeleted(e);
                 break;
-            case AnnotationAddedEvent a:
-                OnLocalAnnotationAdded(a);
+            case AnnotationAddedEvent e:
+                OnLocalAnnotationAdded(e);
                 break;
-            case AnnotationDeletedEvent a:
-                OnLocalAnnotationDeleted(a);
+            case AnnotationDeletedEvent e:
+                OnLocalAnnotationDeleted(e);
                 break;
         }
     }
@@ -163,9 +98,73 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
 
     #endregion
 
-
     #region Remote
 
+    /// <inheritdoc />
+    protected override void ProcessEvent(object? sender, IPartitionEvent? partitionEvent)
+    {
+        Debug.WriteLine($"{sender}: processing event {partitionEvent}");
+        switch (partitionEvent)
+        {
+            case PropertyAddedEvent e:
+                OnRemotePropertyAdded(e);
+                break;
+            case PropertyDeletedEvent e:
+                OnRemotePropertyDeleted(e);
+                break;
+            case PropertyChangedEvent e:
+                OnRemotePropertyChanged(e);
+                break;
+            case ChildAddedEvent e:
+                OnRemoteChildAdded(e);
+                break;
+            case ChildDeletedEvent e:
+                OnRemoteChildDeleted(e);
+                break;
+            case ChildReplacedEvent e:
+                OnRemoteChildReplaced(e);
+                break;
+            case ChildMovedFromOtherContainmentEvent e:
+                OnRemoteChildMovedFromOtherContainment(e);
+                break;
+            case ChildMovedFromOtherContainmentInSameParentEvent e:
+                OnRemoteChildMovedFromOtherContainmentInSameParent(e);
+                break;
+            case ChildMovedInSameContainmentEvent e:
+                OnRemoteChildMovedInSameContainment(e);
+                break;
+            case ChildMovedAndReplacedFromOtherContainmentEvent e:
+                OnRemoteChildMovedAndReplacedFromOtherContainment(e);
+                break;
+            case ChildMovedAndReplacedFromOtherContainmentInSameParentEvent e:
+                OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(e);
+                break;
+            case AnnotationAddedEvent e:
+                OnRemoteAnnotationAdded(e);
+                break;
+            case AnnotationDeletedEvent e:
+                OnRemoteAnnotationDeleted(e);
+                break;
+            case AnnotationMovedFromOtherParentEvent e:
+                OnRemoteAnnotationMovedFromOtherParent(e);
+                break;
+            case AnnotationMovedInSameParentEvent e:
+                OnRemoteAnnotationMovedInSameParent(e);
+                break;
+            case ReferenceAddedEvent e:
+                OnRemoteReferenceAdded(e);
+                break;
+            case ReferenceDeletedEvent e:
+                OnRemoteReferenceDeleted(e);
+                break;
+            case ReferenceChangedEvent e:
+                OnRemoteReferenceChanged(e);
+                break;
+            default:
+                throw new ArgumentException($"Can not process event due to unknown {partitionEvent}!");
+        }
+    }
+    
     #region Properties
 
     private void OnRemotePropertyAdded(PropertyAddedEvent propertyAddedEvent) =>

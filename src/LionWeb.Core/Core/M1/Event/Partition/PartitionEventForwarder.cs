@@ -17,21 +17,7 @@
 
 namespace LionWeb.Core.M1.Event.Partition;
 
-using Forest;
-
 /// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionPublisher"/> events.
 /// <param name="sender">Optional sender of the events.</param>
 public class PartitionEventForwarder(object? sender)
-    : EventForwarderBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander
-{
-    // public ForestEventForwarder? ContainingForestEventForwarder { get; init; }
-
-    /// <inheritdoc />
-    public override IEventId CreateEventId()
-    {
-        // if (ContainingForestEventHandler is not null && ContainingForestEventHandler.TryRegisteredEventId(out var eventId))
-        //     return eventId;
-        
-        return base.CreateEventId();
-    }
-}
+    : EventForwarderBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander;
