@@ -26,20 +26,9 @@ using Core.M3;
 using Forest;
 using Partition;
 
-public interface ILionWebRepository
-{
-    private const string _cyan = "\x1b[96m";
-    private const string _bold = "\x1b[1m";
-    private const string _unbold = "\x1b[22m";
-    private const string _defaultColor = "\x1b[39m";
-    
-    public const string HeaderColor_Start = _cyan + _bold;
-    public const string HeaderColor_End =  _unbold + _defaultColor;
-}
-
 public abstract class LionWebRepositoryBase<T> : IDisposable
 {
-    protected readonly string _name;
+    private readonly string _name;
     protected readonly IRepositoryConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
     protected readonly ForestEventForwarder ForestEventForwarder;
@@ -61,9 +50,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
         _replicator.Subscribe<IForestEvent>(SendEventToAllClients);
 
-        ForestEventForwarder.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
-        // _replicator.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
-        // SharedNodeMap.OnPartitionAdded += OnPartitionAdded;
+        ForestEventForwarder.Subscribe<IForestEvent>(LocalHandler);
 
         _connector.ReceiveFromClient += OnReceiveFromClient;
     }
@@ -72,26 +59,55 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
-        // SharedNodeMap.OnPartitionAdded -= OnPartitionAdded;
         _connector.ReceiveFromClient -= OnReceiveFromClient;
         _replicator.Dispose();
         SharedNodeMap.Dispose();
     }
 
-    private void OnPartitionAdded(object? _, PartitionAddedEvent partitionAddedEvent)
+    #region Local
+
+    private void LocalHandler(object? _, IForestEvent forestEvent)
+    {
+        switch (forestEvent)
+        {
+            case PartitionAddedEvent e:
+                OnLocalPartitionAdded(e);
+                break;
+            case PartitionDeletedEvent e:
+                OnLocalPartitionDeleted(e);
+                break;
+        }
+    }
+
+    private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
     {
         var partition = partitionAddedEvent.NewPartition;
-        var forwarder = new PartitionEventForwarder(_name)
-        {
-            // ContainingForestEventForwarder = ForestEventForwarder
-        };
+        var forwarder = new PartitionEventForwarder(_name);
         var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(forwarder);
         replicator.Subscribe<IPartitionEvent>(SendEventToAllClients);
     }
 
+    private void OnLocalPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region Remote
+
+    protected abstract Task Receive(IMessageContext<T> content);
+
     private void OnReceiveFromClient(object? _, IMessageContext<T> content) =>
         Receive(content);
+
+    #endregion
+
+    #region Send
+
+    protected abstract Task Send(IClientInfo clientInfo, T deltaContent);
+    protected abstract Task SendAll(T deltaContent);
 
     private void SendEventToAllClients(object? sender, IEvent? internalEvent)
     {
@@ -116,6 +132,8 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         }
     }
 
+    #endregion
+
     protected virtual void Log(string message, bool header = false)
     {
         var prependedMessage = $"{_name}: {message}";
@@ -123,9 +141,4 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
             ? $"{ILionWebRepository.HeaderColor_Start}{prependedMessage}{ILionWebRepository.HeaderColor_End}"
             : prependedMessage);
     }
-
-    protected abstract Task Send(IClientInfo clientInfo, T deltaContent);
-    protected abstract Task SendAll(T deltaContent);
-
-    protected abstract Task Receive(IMessageContext<T> content);
 }

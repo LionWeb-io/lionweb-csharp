@@ -40,8 +40,11 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
         _forestEventForwarder = forestEventForwarder;
         _sharedNodeMap = sharedNodeMap;
         _forestEventReplicator = forestEventReplicator;
+    }
 
-        foreach (var partition in sharedNodeMap.Values.OfType<IPartitionInstance>())
+    public void Init()
+    {
+        foreach (var partition in _sharedNodeMap.Values.OfType<IPartitionInstance>())
         {
             OnLocalPartitionAdded(partition);
         }

@@ -50,6 +50,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             deserializerBuilder,
             _replicator
         );
+        
+        _commandReceiver.Init();
     }
 
     /// <inheritdoc />
@@ -60,33 +62,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         base.Dispose();
     }
 
-    /// <inheritdoc />
-    protected override async Task SendAll(IDeltaContent deltaContent)
-    {
-        switch (deltaContent)
-        {
-            case IDeltaEvent deltaEvent:
-                var commandSource = deltaEvent is { OriginCommands: { } cmds }
-                    ? cmds.First()
-                    : null;
-                Log(
-                    $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})", true);
-                break;
-
-            default:
-                Log($"sending: {deltaContent.GetType().Name}", true);
-                break;
-        }
-
-        await _connector.SendToAllClients(deltaContent);
-    }
-
-    /// <inheritdoc />
-    protected override async Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
-    {
-        Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
-        await _connector.SendToClient(clientInfo, deltaContent);
-    }
+    #region Remote
 
     /// <inheritdoc />
     protected override async Task Receive(IMessageContext<IDeltaContent> messageContext)
@@ -131,6 +107,40 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             Log(e.ToString());
         }
     }
+
+    #endregion
+
+    #region Send
+
+    /// <inheritdoc />
+    protected override async Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
+    {
+        Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
+        await _connector.SendToClient(clientInfo, deltaContent);
+    }
+
+    /// <inheritdoc />
+    protected override async Task SendAll(IDeltaContent deltaContent)
+    {
+        switch (deltaContent)
+        {
+            case IDeltaEvent deltaEvent:
+                var commandSource = deltaEvent is { OriginCommands: { } cmds }
+                    ? cmds.First()
+                    : null;
+                Log(
+                    $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})", true);
+                break;
+
+            default:
+                Log($"sending: {deltaContent.GetType().Name}", true);
+                break;
+        }
+
+        await _connector.SendToAllClients(deltaContent);
+    }
+
+    #endregion
 }
 
 public class LionWebTestRepository(
@@ -177,6 +187,6 @@ public class ExceptionParticipationIdProvider : IParticipationIdProvider
     
     /// <inheritdoc />
     public string ParticipationId =>
-        $"participationId{++_nextParticipationId}";
-        // throw new NotImplementedException();
+        // $"participationId{++_nextParticipationId}";
+        throw new NotImplementedException();
 }

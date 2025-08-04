@@ -24,21 +24,10 @@ using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
 using Core.M3;
 
-public interface ILionWebClient
-{
-    private const string _magenta = "\x1b[95m";
-    private const string _bold = "\x1b[1m";
-    private const string _unbold = "\x1b[22m";
-    private const string _defaultColor = "\x1b[39m";
-
-    public const string HeaderColor_Start = _magenta + _bold;
-    public const string HeaderColor_End = _unbold + _defaultColor;
-}
-
 public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 {
+    private readonly string _name;
     protected readonly LionWebVersions _lionWebVersion;
-    protected readonly string _name;
     protected readonly IClientConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
     protected readonly ForestEventForwarder ForestEventForwarder;
@@ -74,9 +63,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
         _replicator.Subscribe<IForestEvent>(SendEventToRepository);
 
-        ForestEventForwarder.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
-        // _replicator.Subscribe<PartitionAddedEvent>(OnPartitionAdded);
-        // SharedNodeMap.OnPartitionAdded += OnPartitionAdded;
+        ForestEventForwarder.Subscribe<IForestEvent>(LocalHandler);
 
         _connector.ReceiveFromRepository += OnReceiveFromRepository;
     }
@@ -85,21 +72,50 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
-        // SharedNodeMap.OnPartitionAdded -= OnPartitionAdded;
         _connector.ReceiveFromRepository -= OnReceiveFromRepository;
         _replicator.Dispose();
         SharedNodeMap.Dispose();
     }
 
-    private void OnPartitionAdded(object? _, PartitionAddedEvent partitionAddedEvent)
+    #region Local
+
+    private void LocalHandler(object? _, IForestEvent forestEvent)
+    {
+        switch (forestEvent)
+        {
+            case PartitionAddedEvent e:
+                OnLocalPartitionAdded(e);
+                break;
+            case PartitionDeletedEvent e:
+                OnLocalPartitionDeleted(e);
+                break;
+        }
+    }
+
+    private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
     {
         var partition = partitionAddedEvent.NewPartition;
         var replicator = _replicator.LookupPartitionReplicator(partition);
         replicator.Subscribe<IPartitionEvent>(SendEventToRepository);
     }
 
+    private void OnLocalPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region Remote
+
+    protected abstract void Receive(T deltaContent);
+
     private void OnReceiveFromRepository(object? _, T content) =>
         Receive(content);
+
+    #endregion
+
+    #region Send
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOnResponse"/></returns>
@@ -113,6 +129,8 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsResponse"/></returns>
     public abstract Task GetAvailableIds(int count);
 
+    protected abstract Task Send(T deltaContent);
+
     private void SendEventToRepository(object? sender, IEvent? internalEvent)
     {
         if (internalEvent == null)
@@ -124,6 +142,8 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         Log("Sent to repository");
     }
 
+    #endregion
+
     protected virtual void Log(string message, bool header = false)
     {
         var prependedMessage = $"{_name}: {message}";
@@ -131,8 +151,4 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
             ? $"{ILionWebClient.HeaderColor_Start}{prependedMessage}{ILionWebClient.HeaderColor_End}"
             : prependedMessage);
     }
-
-    protected abstract Task Send(T deltaContent);
-
-    protected abstract void Receive(T deltaContent);
 }

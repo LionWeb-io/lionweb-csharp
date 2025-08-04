@@ -18,11 +18,19 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core.M1.Event;
+using Message;
 
-public interface IClientConnector<T> 
+public interface IClientConnector<T>
 {
     Task SendToRepository(T content);
     event EventHandler<T> ReceiveFromRepository;
 
     T Convert(IEvent internalEvent);
+}
+
+public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
+
+public interface IEventClientConnector : IClientConnector<IEvent>
+{
+    IEvent IClientConnector<IEvent>.Convert(IEvent internalEvent) => internalEvent;
 }

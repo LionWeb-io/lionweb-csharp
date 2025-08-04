@@ -19,7 +19,6 @@ namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
-using Core.M1.Event;
 using Core.M3;
 using Core.Utilities;
 using Message;
@@ -27,14 +26,6 @@ using Message.Command;
 using Message.Event;
 using Message.Query;
 using System.Collections.Concurrent;
-using System.Diagnostics;
-
-public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
-
-public interface IEventClientConnector : IClientConnector<IEvent>
-{
-    IEvent IClientConnector<IEvent>.Convert(IEvent internalEvent) => internalEvent;
-}
 
 public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
@@ -42,6 +33,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     
     private readonly ConcurrentDictionary<EventSequenceNumber, IDeltaEvent> _unprocessedEvents = [];
     private readonly ConcurrentDictionary<CommandId, bool> _ownCommands = [];
+    private readonly ConcurrentDictionary<QueryId, TaskCompletionSource<IDeltaQueryResponse>> _queryResponses = [];
 
     #region EventSequenceNumber
 
@@ -72,6 +64,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             deserializerBuilder,
             _replicator
         );
+        
+        _eventReceiver.Init();
     }
 
     /// <inheritdoc />
@@ -82,45 +76,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         base.Dispose();
     }
 
-    /// <inheritdoc />
-    public override async Task<SignOnResponse> SignOn()
-    {
-        var signOnResponse = await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId, IdUtils.NewId(), null));
-        ParticipationId = signOnResponse.ParticipationId;
-        return signOnResponse;
-    }
-
-    /// <inheritdoc />
-    public override async Task<SignOffResponse> SignOff() =>
-        await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(IdUtils.NewId(), null));
-
-    /// <inheritdoc />
-    public override async Task<GetAvailableIdsResponse> GetAvailableIds(int count) => 
-        await Query<GetAvailableIdsResponse, GetAvailableIdsRequest>(new GetAvailableIdsRequest(count, IdUtils.NewId(), null));
-
-    private readonly ConcurrentDictionary<QueryId, TaskCompletionSource<IDeltaQueryResponse>> _queryResponses = [];
-    
-    private async Task<TResponse> Query<TResponse, TRequest>(TRequest request) where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest 
-    {
-        var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
-        _queryResponses[request.QueryId] = tcs;
-        await Send(request);
-        var response = await tcs.Task;
-        return response as TResponse ?? throw new ArgumentException(response.GetType().Name);
-    }
-
-    /// <inheritdoc />
-    protected override async Task Send(IDeltaContent deltaContent)
-    {
-        if (deltaContent.RequiresParticipationId)
-            deltaContent.InternalParticipationId = ParticipationId;
-
-        if (deltaContent is IDeltaCommand { CommandId: { } commandId })
-            _ownCommands.TryAdd(commandId, true);
-
-        Log($"sending: {deltaContent.GetType().Name}", true);
-        await _connector.SendToRepository(deltaContent);
-    }
+    #region Remote
 
     /// <inheritdoc />
     protected override void Receive(IDeltaContent content)
@@ -201,6 +157,50 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             _eventReceiver.Receive(deltaEvent);
         }
     }
+
+    #endregion
+
+    #region Send
+
+    /// <inheritdoc />
+    public override async Task<SignOnResponse> SignOn()
+    {
+        var signOnResponse = await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId, IdUtils.NewId(), null));
+        ParticipationId = signOnResponse.ParticipationId;
+        return signOnResponse;
+    }
+
+    /// <inheritdoc />
+    public override async Task<SignOffResponse> SignOff() =>
+        await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(IdUtils.NewId(), null));
+
+    /// <inheritdoc />
+    public override async Task<GetAvailableIdsResponse> GetAvailableIds(int count) => 
+        await Query<GetAvailableIdsResponse, GetAvailableIdsRequest>(new GetAvailableIdsRequest(count, IdUtils.NewId(), null));
+
+    private async Task<TResponse> Query<TResponse, TRequest>(TRequest request) where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest 
+    {
+        var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
+        _queryResponses[request.QueryId] = tcs;
+        await Send(request);
+        var response = await tcs.Task;
+        return response as TResponse ?? throw new ArgumentException(response.GetType().Name);
+    }
+
+    /// <inheritdoc />
+    protected override async Task Send(IDeltaContent deltaContent)
+    {
+        if (deltaContent.RequiresParticipationId)
+            deltaContent.InternalParticipationId = ParticipationId;
+
+        if (deltaContent is IDeltaCommand { CommandId: { } commandId })
+            _ownCommands.TryAdd(commandId, true);
+
+        Log($"sending: {deltaContent.GetType().Name}", true);
+        await _connector.SendToRepository(deltaContent);
+    }
+
+    #endregion
 }
 
 public class LionWebTestClient(
