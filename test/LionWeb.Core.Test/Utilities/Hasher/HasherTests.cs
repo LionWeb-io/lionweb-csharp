@@ -505,6 +505,14 @@ public class HasherTests
         }
 
         public void DetachFromParent() { }
+        public void AddAnnotations(IEnumerable<IWritableNode> annotations) => throw new NotImplementedException();
+        public void AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null) => throw new NotImplementedException();
+
+        public void InsertAnnotations(int index, IEnumerable<IWritableNode> annotations) => throw new NotImplementedException();
+        public void InsertAnnotations(int index, IEnumerable<IWritableNode> annotations, IEventId? eventId = null) => throw new NotImplementedException();
+
+        public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations) => throw new NotImplementedException();
+        public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null) => throw new NotImplementedException();
 
         public void Set(Feature feature, object? value, IEventId? eventId = null) { }
 
