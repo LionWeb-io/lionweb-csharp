@@ -143,32 +143,3 @@ public abstract class EventForwarderBase<TEvent> : EventForwarderBase, ICommande
         Event != null &&
         eventTypes.Any(eventType => _subscribedEvents.TryGetValue(eventType, out var count) && count > 0);
 }
-
-/// Internal event id based on a string and an increasing number.
-public record NumericEventId(string Base, int Id) : IEventId
-{
-    /// <inheritdoc />
-    public virtual bool Equals(NumericEventId? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return string.Equals(Base, other.Base, StringComparison.InvariantCulture) && Id == other.Id;
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        var hashCode = new HashCode();
-        hashCode.Add(Base, StringComparer.InvariantCulture);
-        hashCode.Add(Id);
-        return hashCode.ToHashCode();
-    }
-}
