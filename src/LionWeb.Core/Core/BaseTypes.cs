@@ -216,26 +216,33 @@ public interface IWritableNode : IReadableNode
     public void Set(Feature feature, object? value);
 }
 
+/// <summary>
+/// Represents an interface for nodes that support event operations with optional event identifiers.
+/// </summary>
 public interface IEventableNode : IWritableNode
 {
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => AddAnnotations(annotations, null);
     
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     public void AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
 
     void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) => InsertAnnotations(index, annotations, null);
     
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
 
     bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => RemoveAnnotations(annotations, null);
 
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null);
 
     void IWritableNode.Set(Feature feature, object? value) => Set(feature, value, null);
 
     /// <inheritdoc cref="IWritableNode.Set"/>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     public void Set(Feature feature, object? value, IEventId? eventId = null);
 }
 
@@ -311,21 +318,25 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
     public bool RemoveAnnotations(IEnumerable<T> annotations);
 }
 
+/// The type-parametrized twin of the non-generic <see cref="IEventableNode"/> interface.
 public interface IEventableNode<T> : IEventableNode, IWritableNode<T> where T : class, IEventableNode
 {
     void IWritableNode<T>.AddAnnotations(IEnumerable<T> annotations) => AddAnnotations(M2Extensions.AsNodes<T>(annotations));
     
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     public void AddAnnotations(IEnumerable<T> annotations, IEventId? eventId = null);
 
     void IWritableNode<T>.InsertAnnotations(Index index, IEnumerable<T> annotations) => InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations));
     
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
+    /// <param name="eventId">The event ID of the event that triggers this action</param> 
     public void InsertAnnotations(Index index, IEnumerable<T> annotations, IEventId? eventId = null);
 
     bool IWritableNode<T>.RemoveAnnotations(IEnumerable<T> annotations) => RemoveAnnotations(M2Extensions.AsNodes<T>(annotations));
     
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
+    /// <param name="eventId">The event ID of the event that triggers this action</param>
     public bool RemoveAnnotations(IEnumerable<T> annotations,  IEventId? eventId = null);
 }
 
@@ -408,7 +419,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
 }
 
 /// Base implementation of <see cref="INode"/>.
-public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNode<IEventableNode>
+public abstract class NodeBase : ReadableNodeBase<INode>, INode
 {
     /// <summary>
     /// Initializes <c>this</c> node's <see cref="IReadableNode.GetId">id</see>.
@@ -442,20 +453,20 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     void IEventableNode.AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
         AddAnnotations(M2Extensions.AsNodes<INode>(annotations), eventId);
 
-    bool IEventableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
-        RemoveAnnotations(M2Extensions.AsNodes<INode>(annotations), eventId);
-    
     void IEventableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId? eventId) =>
         InsertAnnotations(index, M2Extensions.AsNodes<INode>(annotations), eventId);
+    
+    bool IEventableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
+        RemoveAnnotations(M2Extensions.AsNodes<INode>(annotations), eventId);
     
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => 
         AddAnnotations(M2Extensions.AsNodes<INode>(annotations), null);
     
-    bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => 
-        RemoveAnnotations(M2Extensions.AsNodes<INode>(annotations), null);
-    
     void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
         InsertAnnotations(index, M2Extensions.AsNodes<INode>(annotations), null);
+    
+    bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => 
+        RemoveAnnotations(M2Extensions.AsNodes<INode>(annotations), null);
     
     /// <inheritdoc />
     public virtual void AddAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null)
