@@ -62,6 +62,20 @@ public class NodeBaseTests
         Assert.AreEqual(2, shape.GetAnnotations().Count);
         CollectionAssert.AreEqual(new List<INode> { doc, bom }, shape.GetAnnotations().ToList());
     }
+    
+    [TestMethod]
+    public void AddAnnotations_IEventableNode_Generic()
+    {
+        var doc = new Documentation("circ0");
+        var bom = new BillOfMaterials("off0");
+        
+        IEventableNode<INode> shape = new Circle("geom");
+        shape.AddAnnotations([doc, bom]);
+        
+        Assert.AreEqual(2, shape.GetAnnotations().Count);
+        CollectionAssert.AreEqual(new List<INode> { doc, bom }, shape.GetAnnotations().ToList());
+    }
+
 
     [TestMethod]
     public void AddAnnotations_IWritableNode()
@@ -70,6 +84,19 @@ public class NodeBaseTests
         var bom = new BillOfMaterials("off0");
         
         IWritableNode shape = new Circle("geom");
+        shape.AddAnnotations([doc, bom]);
+        
+        Assert.AreEqual(2, shape.GetAnnotations().Count);
+        CollectionAssert.AreEqual(new List<INode> { doc, bom }, shape.GetAnnotations().ToList());
+    }
+    
+    [TestMethod]
+    public void AddAnnotations_IWritableNode_Generic()
+    {
+        var doc = new Documentation("circ0");
+        var bom = new BillOfMaterials("off0");
+        
+        IWritableNode<INode> shape = new Circle("geom");
         shape.AddAnnotations([doc, bom]);
         
         Assert.AreEqual(2, shape.GetAnnotations().Count);
@@ -120,12 +147,38 @@ public class NodeBaseTests
     }
 
     [TestMethod]
+    public void InsertAnnotations_IEventableNode_Generic()
+    {
+        var doc = new Documentation("circ0");
+        var bom = new BillOfMaterials("off0");
+        
+        IEventableNode<INode> shape = new Circle("geom");
+        shape.InsertAnnotations(0, [doc, bom]);
+        
+        Assert.AreEqual(2, shape.GetAnnotations().Count);
+        CollectionAssert.AreEqual(new List<INode> { doc, bom }, shape.GetAnnotations().ToList());
+    }
+
+    [TestMethod]
     public void InsertAnnotations_IWritableNode()
     {
         var doc = new Documentation("circ0");
         var bom = new BillOfMaterials("off0");
         
         IWritableNode shape = new Circle("geom");
+        shape.InsertAnnotations(0, [doc, bom]);
+        
+        Assert.AreEqual(2, shape.GetAnnotations().Count);
+        CollectionAssert.AreEqual(new List<INode> { doc, bom }, shape.GetAnnotations().ToList());
+    }
+
+    [TestMethod]
+    public void InsertAnnotations_IWritableNode_Generic()
+    {
+        var doc = new Documentation("circ0");
+        var bom = new BillOfMaterials("off0");
+        
+        IWritableNode<INode> shape = new Circle("geom");
         shape.InsertAnnotations(0, [doc, bom]);
         
         Assert.AreEqual(2, shape.GetAnnotations().Count);
@@ -179,12 +232,40 @@ public class NodeBaseTests
     }
 
     [TestMethod]
+    public void RemoveAnnotations_IEventableNode_Generic()
+    {
+        var doc = new Documentation("circ0");
+        var bom = new BillOfMaterials("off0");
+        
+        IEventableNode<INode> shape = new Circle("geom");
+        shape.InsertAnnotations(0, [doc, bom]);
+        shape.RemoveAnnotations([bom]);
+        
+        Assert.AreEqual(1, shape.GetAnnotations().Count);
+        CollectionAssert.AreEqual(new List<INode> { doc}, shape.GetAnnotations().ToList());
+    }
+
+    [TestMethod]
     public void RemoveAnnotations_IWritableNode()
     {
         var doc = new Documentation("circ0");
         var bom = new BillOfMaterials("off0");
         
         IWritableNode shape = new Circle("geom");
+        shape.InsertAnnotations(0, [doc, bom]);
+        shape.RemoveAnnotations([bom]);
+        
+        Assert.AreEqual(1, shape.GetAnnotations().Count);
+        CollectionAssert.AreEqual(new List<INode> { doc}, shape.GetAnnotations().ToList());
+    }
+    
+    [TestMethod]
+    public void RemoveAnnotations_IWritableNode_Generic()
+    {
+        var doc = new Documentation("circ0");
+        var bom = new BillOfMaterials("off0");
+        
+        IWritableNode<INode> shape = new Circle("geom");
         shape.InsertAnnotations(0, [doc, bom]);
         shape.RemoveAnnotations([bom]);
         
