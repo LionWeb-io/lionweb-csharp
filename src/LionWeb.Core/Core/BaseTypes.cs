@@ -216,36 +216,6 @@ public interface IWritableNode : IReadableNode
     public void Set(Feature feature, object? value);
 }
 
-/// <summary>
-/// Represents an interface for nodes that support event operations with optional event identifiers.
-/// </summary>
-public interface IEventableNode : IWritableNode
-{
-    void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => AddAnnotations(annotations, null);
-    
-    /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public void AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
-
-    void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) => InsertAnnotations(index, annotations, null);
-    
-    /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
-
-    bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => RemoveAnnotations(annotations, null);
-
-    /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null);
-
-    void IWritableNode.Set(Feature feature, object? value) => Set(feature, value, null);
-
-    /// <inheritdoc cref="IWritableNode.Set"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public void Set(Feature feature, object? value, IEventId? eventId = null);
-}
-
 /// The type-parametrized twin of the non-generic <see cref="IWritableNode"/> interface.
 public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : class, IWritableNode
 {
@@ -316,28 +286,6 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
 
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
     public bool RemoveAnnotations(IEnumerable<T> annotations);
-}
-
-/// The type-parametrized twin of the non-generic <see cref="IEventableNode"/> interface.
-public interface IEventableNode<T> : IEventableNode, IWritableNode<T> where T : class, IEventableNode
-{
-    void IWritableNode<T>.AddAnnotations(IEnumerable<T> annotations) => AddAnnotations(M2Extensions.AsNodes<T>(annotations));
-    
-    /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public void AddAnnotations(IEnumerable<T> annotations, IEventId? eventId = null);
-
-    void IWritableNode<T>.InsertAnnotations(Index index, IEnumerable<T> annotations) => InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations));
-    
-    /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param> 
-    public void InsertAnnotations(Index index, IEnumerable<T> annotations, IEventId? eventId = null);
-
-    bool IWritableNode<T>.RemoveAnnotations(IEnumerable<T> annotations) => RemoveAnnotations(M2Extensions.AsNodes<T>(annotations));
-    
-    /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public bool RemoveAnnotations(IEnumerable<T> annotations,  IEventId? eventId = null);
 }
 
 /// An interface that instances of LionWeb <see cref="StructuredDataType">StructuredDataTypes</see> implement.
