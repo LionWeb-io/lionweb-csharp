@@ -28,8 +28,6 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
     where TPartition : TContent, IDeltaContent
     where TForest : TContent, IDeltaContent
 {
-    // private readonly Dictionary<NodeId, PartitionEventProcessor> _partitionEventForwarders = [];
-
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
     private readonly IEventProcessor<IForestEvent> _forestEventReplicator;
@@ -40,18 +38,17 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
         _sharedNodeMap = sharedNodeMap;
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
         _forestEventReplicator = forestEventReplicator;
-        _localForestReceiver = new LocalForestReceiver(this);
+        _localForestReceiver = new LocalForestReceiver(this, this);
     }
 
     public void Init()
     {
         foreach (var partition in _sharedNodeMap.Values.OfType<IPartitionInstance>())
         {
-            _localForestReceiver.OnLocalPartitionAdded(partition);
+            OnLocalPartitionAdded(partition);
         }
 
         IProcessor.Forward(_forestEventReplicator,  _localForestReceiver);
-        // _forestEventReplicator.Subscribe<IForestEvent>(LocalHandler);
     }
 
     /// <inheritdoc />
@@ -62,36 +59,28 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 
     #region Local
 
-    private class LocalForestReceiver(object? sender) : EventProcessorBase<IForestEvent>(sender)
+    private class LocalForestReceiver(object? sender, DeltaProtocolReceiverBase<TContent, TPartition, TForest> receiver) : EventProcessorBase<IForestEvent>(sender)
     {
         public override void Receive(IForestEvent forestEvent)
         {
             switch (forestEvent)
             {
                 case PartitionAddedEvent e:
-                    OnLocalPartitionAdded(e.NewPartition);
+                    receiver.OnLocalPartitionAdded(e.NewPartition);
                     break;
                 case PartitionDeletedEvent e:
-                    OnLocalPartitionDeleted(e.DeletedPartition);
+                    receiver.OnLocalPartitionDeleted(e.DeletedPartition);
                     break;
             }
         }
+    }
 
-        internal void OnLocalPartitionAdded(IPartitionInstance partition)
-        {
-            // var partitionEventForwarder = new PartitionEventProcessor(this);
-            // var replicator = _forestEventReplicator.LookupPartitionReplicator(partition);
-            // // IProcessor.Forward(partitionEventForwarder, replicator);
-            // if (_partitionEventForwarders.TryAdd(partition.GetId(), partitionEventForwarder))
-            // {
-            //     // replicator.ReplicateFrom(partitionEventForwarder);
-            // }
-        }
+    internal void OnLocalPartitionAdded(IPartitionInstance partition)
+    {
+    }
 
-        private void OnLocalPartitionDeleted(IPartitionInstance partition)
-        {
-            // _partitionEventForwarders.Remove(partition.GetId());
-        }
+    private void OnLocalPartitionDeleted(IPartitionInstance partition)
+    {
     }
 
     #endregion

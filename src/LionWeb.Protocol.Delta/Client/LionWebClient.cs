@@ -97,9 +97,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                     Log($"received response: {response})");
                     if (_queryResponses.TryRemove(response.QueryId, out var tcs))
                     {
-                        // Log($"trying to set result");
                         var x = tcs.TrySetResult(response);
-                        // Log($"tried to set result: {x}");
                     }
 
                     break;

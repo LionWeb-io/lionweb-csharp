@@ -56,17 +56,10 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        // ForestEventForwarder = new ForestEventProcessor(name);
         SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
         _replicator = ForestEventReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
-        // _replicator.Init();
-        // _replicator.ReplicateFrom(ForestEventForwarder);
         
         IProcessor.Forward(_replicator, new LocalForestReceiver(name, this));
-
-        // _replicator.Subscribe<IForestEvent>(SendEventToRepository);
-
-        // ForestEventForwarder.ForwardFrom<IForestEvent>(LocalHandler);
 
         _connector.ReceiveFromRepository += OnReceiveFromRepository;
     }
@@ -105,27 +98,11 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         public override void Receive(IPartitionEvent message) =>
             client.SendEventToRepository(sender, message);
     }
-    
-    // private void LocalHandler(object? _, IForestEvent forestEvent)
-    // {
-    //     switch (forestEvent)
-    //     {
-    //         case PartitionAddedEvent e:
-    //             OnLocalPartitionAdded(e);
-    //             break;
-    //         case PartitionDeletedEvent e:
-    //             OnLocalPartitionDeleted(e);
-    //             break;
-    //     }
-    // }
 
     private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
     {
         var eventProcessor = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
         IProcessor.Forward(eventProcessor, new LocalPartitionReceiver(_name, this));
-        // var partition = partitionAddedEvent.NewPartition;
-        // var replicator = _replicator.LookupPartitionReplicator(partition);
-        // replicator.Subscribe<IPartitionEvent>(SendEventToRepository);
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent)

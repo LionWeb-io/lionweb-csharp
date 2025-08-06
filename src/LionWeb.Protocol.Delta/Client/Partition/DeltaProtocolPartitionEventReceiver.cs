@@ -22,6 +22,7 @@ using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Message.Event;
 
+[Obsolete]
 public class DeltaProtocolPartitionEventReceiver : PublisherBase<IPartitionEvent>, IPartitionPublisher
 {
     private readonly DeltaEventToPartitionEventMapper _mapper;

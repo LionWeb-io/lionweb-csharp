@@ -20,7 +20,6 @@ namespace LionWeb.Core.M1.Event;
 using Forest;
 using Partition;
 using System.Reflection;
-using Utilities;
 
 /// Base class to forward all <see cref="ForwardTo">raised</see> events.
 public abstract class EventProcessorBase
@@ -44,6 +43,7 @@ public abstract class EventProcessorBase
     }
 }
 
+[Obsolete]
 public abstract class PublisherBase<TEvent> : EventProcessorBase, IPublisher<TEvent> where TEvent : IEvent
 {
     protected readonly Dictionary<Type, int> _subscribedEvents = [];

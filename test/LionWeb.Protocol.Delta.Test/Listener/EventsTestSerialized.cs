@@ -17,10 +17,12 @@
 
 namespace LionWeb.Protocol.Delta.Test.Listener;
 
+using Client;
 using Client.Partition;
 using Core;
 using Core.M1;
 using Core.M1.Event;
+using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
 using Core.M3;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;

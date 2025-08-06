@@ -25,8 +25,8 @@ public interface IProcessor
     {
         from.Subscribe(to);
         List<IProcessor> alreadyPrinted = [];
-        from.PrintAllReceivers(alreadyPrinted);
-        Console.WriteLine();
+        // from.PrintAllReceivers(alreadyPrinted);
+        // Console.WriteLine();
 
         if (alreadyPrinted.GroupBy(it => it).Any(it => it.Count() > 1))
         {

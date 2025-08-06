@@ -22,6 +22,7 @@ using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Message.Event;
 
+[Obsolete]
 public class DeltaProtocolForestEventReceiver : PublisherBase<IForestEvent>, IForestPublisher
 {
     private readonly DeltaEventToForestEventMapper _mapper;

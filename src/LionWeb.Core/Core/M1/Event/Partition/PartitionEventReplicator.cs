@@ -42,10 +42,9 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent>
         EventIdFilteringEventProcessor<IPartitionEvent> filter, object? sender) : base(sharedNodeMap, filter, sender)
     {
         _localPartition = localPartition;
-        // Init();
     }
 
-    public void Init()
+    protected void Init()
     {
         SharedNodeMap.RegisterNode(_localPartition);
 

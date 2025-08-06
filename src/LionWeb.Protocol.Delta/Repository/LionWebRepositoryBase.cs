@@ -24,7 +24,6 @@ using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
 using Core.M3;
 using Forest;
-using Partition;
 
 public abstract class LionWebRepositoryBase<T> : IDisposable
 {
@@ -34,7 +33,6 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
 
-    // protected readonly ForestEventProcessor ForestEventForwarder;
     protected readonly IEventProcessor<IForestEvent> _replicator;
 
     private long nextFreeNodeId = 0;
@@ -46,16 +44,10 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        // ForestEventForwarder = new ForestEventProcessor(name);
         SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
         _replicator = RewriteForestEventReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
-        // _replicator.Init();
-        // _replicator.ReplicateFrom(ForestEventForwarder);
 
         IProcessor.Forward(_replicator, new LocalForestReceiver(name, this));
-        // _replicator.Subscribe<IForestEvent>(SendEventToAllClients);
-
-        // ForestEventForwarder.ForwardFrom<IForestEvent>(LocalHandler);
 
         _connector.ReceiveFromClient += OnReceiveFromClient;
     }
@@ -113,11 +105,6 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     {
         var eventProcessor = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
         IProcessor.Forward(eventProcessor, new LocalPartitionReceiver(_name, this));
-        // var partition = partitionAddedEvent.NewPartition;
-        // // var forwarder = new PartitionEventProcessor(_name);
-        // var replicator = RewritePartitionEventReplicator.Create(partition, SharedNodeMap);
-        // replicator.ReplicateFrom(forwarder);
-        // replicator.Subscribe<IPartitionEvent>(SendEventToAllClients);
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent)

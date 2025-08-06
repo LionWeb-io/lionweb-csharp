@@ -19,7 +19,6 @@ namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
 using Core.M1;
-using Core.M1.Event.Forest;
 using Core.M3;
 using Message;
 using Message.Command;
@@ -150,8 +149,7 @@ public class LionWebTestRepository(
     List<Language> languages,
     string name,
     IForest forest,
-    IRepositoryConnector<IDeltaContent> connector,
-    SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
+    IRepositoryConnector<IDeltaContent> connector)
     : LionWebRepository(lionWebVersion, languages, name, forest, connector)
 {
     private const int _sleepInterval = 100;

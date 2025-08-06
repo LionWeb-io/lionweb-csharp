@@ -25,42 +25,6 @@ public abstract class FilteringEventProcessor<TEvent>(object? sender)
     : /*IDisposable,*/ EventProcessorBase<TEvent>(sender)
     where TEvent : class, IEvent
 {
-    // // private readonly TPublisher? _localPublisher = localPublisher;
-    // private readonly Dictionary<object, EventHandler<TEvent>> _forwardingHandlers = [];
-    //
-    // /// <inheritdoc />
-    // public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent
-    // {
-    //     // if (_localPublisher == null)
-    //     //     return;
-    //
-    //     EventHandler<TEvent> forwardingHandler = (sender, @event) =>
-    //     {
-    //         if (@event is not TSubscribedEvent s)
-    //             return;
-    //
-    //         var r = Filter<TSubscribedEvent>(s);
-    //         Debug.WriteLine($"Forwarding event id {@event.EventId}: {r?.EventId}");
-    //         if (r is not null)
-    //             handler(sender, s);
-    //     };
-    //
-    //     _forwardingHandlers.Add(handler, forwardingHandler);
-    //
-    //     _localPublisher.Subscribe(forwardingHandler);
-    // }
-    //
-    // /// <inheritdoc />
-    // public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent
-    // {
-    //     if (_localPublisher == null)
-    //         return;
-    //
-    //     if (!_forwardingHandlers.Remove(handler, out var forwardingHandler))
-    //         return;
-    //
-    //     _localPublisher.Unsubscribe(forwardingHandler);
-    // }
 
     /// Unsubscribes all registered <see cref="Subscribe{TSubscribedEvent}">subscribers</see>.
     // public virtual void Dispose()
@@ -75,18 +39,6 @@ public abstract class FilteringEventProcessor<TEvent>(object? sender)
     //     
     //     GC.SuppressFinalize(this);
     // }
-
-    // protected override EventHandler<TEvent> CreateHandler<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) => 
-    //     (object? sender, TEvent @event) =>
-    //     {
-    //         if (@event is not TSubscribedEvent s)
-    //             return;
-    //         
-    //         var r = Filter<TSubscribedEvent>(s);
-    //         Debug.WriteLine($"Forwarding event id {@event.EventId}: {r?.EventId}");
-    //         if (r is not null)
-    //             handler(sender, s);
-    //     };
 
     /// <inheritdoc />
     public override void Receive(TEvent message)
@@ -119,12 +71,6 @@ public class EventIdFilteringEventProcessor<TEvent>(object? sender) : FilteringE
     /// Forwards future events with <paramref name="eventId"/> to <see cref="FilteringEventProcessor{TEvent}.Subscribe{TSubscribedEvent}">subscribers</see>.
     public void UnregisterEventId(IEventId eventId) =>
         _eventIds.Remove(eventId);
-
-    // protected override TSubscribedEvent? Filter<TSubscribedEvent>(TEvent @event)  where TSubscribedEvent : class
-    // {
-    //     var result = !_eventIds.Contains(@event.EventId);
-    //     return result ? @event as TSubscribedEvent : null;
-    // }
 
     /// <inheritdoc />
     protected override TEvent? Filter(TEvent @event)

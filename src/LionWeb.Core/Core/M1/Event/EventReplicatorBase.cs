@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.M1.Event;
 
-using Forest;
 using Partition;
 using Utilities;
 
@@ -46,13 +45,6 @@ public abstract class EventReplicatorBase<TEvent> : EventProcessorBase<TEvent> w
         _filter = filter;
     }
 
-    /// Replicate events raised by <paramref name="publisher"/>. 
-    // public virtual void ReplicateFrom(TPublisher publisher)
-    // {
-    //     publisher.Subscribe<TEvent>(ProcessEvent);
-    //     _publishers.Add(publisher);
-    // }
-
     /// unsubscribes from all <see cref="ReplicateFrom">replicated publishers</see>.
     // public override void Dispose()
     // {
@@ -63,20 +55,13 @@ public abstract class EventReplicatorBase<TEvent> : EventProcessorBase<TEvent> w
     //
     //     GC.SuppressFinalize(this);
     // }
-
-    // protected abstract void ProcessEvent(object? sender, TEvent @event);
-    
-    
-
     public override void Receive(TEvent message) =>
         ProcessEvent(message);
 
     protected abstract void ProcessEvent(TEvent? @event);
 
-    protected void RegisterNode(IReadableNode newNode)
-    {
-        SharedNodeMap.UnregisterNode(newNode);
-    }
+    protected void RegisterNode(IReadableNode newNode) =>
+        SharedNodeMap.RegisterNode(newNode);
 
     protected virtual INode Lookup(NodeId remoteNodeId) =>
         (INode)SharedNodeMap[remoteNodeId];
@@ -90,20 +75,15 @@ public abstract class EventReplicatorBase<TEvent> : EventProcessorBase<TEvent> w
     /// Uses <see cref="EventIdFilteringEventProcessor{TEvent,TPublisher}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
     protected virtual void SuppressEventForwarding(TEvent @event, Action action)
     {
-        IEventId? eventId = null;
-        // if (_localCommander != null)
-        {
-            eventId = @event.EventId;
-            _filter.RegisterEventId(eventId);
-        }
+        IEventId? eventId = @event.EventId;
+        _filter.RegisterEventId(eventId);
 
         try
         {
             action();
         } finally
         {
-            if (eventId != null)
-                _filter.UnregisterEventId(eventId);
+            _filter.UnregisterEventId(eventId);
         }
     }
 }

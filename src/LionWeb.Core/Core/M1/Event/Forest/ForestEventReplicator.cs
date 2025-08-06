@@ -47,7 +47,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
     }
 
-    public void Init()
+    protected void Init()
     {
         foreach (var partition in _localForest.Partitions)
         {
@@ -100,19 +100,6 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
     protected virtual IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition) =>
         PartitionEventReplicator.Create(partition, SharedNodeMap, $"{_localForest}.{partition.GetId()}");
 
-    private void LocalHandler(object? _, IForestEvent forestEvent)
-    {
-        switch (forestEvent)
-        {
-            case PartitionAddedEvent e:
-                OnLocalPartitionAdded(e);
-                break;
-            case PartitionDeletedEvent e:
-                OnLocalPartitionDeleted(e);
-                break;
-        }
-    }
-
     private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent) =>
         RegisterPartition(partitionAddedEvent.NewPartition);
 
@@ -121,21 +108,12 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
 
     private void RegisterPartition(IPartitionInstance partition)
     {
-        // var forwarder = new PartitionEventProcessor(this);
         var replicator = CreatePartitionEventReplicator(partition);
         _sharedPartitionReplicatorMap.Register(partition.GetId(), replicator);
-        // if (!_localPartitionReplicators.TryAdd(partition.GetId(), replicator))
-        //     throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
-        // replicator.Init();
-        // replicator.ReplicateFrom(forwarder);
     }
 
-    private void UnregisterPartition(IPartitionInstance partition)
-    {
-        // var partitionEventApplier = LookupPartitionReplicator(partition);
-        // partitionEventApplier.Dispose();
+    private void UnregisterPartition(IPartitionInstance partition) => 
         _sharedPartitionReplicatorMap.Unregister(partition.GetId());
-    }
 
     #endregion
 
@@ -170,8 +148,6 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
             if (remoteListener is IPartitionProcessor processor)
                 IProcessor.Forward(processor,
                     _sharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId()));
-            // new EventForwarder<IPartitionEvent>(remoteListener, LookupPartitionReplicator(clone));
-            // LookupPartitionReplicator(clone).ReplicateFrom(remoteListener);
         });
 
     private void OnRemotePartitionDeleted(PartitionDeletedEvent partitionDeletedEvent) =>
@@ -182,22 +158,4 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
         });
 
     #endregion
-}
-
-public class SharedPartitionReplicatorMap
-{
-    private readonly Dictionary<NodeId, IEventProcessor<IPartitionEvent>> _localPartitionReplicators = [];
-
-    public IEventProcessor<IPartitionEvent> Lookup(NodeId partitionId) =>
-        _localPartitionReplicators[partitionId];
-
-    public void Register(NodeId partitionId, IEventProcessor<IPartitionEvent> replicator)
-    {
-        if (!_localPartitionReplicators.TryAdd(partitionId, replicator))
-            throw new ArgumentException(
-                $"Duplicate partition replicator: {partitionId}: {replicator} {Lookup(partitionId)}");
-    }
-
-    public void Unregister(NodeId partitionId) =>
-        _localPartitionReplicators.Remove(partitionId);
 }

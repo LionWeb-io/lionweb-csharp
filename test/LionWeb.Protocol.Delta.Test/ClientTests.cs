@@ -57,33 +57,32 @@ public class ClientTests
         _repositoryConnector.Sender = content => _clientConnector.ReceiveMessageFromRepository(content);
 
         _repositoryForest = new Forest();
-        _repositoryPartition = new Geometry("partition");
         _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryForest,
             _repositoryConnector);
 
-        // _repositoryForest.AddPartitions([_repositoryPartition]);
-
         _clientForest = new Forest();
-        _clientPartition = Clone(_repositoryPartition);
+        _clientPartition = new Geometry("partition");
         _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector);
         _client.ParticipationId = _clientInfo.ParticipationId;
         
         _clientForest.AddPartitions([_clientPartition]);
         _repository.WaitForReceived(1);
+        _repositoryPartition = (Geometry)_repositoryForest.Partitions.First();
     }
 
-    [TestMethod, Timeout(6000)]
+    [TestMethod]
+    [Timeout(6000)]
     public void ConnectionWorks()
     {
         _clientPartition.Documentation = new Documentation("doc");
 
-         _repository.WaitForReceived(2);
-        // _client.WaitForReplies(1);
+         _repository.WaitForReceived(1);
 
         AssertEquals(_clientPartition, _repositoryPartition);
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public async Task SignOn()
     {
         var signOnResponse = await _client.SignOn();
@@ -92,6 +91,7 @@ public class ClientTests
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public async Task GetAvailableIds()
     {
         var availableIdsResponse = await _client.GetAvailableIds(11);
@@ -104,6 +104,7 @@ public class ClientTests
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public async Task GetAvailableIds_SomeAlreadyUsed()
     {
         await _client.SignOn();
@@ -123,6 +124,7 @@ public class ClientTests
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public void InOrderEvents()
     {
         _repositoryConnector.SendToAllClients(ChildAdded(0));
@@ -134,6 +136,7 @@ public class ClientTests
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public void OutOfOrderEvents()
     {
         _repositoryConnector.SendToAllClients(PropertyAdded(1));
@@ -177,7 +180,7 @@ public class ClientTests
             ShapesLanguage.Instance.Documentation_text.ToMetaPointer(),
             "changed text",
             "text",
-            [new CommandSource(_clientInfo.ParticipationId, "cmdY")],
+            [new CommandSource(_clientInfo.ParticipationId, "cmdZ")],
             null
         ) { SequenceNumber = sequenceNumber };
 
