@@ -397,24 +397,6 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             _parent = null;
         }
     }
-
-    void IEventableNode.AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
-        AddAnnotations(M2Extensions.AsNodes<INode>(annotations), eventId);
-
-    void IEventableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId? eventId) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<INode>(annotations), eventId);
-    
-    bool IEventableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
-        RemoveAnnotations(M2Extensions.AsNodes<INode>(annotations), eventId);
-    
-    void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => 
-        AddAnnotations(M2Extensions.AsNodes<INode>(annotations), null);
-    
-    void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<INode>(annotations), null);
-    
-    bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => 
-        RemoveAnnotations(M2Extensions.AsNodes<INode>(annotations), null);
     
     /// <inheritdoc />
     public virtual void AddAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null)
