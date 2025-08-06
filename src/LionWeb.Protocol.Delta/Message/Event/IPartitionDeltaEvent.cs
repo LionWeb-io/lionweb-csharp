@@ -21,7 +21,7 @@ using Core.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 
-public interface IPartitionDeltaEvent : IDeltaEvent;
+public interface IPartitionDeltaEvent : IEvent;
 
 #region Nodes
 

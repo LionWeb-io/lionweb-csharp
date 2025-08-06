@@ -56,7 +56,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     {
         switch (deltaContent)
         {
-            case IDeltaEvent deltaEvent:
+            case IEvent deltaEvent:
                 var commandSource = deltaEvent is { OriginCommands: { } cmds }
                     ? cmds.First()
                     : null;

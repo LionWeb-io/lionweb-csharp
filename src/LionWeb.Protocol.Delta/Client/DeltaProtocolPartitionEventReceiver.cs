@@ -40,7 +40,7 @@ public class DeltaProtocolPartitionEventReceiver
     }
 
 
-    public void Receive(IDeltaEvent deltaEvent)
+    public void Receive(IEvent deltaEvent)
     {
         IPartitionEvent partitionEvent = _mapper.Map(deltaEvent);
 

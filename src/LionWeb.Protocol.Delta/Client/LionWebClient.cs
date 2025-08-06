@@ -40,7 +40,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
     private readonly DeltaProtocolPartitionEventReceiver _eventReceiver;
     
-    private readonly ConcurrentDictionary<EventSequenceNumber, IDeltaEvent> _unprocessedEvents = [];
+    private readonly ConcurrentDictionary<EventSequenceNumber, IEvent> _unprocessedEvents = [];
     private readonly ConcurrentDictionary<CommandId, bool> _ownCommands = [];
 
     #region EventSequenceNumber
@@ -122,7 +122,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             
             switch (content)
             {
-                case IDeltaEvent deltaEvent:
+                case IEvent deltaEvent:
                     ReceiveEvent(deltaEvent);
 
                     break;
@@ -149,7 +149,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         }
     }
 
-    private void ReceiveEvent(IDeltaEvent deltaEvent)
+    private void ReceiveEvent(IEvent deltaEvent)
     {
         Log(
             $"received event: {deltaEvent.GetType()}({deltaEvent.OriginCommands},{deltaEvent.SequenceNumber})");
@@ -172,7 +172,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         }
     }
 
-    private void ProcessEvent(IDeltaEvent deltaEvent)
+    private void ProcessEvent(IEvent deltaEvent)
     {
         IncrementEventSequenceNumber();
 

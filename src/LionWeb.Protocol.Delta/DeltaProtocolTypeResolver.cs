@@ -39,7 +39,7 @@ public class DeltaProtocolTypeResolver : DefaultJsonTypeInfoResolver
         Fill(_queries, typeof(IDeltaQuery));
         Fill(_commands, typeof(ICommand));
         // Fill(_singleCommands, typeof(ISingleDeltaCommand));
-        Fill(_events, typeof(IDeltaEvent));
+        Fill(_events, typeof(IEvent));
         // Fill(_singleEvents, typeof(ISingleDeltaEvent));
         Fill(_all, typeof(IDeltaContent));
     }
@@ -75,7 +75,7 @@ public class DeltaProtocolTypeResolver : DefaultJsonTypeInfoResolver
             // {
             //     FillDerived(jsonPolymorphismOptions, _singleCommands);
             //     jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;
-        } else if (jsonTypeInfo.Type == typeof(IDeltaEvent))
+        } else if (jsonTypeInfo.Type == typeof(IEvent))
         {
             FillDerived(jsonPolymorphismOptions, _events);
             jsonTypeInfo.PolymorphismOptions = jsonPolymorphismOptions;

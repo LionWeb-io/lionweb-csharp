@@ -35,7 +35,7 @@ public class JsonSerializationTests : JsonTestsBase
 
         // see https://github.com/LionWeb-io/specification/issues/351
         if (delta is CompositeEvent ce)
-            delta = ce with { SequenceNumber = IDeltaEvent.DefaultEventSequenceNumber };
+            delta = ce with { SequenceNumber = IEvent.DefaultEventSequenceNumber };
         
         Assert.AreEqual(delta, deserialized);
     }

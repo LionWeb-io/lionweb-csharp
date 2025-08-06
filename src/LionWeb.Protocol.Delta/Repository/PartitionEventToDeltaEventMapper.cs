@@ -39,7 +39,7 @@ public class PartitionEventToDeltaEventMapper
         _propertySerializer = ISerializerVersionSpecifics.Create(lionWebVersion);
     }
 
-    public IDeltaEvent Map(IPartitionEvent partitionEvent) =>
+    public IEvent Map(IPartitionEvent partitionEvent) =>
         partitionEvent switch
         {
             PropertyAddedEvent a => OnPropertyAdded(a),

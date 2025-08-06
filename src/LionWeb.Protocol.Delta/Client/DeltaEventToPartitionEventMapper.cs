@@ -44,7 +44,7 @@ public class DeltaEventToPartitionEventMapper
         _deserializerBuilder = deserializerBuilder;
     }
 
-    public IPartitionEvent Map(IDeltaEvent deltaEvent) =>
+    public IPartitionEvent Map(IEvent deltaEvent) =>
         deltaEvent switch
         {
             PropertyAdded a => OnPropertyAdded(a),
@@ -373,7 +373,7 @@ public class DeltaEventToPartitionEventMapper
     #endregion
 
 
-    private static IEventId ToEventId(IDeltaEvent deltaEvent) =>
+    private static IEventId ToEventId(IEvent deltaEvent) =>
         new ParticipationEventId(deltaEvent.InternalParticipationId,
             string.Join("_", deltaEvent.OriginCommands.Select(c => c.CommandId)));
 

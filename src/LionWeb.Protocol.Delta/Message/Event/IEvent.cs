@@ -25,7 +25,7 @@ using System.Text.Json.Serialization;
 
 public record CommandSource(ParticipationId ParticipationId, CommandId CommandId);
 
-public interface IDeltaEvent : IDeltaContent
+public interface IEvent : IDeltaContent
 {
     public const EventSequenceNumber DefaultEventSequenceNumber = -1;
     
@@ -36,14 +36,14 @@ public interface IDeltaEvent : IDeltaContent
 
 public abstract record DeltaEventBase(
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaContentBase(ProtocolMessages), IDeltaEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaContentBase(ProtocolMessages), IEvent
 {
     /// <inheritdoc />
     [JsonIgnore]
     public override string Id => string.Join("__", OriginCommands.Select(x => x.ToString()));
 
     /// <inheritdoc />
-    public virtual EventSequenceNumber SequenceNumber { get; set; } = IDeltaEvent.DefaultEventSequenceNumber;
+    public virtual EventSequenceNumber SequenceNumber { get; set; } = IEvent.DefaultEventSequenceNumber;
 
     /// <inheritdoc />
     public virtual CommandSource[]? OriginCommands { get; init; } = OriginCommands;
@@ -96,9 +96,9 @@ public abstract record DeltaEventBase(
 
 #region Miscellaneous
 
-public record CompositeEvent : DeltaEventBase, IDeltaEvent
+public record CompositeEvent : DeltaEventBase, IEvent
 {
-    public CompositeEvent(IDeltaEvent[] Parts,
+    public CompositeEvent(IEvent[] Parts,
         ProtocolMessage[]? ProtocolMessages) : base(null, ProtocolMessages)
     {
         this.Parts = Parts;
@@ -108,11 +108,11 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
     [JsonIgnore]
     public override string Id => string.Join("--", Parts.Select(e => e.Id));
 
-    public IDeltaEvent[] Parts { get; init; }
+    public IEvent[] Parts { get; init; }
 
     /// <inheritdoc />
     [JsonIgnore]
-    public override EventSequenceNumber SequenceNumber { get; set; } = IDeltaEvent.DefaultEventSequenceNumber;
+    public override EventSequenceNumber SequenceNumber { get; set; } = IEvent.DefaultEventSequenceNumber;
 
     /// <inheritdoc />
     [JsonIgnore]
@@ -174,12 +174,12 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
 
 public record NoOpEvent(
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IEvent;
 
 public record Error(
     ErrorCode ErrorCode,
     string Message,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IEvent;
 
 #endregion
