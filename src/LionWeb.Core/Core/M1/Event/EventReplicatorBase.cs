@@ -39,7 +39,8 @@ public abstract class EventReplicatorBase<TEvent> : EventProcessorBase<TEvent> w
     protected readonly SharedNodeMap SharedNodeMap;
     private readonly EventIdFilteringEventProcessor<TEvent> _filter;
 
-    protected EventReplicatorBase(SharedNodeMap sharedNodeMap, EventIdFilteringEventProcessor<TEvent> filter) : base(null)
+    protected EventReplicatorBase(SharedNodeMap sharedNodeMap, EventIdFilteringEventProcessor<TEvent> filter,
+        object? sender) : base(sender)
     {
         SharedNodeMap = sharedNodeMap;
         _filter = filter;

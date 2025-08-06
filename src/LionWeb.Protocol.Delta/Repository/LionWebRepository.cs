@@ -19,6 +19,7 @@ namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
 using Core.M1;
+using Core.M1.Event.Forest;
 using Core.M3;
 using Message;
 using Message.Command;
@@ -33,7 +34,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         List<Language> languages,
         string name,
         IForest forest,
-        IRepositoryConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, forest, connector)
+        IRepositoryConnector<IDeltaContent> connector
+        ) : base(lionWebVersion, languages, name, forest, connector)
     {
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
@@ -44,8 +46,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
         _commandReceiver = new DeltaProtocolCommandReceiver(
-            ForestEventForwarder,
             SharedNodeMap,
+            SharedPartitionReplicatorMap,
             sharedKeyedMap,
             deserializerBuilder,
             _replicator
@@ -148,7 +150,8 @@ public class LionWebTestRepository(
     List<Language> languages,
     string name,
     IForest forest,
-    IRepositoryConnector<IDeltaContent> connector)
+    IRepositoryConnector<IDeltaContent> connector,
+    SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
     : LionWebRepository(lionWebVersion, languages, name, forest, connector)
 {
     private const int _sleepInterval = 100;

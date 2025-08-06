@@ -141,9 +141,9 @@ public class EventTests_Infrastructure
     private Tuple<IEventProcessor<IPartitionEvent>, IEventProcessor<IPartitionEvent>>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
-        var replicator = PartitionEventReplicator.Create(clone, new());
+        var replicator = PartitionEventReplicator.Create(clone, new(), "cloneReplicator");
         // replicator.Init();
-        var cloneReplicator = PartitionEventReplicator.Create(node, new());
+        var cloneReplicator = PartitionEventReplicator.Create(node, new(), "nodeReplicator");
         // cloneReplicator.Init();
         
         IProcessor.Forward(cloneReplicator, replicator);

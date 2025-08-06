@@ -30,10 +30,11 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly IClientConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
-    protected readonly ForestEventReplicator _replicator;
+    protected readonly IEventProcessor<IForestEvent> _replicator;
 
     private ParticipationId? _participationId;
     private readonly ClientId? _clientId;
+    protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
 
     protected internal ParticipationId ParticipationId
     {
@@ -56,11 +57,14 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
         SharedNodeMap = new();
         // ForestEventForwarder = new ForestEventProcessor(name);
-        _replicator = new ForestEventReplicator(forest, SharedNodeMap, TODO);
-        _replicator.Init();
+        SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
+        _replicator = ForestEventReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
+        // _replicator.Init();
         // _replicator.ReplicateFrom(ForestEventForwarder);
+        
+        IProcessor.Forward(_replicator, new LocalForestReceiver(name, this));
 
-        _replicator.Subscribe<IForestEvent>(SendEventToRepository);
+        // _replicator.Subscribe<IForestEvent>(SendEventToRepository);
 
         // ForestEventForwarder.ForwardFrom<IForestEvent>(LocalHandler);
 
@@ -78,24 +82,50 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     #region Local
 
-    private void LocalHandler(object? _, IForestEvent forestEvent)
+    private class LocalForestReceiver(object? sender, LionWebClientBase<T> client) : EventProcessorBase<IForestEvent>(sender)
     {
-        switch (forestEvent)
+        public override void Receive(IForestEvent message)
         {
-            case PartitionAddedEvent e:
-                OnLocalPartitionAdded(e);
-                break;
-            case PartitionDeletedEvent e:
-                OnLocalPartitionDeleted(e);
-                break;
+            switch (message)
+            {
+                case PartitionAddedEvent partitionAddedEvent:
+                    client.OnLocalPartitionAdded(partitionAddedEvent);
+                    break;
+                case PartitionDeletedEvent partitionDeletedEvent:
+                    client.OnLocalPartitionDeleted(partitionDeletedEvent);
+                    break;
+            }
+            
+            client.SendEventToRepository(sender, message);
         }
     }
+    
+    private class LocalPartitionReceiver(object? sender, LionWebClientBase<T> client) : EventProcessorBase<IPartitionEvent>(sender)
+    {
+        public override void Receive(IPartitionEvent message) =>
+            client.SendEventToRepository(sender, message);
+    }
+    
+    // private void LocalHandler(object? _, IForestEvent forestEvent)
+    // {
+    //     switch (forestEvent)
+    //     {
+    //         case PartitionAddedEvent e:
+    //             OnLocalPartitionAdded(e);
+    //             break;
+    //         case PartitionDeletedEvent e:
+    //             OnLocalPartitionDeleted(e);
+    //             break;
+    //     }
+    // }
 
     private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
     {
-        var partition = partitionAddedEvent.NewPartition;
-        var replicator = _replicator.LookupPartitionReplicator(partition);
-        replicator.Subscribe<IPartitionEvent>(SendEventToRepository);
+        var eventProcessor = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
+        IProcessor.Forward(eventProcessor, new LocalPartitionReceiver(_name, this));
+        // var partition = partitionAddedEvent.NewPartition;
+        // var replicator = _replicator.LookupPartitionReplicator(partition);
+        // replicator.Subscribe<IPartitionEvent>(SendEventToRepository);
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent)

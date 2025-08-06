@@ -23,18 +23,22 @@ using M1.Event.Partition;
 internal class CloningPartitionEventReplicator(
     IPartitionInstance localPartition,
     SharedNodeMap sharedNodeMap,
-    EventIdFilteringEventProcessor<IPartitionEvent> filter)
-    : PartitionEventReplicator(localPartition, sharedNodeMap, filter)
+    EventIdFilteringEventProcessor<IPartitionEvent> filter,
+    object? sender)
+    : PartitionEventReplicator(localPartition, sharedNodeMap, filter, sender)
 {
-    public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap)
+    public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition,
+        SharedNodeMap sharedNodeMap, object? sender)
     {
-        var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(null);
-        var replicator = new CloningPartitionEventReplicator(localPartition, sharedNodeMap, filter);
-        var result = new CompositeEventProcessor<IPartitionEvent>([filter, replicator], localPartition);
+        var internalSender = sender ?? localPartition.GetId();
+        var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(internalSender);
+        var replicator = new CloningPartitionEventReplicator(localPartition, sharedNodeMap, filter, internalSender);
+        var result = new CompositeEventProcessor<IPartitionEvent>([replicator, filter],
+            sender ?? $"Composite of {nameof(CloningPartitionEventReplicator)} {localPartition.GetId()}");
         replicator.Init();
         return result;
     }
-    
+
     protected override INode AdjustRemoteNode(INode remoteNode) =>
         SameIdCloner.Clone(remoteNode);
 }

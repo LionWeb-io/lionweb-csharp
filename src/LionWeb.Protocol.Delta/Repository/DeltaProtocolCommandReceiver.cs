@@ -20,6 +20,7 @@ namespace LionWeb.Protocol.Delta.Repository;
 using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
+using Core.M1.Event.Partition;
 using Forest;
 using Message.Command;
 using Partition;
@@ -32,20 +33,21 @@ public class DeltaProtocolCommandReceiver
 
     public DeltaProtocolCommandReceiver(
         PartitionSharedNodeMap sharedNodeMap,
+        SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder,
-        ForestEventReplicator forestEventReplicator)
-        : base(sharedNodeMap, forestEventReplicator)
+        IEventProcessor<IForestEvent> forestEventReplicator)
+        : base(sharedNodeMap, sharedPartitionReplicatorMap, forestEventReplicator)
     {
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
         _partitionMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
     /// <inheritdoc />
-    protected override IEvent MapPartition(IPartitionDeltaCommand partitionContent) =>
+    protected override IPartitionEvent MapPartition(IPartitionDeltaCommand partitionContent) =>
         _partitionMapper.Map(partitionContent);
 
     /// <inheritdoc />
-    protected override IEvent MapForest(IForestDeltaCommand forestContent) =>
+    protected override IForestEvent MapForest(IForestDeltaCommand forestContent) =>
         _forestMapper.Map(forestContent);
 }

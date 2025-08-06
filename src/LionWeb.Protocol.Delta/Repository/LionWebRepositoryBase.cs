@@ -31,7 +31,10 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     private readonly string _name;
     protected readonly IRepositoryConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
-    protected readonly ForestEventProcessor ForestEventForwarder;
+
+    protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
+
+    // protected readonly ForestEventProcessor ForestEventForwarder;
     protected readonly IEventProcessor<IForestEvent> _replicator;
 
     private long nextFreeNodeId = 0;
@@ -43,14 +46,16 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        ForestEventForwarder = new ForestEventProcessor(name);
-        _replicator = RewriteForestEventReplicator.Create(forest, SharedNodeMap);
+        // ForestEventForwarder = new ForestEventProcessor(name);
+        SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
+        _replicator = RewriteForestEventReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
         // _replicator.Init();
-        _replicator.ReplicateFrom(ForestEventForwarder);
+        // _replicator.ReplicateFrom(ForestEventForwarder);
 
-        _replicator.Subscribe<IForestEvent>(SendEventToAllClients);
+        IProcessor.Forward(_replicator, new LocalForestReceiver(name, this));
+        // _replicator.Subscribe<IForestEvent>(SendEventToAllClients);
 
-        ForestEventForwarder.ForwardFrom<IForestEvent>(LocalHandler);
+        // ForestEventForwarder.ForwardFrom<IForestEvent>(LocalHandler);
 
         _connector.ReceiveFromClient += OnReceiveFromClient;
     }
@@ -60,12 +65,37 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     {
         GC.SuppressFinalize(this);
         _connector.ReceiveFromClient -= OnReceiveFromClient;
-        _replicator.Dispose();
+        // _replicator.Dispose();
         SharedNodeMap.Dispose();
     }
 
     #region Local
 
+    private class LocalForestReceiver(object? sender, LionWebRepositoryBase<T> repository) : EventProcessorBase<IForestEvent>(sender)
+    {
+        public override void Receive(IForestEvent message)
+        {
+            switch (message)
+            {
+                case PartitionAddedEvent partitionAddedEvent:
+                    repository.OnLocalPartitionAdded(partitionAddedEvent);
+                    break;
+                case PartitionDeletedEvent partitionDeletedEvent:
+                    repository.OnLocalPartitionDeleted(partitionDeletedEvent);
+                    break;
+            }
+            
+            repository.SendEventToAllClients(sender, message);
+        }
+    }
+    
+    private class LocalPartitionReceiver(object? sender, LionWebRepositoryBase<T> repository) : EventProcessorBase<IPartitionEvent>(sender)
+    {
+        public override void Receive(IPartitionEvent message) =>
+            repository.SendEventToAllClients(sender, message);
+    }
+
+    
     private void LocalHandler(object? _, IForestEvent forestEvent)
     {
         switch (forestEvent)
@@ -81,11 +111,13 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
     {
-        var partition = partitionAddedEvent.NewPartition;
-        var forwarder = new PartitionEventProcessor(_name);
-        var replicator = new RewritePartitionEventReplicator(partition, TODO, SharedNodeMap);
-        replicator.ReplicateFrom(forwarder);
-        replicator.Subscribe<IPartitionEvent>(SendEventToAllClients);
+        var eventProcessor = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
+        IProcessor.Forward(eventProcessor, new LocalPartitionReceiver(_name, this));
+        // var partition = partitionAddedEvent.NewPartition;
+        // // var forwarder = new PartitionEventProcessor(_name);
+        // var replicator = RewritePartitionEventReplicator.Create(partition, SharedNodeMap);
+        // replicator.ReplicateFrom(forwarder);
+        // replicator.Subscribe<IPartitionEvent>(SendEventToAllClients);
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent)

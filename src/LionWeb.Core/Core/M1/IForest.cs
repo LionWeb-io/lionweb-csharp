@@ -85,4 +85,7 @@ public class Forest : IForest
 
     /// <inheritdoc />
     public IForestCommander GetCommander() => _eventProcessor;
+
+    /// <inheritdoc />
+    public override string ToString() => $"{nameof(Forest)}@{GetHashCode()}";
 }

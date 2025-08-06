@@ -21,10 +21,36 @@ public interface IProcessor
 {
     public static void Forward<TReceiveFrom, TForward, TSendFrom>(
         IProcessor<TReceiveFrom, TForward> from,
-        IProcessor<TForward, TSendFrom> to) =>
+        IProcessor<TForward, TSendFrom> to)
+    {
         from.Subscribe(to);
+        List<IProcessor> alreadyPrinted = [];
+        from.PrintAllReceivers(alreadyPrinted);
+        Console.WriteLine();
 
-    public void PrintAllReceivers(HashSet<IProcessor> alreadyPrinted, string indent = "");
+        if (alreadyPrinted.GroupBy(it => it).Any(it => it.Count() > 1))
+        {
+            // throw new ArgumentException($"Recursion between {from} and {to}");
+        }
+    }
+
+    public void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "");
+
+    protected static bool RecursionDetected(IProcessor self, List<IProcessor> alreadyPrinted, string indent)
+    {
+        try
+        {
+            if (!alreadyPrinted.Contains(self))
+                return false;
+
+            Console.WriteLine($"{indent}Recursion ^^");
+            return true;
+
+        } finally
+        {
+            alreadyPrinted.Add(self);
+        }
+    }
 }
 
 public interface IProcessor<in TReceive, in TSend> : IProcessor

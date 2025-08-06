@@ -60,14 +60,11 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
         _eventProcessors.Last().Unsubscribe(receiver);
 
     /// <inheritdoc />
-    public void PrintAllReceivers(HashSet<IProcessor> alreadyPrinted, string indent = "")
+    public void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "")
     {
         Console.WriteLine($"{indent}{this.GetType().Name}({_sender})");
-        if (!alreadyPrinted.Add(this))
-        {
-            Console.WriteLine($"{indent}Recursion ^^");
+        if (IProcessor.RecursionDetected(this, alreadyPrinted, indent))
             return;
-        }
 
         Console.WriteLine($"{indent}Members:");
         foreach (var processor in this._eventProcessors)

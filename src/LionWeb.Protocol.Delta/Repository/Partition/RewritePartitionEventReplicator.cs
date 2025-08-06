@@ -25,19 +25,23 @@ internal class RewritePartitionEventReplicator(
     IPartitionInstance localPartition,
     EventIdFilteringEventProcessor<IPartitionEvent> filter,
     EventIdReplacingEventProcessor<IPartitionEvent> replacingFilter,
-    SharedNodeMap sharedNodeMap)
-    : PartitionEventReplicator(localPartition, sharedNodeMap, filter)
+    SharedNodeMap sharedNodeMap,
+    object? sender)
+    : PartitionEventReplicator(localPartition, sharedNodeMap, filter, sender)
 {
-    public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap)
+    public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition,
+        SharedNodeMap sharedNodeMap, object? sender)
     {
-        var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(null);
-        var replacingFilter = new EventIdReplacingEventProcessor<IPartitionEvent>(null);
-        var replicator = new RewritePartitionEventReplicator(localPartition, filter, replacingFilter, sharedNodeMap);
-        var result = new CompositeEventProcessor<IPartitionEvent>([filter, replacingFilter, replicator], localPartition);
+        var internalSender = sender ?? localPartition.GetId();
+        var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(internalSender);
+        var replacingFilter = new EventIdReplacingEventProcessor<IPartitionEvent>(internalSender);
+        var replicator = new RewritePartitionEventReplicator(localPartition, filter, replacingFilter, sharedNodeMap, internalSender);
+        var result = new CompositeEventProcessor<IPartitionEvent>([filter, replacingFilter, replicator],
+            sender ?? $"Composite of {nameof(RewritePartitionEventReplicator)} {localPartition.GetId()}");
         replicator.Init();
         return result;
     }
-    
+
     private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
 
     protected override void SuppressEventForwarding(IPartitionEvent partitionEvent, Action action)

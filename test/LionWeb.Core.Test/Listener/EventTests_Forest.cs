@@ -46,7 +46,7 @@ public class EventTests_Forest
         // replicator.Init();
         IProcessor.Forward((IForestProcessor)forest.GetPublisher(), replicator);
         // replicator.ReplicateFrom(forest.GetPublisher());
-        
+
         forest.AddPartitions([node]);
 
         node.AddShapes([moved]);
@@ -60,7 +60,7 @@ public class EventTests_Forest
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originPartition = new Geometry("g") { Shapes = [origin] };
-        
+
         var node = new Geometry("a") { Shapes = [] };
 
         var forest = new Forest();
@@ -73,7 +73,7 @@ public class EventTests_Forest
         IProcessor.Forward((IForestProcessor)forest.GetPublisher(), replicator);
         // new EventForwarder<IForestEvent>(forest.GetPublisher(), replicator);
         // replicator.ReplicateFrom(forest.GetPublisher());
-        
+
         forest.AddPartitions([node]);
 
         node.AddShapes([moved]);
@@ -89,7 +89,7 @@ public class EventTests_Forest
 
         var forest = new Forest();
         forest.AddPartitions([node]);
-        
+
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
         var cloneForest = new Forest();
@@ -111,7 +111,7 @@ public class EventTests_Forest
     {
         var moved = new Documentation("moved");
         var originPartition = new Geometry("g") { Shapes = [new Line("l") { ShapeDocs = moved }] };
-        
+
         var node = new Geometry("a") { };
 
         var forest = new Forest();
@@ -136,7 +136,7 @@ public class EventTests_Forest
     #endregion
 
     private static IEventProcessor<IForestEvent> CreateReplicator(Forest cloneForest) =>
-        CloningForestEventReplicator.Create(cloneForest, new());
+        CloningForestEventReplicator.Create(cloneForest, new(), null);
 
     private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
     {
@@ -147,18 +147,22 @@ public class EventTests_Forest
 
 internal class CloningForestEventReplicator : ForestEventReplicator
 {
-    public static IEventProcessor<IForestEvent> Create(IForest localForest, SharedNodeMap sharedNodeMap)
+    public static IEventProcessor<IForestEvent> Create(IForest localForest, SharedNodeMap sharedNodeMap, object? sender)
     {
-        var filter = new EventIdFilteringEventProcessor<IForestEvent>(null);
-        var replicator = new CloningForestEventReplicator(localForest, sharedNodeMap, filter);
-        var result = new CompositeEventProcessor<IForestEvent>([filter, replicator], localForest);
+        var internalSender = sender ?? localForest;
+        var filter = new EventIdFilteringEventProcessor<IForestEvent>(internalSender);
+        var replicator = new CloningForestEventReplicator(localForest, sharedNodeMap, filter, internalSender);
+        var result = new CompositeEventProcessor<IForestEvent>([replicator, filter],
+            sender ?? $"Composite of {nameof(CloningPartitionEventReplicator)} {localForest}");
         replicator.Init();
         return result;
     }
 
     private CloningForestEventReplicator(IForest localForest,
         SharedNodeMap sharedNodeMap,
-        EventIdFilteringEventProcessor<IForestEvent> filter) : base(localForest, sharedNodeMap, filter)
+        EventIdFilteringEventProcessor<IForestEvent> filter,
+        object? sender
+        ) : base(localForest, new(), sharedNodeMap, filter, sender)
     {
     }
 

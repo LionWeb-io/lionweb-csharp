@@ -26,24 +26,27 @@ using Partition;
 
 internal class RewriteForestEventReplicator(
     IForest localForest,
+    SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
     SharedNodeMap sharedNodeMap,
     EventIdFilteringEventProcessor<IForestEvent> filter,
-    EventIdReplacingEventProcessor<IForestEvent> replacingFilter
-)
-    : ForestEventReplicator(localForest, sharedNodeMap, filter)
+    EventIdReplacingEventProcessor<IForestEvent> replacingFilter,
+    object? sender
+    ) : ForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, filter, sender)
 {
-    public static IEventProcessor<IForestEvent> Create(IForest localForest, SharedNodeMap sharedNodeMap)
+    public static IEventProcessor<IForestEvent> Create(IForest localForest, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
-        var filter = new EventIdFilteringEventProcessor<IForestEvent>(null);
-        var replacingFilter = new EventIdReplacingEventProcessor<IForestEvent>(null);
-        var replicator = new RewriteForestEventReplicator(localForest, sharedNodeMap, filter, replacingFilter);
-        var result = new CompositeEventProcessor<IForestEvent>([filter, replacingFilter, replicator], localForest);
+        var internalSender = sender ?? localForest;
+        var filter = new EventIdFilteringEventProcessor<IForestEvent>(internalSender);
+        var replacingFilter = new EventIdReplacingEventProcessor<IForestEvent>(internalSender);
+        var replicator = new RewriteForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, filter, replacingFilter, internalSender);
+        var result = new CompositeEventProcessor<IForestEvent>([replacingFilter, replicator, filter],
+            sender ?? $"Composite of {nameof(RewriteForestEventReplicator)} {localForest}");
         replicator.Init();
         return result;
     }
 
     protected override IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition) =>
-        RewritePartitionEventReplicator.Create(partition, SharedNodeMap);
+        RewritePartitionEventReplicator.Create(partition, SharedNodeMap, $"{localForest}.{partition.GetId()}");
 
     private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
 

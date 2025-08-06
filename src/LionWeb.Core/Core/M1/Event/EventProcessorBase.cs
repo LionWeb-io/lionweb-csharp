@@ -218,14 +218,12 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
     }
 
     /// <inheritdoc />
-    public void PrintAllReceivers(HashSet<IProcessor> alreadyPrinted, string indent = "")
+    public void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "")
     {
         Console.WriteLine($"{indent}{this.GetType().Name}({_sender})");
-        if (!alreadyPrinted.Add(this))
-        {
-            Console.WriteLine($"{indent}Recursion ^^");
+        if (IProcessor.RecursionDetected(this, alreadyPrinted, indent))
             return;
-        }
+        
         Console.WriteLine($"{indent}Handlers:");
         foreach (var processor in this._handlers.Keys)
         {
@@ -238,9 +236,16 @@ public abstract class CommanderPublisherEventProcessorBase<TEvent>(object? sende
     : EventProcessorBase<TEvent>(sender), ICommander<TEvent>, IPublisher<TEvent>
     where TEvent : IEvent
 {
+    private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(sender);
+    
     /// <inheritdoc />
-    public void Raise(TEvent @event) =>
+    public void Raise(TEvent @event)
+    {
+        if (@event.EventId == null)
+            @event.EventId = _eventIdProvider.CreateEventId();
+        
         Receive(@event);
+    }
 
     /// <inheritdoc />
     public bool CanRaise(params Type[] eventTypes) =>
@@ -284,14 +289,11 @@ internal class EventHandlerProcessor<TSubscribedEvent>(EventHandler<TSubscribedE
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void PrintAllReceivers(HashSet<IProcessor> alreadyPrinted, string indent = "")
+    public void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "")
     {
         Console.WriteLine($"{indent}{this.GetType().Name}");
-        if (!alreadyPrinted.Add(this))
-        {
-            Console.WriteLine($"{indent}Recursion ^^");
+        if (IProcessor.RecursionDetected(this, alreadyPrinted, indent))
             return;
-        }
         
         if (handler is IProcessor p)
             p.PrintAllReceivers(alreadyPrinted, indent + "  ");

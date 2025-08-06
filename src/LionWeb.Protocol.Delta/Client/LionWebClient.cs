@@ -19,6 +19,7 @@ namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
+using Core.M1.Event.Forest;
 using Core.M3;
 using Core.Utilities;
 using Message;
@@ -59,6 +60,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
         _eventReceiver = new DeltaProtocolEventReceiver(
             SharedNodeMap,
+            SharedPartitionReplicatorMap,
             sharedKeyedMap,
             deserializerBuilder,
             _replicator
