@@ -23,7 +23,7 @@ using Core.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 
-public interface IDeltaCommand : IDeltaContent
+public interface ICommand : IDeltaContent
 {
     CommandId? CommandId { get; }
 }
@@ -31,7 +31,7 @@ public interface IDeltaCommand : IDeltaContent
 public abstract record DeltaCommandBase(
     CommandId? CommandId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaContentBase(ProtocolMessages), IDeltaCommand
+) : DeltaContentBase(ProtocolMessages), ICommand
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -86,10 +86,10 @@ public record CommandResponse(CommandId CommandId, ProtocolMessage[]? ProtocolMe
 }
 
 public record CompositeCommand(
-    IDeltaCommand[] Parts,
+    ICommand[] Parts,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaCommandBase(CommandId, ProtocolMessages), IDeltaCommand
+) : DeltaCommandBase(CommandId, ProtocolMessages), ICommand
 {
     /// <inheritdoc />
     public virtual bool Equals(CompositeCommand? other)

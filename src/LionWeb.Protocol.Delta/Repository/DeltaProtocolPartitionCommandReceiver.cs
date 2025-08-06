@@ -39,7 +39,7 @@ public class DeltaProtocolPartitionCommandReceiver
         _mapper = new DeltaCommandToPartitionEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
-    public void Receive(IDeltaCommand deltaCommand)
+    public void Receive(ICommand deltaCommand)
     {
         IPartitionEvent partitionCommand = _mapper.Map(deltaCommand);
         _eventHandler.Raise(partitionCommand);

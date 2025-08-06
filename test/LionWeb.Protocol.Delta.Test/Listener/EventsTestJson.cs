@@ -62,7 +62,7 @@ public class EventsTestJson : EventTestsBase
         {
             var command = new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionEvent);
             var json = deltaSerializer.Serialize(command);
-            var deserialized = deltaSerializer.Deserialize<IDeltaCommand>(json);
+            var deserialized = deltaSerializer.Deserialize<ICommand>(json);
             eventReceiver.Receive(commandToEventMapper.Map(deserialized));
         });
 

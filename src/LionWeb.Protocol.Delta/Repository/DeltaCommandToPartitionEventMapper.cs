@@ -45,7 +45,7 @@ public class DeltaCommandToPartitionEventMapper
         _deserializerBuilder = deserializerBuilder;
     }
 
-    public IPartitionEvent Map(IDeltaCommand command) =>
+    public IPartitionEvent Map(ICommand command) =>
         command switch
         {
             AddProperty a => OnAddProperty(a),
@@ -410,7 +410,7 @@ public class DeltaCommandToPartitionEventMapper
     #endregion
 
 
-    private static IEventId ToEventId(IDeltaCommand command) =>
+    private static IEventId ToEventId(ICommand command) =>
         new ParticipationEventId(command.InternalParticipationId, command.CommandId);
 
     private IWritableNode ToNode(TargetNode nodeId)

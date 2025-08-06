@@ -35,7 +35,7 @@ public class DeltaCommandToDeltaEventMapper
         _participationId = participationId;
     }
 
-    public IDeltaEvent Map(IDeltaCommand deltaCommand) =>
+    public IDeltaEvent Map(ICommand deltaCommand) =>
         deltaCommand switch
         {
             AddProperty a => new PropertyAdded(a.Node, a.Property, a.NewValue, OriginCommands(a), []),
@@ -93,6 +93,6 @@ public class DeltaCommandToDeltaEventMapper
     private long NextSequence() =>
         _nextSequence++;
 
-    private CommandSource[] OriginCommands(IDeltaCommand a) =>
+    private CommandSource[] OriginCommands(ICommand a) =>
         [new CommandSource(_participationId, a.CommandId)];
 }

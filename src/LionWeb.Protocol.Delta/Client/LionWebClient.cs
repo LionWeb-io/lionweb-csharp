@@ -106,7 +106,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         if (deltaContent.RequiresParticipationId)
             deltaContent.InternalParticipationId = ParticipationId;
 
-        if (deltaContent is IDeltaCommand { CommandId: { } commandId })
+        if (deltaContent is ICommand { CommandId: { } commandId })
             _ownCommands.TryAdd(commandId, true);
 
         Log($"sending: {deltaContent.GetType().Name}", true);

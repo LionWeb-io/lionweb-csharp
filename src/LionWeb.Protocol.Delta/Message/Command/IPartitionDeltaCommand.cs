@@ -19,7 +19,7 @@ namespace LionWeb.Protocol.Delta.Message.Command;
 
 using Core.Serialization;
 
-public interface IPartitionDeltaCommand : IDeltaCommand;
+public interface IPartitionDeltaCommand : ICommand;
 
 #region Nodes
 

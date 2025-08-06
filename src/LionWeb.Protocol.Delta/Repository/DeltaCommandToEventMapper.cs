@@ -29,7 +29,7 @@ public class DeltaCommandToEventMapper
         _partitionMapper = partitionMapper;
     }
 
-    public IDelta Map(IDeltaCommand command) =>
+    public IDelta Map(ICommand command) =>
         command switch
         {
             IForestDeltaCommand c => _partitionMapper.Map(c),

@@ -93,7 +93,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 
             switch (content)
             {
-                case IDeltaCommand command:
+                case ICommand command:
                     Log($"received command: {command.GetType()}({command.CommandId})");
                     _commandReceiver.Receive(command);
                     break;
