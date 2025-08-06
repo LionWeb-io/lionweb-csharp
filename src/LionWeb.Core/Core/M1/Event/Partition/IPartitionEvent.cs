@@ -22,7 +22,7 @@ using TargetNode = IReadableNode;
 using SemanticPropertyValue = object;
 
 /// All LionWeb events relating to a partition.
-public interface IPartitionEvent : IEvent;
+public interface IPartitionEvent : IDelta;
 
 public abstract record APartitionEvent(IEventId EventId) : IPartitionEvent
 {

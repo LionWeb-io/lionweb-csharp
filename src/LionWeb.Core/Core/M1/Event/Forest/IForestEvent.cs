@@ -18,7 +18,7 @@
 namespace LionWeb.Core.M1.Event.Forest;
 
 /// All LionWeb events relating to a forest.
-public interface IForestEvent : IEvent;
+public interface IForestEvent : IDelta;
 
 public abstract record AForestEvent(IEventId EventId) : IForestEvent
 {

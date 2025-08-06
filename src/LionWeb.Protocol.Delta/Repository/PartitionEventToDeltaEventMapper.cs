@@ -298,7 +298,7 @@ public class PartitionEventToDeltaEventMapper
     private TargetNode[] ToDescendants(IReadableNode node) =>
         M1Extensions.Descendants(node, false, true).Select(n => n.GetId()).ToArray();
 
-    private CommandSource[] ToCommandSources(IEvent internalEvent)
+    private CommandSource[] ToCommandSources(IDelta internalEvent)
     {
         ParticipationId participationId;
         EventId commandId;

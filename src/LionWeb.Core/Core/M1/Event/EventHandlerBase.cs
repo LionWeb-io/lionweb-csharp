@@ -32,7 +32,7 @@ public abstract class EventHandlerBase
             .GetExecutingAssembly()
             .GetTypes();
 
-        List<Type> baseTypes = [typeof(IEvent), typeof(IForestEvent), typeof(IPartitionEvent)];
+        List<Type> baseTypes = [typeof(IDelta), typeof(IForestEvent), typeof(IPartitionEvent)];
 
         return baseTypes
             .SelectMany(baseType => allTypes
@@ -45,7 +45,7 @@ public abstract class EventHandlerBase
 
 /// Forwards <see cref="ICommander{TEvent}"/> commands to <see cref="IPublisher{TEvent}"/> events.
 public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TEvent>, IPublisher<TEvent>
-    where TEvent : IEvent
+    where TEvent : IDelta
 {
     private readonly object _sender;
 

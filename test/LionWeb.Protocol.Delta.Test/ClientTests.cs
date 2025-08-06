@@ -205,7 +205,7 @@ internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 
     public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
     public void ReceiveMessageFromClient(IDeltaMessageContext context) => ReceiveFromClient?.Invoke(null, context);
-    public IDeltaContent Convert(IEvent internalEvent) => _mapper.Map(internalEvent);
+    public IDeltaContent Convert(IDelta internalEvent) => _mapper.Map(internalEvent);
 }
 
 internal class DeltaClientConnector : IDeltaClientConnector
@@ -229,5 +229,5 @@ internal class DeltaClientConnector : IDeltaClientConnector
     public event EventHandler<IDeltaContent>? ReceiveFromRepository;
 
     public void ReceiveMessageFromRepository(IDeltaContent context) => ReceiveFromRepository?.Invoke(null, context);
-    public IDeltaContent Convert(IEvent internalEvent) => _mapper.Map(internalEvent);
+    public IDeltaContent Convert(IDelta internalEvent) => _mapper.Map(internalEvent);
 }

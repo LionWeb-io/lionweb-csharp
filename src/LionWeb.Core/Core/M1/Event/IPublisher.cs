@@ -19,7 +19,7 @@ namespace LionWeb.Core.M1.Event;
 
 /// Provides event notifications (aka callbacks) of events compatible with <typeparamref name="TEvent"/>
 /// to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>. 
-public interface IPublisher<in TEvent> where TEvent : IEvent
+public interface IPublisher<in TEvent> where TEvent : IDelta
 {
     /// Registers <paramref name="handler"/> to be notified of events compatible with <typeparamref name="TSubscribedEvent"/>.
     /// <typeparam name="TSubscribedEvent">

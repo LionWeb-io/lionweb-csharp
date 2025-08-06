@@ -30,7 +30,7 @@ public class EventToDeltaCommandMapper
         _partitionMapper = partitionMapper;
     }
 
-    public IDeltaCommand Map(IEvent @event) =>
+    public IDeltaCommand Map(IDelta @event) =>
         @event switch
         {
             IPartitionEvent e => _partitionMapper.Map(e),

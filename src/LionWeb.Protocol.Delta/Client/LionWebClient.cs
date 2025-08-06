@@ -31,9 +31,9 @@ using System.Diagnostics;
 
 public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
 
-public interface IEventClientConnector : IClientConnector<IEvent>
+public interface IEventClientConnector : IClientConnector<IDelta>
 {
-    IEvent IClientConnector<IEvent>.Convert(IEvent internalEvent) => internalEvent;
+    IDelta IClientConnector<IDelta>.Convert(IDelta internalEvent) => internalEvent;
 }
 
 public class LionWebClient : LionWebClientBase<IDeltaContent>

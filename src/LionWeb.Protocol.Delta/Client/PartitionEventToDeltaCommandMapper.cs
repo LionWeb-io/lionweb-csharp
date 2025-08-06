@@ -273,7 +273,7 @@ public class PartitionEventToDeltaCommandMapper
         return new DeltaSerializationChunk(serializer.Serialize(M1Extensions.Descendants(node, true, true)).ToArray());
     }
 
-    private CommandId ToCommandId(IEvent @event) =>
+    private CommandId ToCommandId(IDelta @event) =>
         @event.EventId switch
         {
             ParticipationEventId pei => pei.CommandId,

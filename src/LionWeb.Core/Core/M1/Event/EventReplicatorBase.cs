@@ -34,7 +34,7 @@ using Utilities;
 /// Therefore, two instances with different <i>locals</i> can replicate each other, keeping both <i>locals</i> in sync.
 /// </para>
 public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFilteringEventForwarder<TEvent, TPublisher>
-    where TEvent : class, IEvent where TPublisher : IPublisher<TEvent>
+    where TEvent : class, IDelta where TPublisher : IPublisher<TEvent>
 {
     protected readonly ICommander<TEvent>? _localCommander;
     private readonly List<TPublisher> _publishers = [];
