@@ -26,7 +26,7 @@ public readonly record struct NodeIdX
     private const byte _invalidChar = byte.MaxValue;
 
     private readonly byte[] _value;
-    internal readonly string? _invalidId;
+    private readonly string? _invalidId;
 
     public NodeIdX(string nodeId)
     {

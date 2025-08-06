@@ -17,13 +17,12 @@
 
 namespace LionWeb.Core.Test;
 
-using System.Collections;
 using System.Reflection;
 
 [TestClass]
-public class Encode
+public class NodeIdXTests_Encode
 {
-    private static readonly Dictionary<byte, char> _mapping = new Dictionary<byte, char>()
+    private static readonly Dictionary<byte, char> _mapping = new()
     {
         { 0b000000, '0' },
         { 0b000001, '1' },
