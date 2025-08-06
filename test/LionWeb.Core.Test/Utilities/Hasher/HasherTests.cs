@@ -506,7 +506,7 @@ public class HasherTests
         }
 
         public void DetachFromParent() { }
-        
+
         public void Set(Feature feature, object? value, IEventId? eventId = null) { }
 
         public void SetParent(INode? parent) { }
@@ -515,27 +515,9 @@ public class HasherTests
 
         public Containment? GetContainmentOf(INode child) => null;
 
-        public void AddAnnotations(IEnumerable<IWritableNode> annotations) 
-            => AddAnnotations(M2Extensions.AsNodes<INode>(annotations));
-        
-        public void AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null) 
-            => AddAnnotations(M2Extensions.AsNodes<INode>(annotations), eventId);
-        
-        public void InsertAnnotations(int index, IEnumerable<IWritableNode> annotations) 
-            => InsertAnnotations(index, M2Extensions.AsNodes<INode>(annotations));
-
-        public void InsertAnnotations(int index, IEnumerable<IWritableNode> annotations, IEventId? eventId = null) 
-            => InsertAnnotations(index, M2Extensions.AsNodes<INode>(annotations), eventId);
-
-        public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations) 
-            => RemoveAnnotations(M2Extensions.AsNodes<INode>(annotations));
-        
-        public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null) 
-            => RemoveAnnotations(M2Extensions.AsNodes<INode>(annotations), eventId);
-        
         public void AddAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null) { }
 
-        public void InsertAnnotations(int index, IEnumerable<INode> annotations, IEventId? eventId = null) { }
+        public void InsertAnnotations(Int32 index, IEnumerable<INode> annotations, IEventId? eventId = null) { }
 
         public bool RemoveAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null) => false;
 
