@@ -86,6 +86,8 @@ public record struct NodeIdX
 
     internal static bool EncodeFourChars(ReadOnlySpan<char> chars, Span<byte> bytes)
     {
+        Console.WriteLine($"chars: {new string(chars)}");
+        
         if (
             !Encode(chars[0], out var b0) ||
             !Encode(chars[1], out var b1) ||
@@ -170,33 +172,35 @@ public record struct NodeIdX
 
     internal static void DecodeThreeBytes(ReadOnlySpan<byte> bytes, Span<char> chars)
     {
-        byte t0 = bytes[0];
-        byte t1 = bytes[1];
-        byte t2 = bytes[2];
+        byte b0 = bytes[0];
+        byte b1 = bytes[1];
+        byte b2 = bytes[2];
 
-        Console.WriteLine($"t0:{t0:b8} t1:{t1:b8}  t2:{t2:b8}");
+        Console.WriteLine($"b0:{b0:b8} b1:{b1:b8}  b2:{b2:b8}");
 
 
-        byte c0 = (byte)(t0 & 0b111111);
-        chars[0] = Decode((byte)c0);
+        byte c0 = (byte)(b0 >> 2);
+        chars[0] = Decode(c0);
         Console.WriteLine($"c0:{c0:b8}");
 
-        byte t0ToC1 = (byte)((t0 & 0b11) << 4);
-        byte t1ToC1 = (byte)((t1 & 0b11110000) >> 4);
-        var c1 = (byte)(t0ToC1 | t1ToC1);
+        byte b0ToC1 = (byte)((b0 & 0b11) << 4);
+        byte b1ToC1 = (byte)((b1 & 0b11110000) >> 4);
+        var c1 = (byte)(b0ToC1 | b1ToC1);
         chars[1] = Decode(c1);
-        Console.WriteLine($"t0ToC1:{t0ToC1:b8} t1ToC1:{t1ToC1:b8} c1:{c1:b8}");
+        Console.WriteLine($"b0ToC1:{b0ToC1:b8} b1ToC1:{b1ToC1:b8} c1:{c1:b8}");
 
 
-        byte t1ToC2 = (byte)((t1 & 0b1111) << 2);
-        byte t2ToC2 = (byte)((t2  & 0b11000000) >> 6);
-        byte c2 = (byte)(t1ToC2 | t2ToC2);
+        byte b1ToC2 = (byte)((b1 & 0b1111) << 2);
+        byte b2ToC2 = (byte)((b2  & 0b11000000) >> 6);
+        byte c2 = (byte)(b1ToC2 | b2ToC2);
         chars[2] = Decode(c2);
-        Console.WriteLine($"t1ToC2:{t1ToC2:b8} t2ToC2:{t2ToC2:b8} c2:{c2:b8}");
+        Console.WriteLine($"b1ToC2:{b1ToC2:b8} b2ToC2:{b2ToC2:b8} c2:{c2:b8}");
 
-        byte c3 = (byte)(t2 & 0b111111);
+        byte c3 = (byte)(b2 & 0b111111);
         chars[3] = Decode((byte)c3);
         Console.WriteLine($"c3:{c3:b8}");
+
+        Console.WriteLine($"chars: {new string(chars)}");
     }
 
     internal static char Decode(byte b) =>

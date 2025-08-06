@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Test;
 
+using System.Collections;
 using System.Reflection;
 
 [TestClass]
@@ -111,13 +112,14 @@ public class Encode
     
     public static IEnumerable<object[]> FourChars =>
     [
-        [new byte[] { 0, 0, 0 }, new char[] { '0', '0', '0', '0' }],
-        [new byte[] { 0b000000_00, 0b1010_1001, 0b00_111111 }, new char[] { '0', 'A', 'a', '_' }],
-        [new byte[] { 0b111111_11, 0b1110_1111, 0b11_111110 }, new char[] { '_', '-', '_', '-' }],
-        [new byte[] { 0b111111_11, 0b1111_1111, 0b11_111111 }, new char[] { '_', '_', '_', '_' }],
+        [new byte[] { 0, 0, 0 }, new[] { '0', '0', '0', '0' }],
+        [new byte[] { 0b000000_00, 0b1010_1001, 0b00_111111 }, new[] { '0', 'A', 'a', '_' }],
+        [new byte[] { 0b111111_11, 0b1110_1111, 0b11_111110 }, new[] { '_', '-', '_', '-' }],
+        [new byte[] { 0b111111_11, 0b1111_1111, 0b11_111111 }, new[] { '_', '_', '_', '_' }],
+        [new byte[] { 0b000001_00, 0b0010_0000, 0b11_000100 }, new[] { '1', '2', '3', '4' }],
     ];
     
-    public static string GetTestDisplayNames(MethodInfo methodInfo, object[] values)
+    public static string DisplayFourChars(MethodInfo methodInfo, object[] values)
     {
         var bytes = (byte[])values[0];
         var chars = (char[])values[1];
@@ -126,7 +128,7 @@ public class Encode
     }
 
     [TestMethod]
-    [DynamicData(nameof(FourChars), DynamicDataDisplayName = nameof(GetTestDisplayNames))]
+    [DynamicData(nameof(FourChars), DynamicDataDisplayName = nameof(DisplayFourChars))]
     public void EncodeFourChars(byte[] bytes, char[] chars)
     {
         var actual = new byte[3];
@@ -137,11 +139,45 @@ public class Encode
     }
     
     [TestMethod]
-    [DynamicData(nameof(FourChars), DynamicDataDisplayName = nameof(GetTestDisplayNames))]
+    [DynamicData(nameof(FourChars), DynamicDataDisplayName = nameof(DisplayFourChars))]
     public void DecodeThreeBytes(byte[] bytes, char[] chars)
     {
         char[] actual = new char[4];
         NodeIdX.DecodeThreeBytes(bytes.AsSpan(), actual.AsSpan());
+        Assert.AreEqual(chars[0], actual[0]);
+        Assert.AreEqual(chars[1], actual[1]);
+        Assert.AreEqual(chars[2], actual[2]);
+        Assert.AreEqual(chars[3], actual[3]);
+    }
+    
+    public static IEnumerable<object[]> FourCharsRandom
+    {
+        get
+        {
+            var random = new Random();
+            return Enumerable.Range(0, 50)
+                .Select(_ => new object[] { new[] { RandomChar(), RandomChar(), RandomChar(), RandomChar() } });
+
+            char RandomChar()
+            {
+                return _mapping[(byte)random.Next(0, 64)];
+            }
+        }
+    }
+
+    public static string DisplayFourCharsRandom(MethodInfo methodInfo, object[] values) =>
+        new((char[])values[0]);
+
+    [TestMethod]
+    [DynamicData(nameof(FourCharsRandom), DynamicDataDisplayName = nameof(DisplayFourCharsRandom))]
+    public void EncodeFourCharsRandom(char[] chars)
+    {
+        byte[] bytes = new byte[3];
+        NodeIdX.EncodeFourChars(chars.AsSpan(), bytes.AsSpan());
+        Console.WriteLine();
+        char[] actual = new char[4];
+        NodeIdX.DecodeThreeBytes(bytes.AsSpan(),  actual.AsSpan());
+        
         Assert.AreEqual(chars[0], actual[0]);
         Assert.AreEqual(chars[1], actual[1]);
         Assert.AreEqual(chars[2], actual[2]);
