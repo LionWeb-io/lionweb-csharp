@@ -1,4 +1,4 @@
-// Copyright 2025 TRUMPF Laser SE and other contributors
+﻿// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -15,9 +15,26 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Forest;
+namespace LionWeb.Core.M1.Event;
 
-/// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestPublisher"/> events.
-/// <param name="sender">Optional sender of the events.</param>
-public class ForestEventForwarder(object? sender)
-    : EventForwarderBase<IForestEvent>(sender), IForestPublisher, IForestCommander;
+public interface IEventForwarder;
+
+public class EventForwarder<TEvent> : IEventForwarder where TEvent : class, IEvent
+{
+    private readonly IPublisher<TEvent> _from;
+    private readonly ICommander<TEvent> _to;
+
+    public EventForwarder(IPublisher<TEvent> from, ICommander<TEvent> to)
+    {
+        _from = from;
+        _to = to;
+        from.Subscribe<TEvent>(Handler);
+    }
+    
+    private void Handler(object? sender, TEvent @event)
+    {
+        if (_to.CanRaise(typeof(TEvent)))
+            _to.Raise(@event);
+    }
+}
+

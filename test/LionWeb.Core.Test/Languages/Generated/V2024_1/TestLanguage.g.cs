@@ -413,7 +413,7 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.DataTypeTestConcept;
-	private readonly PartitionEventForwarder _eventForwarder;
+	private readonly PartitionEventProcessor _eventForwarder;
 	public IPartitionPublisher? GetPublisher() => _eventForwarder;
 	public IPartitionCommander? GetCommander() => _eventForwarder;
 	/// <inheritdoc/>
@@ -944,7 +944,7 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.LinkTestConcept;
-	private readonly PartitionEventForwarder _eventForwarder;
+	private readonly PartitionEventProcessor _eventForwarder;
 	public IPartitionPublisher? GetPublisher() => _eventForwarder;
 	public IPartitionCommander? GetCommander() => _eventForwarder;
 	/// <inheritdoc/>

@@ -22,19 +22,16 @@ using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Message.Event;
 
-public class DeltaProtocolForestEventReceiver
+public class DeltaProtocolForestEventReceiver : PublisherBase<IForestEvent>, IForestPublisher
 {
-    private readonly ForestEventForwarder _eventForwarder;
     private readonly DeltaEventToForestEventMapper _mapper;
 
     public DeltaProtocolForestEventReceiver(
-        ForestEventForwarder eventForwarder,
         SharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )
     {
-        _eventForwarder = eventForwarder;
         _mapper = new DeltaEventToForestEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
@@ -43,6 +40,6 @@ public class DeltaProtocolForestEventReceiver
     {
         IForestEvent partitionEvent = _mapper.Map(deltaEvent);
 
-        _eventForwarder.Raise(partitionEvent);
+        RaiseInternal(this, partitionEvent);
     }
 }

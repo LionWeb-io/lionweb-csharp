@@ -22,25 +22,22 @@ using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Message.Command;
 
-public class DeltaProtocolPartitionCommandReceiver
+public class DeltaProtocolPartitionCommandReceiver : PublisherBase<IPartitionEvent>, IPartitionPublisher
 {
-    private readonly PartitionEventForwarder _eventForwarder;
     private readonly DeltaCommandToPartitionEventMapper _mapper;
 
     public DeltaProtocolPartitionCommandReceiver(
-        PartitionEventForwarder eventForwarder,
         SharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )
     {
-        _eventForwarder = eventForwarder;
         _mapper = new DeltaCommandToPartitionEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
     public void Receive(IDeltaCommand deltaCommand)
     {
         IPartitionEvent partitionCommand = _mapper.Map(deltaCommand);
-        _eventForwarder.Raise(partitionCommand);
+        RaiseInternal(this, partitionCommand);
     }
 }

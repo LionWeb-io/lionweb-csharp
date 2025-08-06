@@ -20,49 +20,63 @@ namespace LionWeb.Protocol.Delta.Repository.Partition;
 using Core;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
-using System.Diagnostics;
 
 internal class RewritePartitionEventReplicator(
     IPartitionInstance localPartition,
-    SharedNodeMap sharedNodeMap = null)
-    : PartitionEventReplicator(localPartition, sharedNodeMap)
+    EventIdFilteringEventProcessor<IPartitionEvent> filter,
+    EventIdReplacingEventProcessor<IPartitionEvent> replacingFilter,
+    SharedNodeMap sharedNodeMap)
+    : PartitionEventReplicator(localPartition, sharedNodeMap, filter)
 {
-    private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];
+    public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap)
+    {
+        var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(null);
+        var replacingFilter = new EventIdReplacingEventProcessor<IPartitionEvent>(null);
+        var replicator = new RewritePartitionEventReplicator(localPartition, filter, replacingFilter, sharedNodeMap);
+        var result = new CompositeEventProcessor<IPartitionEvent>([filter, replacingFilter, replicator], localPartition);
+        replicator.Init();
+        return result;
+    }
+    
+    private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
 
     protected override void SuppressEventForwarding(IPartitionEvent partitionEvent, Action action)
     {
-        IEventId? eventId = null;
-        if (_localCommander != null)
-        {
-            eventId = _localCommander.CreateEventId();
-            var originalEventId = partitionEvent.EventId;
-            _originalEventIds[eventId] = originalEventId;
-            RegisterEventId(eventId);
-        }
+        IEventId? eventId = _eventIdProvider.CreateEventId();
+        var originalEventId = partitionEvent.EventId;
+        replacingFilter.RegisterReplacementEventId(eventId, originalEventId);
+        filter.RegisterEventId(eventId);
 
         try
         {
             action();
         } finally
         {
-            if (eventId != null)
-            {
-                UnregisterEventId(eventId);
-                _originalEventIds.Remove(eventId);
-            }
+            filter.UnregisterEventId(eventId);
+            replacingFilter.UnregisterReplacementEventId(eventId);
         }
     }
+}
 
-    protected override TSubscribedEvent? Filter<TSubscribedEvent>(IPartitionEvent partitionEvent)
-        where TSubscribedEvent : class
+internal class EventIdReplacingEventProcessor<TEvent>(object? sender)
+    : FilteringEventProcessor<TEvent>(sender) where TEvent : class, IEvent
+{
+    private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];
+
+    public void RegisterReplacementEventId(IEventId eventId, IEventId original) =>
+        _originalEventIds[eventId] = original;
+
+    public void UnregisterReplacementEventId(IEventId eventId) =>
+        _originalEventIds.Remove(eventId);
+
+    protected override TEvent? Filter(TEvent @event)
     {
-        IPartitionEvent? result = base.Filter<TSubscribedEvent>(partitionEvent);
-        if (_originalEventIds.TryGetValue(partitionEvent.EventId, out var originalId))
+        TEvent result = @event;
+        if (_originalEventIds.TryGetValue(@event.EventId, out var originalId))
         {
-            result = partitionEvent;
             result.EventId = originalId;
         }
 
-        return (TSubscribedEvent?)result;
+        return result;
     }
 }

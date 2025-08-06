@@ -17,3 +17,25 @@
 
 namespace LionWeb.Core.M1.Event;
 
+public interface IProcessor
+{
+    public static void Forward<TReceiveFrom, TForward, TSendFrom>(
+        IProcessor<TReceiveFrom, TForward> from,
+        IProcessor<TForward, TSendFrom> to) =>
+        from.Subscribe(to);
+
+    public void PrintAllReceivers(HashSet<IProcessor> alreadyPrinted, string indent = "");
+}
+
+public interface IProcessor<in TReceive, in TSend> : IProcessor
+{
+    public bool CanReceive(params Type[] messageTypes);
+    
+    public void Receive(TReceive message);
+    protected void Send(TSend message);
+
+    
+    internal void Subscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver);
+    
+    internal void Unsubscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver);
+}

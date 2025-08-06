@@ -23,13 +23,21 @@ using System.Diagnostics;
 
 /// Replicates events for a <i>local</i> <see cref="IPartitionInstance">partition</see>.
 /// <inheritdoc cref="EventReplicatorBase{TEvent,TPublisher}"/>
-public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPartitionPublisher>, IPartitionPublisher
+public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent>
 {
+    public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap)
+    {
+        var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(null);
+        var replicator = new PartitionEventReplicator(localPartition, sharedNodeMap, filter);
+        var result = new CompositeEventProcessor<IPartitionEvent>([filter, replicator], localPartition);
+        replicator.Init();
+        return result;
+    }
+
     private readonly IPartitionInstance _localPartition;
 
-    public PartitionEventReplicator(IPartitionInstance localPartition,
-        SharedNodeMap sharedNodeMap = null) : base(localPartition.GetPublisher(),
-        localPartition.GetCommander(), sharedNodeMap)
+    protected PartitionEventReplicator(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap,
+        EventIdFilteringEventProcessor<IPartitionEvent> filter) : base(sharedNodeMap, filter)
     {
         _localPartition = localPartition;
         // Init();
@@ -40,28 +48,26 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
         SharedNodeMap.RegisterNode(_localPartition);
 
         var publisher = _localPartition.GetPublisher();
-        if (publisher == null)
-            return;
-
-        publisher.Subscribe<IPartitionEvent>(LocalHandler);
+        if (publisher is IPartitionProcessor processor)
+            IProcessor.Forward(processor, this);
     }
 
     /// <see cref="SharedNodeMap.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
     /// and <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">unsubscribes</see> from it.
-    public override void Dispose()
-    {
-        base.Dispose();
-
-        SharedNodeMap.UnregisterNode(_localPartition);
-
-        var localPublisher = _localPartition.GetPublisher();
-        if (localPublisher == null)
-            return;
-
-        localPublisher.Unsubscribe<IPartitionEvent>(LocalHandler);
-
-        GC.SuppressFinalize(this);
-    }
+    // public override void Dispose()
+    // {
+    //     base.Dispose();
+    //
+    //     SharedNodeMap.UnregisterNode(_localPartition);
+    //
+    //     var localPublisher = _localPartition.GetPublisher();
+    //     if (localPublisher == null)
+    //         return;
+    //
+    //     localPublisher.Unsubscribe<IPartitionEvent>(LocalHandler);
+    //
+    //     GC.SuppressFinalize(this);
+    // }
 
     #region Local
 
@@ -101,9 +107,9 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent, IPa
     #region Remote
 
     /// <inheritdoc />
-    protected override void ProcessEvent(object? sender, IPartitionEvent? partitionEvent)
+    protected override void ProcessEvent(IPartitionEvent? partitionEvent)
     {
-        Debug.WriteLine($"{sender}: processing event {partitionEvent}");
+        Debug.WriteLine($"processing event {partitionEvent}");
         switch (partitionEvent)
         {
             case PropertyAddedEvent e:

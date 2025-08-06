@@ -22,25 +22,22 @@ using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Message.Command;
 
-public class DeltaProtocolForestCommandReceiver
+public class DeltaProtocolForestCommandReceiver : PublisherBase<IForestEvent>, IForestPublisher
 {
-    private readonly ForestEventForwarder _eventForwarder;
     private readonly DeltaCommandToForestEventMapper _mapper;
 
     public DeltaProtocolForestCommandReceiver(
-        ForestEventForwarder eventForwarder,
         SharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )
     {
-        _eventForwarder = eventForwarder;
         _mapper = new DeltaCommandToForestEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
     public void Receive(IDeltaCommand deltaCommand)
     {
         IForestEvent partitionCommand = _mapper.Map(deltaCommand);
-        _eventForwarder.Raise(partitionCommand);
+        RaiseInternal(this, partitionCommand);
     }
 }

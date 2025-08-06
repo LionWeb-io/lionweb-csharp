@@ -31,8 +31,8 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     private readonly string _name;
     protected readonly IRepositoryConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
-    protected readonly ForestEventForwarder ForestEventForwarder;
-    protected readonly RewriteForestEventReplicator _replicator;
+    protected readonly ForestEventProcessor ForestEventForwarder;
+    protected readonly IEventProcessor<IForestEvent> _replicator;
 
     private long nextFreeNodeId = 0;
 
@@ -43,14 +43,14 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        ForestEventForwarder = new ForestEventForwarder(name);
-        _replicator = new RewriteForestEventReplicator(forest, SharedNodeMap);
-        _replicator.Init();
+        ForestEventForwarder = new ForestEventProcessor(name);
+        _replicator = RewriteForestEventReplicator.Create(forest, SharedNodeMap);
+        // _replicator.Init();
         _replicator.ReplicateFrom(ForestEventForwarder);
 
         _replicator.Subscribe<IForestEvent>(SendEventToAllClients);
 
-        ForestEventForwarder.Subscribe<IForestEvent>(LocalHandler);
+        ForestEventForwarder.ForwardFrom<IForestEvent>(LocalHandler);
 
         _connector.ReceiveFromClient += OnReceiveFromClient;
     }
@@ -82,8 +82,8 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
     {
         var partition = partitionAddedEvent.NewPartition;
-        var forwarder = new PartitionEventForwarder(_name);
-        var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
+        var forwarder = new PartitionEventProcessor(_name);
+        var replicator = new RewritePartitionEventReplicator(partition, TODO, SharedNodeMap);
         replicator.ReplicateFrom(forwarder);
         replicator.Subscribe<IPartitionEvent>(SendEventToAllClients);
     }

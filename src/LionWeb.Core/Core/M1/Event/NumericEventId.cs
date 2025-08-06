@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.M1.Event;
 
+using Utilities;
+
 /// Internal event id based on a string and an increasing number.
 public record NumericEventId(string Base, int Id) : IEventId
 {
@@ -44,4 +46,26 @@ public record NumericEventId(string Base, int Id) : IEventId
         hashCode.Add(Id);
         return hashCode.ToHashCode();
     }
+}
+
+public interface IEventIdProvider
+{
+    IEventId CreateEventId();
+}
+
+public class EventIdProvider : IEventIdProvider
+{
+    // Unique per instance
+    private readonly EventId _eventIdBase;
+
+    private int _nextId = 0;
+
+    public EventIdProvider(object? sender)
+    {
+        _eventIdBase = sender as string ?? IdUtils.NewId();
+    }
+
+    /// <inheritdoc />
+    public virtual IEventId CreateEventId() =>
+        new NumericEventId(_eventIdBase, _nextId++);
 }

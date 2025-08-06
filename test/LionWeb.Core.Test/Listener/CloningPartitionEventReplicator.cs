@@ -20,9 +20,21 @@ namespace LionWeb.Core.Test.Listener;
 using M1.Event;
 using M1.Event.Partition;
 
-internal class CloningPartitionEventReplicator(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap = null)
-    : PartitionEventReplicator(localPartition, sharedNodeMap)
+internal class CloningPartitionEventReplicator(
+    IPartitionInstance localPartition,
+    SharedNodeMap sharedNodeMap,
+    EventIdFilteringEventProcessor<IPartitionEvent> filter)
+    : PartitionEventReplicator(localPartition, sharedNodeMap, filter)
 {
+    public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap)
+    {
+        var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(null);
+        var replicator = new CloningPartitionEventReplicator(localPartition, sharedNodeMap, filter);
+        var result = new CompositeEventProcessor<IPartitionEvent>([filter, replicator], localPartition);
+        replicator.Init();
+        return result;
+    }
+    
     protected override INode AdjustRemoteNode(INode remoteNode) =>
         SameIdCloner.Clone(remoteNode);
 }

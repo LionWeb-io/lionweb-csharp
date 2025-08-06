@@ -28,16 +28,13 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
     where TPartition : TContent, IDeltaContent
     where TForest : TContent, IDeltaContent
 {
-    private readonly Dictionary<NodeId, PartitionEventForwarder> _partitionEventForwarders = [];
+    private readonly Dictionary<NodeId, PartitionEventProcessor> _partitionEventForwarders = [];
 
-    private readonly ForestEventForwarder _forestEventForwarder;
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly ForestEventReplicator _forestEventReplicator;
 
-    public DeltaProtocolReceiverBase(ForestEventForwarder forestEventForwarder, PartitionSharedNodeMap sharedNodeMap,
-        ForestEventReplicator forestEventReplicator)
+    public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap, ForestEventReplicator forestEventReplicator)
     {
-        _forestEventForwarder = forestEventForwarder;
         _sharedNodeMap = sharedNodeMap;
         _forestEventReplicator = forestEventReplicator;
     }
@@ -49,7 +46,6 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
             OnLocalPartitionAdded(partition);
         }
 
-        _forestEventForwarder.Subscribe<IForestEvent>(LocalHandler);
         _forestEventReplicator.Subscribe<IForestEvent>(LocalHandler);
     }
 
@@ -76,7 +72,7 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 
     private void OnLocalPartitionAdded(IPartitionInstance partition)
     {
-        var partitionEventForwarder = new PartitionEventForwarder(this);
+        var partitionEventForwarder = new PartitionEventProcessor(this);
         var replicator = _forestEventReplicator.LookupPartitionReplicator(partition);
         if (_partitionEventForwarders.TryAdd(partition.GetId(), partitionEventForwarder))
         {
@@ -119,7 +115,7 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
                 throw new InvalidOperationException(deltaContent.ToString());
         }
 
-        eventForwarder.Raise(internalEvent);
+        eventForwarder.ForwardTo(internalEvent);
     }
 
     protected abstract IEvent MapPartition(TPartition partitionContent);

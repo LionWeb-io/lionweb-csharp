@@ -21,6 +21,7 @@ using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 using M1.Event;
+using M1.Event.Partition;
 using Comparer = Core.Utilities.Comparer;
 
 public abstract class EventTestsBase
@@ -474,6 +475,9 @@ public abstract class EventTestsBase
         node.AddAnnotations([new BillOfMaterials("bof")]);
 
         var clone = CreateReplicator(node);
+        
+        ((IProcessor)node.GetPublisher()).PrintAllReceivers([]);
+        // return;
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(0, [added]);
@@ -782,9 +786,11 @@ public class EventsTest : EventTestsBase
     {
         var clone = Clone(node);
 
-        var replicator = new CloningPartitionEventReplicator(clone, new());
-        replicator.Init();
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CloningPartitionEventReplicator.Create(clone, new());
+        // replicator.Init();
+        IProcessor.Forward((IPartitionProcessor)node.GetPublisher(), replicator);
+        // new EventForwarder<IPartitionEvent>(node.GetPublisher(), replicator);
+        // replicator.ReplicateFrom(node.GetPublisher());
 
         return clone;
     }

@@ -46,13 +46,15 @@ public interface IForest
 public class Forest : IForest
 {
     private readonly HashSet<IPartitionInstance> _partitions;
-    private readonly ForestEventForwarder _eventForwarder;
+    private readonly ForestEventProcessor _eventProcessor;
+    private readonly IEventIdProvider  _eventIdProvider;
 
     /// <inheritdoc cref="IForest"/>
     public Forest()
     {
         _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
-        _eventForwarder = new ForestEventForwarder(this);
+        _eventProcessor = new ForestEventProcessor(this);
+        _eventIdProvider = new EventIdProvider(this);
     }
 
     /// <inheritdoc />
@@ -64,7 +66,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _eventForwarder.Raise(new PartitionAddedEvent(partition, eventId ?? _eventForwarder.CreateEventId()));
+                _eventProcessor.Raise(new PartitionAddedEvent(partition, eventId ?? _eventIdProvider.CreateEventId()));
         }
     }
 
@@ -74,13 +76,13 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _eventForwarder.Raise(new PartitionDeletedEvent(partition, eventId ?? _eventForwarder.CreateEventId()));
+                _eventProcessor.Raise(new PartitionDeletedEvent(partition, eventId ?? _eventIdProvider.CreateEventId()));
         }
     }
 
     /// <inheritdoc />
-    public IForestPublisher GetPublisher() => _eventForwarder;
+    public IForestPublisher GetPublisher() => _eventProcessor;
 
     /// <inheritdoc />
-    public IForestCommander GetCommander() => _eventForwarder;
+    public IForestCommander GetCommander() => _eventProcessor;
 }

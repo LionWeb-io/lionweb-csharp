@@ -17,7 +17,20 @@
 
 namespace LionWeb.Core.M1.Event.Partition;
 
+public interface IPartitionProcessor : IEventProcessor<IPartitionEvent>, IPartitionCommander, IPartitionPublisher;
+
+/// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+/// <seealso cref="IPartitionCommander"/>
+/// <seealso cref="PartitionEventProcessor"/>
+public interface IPartitionPublisher : IPublisher<IPartitionEvent>;
+
+/// Raises events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+/// <seealso cref="IPartitionPublisher"/>
+/// <seealso cref="PartitionEventProcessor"/>
+public interface IPartitionCommander : ICommander<IPartitionEvent>;
+
 /// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionPublisher"/> events.
 /// <param name="sender">Optional sender of the events.</param>
-public class PartitionEventForwarder(object? sender)
-    : EventForwarderBase<IPartitionEvent>(sender), IPartitionPublisher, IPartitionCommander;
+public class PartitionEventProcessor(object? sender)
+    : CommanderPublisherEventProcessorBase<IPartitionEvent>(sender), IPartitionProcessor
+;

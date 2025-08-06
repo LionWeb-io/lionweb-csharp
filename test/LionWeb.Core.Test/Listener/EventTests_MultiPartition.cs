@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1.Event;
 using M1.Event.Partition;
 using Comparer = Core.Utilities.Comparer;
 using EventId = string;
@@ -39,9 +40,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var replicator = CreateReplicator(clone);
-        replicator.Init();
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> deletions = [];
         node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedChild)));
@@ -67,9 +66,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        var replicator = CreateReplicator(clone);
-        replicator.Init();
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
@@ -97,9 +94,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        var replicator = CreateReplicator(clone);
-        replicator.Init();
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
@@ -124,9 +119,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
-        var replicator = CreateReplicator(clone);
-        replicator.Init();
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> deletions = [];
         node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedChild)));
@@ -151,9 +144,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var replicator = CreateReplicator(clone);
-        replicator.Init();
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
@@ -190,9 +181,7 @@ public class EventTests_MultiPartition
         cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
         var clone = new Geometry("a") { Shapes = [cloneOrigin] };
 
-        var replicator = CreateReplicator(clone);
-        replicator.Init();
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> deletions = [];
         node.GetPublisher()
@@ -220,9 +209,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var replicator = CreateReplicator(clone);
-        replicator.Init();
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
@@ -252,9 +239,7 @@ public class EventTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var replicator = CreateReplicator(clone);
-        replicator.Init();
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
         originPartition.GetPublisher()
@@ -276,8 +261,16 @@ public class EventTests_MultiPartition
 
     #endregion
 
-    private static PartitionEventReplicator CreateReplicator(Geometry clone) => 
-        new CloningPartitionEventReplicator(clone, new());
+    private static IEventProcessor<IPartitionEvent> CreateReplicator(Geometry clone, Geometry node)
+    {
+        var replicator = CloningPartitionEventReplicator.Create(clone, new());
+        IProcessor.Forward((IPartitionProcessor)node.GetPublisher(), replicator);
+        // replicator.Init();
+        // new EventForwarder<IPartitionEvent>(node.GetPublisher(), replicator);
+        // replicator.ReplicateFrom(node.GetPublisher());
+        
+        return replicator;
+    }
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {

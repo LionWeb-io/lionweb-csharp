@@ -846,21 +846,21 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     }
 
     /// Raises <see cref="ReferenceDeletedEvent"/> for <paramref name="reference"/>.
-    protected Action<IPartitionCommander, Index, T, IEventId?> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
+    protected Action<IPartitionCommander, Index, T, IEventId> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
         (commander, index, node, eventId) =>
         {
             IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
-            commander.Raise(new ReferenceDeletedEvent(this, reference, index, deletedTarget, eventId ?? commander.CreateEventId()));
+            commander.Raise(new ReferenceDeletedEvent(this, reference, index, deletedTarget, eventId));
         };
 
     /// Raises <see cref="ChildDeletedEvent"/> for <paramref name="containment"/>.
-    protected Action<IPartitionCommander, Index, T, IEventId?> ContainmentRemover<T>(Containment containment) where T : INode =>
+    protected Action<IPartitionCommander, Index, T, IEventId> ContainmentRemover<T>(Containment containment) where T : INode =>
         (commander, index, node, eventId) =>
-            commander.Raise(new ChildDeletedEvent(node, this, containment, index, eventId ?? commander.CreateEventId()));
+            commander.Raise(new ChildDeletedEvent(node, this, containment, index, eventId));
 
     /// Raises <see cref="AnnotationDeletedEvent"/>.
-    private void AnnotationRemover(IPartitionCommander commander, Index index, INode node, IEventId? eventId = null) =>
-        commander.Raise(new AnnotationDeletedEvent(node, this, index, eventId ?? commander.CreateEventId()));
+    private void AnnotationRemover(IPartitionCommander commander, Index index, INode node, IEventId eventId) =>
+        commander.Raise(new AnnotationDeletedEvent(node, this, index, eventId));
 
     #endregion
 }

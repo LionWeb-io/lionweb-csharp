@@ -94,13 +94,7 @@ public class EventTests_Infrastructure
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionEventReplicator(clone, new());
-        replicator.Init();
-        var cloneReplicator = new PartitionEventReplicator(node, new());
-        cloneReplicator.Init();
-  
-        replicator.ReplicateFrom(cloneReplicator);
-        cloneReplicator.ReplicateFrom(replicator);
+        var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
         int nodeCount = 0;
         node.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => nodeCount++);
@@ -125,14 +119,8 @@ public class EventTests_Infrastructure
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionEventReplicator(clone, new());
-        replicator.Init();
-        var cloneReplicator = new PartitionEventReplicator(node, new());
-        cloneReplicator.Init();
-     
-        replicator.ReplicateFrom(cloneReplicator);
-        cloneReplicator.ReplicateFrom(replicator);
-
+        var (replicator, cloneReplicator) = CreateReplicators(node, clone);
+        
         circle.Name = "Hello";
         cloneCircle.Name = "World";
 
@@ -142,14 +130,32 @@ public class EventTests_Infrastructure
         Assert.AreEqual(0, ReplicatorEventIds(cloneReplicator).Count);
     }
 
-    private static HashSet<IEventId> ReplicatorEventIds(PartitionEventReplicator replicator)
+    private static HashSet<IEventId> ReplicatorEventIds(IEventProcessor<IPartitionEvent> replicator)
     {
-        var type = typeof(EventIdFilteringEventForwarder<IPartitionEvent, IPartitionPublisher>);
+        var type = typeof(EventIdFilteringEventProcessor<IPartitionEvent>);
         var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_eventIds");
         var value = fieldInfo.GetValue(replicator);
         return (HashSet<IEventId>)value!;
     }
 
+    private Tuple<IEventProcessor<IPartitionEvent>, IEventProcessor<IPartitionEvent>>
+        CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
+    {
+        var replicator = PartitionEventReplicator.Create(clone, new());
+        // replicator.Init();
+        var cloneReplicator = PartitionEventReplicator.Create(node, new());
+        // cloneReplicator.Init();
+        
+        IProcessor.Forward(cloneReplicator, replicator);
+        IProcessor.Forward(replicator, cloneReplicator);
+     
+        // new EventForwarder<IPartitionEvent>(cloneReplicator, replicator);
+        // new EventForwarder<IPartitionEvent>(replicator, cloneReplicator);
+        // replicator.ReplicateFrom(cloneReplicator);
+        // cloneReplicator.ReplicateFrom(replicator);
+        
+        return Tuple.Create(replicator, cloneReplicator);
+    }
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();

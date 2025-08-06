@@ -23,53 +23,44 @@ using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
 using Partition;
-using System.Diagnostics;
 
-public class RewriteForestEventReplicator(IForest localForest, SharedNodeMap sharedNodeMap)
-    : ForestEventReplicator(localForest, sharedNodeMap)
+internal class RewriteForestEventReplicator(
+    IForest localForest,
+    SharedNodeMap sharedNodeMap,
+    EventIdFilteringEventProcessor<IForestEvent> filter,
+    EventIdReplacingEventProcessor<IForestEvent> replacingFilter
+)
+    : ForestEventReplicator(localForest, sharedNodeMap, filter)
 {
-    private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];
+    public static IEventProcessor<IForestEvent> Create(IForest localForest, SharedNodeMap sharedNodeMap)
+    {
+        var filter = new EventIdFilteringEventProcessor<IForestEvent>(null);
+        var replacingFilter = new EventIdReplacingEventProcessor<IForestEvent>(null);
+        var replicator = new RewriteForestEventReplicator(localForest, sharedNodeMap, filter, replacingFilter);
+        var result = new CompositeEventProcessor<IForestEvent>([filter, replacingFilter, replicator], localForest);
+        replicator.Init();
+        return result;
+    }
 
-    protected override PartitionEventReplicator CreatePartitionEventReplicator(IPartitionInstance partition) =>
-        new RewritePartitionEventReplicator(partition, SharedNodeMap);
+    protected override IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition) =>
+        RewritePartitionEventReplicator.Create(partition, SharedNodeMap);
+
+    private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
 
     protected override void SuppressEventForwarding(IForestEvent forestEvent, Action action)
     {
-        IEventId? eventId = null;
-        if (_localCommander != null)
-        {
-            eventId = _localCommander.CreateEventId();
-            var originalEventId = forestEvent.EventId;
-            _originalEventIds[eventId] = originalEventId;
-            // _localCommander.RegisterEventId(eventId);
-            RegisterEventId(eventId);
-        }
+        IEventId? eventId = _eventIdProvider.CreateEventId();
+        var originalEventId = forestEvent.EventId;
+        replacingFilter.RegisterReplacementEventId(eventId, originalEventId);
+        filter.RegisterEventId(eventId);
 
         try
         {
             action();
         } finally
         {
-            if (eventId != null)
-            {
-                UnregisterEventId(eventId);
-                _originalEventIds.Remove(eventId);
-            }
+            filter.UnregisterEventId(eventId);
+            replacingFilter.UnregisterReplacementEventId(eventId);
         }
-    }
-
-    protected override TSubscribedEvent? Filter<TSubscribedEvent>(IForestEvent forestEvent)
-        where TSubscribedEvent : class
-    {
-        IForestEvent? result = base.Filter<TSubscribedEvent>(forestEvent);
-        Debug.WriteLine($"result: {result}");
-        if (_originalEventIds.TryGetValue(forestEvent.EventId, out var originalId))
-        {
-            Debug.WriteLine($"originalId: {originalId}");
-            result = forestEvent;
-            result.EventId = originalId;
-        }
-
-        return (TSubscribedEvent?)result;
     }
 }

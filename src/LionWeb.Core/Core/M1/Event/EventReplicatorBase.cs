@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1.Event;
 
+using Forest;
 using Partition;
 using Utilities;
 
@@ -29,44 +30,47 @@ using Utilities;
 ///
 /// <para>
 /// This class is <i>also</i> a <see cref="IPublisher{TEvent}"/> itself.
-/// We <see cref="EventIdFilteringEventForwarder{TEvent,TPublisher}">forward</see> all events from our <i>local</i>,
+/// We <see cref="EventIdFilteringEventProcessor{TEvent,TPublisher}">forward</see> all events from our <i>local</i>,
 /// except the events that stem from replicating <see cref="ReplicateFrom">other publishers</see>.
 /// Therefore, two instances with different <i>locals</i> can replicate each other, keeping both <i>locals</i> in sync.
 /// </para>
-public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFilteringEventForwarder<TEvent, TPublisher>
-    where TEvent : class, IEvent where TPublisher : IPublisher<TEvent>
+public abstract class EventReplicatorBase<TEvent> : EventProcessorBase<TEvent> where TEvent : class, IEvent
 {
-    protected readonly ICommander<TEvent>? _localCommander;
-    private readonly List<TPublisher> _publishers = [];
-
     protected readonly SharedNodeMap SharedNodeMap;
+    private readonly EventIdFilteringEventProcessor<TEvent> _filter;
 
-    protected EventReplicatorBase(TPublisher? localPublisher, ICommander<TEvent>? localCommander,
-        SharedNodeMap sharedNodeMap = null) : base(localPublisher)
+    protected EventReplicatorBase(SharedNodeMap sharedNodeMap, EventIdFilteringEventProcessor<TEvent> filter) : base(null)
     {
-        _localCommander = localCommander;
         SharedNodeMap = sharedNodeMap;
+        _filter = filter;
     }
 
     /// Replicate events raised by <paramref name="publisher"/>. 
-    public virtual void ReplicateFrom(TPublisher publisher)
-    {
-        publisher.Subscribe<TEvent>(ProcessEvent);
-        _publishers.Add(publisher);
-    }
+    // public virtual void ReplicateFrom(TPublisher publisher)
+    // {
+    //     publisher.Subscribe<TEvent>(ProcessEvent);
+    //     _publishers.Add(publisher);
+    // }
 
     /// unsubscribes from all <see cref="ReplicateFrom">replicated publishers</see>.
-    public override void Dispose()
-    {
-        foreach (var publisher in _publishers)
-        {
-            publisher.Unsubscribe<TEvent>(ProcessEvent);
-        }
+    // public override void Dispose()
+    // {
+    //     foreach (var publisher in _publishers)
+    //     {
+    //         publisher.Unsubscribe<TEvent>(ProcessEvent);
+    //     }
+    //
+    //     GC.SuppressFinalize(this);
+    // }
 
-        GC.SuppressFinalize(this);
-    }
+    // protected abstract void ProcessEvent(object? sender, TEvent @event);
+    
+    
 
-    protected abstract void ProcessEvent(object? sender, TEvent @event);
+    public override void Receive(TEvent message) =>
+        ProcessEvent(message);
+
+    protected abstract void ProcessEvent(TEvent? @event);
 
     protected void RegisterNode(IReadableNode newNode)
     {
@@ -82,14 +86,14 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     protected virtual INode AdjustRemoteNode(INode remoteNode) =>
         remoteNode;
 
-    /// Uses <see cref="EventIdFilteringEventForwarder{TEvent,TPublisher}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
+    /// Uses <see cref="EventIdFilteringEventProcessor{TEvent,TPublisher}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
     protected virtual void SuppressEventForwarding(TEvent @event, Action action)
     {
         IEventId? eventId = null;
-        if (_localCommander != null)
+        // if (_localCommander != null)
         {
             eventId = @event.EventId;
-            RegisterEventId(eventId);
+            _filter.RegisterEventId(eventId);
         }
 
         try
@@ -98,7 +102,7 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
         } finally
         {
             if (eventId != null)
-                UnregisterEventId(eventId);
+                _filter.UnregisterEventId(eventId);
         }
     }
 }

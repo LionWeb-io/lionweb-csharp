@@ -19,7 +19,3 @@ namespace LionWeb.Core.M1.Event.Partition;
 
 using M3;
 
-/// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-/// <seealso cref="IPartitionCommander"/>
-/// <seealso cref="PartitionEventForwarder"/>
-public interface IPartitionPublisher : IPublisher<IPartitionEvent>;

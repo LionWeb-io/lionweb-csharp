@@ -41,7 +41,7 @@ public class EventsTestJson : EventTestsBase
 
         SharedNodeMap sharedNodeMap = new();
 
-        var partitionEventForwarder = new PartitionEventForwarder(null);
+        var partitionEventForwarder = new PartitionEventProcessor(null);
 
         var deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
@@ -66,7 +66,7 @@ public class EventsTestJson : EventTestsBase
             eventReceiver.Receive(commandToEventMapper.Map(deserialized));
         });
 
-        var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
+        var replicator = new PartitionEventReplicator(clone, sharedNodeMap, TODO);
         replicator.Init();
         // sharedNodeMap.RegisterNode(clone);
         replicator.ReplicateFrom(partitionEventForwarder);

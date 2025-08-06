@@ -94,7 +94,7 @@ public class ClassifierGenerator(
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
             additionalMembers.AddRange([
-                Field("_eventForwarder", AsType(typeof(PartitionEventForwarder)))
+                Field("_eventForwarder", AsType(typeof(PartitionEventProcessor)))
                     .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
                 Method("GetPublisher", NullableType(AsType(typeof(IPartitionPublisher))), exprBody: IdentifierName("_eventForwarder"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword)),

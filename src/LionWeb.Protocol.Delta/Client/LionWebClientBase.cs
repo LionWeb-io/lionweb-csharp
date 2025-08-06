@@ -30,7 +30,6 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly IClientConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
-    protected readonly ForestEventForwarder ForestEventForwarder;
     protected readonly ForestEventReplicator _replicator;
 
     private ParticipationId? _participationId;
@@ -56,14 +55,14 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        ForestEventForwarder = new ForestEventForwarder(name);
-        _replicator = new ForestEventReplicator(forest, SharedNodeMap);
+        // ForestEventForwarder = new ForestEventProcessor(name);
+        _replicator = new ForestEventReplicator(forest, SharedNodeMap, TODO);
         _replicator.Init();
-        _replicator.ReplicateFrom(ForestEventForwarder);
+        // _replicator.ReplicateFrom(ForestEventForwarder);
 
         _replicator.Subscribe<IForestEvent>(SendEventToRepository);
 
-        ForestEventForwarder.Subscribe<IForestEvent>(LocalHandler);
+        // ForestEventForwarder.ForwardFrom<IForestEvent>(LocalHandler);
 
         _connector.ReceiveFromRepository += OnReceiveFromRepository;
     }
@@ -73,7 +72,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     {
         GC.SuppressFinalize(this);
         _connector.ReceiveFromRepository -= OnReceiveFromRepository;
-        _replicator.Dispose();
+        // _replicator.Dispose();
         SharedNodeMap.Dispose();
     }
 

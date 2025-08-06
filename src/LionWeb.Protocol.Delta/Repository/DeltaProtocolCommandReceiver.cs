@@ -31,12 +31,11 @@ public class DeltaProtocolCommandReceiver
     private readonly DeltaCommandToPartitionEventMapper _partitionMapper;
 
     public DeltaProtocolCommandReceiver(
-        ForestEventForwarder forestEventForwarder,
         PartitionSharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder,
         ForestEventReplicator forestEventReplicator)
-        : base(forestEventForwarder, sharedNodeMap, forestEventReplicator)
+        : base(sharedNodeMap, forestEventReplicator)
     {
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
         _partitionMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);

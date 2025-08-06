@@ -131,7 +131,7 @@ public class DynamicNode : NodeBase
             _settings.Remove(property);
             if (oldValue != null)
             {
-                commander?.Raise(new PropertyDeletedEvent(this, property, oldValue, commander.CreateEventId()));
+                commander?.Raise(new PropertyDeletedEvent(this, property, oldValue, new EventIdProvider(this).CreateEventId()));
             }
 
             return true;
@@ -140,10 +140,10 @@ public class DynamicNode : NodeBase
         var newValue = VersionSpecifics.PrepareSetProperty(property, value);
         if (oldValue != null)
         {
-            commander?.Raise(new PropertyChangedEvent(this, property, newValue, oldValue, commander.CreateEventId()));
+            commander?.Raise(new PropertyChangedEvent(this, property, newValue, oldValue, new EventIdProvider(this).CreateEventId()));
         } else
         {
-            commander?.Raise(new PropertyAddedEvent(this, property, newValue, commander.CreateEventId()));
+            commander?.Raise(new PropertyAddedEvent(this, property, newValue, new EventIdProvider(this).CreateEventId()));
         }
 
         _settings[property] = newValue;
@@ -271,12 +271,12 @@ public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
 public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
 {
-    private readonly PartitionEventForwarder _eventForwarder;
+    private readonly PartitionEventProcessor _eventForwarder;
 
     /// <inheritdoc />
     public DynamicPartitionInstance(NodeId id, Concept concept) : base(id, concept)
     {
-        _eventForwarder = new PartitionEventForwarder(this);
+        _eventForwarder = new PartitionEventProcessor(this);
     }
 
     /// <inheritdoc />
