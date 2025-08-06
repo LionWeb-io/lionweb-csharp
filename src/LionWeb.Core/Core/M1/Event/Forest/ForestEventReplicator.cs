@@ -94,6 +94,8 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
                     replicator.OnLocalPartitionDeleted(partitionDeletedEvent);
                     break;
             }
+            
+            replicator.Send(message);
         }
     }
 

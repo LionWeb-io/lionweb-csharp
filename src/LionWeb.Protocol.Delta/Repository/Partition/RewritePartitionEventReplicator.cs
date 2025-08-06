@@ -36,7 +36,7 @@ internal class RewritePartitionEventReplicator(
         var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(internalSender);
         var replacingFilter = new EventIdReplacingEventProcessor<IPartitionEvent>(internalSender);
         var replicator = new RewritePartitionEventReplicator(localPartition, filter, replacingFilter, sharedNodeMap, internalSender);
-        var result = new CompositeEventProcessor<IPartitionEvent>([filter, replacingFilter, replicator],
+        var result = new CompositeEventProcessor<IPartitionEvent>([replacingFilter, replicator, filter],
             sender ?? $"Composite of {nameof(RewritePartitionEventReplicator)} {localPartition.GetId()}");
         replicator.Init();
         return result;

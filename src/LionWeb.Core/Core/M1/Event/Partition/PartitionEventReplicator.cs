@@ -30,7 +30,7 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent>
         var internalSender = sender ?? localPartition.GetId();
         var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(internalSender);
         var replicator = new PartitionEventReplicator(localPartition, sharedNodeMap, filter, internalSender);
-        var result = new CompositeEventProcessor<IPartitionEvent>([filter, replicator], 
+        var result = new CompositeEventProcessor<IPartitionEvent>([replicator, filter], 
             sender ?? $"Composite of {nameof(PartitionEventReplicator)} {localPartition.GetId()}");
         replicator.Init();
         return result;

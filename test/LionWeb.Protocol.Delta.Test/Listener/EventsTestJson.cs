@@ -41,20 +41,26 @@ public class EventsTestJson : EventTestsBase
 
         SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
-        SharedNodeMap sharedNodeMap = new();
-
-        var partitionEventForwarder = new PartitionEventProcessor(null);
+        PartitionSharedNodeMap sharedNodeMap = new();
 
         var deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
                 .WithLanguages(languages)
             ;
 
-        var eventReceiver = new DeltaProtocolPartitionEventReceiver(
-            partitionEventForwarder,
+        var sharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
+
+        var cloneForest = new Forest();
+        cloneForest.AddPartitions([clone]);
+        
+        var replicator = ForestEventReplicator.Create(cloneForest, sharedPartitionReplicatorMap, sharedNodeMap, "cloneReplicator");
+
+        var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
+            sharedPartitionReplicatorMap,
             sharedKeyedMap,
-            deserializerBuilder
+            deserializerBuilder,
+            replicator
         );
 
         var deltaSerializer = new DeltaSerializer();
@@ -68,10 +74,6 @@ public class EventsTestJson : EventTestsBase
             eventReceiver.Receive(commandToEventMapper.Map(deserialized));
         });
 
-        var replicator = new PartitionEventReplicator(clone, sharedNodeMap, TODO);
-        replicator.Init();
-        // sharedNodeMap.RegisterNode(clone);
-        replicator.ReplicateFrom(partitionEventForwarder);
         return clone;
     }
 }
