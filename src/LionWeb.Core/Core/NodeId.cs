@@ -17,10 +17,11 @@
 
 namespace LionWeb.Core;
 
+using System.Runtime.CompilerServices;
 using System.Text;
 using Utilities;
 
-public record struct NodeIdX
+public readonly record struct NodeIdX
 {
     private const byte _invalidChar = byte.MaxValue;
 
@@ -33,13 +34,16 @@ public record struct NodeIdX
             _invalidId = nodeId;
     }
 
-    public override readonly int GetHashCode() =>
+    /// <inheritdoc />
+    public override int GetHashCode() =>
         _invalidId?.GetHashCode() ?? _value.GetHashCode();
 
-    public override readonly string ToString() =>
+    /// <inheritdoc />
+    public override string ToString() =>
         _invalidId ?? Decode(_value);
 
-    public readonly bool Equals(NodeIdX other)
+    /// <inheritdoc />
+    public bool Equals(NodeIdX other)
     {
         if (_invalidId != null || other._invalidId != null)
             return ToString().Equals(other.ToString(), StringComparison.InvariantCulture);
@@ -47,7 +51,7 @@ public record struct NodeIdX
         return ByteExtensions.Equals(_invalidId, other._invalidId);
     }
 
-    private readonly bool PrintMembers(StringBuilder builder)
+    private bool PrintMembers(StringBuilder builder)
     {
         builder.Append(ToString());
         return true;
@@ -84,10 +88,9 @@ public record struct NodeIdX
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool EncodeFourChars(ReadOnlySpan<char> chars, Span<byte> bytes)
     {
-        Console.WriteLine($"chars: {new string(chars)}");
-        
         if (
             !Encode(chars[0], out var b0) ||
             !Encode(chars[1], out var b1) ||
@@ -96,41 +99,26 @@ public record struct NodeIdX
         )
             return false;
 
-        Console.WriteLine($"b0:{b0:b8} b1:{b1:b8} b2:{b2:b8} b3:{b3:b8}");
-        
-        byte b0To0 = (byte)(b0 << 2);
-        byte b1To0 = (byte)((b1 & 0b110000) >> 4);
-        byte to0 = (byte)(b0To0 | b1To0);
-        bytes[0] = to0;
-        Console.WriteLine($"b0To0:{b0To0:b8} b1To0:{b1To0:b8} to0:{to0:b8}");
-        
-        byte b1To1 = (byte)((b1 & 0b1111) << 4);
-        byte b2To1 = (byte)((b2 & 0b111100) >> 2);
-        byte to1 = (byte)(b1To1 | b2To1);
-        bytes[1] = to1;
-        Console.WriteLine($"b1To1:{b1To1:b8} b2To1:{b2To1:b8} to1:{to1:b8}");
-        
-        byte b2To2 = (byte)(b2 << 6);
-        byte b3To2 = (byte)(b3);
-        byte to2 = (byte)(b2To2 | b3To2);
-        bytes[2] = to2;
-        Console.WriteLine($"b2To2:{b2To2:b8} b3To2:{b3To2:b8} to2:{to2:b8}");
+        bytes[0] = (byte)(b0 << 2 | b1 >> 4);
+        bytes[1] = (byte)(b1 << 4 | b2 >> 2);
+        bytes[2] = (byte)(b2 << 6 | b3);
 
         return true;
     }
 
-    internal static bool Encode(char c, out byte value)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool Encode(char c, out int value)
     {
         switch (c)
         {
             case >= '0' and <= '9':
-                value = (byte)(c - '0');
+                value = c - '0';
                 break;
             case >= 'A' and <= 'Z':
-                value = (byte)(c - 'A' + 10);
+                value = c - 'A' + 10;
                 break;
             case >= 'a' and <= 'z':
-                value = (byte)(c - 'a' + 36);
+                value = c - 'a' + 36;
                 break;
             case '-':
                 value = 62;
@@ -170,40 +158,21 @@ public record struct NodeIdX
         return new string(result);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void DecodeThreeBytes(ReadOnlySpan<byte> bytes, Span<char> chars)
     {
         byte b0 = bytes[0];
         byte b1 = bytes[1];
         byte b2 = bytes[2];
 
-        Console.WriteLine($"b0:{b0:b8} b1:{b1:b8}  b2:{b2:b8}");
-
-
-        byte c0 = (byte)(b0 >> 2);
-        chars[0] = Decode(c0);
-        Console.WriteLine($"c0:{c0:b8}");
-
-        byte b0ToC1 = (byte)((b0 & 0b11) << 4);
-        byte b1ToC1 = (byte)((b1 & 0b11110000) >> 4);
-        var c1 = (byte)(b0ToC1 | b1ToC1);
-        chars[1] = Decode(c1);
-        Console.WriteLine($"b0ToC1:{b0ToC1:b8} b1ToC1:{b1ToC1:b8} c1:{c1:b8}");
-
-
-        byte b1ToC2 = (byte)((b1 & 0b1111) << 2);
-        byte b2ToC2 = (byte)((b2  & 0b11000000) >> 6);
-        byte c2 = (byte)(b1ToC2 | b2ToC2);
-        chars[2] = Decode(c2);
-        Console.WriteLine($"b1ToC2:{b1ToC2:b8} b2ToC2:{b2ToC2:b8} c2:{c2:b8}");
-
-        byte c3 = (byte)(b2 & 0b111111);
-        chars[3] = Decode((byte)c3);
-        Console.WriteLine($"c3:{c3:b8}");
-
-        Console.WriteLine($"chars: {new string(chars)}");
+        chars[0] = Decode(b0 >> 2);
+        chars[1] = Decode((b0 & 0b11) << 4 | b1 >> 4);
+        chars[2] = Decode((b1 & 0b1111) << 2 | b2 >> 6);
+        chars[3] = Decode(b2 & 0b111111);
     }
 
-    internal static char Decode(byte b) =>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static char Decode(int b) =>
         b switch
         {
             <= 9 => (char)(b + '0'),
