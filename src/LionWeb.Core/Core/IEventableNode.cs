@@ -23,8 +23,8 @@ using M3;
 
 /// <summary>
 /// Represents an interface for nodes that support events with optional event identifiers.
-/// <seealso cref="IEvent"/>
 /// </summary>
+/// <seealso cref="IEvent"/>
 public interface IEventableNode : IWritableNode
 {
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => AddAnnotations(annotations, null);
