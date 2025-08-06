@@ -170,7 +170,6 @@ public interface IWritableNode : IReadableNode
     /// Adds <see cref="Annotation">annotations</see> to <c>this</c> node.
     /// </summary>
     /// <param name="annotations">Instances of <see cref="Annotation"/> to add.</param>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <exception cref="InvalidValueException">
     /// If <paramref name="annotations"/> contains any node that's not an instance of <see cref="Annotation"/>,
     /// or the annotation cannot <see cref="Annotation.Annotates">annotate</see> <c>this</c> node.
@@ -178,14 +177,13 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="IReadableNode.GetAnnotations"/>
     /// <seealso cref="InsertAnnotations"/>
     /// <seealso cref="RemoveAnnotations"/>
-    public void AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
+    public void AddAnnotations(IEnumerable<IWritableNode> annotations);
 
     /// <summary>
     /// Inserts <see cref="Annotation">annotations</see> into <c>this</c> node's annotations at <paramref name="index"/>.
     /// </summary>
     /// <param name="index">Position to insert <paramref name="annotations"/> at.</param>
     /// <param name="annotations">Instances of <see cref="Annotation"/> to add.</param>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <exception cref="ArgumentOutOfRangeException">If <c>this</c> node's annotations contains less than <paramref name="index"/> annotations.</exception>
     /// <exception cref="InvalidValueException">
     /// If <paramref name="annotations"/> contains any node that's not an instance of <see cref="Annotation"/>,
@@ -194,13 +192,12 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="IReadableNode.GetAnnotations"/>
     /// <seealso cref="AddAnnotations"/>
     /// <seealso cref="RemoveAnnotations"/>
-    public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
+    public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations);
 
     /// <summary>
     /// Removes <see cref="Annotation">annotations</see> to <c>this</c> node.
     /// </summary>
     /// <param name="annotations">Instances of <see cref="Annotation"/> to add.</param>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <returns><c>true</c> if any of <paramref name="annotations"/> used to be annotations of <c>this</c> node and have been removed; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">
     /// If <paramref name="annotations"/> contains any node that's not an instance of <see cref="Annotation"/>,
@@ -209,32 +206,14 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="IReadableNode.GetAnnotations"/>
     /// <seealso cref="AddAnnotations"/>
     /// <seealso cref="InsertAnnotations"/>
-    public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null);
+    public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations);
     
     /// <summary>
     /// Sets the given <paramref name="feature"/> on <c>this</c> node to the given <paramref name="value"/>.
     /// </summary>
     /// <exception cref="InvalidValueException">If <paramref name="value"/> does not adhere to <paramref name="feature"/>'s type or constraints</exception>
     /// <seealso cref="IReadableNode.Get"/>
-    public void Set(Feature feature, object? value, IEventId? eventId = null);
-}
-
-public interface IEventableNode : IWritableNode
-{
-    /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
-    public void AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
-    // void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => AddAnnotations(annotations, null);
-
-    /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
-    public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId?  eventId = null);
-    
-
-    /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
-    public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null);
-
-
-    /// <inheritdoc cref="IWritableNode.Set"/>
-    public void Set(Feature feature, object? value, IEventId? eventId = null);
+    public void Set(Feature feature, object? value);
 }
 
 /// The type-parametrized twin of the non-generic <see cref="IWritableNode"/> interface.
@@ -288,29 +267,26 @@ public interface IWritableNode<T> : IReadableNode<T>, IWritableNode where T : cl
     public Containment? GetContainmentOf(T child);
 
     /// <inheritdoc/>
-    void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null) =>
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations), eventId);
+    void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) =>
+        AddAnnotations(M2Extensions.AsNodes<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
-    public void AddAnnotations(IEnumerable<T> annotations, IEventId? eventId = null);
+    public void AddAnnotations(IEnumerable<T> annotations);
 
     /// <inheritdoc/>
-    void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId? eventId = null) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations), eventId);
+    void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
+        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
-    public void InsertAnnotations(Index index, IEnumerable<T> annotations, IEventId? eventId = null);
+    public void InsertAnnotations(Index index, IEnumerable<T> annotations);
 
     /// <inheritdoc/>
-    bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null) =>
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations), eventId);
+    bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) =>
+        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
-    public bool RemoveAnnotations(IEnumerable<T> annotations, IEventId? eventId = null);
+    public bool RemoveAnnotations(IEnumerable<T> annotations);
 }
-
-public interface IEventableNode<T> : IEventableNode, IWritableNode<T> where T : class, IEventableNode
-{}
 
 /// An interface that instances of LionWeb <see cref="StructuredDataType">StructuredDataTypes</see> implement.
 public interface IStructuredDataTypeInstance
@@ -330,7 +306,7 @@ public interface IStructuredDataTypeInstance
 }
 
 /// Every model node is an instance of <see cref="INode"/>.
-public interface INode : IWritableNode<INode>;
+public interface INode : IEventableNode<INode>;
 
 /// Base implementation of <see cref="IReadableNode{T}"/>.
 public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
@@ -391,7 +367,7 @@ public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadable
 }
 
 /// Base implementation of <see cref="INode"/>.
-public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNode<IEventableNode>
+public abstract class NodeBase : ReadableNodeBase<INode>, INode
 {
     /// <summary>
     /// Initializes <c>this</c> node's <see cref="IReadableNode.GetId">id</see>.
@@ -421,7 +397,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
             _parent = null;
         }
     }
-
+    
     /// <inheritdoc />
     public virtual void AddAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null)
     {
