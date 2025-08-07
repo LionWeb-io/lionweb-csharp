@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -28,7 +29,7 @@ public readonly record struct NodeIdX
 
     private readonly byte[] _value;
     private readonly int _stringLength;
-    
+
     private readonly string? _invalidId;
 
     public NodeIdX(string nodeId)
@@ -73,7 +74,7 @@ public readonly record struct NodeIdX
         }
 
         var maxLength = stringLength * 6 / 8 + 1;
-        
+
         result = new byte[maxLength + 2];
 
         int currentStringIndex = 0;
@@ -127,35 +128,41 @@ public readonly record struct NodeIdX
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool Encode(char c, out int value)
     {
-        switch (c)
+        unchecked
         {
-            case >= '0' and <= '9':
-                value = c - '0';
-                return true;
-            case >= 'A' and <= 'Z':
-                value = c - 'A' + 10;
-                return true;
-            case >= 'a' and <= 'z':
-                value = c - 'a' + 36;
-                return true;
-            case '-':
-                value = 62;
-                return true;
-            case '_':
-                value = 63;
-                return true;
-            case '\0':
-                value = 0;
-                return true;
-            default:
-                value = _invalidChar;
-                return false;
+            switch (c)
+            {
+                case >= '0' and <= '9':
+                    value = c - '0';
+                    return true;
+                case >= 'A' and <= 'Z':
+                    value = c - 'A' + 10;
+                    return true;
+                case >= 'a' and <= 'z':
+                    value = c - 'a' + 36;
+                    return true;
+                case '-':
+                    value = 62;
+                    return true;
+                case '_':
+                    value = 63;
+                    return true;
+                case '\0':
+                    value = 0;
+                    return true;
+                default:
+                    value = _invalidChar;
+                    return false;
+            }
         }
     }
 
     #endregion
 
     #region Decode
+
+    private delegate void Dec(ReadOnlySpan<byte> bytes, Span<char> chars);
+    private static readonly Dec _decode = BitConverter.IsLittleEndian ? DecodeThreeBytes : DecodeThreeBytesBigEndian;
 
     private static string Decode(ReadOnlySpan<byte> bytes)
     {
@@ -170,7 +177,7 @@ public readonly record struct NodeIdX
         var regularLimit = bytesLength - 2;
         while (currentByteIndex < regularLimit)
         {
-            DecodeThreeBytes(bytes.Slice(currentByteIndex, 3), result.AsSpan(currentStringIndex, 4));
+            _decode(bytes.Slice(currentByteIndex, 3), result.AsSpan(currentStringIndex, 4));
 
             currentStringIndex += 4;
             currentByteIndex += 3;
@@ -180,7 +187,7 @@ public readonly record struct NodeIdX
         {
             byte[] buffer = new byte[3];
             bytes[currentByteIndex..].CopyTo(buffer);
-            DecodeThreeBytes(buffer.AsSpan(), result.AsSpan(currentStringIndex, 4));
+            _decode(buffer.AsSpan(), result.AsSpan(currentStringIndex, 4));
         }
 
         return new string(result);
@@ -189,61 +196,53 @@ public readonly record struct NodeIdX
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void DecodeThreeBytes(ReadOnlySpan<byte> bytes, Span<char> chars)
     {
-        var buf = new byte[4];
+        uint l = (uint)((bytes[0] << 16) | (bytes[1] << 8) | bytes[2]);
 
-        var bitstringA = string.Join(" ", buf.AsEnumerable().Select(b => b.ToString("b8")));
-        Console.WriteLine($"buf:{bitstringA}");
+        var c = DecodeThreeBytes(l);
 
-        bytes.CopyTo(buf);
-
-        var bitstringB = string.Join(" ", buf.AsEnumerable().Select(b => b.ToString("b8")));
-        Console.WriteLine($"buf:{bitstringB}");
-
-        var l = BitConverter.ToUInt32(buf);
-        var c =DecodeThreeBytes(l);
-        var charBytes = BitConverter.GetBytes(c);
-        var bitstringC = string.Join(" ", charBytes.AsEnumerable().Select(b => b.ToString("b8")));
-        Console.WriteLine($"buf:{bitstringC}");
-        MemoryMarshal.Cast<byte, char>(charBytes).CopyTo(chars);
+        BitConverter.TryWriteBytes(MemoryMarshal.Cast<char, byte>(chars), c);
     }
 
-    internal static ulong DecodeThreeBytes(uint bytes)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void DecodeThreeBytesBigEndian(ReadOnlySpan<byte> bytes, Span<char> chars)
     {
-        Console.WriteLine($"             0       1       2");
-        Console.WriteLine($"bytes:{bytes:b24}");
-        
-        byte b2 = (byte)((bytes & 0x00FF0000) >> 16);
-        byte b1 = (byte)((bytes & 0x0000FF00) >> 8);
-        byte b0 = (byte)((bytes & 0x000000FF));
+        uint l = (uint)((bytes[0] << 16) | (bytes[1] << 8) | bytes[2]);
+        l = BinaryPrimitives.ReverseEndianness(l);
 
-        Console.WriteLine($"b0:{b0:b8} b1:{b1:b8} b2:{b2:b8}");
+        var c = DecodeThreeBytes(l);
+        c = BinaryPrimitives.ReverseEndianness(c);
 
-        ulong i0 = Decode(b0 >> 2);
-        ulong i1 = Decode((b0 & 0b11) << 4 | b1 >> 4);
-        ulong i2 = Decode((b1 & 0b1111) << 2 | b2 >> 6);
-        ulong i3 = Decode(b2 & 0b111111);
+        BitConverter.TryWriteBytes(MemoryMarshal.Cast<char, byte>(chars), c);
+    }
 
-        Console.WriteLine($"i0:{i0:B} i1:{i1:B} i2:{i2:B} i3:{i3:B}");
-        
-        var chars = i3 << 48 | i2 << 32 | i1 << 16 | i0;
-        
-        Console.WriteLine($"                     0               1               2               3");
-        Console.WriteLine($"chars:{chars:b64}");
-        return chars;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static ulong DecodeThreeBytes(uint bytes)
+    {
+        uint i0 = Decode(bytes >> 18);
+        uint i1 = Decode((bytes >> 12) & 0x3F);
+        uint i2 = Decode((bytes >> 6) & 0x3F);
+        uint i3 = Decode(bytes & 0x3F);
+
+        return ((ulong)i3 << 48) | ((ulong)i2 << 32) | (i1 << 16) | i0;
     }
 
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static uint Decode(int b) =>
-        b switch
+    internal static uint Decode(uint b)
+    {
+        unchecked
         {
-            <= 9 => (uint)(b + '0'),
-            <= 35 => (uint)(b - 10 + 'A'),
-            <= 61 => (uint)(b - 36 + 'a'),
-            62 => '-',
-            63 => '_',
-            _ => char.MaxValue
-        };
+            return b switch
+            {
+                <= 9 => b + '0',
+                <= 35 => b - 10 + 'A',
+                <= 61 => b - 36 + 'a',
+                62 => '-',
+                63 => '_',
+                _ => char.MaxValue
+            };
+        }
+    }
 
     #endregion
 }
