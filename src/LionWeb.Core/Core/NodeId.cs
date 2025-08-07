@@ -18,6 +18,7 @@
 namespace LionWeb.Core;
 
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using Utilities;
 
@@ -48,7 +49,7 @@ public readonly record struct NodeIdX
     /// <inheritdoc />
     public bool Equals(NodeIdX other)
     {
-        if (_invalidId != null || other._invalidId != null)
+        if (_invalidId != null && other._invalidId != null)
             return ToString().Equals(other.ToString(), StringComparison.InvariantCulture);
 
         return ByteExtensions.Equals(_value, other._value);
@@ -188,23 +189,57 @@ public readonly record struct NodeIdX
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static void DecodeThreeBytes(ReadOnlySpan<byte> bytes, Span<char> chars)
     {
-        byte b0 = bytes[0];
-        byte b1 = bytes[1];
-        byte b2 = bytes[2];
+        var buf = new byte[4];
 
-        chars[0] = Decode(b0 >> 2);
-        chars[1] = Decode((b0 & 0b11) << 4 | b1 >> 4);
-        chars[2] = Decode((b1 & 0b1111) << 2 | b2 >> 6);
-        chars[3] = Decode(b2 & 0b111111);
+        var bitstringA = string.Join(" ", buf.AsEnumerable().Select(b => b.ToString("b8")));
+        Console.WriteLine($"buf:{bitstringA}");
+
+        bytes.CopyTo(buf);
+
+        var bitstringB = string.Join(" ", buf.AsEnumerable().Select(b => b.ToString("b8")));
+        Console.WriteLine($"buf:{bitstringB}");
+
+        var l = BitConverter.ToUInt32(buf);
+        var c =DecodeThreeBytes(l);
+        var charBytes = BitConverter.GetBytes(c);
+        var bitstringC = string.Join(" ", charBytes.AsEnumerable().Select(b => b.ToString("b8")));
+        Console.WriteLine($"buf:{bitstringC}");
+        MemoryMarshal.Cast<byte, char>(charBytes).CopyTo(chars);
     }
 
+    internal static ulong DecodeThreeBytes(uint bytes)
+    {
+        Console.WriteLine($"             0       1       2");
+        Console.WriteLine($"bytes:{bytes:b24}");
+        
+        byte b2 = (byte)((bytes & 0x00FF0000) >> 16);
+        byte b1 = (byte)((bytes & 0x0000FF00) >> 8);
+        byte b0 = (byte)((bytes & 0x000000FF));
+
+        Console.WriteLine($"b0:{b0:b8} b1:{b1:b8} b2:{b2:b8}");
+
+        ulong i0 = Decode(b0 >> 2);
+        ulong i1 = Decode((b0 & 0b11) << 4 | b1 >> 4);
+        ulong i2 = Decode((b1 & 0b1111) << 2 | b2 >> 6);
+        ulong i3 = Decode(b2 & 0b111111);
+
+        Console.WriteLine($"i0:{i0:B} i1:{i1:B} i2:{i2:B} i3:{i3:B}");
+        
+        var chars = i3 << 48 | i2 << 32 | i1 << 16 | i0;
+        
+        Console.WriteLine($"                     0               1               2               3");
+        Console.WriteLine($"chars:{chars:b64}");
+        return chars;
+    }
+
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static char Decode(int b) =>
+    internal static uint Decode(int b) =>
         b switch
         {
-            <= 9 => (char)(b + '0'),
-            <= 35 => (char)(b - 10 + 'A'),
-            <= 61 => (char)(b - 36 + 'a'),
+            <= 9 => (uint)(b + '0'),
+            <= 35 => (uint)(b - 10 + 'A'),
+            <= 61 => (uint)(b - 36 + 'a'),
             62 => '-',
             63 => '_',
             _ => char.MaxValue
