@@ -27,19 +27,13 @@ using System.Text.Json.Stream;
 /// </summary>
 public static class JsonUtils
 {
-    private static readonly JsonSerializerOptions _readOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
+    private static readonly JsonSerializerOptions _readOptions = LionWebJsonSerializerContext.Default.Options;
 
     /// Parses <paramref name="json"/> as JSON.
     public static T ReadJsonFromString<T>(string json) =>
         JsonSerializer.Deserialize<T>(json, _readOptions)!;
 
-    private static readonly JsonSerializerOptions _writeOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
+    private static readonly JsonSerializerOptions _writeOptions = _readOptions;
 
     /// Returns <paramref name="data"/> rendered as JSON.
     public static string WriteJsonToString(object data) =>
@@ -145,7 +139,7 @@ public static class JsonUtils
 
 /// Variant of <see cref="SerializationChunk"/> that moves <see cref="Languages"/> as last entry,
 /// so we can fill it _after_ we've processed all <see cref="Nodes"/>.
-internal class LazySerializationChunk
+public class LazySerializationChunk
 {
     /// <inheritdoc cref="SerializationChunk.SerializationFormatVersion"/>
     [JsonPropertyOrder(0)]
