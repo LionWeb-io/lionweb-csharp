@@ -40,6 +40,22 @@ public class SerializerBenchmark : SerializerBenchmarkBase
 
     [Benchmark]
     [TestMethod]
+    public async Task Serialize_Stream_Async()
+    {
+        await using Stream stream = File.Create(_streamFile);
+        ISerializer serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
+        IEnumerable<IReadableNode> nodes = _nodes;
+        object data = new LazySerializationChunk
+        {
+            SerializationFormatVersion = serializer.LionWebVersion.VersionString,
+            Nodes = serializer.Serialize(nodes),
+            Languages = serializer.UsedLanguages
+        };
+        await JsonSerializer.SerializeAsync(stream, data, _simpleOptions);
+    }
+
+    [Benchmark]
+    [TestMethod]
     public void Serialize_Stream()
     {
         using Stream stream = File.Create(_streamFile);
@@ -52,6 +68,22 @@ public class SerializerBenchmark : SerializerBenchmarkBase
             Languages = serializer.UsedLanguages
         };
         JsonSerializer.Serialize(stream, data, _simpleOptions);
+    }
+
+    [Benchmark]
+    [TestMethod]
+    public async Task Serialize_Stream_Context_Async()
+    {
+        await using Stream stream = File.Create(_streamFile);
+        ISerializer serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
+        IEnumerable<IReadableNode> nodes = _nodes;
+        object data = new LazySerializationChunk
+        {
+            SerializationFormatVersion = serializer.LionWebVersion.VersionString,
+            Nodes = serializer.Serialize(nodes),
+            Languages = serializer.UsedLanguages
+        };
+        await JsonSerializer.SerializeAsync(stream, data, _aotOptions);
     }
 
     [Benchmark]
@@ -78,7 +110,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
             .WithLionWebVersion(_lionWebVersion)
             .Build()
             .SerializeToChunk(_nodes), _simpleOptions);
-        
+
         File.WriteAllText(_stringFile, output);
     }
 
@@ -90,7 +122,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
             .WithLionWebVersion(_lionWebVersion)
             .Build()
             .SerializeToChunk(_nodes), _aotOptions);
-        
+
         File.WriteAllText(_stringFile, output);
     }
 
