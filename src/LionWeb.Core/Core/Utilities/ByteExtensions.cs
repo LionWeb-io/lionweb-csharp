@@ -33,4 +33,19 @@ public static class ByteExtensions
     /// Checks whether byte arrays <paramref name="left"/> and <paramref name="right"/> are equal by length and content.
     public static bool Equals(ReadOnlySpan<byte> left, ReadOnlySpan<byte> right) =>
         left.SequenceEqual(right);
+
+    /// <inheritdoc cref="Equals(System.ReadOnlySpan{byte},System.ReadOnlySpan{byte})"/>
+    public static bool Equals(byte[] left, byte[] right) =>
+        Equals(left.AsSpan(), right.AsSpan());
+
+    public static int GetHashCode(ReadOnlySpan<byte> bytes)
+    {
+        unchecked
+        {
+            var result = 0;
+            foreach (byte b in bytes)
+                result = (result * 31) ^ b;
+            return result;
+        }
+    }
 }

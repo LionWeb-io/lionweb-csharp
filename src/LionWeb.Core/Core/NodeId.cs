@@ -26,21 +26,24 @@ public readonly record struct NodeIdX
     private const byte _invalidChar = byte.MaxValue;
 
     private readonly byte[] _value;
+    private readonly int _stringLength;
+    
     private readonly string? _invalidId;
 
     public NodeIdX(string nodeId)
     {
+        _stringLength = nodeId.Length;
         if (!Encode(nodeId, out _value))
             _invalidId = nodeId;
     }
 
     /// <inheritdoc />
     public override int GetHashCode() =>
-        _invalidId?.GetHashCode() ?? _value.GetHashCode();
+        _invalidId?.GetHashCode() ?? ByteExtensions.GetHashCode(_value);
 
     /// <inheritdoc />
     public override string ToString() =>
-        _invalidId ?? Decode(_value);
+        _invalidId ?? Decode(_value).Substring(0, _stringLength);
 
     /// <inheritdoc />
     public bool Equals(NodeIdX other)
@@ -48,7 +51,7 @@ public readonly record struct NodeIdX
         if (_invalidId != null || other._invalidId != null)
             return ToString().Equals(other.ToString(), StringComparison.InvariantCulture);
 
-        return ByteExtensions.Equals(_invalidId, other._invalidId);
+        return ByteExtensions.Equals(_value, other._value);
     }
 
     private bool PrintMembers(StringBuilder builder)
@@ -61,19 +64,22 @@ public readonly record struct NodeIdX
 
     private static bool Encode(string nodeId, out byte[] result)
     {
-        var maxLength = nodeId.Length * 6 / 8;
-        if (maxLength == 0)
+        var stringLength = nodeId.Length;
+        if (stringLength == 0)
         {
             result = [];
             return false;
         }
 
-        result = new byte[maxLength + 4];
+        var maxLength = stringLength * 6 / 8 + 1;
+        
+        result = new byte[maxLength + 2];
 
         int currentStringIndex = 0;
         int currentByteIndex = 0;
 
-        while (currentStringIndex < nodeId.Length)
+        var regularLimit = stringLength - 3;
+        while (currentStringIndex < regularLimit)
         {
             if (!EncodeFourChars(nodeId.AsSpan(currentStringIndex, 4), result.AsSpan(currentByteIndex, 3)))
             {
@@ -83,6 +89,17 @@ public readonly record struct NodeIdX
 
             currentStringIndex += 4;
             currentByteIndex += 3;
+        }
+
+        if (currentStringIndex < stringLength)
+        {
+            char[] buffer = new char[4];
+            nodeId.AsSpan(currentStringIndex).CopyTo(buffer);
+            if (!EncodeFourChars(buffer.AsSpan(), result.AsSpan(currentByteIndex, 3)))
+            {
+                result = [];
+                return false;
+            }
         }
 
         return true;
@@ -113,46 +130,56 @@ public readonly record struct NodeIdX
         {
             case >= '0' and <= '9':
                 value = c - '0';
-                break;
+                return true;
             case >= 'A' and <= 'Z':
                 value = c - 'A' + 10;
-                break;
+                return true;
             case >= 'a' and <= 'z':
                 value = c - 'a' + 36;
-                break;
+                return true;
             case '-':
                 value = 62;
-                break;
+                return true;
             case '_':
                 value = 63;
-                break;
+                return true;
+            case '\0':
+                value = 0;
+                return true;
             default:
                 value = _invalidChar;
                 return false;
         }
-
-        return true;
     }
 
     #endregion
 
     #region Decode
 
-    private static string Decode(byte[] bytes)
+    private static string Decode(ReadOnlySpan<byte> bytes)
     {
-        var maxLength = bytes.Length * 8 / 6;
+        var bytesLength = bytes.Length;
+        var maxLength = bytesLength * 8 / 6;
 
-        char[] result = new char[maxLength];
+        char[] result = new char[maxLength + 4];
 
         int currentStringIndex = 0;
         int currentByteIndex = 0;
 
-        while (currentByteIndex < bytes.Length)
+        var regularLimit = bytesLength - 2;
+        while (currentByteIndex < regularLimit)
         {
-            DecodeThreeBytes(bytes.AsSpan(currentByteIndex, 3), result.AsSpan(currentStringIndex, 4));
+            DecodeThreeBytes(bytes.Slice(currentByteIndex, 3), result.AsSpan(currentStringIndex, 4));
 
-            currentStringIndex += 3;
-            currentByteIndex += 4;
+            currentStringIndex += 4;
+            currentByteIndex += 3;
+        }
+
+        if (currentByteIndex < bytesLength)
+        {
+            byte[] buffer = new byte[3];
+            bytes[currentByteIndex..].CopyTo(buffer);
+            DecodeThreeBytes(buffer.AsSpan(), result.AsSpan(currentStringIndex, 4));
         }
 
         return new string(result);
