@@ -20,6 +20,7 @@ namespace LionWeb.Core.Benchmark;
 using BenchmarkDotNet.Attributes;
 using M1;
 using Test.Serialization;
+using Test.Utilities;
 
 [MemoryDiagnoser]
 public class NodeIdBenchmark

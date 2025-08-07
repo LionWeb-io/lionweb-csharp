@@ -15,12 +15,20 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Benchmark;
+namespace LionWeb.Core.Test.Utilities;
 
-using BenchmarkDotNet.Running;
-
-public class Program
+public static class StringRandomizer
 {
-    public static void Main(string[] args) => 
-        BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args);
+    // Constant seed for reproducible tests
+    private static readonly Random _defaultRandom = new Random(0x1EE7);
+    private const string _chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789_-";
+
+    public static string RandomLength() =>
+        Random(_defaultRandom.Next(500));
+
+    public static string Random(int length, string? chars = _chars) =>
+        new string(Enumerable.Repeat(chars, length)
+            .Select(s => s[_defaultRandom.Next(s.Length)]).ToArray());
+    
+    public static char RandomChar(string? chars = _chars) => chars[_defaultRandom.Next(chars.Length)];
 }

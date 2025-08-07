@@ -17,8 +17,8 @@
 
 namespace LionWeb.Core.Test;
 
-using Serialization;
 using System.Reflection;
+using Utilities;
 
 [TestClass]
 public class NodeIdXTests_Encode
