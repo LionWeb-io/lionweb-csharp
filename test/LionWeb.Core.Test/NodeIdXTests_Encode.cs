@@ -98,7 +98,7 @@ public class NodeIdXTests_Encode
     [DynamicData(nameof(TestPair))]
     public void EncodeChar(byte b, char c)
     {
-        NodeIdX.Encode(c, out var actual);
+        var actual = NodeIdX.Encode(c);
         Assert.AreEqual(b, actual);
     }
 

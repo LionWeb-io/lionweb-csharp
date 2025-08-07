@@ -35,7 +35,8 @@ public readonly record struct NodeIdX
     public NodeIdX(string nodeId)
     {
         _stringLength = nodeId.Length;
-        if (!Encode(nodeId, out _value))
+        _value = Encode(nodeId);
+        if (_value.Length == 0)
             _invalidId = nodeId;
     }
 
@@ -65,23 +66,22 @@ public readonly record struct NodeIdX
     #region Encode
 
     private delegate bool EncodeDelegate(ReadOnlySpan<char> chars, Span<byte> bytes);
-    private static readonly EncodeDelegate _encode = BitConverter.IsLittleEndian ? EncodeFourChars : EncodeFourCharsBigEndian;
-    
+
+    private static readonly EncodeDelegate _encode =
+        BitConverter.IsLittleEndian ? EncodeFourChars : EncodeFourCharsBigEndian;
+
     private static int Ceiling(int number, int multipleOf) =>
         ((number + multipleOf - 1) / multipleOf) * multipleOf;
 
-    private static bool Encode(string nodeId, out byte[] result)
+    private static byte[] Encode(string nodeId)
     {
         var stringLength = nodeId.Length;
         if (stringLength == 0)
-        {
-            result = [];
-            return false;
-        }
+            return [];
 
         var maxLength = (int)Math.Ceiling(stringLength * 6f / 8 + 3);
 
-        result = new byte[Ceiling(maxLength, 4)];
+        var result = new byte[Ceiling(maxLength, 4)];
 
         int currentStringIndex = 0;
         int currentByteIndex = 0;
@@ -90,10 +90,7 @@ public readonly record struct NodeIdX
         while (currentStringIndex < regularLimit)
         {
             if (!_encode(nodeId.AsSpan(currentStringIndex, 4), result.AsSpan(currentByteIndex, 4)))
-            {
-                result = [];
-                return false;
-            }
+                return [];
 
             currentStringIndex += 4;
             currentByteIndex += 3;
@@ -104,23 +101,25 @@ public readonly record struct NodeIdX
             char[] buffer = new char[4];
             nodeId.AsSpan(currentStringIndex).CopyTo(buffer);
             if (!_encode(buffer.AsSpan(), result.AsSpan(currentByteIndex, 4)))
-            {
-                result = [];
-                return false;
-            }
+                return [];
         }
 
-        return true;
+        return result;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static bool EncodeFourChars(ReadOnlySpan<char> chars, Span<byte> bytes)
     {
+        int c0 = Encode(chars[0]);
+        int c1 = Encode(chars[1]);
+        int c2 = Encode(chars[2]);
+        int c3 = Encode(chars[3]);
+
         if (
-            !Encode(chars[0], out var c0) ||
-            !Encode(chars[1], out var c1) ||
-            !Encode(chars[2], out var c2) ||
-            !Encode(chars[3], out var c3)
+            c0 == _invalidChar ||
+            c1 == _invalidChar ||
+            c2 == _invalidChar ||
+            c3 == _invalidChar
         )
             return false;
 
@@ -130,15 +129,20 @@ public readonly record struct NodeIdX
 
         return BitConverter.TryWriteBytes(bytes, i);
     }
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static bool EncodeFourCharsBigEndian(ReadOnlySpan<char> chars, Span<byte> bytes)
+    private static bool EncodeFourCharsBigEndian(ReadOnlySpan<char> chars, Span<byte> bytes)
     {
+        int c0 = Encode(chars[0]);
+        int c1 = Encode(chars[1]);
+        int c2 = Encode(chars[2]);
+        int c3 = Encode(chars[3]);
+
         if (
-            !Encode(chars[0], out var c0) ||
-            !Encode(chars[1], out var c1) ||
-            !Encode(chars[2], out var c2) ||
-            !Encode(chars[3], out var c3)
+            c0 == _invalidChar ||
+            c1 == _invalidChar ||
+            c2 == _invalidChar ||
+            c3 == _invalidChar
         )
             return false;
 
@@ -150,34 +154,20 @@ public readonly record struct NodeIdX
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static bool Encode(char c, out int value)
+    internal static int Encode(char c)
     {
         unchecked
         {
-            switch (c)
+            return c switch
             {
-                case >= '0' and <= '9':
-                    value = c - '0';
-                    return true;
-                case >= 'A' and <= 'Z':
-                    value = c - 'A' + 10;
-                    return true;
-                case >= 'a' and <= 'z':
-                    value = c - 'a' + 36;
-                    return true;
-                case '-':
-                    value = 62;
-                    return true;
-                case '_':
-                    value = 63;
-                    return true;
-                case '\0':
-                    value = 0;
-                    return true;
-                default:
-                    value = _invalidChar;
-                    return false;
-            }
+                >= '0' and <= '9' => c - '0',
+                >= 'A' and <= 'Z' => c - 'A' + 10,
+                >= 'a' and <= 'z' => c - 'a' + 36,
+                '-' => 62,
+                '_' => 63,
+                '\0' => 0,
+                _ => _invalidChar
+            };
         }
     }
 
@@ -186,7 +176,9 @@ public readonly record struct NodeIdX
     #region Decode
 
     private delegate void DecodeDelegate(ReadOnlySpan<byte> bytes, Span<char> chars);
-    private static readonly DecodeDelegate _decode = BitConverter.IsLittleEndian ? DecodeThreeBytes : DecodeThreeBytesBigEndian;
+
+    private static readonly DecodeDelegate _decode =
+        BitConverter.IsLittleEndian ? DecodeThreeBytes : DecodeThreeBytesBigEndian;
 
     private static string Decode(ReadOnlySpan<byte> bytes)
     {
@@ -198,20 +190,13 @@ public readonly record struct NodeIdX
         int currentStringIndex = 0;
         int currentByteIndex = 0;
 
-        var regularLimit = bytesLength - 2;
+        var regularLimit = bytesLength - 3;
         while (currentByteIndex < regularLimit)
         {
             _decode(bytes.Slice(currentByteIndex, 3), result.AsSpan(currentStringIndex, 4));
 
             currentStringIndex += 4;
             currentByteIndex += 3;
-        }
-
-        if (currentByteIndex < bytesLength)
-        {
-            byte[] buffer = new byte[3];
-            bytes[currentByteIndex..].CopyTo(buffer);
-            _decode(buffer.AsSpan(), result.AsSpan(currentStringIndex, 4));
         }
 
         return new string(result);
