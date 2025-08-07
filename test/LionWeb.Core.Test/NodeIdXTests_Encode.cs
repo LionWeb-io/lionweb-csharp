@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Test;
 
+using Serialization;
 using System.Reflection;
 
 [TestClass]
@@ -130,7 +131,7 @@ public class NodeIdXTests_Encode
     [DynamicData(nameof(FourChars), DynamicDataDisplayName = nameof(DisplayFourChars))]
     public void EncodeFourChars(byte[] bytes, char[] chars)
     {
-        var actual = new byte[3];
+        var actual = new byte[4];
         NodeIdX.EncodeFourChars(chars.AsSpan(), actual.AsSpan());
         Assert.AreEqual(bytes[0], actual[0]);
         Assert.AreEqual(bytes[1], actual[1]);
@@ -149,37 +150,26 @@ public class NodeIdXTests_Encode
         Assert.AreEqual(chars[3], actual[3]);
     }
     
-    public static IEnumerable<object[]> FourCharsRandom
+    public static IEnumerable<object[]> RandomChars
     {
         get
         {
             var random = new Random();
             return Enumerable.Range(0, 50)
-                .Select(_ => new object[] { new[] { RandomChar(), RandomChar(), RandomChar(), RandomChar() } });
-
-            char RandomChar()
-            {
-                return _mapping[(byte)random.Next(0, 64)];
-            }
+                .Select(_ => new object[] { StringRandomizer.Random(random.Next(1, 23)) });
         }
     }
 
     public static string DisplayFourCharsRandom(MethodInfo methodInfo, object[] values) =>
-        new((char[])values[0]);
+        (string)values[0];
 
     [TestMethod]
-    [DynamicData(nameof(FourCharsRandom), DynamicDataDisplayName = nameof(DisplayFourCharsRandom))]
-    public void EncodeFourCharsRandom(char[] chars)
+    [DynamicData(nameof(RandomChars), DynamicDataDisplayName = nameof(DisplayFourCharsRandom))]
+    public void EncodeRandom(string nodeId)
     {
-        byte[] bytes = new byte[3];
-        NodeIdX.EncodeFourChars(chars.AsSpan(), bytes.AsSpan());
-        Console.WriteLine();
-        char[] actual = new char[4];
-        NodeIdX.DecodeThreeBytes(bytes.AsSpan(),  actual.AsSpan());
+        var id = new NodeIdX(nodeId);
+        Assert.IsNull(NodeIdXTests.InvalidId(id));
         
-        Assert.AreEqual(chars[0], actual[0]);
-        Assert.AreEqual(chars[1], actual[1]);
-        Assert.AreEqual(chars[2], actual[2]);
-        Assert.AreEqual(chars[3], actual[3]);
+        Assert.AreEqual(nodeId, id.ToString());
     }
 }

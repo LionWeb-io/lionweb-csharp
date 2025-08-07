@@ -64,6 +64,12 @@ public readonly record struct NodeIdX
 
     #region Encode
 
+    private delegate bool EncodeDelegate(ReadOnlySpan<char> chars, Span<byte> bytes);
+    private static readonly EncodeDelegate _encode = BitConverter.IsLittleEndian ? EncodeFourChars : EncodeFourCharsBigEndian;
+    
+    private static int Ceiling(int number, int multipleOf) =>
+        ((number + multipleOf - 1) / multipleOf) * multipleOf;
+
     private static bool Encode(string nodeId, out byte[] result)
     {
         var stringLength = nodeId.Length;
@@ -73,9 +79,9 @@ public readonly record struct NodeIdX
             return false;
         }
 
-        var maxLength = stringLength * 6 / 8 + 1;
+        var maxLength = (int)Math.Ceiling(stringLength * 6f / 8 + 3);
 
-        result = new byte[maxLength + 2];
+        result = new byte[Ceiling(maxLength, 4)];
 
         int currentStringIndex = 0;
         int currentByteIndex = 0;
@@ -83,7 +89,7 @@ public readonly record struct NodeIdX
         var regularLimit = stringLength - 3;
         while (currentStringIndex < regularLimit)
         {
-            if (!EncodeFourChars(nodeId.AsSpan(currentStringIndex, 4), result.AsSpan(currentByteIndex, 3)))
+            if (!_encode(nodeId.AsSpan(currentStringIndex, 4), result.AsSpan(currentByteIndex, 4)))
             {
                 result = [];
                 return false;
@@ -97,7 +103,7 @@ public readonly record struct NodeIdX
         {
             char[] buffer = new char[4];
             nodeId.AsSpan(currentStringIndex).CopyTo(buffer);
-            if (!EncodeFourChars(buffer.AsSpan(), result.AsSpan(currentByteIndex, 3)))
+            if (!_encode(buffer.AsSpan(), result.AsSpan(currentByteIndex, 4)))
             {
                 result = [];
                 return false;
@@ -111,18 +117,36 @@ public readonly record struct NodeIdX
     internal static bool EncodeFourChars(ReadOnlySpan<char> chars, Span<byte> bytes)
     {
         if (
-            !Encode(chars[0], out var b0) ||
-            !Encode(chars[1], out var b1) ||
-            !Encode(chars[2], out var b2) ||
-            !Encode(chars[3], out var b3)
+            !Encode(chars[0], out var c0) ||
+            !Encode(chars[1], out var c1) ||
+            !Encode(chars[2], out var c2) ||
+            !Encode(chars[3], out var c3)
         )
             return false;
 
-        bytes[0] = (byte)(b0 << 2 | b1 >> 4);
-        bytes[1] = (byte)(b1 << 4 | b2 >> 2);
-        bytes[2] = (byte)(b2 << 6 | b3);
+        int i = (c0 << 2 | c1 >> 4) & 0xff |
+                (((c1 << 4 | c2 >> 2) & 0xff) << 8) |
+                (((c2 << 6 | c3) & 0xff) << 16);
 
-        return true;
+        return BitConverter.TryWriteBytes(bytes, i);
+    }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal static bool EncodeFourCharsBigEndian(ReadOnlySpan<char> chars, Span<byte> bytes)
+    {
+        if (
+            !Encode(chars[0], out var c0) ||
+            !Encode(chars[1], out var c1) ||
+            !Encode(chars[2], out var c2) ||
+            !Encode(chars[3], out var c3)
+        )
+            return false;
+
+        int i = (c3 << 2 | c2 >> 4) & 0xff |
+                (((c2 << 4 | c1 >> 2) & 0xff) << 8) |
+                (((c1 << 6 | c0) & 0xff) << 16);
+
+        return BitConverter.TryWriteBytes(bytes, i);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -161,15 +185,15 @@ public readonly record struct NodeIdX
 
     #region Decode
 
-    private delegate void Dec(ReadOnlySpan<byte> bytes, Span<char> chars);
-    private static readonly Dec _decode = BitConverter.IsLittleEndian ? DecodeThreeBytes : DecodeThreeBytesBigEndian;
+    private delegate void DecodeDelegate(ReadOnlySpan<byte> bytes, Span<char> chars);
+    private static readonly DecodeDelegate _decode = BitConverter.IsLittleEndian ? DecodeThreeBytes : DecodeThreeBytesBigEndian;
 
     private static string Decode(ReadOnlySpan<byte> bytes)
     {
         var bytesLength = bytes.Length;
-        var maxLength = bytesLength * 8 / 6;
+        var maxLength = (int)Math.Ceiling(bytesLength * 8f / 6);
 
-        char[] result = new char[maxLength + 4];
+        char[] result = new char[Ceiling(maxLength, 4)];
 
         int currentStringIndex = 0;
         int currentByteIndex = 0;

@@ -569,7 +569,7 @@ public class NodeIdXTests
 
     #endregion
 
-    private static object? InvalidId(NodeIdX id)
+    internal static object? InvalidId(NodeIdX id)
     {
         var invalidIdField = typeof(NodeIdX).GetField("_invalidId", BindingFlags.NonPublic | BindingFlags.Instance);
         var invalidId = invalidIdField.GetValue(id);
