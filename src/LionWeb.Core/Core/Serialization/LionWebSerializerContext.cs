@@ -17,10 +17,29 @@
 
 namespace LionWeb.Core.Serialization;
 
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 /// Source generator for efficient, AOT-optimizable JSON (de)serialization of LionWeb chunks.
-[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase)]
+[JsonSourceGenerationOptions(PropertyNamingPolicy = JsonKnownNamingPolicy.CamelCase,Converters = [typeof(InternedStringConverter)])]
 [JsonSerializable(typeof(SerializationChunk))]
 [JsonSerializable(typeof(LazySerializationChunk))]
 public partial class LionWebJsonSerializerContext : JsonSerializerContext;
+
+public class InternedStringConverter : JsonConverter<string>
+{
+    public override string? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var s = reader.GetString();
+        return string.IsInterned(s) ?? s;
+    }
+    
+
+    public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
+    {
+7        if (value != null)
+            writer.WriteStringValue(value.AsSpan());
+        else
+            writer.WriteNullValue();
+    }
+}

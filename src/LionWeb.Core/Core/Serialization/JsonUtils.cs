@@ -130,10 +130,59 @@ public static class JsonUtils
                     break;
             }
         }
-
+        
         return deserializer.Finish().ToList();
 
         async Task<bool> Advance() => await streamReader.ReadAsync();
+    }
+
+    public static List<IReadableNode> ReadNodesFromStream(Stream utf8JsonStream, IDeserializer deserializer,
+        Action<string>? lionWebVersionChecker = null)
+    {
+        var bufferSize = 1024 * 8;
+        
+        using var jsonStreamReader = new Utf8JsonStreamReader(utf8JsonStream, bufferSize);
+        
+        var insideNodes = false;
+        while (jsonStreamReader.Read())
+        {
+                
+            switch (jsonStreamReader.TokenType)
+            {
+                case JsonTokenType.PropertyName when jsonStreamReader.GetString() == "serializationFormatVersion":
+                    jsonStreamReader.Read();
+                    string? version = jsonStreamReader.GetString();
+                    if (version != null)
+                    {
+                        if (lionWebVersionChecker == null)
+                        {
+                            deserializer.LionWebVersion.AssureCompatible(version);
+                        } else
+                        {
+                            lionWebVersionChecker(version);
+                        }
+                    }
+        
+                    break;
+        
+                case JsonTokenType.PropertyName when jsonStreamReader.GetString() == "nodes":
+                    insideNodes = true;
+                    break;
+        
+                case JsonTokenType.PropertyName when jsonStreamReader.GetString() != "nodes":
+                    insideNodes = false;
+                    break;
+        
+                case JsonTokenType.StartObject when insideNodes:
+                    var serializedNode = jsonStreamReader.Deserialize<SerializedNode>(_readOptions);
+                    if (serializedNode != null)
+                        deserializer.Process(serializedNode);
+        
+                    break;
+            }
+        }
+        
+        return deserializer.Finish().ToList();
     }
 }
 

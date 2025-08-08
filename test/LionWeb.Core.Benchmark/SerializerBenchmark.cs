@@ -72,7 +72,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
 
     [Benchmark]
     [TestMethod]
-    public async Task Serialize_Stream_Context_Async()
+    public async Task Serialize_Stream_Async_Aot()
     {
         await using Stream stream = File.Create(_streamFile);
         ISerializer serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
@@ -88,7 +88,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
 
     [Benchmark]
     [TestMethod]
-    public void Serialize_Stream_Context()
+    public void Serialize_Stream_Aot()
     {
         using Stream stream = File.Create(_streamFile);
         ISerializer serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
@@ -116,7 +116,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
 
     [Benchmark]
     [TestMethod]
-    public void Serialize_String_Context()
+    public void Serialize_String_Aot()
     {
         var output = JsonSerializer.Serialize((object)new SerializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
