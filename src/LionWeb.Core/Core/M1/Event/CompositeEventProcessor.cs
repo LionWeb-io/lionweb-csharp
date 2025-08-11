@@ -43,6 +43,10 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
     }
 
     /// <inheritdoc />
+    public string ProcessorId =>
+        _sender?.ToString() ?? GetType().Name;
+
+    /// <inheritdoc />
     public void Receive(TEvent message) =>
         _eventProcessors.First().Receive(message);
 

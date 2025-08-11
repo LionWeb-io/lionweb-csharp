@@ -116,7 +116,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     private void ReceiveEvent(IDeltaEvent deltaEvent)
     {
         Log(
-            $"received event: {deltaEvent.GetType()}({deltaEvent.OriginCommands},{deltaEvent.SequenceNumber})");
+            $"received event: {deltaEvent.GetType()}({string.Join(",", deltaEvent.OriginCommands.Select(oc => $"{oc.ParticipationId}:{oc.CommandId}"))},{deltaEvent.SequenceNumber})");
 
         CommandSource? commandSource = deltaEvent.OriginCommands.FirstOrDefault();
 

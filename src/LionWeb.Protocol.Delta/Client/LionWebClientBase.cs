@@ -59,6 +59,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
         _replicator = ForestEventReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
         
+        IProcessor.Forward((IForestProcessor)forest.GetCommander(), new LocalForestChangeReceiver(name, this));
         IProcessor.Forward(_replicator, new LocalForestReceiver(name, this));
 
         _connector.ReceiveFromRepository += OnReceiveFromRepository;
@@ -74,8 +75,8 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     }
 
     #region Local
-
-    private class LocalForestReceiver(object? sender, LionWebClientBase<T> client) : EventProcessorBase<IForestEvent>(sender)
+    
+    private class LocalForestChangeReceiver(object? sender, LionWebClientBase<T> client) : EventProcessorBase<IForestEvent>(sender)
     {
         public override void Receive(IForestEvent message)
         {
@@ -88,9 +89,13 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
                     client.OnLocalPartitionDeleted(partitionDeletedEvent);
                     break;
             }
-            
-            client.SendEventToRepository(sender, message);
         }
+    }
+    
+    private class LocalForestReceiver(object? sender, LionWebClientBase<T> client) : EventProcessorBase<IForestEvent>(sender)
+    {
+        public override void Receive(IForestEvent message) => 
+            client.SendEventToRepository(sender, message);
     }
     
     private class LocalPartitionReceiver(object? sender, LionWebClientBase<T> client) : EventProcessorBase<IPartitionEvent>(sender)

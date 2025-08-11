@@ -87,20 +87,6 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
             repository.SendEventToAllClients(sender, message);
     }
 
-    
-    private void LocalHandler(object? _, IForestEvent forestEvent)
-    {
-        switch (forestEvent)
-        {
-            case PartitionAddedEvent e:
-                OnLocalPartitionAdded(e);
-                break;
-            case PartitionDeletedEvent e:
-                OnLocalPartitionDeleted(e);
-                break;
-        }
-    }
-
     private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
     {
         var eventProcessor = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());

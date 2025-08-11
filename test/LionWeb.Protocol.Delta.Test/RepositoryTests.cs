@@ -110,7 +110,7 @@ public class RepositoryTests
         Assert.IsNotNull(bPartition);
         
         bPartition.AddAnnotations([new BillOfMaterials("bom")]);
-        _aClient.WaitForReceived(2);
+        _aClient.WaitForReceived(1);
 
         AssertEquals(_aForest.Partitions, _bForest.Partitions);
     }

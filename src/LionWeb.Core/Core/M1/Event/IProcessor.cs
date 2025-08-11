@@ -19,6 +19,8 @@ namespace LionWeb.Core.M1.Event;
 
 public interface IProcessor
 {
+    public string ProcessorId { get; }
+    
     public static void Forward<TReceiveFrom, TForward, TSendFrom>(
         IProcessor<TReceiveFrom, TForward> from,
         IProcessor<TForward, TSendFrom> to)

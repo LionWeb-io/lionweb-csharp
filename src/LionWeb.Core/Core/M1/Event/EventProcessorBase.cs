@@ -133,6 +133,10 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
     }
 
     /// <inheritdoc />
+    public string ProcessorId =>
+        _sender?.ToString() ?? GetType().Name;
+
+    /// <inheritdoc />
     public abstract void Receive(TEvent message);
 
     private event EventHandler<TEvent>? InternalEvent;
@@ -223,7 +227,7 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
         Console.WriteLine($"{indent}{this.GetType().Name}({_sender})");
         if (IProcessor.RecursionDetected(this, alreadyPrinted, indent))
             return;
-        
+
         Console.WriteLine($"{indent}Handlers:");
         foreach (var processor in this._handlers.Keys)
         {
@@ -237,13 +241,13 @@ public abstract class CommanderPublisherEventProcessorBase<TEvent>(object? sende
     where TEvent : IEvent
 {
     private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(sender);
-    
+
     /// <inheritdoc />
     public void Raise(TEvent @event)
     {
         if (@event.EventId == null)
             @event.EventId = _eventIdProvider.CreateEventId();
-        
+
         Receive(@event);
     }
 
@@ -258,7 +262,10 @@ public abstract class CommanderPublisherEventProcessorBase<TEvent>(object? sende
     public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
         where TSubscribedEvent : class, TEvent =>
         IProcessor.Forward<TEvent, TSubscribedEvent, TSubscribedEvent>(this,
-            new EventHandlerProcessor<TSubscribedEvent>(handler));
+            new EventHandlerProcessor<TSubscribedEvent>(handler)
+            {
+                ProcessorId = sender?.ToString() ?? GetType().Name
+            });
 
     /// <inheritdoc />
     public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
@@ -268,6 +275,8 @@ public abstract class CommanderPublisherEventProcessorBase<TEvent>(object? sende
 internal class EventHandlerProcessor<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
     : IEventProcessor<TSubscribedEvent>
 {
+    public required string ProcessorId { get; init; }
+
     /// <inheritdoc />
     public bool CanReceive(params Type[] messageTypes) =>
         throw new NotImplementedException();
@@ -294,7 +303,7 @@ internal class EventHandlerProcessor<TSubscribedEvent>(EventHandler<TSubscribedE
         Console.WriteLine($"{indent}{this.GetType().Name}");
         if (IProcessor.RecursionDetected(this, alreadyPrinted, indent))
             return;
-        
+
         if (handler is IProcessor p)
             p.PrintAllReceivers(alreadyPrinted, indent + "  ");
         else
