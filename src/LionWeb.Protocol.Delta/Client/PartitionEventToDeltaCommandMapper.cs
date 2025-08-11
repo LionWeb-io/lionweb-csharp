@@ -196,7 +196,7 @@ public class PartitionEventToDeltaCommandMapper
             []
         );
 
-    private DeleteAnnotation OnAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
+    private DeleteAnnotationCommand OnAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
         new(
             annotationDeletedEvent.Parent.GetId(),
             annotationDeletedEvent.Index,

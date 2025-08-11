@@ -60,7 +60,7 @@ public class DeltaCommandToPartitionEventMapper
             MoveAndReplaceChildFromOtherContainment a => OnMoveAndReplaceChildFromOtherContainment(a),
             MoveAndReplaceChildFromOtherContainmentInSameParent a => OnMoveAndReplaceChildFromOtherContainmentInSameParent(a),
             AddAnnotationCommand a => OnAddAnnotation(a),
-            DeleteAnnotation a => OnDeleteAnnotation(a),
+            DeleteAnnotationCommand a => OnDeleteAnnotation(a),
             MoveAnnotationFromOtherParent a => OnMoveAnnotationFromOtherParent(a),
             MoveAnnotationInSameParent a => OnMoveAnnotationInSameParent(a),
             AddReference a => OnAddReference(a),
@@ -310,15 +310,15 @@ public class DeltaCommandToPartitionEventMapper
         );
     }
 
-    private AnnotationDeletedEvent OnDeleteAnnotation(DeleteAnnotation deleteAnnotationEvent)
+    private AnnotationDeletedEvent OnDeleteAnnotation(DeleteAnnotationCommand deleteAnnotationCommand)
     {
-        var parent = ToNode(deleteAnnotationEvent.Parent);
-        var deletedAnnotation = parent.GetAnnotations()[deleteAnnotationEvent.Index];
+        var parent = ToNode(deleteAnnotationCommand.Parent);
+        var deletedAnnotation = parent.GetAnnotations()[deleteAnnotationCommand.Index];
         return new AnnotationDeletedEvent(
             deletedAnnotation as IWritableNode ?? throw new InvalidValueException(null, deletedAnnotation),
             parent,
-            deleteAnnotationEvent.Index,
-            ToEventId(deleteAnnotationEvent)
+            deleteAnnotationCommand.Index,
+            ToEventId(deleteAnnotationCommand)
         );
     }
 

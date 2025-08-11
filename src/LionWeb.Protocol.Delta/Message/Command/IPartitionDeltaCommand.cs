@@ -167,7 +167,7 @@ public record AddAnnotationCommand(
     ProtocolMessage[]? ProtocolMessages
 ) : DeltaCommandBase(CommandId, ProtocolMessages), IAnnotationCommand;
 
-public record DeleteAnnotation(
+public record DeleteAnnotationCommand(
     TargetNode Parent,
     Index Index,
     TargetNode DeletedAnnotation,
