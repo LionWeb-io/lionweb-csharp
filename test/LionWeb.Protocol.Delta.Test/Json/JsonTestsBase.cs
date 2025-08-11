@@ -193,10 +193,10 @@ public abstract class JsonTestsBase
 
     #region Annotations
 
-    protected static AddAnnotation CreateAddAnnotation() =>
+    protected static AddAnnotationCommand CreateAddAnnotationCommand() =>
         new(TargetNode(), Chunk(), Index(), CommandId(), ProtocolMessages());
 
-    protected static DeleteAnnotation CreateDeleteAnnotation() =>
+    protected static DeleteAnnotationCommand CreateDeleteAnnotationCommand() =>
         new(TargetNode(), Index(), TargetNode(), CommandId(), ProtocolMessages());
 
     protected static ReplaceAnnotation CreateReplaceAnnotation() =>
@@ -291,7 +291,7 @@ public abstract class JsonTestsBase
         new([
             CreateDeleteProperty(),
             CreateDeleteChild(),
-            CreateDeleteAnnotation(),
+            CreateDeleteAnnotationCommand(),
             CreateDeleteReference()
         ], CommandId(), ProtocolMessages());
 
@@ -314,8 +314,8 @@ public abstract class JsonTestsBase
         [CreateMoveAndReplaceChildFromOtherContainment()],
         [CreateMoveAndReplaceChildFromOtherContainmentInSameParent()],
         [CreateMoveAndReplaceChildInSameContainment()],
-        [CreateAddAnnotation()],
-        [CreateDeleteAnnotation()],
+        [CreateAddAnnotationCommand()],
+        [CreateDeleteAnnotationCommand()],
         [CreateReplaceAnnotation()],
         [CreateMoveAnnotationFromOtherParent()],
         [CreateMoveAnnotationInSameParent()],
