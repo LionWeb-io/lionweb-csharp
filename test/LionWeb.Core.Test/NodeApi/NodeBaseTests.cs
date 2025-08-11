@@ -49,11 +49,11 @@ public class NodeBaseTests
     }
     
     [TestMethod]
-    public void Set_IEventableNode()
+    public void Set_INotifiableNode()
     {
         var coord = new Coord("coord");
         
-        IEventableNode shape = new Circle("geom");
+        INotifiableNode shape = new Circle("geom");
         shape.Set(ShapesLanguage.Instance.Circle_center, coord);
 
         Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
@@ -61,11 +61,11 @@ public class NodeBaseTests
     }
 
     [TestMethod]
-    public void Set_IEventableNode_Generic()
+    public void Set_INotifiableNode_Generic()
     {
         var coord = new Coord("coord");
         
-        IEventableNode<INode> shape = new Circle("geom");
+        INotifiableNode<INode> shape = new Circle("geom");
         shape.Set(ShapesLanguage.Instance.Circle_center, coord);
 
         Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
@@ -125,11 +125,11 @@ public class NodeBaseTests
     }
     
     [TestMethod]
-    public void Set_IEventableNode_with_null_eventId()
+    public void Set_INotifiableNode_with_null_eventId()
     {
         var coord = new Coord("coord");
         
-        IEventableNode shape = new Circle("geom");
+        INotifiableNode shape = new Circle("geom");
         shape.Set(ShapesLanguage.Instance.Circle_center, coord, null);
 
         Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
@@ -137,11 +137,11 @@ public class NodeBaseTests
     }
 
     [TestMethod]
-    public void Set_IEventableNode_Generic_with_null_eventId()
+    public void Set_INotifiableNode_Generic_with_null_eventId()
     {
         var coord = new Coord("coord");
         
-        IEventableNode<INode> shape = new Circle("geom");
+        INotifiableNode<INode> shape = new Circle("geom");
         shape.Set(ShapesLanguage.Instance.Circle_center, coord, null);
 
         Assert.AreEqual(1, shape.CollectAllSetFeatures().ToList().Count);
@@ -179,12 +179,12 @@ public class NodeBaseTests
     }
 
     [TestMethod]
-    public void AddAnnotations_IEventableNode()
+    public void AddAnnotations_INotifiableNode()
     {
         var doc = new Documentation("circ0");
         var bom = new BillOfMaterials("off0");
         
-        IEventableNode shape = new Circle("geom");
+        INotifiableNode shape = new Circle("geom");
         shape.AddAnnotations([doc, bom]);
         
         Assert.AreEqual(2, shape.GetAnnotations().Count);
@@ -192,12 +192,12 @@ public class NodeBaseTests
     }
     
     [TestMethod]
-    public void AddAnnotations_IEventableNode_Generic()
+    public void AddAnnotations_INotifiableNode_Generic()
     {
         var doc = new Documentation("circ0");
         var bom = new BillOfMaterials("off0");
         
-        IEventableNode<INode> shape = new Circle("geom");
+        INotifiableNode<INode> shape = new Circle("geom");
         shape.AddAnnotations([doc, bom]);
         
         Assert.AreEqual(2, shape.GetAnnotations().Count);
@@ -262,12 +262,12 @@ public class NodeBaseTests
     }
 
     [TestMethod]
-    public void InsertAnnotations_IEventableNode()
+    public void InsertAnnotations_INotifiableNode()
     {
         var doc = new Documentation("circ0");
         var bom = new BillOfMaterials("off0");
         
-        IEventableNode shape = new Circle("geom");
+        INotifiableNode shape = new Circle("geom");
         shape.InsertAnnotations(0, [doc, bom]);
         
         Assert.AreEqual(2, shape.GetAnnotations().Count);
@@ -275,12 +275,12 @@ public class NodeBaseTests
     }
 
     [TestMethod]
-    public void InsertAnnotations_IEventableNode_Generic()
+    public void InsertAnnotations_INotifiableNode_Generic()
     {
         var doc = new Documentation("circ0");
         var bom = new BillOfMaterials("off0");
         
-        IEventableNode<INode> shape = new Circle("geom");
+        INotifiableNode<INode> shape = new Circle("geom");
         shape.InsertAnnotations(0, [doc, bom]);
         
         Assert.AreEqual(2, shape.GetAnnotations().Count);
@@ -346,12 +346,12 @@ public class NodeBaseTests
     }
 
     [TestMethod]
-    public void RemoveAnnotations_IEventableNode()
+    public void RemoveAnnotations_INotifiableNode()
     {
         var doc = new Documentation("circ0");
         var bom = new BillOfMaterials("off0");
         
-        IEventableNode shape = new Circle("geom");
+        INotifiableNode shape = new Circle("geom");
         shape.InsertAnnotations(0, [doc, bom]);
         shape.RemoveAnnotations([bom]);
         
@@ -360,12 +360,12 @@ public class NodeBaseTests
     }
 
     [TestMethod]
-    public void RemoveAnnotations_IEventableNode_Generic()
+    public void RemoveAnnotations_INotifiableNode_Generic()
     {
         var doc = new Documentation("circ0");
         var bom = new BillOfMaterials("off0");
         
-        IEventableNode<INode> shape = new Circle("geom");
+        INotifiableNode<INode> shape = new Circle("geom");
         shape.InsertAnnotations(0, [doc, bom]);
         shape.RemoveAnnotations([bom]);
         

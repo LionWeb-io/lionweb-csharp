@@ -306,7 +306,7 @@ public interface IStructuredDataTypeInstance
 }
 
 /// Every model node is an instance of <see cref="INode"/>.
-public interface INode : IEventableNode<INode>;
+public interface INode : INotifiableNode<INode>;
 
 /// Base implementation of <see cref="IReadableNode{T}"/>.
 public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode

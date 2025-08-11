@@ -22,10 +22,10 @@ using M2;
 using M3;
 
 /// <summary>
-/// Represents an interface for nodes that support events with optional event identifiers.
+/// Represents an interface for nodes that support notifications with optional notification identifiers.
 /// </summary>
 /// <seealso cref="INotification"/>
-public interface IEventableNode : IWritableNode
+public interface INotifiableNode : IWritableNode
 {
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => AddAnnotations(annotations, null);
 
@@ -52,15 +52,15 @@ public interface IEventableNode : IWritableNode
     public void Set(Feature feature, object? value, IEventId? eventId = null);
 }
 
-/// The type-parametrized twin of the non-generic <see cref="LionWeb.Core.IEventableNode"/> interface.
-public interface IEventableNode<T> : IEventableNode, IWritableNode<T> where T : class, IEventableNode
+/// The type-parametrized twin of the non-generic <see cref="INotifiableNode"/> interface.
+public interface INotifiableNode<T> : INotifiableNode, IWritableNode<T> where T : class, INotifiableNode
 {
     #region AddAnnotations
 
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => 
         AddAnnotations(M2Extensions.AsNodes<T>(annotations), null);
     
-    void IEventableNode.AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
+    void INotifiableNode.AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
         AddAnnotations(M2Extensions.AsNodes<T>(annotations), eventId);
     
     void IWritableNode<T>.AddAnnotations(IEnumerable<T> annotations) => 
@@ -77,7 +77,7 @@ public interface IEventableNode<T> : IEventableNode, IWritableNode<T> where T : 
     void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
         InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations), null);
     
-    void IEventableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId? eventId) =>
+    void INotifiableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId? eventId) =>
         InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations), eventId);
     
     void IWritableNode<T>.InsertAnnotations(Index index, IEnumerable<T> annotations) =>
@@ -94,7 +94,7 @@ public interface IEventableNode<T> : IEventableNode, IWritableNode<T> where T : 
     bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => 
         RemoveAnnotations(M2Extensions.AsNodes<T>(annotations), null);
 
-    bool IEventableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
+    bool INotifiableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
         RemoveAnnotations(M2Extensions.AsNodes<T>(annotations), eventId);
 
     bool IWritableNode<T>.RemoveAnnotations(IEnumerable<T> annotations) => 
