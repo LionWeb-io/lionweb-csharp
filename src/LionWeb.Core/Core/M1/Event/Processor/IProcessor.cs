@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.M1.Event.Processor;
 
-/// A member in a directed graph that send messages.
+/// A member in a directed graph that sends messages.
 /// Each member is <see cref="Connect{TReceiveFrom,TConnected,TSendFrom}">connected</see>
 /// <i>from</i> one or more <i>preceding</i> processors, and
 /// <i>to</i> one or more <i>following</i> processors.
@@ -44,6 +44,10 @@ public interface IProcessor
         IProcessor<TConnected, TSendFrom> to) =>
         from.Subscribe(to);
 
+    /// Unsubscribes <paramref name="receiver"/> from this.
+    /// For internal use only -- each processor should unsubscribe itself from all <i>preceding</i> processors on disposal.
+    protected internal void Unsubscribe<T>(IProcessor receiver);
+    
     protected internal void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "");
 
     protected static bool RecursionDetected(IProcessor self, List<IProcessor> alreadyPrinted, string indent)
@@ -64,7 +68,7 @@ public interface IProcessor
 }
 
 /// A processor that receives <typeparamref name="TReceive"/> messages and sends <typeparamref name="TSend"/> messages.
-public interface IProcessor<in TReceive, in TSend> : IProcessor
+public interface IProcessor<in TReceive, in TSend> : IProcessor, IDisposable
 {
     /// Whether anybody would receive any of the <paramref name="messageTypes"/> events.
     /// Useful for returning eagerly from complex logic to calculate the event contents.
@@ -85,8 +89,4 @@ public interface IProcessor<in TReceive, in TSend> : IProcessor
     /// <see cref="Receive">receives</see> all messages <see cref="Send">sent</see> by this processor.
     /// For internal use only, use <see cref="IProcessor.Connect{TReceiveFrom,TForward,TSendFrom}"/>.
     internal void Subscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver);
-
-    /// Unsubscribes <paramref name="receiver"/> from this.
-    /// For internal use only -- each processor should unsubscribe itself from all <i>preceding</i> processors on disposal.
-    protected internal void Unsubscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver);
 }

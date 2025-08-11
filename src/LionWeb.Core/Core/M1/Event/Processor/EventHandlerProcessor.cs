@@ -20,6 +20,10 @@ namespace LionWeb.Core.M1.Event.Processor;
 internal class EventHandlerProcessor<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
     : IEventProcessor<TSubscribedEvent> where TSubscribedEvent : IEvent
 {
+    public void Dispose()
+    {
+    }
+
     public required string ProcessorId { get; init; }
 
     /// <inheritdoc />
@@ -39,7 +43,7 @@ internal class EventHandlerProcessor<TSubscribedEvent>(EventHandler<TSubscribedE
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Unsubscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) =>
+    void IProcessor.Unsubscribe<T>(IProcessor receiver) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />

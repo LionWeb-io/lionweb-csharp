@@ -55,6 +55,16 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
     }
 
     /// <inheritdoc />
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        foreach (IEventProcessor<TEvent> eventProcessor in _eventProcessors.Reverse())
+        {
+            eventProcessor.Dispose();
+        }
+    }
+
+    /// <inheritdoc />
     public string ProcessorId =>
         _sender?.ToString() ?? GetType().Name;
 
@@ -72,9 +82,9 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
     void IProcessor<TEvent, TEvent>.Subscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) => 
         _lastProcessor.Subscribe(receiver);
 
-    void IProcessor<TEvent, TEvent>.Unsubscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) =>
-        _lastProcessor.Unsubscribe(receiver);
-
+    void IProcessor.Unsubscribe<T>(IProcessor receiver) =>
+        _lastProcessor.Unsubscribe<T>(receiver);
+    
     /// <inheritdoc />
     public void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "")
     {

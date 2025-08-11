@@ -58,6 +58,21 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
     }
 
     /// <inheritdoc />
+    public void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        foreach (var (processor, handler) in _handlers)
+        {
+            UnsubscribeProcessor(processor, handler);
+        }
+        
+        return;
+        
+        void UnsubscribeProcessor<T>(IProcessor processor, EventHandler<T> _) =>
+            Unsubscribe<T>(processor);
+    }
+
+    /// <inheritdoc />
     public string ProcessorId =>
         Sender.ToString() ?? GetType().Name;
 
@@ -131,18 +146,18 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
     }
 
     /// <inheritdoc />
-    void IProcessor<TEvent, TEvent>.Unsubscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) =>
-        Unsubscribe(receiver);
+    void IProcessor.Unsubscribe<T>(IProcessor receiver) =>
+        Unsubscribe<T>(receiver);
 
-    /// <inheritdoc cref="IProcessor{TReceive,TSend}.Unsubscribe{TReceiveTo,TSendTo}"/>
-    protected void Unsubscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver)
+    /// <inheritdoc cref="IProcessor.Unsubscribe{T}"/>
+    private void Unsubscribe<T>(IProcessor receiver)
     {
         if (!_handlers.Remove(receiver, out var handler))
             return;
 
         InternalEvent -= handler;
 
-        UnregisterSubscribedEvents<TReceiveTo>();
+        UnregisterSubscribedEvents<T>();
     }
 
     /// <inheritdoc />
