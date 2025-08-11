@@ -87,13 +87,13 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         Method("SetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
                 Param("value", NullableType(AsType(typeof(object)))),
-                ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
+                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    IfStatement(ParseExpression("base.SetInternal(feature, value, eventId)"),
+                    IfStatement(ParseExpression("base.SetInternal(feature, value, notificationId)"),
                         ReturnTrue())
                 }
                 .Concat(FeaturesToImplement(classifier).Select(GenSetInternal))
@@ -130,7 +130,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(property)), AsArguments([IdentifierName("v"), IdentifierName("eventId")]))),
+                        IdentifierName(FeatureSet(property)), AsArguments([IdentifierName("v"), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
@@ -144,7 +144,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(property)), AsArguments([CastValueType(property), IdentifierName("eventId")]))),
+                        IdentifierName(FeatureSet(property)), AsArguments([CastValueType(property), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
@@ -158,7 +158,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(link)), AsArguments([IdentifierName("v"), IdentifierName("eventId")]))),
+                        IdentifierName(FeatureSet(link)), AsArguments([IdentifierName("v"), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
@@ -172,7 +172,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link), IdentifierName("eventId")]))),
+                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
@@ -237,18 +237,18 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private LocalDeclarationStatementSyntax SetContainmentEventVariable(Containment containment) =>
         Variable(
             "evt",
-            AsType(typeof(ContainmentSetEventEmitter<>), AsType(containment.GetFeatureType())),
+            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType())),
             NewCall([
-                MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("eventId")
+                MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("notificationId")
             ])
         );
 
     private LocalDeclarationStatementSyntax SetReferenceEventVariable(Reference reference) =>
         Variable(
             "evt",
-            AsType(typeof(ReferenceSetEventEmitter<>), AsType(reference.GetFeatureType())),
+            AsType(typeof(ReferenceSetNotificationEmitter<>), AsType(reference.GetFeatureType())),
             NewCall([
-                MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference), IdentifierName("eventId")
+                MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference), IdentifierName("notificationId")
             ])
         );
 

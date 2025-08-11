@@ -410,8 +410,8 @@ public class DeltaCommandToPartitionEventMapper
     #endregion
 
 
-    private static IEventId ToEventId(IDeltaCommand command) =>
-        new ParticipationEventId(command.InternalParticipationId, command.CommandId);
+    private static INotificationId ToEventId(IDeltaCommand command) =>
+        new ParticipationNotificationId(command.InternalParticipationId, command.CommandId);
 
     private IWritableNode ToNode(TargetNode nodeId)
     {

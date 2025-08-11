@@ -274,9 +274,9 @@ public class PartitionEventToDeltaCommandMapper
     }
 
     private CommandId ToCommandId(INotification notification) =>
-        notification.EventId switch
+        notification.NotificationId switch
         {
-            ParticipationEventId pei => pei.CommandId,
+            ParticipationNotificationId pei => pei.CommandId,
             _ => _commandIdProvider.Create()
         };
 }

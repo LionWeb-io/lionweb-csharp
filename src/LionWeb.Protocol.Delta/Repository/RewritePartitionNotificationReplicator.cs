@@ -22,22 +22,22 @@ using Core.M1.Event;
 using Core.M1.Event.Partition;
 using System.Diagnostics;
 
-internal class RewritePartitionEventReplicator(
+internal class RewritePartitionNotificationReplicator(
     IPartitionInstance localPartition,
     SharedNodeMap sharedNodeMap = null)
-    : PartitionEventReplicator(localPartition, sharedNodeMap)
+    : PartitionNotificationReplicator(localPartition, sharedNodeMap)
 {
-    private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];
+    private readonly Dictionary<INotificationId, INotificationId> _originalEventIds = [];
         
     protected override void SuppressEventForwarding(IPartitionNotification partitionNotification, Action action)
     {
-        IEventId? eventId = null;
+        INotificationId? eventId = null;
         if (_localCommander != null)
         {
             eventId = _localCommander.CreateEventId();
-            var originalEventId = partitionNotification.EventId;
+            var originalEventId = partitionNotification.NotificationId;
             _originalEventIds[eventId] = originalEventId;
-            RegisterEventId(eventId);
+            RegisterNotificationId(eventId);
         }
 
         try
@@ -47,7 +47,7 @@ internal class RewritePartitionEventReplicator(
         {
             if (eventId != null)
             {
-                UnregisterEventId(eventId);
+                UnregisterNotificationId(eventId);
                 _originalEventIds.Remove(eventId);
             }
         }
@@ -57,11 +57,11 @@ internal class RewritePartitionEventReplicator(
     {
         IPartitionNotification? result = base.Filter<TSubscribedEvent>(partitionNotification);
         Debug.WriteLine($"result: {result}");
-        if (_originalEventIds.TryGetValue(partitionNotification.EventId, out var originalId))
+        if (_originalEventIds.TryGetValue(partitionNotification.NotificationId, out var originalId))
         {
             Debug.WriteLine($"originalId: {originalId}");
             result = partitionNotification;
-            result.EventId = originalId;
+            result.NotificationId = originalId;
         }
 
         return (TSubscribedEvent?)result;

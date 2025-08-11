@@ -30,26 +30,26 @@ public interface INotifiableNode : IWritableNode
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => AddAnnotations(annotations, null);
 
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public void AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null);
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    public void AddAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId = null);
 
     void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) => InsertAnnotations(index, annotations, null);
 
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId? eventId = null);
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    public void InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, INotificationId? notificationId = null);
 
     bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => RemoveAnnotations(annotations, null);
 
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId = null);
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId = null);
 
     void IWritableNode.Set(Feature feature, object? value) => Set(feature, value, null);
 
     /// <inheritdoc cref="IWritableNode.Set"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public void Set(Feature feature, object? value, IEventId? eventId = null);
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    public void Set(Feature feature, object? value, INotificationId? notificationId = null);
 }
 
 /// The type-parametrized twin of the non-generic <see cref="INotifiableNode"/> interface.
@@ -60,15 +60,15 @@ public interface INotifiableNode<T> : INotifiableNode, IWritableNode<T> where T 
     void IWritableNode.AddAnnotations(IEnumerable<IWritableNode> annotations) => 
         AddAnnotations(M2Extensions.AsNodes<T>(annotations), null);
     
-    void INotifiableNode.AddAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
-        AddAnnotations(M2Extensions.AsNodes<T>(annotations), eventId);
+    void INotifiableNode.AddAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId) => 
+        AddAnnotations(M2Extensions.AsNodes<T>(annotations), notificationId);
     
     void IWritableNode<T>.AddAnnotations(IEnumerable<T> annotations) => 
         AddAnnotations(M2Extensions.AsNodes<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.AddAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public void AddAnnotations(IEnumerable<T> annotations, IEventId? eventId = null);
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    public void AddAnnotations(IEnumerable<T> annotations, INotificationId? notificationId = null);
 
     #endregion
 
@@ -77,15 +77,15 @@ public interface INotifiableNode<T> : INotifiableNode, IWritableNode<T> where T 
     void IWritableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations) =>
         InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations), null);
     
-    void INotifiableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, IEventId? eventId) =>
-        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations), eventId);
+    void INotifiableNode.InsertAnnotations(Index index, IEnumerable<IWritableNode> annotations, INotificationId? notificationId) =>
+        InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations), notificationId);
     
     void IWritableNode<T>.InsertAnnotations(Index index, IEnumerable<T> annotations) =>
         InsertAnnotations(index, M2Extensions.AsNodes<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.InsertAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param> 
-    public void InsertAnnotations(Index index, IEnumerable<T> annotations, IEventId? eventId = null);
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param> 
+    public void InsertAnnotations(Index index, IEnumerable<T> annotations, INotificationId? notificationId = null);
 
     #endregion
 
@@ -94,15 +94,15 @@ public interface INotifiableNode<T> : INotifiableNode, IWritableNode<T> where T 
     bool IWritableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations) => 
         RemoveAnnotations(M2Extensions.AsNodes<T>(annotations), null);
 
-    bool INotifiableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, IEventId? eventId) => 
-        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations), eventId);
+    bool INotifiableNode.RemoveAnnotations(IEnumerable<IWritableNode> annotations, INotificationId? notificationId) => 
+        RemoveAnnotations(M2Extensions.AsNodes<T>(annotations), notificationId);
 
     bool IWritableNode<T>.RemoveAnnotations(IEnumerable<T> annotations) => 
         RemoveAnnotations(M2Extensions.AsNodes<T>(annotations));
 
     /// <inheritdoc cref="IWritableNode.RemoveAnnotations"/>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
-    public bool RemoveAnnotations(IEnumerable<T> annotations, IEventId? eventId = null);
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
+    public bool RemoveAnnotations(IEnumerable<T> annotations, INotificationId? notificationId = null);
 
     #endregion
 }

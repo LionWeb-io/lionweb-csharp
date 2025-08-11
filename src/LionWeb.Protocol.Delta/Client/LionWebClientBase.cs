@@ -67,7 +67,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient
 
         SharedNodeMap = new();
         PartitionEventHandler = new PartitionEventHandler(name);
-        var replicator = new PartitionEventReplicator(partition, SharedNodeMap);
+        var replicator = new PartitionNotificationReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(PartitionEventHandler);
 
         replicator.Subscribe<IPartitionNotification>(SendPartitionEventToRepository);

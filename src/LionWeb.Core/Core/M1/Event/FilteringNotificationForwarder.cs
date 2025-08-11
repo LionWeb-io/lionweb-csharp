@@ -19,9 +19,9 @@ namespace LionWeb.Core.M1.Event;
 
 using System.Diagnostics;
 
-/// Forwards events raised by <paramref name="localPublisher"/> to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>
+/// Forwards notifications raised by <paramref name="localPublisher"/> to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>
 /// if the event passes <see cref="Filter{TSubscribedEvent}"/>.
-public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
+public abstract class FilteringNotificationForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
     : IDisposable, IPublisher<TEvent>
     where TEvent : class, INotification
     where TPublisher : IPublisher<TEvent>
@@ -41,7 +41,7 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
                 return;
 
             var r = Filter<TSubscribedEvent>(s);
-            Debug.WriteLine($"Forwarding event id {@event.EventId}: {r?.EventId}");
+            Debug.WriteLine($"Forwarding event id {@event.NotificationId}: {r?.NotificationId}");
             if (r is not null)
                 handler(sender, s);
         };
@@ -86,25 +86,25 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
     protected abstract TSubscribedEvent? Filter<TSubscribedEvent>(TEvent @event) where TSubscribedEvent : class, TEvent;
 }
 
-/// Suppresses all events with <see cref="RegisterEventId">registered event ids</see>.
-public abstract class EventIdFilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
-    : FilteringEventForwarder<TEvent, TPublisher>(localPublisher)
+/// Suppresses all notifications with <see cref="RegisterNotificationId">registered notification ids</see>.
+public abstract class NotificationIdFilteringNotificationForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
+    : FilteringNotificationForwarder<TEvent, TPublisher>(localPublisher)
     where TEvent : class, INotification where TPublisher : IPublisher<TEvent>
 {
-    private readonly HashSet<IEventId> _eventIds = [];
+    private readonly HashSet<INotificationId> _notificationIds = [];
 
-    /// Suppresses future events with <paramref name="eventId"/> from <see cref="FilteringEventForwarder{TEvent,TPublisher}.Subscribe{TSubscribedEvent}">subscribers</see>.
-    protected void RegisterEventId(IEventId eventId) =>
-        _eventIds.Add(eventId);
+    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="FilteringNotificationForwarder{TEvent,TPublisher}.Subscribe{TSubscribedEvent}">subscribers</see>.
+    protected void RegisterNotificationId(INotificationId notificationId) =>
+        _notificationIds.Add(notificationId);
 
-    /// Forwards future events with <paramref name="eventId"/> to <see cref="FilteringEventForwarder{TEvent,TPublisher}.Subscribe{TSubscribedEvent}">subscribers</see>.
-    protected void UnregisterEventId(IEventId eventId) =>
-        _eventIds.Remove(eventId);
+    /// Forwards future notifications with <paramref name="notificationId"/> to <see cref="FilteringNotificationForwarder{TEvent,TPublisher}.Subscribe{TSubscribedEvent}">subscribers</see>.
+    protected void UnregisterNotificationId(INotificationId notificationId) =>
+        _notificationIds.Remove(notificationId);
 
     /// <inheritdoc />
     protected override TSubscribedEvent? Filter<TSubscribedEvent>(TEvent @event)  where TSubscribedEvent : class
     {
-        var result = !_eventIds.Contains(@event.EventId);
+        var result = !_notificationIds.Contains(@event.NotificationId);
         return result ? @event as TSubscribedEvent : null;
     }
 }

@@ -94,8 +94,8 @@ public class EventTests_Infrastructure
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        var cloneReplicator = new PartitionEventReplicator(node);
+        var replicator = new PartitionNotificationReplicator(clone);
+        var cloneReplicator = new PartitionNotificationReplicator(node);
         
         replicator.ReplicateFrom(cloneReplicator);
         cloneReplicator.ReplicateFrom(replicator);
@@ -123,8 +123,8 @@ public class EventTests_Infrastructure
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        var cloneReplicator = new PartitionEventReplicator(node);
+        var replicator = new PartitionNotificationReplicator(clone);
+        var cloneReplicator = new PartitionNotificationReplicator(node);
         
         replicator.ReplicateFrom(cloneReplicator);
         cloneReplicator.ReplicateFrom(replicator);
@@ -138,12 +138,12 @@ public class EventTests_Infrastructure
         Assert.AreEqual(0, ReplicatorEventIds(cloneReplicator).Count);
     }
 
-    private static HashSet<IEventId> ReplicatorEventIds(PartitionEventReplicator replicator)
+    private static HashSet<INotificationId> ReplicatorEventIds(PartitionNotificationReplicator replicator)
     {
-        var type = typeof(EventIdFilteringEventForwarder<IPartitionNotification, IPartitionPublisher>);
-        var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_eventIds");
+        var type = typeof(NotificationIdFilteringNotificationForwarder<IPartitionNotification, IPartitionPublisher>);
+        var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_notificationIds");
         var value = fieldInfo.GetValue(replicator);
-        return (HashSet<IEventId>)value!;
+        return (HashSet<INotificationId>)value!;
     }
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

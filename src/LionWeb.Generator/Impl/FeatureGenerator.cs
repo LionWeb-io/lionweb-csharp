@@ -119,8 +119,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private LocalDeclarationStatementSyntax PropertyEventVariable() =>
         Variable(
             "evt",
-            AsType(typeof(PropertyEventEmitter)),
-            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("eventId")])
+            AsType(typeof(PropertyNotificationEmitter)),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
     
     private MethodDeclarationSyntax TryGet(bool writeable = false) =>
@@ -227,8 +227,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private LocalDeclarationStatementSyntax SingleContainmentEventVariable() =>
         Variable(
             "evt",
-            AsType(typeof(ContainmentSingleEventEmitter<>), AsType(feature.GetFeatureType(), writeable:true)),
-            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("eventId")])
+            AsType(typeof(ContainmentSingleNotificationEmitter<>), AsType(feature.GetFeatureType(), writeable:true)),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
@@ -253,8 +253,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private LocalDeclarationStatementSyntax ReferenceEventVariable() =>
         Variable(
             "evt",
-            AsType(typeof(ReferenceSingleEventEmitter)),
-            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("eventId")])
+            AsType(typeof(ReferenceSingleNotificationEmitter)),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
@@ -371,9 +371,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(ExpressionSyntax index) =>
         Variable(
             "evt",
-            AsType(typeof(ContainmentAddMultipleEventEmitter<>), AsType(feature.GetFeatureType())),
+            AsType(typeof(ContainmentAddMultipleNotificationEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([
-                MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index, IdentifierName("eventId")
+                MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index, IdentifierName("notificationId")
             ])
         );
 
@@ -424,9 +424,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private LocalDeclarationStatementSyntax AddMultipleReferenceEventVariable(ExpressionSyntax index) =>
         Variable(
             "evt",
-            AsType(typeof(ReferenceAddMultipleEventEmitter<>), AsType(feature.GetFeatureType())),
+            AsType(typeof(ReferenceAddMultipleNotificationEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([
-                MetaProperty(feature), This(), IdentifierName("safeNodes"), index, IdentifierName("eventId")
+                MetaProperty(feature), This(), IdentifierName("safeNodes"), index, IdentifierName("notificationId")
             ])
         );
 
@@ -747,7 +747,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         Method(FeatureSet().ToString(), AsType(classifier),
                 [
                     Param("value", AsType(feature.GetFeatureType(), writeable: writeable)), 
-                    ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
+                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -824,7 +824,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private MethodDeclarationSyntax AbstractOptionalFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier), [
                 Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable))),
-                ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
+                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
@@ -852,7 +852,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         Method(LinkRemove(link).ToString(), AsType(classifier),
                 [
                     Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type))),
-                    ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
+                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
@@ -881,7 +881,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         Method(LinkInsert(link).ToString(), AsType(classifier), [
                 Param("index", AsType(typeof(int))),
                 Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type))),
-                ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
+                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
@@ -908,7 +908,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         Method(LinkAdd(link).ToString(), AsType(classifier),
                 [
                     Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type))),
-                    ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
+                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))

@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
-public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
+public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBase<INode>
 {
     private readonly IReadableNode? _newTarget;
     private readonly IReadableNode? _oldTarget;
@@ -28,8 +28,8 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
     /// Raises either <see cref="ReferenceAddedNotification"/>, <see cref="ReferenceDeletedNotification"/> or
     /// <see cref="ReferenceChangedNotification"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
-    public ReferenceSingleEventEmitter(Reference reference, NodeBase destinationParent, IReadableNode? newTarget,
-        IReadableNode? oldTarget, IEventId? eventId = null) : base(reference, destinationParent, eventId)
+    public ReferenceSingleNotificationEmitter(Reference reference, NodeBase destinationParent, IReadableNode? newTarget,
+        IReadableNode? oldTarget, INotificationId? notificationId = null) : base(reference, destinationParent, notificationId)
     {
         _newTarget = newTarget;
         _oldTarget = oldTarget;
@@ -39,7 +39,7 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
     public override void CollectOldData() { }
 
     /// <inheritdoc />
-    public override void RaiseEvent()
+    public override void Notify()
     {
         if (!IsActive())
             return;
@@ -49,18 +49,18 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
             case (null, { } v):
                 IReferenceTarget newTarget = new ReferenceTarget(null, v);
                 PartitionCommander.Raise(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
             case ({ } o, null):
                 IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
                 PartitionCommander.Raise(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
             case ({ } o, { } n):
                 IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
                 PartitionCommander.Raise(new ReferenceChangedNotification(DestinationParent, Reference, 0,
                     new ReferenceTarget(null, n), replacedTarget,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
         }
     }

@@ -19,12 +19,13 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 
 using M3;
 
-public abstract class ReferenceEventEmitterBase<T> : PartitionEventEmitterBase<T> where T : IReadableNode
+public abstract class ReferenceMultipleNotificationEmitterBase<T> : ReferenceNotificationEmitterBase<T> where T : IReadableNode
 {
-    protected readonly Reference Reference;
+    protected readonly List<T> SafeNodes;
 
-    protected ReferenceEventEmitterBase(Reference reference, NodeBase destinationParent, IEventId? eventId) : base(destinationParent, eventId)
+    protected ReferenceMultipleNotificationEmitterBase(Reference reference, NodeBase destinationParent, List<T> safeNodes,
+        INotificationId? notificationId) : base(reference, destinationParent, notificationId)
     {
-        Reference = reference;
+        SafeNodes = safeNodes;
     }
 }

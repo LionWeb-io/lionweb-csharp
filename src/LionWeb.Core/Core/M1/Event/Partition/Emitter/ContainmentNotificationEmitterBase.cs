@@ -20,22 +20,22 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 using M2;
 using M3;
 
-/// Encapsulates event-related logic and data for <see cref="Containment"/>s.
+/// Encapsulates notification-related logic and data for <see cref="Containment"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
-public abstract class ContainmentEventEmitterBase<T> : PartitionEventEmitterBase<T> where T : INode
+public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificationEmitterBase<T> where T : INode
 {
     /// Represented <see cref="Containment"/>.
     protected readonly Containment Containment;
 
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
-    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
-    protected ContainmentEventEmitterBase(Containment containment, NodeBase destinationParent, IEventId? eventId = null) : base(destinationParent, eventId)
+    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    protected ContainmentNotificationEmitterBase(Containment containment, NodeBase destinationParent, INotificationId? notificationId = null) : base(destinationParent, notificationId)
     {
         Containment = containment;
     }
 
-    /// Collects <see cref="OldContainmentInfo"/> from <paramref name="value"/>, to be used in <see cref="PartitionEventEmitterBase{T}.CollectOldData"/>
+    /// Collects <see cref="OldContainmentInfo"/> from <paramref name="value"/>, to be used in <see cref="PartitionNotificationEmitterBase{T}.CollectOldData"/>
     protected OldContainmentInfo? Collect(T value)
     {
         var oldParent = value.GetParent();

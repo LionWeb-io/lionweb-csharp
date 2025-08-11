@@ -108,7 +108,7 @@ public class DynamicNode : NodeBase
     }
 
     /// <inheritdoc />
-    protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
     {
         if (base.SetInternal(feature, value))
             return true;

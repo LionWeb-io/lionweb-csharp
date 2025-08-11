@@ -193,16 +193,16 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, IEventId? eventId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value, INotificationId? eventId = null) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedAbstractConcept SetName(string value, IEventId? eventId = null)
+        public NamedAbstractConcept SetName(string value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
+		PropertyNotificationEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
 		evt.CollectOldData();
 		_name = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -227,7 +227,7 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;
@@ -275,16 +275,16 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, IEventId? eventId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value, INotificationId? eventId = null) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedAnn SetName(string value, IEventId? eventId = null)
+        public NamedAnn SetName(string value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
+		PropertyNotificationEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
 		evt.CollectOldData();
 		_name = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -309,7 +309,7 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;
@@ -357,16 +357,16 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, IEventId? eventId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value, INotificationId? eventId = null) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedConcept SetName(string value, IEventId? eventId = null)
+        public NamedConcept SetName(string value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
+		PropertyNotificationEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
 		evt.CollectOldData();
 		_name = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -391,7 +391,7 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;
@@ -455,16 +455,16 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, IEventId? eventId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value, INotificationId? eventId = null) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedIfaceAnn SetName(string value, IEventId? eventId = null)
+        public NamedIfaceAnn SetName(string value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
+		PropertyNotificationEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
 		evt.CollectOldData();
 		_name = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -489,7 +489,7 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;
@@ -537,16 +537,16 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, IEventId? eventId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value, INotificationId? eventId = null) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public NamedIfaceConcept SetName(string value, IEventId? eventId = null)
+        public NamedIfaceConcept SetName(string value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyEventEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
+		PropertyNotificationEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
 		evt.CollectOldData();
 		_name = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -571,7 +571,7 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;

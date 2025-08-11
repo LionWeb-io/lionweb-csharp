@@ -124,13 +124,13 @@ public partial class EnumHolder : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public EnumHolder SetEnumValue(MyEnum value, IEventId? eventId = null)
+        public EnumHolder SetEnumValue(MyEnum value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, WithEnumLanguage.Instance.EnumHolder_enumValue);
-		PropertyEventEmitter evt = new(WithEnumLanguage.Instance.EnumHolder_enumValue, this, value, _enumValue, eventId);
+		PropertyNotificationEmitter evt = new(WithEnumLanguage.Instance.EnumHolder_enumValue, this, value, _enumValue, eventId);
 		evt.CollectOldData();
 		_enumValue = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -155,7 +155,7 @@ public partial class EnumHolder : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;

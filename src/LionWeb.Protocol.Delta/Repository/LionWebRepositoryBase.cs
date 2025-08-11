@@ -53,7 +53,7 @@ public abstract class LionWebRepositoryBase<T>
 
         SharedNodeMap = new();
         PartitionEventHandler = new PartitionEventHandler(name);
-        var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
+        var replicator = new RewritePartitionNotificationReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(PartitionEventHandler);
 
         replicator.Subscribe<IPartitionNotification>(SendPartitionEventToAllClients);

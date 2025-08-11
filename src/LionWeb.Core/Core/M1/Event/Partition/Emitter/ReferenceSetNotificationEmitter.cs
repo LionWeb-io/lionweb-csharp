@@ -21,9 +21,9 @@ using M3;
 using System.Diagnostics.CodeAnalysis;
 using Utilities.ListComparer;
 
-/// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Reference"/>s.
+/// Encapsulates notification-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Reference"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Reference"/>.</typeparam>
-public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> where T : IReadableNode
+public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationEmitterBase<T> where T : IReadableNode
 {
     private readonly List<IListChange<T>> _changes = [];
 
@@ -31,10 +31,10 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
     /// <param name="destinationParent"> Owner of the represented <paramref name="reference"/>.</param>
     /// <param name="safeNodes">Newly added values.</param>
     /// <param name="storage">Values already present in <paramref name="reference"/>.</param>
-    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
-    public ReferenceSetEventEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes, List<T> storage,
-        IEventId? eventId = null) :
-        base(reference, destinationParent, safeNodes, eventId)
+    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    public ReferenceSetNotificationEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes, List<T> storage,
+        INotificationId? notificationId = null) :
+        base(reference, destinationParent, safeNodes, notificationId)
     {
         if (!IsActive())
             return;
@@ -47,7 +47,7 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
     public override void CollectOldData() { }
 
     /// <inheritdoc />
-    public override void RaiseEvent()
+    public override void Notify()
     {
         if (!IsActive())
             return;
@@ -59,18 +59,18 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
                 case ListAdded<T> added:
                     IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
                     PartitionCommander.Raise(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, newTarget,
-                        GetEventId()));
+                        GetNotificationId()));
                     break;
                 case ListMoved<T> moved:
                     IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
                     PartitionCommander.Raise(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
                         moved.LeftIndex, target,
-                        GetEventId()));
+                        GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
                     IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
                     PartitionCommander.Raise(new ReferenceDeletedNotification(DestinationParent, Reference, deleted.LeftIndex,
-                        deletedTarget, GetEventId()));
+                        deletedTarget, GetNotificationId()));
                     break;
             }
         }

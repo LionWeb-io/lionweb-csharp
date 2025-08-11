@@ -21,19 +21,19 @@ using M3;
 using System.Diagnostics.CodeAnalysis;
 using Utilities.ListComparer;
 
-/// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
-public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
+/// Encapsulates notification-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Annotation"/>s.
+public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBase
 {
     private readonly List<IListChange<INode>> _changes = [];
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <see cref="IReadableNode.GetAnnotations"/>.</param>
-    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
-    public AnnotationSetEventEmitter(NodeBase destinationParent,
+    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    public AnnotationSetNotificationEmitter(NodeBase destinationParent,
         List<INode>? setValues,
         List<INode> existingValues,
-        IEventId? eventId = null) : base(destinationParent, setValues, eventId)
+        INotificationId? notificationId = null) : base(destinationParent, setValues, notificationId)
     {
         if (!IsActive() || setValues == null)
             return;
@@ -43,7 +43,7 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
     }
 
     /// <inheritdoc />
-    public override void RaiseEvent()
+    public override void Notify()
     {
         if (!IsActive())
             return;
@@ -57,15 +57,15 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                     {
                         case null:
                             PartitionCommander.Raise(new AnnotationAddedNotification(DestinationParent, added.Element,
-                                added.RightIndex, GetEventId()));
+                                added.RightIndex, GetNotificationId()));
                             break;
 
                         case { } old when old.Parent != DestinationParent:
-                            var eventId = GetEventId();
-                            var @event = new AnnotationMovedFromOtherParentNotification(DestinationParent, added.RightIndex,
-                                added.Element, old.Parent, old.Index, eventId);
-                            RaiseOriginMoveEvent(old, @event);
-                            PartitionCommander.Raise(@event);
+                            var notificationId = GetNotificationId();
+                            var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, added.RightIndex,
+                                added.Element, old.Parent, old.Index, notificationId);
+                            RaiseOriginMoveEvent(old, notification);
+                            PartitionCommander.Raise(notification);
                             break;
 
 
@@ -77,12 +77,12 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
 
                 case ListMoved<INode> moved:
                     PartitionCommander.Raise(new AnnotationMovedInSameParentNotification(moved.RightIndex, moved.LeftElement,
-                        DestinationParent, moved.LeftIndex, GetEventId()));
+                        DestinationParent, moved.LeftIndex, GetNotificationId()));
                     break;
 
                 case ListDeleted<INode> deleted:
                     PartitionCommander.Raise(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,
-                        GetEventId()));
+                        GetNotificationId()));
                     break;
             }
         }

@@ -22,8 +22,8 @@ using System.Diagnostics.CodeAnalysis;
 
 #region Annotation
 
-/// Encapsulates event-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Annotation"/>s.
-public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
+/// Encapsulates notification-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Annotation"/>s.
+public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEmitterBase
 {
     private Index _newIndex;
 
@@ -31,16 +31,16 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
     /// <param name="addedValues">Newly added values.</param>
     /// <param name="existingValues">Values already present in <see cref="IReadableNode.GetAnnotations"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <see cref="Annotation"/>s.</param>
-    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
-    public AnnotationAddMultipleEventEmitter(NodeBase destinationParent,
+    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    public AnnotationAddMultipleNotificationEmitter(NodeBase destinationParent,
         List<INode>? addedValues,
-        List<INode> existingValues, Index? startIndex = null, IEventId? eventId = null) : base(destinationParent, addedValues, eventId)
+        List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues, notificationId)
     {
         _newIndex = startIndex ?? Math.Max(existingValues.Count - 1, 0);
     }
 
     /// <inheritdoc />
-    public override void RaiseEvent()
+    public override void Notify()
     {
         if (!IsActive())
             return;
@@ -51,15 +51,15 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
             {
                 case null:
                     PartitionCommander.Raise(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
-                        GetEventId()));
+                        GetNotificationId()));
                     break;
 
                 case not null when old.Parent != DestinationParent:
-                    var eventId = GetEventId();
-                    var @event = new AnnotationMovedFromOtherParentNotification(DestinationParent, _newIndex, added, old.Parent,
-                        old.Index, eventId);
-                    RaiseOriginMoveEvent(old, @event);
-                    PartitionCommander.Raise(@event);
+                    var notificationId = GetNotificationId();
+                    var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, _newIndex, added, old.Parent,
+                        old.Index, notificationId);
+                    RaiseOriginMoveEvent(old, notification);
+                    PartitionCommander.Raise(notification);
                     break;
 
 
@@ -69,7 +69,7 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
 
                 case not null when old.Parent == DestinationParent:
                     PartitionCommander.Raise(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
-                        old.Index, GetEventId()));
+                        old.Index, GetNotificationId()));
                     break;
 
                 default:

@@ -68,7 +68,7 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
     }
 
     /// <inheritdoc />
-    public virtual IEventId CreateEventId() => new NumericEventId(_eventIdBase, _nextId++);
+    public virtual INotificationId CreateEventId() => new NumericNotificationId(_eventIdBase, _nextId++);
 
     /// <inheritdoc />
     public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, TEvent
@@ -132,5 +132,5 @@ public abstract class EventHandlerBase<TEvent> : EventHandlerBase, ICommander<TE
         eventTypes.Any(eventType => _subscribedEvents.TryGetValue(eventType, out var count) && count > 0);
 }
 
-/// Internal event id based on a string and an increasing number.
-public record NumericEventId(string Base, int Id) : IEventId;
+/// Notification id based on a string and an increasing number.
+public record NumericNotificationId(string Base, int Id) : INotificationId;

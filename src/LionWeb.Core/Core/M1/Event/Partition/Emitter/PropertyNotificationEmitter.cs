@@ -20,8 +20,8 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
-/// Encapsulates event-related logic and data for <i>adding</i> or <i>changing</i> or <i>deleting</i> of <see cref="Property"/>s.
-public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
+/// Encapsulates notification-related logic and data for <i>adding</i> or <i>changing</i> or <i>deleting</i> of <see cref="Property"/>s.
+public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INode>
 {
     private readonly Property _property;
     private readonly object? _newValue;
@@ -30,9 +30,9 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
     /// Raises either <see cref="PropertyAddedNotification"/>, <see cref="PropertyDeletedNotification"/> or
     /// <see cref="PropertyChangedNotification"/> for <paramref name="property"/>,
     /// depending on <paramref name="oldValue"/> and <paramref name="newValue"/>.
-    public PropertyEventEmitter(Property property, NodeBase destinationParent, object? newValue, object? oldValue,
-        IEventId? eventId = null) :
-        base(destinationParent, eventId)
+    public PropertyNotificationEmitter(Property property, NodeBase destinationParent, object? newValue, object? oldValue,
+        INotificationId? notificationId = null) :
+        base(destinationParent, notificationId)
     {
         _property = property;
         _newValue = newValue;
@@ -43,7 +43,7 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
     public override void CollectOldData() { }
 
     /// <inheritdoc />
-    public override void RaiseEvent()
+    public override void Notify()
     {
         if (!IsActive())
             return;
@@ -52,15 +52,15 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
         {
             case (null, { } v):
                 PartitionCommander.Raise(new PropertyAddedNotification(DestinationParent, _property, v,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
             case ({ } o, null):
                 PartitionCommander.Raise(new PropertyDeletedNotification(DestinationParent, _property, o,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
             case ({ } o, { } n):
                 PartitionCommander.Raise(new PropertyChangedNotification(DestinationParent, _property, n, o,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
         }
     }

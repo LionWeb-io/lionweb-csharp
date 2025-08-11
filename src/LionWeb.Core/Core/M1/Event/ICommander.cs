@@ -32,6 +32,6 @@ public interface ICommander<in TEvent> where TEvent : INotification
     public bool CanRaise(params Type[] eventTypes);
 
     /// Creates a globally unique event id.
-    public IEventId CreateEventId();
+    public INotificationId CreateEventId();
     
 }

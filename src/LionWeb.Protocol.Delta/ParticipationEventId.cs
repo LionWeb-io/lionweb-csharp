@@ -20,4 +20,4 @@ namespace LionWeb.Protocol.Delta;
 using Core.M1.Event;
 
 /// Internal event id based on delta protocol <see cref="LionWeb.Protocol.Delta.Message.Event.CommandSource"/>.
-public record ParticipationEventId(ParticipationId ParticipationId, CommandId CommandId) : IEventId;
+public record ParticipationNotificationId(ParticipationId ParticipationId, CommandId CommandId) : INotificationId;

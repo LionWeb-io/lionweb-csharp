@@ -136,12 +136,12 @@ public partial class AConcept : ConceptInstanceBase
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
-        public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? value, IEventId? eventId = null)
+        public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2023_1.Circular.B.BConcept? value, INotificationId? eventId = null)
 	{
-		ReferenceSingleEventEmitter evt = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, eventId);
+		ReferenceSingleNotificationEmitter evt = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, eventId);
 		evt.CollectOldData();
 		_bRef = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -166,7 +166,7 @@ public partial class AConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;

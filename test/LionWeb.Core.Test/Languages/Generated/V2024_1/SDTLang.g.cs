@@ -266,13 +266,13 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetA(A value, IEventId? eventId = null)
+        public SDTConcept SetA(A value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_A);
-		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_A, this, value, _a, eventId);
+		PropertyNotificationEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_A, this, value, _a, eventId);
 		evt.CollectOldData();
 		_a = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -294,13 +294,13 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetAmount(Amount value, IEventId? eventId = null)
+        public SDTConcept SetAmount(Amount value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_amount);
-		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_amount, this, value, _amount, eventId);
+		PropertyNotificationEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_amount, this, value, _amount, eventId);
 		evt.CollectOldData();
 		_amount = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -322,13 +322,13 @@ public partial class SDTConcept : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SDTConcept SetComplex(ComplexNumber value, IEventId? eventId = null)
+        public SDTConcept SetComplex(ComplexNumber value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_complex);
-		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_complex, this, value, _complex, eventId);
+		PropertyNotificationEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_complex, this, value, _complex, eventId);
 		evt.CollectOldData();
 		_complex = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -346,12 +346,12 @@ public partial class SDTConcept : ConceptInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public SDTConcept SetDecimal(Decimal? value, IEventId? eventId = null)
+        public SDTConcept SetDecimal(Decimal? value, INotificationId? eventId = null)
 	{
-		PropertyEventEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_decimal, this, value, _decimal, eventId);
+		PropertyNotificationEmitter evt = new(SDTLangLanguage.Instance.SDTConcept_decimal, this, value, _decimal, eventId);
 		evt.CollectOldData();
 		_decimal = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -394,7 +394,7 @@ public partial class SDTConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;

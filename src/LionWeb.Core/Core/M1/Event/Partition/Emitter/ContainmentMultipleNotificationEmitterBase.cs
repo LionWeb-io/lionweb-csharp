@@ -19,9 +19,9 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 
 using M3;
 
-/// Encapsulates event-related logic and data for <i>multiple</i> <see cref="Containment"/>s.
+/// Encapsulates notification-related logic and data for <i>multiple</i> <see cref="Containment"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
-public abstract class ContainmentMultipleEventEmitterBase<T> : ContainmentEventEmitterBase<T> where T : INode
+public abstract class ContainmentMultipleNotificationEmitterBase<T> : ContainmentNotificationEmitterBase<T> where T : INode
 {
     /// Newly set values and their previous context.
     protected readonly Dictionary<T, OldContainmentInfo?> NewValues;
@@ -29,10 +29,10 @@ public abstract class ContainmentMultipleEventEmitterBase<T> : ContainmentEventE
     /// <param name="containment">Represented <see cref="Containment"/>.</param>
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValues">Newly set values.</param>
-    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
-    protected ContainmentMultipleEventEmitterBase(Containment containment, NodeBase destinationParent,
-        List<T>? newValues, IEventId? eventId = null) :
-        base(containment, destinationParent, eventId)
+    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    protected ContainmentMultipleNotificationEmitterBase(Containment containment, NodeBase destinationParent,
+        List<T>? newValues, INotificationId? notificationId = null) :
+        base(containment, destinationParent, notificationId)
     {
         try
         {

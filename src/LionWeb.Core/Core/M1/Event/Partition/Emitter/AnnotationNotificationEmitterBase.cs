@@ -19,16 +19,16 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 
 using M3;
 
-/// Encapsulates event-related logic and data for <i>multiple</i> <see cref="Annotation"/>s.
-public abstract class AnnotationEventEmitterBase : PartitionEventEmitterBase<INode>
+/// Encapsulates notification-related logic and data for <i>multiple</i> <see cref="Annotation"/>s.
+public abstract class AnnotationNotificationEmitterBase : PartitionNotificationEmitterBase<INode>
 {
     /// Newly set values and their previous context.
     protected readonly Dictionary<INode, OldAnnotationInfo?> NewValues;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="newValues">Newly set values.</param>
-    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
-    protected AnnotationEventEmitterBase(NodeBase destinationParent, List<INode>? newValues, IEventId? eventId = null) : base(destinationParent, eventId)
+    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    protected AnnotationNotificationEmitterBase(NodeBase destinationParent, List<INode>? newValues, INotificationId? notificationId = null) : base(destinationParent, notificationId)
     {
         NewValues = newValues?.ToDictionary<INode, INode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
     }

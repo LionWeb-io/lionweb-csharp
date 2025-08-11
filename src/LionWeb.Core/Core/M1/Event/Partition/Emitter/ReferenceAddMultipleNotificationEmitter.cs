@@ -20,7 +20,7 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
-public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> where T : IReadableNode
+public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotificationEmitterBase<T> where T : IReadableNode
 {
     private readonly Index _startIndex;
 
@@ -29,10 +29,10 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
     /// <param name="destinationParent">Owner of the represented <paramref name="reference"/> </param>
     /// <param name="safeNodes">Targets to raise events for.</param>
     /// <param name="startIndex">Index where we add <paramref name="safeNodes"/> to <paramref name="reference"/>.</param>
-    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
+    /// <param name="notificationId">The event ID of the event emitted by this event emitter</param>
     /// <typeparam name="T">Type of members of <paramref name="reference"/>.</typeparam>
-    public ReferenceAddMultipleEventEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes,
-        Index startIndex, IEventId? eventId = null) : base(reference, destinationParent, safeNodes, eventId)
+    public ReferenceAddMultipleNotificationEmitter(Reference reference, NodeBase destinationParent, List<T> safeNodes,
+        Index startIndex, INotificationId? notificationId = null) : base(reference, destinationParent, safeNodes, notificationId)
     {
         _startIndex = startIndex;
     }
@@ -41,7 +41,7 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
     public override void CollectOldData() { }
 
     /// <inheritdoc />
-    public override void RaiseEvent()
+    public override void Notify()
     {
         if (!IsActive())
             return;
@@ -51,7 +51,7 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
         {
             IReferenceTarget newTarget = new ReferenceTarget(null, node);
             PartitionCommander.Raise(new ReferenceAddedNotification(DestinationParent, Reference, index++, newTarget,
-                GetEventId()));
+                GetNotificationId()));
         }
     }
 

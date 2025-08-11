@@ -29,11 +29,11 @@ using Utilities;
 ///
 /// <para>
 /// This class is <i>also</i> a <see cref="IPublisher{TEvent}"/> itself.
-/// We <see cref="EventIdFilteringEventForwarder{TEvent,TPublisher}">forward</see> all events from our <i>local</i>,
+/// We <see cref="NotificationIdFilteringNotificationForwarder{TEvent,TPublisher}">forward</see> all events from our <i>local</i>,
 /// except the events that stem from replicating <see cref="ReplicateFrom">other publishers</see>.
 /// Therefore, two instances with different <i>locals</i> can replicate each other, keeping both <i>locals</i> in sync.
 /// </para>
-public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFilteringEventForwarder<TEvent, TPublisher>
+public abstract class NotificationReplicatorBase<TEvent, TPublisher> : NotificationIdFilteringNotificationForwarder<TEvent, TPublisher>
     where TEvent : class, INotification where TPublisher : IPublisher<TEvent>
 {
     protected readonly ICommander<TEvent>? _localCommander;
@@ -41,7 +41,7 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
 
     protected readonly SharedNodeMap NodeById;
 
-    protected EventReplicatorBase(TPublisher? localPublisher, ICommander<TEvent>? localCommander,
+    protected NotificationReplicatorBase(TPublisher? localPublisher, ICommander<TEvent>? localCommander,
         SharedNodeMap sharedNodeMap = null) : base(localPublisher)
     {
         _localCommander = localCommander;
@@ -87,14 +87,14 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
     protected virtual INode Clone(INode remoteNode) =>
         new SameIdCloner(remoteNode.Descendants(true, true)).Clone()[remoteNode];
 
-    /// Uses <see cref="EventIdFilteringEventForwarder{TEvent,TPublisher}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
+    /// Uses <see cref="NotificationIdFilteringNotificationForwarder{TEvent,TPublisher}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
     protected virtual void SuppressEventForwarding(TEvent @event, Action action)
     {
-        IEventId? eventId = null;
+        INotificationId? notificationId = null;
         if (_localCommander != null)
         {
-            eventId = @event.EventId;
-            RegisterEventId(eventId);
+            notificationId = @event.NotificationId;
+            RegisterNotificationId(notificationId);
         }
 
         try
@@ -102,8 +102,8 @@ public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFiltering
             action();
         } finally
         {
-            if (eventId != null)
-                UnregisterEventId(eventId);
+            if (notificationId != null)
+                UnregisterNotificationId(notificationId);
         }
     }
 }

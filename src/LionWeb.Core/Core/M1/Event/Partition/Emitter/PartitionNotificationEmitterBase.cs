@@ -20,11 +20,11 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
-/// Encapsulates event-related logic and data to execute
-/// <see cref="CollectOldData">before</see> and <see cref="RaiseEvent">after</see>
+/// Encapsulates notification-related logic and data to execute
+/// <see cref="CollectOldData">before</see> and <see cref="Notify">after</see>
 /// the actual manipulation of the underlying nodes for one specific <see cref="Feature"/>.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Feature"/>.</typeparam>
-public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
+public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNode
 {
     protected readonly IPartitionInstance? DestinationPartition;
 
@@ -35,14 +35,14 @@ public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
     protected readonly NodeBase DestinationParent;
 
     /// The event ID associated with the event emitter
-    private readonly IEventId? _eventId;
+    private readonly INotificationId? _notificationId;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Feature"/>.</param>
-    /// <param name="eventId">The event ID of the event emitted by event emitters</param>
-    protected PartitionEventEmitterBase(NodeBase destinationParent, IEventId? eventId = null)
+    /// <param name="notificationId">The notification ID of the notification emitted by notification emitters</param>
+    protected PartitionNotificationEmitterBase(NodeBase destinationParent, INotificationId? notificationId = null)
     {
         DestinationParent = destinationParent;
-        _eventId = eventId;
+        _notificationId = notificationId;
         DestinationPartition = destinationParent.GetPartition();
         PartitionCommander = DestinationPartition?.GetCommander();
     }
@@ -51,7 +51,7 @@ public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
     public abstract void CollectOldData();
 
     /// Logic to execute <i>after</i> any changes to the underlying nodes.
-    public abstract void RaiseEvent();
+    public abstract void Notify();
 
     /// <summary>
     /// Whether this event should execute at all.
@@ -63,5 +63,5 @@ public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
     /// Retrieves the event ID associated with the event emitter.
     /// If no event ID is set, it creates a new event ID.
     /// </summary>
-    protected IEventId GetEventId() => _eventId ?? PartitionCommander.CreateEventId();
+    protected INotificationId GetNotificationId() => _notificationId ?? PartitionCommander.CreateEventId();
 }

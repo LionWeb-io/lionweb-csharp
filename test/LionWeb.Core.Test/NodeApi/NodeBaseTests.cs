@@ -98,7 +98,7 @@ public class NodeBaseTests
     
     #endregion
     
-    #region Set method with eventId parameter set to null
+    #region Set method with notificationId parameter set to null
 
     [TestMethod]
     public void Set_NodeBase_with_null_eventId()

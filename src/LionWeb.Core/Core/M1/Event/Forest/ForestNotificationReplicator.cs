@@ -20,14 +20,14 @@ namespace LionWeb.Core.M1.Event.Forest;
 using Partition;
 using System.Diagnostics;
 
-/// Replicates events for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
-/// <inheritdoc cref="EventReplicatorBase{TEvent,TPublisher}"/>
-public class ForestEventReplicator : EventReplicatorBase<IForestNotification, IForestPublisher>, IForestPublisher
+/// Replicates notifications for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
+/// <inheritdoc cref="NotificationReplicatorBase{TEvent,TPublisher}"/>
+public class ForestNotificationReplicator : NotificationReplicatorBase<IForestNotification, IForestPublisher>, IForestPublisher
 {
     private readonly IForest _localForest;
-    private readonly Dictionary<NodeId, PartitionEventReplicator> _localPartitions = [];
+    private readonly Dictionary<NodeId, PartitionNotificationReplicator> _localPartitions = [];
 
-    public ForestEventReplicator(IForest localForest, SharedNodeMap sharedNodeMap = null) :
+    public ForestNotificationReplicator(IForest localForest, SharedNodeMap sharedNodeMap = null) :
         base(localForest.GetPublisher(), localForest.GetCommander(), sharedNodeMap)
     {
         _localForest = localForest;
@@ -99,12 +99,12 @@ public class ForestEventReplicator : EventReplicatorBase<IForestNotification, IF
 
     private void RegisterPartition(IPartitionInstance partition)
     {
-        PartitionEventReplicator replicator = new PartitionEventReplicator(partition, NodeById);
+        PartitionNotificationReplicator replicator = new PartitionNotificationReplicator(partition, NodeById);
         if (!_localPartitions.TryAdd(partition.GetId(), replicator))
             throw new DuplicateNodeIdException(partition, Lookup(partition.GetId()));
     }
 
-    private PartitionEventReplicator LookupPartition(IPartitionInstance partition) =>
+    private PartitionNotificationReplicator LookupPartition(IPartitionInstance partition) =>
         _localPartitions[partition.GetId()];
 
     private void UnregisterPartition(IPartitionInstance partition)

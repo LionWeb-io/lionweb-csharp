@@ -373,8 +373,8 @@ public class DeltaEventToPartitionEventMapper
     #endregion
 
 
-    private static IEventId ToEventId(IDeltaEvent deltaEvent) =>
-        new ParticipationEventId(deltaEvent.InternalParticipationId,
+    private static INotificationId ToEventId(IDeltaEvent deltaEvent) =>
+        new ParticipationNotificationId(deltaEvent.InternalParticipationId,
             string.Join("_", deltaEvent.OriginCommands.Select(c => c.CommandId)));
 
     private IWritableNode ToNode(TargetNode nodeId)

@@ -21,9 +21,9 @@ using M3;
 using System.Diagnostics.CodeAnalysis;
 using Utilities.ListComparer;
 
-/// Encapsulates event-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Containment"/>s.
+/// Encapsulates notification-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Containment"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>
-public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase<T> where T : INode
+public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificationEmitterBase<T> where T : INode
 {
     private readonly List<IListChange<T>> _changes = [];
 
@@ -31,11 +31,11 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <paramref name="containment"/>.</param>
-    /// <param name="eventId">The event ID of the event emitted by this event emitter.</param>
-    public ContainmentSetEventEmitter(Containment containment,
+    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    public ContainmentSetNotificationEmitter(Containment containment,
         NodeBase destinationParent,
         List<T>? setValues,
-        List<T> existingValues, IEventId? eventId = null) : base(containment, destinationParent, setValues, eventId)
+        List<T> existingValues, INotificationId? notificationId = null) : base(containment, destinationParent, setValues, notificationId)
     {
         if (!IsActive() || setValues == null)
             return;
@@ -45,7 +45,7 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
     }
 
     /// <inheritdoc />
-    public override void RaiseEvent()
+    public override void Notify()
     {
         if (!IsActive())
             return;
@@ -59,22 +59,22 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
                     {
                         case null:
                             PartitionCommander.Raise(new ChildAddedNotification(DestinationParent, added.Element, Containment,
-                                added.RightIndex, GetEventId()));
+                                added.RightIndex, GetNotificationId()));
                             break;
 
                         case { } old when old.Parent != DestinationParent:
-                            var eventId = GetEventId();
-                            var @event = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment,
-                                added.RightIndex, added.Element, old.Parent, old.Containment, old.Index, eventId);
-                            RaiseOriginMoveEvent(old, @event);
-                            PartitionCommander.Raise(@event);
+                            var notificationId = GetNotificationId();
+                            var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment,
+                                added.RightIndex, added.Element, old.Parent, old.Containment, old.Index, notificationId);
+                            RaiseOriginMoveEvent(old, notification);
+                            PartitionCommander.Raise(notification);
                             break;
 
 
                         case { } old when old.Parent == DestinationParent && old.Containment != Containment:
                             PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentNotification(Containment,
                                 added.RightIndex, added.Element, DestinationParent, old.Containment, old.Index,
-                                GetEventId()));
+                                GetNotificationId()));
                             break;
 
                         default:
@@ -85,11 +85,11 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
 
                 case ListMoved<T> moved:
                     PartitionCommander.Raise(new ChildMovedInSameContainmentNotification(moved.RightIndex, moved.LeftElement,
-                        DestinationParent, Containment, moved.LeftIndex, GetEventId()));
+                        DestinationParent, Containment, moved.LeftIndex, GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
                     PartitionCommander.Raise(new ChildDeletedNotification(deleted.Element, DestinationParent, Containment,
-                        deleted.LeftIndex, GetEventId()));
+                        deleted.LeftIndex, GetNotificationId()));
                     break;
             }
         }

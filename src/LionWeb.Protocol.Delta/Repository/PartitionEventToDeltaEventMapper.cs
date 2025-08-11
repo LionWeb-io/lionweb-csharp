@@ -302,14 +302,14 @@ public class PartitionEventToDeltaEventMapper
     {
         ParticipationId participationId;
         EventId commandId;
-        if (internalNotification.EventId is ParticipationEventId pei)
+        if (internalNotification.NotificationId is ParticipationNotificationId pei)
         {
             participationId = pei.ParticipationId;
             commandId = pei.CommandId;
         } else
         {
             participationId = _participationIdProvider.ParticipationId;
-            commandId = internalNotification.EventId.ToString();
+            commandId = internalNotification.NotificationId.ToString();
         }
         return [new CommandSource(participationId, commandId)];
     }

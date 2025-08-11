@@ -61,7 +61,7 @@ public class EventsTestSerialized : EventTestsBase
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
         });
 
-        var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
+        var replicator = new PartitionNotificationReplicator(clone, sharedNodeMap);
         replicator.ReplicateFrom(partitionEventHandler);
         return clone;
     }

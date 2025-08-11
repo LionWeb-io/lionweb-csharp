@@ -20,9 +20,9 @@ namespace LionWeb.Core.M1.Event.Partition.Emitter;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
-/// Encapsulates event-related logic and data for changing <i>single</i> <see cref="Containment"/>s.
+/// Encapsulates notification-related logic and data for changing <i>single</i> <see cref="Containment"/>s.
 /// <typeparam name="T">Type of node of the represented <see cref="Containment"/>.</typeparam>
-public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> where T : INode
+public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEmitterBase<T> where T : INode
 {
     private readonly T? _newValue;
     private readonly T? _oldValue;
@@ -33,10 +33,10 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValue">Newly set value.</param>
     /// <param name="oldValue">Previous value of <paramref name="containment"/>.</param>
-    /// <param name="eventId">The event ID of the event emitted by this event emitter</param>
-    public ContainmentSingleEventEmitter(Containment containment, NodeBase destinationParent, T? newValue, T? oldValue,
-        IEventId? eventId = null)
-        : base(containment, destinationParent, eventId)
+    /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
+    public ContainmentSingleNotificationEmitter(Containment containment, NodeBase destinationParent, T? newValue, T? oldValue,
+        INotificationId? notificationId = null)
+        : base(containment, destinationParent, notificationId)
     {
         _oldValue = oldValue;
         _newValue = newValue;
@@ -56,7 +56,7 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
     }
 
     /// <inheritdoc />
-    public override void RaiseEvent()
+    public override void Notify()
     {
         if (!IsActive())
             return;
@@ -71,31 +71,31 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
 
             case (not null, null, _):
                 PartitionCommander.Raise(new ChildDeletedNotification(_oldValue, DestinationParent, Containment, 0,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
 
             case (null, not null, null):
                 PartitionCommander.Raise(new ChildAddedNotification(DestinationParent, _newValue, Containment, 0,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
 
             case (not null, not null, null):
                 PartitionCommander.Raise(new ChildReplacedNotification(_newValue, _oldValue, DestinationParent, Containment, 0,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
                 PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, 0, _newValue,
                     DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
                 PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(Containment, 0,
                     _newValue, DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, _oldValue,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
 
             case (not null, not null, not null)
@@ -103,16 +103,16 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
                 PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentNotification(DestinationParent,
                     Containment, 0, _newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index, _oldValue,
-                    GetEventId()));
+                    GetNotificationId()));
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent != DestinationParent:
-                var eventId = GetEventId();
-                var @event = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, 0, _newValue,
-                    _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, eventId);
-                RaiseOriginMoveEvent(_oldContainmentInfo, @event);
-                PartitionCommander.Raise(@event);
+                var notificationId = GetNotificationId();
+                var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, 0, _newValue,
+                    _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, notificationId);
+                RaiseOriginMoveEvent(_oldContainmentInfo, notification);
+                PartitionCommander.Raise(notification);
                 break;
 
             default:

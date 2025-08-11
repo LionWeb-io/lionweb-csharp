@@ -126,13 +126,13 @@ public partial class BConcept : ConceptInstanceBase
     	/// <seealso cref = "LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AConcept.BRef"/>
     	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AEnum value, IEventId? eventId = null)
+        public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AEnum value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
-		PropertyEventEmitter evt = new(BLangLanguage.Instance.BConcept_AEnumProp, this, value, _aEnumProp, eventId);
+		PropertyNotificationEmitter evt = new(BLangLanguage.Instance.BConcept_AEnumProp, this, value, _aEnumProp, eventId);
 		evt.CollectOldData();
 		_aEnumProp = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -150,12 +150,12 @@ public partial class BConcept : ConceptInstanceBase
 	}
 
 	/// <remarks>Optional Single Reference</remarks>
-        public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AConcept? value, IEventId? eventId = null)
+        public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AConcept? value, INotificationId? eventId = null)
 	{
-		ReferenceSingleEventEmitter evt = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, eventId);
+		ReferenceSingleNotificationEmitter evt = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, eventId);
 		evt.CollectOldData();
 		_aRef = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -186,7 +186,7 @@ public partial class BConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;

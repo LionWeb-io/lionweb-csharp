@@ -21,8 +21,8 @@ namespace LionWeb.Core.M1.Event;
 public interface INotification
 {
     /// Globally unique id of this event.
-    IEventId EventId { get; set; }
+    INotificationId NotificationId { get; set; }
 }
 
 /// Id of an internal event in the LionWeb event system.
-public interface IEventId;
+public interface INotificationId;

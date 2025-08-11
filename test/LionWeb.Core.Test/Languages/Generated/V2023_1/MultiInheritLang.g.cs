@@ -126,18 +126,18 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 	}
 /// <remarks>Required Single Containment</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- BaseIface BaseIface.SetIfaceContainment(INode value, IEventId? eventId = null) => SetIfaceContainment(value);
+ BaseIface BaseIface.SetIfaceContainment(INode value, INotificationId? eventId = null) => SetIfaceContainment(value);
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public AbstractConcept SetIfaceContainment(INode value, IEventId? eventId = null)
+        public AbstractConcept SetIfaceContainment(INode value, INotificationId? eventId = null)
 	{
 		AssureNotNull(value, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
-		ContainmentSingleEventEmitter<INode> evt = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment, eventId);
+		ContainmentSingleNotificationEmitter<INode> evt = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment, eventId);
 		evt.CollectOldData();
 		SetParentNull(_ifaceContainment);
 		AttachChild(value);
 		_ifaceContainment = value;
-		evt.RaiseEvent();
+		evt.Notify();
 		return this;
 	}
 
@@ -162,7 +162,7 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
 	{
 		if (base.SetInternal(feature, value, eventId))
 			return true;
@@ -225,7 +225,7 @@ public partial interface BaseIface : INode
 	public INode IfaceContainment { get; set; }
 
 	/// <remarks>Required Single Containment</remarks>
-        public BaseIface SetIfaceContainment(INode value, IEventId? eventId = null);
+        public BaseIface SetIfaceContainment(INode value, INotificationId? eventId = null);
 }
 
 [LionCoreMetaPointer(Language = typeof(MultiInheritLangLanguage), Key = "key-CombinedConcept")]
