@@ -21,6 +21,7 @@ using Core;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
+using Core.M1.Event.Processor;
 using Message;
 
 public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> : IDisposable

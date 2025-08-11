@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event;
+namespace LionWeb.Core.M1.Event.Processor;
 
 /// Forwards all <see cref="Receive">received</see> events unchanged to <i>following</i> processors,
 /// and to EventHandlers <see cref="Subscribe{TSubscribedEvent}">subscribed</see> to specific events.

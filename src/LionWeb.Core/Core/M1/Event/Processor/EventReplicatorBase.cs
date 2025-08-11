@@ -15,34 +15,27 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event;
+namespace LionWeb.Core.M1.Event.Processor;
 
 using Partition;
 using Utilities;
 
-/// Replicates events received from <see cref="ReplicateFrom">other publishers</see> on a <i>local</i> equivalent.
+/// Replicates <see cref="Receive">received</see> events on a <i>local</i> equivalent.
 /// 
 /// <para>
 /// Example: We receive a <see cref="PropertyAddedEvent"/> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-///
-/// <para>
-/// This class is <i>also</i> a <see cref="IPublisher{TEvent}"/> itself.
-/// We <see cref="EventIdFilteringEventProcessor{TEvent,TPublisher}">forward</see> all events from our <i>local</i>,
-/// except the events that stem from replicating <see cref="ReplicateFrom">other publishers</see>.
-/// Therefore, two instances with different <i>locals</i> can replicate each other, keeping both <i>locals</i> in sync.
-/// </para>
 public abstract class EventReplicatorBase<TEvent> : EventProcessorBase<TEvent> where TEvent : class, IEvent
 {
     protected readonly SharedNodeMap SharedNodeMap;
-    private readonly EventIdFilteringEventProcessor<TEvent> _filter;
+    protected readonly EventIdFilteringEventProcessor<TEvent> Filter;
 
     protected EventReplicatorBase(SharedNodeMap sharedNodeMap, EventIdFilteringEventProcessor<TEvent> filter,
         object? sender) : base(sender)
     {
         SharedNodeMap = sharedNodeMap;
-        _filter = filter;
+        Filter = filter;
     }
 
     /// unsubscribes from all <see cref="ReplicateFrom">replicated publishers</see>.
@@ -60,30 +53,27 @@ public abstract class EventReplicatorBase<TEvent> : EventProcessorBase<TEvent> w
 
     protected abstract void ProcessEvent(TEvent? @event);
 
-    protected void RegisterNode(IReadableNode newNode) =>
-        SharedNodeMap.RegisterNode(newNode);
+    protected INode Lookup(NodeId nodeId) =>
+        (INode)SharedNodeMap[nodeId];
 
-    protected virtual INode Lookup(NodeId remoteNodeId) =>
-        (INode)SharedNodeMap[remoteNodeId];
-
-    protected virtual INode? LookupOpt(NodeId remoteNodeId) =>
-        (INode?)SharedNodeMap.GetValueOrDefault(remoteNodeId);
+    protected INode? LookupOpt(NodeId nodeId) =>
+        SharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
 
     protected virtual INode AdjustRemoteNode(INode remoteNode) =>
         remoteNode;
 
-    /// Uses <see cref="EventIdFilteringEventProcessor{TEvent,TPublisher}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
+    /// Uses <see cref="EventIdFilteringEventProcessor{TEvent}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
     protected virtual void SuppressEventForwarding(TEvent @event, Action action)
     {
-        IEventId? eventId = @event.EventId;
-        _filter.RegisterEventId(eventId);
+        IEventId eventId = @event.EventId;
+        Filter.RegisterEventId(eventId);
 
         try
         {
             action();
         } finally
         {
-            _filter.UnregisterEventId(eventId);
+            Filter.UnregisterEventId(eventId);
         }
     }
 }

@@ -15,12 +15,11 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event;
+namespace LionWeb.Core.M1.Event.Processor;
 
 using System.Diagnostics;
 
-/// Forwards events raised by <paramref name="localPublisher"/> to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>
-/// if the event passes <see cref="Filter{TSubscribedEvent}"/>.
+/// Forwards <see cref="Receive">received</see> events if the event passes <see cref="Filter"/>.
 public abstract class FilteringEventProcessor<TEvent>(object? sender)
     : /*IDisposable,*/ EventProcessorBase<TEvent>(sender)
     where TEvent : class, IEvent
@@ -50,12 +49,9 @@ public abstract class FilteringEventProcessor<TEvent>(object? sender)
     }
 
 
-    /// <summary>
-    /// Determines whether <paramref name="@event"/> will be forwarded to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>.
-    /// </summary>
+    /// Determines whether <paramref name="@event"/> will be <see cref="IProcessor{TReceive,TSend}.Send">sent</see> to <i>following</i> processors.
     /// <param name="event">Event to check.</param>
-    /// <typeparam name="TSubscribedEvent">Requested type of event.</typeparam>
-    /// <returns><c>true</c> if <paramref name="@event"/> should be forwarded to <see cref="Subscribe{TSubscribedEvent}">subscribers</see>; <c>false</c> otherwise.</returns>
+    /// <returns>the event to send, or <c>null</c>.</returns>
     protected abstract TEvent? Filter(TEvent @event);
 }
 
@@ -64,11 +60,11 @@ public class EventIdFilteringEventProcessor<TEvent>(object? sender) : FilteringE
 {
     private readonly HashSet<IEventId> _eventIds = [];
 
-    /// Suppresses future events with <paramref name="eventId"/> from <see cref="FilteringEventProcessor{TEvent}.Subscribe{TSubscribedEvent}">subscribers</see>.
+    /// Suppresses future events with <paramref name="eventId"/> from <see cref="IProcessor{TReceive,TSend}.Send">sending</see>.
     public void RegisterEventId(IEventId eventId) =>
         _eventIds.Add(eventId);
 
-    /// Forwards future events with <paramref name="eventId"/> to <see cref="FilteringEventProcessor{TEvent}.Subscribe{TSubscribedEvent}">subscribers</see>.
+    /// <see cref="IProcessor{TReceive,TSend}.Send">Sends</see> future events with <paramref name="eventId"/>.
     public void UnregisterEventId(IEventId eventId) =>
         _eventIds.Remove(eventId);
 

@@ -15,14 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event;
+namespace LionWeb.Core.M1.Event.Processor;
 
 /// Composes two or more <see cref="IEventProcessor{TEvent}"/>s.
 ///
 /// Every message this processor <see cref="Receive">receives</see>
 /// is forwarded to the first <see cref="_eventProcessors">component</see>.
 /// Each component is connected to the next component.
-/// The last component <see cref="Send">sends</see> to
+/// The last component <see cref="IProcessor{TReceive,TSend}.Send">sends</see> to
 /// this processor's <i>following</i> processors.
 public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
     where TEvent : class, IEvent

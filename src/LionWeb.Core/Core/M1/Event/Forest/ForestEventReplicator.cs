@@ -18,10 +18,11 @@
 namespace LionWeb.Core.M1.Event.Forest;
 
 using Partition;
+using Processor;
 using System.Diagnostics;
 
 /// Replicates events for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
-/// <inheritdoc cref="EventReplicatorBase{TEvent,TPublisher}"/>
+/// <inheritdoc cref="EventReplicatorBase{TEvent}"/>
 public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
 {
     public static IEventProcessor<IForestEvent> Create(IForest localForest,
@@ -99,8 +100,8 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
         }
     }
 
-    protected virtual IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition) =>
-        PartitionEventReplicator.Create(partition, SharedNodeMap, $"{_localForest}.{partition.GetId()}");
+    protected virtual IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition, string sender) =>
+        PartitionEventReplicator.Create(partition, SharedNodeMap, sender);
 
     private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent) =>
         RegisterPartition(partitionAddedEvent.NewPartition);
@@ -110,7 +111,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
 
     private void RegisterPartition(IPartitionInstance partition)
     {
-        var replicator = CreatePartitionEventReplicator(partition);
+        var replicator = CreatePartitionEventReplicator(partition, $"{_localForest}.{partition.GetId()}");
         _sharedPartitionReplicatorMap.Register(partition.GetId(), replicator);
     }
 

@@ -20,6 +20,7 @@ namespace LionWeb.Protocol.Delta.Repository.Partition;
 using Core;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
+using Core.M1.Event.Processor;
 
 internal class RewritePartitionEventReplicator(
     IPartitionInstance localPartition,
@@ -29,7 +30,7 @@ internal class RewritePartitionEventReplicator(
     object? sender)
     : PartitionEventReplicator(localPartition, sharedNodeMap, filter, sender)
 {
-    public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition,
+    public static new IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
@@ -49,38 +50,15 @@ internal class RewritePartitionEventReplicator(
         IEventId? eventId = _eventIdProvider.CreateEventId();
         var originalEventId = partitionEvent.EventId;
         replacingFilter.RegisterReplacementEventId(eventId, originalEventId);
-        filter.RegisterEventId(eventId);
+        Filter.RegisterEventId(eventId);
 
         try
         {
             action();
         } finally
         {
-            filter.UnregisterEventId(eventId);
+            Filter.UnregisterEventId(eventId);
             replacingFilter.UnregisterReplacementEventId(eventId);
         }
-    }
-}
-
-internal class EventIdReplacingEventProcessor<TEvent>(object? sender)
-    : FilteringEventProcessor<TEvent>(sender) where TEvent : class, IEvent
-{
-    private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];
-
-    public void RegisterReplacementEventId(IEventId eventId, IEventId original) =>
-        _originalEventIds[eventId] = original;
-
-    public void UnregisterReplacementEventId(IEventId eventId) =>
-        _originalEventIds.Remove(eventId);
-
-    protected override TEvent? Filter(TEvent @event)
-    {
-        TEvent result = @event;
-        if (_originalEventIds.TryGetValue(@event.EventId, out var originalId))
-        {
-            result.EventId = originalId;
-        }
-
-        return result;
     }
 }

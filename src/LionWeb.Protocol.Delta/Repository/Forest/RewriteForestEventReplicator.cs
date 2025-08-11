@@ -22,6 +22,7 @@ using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
+using Core.M1.Event.Processor;
 using Partition;
 
 internal class RewriteForestEventReplicator(
@@ -33,7 +34,7 @@ internal class RewriteForestEventReplicator(
     object? sender
     ) : ForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, filter, sender)
 {
-    public static IEventProcessor<IForestEvent> Create(IForest localForest, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
+    public static new IEventProcessor<IForestEvent> Create(IForest localForest, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
         var filter = new EventIdFilteringEventProcessor<IForestEvent>(internalSender);
@@ -45,24 +46,24 @@ internal class RewriteForestEventReplicator(
         return result;
     }
 
-    protected override IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition) =>
-        RewritePartitionEventReplicator.Create(partition, SharedNodeMap, $"{localForest}.{partition.GetId()}");
+    protected override IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition, string sender) =>
+        RewritePartitionEventReplicator.Create(partition, SharedNodeMap, sender);
 
     private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
 
     protected override void SuppressEventForwarding(IForestEvent forestEvent, Action action)
     {
-        IEventId? eventId = _eventIdProvider.CreateEventId();
+        IEventId eventId = _eventIdProvider.CreateEventId();
         var originalEventId = forestEvent.EventId;
         replacingFilter.RegisterReplacementEventId(eventId, originalEventId);
-        filter.RegisterEventId(eventId);
+        Filter.RegisterEventId(eventId);
 
         try
         {
             action();
         } finally
         {
-            filter.UnregisterEventId(eventId);
+            Filter.UnregisterEventId(eventId);
             replacingFilter.UnregisterReplacementEventId(eventId);
         }
     }

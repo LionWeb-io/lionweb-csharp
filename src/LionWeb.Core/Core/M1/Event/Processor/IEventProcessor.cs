@@ -15,5 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event;
+namespace LionWeb.Core.M1.Event.Processor;
 
+/// <see cref="IProcessor">Processor</see> that receives and sends <typeparamref name="TEvent"/>s.
+public interface IEventProcessor<in TEvent> : IProcessor<TEvent, TEvent> where TEvent : IEvent;

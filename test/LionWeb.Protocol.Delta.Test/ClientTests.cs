@@ -23,6 +23,7 @@ using Client.Partition;
 using Core;
 using Core.M1;
 using Core.M1.Event;
+using Core.M1.Event.Processor;
 using Core.M3;
 using Core.Serialization;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;

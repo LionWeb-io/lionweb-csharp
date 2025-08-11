@@ -18,11 +18,12 @@
 namespace LionWeb.Core.M1.Event.Partition;
 
 using M3;
+using Processor;
 using System.Collections;
 using System.Diagnostics;
 
 /// Replicates events for a <i>local</i> <see cref="IPartitionInstance">partition</see>.
-/// <inheritdoc cref="EventReplicatorBase{TEvent,TPublisher}"/>
+/// <inheritdoc cref="EventReplicatorBase{TEvent}"/>
 public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent>
 {
     public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap, object? sender)

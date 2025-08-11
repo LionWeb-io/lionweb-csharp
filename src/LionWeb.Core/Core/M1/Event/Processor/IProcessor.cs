@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event;
+namespace LionWeb.Core.M1.Event.Processor;
 
 /// A member in a directed graph that send messages.
 /// Each member is <see cref="Connect{TReceiveFrom,TConnected,TSendFrom}">connected</see>

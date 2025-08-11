@@ -18,6 +18,7 @@
 namespace LionWeb.Core.M1.Event.Forest;
 
 using Partition;
+using Processor;
 
 public class SharedPartitionReplicatorMap
 {

@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.M1.Event.Partition;
 
+using Processor;
+
 /// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 /// Raises events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 public interface IPartitionProcessor : IEventProcessor<IPartitionEvent>

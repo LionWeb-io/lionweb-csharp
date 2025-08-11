@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.Listener;
 
 using M1.Event;
 using M1.Event.Partition;
+using M1.Event.Processor;
 
 internal class CloningPartitionEventReplicator(
     IPartitionInstance localPartition,
@@ -27,7 +28,7 @@ internal class CloningPartitionEventReplicator(
     object? sender)
     : PartitionEventReplicator(localPartition, sharedNodeMap, filter, sender)
 {
-    public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition,
+    public static new IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
