@@ -1,0 +1,122 @@
+﻿@startuml
+left to right direction
+<style>
+.connect {
+    LineColor red
+}
+.receive {
+    LineColor blue
+}
+</style>
+
+'package "Client" {
+    together {
+        node "Forest" as clientForest {
+            [ForestEventProcessor] as clientForestProcessor
+            
+            clientForest -> clientForestProcessor <<receive>>
+        }
+        
+        node "ForestEventReplicator" as clientForestReplicator {
+            portin "Receive" as clientForestReplicator_receive
+            [EventIdFilteringEventProcessor] as clientForestReplicator_filter
+            node "Replicator" as clientForestReplicator_replicator {
+                [LocalReceiver] as clientForestReplicator_replicator_localReceiver
+            }
+            portout "Send" as clientForestReplicator_send
+            
+            clientForestReplicator_receive -> clientForestReplicator_replicator <<receive>>
+    '        clientForestReplicator_replicator_localReceiver --> clientForestReplicator_replicator <<receive>>
+    '        clientForestReplicator_replicator --> clientForestReplicator_filter <<connect>>
+            clientForestReplicator_replicator_localReceiver -> clientForestReplicator_filter <<receive>>
+            clientForestReplicator_filter -> clientForestReplicator_send <<connect>>
+            
+            clientForestProcessor -> clientForestReplicator_replicator_localReceiver <<connect>>
+            
+            clientForestReplicator_replicator -> clientForest
+        }
+    }
+    
+    together {
+        node "Partition" as clientPartition {
+            [Emitter] as clientEmitter
+            [PartitionEventProcessor] as clientPartitionProcessor
+            
+            clientPartition -> clientEmitter
+            clientEmitter -> clientPartitionProcessor <<receive>>
+        }
+    
+        node "PartitionEventReplicator" as clientPartitionReplicator {
+            portin "Receive" as clientPartitionReplicator_receive
+            node "Replicator" as clientPartitionReplicator_replicator {
+                [LocalReceiver] as clientPartitionReplicator_replicator_localReceiver
+            }
+            [EventIdFilteringEventProcessor] as clientPartitionReplicator_filter
+            portout "Send" as clientPartitionReplicator_send
+            
+            clientPartitionReplicator_receive -> clientPartitionReplicator_replicator <<receive>>
+    '        clientPartitionReplicator_replicator_localReceiver --> clientPartitionReplicator_replicator <<receive>>
+    '        clientPartitionReplicator_replicator --> clientPartitionReplicator_filter <<connect>>
+            clientPartitionReplicator_replicator_localReceiver -> clientPartitionReplicator_filter <<receive>>
+            clientPartitionReplicator_filter -> clientPartitionReplicator_send <<connect>>
+            
+            clientPartitionProcessor -> clientPartitionReplicator_replicator_localReceiver <<connect>>
+            
+            clientPartitionReplicator_replicator --> clientPartition
+        }
+        
+        clientPartitionReplicator -[hidden]-> clientPartition
+    }
+    
+    node "Client" as client {
+        [LocalPartitionReceiver] as clientLocalPartitionReceiver
+        clientPartitionReplicator_send -> clientLocalPartitionReceiver <<connect>>
+
+        [LocalForestChangeReceiver] as clientLocalForestChangeReceiver
+        clientForestProcessor -> clientLocalForestChangeReceiver <<connect>>
+        
+        [LocalForestReceiver] as clientLocalForestReceiver
+        clientForestReplicator_send -> clientLocalForestReceiver <<connect>>
+    }
+    
+    [DeltaProtocolReceiver] as clientDeltaProtocolReceiver
+        clientDeltaProtocolReceiver --> clientForestReplicator_receive <<receive>>
+    clientDeltaProtocolReceiver --> clientPartitionReplicator_receive <<receive>>
+    
+    [ClientConnector] as clientConnector
+    clientLocalForestReceiver --> clientConnector
+    clientLocalPartitionReceiver --> clientConnector
+    
+
+'    clientForest -[hidden]-> clientForestReplicator
+'    clientForest -[hidden]> client
+'    clientForestReplicator -[hidden]> client
+'    client -[hidden]> clientPartitionReplicator
+'    client -[hidden]> clientPartition
+'    clientPartitionReplicator -[hidden]-> clientPartition
+'}
+
+'package "Repository" {
+'    [ForestEventProcessor] as repoForest
+'
+'    node "ForestEventReplicator" as repoForestReplicator {
+'        [EventIdReplacingEventProcessor] as repoForestReplicator_replacingFilter 
+'        [Replicator] as repoForestReplicator_replicator
+'        [EventIdFilteringEventProcessor] as repoForestReplicator_filter
+'        
+'        repoForestReplicator_replacingFilter --> repoForestReplicator_replicator
+'        repoForestReplicator_replicator --> repoForestReplicator_filter
+'    }
+'
+'    [PartitionEventProcessor] as repoPartition
+'
+'    node "PartitionEventReplicator" as repoPartitionReplicator {
+'        [EventIdReplacingEventProcessor] as repoPartitionReplicator_replacingFilter 
+'        [Replicator] as repoPartitionReplicator_replicator
+'        [EventIdFilteringEventProcessor] as repoPartitionReplicator_filter
+'        
+'        repoPartitionReplicator_replacingFilter --> repoPartitionReplicator_replicator
+'        repoPartitionReplicator_replicator --> repoPartitionReplicator_filter
+'    }
+'}
+@enduml

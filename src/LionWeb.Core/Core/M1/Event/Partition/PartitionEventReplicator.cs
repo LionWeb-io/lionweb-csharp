@@ -49,9 +49,9 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent>
     {
         SharedNodeMap.RegisterNode(_localPartition);
 
-        var publisher = _localPartition.GetProcessor();
-        if (publisher != null)
-            IProcessor.Connect(publisher, new LocalReceiver(_localPartition.GetId(), this));
+        var partitionProcessor = _localPartition.GetProcessor();
+        if (partitionProcessor != null)
+            IProcessor.Connect(partitionProcessor, new LocalReceiver(_localPartition.GetId(), this));
     }
 
     /// <see cref="SharedNodeMap.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,

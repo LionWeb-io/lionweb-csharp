@@ -32,24 +32,16 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
     private readonly IEventProcessor<IForestEvent> _forestEventReplicator;
-    private readonly LocalForestReceiver _localForestReceiver;
 
     public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, IEventProcessor<IForestEvent> forestEventReplicator)
     {
         _sharedNodeMap = sharedNodeMap;
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
         _forestEventReplicator = forestEventReplicator;
-        _localForestReceiver = new LocalForestReceiver(this, this);
     }
 
     public void Init()
     {
-        foreach (var partition in _sharedNodeMap.Values.OfType<IPartitionInstance>())
-        {
-            OnLocalPartitionAdded(partition);
-        }
-
-        IProcessor.Connect(_forestEventReplicator,  _localForestReceiver);
     }
 
     /// <inheritdoc />
@@ -57,34 +49,6 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
     {
         GC.SuppressFinalize(this);
     }
-
-    #region Local
-
-    private class LocalForestReceiver(object? sender, DeltaProtocolReceiverBase<TContent, TPartition, TForest> receiver) : EventProcessorBase<IForestEvent>(sender)
-    {
-        public override void Receive(IForestEvent forestEvent)
-        {
-            switch (forestEvent)
-            {
-                case PartitionAddedEvent e:
-                    receiver.OnLocalPartitionAdded(e.NewPartition);
-                    break;
-                case PartitionDeletedEvent e:
-                    receiver.OnLocalPartitionDeleted(e.DeletedPartition);
-                    break;
-            }
-        }
-    }
-
-    internal void OnLocalPartitionAdded(IPartitionInstance partition)
-    {
-    }
-
-    private void OnLocalPartitionDeleted(IPartitionInstance partition)
-    {
-    }
-
-    #endregion
 
     #region Remote
 
@@ -96,8 +60,8 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
                 var partitionEvent = MapPartition(partitionContent);
                 if (_sharedNodeMap.TryGetPartition(partitionEvent.ContextNodeId, out var partition))
                 {
-                    var eventForwarder = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
-                    eventForwarder.Receive(partitionEvent);
+                    var partitionReplicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
+                    partitionReplicator.Receive(partitionEvent);
                 } else
                 {
                     throw new InvalidOperationException();

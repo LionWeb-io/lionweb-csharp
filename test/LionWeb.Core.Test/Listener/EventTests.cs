@@ -787,10 +787,7 @@ public class EventsTest : EventTestsBase
         var clone = Clone(node);
 
         var replicator = CloningPartitionEventReplicator.Create(clone, new(), node.GetId());
-        // replicator.Init();
         IProcessor.Connect((IPartitionProcessor)node.GetProcessor(), replicator);
-        // new EventForwarder<IPartitionEvent>(node.GetPublisher(), replicator);
-        // replicator.ReplicateFrom(node.GetPublisher());
 
         return clone;
     }

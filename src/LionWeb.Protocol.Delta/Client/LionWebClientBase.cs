@@ -108,8 +108,8 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
     {
-        var eventProcessor = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
-        IProcessor.Connect(eventProcessor, new LocalPartitionReceiver(_name, this));
+        var partitionReplicator = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
+        IProcessor.Connect(partitionReplicator, new LocalPartitionReceiver(_name, this));
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent)
