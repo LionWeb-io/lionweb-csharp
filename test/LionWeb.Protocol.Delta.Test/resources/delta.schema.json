@@ -851,7 +851,7 @@
           "$ref": "#/$defs/DeleteAnnotationCommand"
         },
         {
-          "$ref": "#/$defs/ReplaceAnnotation"
+          "$ref": "#/$defs/ReplaceAnnotationCommand"
         },
         {
           "$ref": "#/$defs/MoveAnnotationFromOtherParent"
@@ -1483,10 +1483,10 @@
       "minProperties": 5,
       "maxProperties": 6
     },
-    "ReplaceAnnotation": {
+    "ReplaceAnnotationCommand": {
       "properties": {
         "messageKind": {
-          "const": "ReplaceAnnotation"
+          "const": "ReplaceAnnotationCommand"
         },
         "parent": {
           "$ref": "#/$defs/targetNode"

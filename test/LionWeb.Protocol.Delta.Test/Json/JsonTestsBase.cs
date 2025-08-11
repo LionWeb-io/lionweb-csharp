@@ -199,7 +199,7 @@ public abstract class JsonTestsBase
     protected static DeleteAnnotationCommand CreateDeleteAnnotationCommand() =>
         new(TargetNode(), Index(), TargetNode(), CommandId(), ProtocolMessages());
 
-    protected static ReplaceAnnotation CreateReplaceAnnotation() =>
+    protected static ReplaceAnnotationCommand CreateReplaceAnnotationCommand() =>
         new(Chunk(), TargetNode(), Index(), TargetNode(), CommandId(),
             ProtocolMessages());
 
@@ -316,7 +316,7 @@ public abstract class JsonTestsBase
         [CreateMoveAndReplaceChildInSameContainment()],
         [CreateAddAnnotationCommand()],
         [CreateDeleteAnnotationCommand()],
-        [CreateReplaceAnnotation()],
+        [CreateReplaceAnnotationCommand()],
         [CreateMoveAnnotationFromOtherParent()],
         [CreateMoveAnnotationInSameParent()],
         [CreateMoveAndReplaceAnnotationFromOtherParent()],
