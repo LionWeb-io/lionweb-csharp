@@ -55,7 +55,7 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
             switch (old)
             {
                 case null:
-                    PartitionCommander.Raise(new ChildAddedEvent(DestinationParent, added, Containment, _newIndex,
+                    PartitionProcessor.Receive(new ChildAddedEvent(DestinationParent, added, Containment, _newIndex,
                         GetEventId()));
                     break;
 
@@ -64,7 +64,7 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
                     var @event = new ChildMovedFromOtherContainmentEvent(DestinationParent, Containment, _newIndex, added,
                         old.Parent, old.Containment, old.Index, eventId);
                     RaiseOriginMoveEvent(old, @event);
-                    PartitionCommander.Raise(@event);
+                    PartitionProcessor.Receive(@event);
                     break;
 
                 case not null when old.Parent == DestinationParent && old.Containment == Containment && old.Index == _newIndex:
@@ -76,14 +76,14 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
                         _newIndex--;
                     if (old.Index != _newIndex)
                     {
-                        PartitionCommander.Raise(new ChildMovedInSameContainmentEvent(_newIndex, added, DestinationParent,
+                        PartitionProcessor.Receive(new ChildMovedInSameContainmentEvent(_newIndex, added, DestinationParent,
                             old.Containment, old.Index, GetEventId()));
                     }
 
                     break;
 
                 case not null when old.Parent == DestinationParent && old.Containment != Containment:
-                    PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentEvent(Containment, _newIndex,
+                    PartitionProcessor.Receive(new ChildMovedFromOtherContainmentInSameParentEvent(Containment, _newIndex,
                         added, DestinationParent, old.Containment, old.Index, GetEventId()));
                     break;
 
@@ -96,9 +96,9 @@ public class ContainmentAddMultipleEventEmitter<T> : ContainmentMultipleEventEmi
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(ChildAddedEvent),
             typeof(ChildMovedFromOtherContainmentEvent),
             typeof(ChildMovedFromOtherContainmentInSameParentEvent),

@@ -63,7 +63,7 @@ public class EventsTestSerialized : EventTestsBase
         );
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, partitionEvent) =>
+        node.GetProcessor().Subscribe<IPartitionEvent>((sender, partitionEvent) =>
         {
             var deltaCommand = new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionEvent);
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));

@@ -43,9 +43,7 @@ public class EventTests_Forest
         var cloneForest = new Forest();
 
         var replicator = CreateReplicator(cloneForest);
-        // replicator.Init();
-        IProcessor.Forward((IForestProcessor)forest.GetPublisher(), replicator);
-        // replicator.ReplicateFrom(forest.GetPublisher());
+        IProcessor.Connect(forest.GetProcessor(), replicator);
 
         forest.AddPartitions([node]);
 
@@ -69,10 +67,7 @@ public class EventTests_Forest
         var cloneForest = new Forest();
 
         var replicator = CreateReplicator(cloneForest);
-        // replicator.Init();
-        IProcessor.Forward((IForestProcessor)forest.GetPublisher(), replicator);
-        // new EventForwarder<IForestEvent>(forest.GetPublisher(), replicator);
-        // replicator.ReplicateFrom(forest.GetPublisher());
+        IProcessor.Connect(forest.GetProcessor(), replicator);
 
         forest.AddPartitions([node]);
 
@@ -96,9 +91,7 @@ public class EventTests_Forest
         cloneForest.AddPartitions([clone]);
 
         var replicator = CreateReplicator(cloneForest);
-        IProcessor.Forward((IForestProcessor)forest.GetPublisher(), replicator);
-        // replicator.Init();
-        // replicator.ReplicateFrom(forest.GetPublisher());
+        IProcessor.Connect(forest.GetProcessor(), replicator);
 
         node.Documentation = moved;
 
@@ -119,10 +112,7 @@ public class EventTests_Forest
         var cloneForest = new Forest();
 
         var replicator = CreateReplicator(cloneForest);
-        IProcessor.Forward((IForestProcessor)forest.GetPublisher(), replicator);
-        // replicator.Init();
-        // new EventForwarder<IForestEvent>(forest.GetPublisher(), replicator);
-        // replicator.ReplicateFrom(forest.GetPublisher());
+        IProcessor.Connect(forest.GetProcessor(), replicator);
 
         forest.AddPartitions([node, originPartition]);
 

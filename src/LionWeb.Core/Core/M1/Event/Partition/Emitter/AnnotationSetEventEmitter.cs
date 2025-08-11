@@ -56,7 +56,7 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            PartitionCommander.Raise(new AnnotationAddedEvent(DestinationParent, added.Element,
+                            PartitionProcessor.Receive(new AnnotationAddedEvent(DestinationParent, added.Element,
                                 added.RightIndex, GetEventId()));
                             break;
 
@@ -65,7 +65,7 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                             var @event = new AnnotationMovedFromOtherParentEvent(DestinationParent, added.RightIndex,
                                 added.Element, old.Parent, old.Index, eventId);
                             RaiseOriginMoveEvent(old, @event);
-                            PartitionCommander.Raise(@event);
+                            PartitionProcessor.Receive(@event);
                             break;
 
 
@@ -76,12 +76,12 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                     break;
 
                 case ListMoved<INode> moved:
-                    PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(moved.RightIndex, moved.LeftElement,
+                    PartitionProcessor.Receive(new AnnotationMovedInSameParentEvent(moved.RightIndex, moved.LeftElement,
                         DestinationParent, moved.LeftIndex, GetEventId()));
                     break;
 
                 case ListDeleted<INode> deleted:
-                    PartitionCommander.Raise(new AnnotationDeletedEvent(deleted.Element, DestinationParent, deleted.LeftIndex,
+                    PartitionProcessor.Receive(new AnnotationDeletedEvent(deleted.Element, DestinationParent, deleted.LeftIndex,
                         GetEventId()));
                     break;
             }
@@ -89,9 +89,9 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(AnnotationAddedEvent),
             typeof(AnnotationDeletedEvent),
             typeof(AnnotationMovedFromOtherParentEvent),

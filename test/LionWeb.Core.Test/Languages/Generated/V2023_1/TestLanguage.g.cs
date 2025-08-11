@@ -13,7 +13,6 @@ using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
-using M1.Event;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -408,14 +407,13 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 
 	public DataTypeTestConcept(string id) : base(id)
 	{
-		_eventForwarder = new(this);
+		_eventProcessor = new(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.DataTypeTestConcept;
-	private readonly PartitionEventProcessor _eventForwarder;
-	public IPartitionPublisher? GetPublisher() => _eventForwarder;
-	public IPartitionCommander? GetCommander() => _eventForwarder;
+	private readonly PartitionEventProcessor _eventProcessor;
+	public IPartitionProcessor? GetProcessor() => _eventProcessor;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -939,14 +937,13 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 	public LinkTestConcept(string id) : base(id)
 	{
-		_eventForwarder = new(this);
+		_eventProcessor = new(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.LinkTestConcept;
-	private readonly PartitionEventProcessor _eventForwarder;
-	public IPartitionPublisher? GetPublisher() => _eventForwarder;
-	public IPartitionCommander? GetCommander() => _eventForwarder;
+	private readonly PartitionEventProcessor _eventProcessor;
+	public IPartitionProcessor? GetProcessor() => _eventProcessor;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{

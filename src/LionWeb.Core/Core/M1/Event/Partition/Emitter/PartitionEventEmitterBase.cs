@@ -28,8 +28,8 @@ public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
 {
     protected readonly IPartitionInstance? DestinationPartition;
 
-    /// <see cref="IPartitionCommander"/> to use for our events, if any.
-    protected readonly IPartitionCommander? PartitionCommander;
+    /// <see cref="IPartitionProcessor"/> to use for our events, if any.
+    protected readonly IPartitionProcessor? PartitionProcessor;
 
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly NodeBase DestinationParent;
@@ -45,7 +45,7 @@ public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
         DestinationParent = destinationParent;
         _eventId = eventId;
         DestinationPartition = destinationParent.GetPartition();
-        PartitionCommander = DestinationPartition?.GetCommander();
+        PartitionProcessor = DestinationPartition?.GetProcessor();
     }
 
     /// Logic to execute <i>before</i> any changes to the underlying nodes.
@@ -57,7 +57,7 @@ public abstract class PartitionEventEmitterBase<T> where T : IReadableNode
     /// <summary>
     /// Whether this event should execute at all.
     /// </summary>
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     protected abstract bool IsActive();
 
     /// <summary>

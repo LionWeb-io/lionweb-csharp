@@ -128,13 +128,10 @@ public interface IConceptInstance<out T> : IReadableNode<T>, IConceptInstance wh
 /// <inheritdoc />
 public interface IPartitionInstance : IConceptInstance
 {
+    /// Optional hook to raise partition events.
     /// Optional hook to listen to partition events.
     /// Not supported by every implementation. 
-    IPartitionPublisher? GetPublisher() => null;
-
-    /// Optional hook to raise partition events.
-    /// Not supported by every implementation. 
-    IPartitionCommander? GetCommander() => null;
+    IPartitionProcessor? GetProcessor() => null;
 }
 
 /// <inheritdoc cref="IPartitionInstance" />
@@ -511,11 +508,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     }
 
     /// <summary>
-    /// Tries to retrieve the <see cref="IPartitionInstance.GetCommander"/> from this node's <see cref="Concept.Partition"/>.
+    /// Tries to retrieve the <see cref="IPartitionInstance.GetProcessor"/> from this node's <see cref="Concept.Partition"/>.
     /// </summary>
-    /// <returns>This node's <see cref="IPartitionCommander"/>, if available.</returns>
-    protected virtual IPartitionCommander? GetPartitionCommander() =>
-        this.GetPartition()?.GetCommander();
+    /// <returns>This node's <see cref="IPartitionProcessor"/>, if available.</returns>
+    protected virtual IPartitionProcessor? GetPartitionProcessor() =>
+        this.GetPartition()?.GetProcessor();
 
     #region Helpers
 
@@ -784,19 +781,19 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
     /// <param name="remover">
     ///     Optional Action to call for each removed element of <paramref name="list"/>.
-    ///     Only called if <see cref="GetPartitionCommander"/> is available.
+    ///     Only called if <see cref="GetPartitionProcessor"/> is available.
     /// </param>
     /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link, Action<IPartitionCommander, Index, T, IEventId?>? remover = null, IEventId? eventId = null)
+    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link, Action<IPartitionProcessor, Index, T, IEventId?>? remover = null, IEventId? eventId = null)
         where T : IReadableNode
     {
         AssureNotNull(list, link);
         AssureNotNullMembers(list, link);
 
-        var partitionCommander = GetPartitionCommander();
+        var partitionProcessor = GetPartitionProcessor();
 
         bool result = false;
         foreach (T node in list)
@@ -809,8 +806,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
             result = true;
             if(node is  INode iNode)
                 SetParentInternal(iNode, null);
-            if (partitionCommander != null && remover != null)
-                remover(partitionCommander, index, node, eventId);
+            if (partitionProcessor != null && remover != null)
+                remover(partitionProcessor, index, node, eventId);
         }
 
         return result;
@@ -824,14 +821,14 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
     /// <param name="storage">Storage of nodes.</param>
     /// <param name="remover">
     ///     Optional Action to call for each removed element of <paramref name="safeNodes"/>.
-    ///     Only called if <see cref="GetPartitionCommander"/> is available.
+    ///     Only called if <see cref="GetPartitionProcessor"/> is available.
     /// </param>
     /// <param name="eventId">The event ID of the event that triggers this action</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
-    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, Index, T, IEventId?>? remover, IEventId? eventId = null)
+    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionProcessor, Index, T, IEventId?>? remover, IEventId? eventId = null)
         where T : IReadableNode
     {
-        var partitionCommander = GetPartitionCommander();
+        var partitionProcessor = GetPartitionProcessor();
 
         foreach (var node in safeNodes)
         {
@@ -840,27 +837,27 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode // IEventableNod
                 continue;
 
             storage.RemoveAt(index);
-            if (partitionCommander != null && remover != null)
-                remover(partitionCommander, index, node, eventId);
+            if (partitionProcessor != null && remover != null)
+                remover(partitionProcessor, index, node, eventId);
         }
     }
 
     /// Raises <see cref="ReferenceDeletedEvent"/> for <paramref name="reference"/>.
-    protected Action<IPartitionCommander, Index, T, IEventId> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
-        (commander, index, node, eventId) =>
+    protected Action<IPartitionProcessor, Index, T, IEventId> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
+        (processor, index, node, eventId) =>
         {
             IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
-            commander.Raise(new ReferenceDeletedEvent(this, reference, index, deletedTarget, eventId));
+            processor.Receive(new ReferenceDeletedEvent(this, reference, index, deletedTarget, eventId));
         };
 
     /// Raises <see cref="ChildDeletedEvent"/> for <paramref name="containment"/>.
-    protected Action<IPartitionCommander, Index, T, IEventId> ContainmentRemover<T>(Containment containment) where T : INode =>
-        (commander, index, node, eventId) =>
-            commander.Raise(new ChildDeletedEvent(node, this, containment, index, eventId));
+    protected Action<IPartitionProcessor, Index, T, IEventId> ContainmentRemover<T>(Containment containment) where T : INode =>
+        (processor, index, node, eventId) =>
+            processor.Receive(new ChildDeletedEvent(node, this, containment, index, eventId));
 
     /// Raises <see cref="AnnotationDeletedEvent"/>.
-    private void AnnotationRemover(IPartitionCommander commander, Index index, INode node, IEventId eventId) =>
-        commander.Raise(new AnnotationDeletedEvent(node, this, index, eventId));
+    private void AnnotationRemover(IPartitionProcessor processor, Index index, INode node, IEventId eventId) =>
+        processor.Receive(new AnnotationDeletedEvent(node, this, index, eventId));
 
     #endregion
 }

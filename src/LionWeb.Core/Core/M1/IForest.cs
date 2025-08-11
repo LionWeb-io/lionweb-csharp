@@ -35,11 +35,8 @@ public interface IForest
     /// Removes <paramref name="partitions"/> from <c>this</c> forest.
     public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, IEventId? eventId = null);
 
-    /// <c>this</c> forest's publisher, if any.
-    IForestPublisher? GetPublisher();
-
-    /// <c>this</c> forest's commander, if any.
-    IForestCommander? GetCommander();
+    /// <c>this</c> forest's processor, if any.
+    IForestProcessor? GetProcessor();
 }
 
 /// <inheritdoc />
@@ -66,7 +63,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _eventProcessor.Raise(new PartitionAddedEvent(partition, eventId ?? _eventIdProvider.CreateEventId()));
+                _eventProcessor.Receive(new PartitionAddedEvent(partition, eventId ?? _eventIdProvider.CreateEventId()));
         }
     }
 
@@ -76,15 +73,12 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _eventProcessor.Raise(new PartitionDeletedEvent(partition, eventId ?? _eventIdProvider.CreateEventId()));
+                _eventProcessor.Receive(new PartitionDeletedEvent(partition, eventId ?? _eventIdProvider.CreateEventId()));
         }
     }
 
     /// <inheritdoc />
-    public IForestPublisher GetPublisher() => _eventProcessor;
-
-    /// <inheritdoc />
-    public IForestCommander GetCommander() => _eventProcessor;
+    public IForestProcessor GetProcessor() => _eventProcessor;
 
     /// <inheritdoc />
     public override string ToString() => $"{nameof(Forest)}@{GetHashCode()}";

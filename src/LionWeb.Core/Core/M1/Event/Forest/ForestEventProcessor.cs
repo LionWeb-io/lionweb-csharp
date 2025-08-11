@@ -17,20 +17,13 @@
 
 namespace LionWeb.Core.M1.Event.Forest;
 
-public interface IForestProcessor : IEventProcessor<IForestEvent>, IForestCommander, IForestPublisher;
-
 /// Provides events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-/// <seealso cref="IForestCommander"/>
-/// <seealso cref="ForestEventProcessor"/>
-public interface IForestPublisher : IPublisher<IForestEvent>;
-
 /// Raises events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-/// <seealso cref="IForestPublisher"/>
-/// <seealso cref="ForestEventProcessor"/>
-public interface IForestCommander : ICommander<IForestEvent>;
+public interface IForestProcessor : IEventProcessor<IForestEvent>;
 
-/// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestPublisher"/> events.
-/// <param name="sender">Optional sender of the events.</param>
+/// Forwards all <see cref="ModelEventProcessorBase{IForestEvent}.Receive">received</see> events
+/// unchanged to <i>following</i> processors,
+/// and to EventHandlers <see cref="ModelEventProcessorBase{IForestEvent}.Subscribe{TSubscribedEvent}">subscribed</see>
+/// to specific events.
 public class ForestEventProcessor(object? sender)
-    : CommanderPublisherEventProcessorBase<IForestEvent>(sender), IForestProcessor
-;
+    : ModelEventProcessorBase<IForestEvent>(sender), IForestProcessor;

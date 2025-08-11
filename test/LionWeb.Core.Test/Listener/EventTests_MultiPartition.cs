@@ -43,9 +43,9 @@ public class EventTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> deletions = [];
-        node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedChild)));
+        node.GetProcessor().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedChild)));
         List<(EventId, IReadableNode)> moves = [];
-        node.GetPublisher()
+        node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.AddShapes([moved]);
@@ -69,10 +69,10 @@ public class EventTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
-        originPartition.GetPublisher()
+        originPartition.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedChild)));
         List<(EventId, IReadableNode)> destinationMoves = [];
-        node.GetPublisher()
+        node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.AddShapes([moved]);
@@ -97,10 +97,10 @@ public class EventTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
-        originPartition.GetPublisher()
+        originPartition.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedChild)));
         List<(EventId, IReadableNode)> destinationMoves = [];
-        node.GetPublisher()
+        node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.InsertShapes(0, [moved]);
@@ -122,9 +122,9 @@ public class EventTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> deletions = [];
-        node.GetPublisher().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedChild)));
+        node.GetProcessor().Subscribe<ChildDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedChild)));
         List<(EventId, IReadableNode)> moves = [];
-        node.GetPublisher()
+        node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => moves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.Documentation = moved;
@@ -147,10 +147,10 @@ public class EventTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
-        originPartition.GetPublisher()
+        originPartition.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedChild)));
         List<(EventId, IReadableNode)> destinationMoves = [];
-        node.GetPublisher()
+        node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentEvent>((o, e) => destinationMoves.Add((e.EventId.ToString(), e.MovedChild)));
 
         node.Documentation = moved;
@@ -184,10 +184,10 @@ public class EventTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> deletions = [];
-        node.GetPublisher()
+        node.GetProcessor()
             .Subscribe<AnnotationDeletedEvent>((o, e) => deletions.Add((e.EventId.ToString(), e.DeletedAnnotation)));
         List<(EventId, IReadableNode)> moves = [];
-        node.GetPublisher()
+        node.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => moves.Add((e.EventId.ToString(), e.MovedAnnotation)));
 
         node.AddAnnotations([moved]);
@@ -212,10 +212,10 @@ public class EventTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
-        originPartition.GetPublisher()
+        originPartition.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedAnnotation)));
         List<(EventId, IReadableNode)> destinationMoves = [];
-        node.GetPublisher()
+        node.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) =>
                 destinationMoves.Add((e.EventId.ToString(), e.MovedAnnotation)));
 
@@ -242,10 +242,10 @@ public class EventTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(EventId, IReadableNode)> originMoves = [];
-        originPartition.GetPublisher()
+        originPartition.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) => originMoves.Add((e.EventId.ToString(), e.MovedAnnotation)));
         List<(EventId, IReadableNode)> destinationMoves = [];
-        node.GetPublisher()
+        node.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentEvent>((o, e) =>
                 destinationMoves.Add((e.EventId.ToString(), e.MovedAnnotation)));
 
@@ -264,10 +264,10 @@ public class EventTests_MultiPartition
     private static IEventProcessor<IPartitionEvent> CreateReplicator(Geometry clone, Geometry node)
     {
         var replicator = CloningPartitionEventReplicator.Create(clone, new(), "cloneReplicator");
-        IProcessor.Forward((IPartitionProcessor)node.GetPublisher(), replicator);
+        IProcessor.Connect((IPartitionProcessor)node.GetProcessor(), replicator);
         // replicator.Init();
-        // new EventForwarder<IPartitionEvent>(node.GetPublisher(), replicator);
-        // replicator.ReplicateFrom(node.GetPublisher());
+        // new EventForwarder<IPartitionEvent>(node.GetProcessor(), replicator);
+        // replicator.ReplicateFrom(node.GetProcessor());
         
         return replicator;
     }

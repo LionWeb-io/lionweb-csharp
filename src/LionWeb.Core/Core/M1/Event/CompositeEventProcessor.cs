@@ -17,10 +17,19 @@
 
 namespace LionWeb.Core.M1.Event;
 
+/// Composes two or more <see cref="IEventProcessor{TEvent}"/>s.
+///
+/// Every message this processor <see cref="Receive">receives</see>
+/// is forwarded to the first <see cref="_eventProcessors">component</see>.
+/// Each component is connected to the next component.
+/// The last component <see cref="Send">sends</see> to
+/// this processor's <i>following</i> processors.
 public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
     where TEvent : class, IEvent
 {
-    private readonly List<IEventProcessor<TEvent>> _eventProcessors;
+    private readonly IEventProcessor<TEvent> _firstProcessor;
+    private readonly IEventProcessor<TEvent> _lastProcessor;
+    private readonly IEnumerable<IEventProcessor<TEvent>> _eventProcessors;
     private readonly object? _sender;
 
     public CompositeEventProcessor(List<IEventProcessor<TEvent>> eventProcessors, object? sender)
@@ -29,6 +38,9 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
         _sender = sender;
         if(eventProcessors.Count < 2)
             throw new ArgumentException($"{nameof(CompositeEventProcessor<TEvent>)} must get at least 2 processors");
+        
+        _firstProcessor = eventProcessors[0];
+        _lastProcessor = eventProcessors[^1];
 
         var enumerator = eventProcessors.GetEnumerator();
         enumerator.MoveNext();
@@ -36,7 +48,7 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
         while(enumerator.MoveNext())
         {
             var current = enumerator.Current;
-            IProcessor.Forward(previous, current);
+            IProcessor.Connect(previous, current);
             
             previous = current;
         }
@@ -48,20 +60,20 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
 
     /// <inheritdoc />
     public void Receive(TEvent message) =>
-        _eventProcessors.First().Receive(message);
+        _firstProcessor.Receive(message);
 
     /// <inheritdoc />
     public bool CanReceive(params Type[] messageTypes) => 
-        _eventProcessors.First().CanReceive(messageTypes);
+        _firstProcessor.CanReceive(messageTypes);
 
     void IProcessor<TEvent, TEvent>.Send(TEvent message) =>
         throw new ArgumentException("Should never be called");
 
     void IProcessor<TEvent, TEvent>.Subscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) => 
-        _eventProcessors.Last().Subscribe(receiver);
+        _lastProcessor.Subscribe(receiver);
 
     void IProcessor<TEvent, TEvent>.Unsubscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) =>
-        _eventProcessors.Last().Unsubscribe(receiver);
+        _lastProcessor.Unsubscribe(receiver);
 
     /// <inheritdoc />
     public void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "")

@@ -1429,14 +1429,13 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 	public Geometry(string id) : base(id)
 	{
-		_eventForwarder = new(this);
+		_eventProcessor = new(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
-	private readonly PartitionEventProcessor _eventForwarder;
-	public IPartitionPublisher? GetPublisher() => _eventForwarder;
-	public IPartitionCommander? GetCommander() => _eventForwarder;
+	private readonly PartitionEventProcessor _eventProcessor;
+	public IPartitionProcessor? GetProcessor() => _eventProcessor;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -2294,14 +2293,13 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 
 	public ReferenceGeometry(string id) : base(id)
 	{
-		_eventForwarder = new(this);
+		_eventProcessor = new(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
-	private readonly PartitionEventProcessor _eventForwarder;
-	public IPartitionPublisher? GetPublisher() => _eventForwarder;
-	public IPartitionCommander? GetCommander() => _eventForwarder;
+	private readonly PartitionEventProcessor _eventProcessor;
+	public IPartitionProcessor? GetProcessor() => _eventProcessor;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{

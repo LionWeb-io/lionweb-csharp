@@ -68,6 +68,6 @@ public abstract class ContainmentEventEmitterBase<T> : PartitionEventEmitterBase
     protected void RaiseOriginMoveEvent(OldContainmentInfo old, ChildMovedFromOtherContainmentEvent @event)
     {
         if (old.Partition != null && old.Partition != DestinationPartition)
-            old.Partition.GetCommander()?.Raise(@event);
+            old.Partition.GetProcessor()?.Receive(@event);
     }
 }

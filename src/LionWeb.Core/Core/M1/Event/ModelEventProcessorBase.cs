@@ -17,38 +17,32 @@
 
 namespace LionWeb.Core.M1.Event;
 
-public abstract class CommanderPublisherEventProcessorBase<TEvent>(object? sender)
-    : EventProcessorBase<TEvent>(sender), ICommander<TEvent>, IPublisher<TEvent>
+/// Forwards all <see cref="Receive">received</see> events unchanged to <i>following</i> processors,
+/// and to EventHandlers <see cref="Subscribe{TSubscribedEvent}">subscribed</see> to specific events.
+public abstract class ModelEventProcessorBase<TEvent>(object? sender)
+    : EventProcessorBase<TEvent>(sender)
     where TEvent : IEvent
 {
-    private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(sender);
-
     /// <inheritdoc />
-    public void Raise(TEvent @event)
-    {
-        if (@event.EventId == null)
-            @event.EventId = _eventIdProvider.CreateEventId();
-
-        Receive(@event);
-    }
-
-    /// <inheritdoc />
-    public bool CanRaise(params Type[] eventTypes) =>
-        CanReceive(eventTypes);
-
     public override void Receive(TEvent message) =>
         Send(message);
 
-    /// <inheritdoc />
+    /// Registers <paramref name="handler"/> to be notified of events compatible with <typeparamref name="TSubscribedEvent"/>.
+    /// <typeparam name="TSubscribedEvent">
+    /// Type of events <paramref name="handler"/> is interested in.
+    /// Events raised by this publisher that are <i>not</i> compatible with <typeparamref name="TSubscribedEvent"/>
+    /// will <i>not</i> reach <paramref name="handler"/>.
+    /// </typeparam> 
     public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
         where TSubscribedEvent : class, TEvent =>
-        IProcessor.Forward<TEvent, TSubscribedEvent, TSubscribedEvent>(this,
+        IProcessor.Connect<TEvent, TSubscribedEvent, TSubscribedEvent>(this,
             new EventHandlerProcessor<TSubscribedEvent>(handler)
             {
-                ProcessorId = sender?.ToString() ?? GetType().Name
+                ProcessorId = Sender.ToString() ?? GetType().Name
             });
 
-    /// <inheritdoc />
+    /// Unregisters <paramref name="handler"/> from notification of events.
+    /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
     public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
         where TSubscribedEvent : class, TEvent => throw new NotImplementedException();
 }

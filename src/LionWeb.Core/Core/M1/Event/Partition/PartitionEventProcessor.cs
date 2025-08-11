@@ -17,20 +17,27 @@
 
 namespace LionWeb.Core.M1.Event.Partition;
 
-public interface IPartitionProcessor : IEventProcessor<IPartitionEvent>, IPartitionCommander, IPartitionPublisher;
-
 /// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-/// <seealso cref="IPartitionCommander"/>
-/// <seealso cref="PartitionEventProcessor"/>
-public interface IPartitionPublisher : IPublisher<IPartitionEvent>;
-
 /// Raises events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-/// <seealso cref="IPartitionPublisher"/>
-/// <seealso cref="PartitionEventProcessor"/>
-public interface IPartitionCommander : ICommander<IPartitionEvent>;
+public interface IPartitionProcessor : IEventProcessor<IPartitionEvent>
+{
+    /// Registers <paramref name="handler"/> to be notified of events compatible with <typeparamref name="TSubscribedEvent"/>.
+    /// <typeparam name="TSubscribedEvent">
+    /// Type of events <paramref name="handler"/> is interested in.
+    /// Events raised by this publisher that are <i>not</i> compatible with <typeparamref name="TSubscribedEvent"/>
+    /// will <i>not</i> reach <paramref name="handler"/>.
+    /// </typeparam> 
+    void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, IPartitionEvent;
 
-/// Forwards <see cref="IPartitionCommander"/> commands to <see cref="IPartitionPublisher"/> events.
-/// <param name="sender">Optional sender of the events.</param>
+    /// Unregisters <paramref name="handler"/> from notification of events.
+    /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
+    void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, IPartitionEvent;
+}
+
+/// Forwards all <see cref="ModelEventProcessorBase{IPartitionEvent}.Receive">received</see> events
+/// unchanged to <i>following</i> processors,
+/// and to EventHandlers <see cref="ModelEventProcessorBase{IPartitionEvent}.Subscribe{TSubscribedEvent}">subscribed</see>
+/// to specific events.
 public class PartitionEventProcessor(object? sender)
-    : CommanderPublisherEventProcessorBase<IPartitionEvent>(sender), IPartitionProcessor
+    : ModelEventProcessorBase<IPartitionEvent>(sender), IPartitionProcessor
 ;

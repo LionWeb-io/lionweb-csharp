@@ -48,7 +48,7 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
             OnLocalPartitionAdded(partition);
         }
 
-        IProcessor.Forward(_forestEventReplicator,  _localForestReceiver);
+        IProcessor.Connect(_forestEventReplicator,  _localForestReceiver);
     }
 
     /// <inheritdoc />

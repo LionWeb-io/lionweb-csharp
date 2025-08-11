@@ -48,17 +48,17 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
         {
             case (null, { } v):
                 IReferenceTarget newTarget = new ReferenceTarget(null, v);
-                PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, 0, newTarget,
+                PartitionProcessor.Receive(new ReferenceAddedEvent(DestinationParent, Reference, 0, newTarget,
                     GetEventId()));
                 break;
             case ({ } o, null):
                 IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
-                PartitionCommander.Raise(new ReferenceDeletedEvent(DestinationParent, Reference, 0, deletedTarget,
+                PartitionProcessor.Receive(new ReferenceDeletedEvent(DestinationParent, Reference, 0, deletedTarget,
                     GetEventId()));
                 break;
             case ({ } o, { } n):
                 IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
-                PartitionCommander.Raise(new ReferenceChangedEvent(DestinationParent, Reference, 0,
+                PartitionProcessor.Receive(new ReferenceChangedEvent(DestinationParent, Reference, 0,
                     new ReferenceTarget(null, n), replacedTarget,
                     GetEventId()));
                 break;
@@ -66,9 +66,9 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(ReferenceAddedEvent),
             typeof(ReferenceDeletedEvent),
             typeof(ReferenceChangedEvent)

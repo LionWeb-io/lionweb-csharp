@@ -33,9 +33,9 @@ public class EventTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        node.GetPublisher().Subscribe<PropertyAddedEvent>((sender, args) => { } );
-        node.GetPublisher().Subscribe<PropertyChangedEvent>((sender, args) => { });
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => { });
+        node.GetProcessor().Subscribe<PropertyAddedEvent>((sender, args) => { } );
+        node.GetProcessor().Subscribe<PropertyChangedEvent>((sender, args) => { });
+        node.GetProcessor().Subscribe<IPartitionEvent>((sender, args) => { });
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -50,9 +50,9 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetPublisher().Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
+        node.GetProcessor().Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
         
-        node.GetPublisher().Subscribe<PropertyChangedEvent>((sender, args) => {});
+        node.GetProcessor().Subscribe<PropertyChangedEvent>((sender, args) => {});
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -68,13 +68,13 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetPublisher().Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
+        node.GetProcessor().Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
         
         int changedCount = 0;
-        node.GetPublisher().Subscribe<PropertyChangedEvent>((sender, args) => changedCount++);
+        node.GetProcessor().Subscribe<PropertyChangedEvent>((sender, args) => changedCount++);
 
         int allCount = 0;
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => allCount++);
+        node.GetProcessor().Subscribe<IPartitionEvent>((sender, args) => allCount++);
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -97,10 +97,10 @@ public class EventTests_Infrastructure
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
         int nodeCount = 0;
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => nodeCount++);
+        node.GetProcessor().Subscribe<IPartitionEvent>((sender, args) => nodeCount++);
         
         int cloneCount = 0;
-        clone.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => cloneCount++);
+        clone.GetProcessor().Subscribe<IPartitionEvent>((sender, args) => cloneCount++);
         
         circle.Name = "Hello";
         cloneCircle.Name = "World";
@@ -146,8 +146,8 @@ public class EventTests_Infrastructure
         var cloneReplicator = PartitionEventReplicator.Create(node, new(), "nodeReplicator");
         // cloneReplicator.Init();
         
-        IProcessor.Forward(cloneReplicator, replicator);
-        IProcessor.Forward(replicator, cloneReplicator);
+        IProcessor.Connect(cloneReplicator, replicator);
+        IProcessor.Connect(replicator, cloneReplicator);
      
         // new EventForwarder<IPartitionEvent>(cloneReplicator, replicator);
         // new EventForwarder<IPartitionEvent>(replicator, cloneReplicator);

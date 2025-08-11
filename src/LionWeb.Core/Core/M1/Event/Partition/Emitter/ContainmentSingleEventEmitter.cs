@@ -70,37 +70,37 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
                 break;
 
             case (not null, null, _):
-                PartitionCommander.Raise(new ChildDeletedEvent(_oldValue, DestinationParent, Containment, 0,
+                PartitionProcessor.Receive(new ChildDeletedEvent(_oldValue, DestinationParent, Containment, 0,
                     GetEventId()));
                 break;
 
             case (null, not null, null):
-                PartitionCommander.Raise(new ChildAddedEvent(DestinationParent, _newValue, Containment, 0,
+                PartitionProcessor.Receive(new ChildAddedEvent(DestinationParent, _newValue, Containment, 0,
                     GetEventId()));
                 break;
 
             case (not null, not null, null):
-                PartitionCommander.Raise(new ChildReplacedEvent(_newValue, _oldValue, DestinationParent, Containment, 0,
+                PartitionProcessor.Receive(new ChildReplacedEvent(_newValue, _oldValue, DestinationParent, Containment, 0,
                     GetEventId()));
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentEvent(Containment, 0, _newValue,
+                PartitionProcessor.Receive(new ChildMovedFromOtherContainmentInSameParentEvent(Containment, 0, _newValue,
                     DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index,
                     GetEventId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(Containment, 0,
+                PartitionProcessor.Receive(new ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(Containment, 0,
                     _newValue, DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, _oldValue,
                     GetEventId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent != DestinationParent:
-                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentEvent(DestinationParent,
+                PartitionProcessor.Receive(new ChildMovedAndReplacedFromOtherContainmentEvent(DestinationParent,
                     Containment, 0, _newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index, _oldValue,
                     GetEventId()));
@@ -112,7 +112,7 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
                 var @event = new ChildMovedFromOtherContainmentEvent(DestinationParent, Containment, 0, _newValue,
                     _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, eventId);
                 RaiseOriginMoveEvent(_oldContainmentInfo, @event);
-                PartitionCommander.Raise(@event);
+                PartitionProcessor.Receive(@event);
                 break;
 
             default:
@@ -121,10 +121,10 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     [MemberNotNullWhen(true, nameof(_oldContainmentInfo))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(ChildAddedEvent),
             typeof(ChildDeletedEvent),
             typeof(ChildReplacedEvent),

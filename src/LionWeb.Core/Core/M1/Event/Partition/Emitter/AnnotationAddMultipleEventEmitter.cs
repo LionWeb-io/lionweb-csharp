@@ -50,7 +50,7 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
             switch (old)
             {
                 case null:
-                    PartitionCommander.Raise(new AnnotationAddedEvent(DestinationParent, added, _newIndex,
+                    PartitionProcessor.Receive(new AnnotationAddedEvent(DestinationParent, added, _newIndex,
                         GetEventId()));
                     break;
 
@@ -59,7 +59,7 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
                     var @event = new AnnotationMovedFromOtherParentEvent(DestinationParent, _newIndex, added, old.Parent,
                         old.Index, eventId);
                     RaiseOriginMoveEvent(old, @event);
-                    PartitionCommander.Raise(@event);
+                    PartitionProcessor.Receive(@event);
                     break;
 
 
@@ -68,7 +68,7 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
                     break;
 
                 case not null when old.Parent == DestinationParent:
-                    PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(_newIndex, added, DestinationParent,
+                    PartitionProcessor.Receive(new AnnotationMovedInSameParentEvent(_newIndex, added, DestinationParent,
                         old.Index, GetEventId()));
                     break;
 
@@ -81,9 +81,9 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(AnnotationAddedEvent),
             typeof(AnnotationMovedFromOtherParentEvent),
             typeof(AnnotationMovedInSameParentEvent)

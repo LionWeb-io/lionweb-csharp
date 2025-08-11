@@ -61,6 +61,6 @@ public abstract class AnnotationEventEmitterBase : PartitionEventEmitterBase<INo
     protected void RaiseOriginMoveEvent(OldAnnotationInfo old, AnnotationMovedFromOtherParentEvent @event)
     {
         if (old.Partition != null && old.Partition != DestinationPartition)
-            old.Partition.GetCommander()?.Raise(@event);
+            old.Partition.GetProcessor()?.Receive(@event);
     }
 }

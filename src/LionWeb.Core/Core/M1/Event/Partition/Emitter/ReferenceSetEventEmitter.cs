@@ -58,18 +58,18 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
             {
                 case ListAdded<T> added:
                     IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
-                    PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, added.RightIndex, newTarget,
+                    PartitionProcessor.Receive(new ReferenceAddedEvent(DestinationParent, Reference, added.RightIndex, newTarget,
                         GetEventId()));
                     break;
                 case ListMoved<T> moved:
                     IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
-                    PartitionCommander.Raise(new EntryMovedInSameReferenceEvent(DestinationParent, Reference, moved.RightIndex,
+                    PartitionProcessor.Receive(new EntryMovedInSameReferenceEvent(DestinationParent, Reference, moved.RightIndex,
                         moved.LeftIndex, target,
                         GetEventId()));
                     break;
                 case ListDeleted<T> deleted:
                     IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
-                    PartitionCommander.Raise(new ReferenceDeletedEvent(DestinationParent, Reference, deleted.LeftIndex,
+                    PartitionProcessor.Receive(new ReferenceDeletedEvent(DestinationParent, Reference, deleted.LeftIndex,
                         deletedTarget, GetEventId()));
                     break;
             }
@@ -77,9 +77,9 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(ReferenceAddedEvent),
             typeof(EntryMovedInSameReferenceEvent),
             typeof(ReferenceDeletedEvent)

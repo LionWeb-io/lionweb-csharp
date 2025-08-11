@@ -54,9 +54,9 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
             RegisterPartition(partition);
         }
 
-        var forestPublisher = _localForest.GetPublisher();
-        if (forestPublisher is IForestProcessor processor)
-            IProcessor.Forward(processor, new LocalReceiver(_localForest, this));
+        var forestPublisher = _localForest.GetProcessor();
+        if (forestPublisher != null)
+            IProcessor.Connect(forestPublisher, new LocalReceiver(_localForest, this));
     }
 
     /// <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">Unsubscribes</see>

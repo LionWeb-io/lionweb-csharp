@@ -50,15 +50,15 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
         foreach (var node in SafeNodes)
         {
             IReferenceTarget newTarget = new ReferenceTarget(null, node);
-            PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, index++, newTarget,
+            PartitionProcessor.Receive(new ReferenceAddedEvent(DestinationParent, Reference, index++, newTarget,
                 GetEventId()));
         }
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(ReferenceAddedEvent)
         );
 }

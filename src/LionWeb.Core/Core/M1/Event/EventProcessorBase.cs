@@ -21,7 +21,7 @@ using Forest;
 using Partition;
 using System.Reflection;
 
-/// Base class to forward all <see cref="ForwardTo">raised</see> events.
+/// Base for all <see cref="IProcessor">processors</see> that process <see cref="IEvent">events</see>.
 public abstract class EventProcessorBase
 {
     protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
@@ -43,10 +43,10 @@ public abstract class EventProcessorBase
     }
 }
 
-/// Forwards <see cref="ICommander{TEvent}"/> commands to <see cref="IPublisher{TEvent}"/> events.
+/// <inheritdoc cref="EventProcessorBase"/>
 public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventProcessor<TEvent> where TEvent : IEvent
 {
-    private readonly object _sender;
+    protected readonly object Sender;
     private readonly Dictionary<Type, int> _subscribedEvents = [];
     private readonly Dictionary<IProcessor, EventHandler<TEvent>> _handlers = [];
 
@@ -54,12 +54,12 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
     /// <param name="sender">Optional sender of the events.</param>
     protected EventProcessorBase(object? sender)
     {
-        _sender = sender ?? this;
+        Sender = sender ?? this;
     }
 
     /// <inheritdoc />
     public string ProcessorId =>
-        _sender?.ToString() ?? GetType().Name;
+        Sender.ToString() ?? GetType().Name;
 
     /// <inheritdoc />
     public abstract void Receive(TEvent message);
@@ -79,7 +79,7 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
 
     /// <inheritdoc cref="IProcessor{TReceive,TSend}.Send"/>
     protected void Send(TEvent message) =>
-        InternalEvent?.Invoke(_sender, message);
+        InternalEvent?.Invoke(Sender, message);
 
     /// <inheritdoc />
     void IProcessor<TEvent, TEvent>.Subscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) =>
@@ -98,12 +98,11 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
     }
 
     private EventHandler<TEvent> CreateHandler<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver)
-        =>
-            (object? _, TEvent @event) =>
-            {
-                if (@event is TReceiveTo r)
-                    receiver.Receive(r);
-            };
+        => (_, @event) =>
+        {
+            if (@event is TReceiveTo r)
+                receiver.Receive(r);
+        };
 
     private void RegisterSubscribedEvents<TSubscribedEvent>()
     {
@@ -149,7 +148,7 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
     /// <inheritdoc />
     public void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "")
     {
-        Console.WriteLine($"{indent}{this.GetType().Name}({_sender})");
+        Console.WriteLine($"{indent}{this.GetType().Name}({Sender})");
         if (IProcessor.RecursionDetected(this, alreadyPrinted, indent))
             return;
 

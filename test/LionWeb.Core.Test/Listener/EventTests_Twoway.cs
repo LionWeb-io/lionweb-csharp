@@ -839,8 +839,8 @@ public class EventTests_Twoway
         var cloneReplicator = CreateReplicator(clone, "cloneReplicator");
         // cloneReplicator.Init();
         
-        IProcessor.Forward(cloneReplicator, replicator);
-        IProcessor.Forward(replicator, cloneReplicator);
+        IProcessor.Connect(cloneReplicator, replicator);
+        IProcessor.Connect(replicator, cloneReplicator);
      
         // new EventForwarder<IPartitionEvent>(cloneReplicator, replicator);
         // new EventForwarder<IPartitionEvent>(replicator, cloneReplicator);

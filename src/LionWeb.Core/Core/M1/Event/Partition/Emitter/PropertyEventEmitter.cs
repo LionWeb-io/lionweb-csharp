@@ -51,24 +51,24 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
         switch (_oldValue, _newValue)
         {
             case (null, { } v):
-                PartitionCommander.Raise(new PropertyAddedEvent(DestinationParent, _property, v,
+                PartitionProcessor.Receive(new PropertyAddedEvent(DestinationParent, _property, v,
                     GetEventId()));
                 break;
             case ({ } o, null):
-                PartitionCommander.Raise(new PropertyDeletedEvent(DestinationParent, _property, o,
+                PartitionProcessor.Receive(new PropertyDeletedEvent(DestinationParent, _property, o,
                     GetEventId()));
                 break;
             case ({ } o, { } n):
-                PartitionCommander.Raise(new PropertyChangedEvent(DestinationParent, _property, n, o,
+                PartitionProcessor.Receive(new PropertyChangedEvent(DestinationParent, _property, n, o,
                     GetEventId()));
                 break;
         }
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(PropertyAddedEvent),
             typeof(PropertyDeletedEvent),
             typeof(PropertyChangedEvent)

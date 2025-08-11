@@ -18,7 +18,7 @@
 namespace LionWeb.Core.M1.Event;
 
 internal class EventHandlerProcessor<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
-    : IEventProcessor<TSubscribedEvent>
+    : IEventProcessor<TSubscribedEvent> where TSubscribedEvent : IEvent
 {
     public required string ProcessorId { get; init; }
 
