@@ -145,11 +145,6 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
             var clone = (IPartitionInstance)AdjustRemoteNode(newPartition);
 
             _localForest.AddPartitions([clone], partitionAddedEvent.EventId);
-
-            var remoteListener = partitionAddedEvent.NewPartition.GetPublisher();
-            if (remoteListener is IPartitionProcessor processor)
-                IProcessor.Forward(processor,
-                    _sharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId()));
         });
 
     private void OnRemotePartitionDeleted(PartitionDeletedEvent partitionDeletedEvent) =>

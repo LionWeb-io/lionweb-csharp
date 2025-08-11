@@ -78,7 +78,6 @@ public class SharedNodeMap : IDisposable
             return true;
         }
 
-        ;
         return false;
     }
 }

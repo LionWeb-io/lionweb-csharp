@@ -96,10 +96,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent>
         }
     }
 
-    private void LocalHandler(object? _, IPartitionEvent partitionEvent)
-    {
-    }
-
     private void OnLocalChildAdded(ChildAddedEvent childAddedEvent) =>
         SharedNodeMap.RegisterNode(childAddedEvent.NewChild);
 

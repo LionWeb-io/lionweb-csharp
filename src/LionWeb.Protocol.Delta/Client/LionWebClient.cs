@@ -230,8 +230,11 @@ public class LionWebTestClient(
 
     /// Wait until <paramref name="delta"/> <i>more</i> messages than at the last call have been received.
     /// Counts any kind of <see cref="IDeltaContent">delta message</see>.
-    public void WaitForReceived(int delta) =>
+    public void WaitForReceived(int delta)
+    {
+        Log($"{nameof(WaitCount)}: {WaitCount} delta: {delta}");
         WaitForCount(WaitCount += delta);
+    }
 
     /// <inheritdoc />
     protected override void Receive(IDeltaContent content)
