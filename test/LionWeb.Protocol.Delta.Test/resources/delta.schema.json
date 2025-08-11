@@ -845,10 +845,10 @@
           "$ref": "#/$defs/MoveAndReplaceChildInSameContainment"
         },
         {
-          "$ref": "#/$defs/AddAnnotation"
+          "$ref": "#/$defs/AddAnnotationCommand"
         },
         {
-          "$ref": "#/$defs/DeleteAnnotation"
+          "$ref": "#/$defs/DeleteAnnotationCommand"
         },
         {
           "$ref": "#/$defs/ReplaceAnnotation"
@@ -1419,10 +1419,10 @@
       "minProperties": 5,
       "maxProperties": 6
     },
-    "AddAnnotation": {
+    "AddAnnotationCommand": {
       "properties": {
         "messageKind": {
-          "const": "AddAnnotation"
+          "const": "AddAnnotationCommand"
         },
         "parent": {
           "$ref": "#/$defs/targetNode"
@@ -1451,10 +1451,10 @@
       "minProperties": 5,
       "maxProperties": 6
     },
-    "DeleteAnnotation": {
+    "DeleteAnnotationCommand": {
       "properties": {
         "messageKind": {
-          "const": "DeleteAnnotation"
+          "const": "DeleteAnnotationCommand"
         },
         "parent": {
           "$ref": "#/$defs/targetNode"
