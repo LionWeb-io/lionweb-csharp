@@ -32,7 +32,7 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -55,7 +55,7 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -79,7 +79,7 @@ public class ReferenceTests_Single_Listener
         source.AltSource = reference;
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -103,7 +103,7 @@ public class ReferenceTests_Single_Listener
         source.AltSource = reference;
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -128,7 +128,7 @@ public class ReferenceTests_Single_Listener
         var newTarget = new Line("newTarget");
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceChangedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceChangedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -139,8 +139,8 @@ public class ReferenceTests_Single_Listener
         });
 
         int badEvents = 0;
-        partition.GetPublisher().Subscribe<ReferenceAddedEvent>((_, _) => badEvents++);
-        partition.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => badEvents++);
+        partition.GetPublisher().Subscribe<ReferenceAddedNotification>((_, _) => badEvents++);
+        partition.GetPublisher().Subscribe<ReferenceDeletedNotification>((_, _) => badEvents++);
 
         source.AltSource = newTarget;
 
@@ -159,7 +159,7 @@ public class ReferenceTests_Single_Listener
         var newTarget = new Line("newTarget");
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceChangedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceChangedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -170,8 +170,8 @@ public class ReferenceTests_Single_Listener
         });
 
         int badEvents = 0;
-        partition.GetPublisher().Subscribe<ReferenceAddedEvent>((_, _) => badEvents++);
-        partition.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => badEvents++);
+        partition.GetPublisher().Subscribe<ReferenceAddedNotification>((_, _) => badEvents++);
+        partition.GetPublisher().Subscribe<ReferenceDeletedNotification>((_, _) => badEvents++);
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, newTarget);
 
@@ -188,7 +188,7 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -212,7 +212,7 @@ public class ReferenceTests_Single_Listener
         source.Source = reference;
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -236,7 +236,7 @@ public class ReferenceTests_Single_Listener
         source.Source = reference;
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -262,7 +262,7 @@ public class ReferenceTests_Single_Listener
         var newTarget = new Line("newTarget");
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceChangedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceChangedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -273,8 +273,8 @@ public class ReferenceTests_Single_Listener
         });
 
         int badEvents = 0;
-        partition.GetPublisher().Subscribe<ReferenceAddedEvent>((_, _) => badEvents++);
-        partition.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => badEvents++);
+        partition.GetPublisher().Subscribe<ReferenceAddedNotification>((_, _) => badEvents++);
+        partition.GetPublisher().Subscribe<ReferenceDeletedNotification>((_, _) => badEvents++);
 
         source.Source = newTarget;
 
@@ -293,7 +293,7 @@ public class ReferenceTests_Single_Listener
         var newTarget = new Line("newTarget");
 
         int events = 0;
-        partition.GetPublisher().Subscribe<ReferenceChangedEvent>((_, args) =>
+        partition.GetPublisher().Subscribe<ReferenceChangedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(source, args.Parent);
@@ -304,8 +304,8 @@ public class ReferenceTests_Single_Listener
         });
 
         int badEvents = 0;
-        partition.GetPublisher().Subscribe<ReferenceAddedEvent>((_, _) => badEvents++);
-        partition.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => badEvents++);
+        partition.GetPublisher().Subscribe<ReferenceAddedNotification>((_, _) => badEvents++);
+        partition.GetPublisher().Subscribe<ReferenceDeletedNotification>((_, _) => badEvents++);
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, newTarget);
 

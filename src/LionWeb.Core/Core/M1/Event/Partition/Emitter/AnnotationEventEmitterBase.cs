@@ -58,9 +58,9 @@ public abstract class AnnotationEventEmitterBase : PartitionEventEmitterBase<INo
     /// <param name="Index"></param>
     protected record OldAnnotationInfo(INode Parent, Index Index, IPartitionInstance? Partition);
 
-    protected void RaiseOriginMoveEvent(OldAnnotationInfo old, AnnotationMovedFromOtherParentEvent @event)
+    protected void RaiseOriginMoveEvent(OldAnnotationInfo old, AnnotationMovedFromOtherParentNotification notification)
     {
         if (old.Partition != null && old.Partition != DestinationPartition)
-            old.Partition.GetCommander()?.Raise(@event);
+            old.Partition.GetCommander()?.Raise(notification);
     }
 }

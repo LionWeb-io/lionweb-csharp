@@ -56,13 +56,13 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            PartitionCommander.Raise(new AnnotationAddedEvent(DestinationParent, added.Element,
+                            PartitionCommander.Raise(new AnnotationAddedNotification(DestinationParent, added.Element,
                                 added.RightIndex, GetEventId()));
                             break;
 
                         case { } old when old.Parent != DestinationParent:
                             var eventId = GetEventId();
-                            var @event = new AnnotationMovedFromOtherParentEvent(DestinationParent, added.RightIndex,
+                            var @event = new AnnotationMovedFromOtherParentNotification(DestinationParent, added.RightIndex,
                                 added.Element, old.Parent, old.Index, eventId);
                             RaiseOriginMoveEvent(old, @event);
                             PartitionCommander.Raise(@event);
@@ -76,12 +76,12 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
                     break;
 
                 case ListMoved<INode> moved:
-                    PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(moved.RightIndex, moved.LeftElement,
+                    PartitionCommander.Raise(new AnnotationMovedInSameParentNotification(moved.RightIndex, moved.LeftElement,
                         DestinationParent, moved.LeftIndex, GetEventId()));
                     break;
 
                 case ListDeleted<INode> deleted:
-                    PartitionCommander.Raise(new AnnotationDeletedEvent(deleted.Element, DestinationParent, deleted.LeftIndex,
+                    PartitionCommander.Raise(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,
                         GetEventId()));
                     break;
             }
@@ -92,9 +92,9 @@ public class AnnotationSetEventEmitter : AnnotationEventEmitterBase
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
         PartitionCommander != null && PartitionCommander.CanRaise(
-            typeof(AnnotationAddedEvent),
-            typeof(AnnotationDeletedEvent),
-            typeof(AnnotationMovedFromOtherParentEvent),
-            typeof(AnnotationMovedInSameParentEvent)
+            typeof(AnnotationAddedNotification),
+            typeof(AnnotationDeletedNotification),
+            typeof(AnnotationMovedFromOtherParentNotification),
+            typeof(AnnotationMovedInSameParentNotification)
         );
 }

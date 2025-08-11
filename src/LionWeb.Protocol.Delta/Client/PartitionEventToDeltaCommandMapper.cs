@@ -39,56 +39,56 @@ public class PartitionEventToDeltaCommandMapper
         _propertySerializer = ISerializerVersionSpecifics.Create(lionWebVersion);
     }
 
-    public IDeltaCommand Map(IPartitionEvent partitionEvent) =>
-        partitionEvent switch
+    public IDeltaCommand Map(IPartitionNotification partitionNotification) =>
+        partitionNotification switch
         {
-            PropertyAddedEvent a => OnPropertyAdded(a),
-            PropertyDeletedEvent a => OnPropertyDeleted(a),
-            PropertyChangedEvent a => OnPropertyChanged(a),
-            ChildAddedEvent a => OnChildAdded(a),
-            ChildDeletedEvent a => OnChildDeleted(a),
-            ChildReplacedEvent a => OnChildReplaced(a),
-            ChildMovedFromOtherContainmentEvent a => OnChildMovedFromOtherContainment(a),
-            ChildMovedFromOtherContainmentInSameParentEvent a =>
+            PropertyAddedNotification a => OnPropertyAdded(a),
+            PropertyDeletedNotification a => OnPropertyDeleted(a),
+            PropertyChangedNotification a => OnPropertyChanged(a),
+            ChildAddedNotification a => OnChildAdded(a),
+            ChildDeletedNotification a => OnChildDeleted(a),
+            ChildReplacedNotification a => OnChildReplaced(a),
+            ChildMovedFromOtherContainmentNotification a => OnChildMovedFromOtherContainment(a),
+            ChildMovedFromOtherContainmentInSameParentNotification a =>
                 OnChildMovedFromOtherContainmentInSameParent(a),
-            ChildMovedInSameContainmentEvent a => OnChildMovedInSameContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentEvent a => OnChildMovedAndReplacedFromOtherContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentInSameParentEvent a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a), 
-            AnnotationAddedEvent a => OnAnnotationAdded(a),
-            AnnotationDeletedEvent a => OnAnnotationDeleted(a),
-            AnnotationMovedFromOtherParentEvent a => OnAnnotationMovedFromOtherParent(a),
-            AnnotationMovedInSameParentEvent a => OnAnnotationMovedInSameParent(a),
-            ReferenceAddedEvent a => OnReferenceAdded(a),
-            ReferenceDeletedEvent a => OnReferenceDeleted(a),
-            ReferenceChangedEvent a => OnReferenceChanged(a),
-            _ => throw new NotImplementedException(partitionEvent.GetType().Name)
+            ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
+            ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
+            ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a), 
+            AnnotationAddedNotification a => OnAnnotationAdded(a),
+            AnnotationDeletedNotification a => OnAnnotationDeleted(a),
+            AnnotationMovedFromOtherParentNotification a => OnAnnotationMovedFromOtherParent(a),
+            AnnotationMovedInSameParentNotification a => OnAnnotationMovedInSameParent(a),
+            ReferenceAddedNotification a => OnReferenceAdded(a),
+            ReferenceDeletedNotification a => OnReferenceDeleted(a),
+            ReferenceChangedNotification a => OnReferenceChanged(a),
+            _ => throw new NotImplementedException(partitionNotification.GetType().Name)
         };
 
     #region Properties
 
-    private AddProperty OnPropertyAdded(PropertyAddedEvent propertyAddedEvent) =>
+    private AddProperty OnPropertyAdded(PropertyAddedNotification propertyAddedNotification) =>
         new(
-            propertyAddedEvent.Node.GetId(),
-            propertyAddedEvent.Property.ToMetaPointer(),
-            ToDelta(propertyAddedEvent.Node, propertyAddedEvent.Property, propertyAddedEvent.NewValue)!,
-            ToCommandId(propertyAddedEvent),
+            propertyAddedNotification.Node.GetId(),
+            propertyAddedNotification.Property.ToMetaPointer(),
+            ToDelta(propertyAddedNotification.Node, propertyAddedNotification.Property, propertyAddedNotification.NewValue)!,
+            ToCommandId(propertyAddedNotification),
             []
         );
 
-    private DeleteProperty OnPropertyDeleted(PropertyDeletedEvent propertyDeletedEvent) =>
+    private DeleteProperty OnPropertyDeleted(PropertyDeletedNotification propertyDeletedNotification) =>
         new(
-            propertyDeletedEvent.Node.GetId(),
-            propertyDeletedEvent.Property.ToMetaPointer(),
-            ToCommandId(propertyDeletedEvent),
+            propertyDeletedNotification.Node.GetId(),
+            propertyDeletedNotification.Property.ToMetaPointer(),
+            ToCommandId(propertyDeletedNotification),
             []
         );
 
-    private ChangeProperty OnPropertyChanged(PropertyChangedEvent propertyChangedEvent) =>
+    private ChangeProperty OnPropertyChanged(PropertyChangedNotification propertyChangedNotification) =>
         new(
-            propertyChangedEvent.Node.GetId(),
-            propertyChangedEvent.Property.ToMetaPointer(),
-            ToDelta(propertyChangedEvent.Node, propertyChangedEvent.Property, propertyChangedEvent.NewValue)!,
-            ToCommandId(propertyChangedEvent),
+            propertyChangedNotification.Node.GetId(),
+            propertyChangedNotification.Property.ToMetaPointer(),
+            ToDelta(propertyChangedNotification.Node, propertyChangedNotification.Property, propertyChangedNotification.NewValue)!,
+            ToCommandId(propertyChangedNotification),
             []
         );
 
@@ -99,87 +99,87 @@ public class PartitionEventToDeltaCommandMapper
 
     #region Children
 
-    private AddChild OnChildAdded(ChildAddedEvent childAddedEvent) =>
+    private AddChild OnChildAdded(ChildAddedNotification childAddedNotification) =>
         new(
-            childAddedEvent.Parent.GetId(),
-            ToDeltaChunk(childAddedEvent.NewChild),
-            childAddedEvent.Containment.ToMetaPointer(),
-            childAddedEvent.Index,
-            ToCommandId(childAddedEvent),
+            childAddedNotification.Parent.GetId(),
+            ToDeltaChunk(childAddedNotification.NewChild),
+            childAddedNotification.Containment.ToMetaPointer(),
+            childAddedNotification.Index,
+            ToCommandId(childAddedNotification),
             []
         );
 
-    private DeleteChild OnChildDeleted(ChildDeletedEvent childDeletedEvent) =>
+    private DeleteChild OnChildDeleted(ChildDeletedNotification childDeletedNotification) =>
         new(
-            childDeletedEvent.Parent.GetId(),
-            childDeletedEvent.Containment.ToMetaPointer(),
-            childDeletedEvent.Index,
-            childDeletedEvent.DeletedChild.GetId(),
-            ToCommandId(childDeletedEvent),
+            childDeletedNotification.Parent.GetId(),
+            childDeletedNotification.Containment.ToMetaPointer(),
+            childDeletedNotification.Index,
+            childDeletedNotification.DeletedChild.GetId(),
+            ToCommandId(childDeletedNotification),
             []
         );
 
-    private ReplaceChild OnChildReplaced(ChildReplacedEvent childReplacedEvent) =>
+    private ReplaceChild OnChildReplaced(ChildReplacedNotification childReplacedNotification) =>
         new(
-            ToDeltaChunk(childReplacedEvent.NewChild),
-            childReplacedEvent.Parent.GetId(),
-            childReplacedEvent.Containment.ToMetaPointer(),
-            childReplacedEvent.Index,
-            childReplacedEvent.ReplacedChild.GetId(),
-            ToCommandId(childReplacedEvent),
+            ToDeltaChunk(childReplacedNotification.NewChild),
+            childReplacedNotification.Parent.GetId(),
+            childReplacedNotification.Containment.ToMetaPointer(),
+            childReplacedNotification.Index,
+            childReplacedNotification.ReplacedChild.GetId(),
+            ToCommandId(childReplacedNotification),
             []
         );
 
     private MoveChildFromOtherContainment
-        OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentEvent childMovedEvent) =>
+        OnChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMovedNotification) =>
         new(
-            childMovedEvent.NewParent.GetId(),
-            childMovedEvent.NewContainment.ToMetaPointer(),
-            childMovedEvent.NewIndex,
-            childMovedEvent.MovedChild.GetId(),
-            ToCommandId(childMovedEvent),
+            childMovedNotification.NewParent.GetId(),
+            childMovedNotification.NewContainment.ToMetaPointer(),
+            childMovedNotification.NewIndex,
+            childMovedNotification.MovedChild.GetId(),
+            ToCommandId(childMovedNotification),
             []
         );
 
     private MoveAndReplaceChildFromOtherContainment 
-        OnChildMovedAndReplacedFromOtherContainment(ChildMovedAndReplacedFromOtherContainmentEvent childMovedAndReplacedEvent) => 
+        OnChildMovedAndReplacedFromOtherContainment(ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedNotification) => 
         new(
-            childMovedAndReplacedEvent.NewParent.GetId(),
-            childMovedAndReplacedEvent.NewContainment.ToMetaPointer(),
-            childMovedAndReplacedEvent.NewIndex,
-            childMovedAndReplacedEvent.ReplacedChild.GetId(),
-            childMovedAndReplacedEvent.MovedChild.GetId(),
-            ToCommandId(childMovedAndReplacedEvent),
+            childMovedAndReplacedNotification.NewParent.GetId(),
+            childMovedAndReplacedNotification.NewContainment.ToMetaPointer(),
+            childMovedAndReplacedNotification.NewIndex,
+            childMovedAndReplacedNotification.ReplacedChild.GetId(),
+            childMovedAndReplacedNotification.MovedChild.GetId(),
+            ToCommandId(childMovedAndReplacedNotification),
             []
         );
 
     private MoveAndReplaceChildFromOtherContainmentInSameParent
         OnChildMovedAndReplacedFromOtherContainmentInSameParent(
-            ChildMovedAndReplacedFromOtherContainmentInSameParentEvent childMovedAndReplacedEvent) =>
+            ChildMovedAndReplacedFromOtherContainmentInSameParentNotification childMovedAndReplacedNotification) =>
         new(
-            childMovedAndReplacedEvent.NewContainment.ToMetaPointer(),
-            childMovedAndReplacedEvent.NewIndex,
-            childMovedAndReplacedEvent.ReplacedChild.GetId(),
-            childMovedAndReplacedEvent.MovedChild.GetId(),
-            ToCommandId(childMovedAndReplacedEvent),
+            childMovedAndReplacedNotification.NewContainment.ToMetaPointer(),
+            childMovedAndReplacedNotification.NewIndex,
+            childMovedAndReplacedNotification.ReplacedChild.GetId(),
+            childMovedAndReplacedNotification.MovedChild.GetId(),
+            ToCommandId(childMovedAndReplacedNotification),
             []
         );
     
     private MoveChildFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(
-        ChildMovedFromOtherContainmentInSameParentEvent childMovedEvent) =>
+        ChildMovedFromOtherContainmentInSameParentNotification childMovedNotification) =>
         new(
-            childMovedEvent.NewContainment.ToMetaPointer(),
-            childMovedEvent.NewIndex,
-            childMovedEvent.MovedChild.GetId(),
-            ToCommandId(childMovedEvent),
+            childMovedNotification.NewContainment.ToMetaPointer(),
+            childMovedNotification.NewIndex,
+            childMovedNotification.MovedChild.GetId(),
+            ToCommandId(childMovedNotification),
             []
         );
 
-    private MoveChildInSameContainment OnChildMovedInSameContainment(ChildMovedInSameContainmentEvent childMovedEvent) =>
+    private MoveChildInSameContainment OnChildMovedInSameContainment(ChildMovedInSameContainmentNotification childMovedNotification) =>
         new(
-            childMovedEvent.NewIndex,
-            childMovedEvent.MovedChild.GetId(),
-            ToCommandId(childMovedEvent),
+            childMovedNotification.NewIndex,
+            childMovedNotification.MovedChild.GetId(),
+            ToCommandId(childMovedNotification),
             []
         );
 
@@ -187,39 +187,39 @@ public class PartitionEventToDeltaCommandMapper
 
     #region Annotations
 
-    private AddAnnotation OnAnnotationAdded(AnnotationAddedEvent annotationAddedEvent) =>
+    private AddAnnotation OnAnnotationAdded(AnnotationAddedNotification annotationAddedNotification) =>
         new(
-            annotationAddedEvent.Parent.GetId(),
-            ToDeltaChunk(annotationAddedEvent.NewAnnotation),
-            annotationAddedEvent.Index,
-            ToCommandId(annotationAddedEvent),
+            annotationAddedNotification.Parent.GetId(),
+            ToDeltaChunk(annotationAddedNotification.NewAnnotation),
+            annotationAddedNotification.Index,
+            ToCommandId(annotationAddedNotification),
             []
         );
 
-    private DeleteAnnotation OnAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
+    private DeleteAnnotation OnAnnotationDeleted(AnnotationDeletedNotification annotationDeletedNotification) =>
         new(
-            annotationDeletedEvent.Parent.GetId(),
-            annotationDeletedEvent.Index,
-            annotationDeletedEvent.DeletedAnnotation.GetId(),
-            ToCommandId(annotationDeletedEvent),
+            annotationDeletedNotification.Parent.GetId(),
+            annotationDeletedNotification.Index,
+            annotationDeletedNotification.DeletedAnnotation.GetId(),
+            ToCommandId(annotationDeletedNotification),
             []
         );
 
     private MoveAnnotationFromOtherParent
-        OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentEvent annotationMovedEvent) =>
+        OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification annotationMovedNotification) =>
         new(
-            annotationMovedEvent.NewParent.GetId(),
-            annotationMovedEvent.NewIndex,
-            annotationMovedEvent.MovedAnnotation.GetId(),
-            ToCommandId(annotationMovedEvent),
+            annotationMovedNotification.NewParent.GetId(),
+            annotationMovedNotification.NewIndex,
+            annotationMovedNotification.MovedAnnotation.GetId(),
+            ToCommandId(annotationMovedNotification),
             []
         );
 
-    private MoveAnnotationInSameParent OnAnnotationMovedInSameParent(AnnotationMovedInSameParentEvent annotationMovedEvent) =>
+    private MoveAnnotationInSameParent OnAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification annotationMovedNotification) =>
         new(
-            annotationMovedEvent.NewIndex,
-            annotationMovedEvent.MovedAnnotation.GetId(),
-            ToCommandId(annotationMovedEvent),
+            annotationMovedNotification.NewIndex,
+            annotationMovedNotification.MovedAnnotation.GetId(),
+            ToCommandId(annotationMovedNotification),
             []
         );
 
@@ -227,38 +227,38 @@ public class PartitionEventToDeltaCommandMapper
 
     #region References
 
-    private AddReference OnReferenceAdded(ReferenceAddedEvent referenceAddedEvent) =>
+    private AddReference OnReferenceAdded(ReferenceAddedNotification referenceAddedNotification) =>
         new(
-            referenceAddedEvent.Parent.GetId(),
-            referenceAddedEvent.Reference.ToMetaPointer(),
-            referenceAddedEvent.Index,
-            referenceAddedEvent.NewTarget.Reference?.GetId(),
-            referenceAddedEvent.NewTarget.ResolveInfo,
-            ToCommandId(referenceAddedEvent),
+            referenceAddedNotification.Parent.GetId(),
+            referenceAddedNotification.Reference.ToMetaPointer(),
+            referenceAddedNotification.Index,
+            referenceAddedNotification.NewTarget.Reference?.GetId(),
+            referenceAddedNotification.NewTarget.ResolveInfo,
+            ToCommandId(referenceAddedNotification),
             []
         );
 
-    private DeleteReference OnReferenceDeleted(ReferenceDeletedEvent referenceDeletedEvent) =>
+    private DeleteReference OnReferenceDeleted(ReferenceDeletedNotification referenceDeletedNotification) =>
         new(
-            referenceDeletedEvent.Parent.GetId(),
-            referenceDeletedEvent.Reference.ToMetaPointer(),
-            referenceDeletedEvent.Index,
-            referenceDeletedEvent.DeletedTarget.Reference?.GetId(),
-            referenceDeletedEvent.DeletedTarget.ResolveInfo,
-            ToCommandId(referenceDeletedEvent),
+            referenceDeletedNotification.Parent.GetId(),
+            referenceDeletedNotification.Reference.ToMetaPointer(),
+            referenceDeletedNotification.Index,
+            referenceDeletedNotification.DeletedTarget.Reference?.GetId(),
+            referenceDeletedNotification.DeletedTarget.ResolveInfo,
+            ToCommandId(referenceDeletedNotification),
             []
         );
 
-    private ChangeReference OnReferenceChanged(ReferenceChangedEvent referenceChangedEvent) =>
+    private ChangeReference OnReferenceChanged(ReferenceChangedNotification referenceChangedNotification) =>
         new(
-            referenceChangedEvent.Parent.GetId(),
-            referenceChangedEvent.Reference.ToMetaPointer(),
-            referenceChangedEvent.Index,
-            referenceChangedEvent.OldTarget.Reference?.GetId(),
-            referenceChangedEvent.OldTarget.ResolveInfo,
-            referenceChangedEvent.NewTarget.Reference?.GetId(),
-            referenceChangedEvent.NewTarget.ResolveInfo,
-            ToCommandId(referenceChangedEvent),
+            referenceChangedNotification.Parent.GetId(),
+            referenceChangedNotification.Reference.ToMetaPointer(),
+            referenceChangedNotification.Index,
+            referenceChangedNotification.OldTarget.Reference?.GetId(),
+            referenceChangedNotification.OldTarget.ResolveInfo,
+            referenceChangedNotification.NewTarget.Reference?.GetId(),
+            referenceChangedNotification.NewTarget.ResolveInfo,
+            ToCommandId(referenceChangedNotification),
             []
         );
 
@@ -273,8 +273,8 @@ public class PartitionEventToDeltaCommandMapper
         return new DeltaSerializationChunk(serializer.Serialize(M1Extensions.Descendants(node, true, true)).ToArray());
     }
 
-    private CommandId ToCommandId(IEvent @event) =>
-        @event.EventId switch
+    private CommandId ToCommandId(INotification notification) =>
+        notification.EventId switch
         {
             ParticipationEventId pei => pei.CommandId,
             _ => _commandIdProvider.Create()

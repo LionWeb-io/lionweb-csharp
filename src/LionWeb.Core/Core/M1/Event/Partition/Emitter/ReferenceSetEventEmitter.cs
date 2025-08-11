@@ -58,18 +58,18 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
             {
                 case ListAdded<T> added:
                     IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
-                    PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, added.RightIndex, newTarget,
+                    PartitionCommander.Raise(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, newTarget,
                         GetEventId()));
                     break;
                 case ListMoved<T> moved:
                     IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
-                    PartitionCommander.Raise(new EntryMovedInSameReferenceEvent(DestinationParent, Reference, moved.RightIndex,
+                    PartitionCommander.Raise(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
                         moved.LeftIndex, target,
                         GetEventId()));
                     break;
                 case ListDeleted<T> deleted:
                     IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
-                    PartitionCommander.Raise(new ReferenceDeletedEvent(DestinationParent, Reference, deleted.LeftIndex,
+                    PartitionCommander.Raise(new ReferenceDeletedNotification(DestinationParent, Reference, deleted.LeftIndex,
                         deletedTarget, GetEventId()));
                     break;
             }
@@ -80,8 +80,8 @@ public class ReferenceSetEventEmitter<T> : ReferenceMultipleEventEmitterBase<T> 
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
         PartitionCommander != null && PartitionCommander.CanRaise(
-            typeof(ReferenceAddedEvent),
-            typeof(EntryMovedInSameReferenceEvent),
-            typeof(ReferenceDeletedEvent)
+            typeof(ReferenceAddedNotification),
+            typeof(EntryMovedInSameReferenceNotification),
+            typeof(ReferenceDeletedNotification)
         );
 }

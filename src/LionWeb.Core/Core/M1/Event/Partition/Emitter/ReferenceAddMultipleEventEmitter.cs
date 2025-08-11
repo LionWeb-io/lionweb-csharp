@@ -24,7 +24,7 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
 {
     private readonly Index _startIndex;
 
-    /// Raises <see cref="ReferenceAddedEvent"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
+    /// Raises <see cref="ReferenceAddedNotification"/> for <paramref name="reference"/> for each entry in <paramref name="safeNodes"/>.
     /// <param name="reference">Reference to raise events for.</param>
     /// <param name="destinationParent">Owner of the represented <paramref name="reference"/> </param>
     /// <param name="safeNodes">Targets to raise events for.</param>
@@ -50,7 +50,7 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
         foreach (var node in SafeNodes)
         {
             IReferenceTarget newTarget = new ReferenceTarget(null, node);
-            PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, index++, newTarget,
+            PartitionCommander.Raise(new ReferenceAddedNotification(DestinationParent, Reference, index++, newTarget,
                 GetEventId()));
         }
     }
@@ -59,6 +59,6 @@ public class ReferenceAddMultipleEventEmitter<T> : ReferenceMultipleEventEmitter
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
         PartitionCommander != null && PartitionCommander.CanRaise(
-            typeof(ReferenceAddedEvent)
+            typeof(ReferenceAddedNotification)
         );
 }

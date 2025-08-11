@@ -22,9 +22,9 @@ using TargetNode = IReadableNode;
 using SemanticPropertyValue = object;
 
 /// All LionWeb events relating to a partition.
-public interface IPartitionEvent : IEvent;
+public interface IPartitionNotification : INotification;
 
-public abstract record APartitionEvent(IEventId EventId) : IPartitionEvent
+public abstract record APartitionNotification(IEventId EventId) : IPartitionNotification
 {
     public IEventId EventId { get; set; } = EventId;
 }
@@ -34,11 +34,11 @@ public abstract record APartitionEvent(IEventId EventId) : IPartitionEvent
 /// <param name="Node"></param>
 /// <param name="NewClassifier"></param>
 /// <param name="OldClassifier"></param>
-public record ClassifierChangedEvent(
+public record ClassifierChangedNotification(
     IWritableNode Node,
     Classifier NewClassifier,
     Classifier OldClassifier,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 #endregion
 
@@ -47,33 +47,33 @@ public record ClassifierChangedEvent(
 /// <param name="Node"></param>
 /// <param name="Property"></param>
 /// <param name="NewValue"></param>
-public record PropertyAddedEvent(
+public record PropertyAddedNotification(
     IWritableNode Node,
     Property Property,
     SemanticPropertyValue NewValue,
     IEventId EventId)
-    : APartitionEvent(EventId);
+    : APartitionNotification(EventId);
 
 /// <param name="Node"></param>
 /// <param name="Property"></param>
 /// <param name="OldValue"></param>
-public record PropertyDeletedEvent(
+public record PropertyDeletedNotification(
     IWritableNode Node,
     Property Property,
     SemanticPropertyValue OldValue,
     IEventId EventId)
-    : APartitionEvent(EventId);
+    : APartitionNotification(EventId);
 
 /// <param name="Node"></param>
 /// <param name="Property"></param>
 /// <param name="NewValue"></param>
 /// <param name="OldValue"></param>
-public record PropertyChangedEvent(
+public record PropertyChangedNotification(
     IWritableNode Node,
     Property Property,
     SemanticPropertyValue NewValue,
     SemanticPropertyValue OldValue,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 #endregion
 
@@ -83,36 +83,36 @@ public record PropertyChangedEvent(
 /// <param name="NewChild"></param>
 /// <param name="Containment"></param>
 /// <param name="Index"></param>
-public record ChildAddedEvent(
+public record ChildAddedNotification(
     IWritableNode Parent,
     IWritableNode NewChild,
     Containment Containment,
     Index Index,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="DeletedChild"></param>
 /// <param name="Parent"></param>
 /// <param name="Containment"></param>
 /// <param name="Index"></param>
-public record ChildDeletedEvent(
+public record ChildDeletedNotification(
     IWritableNode DeletedChild,
     IWritableNode Parent,
     Containment Containment,
     Index Index,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewChild"></param>
 /// <param name="ReplacedChild"></param>
 /// <param name="Parent"></param>
 /// <param name="Containment"></param>
 /// <param name="Index"></param>
-public record ChildReplacedEvent(
+public record ChildReplacedNotification(
     IWritableNode NewChild,
     IWritableNode ReplacedChild,
     IWritableNode Parent,
     Containment Containment,
     Index Index,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewParent"></param>
 /// <param name="NewContainment"></param>
@@ -121,7 +121,7 @@ public record ChildReplacedEvent(
 /// <param name="OldParent"></param>
 /// <param name="OldContainment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedFromOtherContainmentEvent(
+public record ChildMovedFromOtherContainmentNotification(
     IWritableNode NewParent,
     Containment NewContainment,
     Index NewIndex,
@@ -129,7 +129,7 @@ public record ChildMovedFromOtherContainmentEvent(
     IWritableNode OldParent,
     Containment OldContainment,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewContainment"></param>
 /// <param name="NewIndex"></param>
@@ -137,27 +137,27 @@ public record ChildMovedFromOtherContainmentEvent(
 /// <param name="Parent"></param>
 /// <param name="OldContainment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedFromOtherContainmentInSameParentEvent(
+public record ChildMovedFromOtherContainmentInSameParentNotification(
     Containment NewContainment,
     Index NewIndex,
     IWritableNode MovedChild,
     IWritableNode Parent,
     Containment OldContainment,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedChild"></param>
 /// <param name="Parent"></param>
 /// <param name="Containment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedInSameContainmentEvent(
+public record ChildMovedInSameContainmentNotification(
     Index NewIndex,
     IWritableNode MovedChild,
     IWritableNode Parent,
     Containment Containment,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewParent"></param>
 /// <param name="NewContainment"></param>
@@ -166,7 +166,7 @@ public record ChildMovedInSameContainmentEvent(
 /// <param name="OldParent"></param>
 /// <param name="OldContainment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedAndReplacedFromOtherContainmentEvent(
+public record ChildMovedAndReplacedFromOtherContainmentNotification(
     IWritableNode NewParent,
     Containment NewContainment,
     Index NewIndex,
@@ -175,7 +175,7 @@ public record ChildMovedAndReplacedFromOtherContainmentEvent(
     Containment OldContainment,
     Index OldIndex,
     IWritableNode ReplacedChild,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewContainment"></param>
 /// <param name="NewIndex"></param>
@@ -183,7 +183,7 @@ public record ChildMovedAndReplacedFromOtherContainmentEvent(
 /// <param name="Parent"></param>
 /// <param name="OldContainment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(
+public record ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
     Containment NewContainment,
     Index NewIndex,
     IWritableNode MovedChild,
@@ -191,21 +191,21 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(
     Containment OldContainment,
     Index OldIndex,
     IWritableNode ReplacedChild,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedChild"></param>
 /// <param name="Parent"></param>
 /// <param name="Containment"></param>
 /// <param name="OldIndex"></param>
-public record ChildMovedAndReplacedInSameContainmentEvent(
+public record ChildMovedAndReplacedInSameContainmentNotification(
     Index NewIndex,
     IWritableNode MovedChild,
     IWritableNode Parent,
     Containment Containment,
     IWritableNode ReplacedChild,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 #endregion
 
@@ -214,83 +214,83 @@ public record ChildMovedAndReplacedInSameContainmentEvent(
 /// <param name="Parent"></param>
 /// <param name="NewAnnotation"></param>
 /// <param name="Index"></param>
-public record AnnotationAddedEvent(
+public record AnnotationAddedNotification(
     IWritableNode Parent,
     IWritableNode NewAnnotation,
     Index Index,
     IEventId EventId)
-    : APartitionEvent(EventId);
+    : APartitionNotification(EventId);
 
 /// <param name="DeletedAnnotation"></param>
 /// <param name="Parent"></param>
 /// <param name="Index"></param>
-public record AnnotationDeletedEvent(
+public record AnnotationDeletedNotification(
     IWritableNode DeletedAnnotation,
     IWritableNode Parent,
     Index Index,
     IEventId EventId)
-    : APartitionEvent(EventId);
+    : APartitionNotification(EventId);
 
 /// <param name="NewAnnotation"></param>
 /// <param name="ReplacedAnnotation"></param>
 /// <param name="Parent"></param>
 /// <param name="Index"></param>
-public record AnnotationReplacedEvent(
+public record AnnotationReplacedNotification(
     IWritableNode NewAnnotation,
     IWritableNode ReplacedAnnotation,
     IWritableNode Parent,
     Index Index,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewParent"></param>
 /// <param name="NewIndex"></param>
 /// <param name="MovedAnnotation"></param>
 /// <param name="OldParent"></param>
 /// <param name="OldIndex"></param>
-public record AnnotationMovedFromOtherParentEvent(
+public record AnnotationMovedFromOtherParentNotification(
     IWritableNode NewParent,
     Index NewIndex,
     IWritableNode MovedAnnotation,
     IWritableNode OldParent,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedAnnotation"></param>
 /// <param name="Parent"></param>
 /// <param name="OldIndex"></param>
-public record AnnotationMovedInSameParentEvent(
+public record AnnotationMovedInSameParentNotification(
     Index NewIndex,
     IWritableNode MovedAnnotation,
     IWritableNode Parent,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewParent"></param>
 /// <param name="NewIndex"></param>
 /// <param name="MovedAnnotation"></param>
 /// <param name="OldParent"></param>
 /// <param name="OldIndex"></param>
-public record AnnotationMovedAndReplacedFromOtherParentEvent(
+public record AnnotationMovedAndReplacedFromOtherParentNotification(
     IWritableNode NewParent,
     Index NewIndex,
     IWritableNode MovedAnnotation,
     IWritableNode OldParent,
     Index OldIndex,
     IWritableNode ReplacedAnnotation,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedAnnotation"></param>
 /// <param name="Parent"></param>
 /// <param name="OldIndex"></param>
-public record AnnotationMovedAndReplacedInSameParentEvent(
+public record AnnotationMovedAndReplacedInSameParentNotification(
     Index NewIndex,
     IWritableNode MovedAnnotation,
     IWritableNode Parent,
     Index OldIndex,
     IWritableNode ReplacedAnnotation,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 #endregion
 
@@ -300,36 +300,36 @@ public record AnnotationMovedAndReplacedInSameParentEvent(
 /// <param name="Reference"></param>
 /// <param name="Index"></param>
 /// <param name="NewTarget"></param>
-public record ReferenceAddedEvent(
+public record ReferenceAddedNotification(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     IReferenceTarget NewTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
 /// <param name="Index"></param>
 /// <param name="DeletedTarget"></param>
-public record ReferenceDeletedEvent(
+public record ReferenceDeletedNotification(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     IReferenceTarget DeletedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
 /// <param name="Index"></param>
 /// <param name="NewTarget"></param>
 /// <param name="OldTarget"></param>
-public record ReferenceChangedEvent(
+public record ReferenceChangedNotification(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     IReferenceTarget NewTarget,
     IReferenceTarget OldTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewParent"></param>
 /// <param name="NewReference"></param>
@@ -338,7 +338,7 @@ public record ReferenceChangedEvent(
 /// <param name="OldReference"></param>
 /// <param name="OldIndex"></param>
 /// <param name="MovedTarget"></param>
-public record EntryMovedFromOtherReferenceEvent(
+public record EntryMovedFromOtherReferenceNotification(
     IWritableNode NewParent,
     Reference NewReference,
     Index NewIndex,
@@ -346,7 +346,7 @@ public record EntryMovedFromOtherReferenceEvent(
     IWritableNode OldParent,
     Reference OldReference,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="NewReference"></param>
@@ -354,27 +354,27 @@ public record EntryMovedFromOtherReferenceEvent(
 /// <param name="OldReference"></param>
 /// <param name="OldIndex"></param>
 /// <param name="MovedTarget"></param>
-public record EntryMovedFromOtherReferenceInSameParentEvent(
+public record EntryMovedFromOtherReferenceInSameParentNotification(
     IWritableNode Parent,
     Reference NewReference,
     Index NewIndex,
     IReferenceTarget MovedTarget,
     Reference OldReference,
     Index OldIndex,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
 /// <param name="OldIndex"></param>
 /// <param name="NewIndex"></param>
 /// <param name="Target"></param>
-public record EntryMovedInSameReferenceEvent(
+public record EntryMovedInSameReferenceNotification(
     IWritableNode Parent,
     Reference Reference,
     Index OldIndex,
     Index NewIndex,
     IReferenceTarget Target,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="NewParent"></param>
 /// <param name="NewReference"></param>
@@ -383,7 +383,7 @@ public record EntryMovedInSameReferenceEvent(
 /// <param name="OldReference"></param>
 /// <param name="OldIndex"></param>
 /// <param name="MovedTarget"></param>
-public record EntryMovedAndReplacedFromOtherReferenceEvent(
+public record EntryMovedAndReplacedFromOtherReferenceNotification(
     IWritableNode NewParent,
     Reference NewReference,
     Index NewIndex,
@@ -392,7 +392,7 @@ public record EntryMovedAndReplacedFromOtherReferenceEvent(
     Reference OldReference,
     Index OldIndex,
     IReferenceTarget ReplacedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="NewReference"></param>
@@ -400,7 +400,7 @@ public record EntryMovedAndReplacedFromOtherReferenceEvent(
 /// <param name="OldReference"></param>
 /// <param name="OldIndex"></param>
 /// <param name="MovedTarget"></param>
-public record EntryMovedAndReplacedFromOtherReferenceInSameParentEvent(
+public record EntryMovedAndReplacedFromOtherReferenceInSameParentNotification(
     IWritableNode Parent,
     Reference NewReference,
     Index NewIndex,
@@ -408,47 +408,47 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParentEvent(
     Reference OldReference,
     Index OldIndex,
     IReferenceTarget ReplacedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
 /// <param name="OldIndex"></param>
 /// <param name="NewIndex"></param>
 /// <param name="MovedTarget"></param>
-public record EntryMovedAndReplacedInSameReferenceEvent(
+public record EntryMovedAndReplacedInSameReferenceNotification(
     IWritableNode Parent,
     Reference Reference,
     Index NewIndex,
     IReferenceTarget MovedTarget,
     Index OldIndex,
     IReferenceTarget ReplacedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
 /// <param name="Index"></param>
 /// <param name="NewResolveInfo"></param>
 /// <param name="Target"></param>
-public record ReferenceResolveInfoAddedEvent(
+public record ReferenceResolveInfoAddedNotification(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     ResolveInfo NewResolveInfo,
     TargetNode Target,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
 /// <param name="Index"></param>
 /// <param name="Target"></param>
 /// <param name="DeletedResolveInfo"></param>
-public record ReferenceResolveInfoDeletedEvent(
+public record ReferenceResolveInfoDeletedNotification(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     TargetNode Target,
     ResolveInfo DeletedResolveInfo,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -456,40 +456,40 @@ public record ReferenceResolveInfoDeletedEvent(
 /// <param name="NewResolveInfo"></param>
 /// <param name="Target"></param>
 /// <param name="ReplacedResolveInfo"></param>
-public record ReferenceResolveInfoChangedEvent(
+public record ReferenceResolveInfoChangedNotification(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     ResolveInfo NewResolveInfo,
     TargetNode? Target,
     ResolveInfo ReplacedResolveInfo,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
 /// <param name="Index"></param>
 /// <param name="NewTarget"></param>
 /// <param name="ResolveInfo"></param>
-public record ReferenceTargetAddedEvent(
+public record ReferenceTargetAddedNotification(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     TargetNode NewTarget,
     ResolveInfo ResolveInfo,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
 /// <param name="Index"></param>
 /// <param name="ResolveInfo"></param>
 /// <param name="DeletedTarget"></param>
-public record ReferenceTargetDeletedEvent(
+public record ReferenceTargetDeletedNotification(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     ResolveInfo ResolveInfo,
     TargetNode DeletedTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -497,13 +497,13 @@ public record ReferenceTargetDeletedEvent(
 /// <param name="NewTarget"></param>
 /// <param name="ResolveInfo"></param>
 /// <param name="OldTarget"></param>
-public record ReferenceTargetChangedEvent(
+public record ReferenceTargetChangedNotification(
     IWritableNode Parent,
     Reference Reference,
     Index Index,
     TargetNode NewTarget,
     ResolveInfo? ResolveInfo,
     TargetNode OldTarget,
-    IEventId EventId) : APartitionEvent(EventId);
+    IEventId EventId) : APartitionNotification(EventId);
 
 #endregion

@@ -50,13 +50,13 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
             switch (old)
             {
                 case null:
-                    PartitionCommander.Raise(new AnnotationAddedEvent(DestinationParent, added, _newIndex,
+                    PartitionCommander.Raise(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
                         GetEventId()));
                     break;
 
                 case not null when old.Parent != DestinationParent:
                     var eventId = GetEventId();
-                    var @event = new AnnotationMovedFromOtherParentEvent(DestinationParent, _newIndex, added, old.Parent,
+                    var @event = new AnnotationMovedFromOtherParentNotification(DestinationParent, _newIndex, added, old.Parent,
                         old.Index, eventId);
                     RaiseOriginMoveEvent(old, @event);
                     PartitionCommander.Raise(@event);
@@ -68,7 +68,7 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
                     break;
 
                 case not null when old.Parent == DestinationParent:
-                    PartitionCommander.Raise(new AnnotationMovedInSameParentEvent(_newIndex, added, DestinationParent,
+                    PartitionCommander.Raise(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
                         old.Index, GetEventId()));
                     break;
 
@@ -84,9 +84,9 @@ public class AnnotationAddMultipleEventEmitter : AnnotationEventEmitterBase
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
         PartitionCommander != null && PartitionCommander.CanRaise(
-            typeof(AnnotationAddedEvent),
-            typeof(AnnotationMovedFromOtherParentEvent),
-            typeof(AnnotationMovedInSameParentEvent)
+            typeof(AnnotationAddedNotification),
+            typeof(AnnotationMovedFromOtherParentNotification),
+            typeof(AnnotationMovedInSameParentNotification)
         );
 }
 

@@ -23,7 +23,7 @@ using Utilities;
 /// Replicates events received from <see cref="ReplicateFrom">other publishers</see> on a <i>local</i> equivalent.
 /// 
 /// <para>
-/// Example: We receive a <see cref="PropertyAddedEvent"/> for a node that we know <i>locally</i>.
+/// Example: We receive a <see cref="PropertyAddedNotification"/> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
 ///
@@ -34,7 +34,7 @@ using Utilities;
 /// Therefore, two instances with different <i>locals</i> can replicate each other, keeping both <i>locals</i> in sync.
 /// </para>
 public abstract class EventReplicatorBase<TEvent, TPublisher> : EventIdFilteringEventForwarder<TEvent, TPublisher>
-    where TEvent : class, IEvent where TPublisher : IPublisher<TEvent>
+    where TEvent : class, INotification where TPublisher : IPublisher<TEvent>
 {
     protected readonly ICommander<TEvent>? _localCommander;
     private readonly List<TPublisher> _publishers = [];

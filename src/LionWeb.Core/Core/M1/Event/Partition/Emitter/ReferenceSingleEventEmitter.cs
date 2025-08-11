@@ -25,8 +25,8 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
     private readonly IReadableNode? _newTarget;
     private readonly IReadableNode? _oldTarget;
 
-    /// Raises either <see cref="ReferenceAddedEvent"/>, <see cref="ReferenceDeletedEvent"/> or
-    /// <see cref="ReferenceChangedEvent"/> for <paramref name="reference"/>,
+    /// Raises either <see cref="ReferenceAddedNotification"/>, <see cref="ReferenceDeletedNotification"/> or
+    /// <see cref="ReferenceChangedNotification"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
     public ReferenceSingleEventEmitter(Reference reference, NodeBase destinationParent, IReadableNode? newTarget,
         IReadableNode? oldTarget, IEventId? eventId = null) : base(reference, destinationParent, eventId)
@@ -48,17 +48,17 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
         {
             case (null, { } v):
                 IReferenceTarget newTarget = new ReferenceTarget(null, v);
-                PartitionCommander.Raise(new ReferenceAddedEvent(DestinationParent, Reference, 0, newTarget,
+                PartitionCommander.Raise(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
                     GetEventId()));
                 break;
             case ({ } o, null):
                 IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
-                PartitionCommander.Raise(new ReferenceDeletedEvent(DestinationParent, Reference, 0, deletedTarget,
+                PartitionCommander.Raise(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
                     GetEventId()));
                 break;
             case ({ } o, { } n):
                 IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
-                PartitionCommander.Raise(new ReferenceChangedEvent(DestinationParent, Reference, 0,
+                PartitionCommander.Raise(new ReferenceChangedNotification(DestinationParent, Reference, 0,
                     new ReferenceTarget(null, n), replacedTarget,
                     GetEventId()));
                 break;
@@ -69,8 +69,8 @@ public class ReferenceSingleEventEmitter : ReferenceEventEmitterBase<INode>
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
         PartitionCommander != null && PartitionCommander.CanRaise(
-            typeof(ReferenceAddedEvent),
-            typeof(ReferenceDeletedEvent),
-            typeof(ReferenceChangedEvent)
+            typeof(ReferenceAddedNotification),
+            typeof(ReferenceDeletedNotification),
+            typeof(ReferenceChangedNotification)
         );
 }

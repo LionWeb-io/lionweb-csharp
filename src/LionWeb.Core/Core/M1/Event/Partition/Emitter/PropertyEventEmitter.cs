@@ -27,8 +27,8 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
     private readonly object? _newValue;
     private readonly object? _oldValue;
 
-    /// Raises either <see cref="PropertyAddedEvent"/>, <see cref="PropertyDeletedEvent"/> or
-    /// <see cref="PropertyChangedEvent"/> for <paramref name="property"/>,
+    /// Raises either <see cref="PropertyAddedNotification"/>, <see cref="PropertyDeletedNotification"/> or
+    /// <see cref="PropertyChangedNotification"/> for <paramref name="property"/>,
     /// depending on <paramref name="oldValue"/> and <paramref name="newValue"/>.
     public PropertyEventEmitter(Property property, NodeBase destinationParent, object? newValue, object? oldValue,
         IEventId? eventId = null) :
@@ -51,15 +51,15 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
         switch (_oldValue, _newValue)
         {
             case (null, { } v):
-                PartitionCommander.Raise(new PropertyAddedEvent(DestinationParent, _property, v,
+                PartitionCommander.Raise(new PropertyAddedNotification(DestinationParent, _property, v,
                     GetEventId()));
                 break;
             case ({ } o, null):
-                PartitionCommander.Raise(new PropertyDeletedEvent(DestinationParent, _property, o,
+                PartitionCommander.Raise(new PropertyDeletedNotification(DestinationParent, _property, o,
                     GetEventId()));
                 break;
             case ({ } o, { } n):
-                PartitionCommander.Raise(new PropertyChangedEvent(DestinationParent, _property, n, o,
+                PartitionCommander.Raise(new PropertyChangedNotification(DestinationParent, _property, n, o,
                     GetEventId()));
                 break;
         }
@@ -69,8 +69,8 @@ public class PropertyEventEmitter : PartitionEventEmitterBase<INode>
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
         PartitionCommander != null && PartitionCommander.CanRaise(
-            typeof(PropertyAddedEvent),
-            typeof(PropertyDeletedEvent),
-            typeof(PropertyChangedEvent)
+            typeof(PropertyAddedNotification),
+            typeof(PropertyDeletedNotification),
+            typeof(PropertyChangedNotification)
         );
 }

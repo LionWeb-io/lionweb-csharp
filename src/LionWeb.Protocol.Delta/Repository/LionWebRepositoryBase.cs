@@ -56,12 +56,12 @@ public abstract class LionWebRepositoryBase<T>
         var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(PartitionEventHandler);
 
-        replicator.Subscribe<IPartitionEvent>(SendPartitionEventToAllClients);
+        replicator.Subscribe<IPartitionNotification>(SendPartitionEventToAllClients);
 
         connector.ReceiveFromClient += (_, content) => Receive(content);
     }
 
-    private void SendPartitionEventToAllClients(object? sender, IPartitionEvent? partitionEvent)
+    private void SendPartitionEventToAllClients(object? sender, IPartitionNotification? partitionEvent)
     {
         if (partitionEvent == null)
             return;

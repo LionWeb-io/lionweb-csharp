@@ -30,10 +30,10 @@ public class EventToDeltaCommandMapper
         _partitionMapper = partitionMapper;
     }
 
-    public IDeltaCommand Map(IEvent @event) =>
-        @event switch
+    public IDeltaCommand Map(INotification notification) =>
+        notification switch
         {
-            IPartitionEvent e => _partitionMapper.Map(e),
-            _ => throw new NotImplementedException(@event.GetType().Name)
+            IPartitionNotification e => _partitionMapper.Map(e),
+            _ => throw new NotImplementedException(notification.GetType().Name)
         };
 }

@@ -23,7 +23,7 @@ using System.Diagnostics;
 /// if the event passes <see cref="Filter{TSubscribedEvent}"/>.
 public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
     : IDisposable, IPublisher<TEvent>
-    where TEvent : class, IEvent
+    where TEvent : class, INotification
     where TPublisher : IPublisher<TEvent>
 {
     private readonly TPublisher? _localPublisher = localPublisher;
@@ -89,7 +89,7 @@ public abstract class FilteringEventForwarder<TEvent, TPublisher>(TPublisher? lo
 /// Suppresses all events with <see cref="RegisterEventId">registered event ids</see>.
 public abstract class EventIdFilteringEventForwarder<TEvent, TPublisher>(TPublisher? localPublisher)
     : FilteringEventForwarder<TEvent, TPublisher>(localPublisher)
-    where TEvent : class, IEvent where TPublisher : IPublisher<TEvent>
+    where TEvent : class, INotification where TPublisher : IPublisher<TEvent>
 {
     private readonly HashSet<IEventId> _eventIds = [];
 

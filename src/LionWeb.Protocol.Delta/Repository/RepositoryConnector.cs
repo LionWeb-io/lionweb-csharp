@@ -24,7 +24,7 @@ public interface IRepositoryConnector<T>
     Task SendToClient(IClientInfo clientInfo, T content);
     Task SendToAllClients(T content);
     event EventHandler<IMessageContext<T>> ReceiveFromClient;
-    T Convert(IEvent internalEvent);
+    T Convert(INotification internalNotification);
 }
 
 public interface IMessageContext<T>

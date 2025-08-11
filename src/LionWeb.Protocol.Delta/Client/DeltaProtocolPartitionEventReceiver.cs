@@ -42,8 +42,8 @@ public class DeltaProtocolPartitionEventReceiver
 
     public void Receive(IDeltaEvent deltaEvent)
     {
-        IPartitionEvent partitionEvent = _mapper.Map(deltaEvent);
+        IPartitionNotification partitionNotification = _mapper.Map(deltaEvent);
 
-        _eventHandler.Raise(partitionEvent);
+        _eventHandler.Raise(partitionNotification);
     }
 }

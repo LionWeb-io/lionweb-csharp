@@ -58,13 +58,13 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            PartitionCommander.Raise(new ChildAddedEvent(DestinationParent, added.Element, Containment,
+                            PartitionCommander.Raise(new ChildAddedNotification(DestinationParent, added.Element, Containment,
                                 added.RightIndex, GetEventId()));
                             break;
 
                         case { } old when old.Parent != DestinationParent:
                             var eventId = GetEventId();
-                            var @event = new ChildMovedFromOtherContainmentEvent(DestinationParent, Containment,
+                            var @event = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment,
                                 added.RightIndex, added.Element, old.Parent, old.Containment, old.Index, eventId);
                             RaiseOriginMoveEvent(old, @event);
                             PartitionCommander.Raise(@event);
@@ -72,7 +72,7 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
 
 
                         case { } old when old.Parent == DestinationParent && old.Containment != Containment:
-                            PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentEvent(Containment,
+                            PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentNotification(Containment,
                                 added.RightIndex, added.Element, DestinationParent, old.Containment, old.Index,
                                 GetEventId()));
                             break;
@@ -84,11 +84,11 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
                     break;
 
                 case ListMoved<T> moved:
-                    PartitionCommander.Raise(new ChildMovedInSameContainmentEvent(moved.RightIndex, moved.LeftElement,
+                    PartitionCommander.Raise(new ChildMovedInSameContainmentNotification(moved.RightIndex, moved.LeftElement,
                         DestinationParent, Containment, moved.LeftIndex, GetEventId()));
                     break;
                 case ListDeleted<T> deleted:
-                    PartitionCommander.Raise(new ChildDeletedEvent(deleted.Element, DestinationParent, Containment,
+                    PartitionCommander.Raise(new ChildDeletedNotification(deleted.Element, DestinationParent, Containment,
                         deleted.LeftIndex, GetEventId()));
                     break;
             }
@@ -99,10 +99,10 @@ public class ContainmentSetEventEmitter<T> : ContainmentMultipleEventEmitterBase
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected override bool IsActive() =>
         PartitionCommander != null && PartitionCommander.CanRaise(
-            typeof(ChildAddedEvent),
-            typeof(ChildDeletedEvent),
-            typeof(ChildMovedFromOtherContainmentEvent),
-            typeof(ChildMovedFromOtherContainmentInSameParentEvent),
-            typeof(ChildMovedInSameContainmentEvent)
+            typeof(ChildAddedNotification),
+            typeof(ChildDeletedNotification),
+            typeof(ChildMovedFromOtherContainmentNotification),
+            typeof(ChildMovedFromOtherContainmentInSameParentNotification),
+            typeof(ChildMovedInSameContainmentNotification)
         );
 }

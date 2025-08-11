@@ -19,7 +19,7 @@ namespace LionWeb.Core.M1.Event;
 
 /// Sends event notifications (aka callbacks) of events compatible with <typeparamref name="TEvent"/>
 /// via a corresponding <see cref="IPublisher{TEvent}"/>.
-public interface ICommander<in TEvent> where TEvent : IEvent
+public interface ICommander<in TEvent> where TEvent : INotification
 {
     /// Raises <paramref name="@event"/>, i.e. sends it to all <see cref="IPublisher{TEvent}.Subscribe{TSubscribedEvent}">subscribers</see>.
     public void Raise(TEvent @event);

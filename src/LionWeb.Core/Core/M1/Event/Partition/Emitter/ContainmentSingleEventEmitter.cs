@@ -70,37 +70,37 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
                 break;
 
             case (not null, null, _):
-                PartitionCommander.Raise(new ChildDeletedEvent(_oldValue, DestinationParent, Containment, 0,
+                PartitionCommander.Raise(new ChildDeletedNotification(_oldValue, DestinationParent, Containment, 0,
                     GetEventId()));
                 break;
 
             case (null, not null, null):
-                PartitionCommander.Raise(new ChildAddedEvent(DestinationParent, _newValue, Containment, 0,
+                PartitionCommander.Raise(new ChildAddedNotification(DestinationParent, _newValue, Containment, 0,
                     GetEventId()));
                 break;
 
             case (not null, not null, null):
-                PartitionCommander.Raise(new ChildReplacedEvent(_newValue, _oldValue, DestinationParent, Containment, 0,
+                PartitionCommander.Raise(new ChildReplacedNotification(_newValue, _oldValue, DestinationParent, Containment, 0,
                     GetEventId()));
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentEvent(Containment, 0, _newValue,
+                PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, 0, _newValue,
                     DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index,
                     GetEventId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(Containment, 0,
+                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(Containment, 0,
                     _newValue, DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, _oldValue,
                     GetEventId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent != DestinationParent:
-                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentEvent(DestinationParent,
+                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentNotification(DestinationParent,
                     Containment, 0, _newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index, _oldValue,
                     GetEventId()));
@@ -109,7 +109,7 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent != DestinationParent:
                 var eventId = GetEventId();
-                var @event = new ChildMovedFromOtherContainmentEvent(DestinationParent, Containment, 0, _newValue,
+                var @event = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, 0, _newValue,
                     _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, eventId);
                 RaiseOriginMoveEvent(_oldContainmentInfo, @event);
                 PartitionCommander.Raise(@event);
@@ -125,13 +125,13 @@ public class ContainmentSingleEventEmitter<T> : ContainmentEventEmitterBase<T> w
     [MemberNotNullWhen(true, nameof(_oldContainmentInfo))]
     protected override bool IsActive() =>
         PartitionCommander != null && PartitionCommander.CanRaise(
-            typeof(ChildAddedEvent),
-            typeof(ChildDeletedEvent),
-            typeof(ChildReplacedEvent),
-            typeof(ChildMovedFromOtherContainmentEvent),
-            typeof(ChildMovedFromOtherContainmentInSameParentEvent),
-            typeof(ChildMovedInSameContainmentEvent),
-            typeof(ChildMovedAndReplacedFromOtherContainmentEvent),
-            typeof(ChildMovedAndReplacedFromOtherContainmentInSameParentEvent)
+            typeof(ChildAddedNotification),
+            typeof(ChildDeletedNotification),
+            typeof(ChildReplacedNotification),
+            typeof(ChildMovedFromOtherContainmentNotification),
+            typeof(ChildMovedFromOtherContainmentInSameParentNotification),
+            typeof(ChildMovedInSameContainmentNotification),
+            typeof(ChildMovedAndReplacedFromOtherContainmentNotification),
+            typeof(ChildMovedAndReplacedFromOtherContainmentInSameParentNotification)
         );
 }

@@ -41,7 +41,7 @@ public class DeltaProtocolPartitionCommandReceiver
 
     public void Receive(IDeltaCommand deltaCommand)
     {
-        IPartitionEvent partitionCommand = _mapper.Map(deltaCommand);
+        IPartitionNotification partitionCommand = _mapper.Map(deltaCommand);
         _eventHandler.Raise(partitionCommand);
     }
 }

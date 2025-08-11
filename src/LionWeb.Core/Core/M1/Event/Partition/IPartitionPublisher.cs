@@ -22,4 +22,4 @@ using M3;
 /// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 /// <seealso cref="IPartitionCommander"/>
 /// <seealso cref="PartitionEventHandler"/>
-public interface IPartitionPublisher : IPublisher<IPartitionEvent>;
+public interface IPartitionPublisher : IPublisher<IPartitionNotification>;

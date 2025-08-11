@@ -22,7 +22,7 @@ using System.Diagnostics;
 
 /// Replicates events for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
 /// <inheritdoc cref="EventReplicatorBase{TEvent,TPublisher}"/>
-public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPublisher>, IForestPublisher
+public class ForestEventReplicator : EventReplicatorBase<IForestNotification, IForestPublisher>, IForestPublisher
 {
     private readonly IForest _localForest;
     private readonly Dictionary<NodeId, PartitionEventReplicator> _localPartitions = [];
@@ -45,33 +45,33 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         if (forestPublisher == null)
             return;
 
-        forestPublisher.Subscribe<IForestEvent>(LocalHandler);
+        forestPublisher.Subscribe<IForestNotification>(LocalHandler);
     }
 
-    private void LocalHandler(object? sender, IForestEvent forestEvent)
+    private void LocalHandler(object? sender, IForestNotification forestNotification)
     {
-        switch (forestEvent)
+        switch (forestNotification)
         {
-            case PartitionAddedEvent a:
+            case PartitionAddedNotification a:
                 OnLocalNewPartition(sender, a);
                 break;
-            case PartitionDeletedEvent a:
+            case PartitionDeletedNotification a:
                 OnLocalPartitionDeleted(sender, a);
                 break;
         }
     }
 
     /// <inheritdoc />
-    protected override void ProcessEvent(object? sender, IForestEvent? forestEvent)
+    protected override void ProcessEvent(object? sender, IForestNotification? forestEvent)
     {
         Debug.WriteLine($"{this.GetType()}: processing event {forestEvent}");
         switch (forestEvent)
         {
-            case PartitionAddedEvent a:
+            case PartitionAddedNotification a:
                 OnRemoteNewPartition(null, a);
                 break;
 
-            case PartitionDeletedEvent a:
+            case PartitionDeletedNotification a:
                 OnRemotePartitionDeleted(null, a);
                 break;
         }
@@ -92,7 +92,7 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
         if (forestListener == null)
             return;
 
-        forestListener.Unsubscribe<IForestEvent>(LocalHandler);
+        forestListener.Unsubscribe<IForestNotification>(LocalHandler);
 
         GC.SuppressFinalize(this);
     }
@@ -116,34 +116,34 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent, IForestPu
 
     #region Local
 
-    private void OnLocalNewPartition(object? sender, PartitionAddedEvent partitionAddedEvent) =>
-        RegisterPartition(partitionAddedEvent.NewPartition);
+    private void OnLocalNewPartition(object? sender, PartitionAddedNotification partitionAddedNotification) =>
+        RegisterPartition(partitionAddedNotification.NewPartition);
 
-    private void OnLocalPartitionDeleted(object? sender, PartitionDeletedEvent partitionDeletedEvent) =>
-        UnregisterPartition(partitionDeletedEvent.DeletedPartition);
+    private void OnLocalPartitionDeleted(object? sender, PartitionDeletedNotification partitionDeletedNotification) =>
+        UnregisterPartition(partitionDeletedNotification.DeletedPartition);
 
     #endregion
 
     #region Remote
 
-    private void OnRemoteNewPartition(object? sender, PartitionAddedEvent partitionAddedEvent) =>
-        SuppressEventForwarding(partitionAddedEvent, () =>
+    private void OnRemoteNewPartition(object? sender, PartitionAddedNotification partitionAddedNotification) =>
+        SuppressEventForwarding(partitionAddedNotification, () =>
         {
-            var newPartition = (INode)partitionAddedEvent.NewPartition;
+            var newPartition = (INode)partitionAddedNotification.NewPartition;
 
             var clone = (IPartitionInstance)Clone(newPartition);
 
             _localForest.AddPartitions([clone]);
 
-            var remoteListener = partitionAddedEvent.NewPartition.GetPublisher();
+            var remoteListener = partitionAddedNotification.NewPartition.GetPublisher();
             if (remoteListener != null)
                 LookupPartition(clone).ReplicateFrom(remoteListener);
         });
 
-    private void OnRemotePartitionDeleted(object? sender, PartitionDeletedEvent partitionDeletedEvent) =>
-        SuppressEventForwarding(partitionDeletedEvent, () =>
+    private void OnRemotePartitionDeleted(object? sender, PartitionDeletedNotification partitionDeletedNotification) =>
+        SuppressEventForwarding(partitionDeletedNotification, () =>
         {
-            var localPartition = (IPartitionInstance)Lookup(partitionDeletedEvent.DeletedPartition.GetId());
+            var localPartition = (IPartitionInstance)Lookup(partitionDeletedNotification.DeletedPartition.GetId());
             _localForest.RemovePartitions([localPartition]);
         });
 

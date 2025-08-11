@@ -20,4 +20,4 @@ namespace LionWeb.Core.M1.Event.Forest;
 /// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestPublisher"/> events.
 /// <param name="sender">Optional sender of the events.</param>
 public class ForestEventHandler(object? sender)
-    : EventHandlerBase<IForestEvent>(sender), IForestPublisher, IForestCommander;
+    : EventHandlerBase<IForestNotification>(sender), IForestPublisher, IForestCommander;
