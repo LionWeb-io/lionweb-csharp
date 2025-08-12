@@ -201,48 +201,6 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     #endregion
 }
 
-public class LionWebTestClient(
-    LionWebVersions lionWebVersion,
-    List<Language> languages,
-    string name,
-    IForest forest,
-    IDeltaClientConnector connector)
-    : LionWebClient(lionWebVersion, languages, name, forest, connector)
-{
-    private const int _sleepInterval = 100;
-
-    private long _messageCount;
-
-    private long MessageCount => Interlocked.Read(ref _messageCount);
-    private void IncrementMessageCount() => Interlocked.Increment(ref _messageCount);
-
-    private long WaitCount { get; set; }
-
-    private void WaitForCount(long count)
-    {
-        while (MessageCount < count)
-        {
-            Log($"{nameof(MessageCount)}: {MessageCount} vs. {nameof(count)}: {count}");
-            Thread.Sleep(_sleepInterval);
-        }
-    }
-
-    /// Wait until <paramref name="delta"/> <i>more</i> messages than at the last call have been received.
-    /// Counts any kind of <see cref="IDeltaContent">delta message</see>.
-    public void WaitForReceived(int delta)
-    {
-        Log($"{nameof(WaitCount)}: {WaitCount} delta: {delta}");
-        WaitForCount(WaitCount += delta);
-    }
-
-    /// <inheritdoc />
-    protected override void Receive(IDeltaContent content)
-    {
-        IncrementMessageCount();
-        base.Receive(content);
-    }
-}
-
 public class CommandIdProvider : ICommandIdProvider
 {
     private int nextId = 0;

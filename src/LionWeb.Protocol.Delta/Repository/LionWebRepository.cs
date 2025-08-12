@@ -34,7 +34,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         string name,
         IForest forest,
         IRepositoryConnector<IDeltaContent> connector
-        ) : base(lionWebVersion, languages, name, forest, connector)
+    ) : base(lionWebVersion, languages, name, forest, connector)
     {
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
@@ -51,7 +51,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             deserializerBuilder,
             _replicator
         );
-        
+
         _commandReceiver.Init();
     }
 
@@ -144,48 +144,10 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     #endregion
 }
 
-public class LionWebTestRepository(
-    LionWebVersions lionWebVersion,
-    List<Language> languages,
-    string name,
-    IForest forest,
-    IRepositoryConnector<IDeltaContent> connector)
-    : LionWebRepository(lionWebVersion, languages, name, forest, connector)
-{
-    private const int _sleepInterval = 100;
-    
-    private long _messageCount;
-    private long MessageCount => Interlocked.Read(ref _messageCount);
-    private void IncrementMessageCount() => Interlocked.Increment(ref _messageCount);
-    private long WaitCount { get; set; }
-
-
-    private void WaitForCount(long count)
-    {
-        while (MessageCount < count)
-        {
-            Log($"{nameof(MessageCount)}: {MessageCount} vs. {nameof(count)}: {count}");
-            Thread.Sleep(_sleepInterval);
-        }
-    }
-
-    /// Wait until <paramref name="delta"/> <i>more</i> messages than at the last call have been received.
-    /// Counts any kind of <see cref="IDeltaContent">delta message</see>.
-    public void WaitForReceived(int delta) =>
-        WaitForCount(WaitCount += delta);
-
-    /// <inheritdoc />
-    protected override Task Receive(IMessageContext<IDeltaContent> messageContext)
-    {
-        IncrementMessageCount();
-        return base.Receive(messageContext);
-    }
-}
-
 public class ExceptionParticipationIdProvider : IParticipationIdProvider
 {
     private int _nextParticipationId = 1000;
-    
+
     /// <inheritdoc />
     public string ParticipationId =>
         // $"participationId{++_nextParticipationId}";
