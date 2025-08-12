@@ -132,12 +132,12 @@ public abstract partial class AbstractConcept : ConceptInstanceBase, BaseIface
         public AbstractConcept SetIfaceContainment(INode value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment);
-		ContainmentSingleNotificationEmitter<INode> notification = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment, notificationId);
-		notification.CollectOldData();
+		ContainmentSingleNotificationEmitter<INode> emitter = new(MultiInheritLangLanguage.Instance.BaseIface_ifaceContainment, this, value, _ifaceContainment, notificationId);
+		emitter.CollectOldData();
 		SetParentNull(_ifaceContainment);
 		AttachChild(value);
 		_ifaceContainment = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 

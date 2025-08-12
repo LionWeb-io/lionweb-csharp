@@ -199,10 +199,10 @@ public abstract partial class NamedAbstractConcept : ConceptInstanceBase, INamed
         public NamedAbstractConcept SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter notification = new(_builtIns.INamed_name, this, value, _name, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
 		_name = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -281,10 +281,10 @@ public partial class NamedAnn : AnnotationInstanceBase, INamedWritable
         public NamedAnn SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter notification = new(_builtIns.INamed_name, this, value, _name, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
 		_name = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -363,10 +363,10 @@ public partial class NamedConcept : ConceptInstanceBase, INamedWritable
         public NamedConcept SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter notification = new(_builtIns.INamed_name, this, value, _name, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
 		_name = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -461,10 +461,10 @@ public partial class NamedIfaceAnn : AnnotationInstanceBase, NamedIface, INamedW
         public NamedIfaceAnn SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter notification = new(_builtIns.INamed_name, this, value, _name, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
 		_name = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -543,10 +543,10 @@ public partial class NamedIfaceConcept : ConceptInstanceBase, NamedIface, INamed
         public NamedIfaceConcept SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter notification = new(_builtIns.INamed_name, this, value, _name, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
 		_name = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 

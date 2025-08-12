@@ -200,10 +200,10 @@ public partial class @out : @struct
         public @out SetDefault(@if value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.out_default);
-		PropertyNotificationEmitter notification = new(ClassLanguage.Instance.out_default, this, value, _default, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.out_default, this, value, _default, notificationId);
+		emitter.CollectOldData();
 		_default = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -287,10 +287,10 @@ public partial class @record : AnnotationInstanceBase, @interface
         public @record SetString(@enum value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
-		PropertyNotificationEmitter notification = new(ClassLanguage.Instance.interface_string, this, value, _string, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.interface_string, this, value, _string, notificationId);
+		emitter.CollectOldData();
 		_string = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -314,12 +314,12 @@ public partial class @record : AnnotationInstanceBase, @interface
         public @record SetDouble(@interface value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.record_double);
-		ContainmentSingleNotificationEmitter<@interface> notification = new(ClassLanguage.Instance.record_double, this, value, _double, notificationId);
-		notification.CollectOldData();
+		ContainmentSingleNotificationEmitter<@interface> emitter = new(ClassLanguage.Instance.record_double, this, value, _double, notificationId);
+		emitter.CollectOldData();
 		SetParentNull(_double);
 		AttachChild(value);
 		_double = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -443,10 +443,10 @@ public partial class @struct : ConceptInstanceBase, @interface
         public @struct SetString(@enum value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
-		PropertyNotificationEmitter notification = new(ClassLanguage.Instance.interface_string, this, value, _string, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.interface_string, this, value, _string, notificationId);
+		emitter.CollectOldData();
 		_string = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -470,10 +470,10 @@ public partial class @struct : ConceptInstanceBase, @interface
         public @struct SetRef(@record value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
-		ReferenceSingleNotificationEmitter notification = new(ClassLanguage.Instance.struct_ref, this, value, _ref, notificationId);
-		notification.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(ClassLanguage.Instance.struct_ref, this, value, _ref, notificationId);
+		emitter.CollectOldData();
 		_ref = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 

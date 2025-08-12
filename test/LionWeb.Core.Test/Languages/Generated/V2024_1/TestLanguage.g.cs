@@ -225,10 +225,10 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	/// <remarks>Optional Property</remarks>
         public DataTypeTestConcept SetBooleanValue_0_1(bool? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, this, value, _booleanValue_0_1, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_0_1, this, value, _booleanValue_0_1, notificationId);
+		emitter.CollectOldData();
 		_booleanValue_0_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -249,10 +249,10 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	/// <remarks>Required Property</remarks>
         public DataTypeTestConcept SetBooleanValue_1(bool value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_1, this, value, _booleanValue_1, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_booleanValue_1, this, value, _booleanValue_1, notificationId);
+		emitter.CollectOldData();
 		_booleanValue_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -272,10 +272,10 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	/// <remarks>Optional Property</remarks>
         public DataTypeTestConcept SetEnumValue_0_1(TestEnumeration? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, this, value, _enumValue_0_1, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_0_1, this, value, _enumValue_0_1, notificationId);
+		emitter.CollectOldData();
 		_enumValue_0_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -300,10 +300,10 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public DataTypeTestConcept SetEnumValue_1(TestEnumeration value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_1);
-		PropertyNotificationEmitter notification = new(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_1, this, value, _enumValue_1, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_enumValue_1, this, value, _enumValue_1, notificationId);
+		emitter.CollectOldData();
 		_enumValue_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -323,10 +323,10 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	/// <remarks>Optional Property</remarks>
         public DataTypeTestConcept SetIntegerValue_0_1(int? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_0_1, this, value, _integerValue_0_1, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_0_1, this, value, _integerValue_0_1, notificationId);
+		emitter.CollectOldData();
 		_integerValue_0_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -347,10 +347,10 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	/// <remarks>Required Property</remarks>
         public DataTypeTestConcept SetIntegerValue_1(int value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, this, value, _integerValue_1, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_integerValue_1, this, value, _integerValue_1, notificationId);
+		emitter.CollectOldData();
 		_integerValue_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -370,10 +370,10 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	/// <remarks>Optional Property</remarks>
         public DataTypeTestConcept SetStringValue_0_1(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, this, value, _stringValue_0_1, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_0_1, this, value, _stringValue_0_1, notificationId);
+		emitter.CollectOldData();
 		_stringValue_0_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -398,10 +398,10 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
         public DataTypeTestConcept SetStringValue_1(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_1);
-		PropertyNotificationEmitter notification = new(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_1, this, value, _stringValue_1, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(TestLanguageLanguage.Instance.DataTypeTestConcept_stringValue_1, this, value, _stringValue_1, notificationId);
+		emitter.CollectOldData();
 		_stringValue_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -617,10 +617,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public LinkTestConcept SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter notification = new(_builtIns.INamed_name, this, value, _name, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
 		_name = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -640,12 +640,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Optional Single Containment</remarks>
         public LinkTestConcept SetContainment_0_1(LinkTestConcept? value, INotificationId? notificationId = null)
 	{
-		ContainmentSingleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, this, value, _containment_0_1, notificationId);
-		notification.CollectOldData();
+		ContainmentSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_1, this, value, _containment_0_1, notificationId);
+		emitter.CollectOldData();
 		SetParentNull(_containment_0_1);
 		AttachChild(value);
 		_containment_0_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -668,10 +668,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
-		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, safeNodes, _containment_0_n, null, notificationId);
-		notification.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, safeNodes, _containment_0_n, null, notificationId);
+		emitter.CollectOldData();
 		_containment_0_n.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -683,10 +683,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
 		AssureNoSelfMove(index, safeNodes, _containment_0_n);
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
-		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, safeNodes, _containment_0_n, index, notificationId);
-		notification.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, safeNodes, _containment_0_n, index, notificationId);
+		emitter.CollectOldData();
 		_containment_0_n.InsertRange(index, SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -717,12 +717,12 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public LinkTestConcept SetContainment_1(LinkTestConcept value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, TestLanguageLanguage.Instance.LinkTestConcept_containment_1);
-		ContainmentSingleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, this, value, _containment_1, notificationId);
-		notification.CollectOldData();
+		ContainmentSingleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1, this, value, _containment_1, notificationId);
+		emitter.CollectOldData();
 		SetParentNull(_containment_1);
 		AttachChild(value);
 		_containment_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -746,10 +746,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
-		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, safeNodes, _containment_1_n, null, notificationId);
-		notification.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, safeNodes, _containment_1_n, null, notificationId);
+		emitter.CollectOldData();
 		_containment_1_n.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -762,10 +762,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
 		AssureNoSelfMove(index, safeNodes, _containment_1_n);
-		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, safeNodes, _containment_1_n, index, notificationId);
-		notification.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, safeNodes, _containment_1_n, index, notificationId);
+		emitter.CollectOldData();
 		_containment_1_n.InsertRange(index, SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -796,10 +796,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <remarks>Optional Single Reference</remarks>
         public LinkTestConcept SetReference_0_1(LinkTestConcept? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter notification = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1, notificationId);
-		notification.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, this, value, _reference_0_1, notificationId);
+		emitter.CollectOldData();
 		_reference_0_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -822,10 +822,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n.Count, notificationId);
-		notification.CollectOldData();
+		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n.Count, notificationId);
+		emitter.CollectOldData();
 		_reference_0_n.AddRange(safeNodes);
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -836,10 +836,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 		AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, index, notificationId);
-		notification.CollectOldData();
+		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, index, notificationId);
+		emitter.CollectOldData();
 		_reference_0_n.InsertRange(index, safeNodes);
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -873,10 +873,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
         public LinkTestConcept SetReference_1(LinkTestConcept value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, TestLanguageLanguage.Instance.LinkTestConcept_reference_1);
-		ReferenceSingleNotificationEmitter notification = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1, notificationId);
-		notification.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1, this, value, _reference_1, notificationId);
+		emitter.CollectOldData();
 		_reference_1 = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -901,10 +901,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n.Count, notificationId);
-		notification.CollectOldData();
+		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n.Count, notificationId);
+		emitter.CollectOldData();
 		_reference_1_n.AddRange(safeNodes);
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -917,10 +917,10 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
 		AssureNonEmpty(safeNodes, _reference_1_n, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, index, notificationId);
-		notification.CollectOldData();
+		ReferenceAddMultipleNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, index, notificationId);
+		emitter.CollectOldData();
 		_reference_1_n.InsertRange(index, safeNodes);
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -1038,11 +1038,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		if (TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.EqualsIdentity(feature))
 		{
 			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value).ToList();
-			ContainmentSetNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, safeNodes, _containment_0_n, notificationId);
-			notification.CollectOldData();
+			ContainmentSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n, this, safeNodes, _containment_0_n, notificationId);
+			emitter.CollectOldData();
 			RemoveSelfParent(_containment_0_n.ToList(), _containment_0_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n);
 			_containment_0_n.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_0_n));
-			notification.Notify();
+			emitter.Notify();
 			return true;
 		}
 
@@ -1061,11 +1061,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		{
 			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value).ToList();
 			AssureNonEmpty(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
-			ContainmentSetNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, safeNodes, _containment_1_n, notificationId);
-			notification.CollectOldData();
+			ContainmentSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n, this, safeNodes, _containment_1_n, notificationId);
+			emitter.CollectOldData();
 			RemoveSelfParent(_containment_1_n.ToList(), _containment_1_n, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n);
 			_containment_1_n.AddRange(SetSelfParent(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_containment_1_n));
-			notification.Notify();
+			emitter.Notify();
 			return true;
 		}
 
@@ -1085,11 +1085,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value).ToList();
 			AssureNotNull(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
 			AssureNotNullMembers(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n);
-			ReferenceSetNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n, notificationId);
-			notification.CollectOldData();
+			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, this, safeNodes, _reference_0_n, notificationId);
+			emitter.CollectOldData();
 			_reference_0_n.Clear();
 			_reference_0_n.AddRange(safeNodes);
-			notification.Notify();
+			emitter.Notify();
 			return true;
 		}
 
@@ -1108,11 +1108,11 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 		{
 			var safeNodes = TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.TestLanguage.LinkTestConcept>(value).ToList();
 			AssureNonEmpty(safeNodes, TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n);
-			ReferenceSetNotificationEmitter<LinkTestConcept> notification = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n, notificationId);
-			notification.CollectOldData();
+			ReferenceSetNotificationEmitter<LinkTestConcept> emitter = new(TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, this, safeNodes, _reference_1_n, notificationId);
+			emitter.CollectOldData();
 			_reference_1_n.Clear();
 			_reference_1_n.AddRange(safeNodes);
-			notification.Notify();
+			emitter.Notify();
 			return true;
 		}
 

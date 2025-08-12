@@ -129,10 +129,10 @@ public partial class BConcept : ConceptInstanceBase
         public BConcept SetAEnumProp(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AEnum value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, BLangLanguage.Instance.BConcept_AEnumProp);
-		PropertyNotificationEmitter notification = new(BLangLanguage.Instance.BConcept_AEnumProp, this, value, _aEnumProp, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(BLangLanguage.Instance.BConcept_AEnumProp, this, value, _aEnumProp, notificationId);
+		emitter.CollectOldData();
 		_aEnumProp = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -152,10 +152,10 @@ public partial class BConcept : ConceptInstanceBase
 	/// <remarks>Optional Single Reference</remarks>
         public BConcept SetARef(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A.AConcept? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter notification = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
-		notification.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(BLangLanguage.Instance.BConcept_ARef, this, value, _aRef, notificationId);
+		emitter.CollectOldData();
 		_aRef = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 

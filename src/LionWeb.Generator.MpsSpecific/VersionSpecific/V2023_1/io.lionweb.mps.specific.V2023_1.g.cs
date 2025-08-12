@@ -176,10 +176,10 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public ConceptDescription SetConceptAlias(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.ConceptDescription_conceptAlias, this, value, _conceptAlias, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.ConceptDescription_conceptAlias, this, value, _conceptAlias, notificationId);
+		emitter.CollectOldData();
 		_conceptAlias = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -199,10 +199,10 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public ConceptDescription SetConceptShortDescription(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.ConceptDescription_conceptShortDescription, this, value, _conceptShortDescription, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.ConceptDescription_conceptShortDescription, this, value, _conceptShortDescription, notificationId);
+		emitter.CollectOldData();
 		_conceptShortDescription = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -222,10 +222,10 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public ConceptDescription SetHelpUrl(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.ConceptDescription_helpUrl, this, value, _helpUrl, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.ConceptDescription_helpUrl, this, value, _helpUrl, notificationId);
+		emitter.CollectOldData();
 		_helpUrl = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -335,10 +335,10 @@ public partial class Deprecated : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Deprecated SetBuild(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.Deprecated_build, this, value, _build, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.Deprecated_build, this, value, _build, notificationId);
+		emitter.CollectOldData();
 		_build = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -358,10 +358,10 @@ public partial class Deprecated : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Deprecated SetComment(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.Deprecated_comment, this, value, _comment, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.Deprecated_comment, this, value, _comment, notificationId);
+		emitter.CollectOldData();
 		_comment = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -452,10 +452,10 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public KeyedDescription SetDocumentation(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.KeyedDescription_documentation, this, value, _documentation, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.KeyedDescription_documentation, this, value, _documentation, notificationId);
+		emitter.CollectOldData();
 		_documentation = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -478,10 +478,10 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> notification = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso.Count, notificationId);
-		notification.CollectOldData();
+		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso.Count, notificationId);
+		emitter.CollectOldData();
 		_seeAlso.AddRange(safeNodes);
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -492,10 +492,10 @@ public partial class KeyedDescription : AnnotationInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> notification = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, index, notificationId);
-		notification.CollectOldData();
+		ReferenceAddMultipleNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, index, notificationId);
+		emitter.CollectOldData();
 		_seeAlso.InsertRange(index, safeNodes);
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -556,11 +556,11 @@ public partial class KeyedDescription : AnnotationInstanceBase
 			var safeNodes = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value).ToList();
 			AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 			AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-			ReferenceSetNotificationEmitter<IReadableNode> notification = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso, notificationId);
-			notification.CollectOldData();
+			ReferenceSetNotificationEmitter<IReadableNode> emitter = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso, notificationId);
+			emitter.CollectOldData();
 			_seeAlso.Clear();
 			_seeAlso.AddRange(safeNodes);
-			notification.Notify();
+			emitter.Notify();
 			return true;
 		}
 
@@ -598,10 +598,10 @@ public partial class ShortDescription : AnnotationInstanceBase
 	/// <remarks>Optional Property</remarks>
         public ShortDescription SetDescription(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.ShortDescription_description, this, value, _description, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SpecificLanguage.Instance.ShortDescription_description, this, value, _description, notificationId);
+		emitter.CollectOldData();
 		_description = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -680,10 +680,10 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
         public VirtualPackage SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter notification = new(_builtIns.INamed_name, this, value, _name, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
 		_name = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 

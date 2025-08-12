@@ -138,10 +138,10 @@ public partial class AConcept : ConceptInstanceBase
     	/// <remarks>Optional Single Reference</remarks>
         public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2024_1.Circular.B.BConcept? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter notification = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, notificationId);
-		notification.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, notificationId);
+		emitter.CollectOldData();
 		_bRef = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 

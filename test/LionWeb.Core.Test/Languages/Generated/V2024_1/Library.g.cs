@@ -198,10 +198,10 @@ public partial class Book : ConceptInstanceBase
         public Book SetAuthor(Writer value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
-		ReferenceSingleNotificationEmitter notification = new(LibraryLanguage.Instance.Book_author, this, value, _author, notificationId);
-		notification.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_author, this, value, _author, notificationId);
+		emitter.CollectOldData();
 		_author = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -222,10 +222,10 @@ public partial class Book : ConceptInstanceBase
 	/// <remarks>Required Property</remarks>
         public Book SetPages(int value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Book_pages, this, value, _pages, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_pages, this, value, _pages, notificationId);
+		emitter.CollectOldData();
 		_pages = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -250,10 +250,10 @@ public partial class Book : ConceptInstanceBase
         public Book SetTitle(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
-		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Book_title, this, value, _title, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_title, this, value, _title, notificationId);
+		emitter.CollectOldData();
 		_title = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -273,10 +273,10 @@ public partial class Book : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         public Book SetType(BookType? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Book_type, this, value, _type, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Book_type, this, value, _type, notificationId);
+		emitter.CollectOldData();
 		_type = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -410,10 +410,10 @@ public partial class GuideBookWriter : Writer
         public GuideBookWriter SetCountries(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.GuideBookWriter_countries);
-		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.GuideBookWriter_countries, this, value, _countries, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.GuideBookWriter_countries, this, value, _countries, notificationId);
+		emitter.CollectOldData();
 		_countries = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -489,10 +489,10 @@ public partial class Library : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		ContainmentAddMultipleNotificationEmitter<Book> notification = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null, notificationId);
-		notification.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null, notificationId);
+		emitter.CollectOldData();
 		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -505,10 +505,10 @@ public partial class Library : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
 		AssureNoSelfMove(index, safeNodes, _books);
-		ContainmentAddMultipleNotificationEmitter<Book> notification = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, index, notificationId);
-		notification.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, index, notificationId);
+		emitter.CollectOldData();
 		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -544,10 +544,10 @@ public partial class Library : ConceptInstanceBase
         public Library SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Library_name);
-		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Library_name, this, value, _name, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Library_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
 		_name = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -586,11 +586,11 @@ public partial class Library : ConceptInstanceBase
 		{
 			var safeNodes = LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Library.M2.Book>(value).ToList();
 			AssureNonEmpty(safeNodes, LibraryLanguage.Instance.Library_books);
-			ContainmentSetNotificationEmitter<Book> notification = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, notificationId);
-			notification.CollectOldData();
+			ContainmentSetNotificationEmitter<Book> emitter = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, notificationId);
+			emitter.CollectOldData();
 			RemoveSelfParent(_books.ToList(), _books, LibraryLanguage.Instance.Library_books);
 			_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-			notification.Notify();
+			emitter.Notify();
 			return true;
 		}
 
@@ -670,10 +670,10 @@ public partial class SpecialistBookWriter : Writer
         public SpecialistBookWriter SetSubject(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.SpecialistBookWriter_subject);
-		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.SpecialistBookWriter_subject, this, value, _subject, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.SpecialistBookWriter_subject, this, value, _subject, notificationId);
+		emitter.CollectOldData();
 		_subject = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -750,10 +750,10 @@ public partial class Writer : ConceptInstanceBase
         public Writer SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Writer_name);
-		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Writer_name, this, value, _name, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(LibraryLanguage.Instance.Writer_name, this, value, _name, notificationId);
+		emitter.CollectOldData();
 		_name = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 

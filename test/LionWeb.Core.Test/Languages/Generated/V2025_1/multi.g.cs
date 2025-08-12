@@ -112,10 +112,10 @@ public partial class Container : ConceptInstanceBase
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> notification = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, null, notificationId);
-		notification.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, null, notificationId);
+		emitter.CollectOldData();
 		_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -128,10 +128,10 @@ public partial class Container : ConceptInstanceBase
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
 		AssureNoSelfMove(index, safeNodes, _libraries);
-		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> notification = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, index, notificationId);
-		notification.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, index, notificationId);
+		emitter.CollectOldData();
 		_libraries.InsertRange(index, SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -175,11 +175,11 @@ public partial class Container : ConceptInstanceBase
 		{
 			var safeNodes = MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library>(value).ToList();
 			AssureNonEmpty(safeNodes, MultiLanguage.Instance.Container_libraries);
-			ContainmentSetNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> notification = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, notificationId);
-			notification.CollectOldData();
+			ContainmentSetNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> emitter = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, notificationId);
+			emitter.CollectOldData();
 			RemoveSelfParent(_libraries.ToList(), _libraries, MultiLanguage.Instance.Container_libraries);
 			_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-			notification.Notify();
+			emitter.Notify();
 			return true;
 		}
 

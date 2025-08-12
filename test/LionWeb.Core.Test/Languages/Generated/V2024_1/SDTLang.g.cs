@@ -269,10 +269,10 @@ public partial class SDTConcept : ConceptInstanceBase
         public SDTConcept SetA(A value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_A);
-		PropertyNotificationEmitter notification = new(SDTLangLanguage.Instance.SDTConcept_A, this, value, _a, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_A, this, value, _a, notificationId);
+		emitter.CollectOldData();
 		_a = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -297,10 +297,10 @@ public partial class SDTConcept : ConceptInstanceBase
         public SDTConcept SetAmount(Amount value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_amount);
-		PropertyNotificationEmitter notification = new(SDTLangLanguage.Instance.SDTConcept_amount, this, value, _amount, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_amount, this, value, _amount, notificationId);
+		emitter.CollectOldData();
 		_amount = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -325,10 +325,10 @@ public partial class SDTConcept : ConceptInstanceBase
         public SDTConcept SetComplex(ComplexNumber value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, SDTLangLanguage.Instance.SDTConcept_complex);
-		PropertyNotificationEmitter notification = new(SDTLangLanguage.Instance.SDTConcept_complex, this, value, _complex, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_complex, this, value, _complex, notificationId);
+		emitter.CollectOldData();
 		_complex = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -348,10 +348,10 @@ public partial class SDTConcept : ConceptInstanceBase
 	/// <remarks>Optional Property</remarks>
         public SDTConcept SetDecimal(Decimal? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter notification = new(SDTLangLanguage.Instance.SDTConcept_decimal, this, value, _decimal, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(SDTLangLanguage.Instance.SDTConcept_decimal, this, value, _decimal, notificationId);
+		emitter.CollectOldData();
 		_decimal = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 

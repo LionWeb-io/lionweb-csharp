@@ -127,10 +127,10 @@ public partial class EnumHolder : ConceptInstanceBase
         public EnumHolder SetEnumValue(MyEnum value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, WithEnumLanguage.Instance.EnumHolder_enumValue);
-		PropertyNotificationEmitter notification = new(WithEnumLanguage.Instance.EnumHolder_enumValue, this, value, _enumValue, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(WithEnumLanguage.Instance.EnumHolder_enumValue, this, value, _enumValue, notificationId);
+		emitter.CollectOldData();
 		_enumValue = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 

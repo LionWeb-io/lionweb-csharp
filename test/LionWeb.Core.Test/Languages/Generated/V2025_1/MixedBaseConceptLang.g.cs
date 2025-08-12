@@ -110,10 +110,10 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetEnumProp(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedDirectEnumLang.DirectEnum value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp);
-		PropertyNotificationEmitter notification = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp, this, value, _enumProp, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_enumProp, this, value, _enumProp, notificationId);
+		emitter.CollectOldData();
 		_enumProp = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -138,10 +138,10 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetSdtProp(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedDirectSdtLang.DirectSdt value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp);
-		PropertyNotificationEmitter notification = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp, this, value, _sdtProp, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(MixedBaseConceptLangLanguage.Instance.BaseConcept_sdtProp, this, value, _sdtProp, notificationId);
+		emitter.CollectOldData();
 		_sdtProp = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -167,12 +167,12 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetCont(INode value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont);
-		ContainmentSingleNotificationEmitter<INode> notification = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont, this, value, _cont, notificationId);
-		notification.CollectOldData();
+		ContainmentSingleNotificationEmitter<INode> emitter = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseContainmentLang.MixedBaseContainmentLangLanguage.Instance.BaseContainmentIface_Cont, this, value, _cont, notificationId);
+		emitter.CollectOldData();
 		SetParentNull(_cont);
 		AttachChild(value);
 		_cont = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -199,10 +199,10 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetProp(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop);
-		PropertyNotificationEmitter notification = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop, this, value, _prop, notificationId);
-		notification.CollectOldData();
+		PropertyNotificationEmitter emitter = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBasePropertyLang.MixedBasePropertyLangLanguage.Instance.BasePropertyIface_Prop, this, value, _prop, notificationId);
+		emitter.CollectOldData();
 		_prop = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
@@ -228,10 +228,10 @@ public abstract partial class BaseConcept : ConceptInstanceBase, LionWeb.Core.Te
         public BaseConcept SetRef(IReadableNode value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref);
-		ReferenceSingleNotificationEmitter notification = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, this, value, _ref, notificationId);
-		notification.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(LionWeb.Core.Test.Languages.Generated.V2025_1.Mixed.MixedBaseReferenceLang.MixedBaseReferenceLangLanguage.Instance.BaseReferenceIface_Ref, this, value, _ref, notificationId);
+		emitter.CollectOldData();
 		_ref = value;
-		notification.Notify();
+		emitter.Notify();
 		return this;
 	}
 
