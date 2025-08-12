@@ -24,5 +24,5 @@ public interface INotification
     INotificationId NotificationId { get; set; }
 }
 
-/// ID of an notification in the LionWeb notification system.
+/// ID of a notification in the LionWeb notification system.
 public interface INotificationId;
