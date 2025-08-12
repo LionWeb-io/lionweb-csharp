@@ -17,12 +17,12 @@
 
 namespace LionWeb.Core.Notification;
 
-/// Any event in the LionWeb event system.
+/// Any notification in the LionWeb notification system.
 public interface INotification
 {
-    /// Globally unique id of this event.
+    /// Globally unique id of this notification.
     INotificationId NotificationId { get; set; }
 }
 
-/// Id of an internal event in the LionWeb event system.
+/// ID of an notification in the LionWeb notification system.
 public interface INotificationId;
