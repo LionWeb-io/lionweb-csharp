@@ -17,12 +17,12 @@
 
 namespace LionWeb.Protocol.Delta.Client;
 
-using LionWeb.Core.M1.Event;
+using Core.Notification;
 
 public interface IClientConnector<T> 
 {
     Task SendToRepository(T content);
     event EventHandler<T> ReceiveFromRepository;
 
-    T Convert(IEvent internalEvent);
+    T Convert(INotification internalNotification);
 }

@@ -6,9 +6,9 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.Mixed.MixedBaseReferenceLang;
 using LionWeb.Core;
-using LionWeb.Core.M1.Event;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
+using LionWeb.Core.Notification;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
@@ -89,5 +89,5 @@ public partial interface BaseReferenceIface : INode
 	public IReadableNode Ref { get; set; }
 
 	/// <remarks>Required Single Reference</remarks>
-        public BaseReferenceIface SetRef(IReadableNode value, IEventId? eventId = null);
+        public BaseReferenceIface SetRef(IReadableNode value, INotificationId? notificationId = null);
 }

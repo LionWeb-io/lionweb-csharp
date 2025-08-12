@@ -6,10 +6,10 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.WithEnum.M2;
 using LionWeb.Core;
-using LionWeb.Core.M1.Event;
-using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Partition.Emitter;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
@@ -124,13 +124,13 @@ public partial class EnumHolder : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public EnumHolder SetEnumValue(MyEnum value, IEventId? eventId = null)
+        public EnumHolder SetEnumValue(MyEnum value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, WithEnumLanguage.Instance.EnumHolder_enumValue);
-		PropertyEventEmitter evt = new(WithEnumLanguage.Instance.EnumHolder_enumValue, this, value, _enumValue, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter emitter = new(WithEnumLanguage.Instance.EnumHolder_enumValue, this, value, _enumValue, notificationId);
+		emitter.CollectOldData();
 		_enumValue = value;
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
@@ -155,15 +155,15 @@ public partial class EnumHolder : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (WithEnumLanguage.Instance.EnumHolder_enumValue.EqualsIdentity(feature))
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2023_1.WithEnum.M2.MyEnum v)
 			{
-				SetEnumValue(v, eventId);
+				SetEnumValue(v, notificationId);
 				return true;
 			}
 

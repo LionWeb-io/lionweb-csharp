@@ -18,9 +18,9 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
-using Core.M1.Event;
-using Core.M1.Event.Partition;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition;
 
 public interface ILionWebRepository
 {
@@ -53,15 +53,15 @@ public abstract class LionWebRepositoryBase<T>
 
         SharedNodeMap = new();
         PartitionEventHandler = new PartitionEventHandler(name);
-        var replicator = new RewritePartitionEventReplicator(partition, SharedNodeMap);
+        var replicator = new RewritePartitionNotificationReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(PartitionEventHandler);
 
-        replicator.Subscribe<IPartitionEvent>(SendPartitionEventToAllClients);
+        replicator.Subscribe<IPartitionNotification>(SendPartitionEventToAllClients);
 
         connector.ReceiveFromClient += (_, content) => Receive(content);
     }
 
-    private void SendPartitionEventToAllClients(object? sender, IPartitionEvent? partitionEvent)
+    private void SendPartitionEventToAllClients(object? sender, IPartitionNotification? partitionEvent)
     {
         if (partitionEvent == null)
             return;

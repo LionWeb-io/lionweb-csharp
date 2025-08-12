@@ -18,11 +18,11 @@
 namespace LionWeb.Core;
 
 using M1;
-using M1.Event;
-using M1.Event.Partition;
-using M1.Event.Partition.Emitter;
 using M2;
 using M3;
+using Notification;
+using Notification.Partition;
+using Notification.Partition.Emitter;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
@@ -306,7 +306,7 @@ public interface IStructuredDataTypeInstance
 }
 
 /// Every model node is an instance of <see cref="INode"/>.
-public interface INode : IEventableNode<INode>;
+public interface INode : INotifiableNode<INode>;
 
 /// Base implementation of <see cref="IReadableNode{T}"/>.
 public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
@@ -399,31 +399,31 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
     
     /// <inheritdoc />
-    public virtual void AddAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null)
+    public virtual void AddAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null)
     {
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleEventEmitter evt = new(this, safeAnnotations, _annotations, startIndex: null, eventId: eventId);
-        evt.CollectOldData();
+        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations, startIndex: null, notificationId: notificationId);
+        notification.CollectOldData();
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
-        evt.RaiseEvent();
+        notification.Notify();
     }
 
     /// <inheritdoc />
-    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations, IEventId? eventId = null)
+    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations, INotificationId? notificationId = null)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleEventEmitter evt = new(this, safeAnnotations, _annotations, startIndex: index, eventId: eventId);
-        evt.CollectOldData();
+        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations, startIndex: index, notificationId: notificationId);
+        notification.CollectOldData();
         _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
-        evt.RaiseEvent();
+        notification.Notify();
     }
 
     /// <inheritdoc />
-    public virtual bool RemoveAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, eventId);
+    public virtual bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) =>
+        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, notificationId);
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() => [];
@@ -458,16 +458,16 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         GetInternal(feature, out value);
 
     /// <inheritdoc />
-    public void Set(Feature feature, object? value, IEventId? eventId = null)
+    public void Set(Feature feature, object? value, INotificationId? notificationId = null)
     {
-        if (SetInternal(feature, value, eventId))
+        if (SetInternal(feature, value, notificationId))
             return;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
 
     /// <inheritdoc cref="IWritableNode.Set"/>
-    protected virtual bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+    protected virtual bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
     {
         if (feature == null)
         {
@@ -475,11 +475,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 throw new InvalidValueException(feature, value);
             var safeNodes = M2Extensions.AsNodes<INode>(value).ToList();
             AssureAnnotations(safeNodes);
-            AnnotationSetEventEmitter evt = new(this, safeNodes, _annotations, eventId);
-            evt.CollectOldData();
+            AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations, notificationId);
+            notification.CollectOldData();
             RemoveSelfParent(_annotations.ToList(), _annotations, null);
             _annotations.AddRange(SetSelfParent(safeNodes, null));
-            evt.RaiseEvent();
+            notification.Notify();
             return true;
         }
 
@@ -743,11 +743,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="node">Node to remove from <paramref name="storage"/>.</param>
     /// <param name="storage">Storage potentially containing <paramref name="node"/>.</param>
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if <paramref name="node"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="node"/> is <c>null</c> or not an instance of <typeparamref name="T"/>.</exception>
-    protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link, IEventId? eventId = null)
+    protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link, INotificationId? notificationId = null)
         where T : class, INode =>
         RemoveSelfParent(AsList<T>(node, link), storage, link);
 
@@ -762,11 +762,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// Optional Action to call for each removed element of <paramref name="list"/>.
     /// Only called if <see cref="GetPartitionCommander"/> is available.
     /// </param>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link, Action<IPartitionCommander, Index, T, IEventId?>? remover = null, IEventId? eventId = null)
+    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link, Action<IPartitionCommander, Index, T, INotificationId?>? remover = null, INotificationId? notificationId = null)
         where T : IReadableNode
     {
         AssureNotNull(list, link);
@@ -786,7 +786,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             if(node is  INode iNode)
                 SetParentInternal(iNode, null);
             if (partitionCommander != null && remover != null)
-                remover(partitionCommander, index, node, eventId);
+                remover(partitionCommander, index, node, notificationId);
         }
 
         return result;
@@ -802,9 +802,9 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// Optional Action to call for each removed element of <paramref name="safeNodes"/>.
     /// Only called if <see cref="GetPartitionCommander"/> is available.
     /// </param>
-    /// <param name="eventId">The event ID of the event that triggers this action</param>
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
-    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, Index, T, IEventId?>? remover, IEventId? eventId = null)
+    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, Index, T, INotificationId?>? remover, INotificationId? notificationId = null)
         where T : IReadableNode
     {
         var partitionCommander = GetPartitionCommander();
@@ -817,26 +817,26 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
             storage.RemoveAt(index);
             if (partitionCommander != null && remover != null)
-                remover(partitionCommander, index, node, eventId);
+                remover(partitionCommander, index, node, notificationId);
         }
     }
 
-    /// Raises <see cref="ReferenceDeletedEvent"/> for <paramref name="reference"/>.
-    protected Action<IPartitionCommander, Index, T, IEventId?> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
-        (commander, index, node, eventId) =>
+    /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
+    protected Action<IPartitionCommander, Index, T, INotificationId?> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
+        (commander, index, node, notificationId) =>
         {
             IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
-            commander.Raise(new ReferenceDeletedEvent(this, reference, index, deletedTarget, eventId ?? commander.CreateEventId()));
+            commander.Raise(new ReferenceDeletedNotification(this, reference, index, deletedTarget, notificationId ?? commander.CreateEventId()));
         };
 
-    /// Raises <see cref="ChildDeletedEvent"/> for <paramref name="containment"/>.
-    protected Action<IPartitionCommander, Index, T, IEventId?> ContainmentRemover<T>(Containment containment) where T : INode =>
-        (commander, index, node, eventId) =>
-            commander.Raise(new ChildDeletedEvent(node, this, containment, index, eventId ?? commander.CreateEventId()));
+    /// Raises <see cref="ChildDeletedNotification"/> for <paramref name="containment"/>.
+    protected Action<IPartitionCommander, Index, T, INotificationId?> ContainmentRemover<T>(Containment containment) where T : INode =>
+        (commander, index, node, notificationId) =>
+            commander.Raise(new ChildDeletedNotification(node, this, containment, index, notificationId ?? commander.CreateEventId()));
 
-    /// Raises <see cref="AnnotationDeletedEvent"/>.
-    private void AnnotationRemover(IPartitionCommander commander, Index index, INode node, IEventId? eventId = null) =>
-        commander.Raise(new AnnotationDeletedEvent(node, this, index, eventId ?? commander.CreateEventId()));
+    /// Raises <see cref="AnnotationDeletedNotification"/>.
+    private void AnnotationRemover(IPartitionCommander commander, Index index, INode node, INotificationId? notificationId = null) =>
+        commander.Raise(new AnnotationDeletedNotification(node, this, index, notificationId ?? commander.CreateEventId()));
 
     #endregion
 }

@@ -18,11 +18,9 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
-using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Forest;
-using Core.M1.Event.Partition;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition;
 
 public interface ILionWebClient
 {
@@ -67,10 +65,10 @@ public abstract class LionWebClientBase<T> : ILionWebClient
 
         SharedNodeMap = new();
         PartitionEventHandler = new PartitionEventHandler(name);
-        var replicator = new PartitionEventReplicator(partition, SharedNodeMap);
+        var replicator = new PartitionNotificationReplicator(partition, SharedNodeMap);
         replicator.ReplicateFrom(PartitionEventHandler);
 
-        replicator.Subscribe<IPartitionEvent>(SendPartitionEventToRepository);
+        replicator.Subscribe<IPartitionNotification>(SendPartitionEventToRepository);
 
         connector.ReceiveFromRepository += (_, content) => Receive(content);
     }
@@ -90,7 +88,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsResponse"/></returns>
     public abstract Task GetAvailableIds(int count);
     
-    private void SendPartitionEventToRepository(object? sender, IPartitionEvent? partitionEvent)
+    private void SendPartitionEventToRepository(object? sender, IPartitionNotification? partitionEvent)
     {
         if (partitionEvent == null)
             return;

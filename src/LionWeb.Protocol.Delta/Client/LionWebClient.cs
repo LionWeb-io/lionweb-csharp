@@ -19,21 +19,20 @@ namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
-using Core.M1.Event;
 using Core.M3;
+using Core.Notification;
 using Core.Utilities;
 using Message;
 using Message.Command;
 using Message.Event;
 using Message.Query;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 
 public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
 
-public interface IEventClientConnector : IClientConnector<IEvent>
+public interface IEventClientConnector : IClientConnector<INotification>
 {
-    IEvent IClientConnector<IEvent>.Convert(IEvent internalEvent) => internalEvent;
+    INotification IClientConnector<INotification>.Convert(INotification internalNotification) => internalNotification;
 }
 
 public class LionWebClient : LionWebClientBase<IDeltaContent>

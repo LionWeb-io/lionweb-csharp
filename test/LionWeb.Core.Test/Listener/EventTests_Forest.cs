@@ -20,7 +20,7 @@ namespace LionWeb.Core.Test.Listener;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using M1.Event.Forest;
+using Notification.Forest;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
@@ -41,7 +41,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = new ForestEventReplicator(cloneForest);
+        var replicator = new ForestNotificationReplicator(cloneForest);
         replicator.ReplicateFrom(forest.GetPublisher());
         
         forest.AddPartitions([node]);
@@ -65,7 +65,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = new ForestEventReplicator(cloneForest);
+        var replicator = new ForestNotificationReplicator(cloneForest);
         replicator.ReplicateFrom(forest.GetPublisher());
         
         forest.AddPartitions([node]);
@@ -89,7 +89,7 @@ public class EventTests_Forest
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
 
-        var replicator = new ForestEventReplicator(cloneForest);
+        var replicator = new ForestNotificationReplicator(cloneForest);
         replicator.ReplicateFrom(forest.GetPublisher());
 
         node.Documentation = moved;
@@ -110,7 +110,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = new ForestEventReplicator(cloneForest);
+        var replicator = new ForestNotificationReplicator(cloneForest);
         replicator.ReplicateFrom(forest.GetPublisher());
 
         forest.AddPartitions([node, originPartition]);

@@ -19,8 +19,8 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1.Event;
-using M1.Event.Partition;
+using Notification;
+using Notification.Partition;
 using System.Reflection;
 using Comparer = Core.Utilities.Comparer;
 
@@ -33,9 +33,9 @@ public class EventTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        node.GetPublisher().Subscribe<PropertyAddedEvent>((sender, args) => { } );
-        node.GetPublisher().Subscribe<PropertyChangedEvent>((sender, args) => { });
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => { });
+        node.GetPublisher().Subscribe<PropertyAddedNotification>((sender, args) => { } );
+        node.GetPublisher().Subscribe<PropertyChangedNotification>((sender, args) => { });
+        node.GetPublisher().Subscribe<IPartitionNotification>((sender, args) => { });
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -50,9 +50,9 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetPublisher().Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
+        node.GetPublisher().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
         
-        node.GetPublisher().Subscribe<PropertyChangedEvent>((sender, args) => {});
+        node.GetPublisher().Subscribe<PropertyChangedNotification>((sender, args) => {});
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -68,13 +68,13 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetPublisher().Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
+        node.GetPublisher().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
         
         int changedCount = 0;
-        node.GetPublisher().Subscribe<PropertyChangedEvent>((sender, args) => changedCount++);
+        node.GetPublisher().Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
 
         int allCount = 0;
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => allCount++);
+        node.GetPublisher().Subscribe<IPartitionNotification>((sender, args) => allCount++);
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -94,17 +94,17 @@ public class EventTests_Infrastructure
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        var cloneReplicator = new PartitionEventReplicator(node);
+        var replicator = new PartitionNotificationReplicator(clone);
+        var cloneReplicator = new PartitionNotificationReplicator(node);
         
         replicator.ReplicateFrom(cloneReplicator);
         cloneReplicator.ReplicateFrom(replicator);
 
         int nodeCount = 0;
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => nodeCount++);
+        node.GetPublisher().Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
         
         int cloneCount = 0;
-        clone.GetPublisher().Subscribe<IPartitionEvent>((sender, args) => cloneCount++);
+        clone.GetPublisher().Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
         
         circle.Name = "Hello";
         cloneCircle.Name = "World";
@@ -123,8 +123,8 @@ public class EventTests_Infrastructure
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionEventReplicator(clone);
-        var cloneReplicator = new PartitionEventReplicator(node);
+        var replicator = new PartitionNotificationReplicator(clone);
+        var cloneReplicator = new PartitionNotificationReplicator(node);
         
         replicator.ReplicateFrom(cloneReplicator);
         cloneReplicator.ReplicateFrom(replicator);
@@ -138,12 +138,12 @@ public class EventTests_Infrastructure
         Assert.AreEqual(0, ReplicatorEventIds(cloneReplicator).Count);
     }
 
-    private static HashSet<IEventId> ReplicatorEventIds(PartitionEventReplicator replicator)
+    private static HashSet<INotificationId> ReplicatorEventIds(PartitionNotificationReplicator replicator)
     {
-        var type = typeof(EventIdFilteringEventForwarder<IPartitionEvent, IPartitionPublisher>);
-        var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_eventIds");
+        var type = typeof(NotificationIdFilteringNotificationForwarder<IPartitionNotification, IPartitionPublisher>);
+        var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_notificationIds");
         var value = fieldInfo.GetValue(replicator);
-        return (HashSet<IEventId>)value!;
+        return (HashSet<INotificationId>)value!;
     }
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

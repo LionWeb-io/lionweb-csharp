@@ -19,8 +19,8 @@
 
 namespace LionWeb.Core.M2;
 
-using M1.Event;
 using M3;
+using Notification;
 using System.Diagnostics.CodeAnalysis;
 
 /// The definition of the LionCore language containing the built-ins:
@@ -88,5 +88,5 @@ public interface INamedWritable : INamed, IWritableNode
     public new string Name { get; set; }
 
     /// <inheritdoc cref="INamed.Name"/>
-    public INamedWritable SetName(string value, IEventId? eventId = null);
+    public INamedWritable SetName(string value, INotificationId? eventId = null);
 }

@@ -20,9 +20,9 @@ namespace LionWeb.Protocol.Delta.Test.Listener;
 using Client;
 using Core;
 using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Partition;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Listener;
 using Message.Command;
@@ -58,7 +58,7 @@ public class EventsTestJson : EventTestsBase
         var deltaSerializer = new DeltaSerializer();
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetPublisher().Subscribe<IPartitionEvent>((sender, partitionEvent) =>
+        node.GetPublisher().Subscribe<IPartitionNotification>((sender, partitionEvent) =>
         {
             var command = new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionEvent);
             var json = deltaSerializer.Serialize(command);
@@ -66,7 +66,7 @@ public class EventsTestJson : EventTestsBase
             eventReceiver.Receive(commandToEventMapper.Map(deserialized));
         });
 
-        var replicator = new PartitionEventReplicator(clone, sharedNodeMap);
+        var replicator = new PartitionNotificationReplicator(clone, sharedNodeMap);
         replicator.ReplicateFrom(partitionEventHandler);
         return clone;
     }
