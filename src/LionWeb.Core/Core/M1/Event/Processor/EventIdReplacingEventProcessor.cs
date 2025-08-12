@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1.Event.Processor;
 
+/// TODO: Do we really need this class?
 /// Replaces all <see cref="RegisterReplacementEventId">registered event ids</see>.
 public class EventIdReplacingEventProcessor<TEvent>(object? sender)
     : FilteringEventProcessor<TEvent>(sender) where TEvent : class, IEvent
