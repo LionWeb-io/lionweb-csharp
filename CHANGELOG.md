@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - tbd
 
 ### Added
+* Introduced `INotifiableNode`.
 * Added `LionWebVersions` _2025.1_ and _2025.1-compatible_. No content differences to _2024.1_ so far.
 * Added `EnumerationLiteralIdentityComparer` and `KeyedIdentityComparer`.
 * Added `bool IReadableNode.TryGet(Feature, out object? value)`.
@@ -58,6 +59,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * `Hasher` would not recognize internal references if it encounters the reference before the target node.
 * Deserializing languages with annotations that contain references works now.
 ### Changed
+* Renamed `IEvent` to `INotification` to make a clear distinction between delta protocol-specific events and LionWeb internal event system.
+* Renamed `IEventId` to `INotificationId`.
 * Made `DynamicStructuredDataTypeInstance.GetHashCode()` more stable.
 * `DynamicLanguageCloner` doesn't change a language's factory anymore.
 * `ILanguageRegistry` works on both registered and current round's languages.
