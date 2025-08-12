@@ -174,12 +174,12 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public ConceptDescription SetConceptAlias(string? value, INotificationId? eventId = null)
+        public ConceptDescription SetConceptAlias(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter evt = new(SpecificLanguage.Instance.ConceptDescription_conceptAlias, this, value, _conceptAlias, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.ConceptDescription_conceptAlias, this, value, _conceptAlias, notificationId);
+		notification.CollectOldData();
 		_conceptAlias = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -197,12 +197,12 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public ConceptDescription SetConceptShortDescription(string? value, INotificationId? eventId = null)
+        public ConceptDescription SetConceptShortDescription(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter evt = new(SpecificLanguage.Instance.ConceptDescription_conceptShortDescription, this, value, _conceptShortDescription, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.ConceptDescription_conceptShortDescription, this, value, _conceptShortDescription, notificationId);
+		notification.CollectOldData();
 		_conceptShortDescription = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -220,12 +220,12 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public ConceptDescription SetHelpUrl(string? value, INotificationId? eventId = null)
+        public ConceptDescription SetHelpUrl(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter evt = new(SpecificLanguage.Instance.ConceptDescription_helpUrl, this, value, _helpUrl, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.ConceptDescription_helpUrl, this, value, _helpUrl, notificationId);
+		notification.CollectOldData();
 		_helpUrl = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -262,15 +262,15 @@ public partial class ConceptDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (SpecificLanguage.Instance.ConceptDescription_conceptAlias.EqualsIdentity(feature))
 		{
 			if (value is null or string)
 			{
-				SetConceptAlias((string?)value, eventId);
+				SetConceptAlias((string?)value, notificationId);
 				return true;
 			}
 
@@ -281,7 +281,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		{
 			if (value is null or string)
 			{
-				SetConceptShortDescription((string?)value, eventId);
+				SetConceptShortDescription((string?)value, notificationId);
 				return true;
 			}
 
@@ -292,7 +292,7 @@ public partial class ConceptDescription : AnnotationInstanceBase
 		{
 			if (value is null or string)
 			{
-				SetHelpUrl((string?)value, eventId);
+				SetHelpUrl((string?)value, notificationId);
 				return true;
 			}
 
@@ -333,12 +333,12 @@ public partial class Deprecated : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public Deprecated SetBuild(string? value, INotificationId? eventId = null)
+        public Deprecated SetBuild(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter evt = new(SpecificLanguage.Instance.Deprecated_build, this, value, _build, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.Deprecated_build, this, value, _build, notificationId);
+		notification.CollectOldData();
 		_build = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -356,12 +356,12 @@ public partial class Deprecated : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public Deprecated SetComment(string? value, INotificationId? eventId = null)
+        public Deprecated SetComment(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter evt = new(SpecificLanguage.Instance.Deprecated_comment, this, value, _comment, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.Deprecated_comment, this, value, _comment, notificationId);
+		notification.CollectOldData();
 		_comment = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -392,15 +392,15 @@ public partial class Deprecated : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (SpecificLanguage.Instance.Deprecated_build.EqualsIdentity(feature))
 		{
 			if (value is null or string)
 			{
-				SetBuild((string?)value, eventId);
+				SetBuild((string?)value, notificationId);
 				return true;
 			}
 
@@ -411,7 +411,7 @@ public partial class Deprecated : AnnotationInstanceBase
 		{
 			if (value is null or string)
 			{
-				SetComment((string?)value, eventId);
+				SetComment((string?)value, notificationId);
 				return true;
 			}
 
@@ -450,12 +450,12 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public KeyedDescription SetDocumentation(string? value, INotificationId? eventId = null)
+        public KeyedDescription SetDocumentation(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter evt = new(SpecificLanguage.Instance.KeyedDescription_documentation, this, value, _documentation, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.KeyedDescription_documentation, this, value, _documentation, notificationId);
+		notification.CollectOldData();
 		_documentation = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -473,34 +473,34 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public KeyedDescription AddSeeAlso(IEnumerable<IReadableNode> nodes, INotificationId? eventId = null)
+        public KeyedDescription AddSeeAlso(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> evt = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso.Count, eventId);
-		evt.CollectOldData();
+		ReferenceAddMultipleNotificationEmitter<IReadableNode> notification = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso.Count, notificationId);
+		notification.CollectOldData();
 		_seeAlso.AddRange(safeNodes);
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public KeyedDescription InsertSeeAlso(int index, IEnumerable<IReadableNode> nodes, INotificationId? eventId = null)
+        public KeyedDescription InsertSeeAlso(int index, IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _seeAlso);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 		AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-		ReferenceAddMultipleNotificationEmitter<IReadableNode> evt = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, index, eventId);
-		evt.CollectOldData();
+		ReferenceAddMultipleNotificationEmitter<IReadableNode> notification = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, index, notificationId);
+		notification.CollectOldData();
 		_seeAlso.InsertRange(index, safeNodes);
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Reference</remarks>
-        public KeyedDescription RemoveSeeAlso(IEnumerable<IReadableNode> nodes, INotificationId? eventId = null)
+        public KeyedDescription RemoveSeeAlso(IEnumerable<IReadableNode> nodes, INotificationId? notificationId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
@@ -536,15 +536,15 @@ public partial class KeyedDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (SpecificLanguage.Instance.KeyedDescription_documentation.EqualsIdentity(feature))
 		{
 			if (value is null or string)
 			{
-				SetDocumentation((string?)value, eventId);
+				SetDocumentation((string?)value, notificationId);
 				return true;
 			}
 
@@ -556,11 +556,11 @@ public partial class KeyedDescription : AnnotationInstanceBase
 			var safeNodes = SpecificLanguage.Instance.KeyedDescription_seeAlso.AsNodes<IReadableNode>(value).ToList();
 			AssureNotNull(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
 			AssureNotNullMembers(safeNodes, SpecificLanguage.Instance.KeyedDescription_seeAlso);
-			ReferenceSetNotificationEmitter<IReadableNode> evt = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso, eventId);
-			evt.CollectOldData();
+			ReferenceSetNotificationEmitter<IReadableNode> notification = new(SpecificLanguage.Instance.KeyedDescription_seeAlso, this, safeNodes, _seeAlso, notificationId);
+			notification.CollectOldData();
 			_seeAlso.Clear();
 			_seeAlso.AddRange(safeNodes);
-			evt.Notify();
+			notification.Notify();
 			return true;
 		}
 
@@ -596,12 +596,12 @@ public partial class ShortDescription : AnnotationInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public ShortDescription SetDescription(string? value, INotificationId? eventId = null)
+        public ShortDescription SetDescription(string? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter evt = new(SpecificLanguage.Instance.ShortDescription_description, this, value, _description, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(SpecificLanguage.Instance.ShortDescription_description, this, value, _description, notificationId);
+		notification.CollectOldData();
 		_description = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -626,15 +626,15 @@ public partial class ShortDescription : AnnotationInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (SpecificLanguage.Instance.ShortDescription_description.EqualsIdentity(feature))
 		{
 			if (value is null or string)
 			{
-				SetDescription((string?)value, eventId);
+				SetDescription((string?)value, notificationId);
 				return true;
 			}
 
@@ -674,16 +674,16 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- INamedWritable INamedWritable.SetName(string value, INotificationId? eventId = null) => SetName(value);
+ INamedWritable INamedWritable.SetName(string value, INotificationId? notificationId = null) => SetName(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public VirtualPackage SetName(string value, INotificationId? eventId = null)
+        public VirtualPackage SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, _builtIns.INamed_name);
-		PropertyNotificationEmitter evt = new(_builtIns.INamed_name, this, value, _name, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(_builtIns.INamed_name, this, value, _name, notificationId);
+		notification.CollectOldData();
 		_name = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -708,15 +708,15 @@ public partial class VirtualPackage : AnnotationInstanceBase, INamedWritable
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (_builtIns.INamed_name.EqualsIdentity(feature))
 		{
 			if (value is string v)
 			{
-				SetName(v, eventId);
+				SetName(v, notificationId);
 				return true;
 			}
 
