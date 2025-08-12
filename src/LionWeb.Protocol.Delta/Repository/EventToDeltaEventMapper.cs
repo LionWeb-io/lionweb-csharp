@@ -17,8 +17,8 @@
 
 namespace LionWeb.Protocol.Delta.Repository;
 
-using Core.M1.Event;
-using Core.M1.Event.Partition;
+using Core.Notification;
+using Core.Notification.Partition;
 using Message.Event;
 
 public class EventToDeltaEventMapper

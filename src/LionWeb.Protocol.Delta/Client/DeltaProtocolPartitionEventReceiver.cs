@@ -18,9 +18,9 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Partition;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition;
 using Message.Event;
 
 public class DeltaProtocolPartitionEventReceiver

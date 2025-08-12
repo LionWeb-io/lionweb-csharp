@@ -17,8 +17,8 @@
 
 namespace LionWeb.Core.M3;
 
-using M1.Event;
 using M2;
+using Notification;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;

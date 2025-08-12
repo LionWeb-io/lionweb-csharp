@@ -17,9 +17,9 @@
 
 namespace LionWeb.Core;
 
-using M1.Event;
 using M2;
 using M3;
+using Notification;
 
 /// <summary>
 /// Represents an interface for nodes that support notifications with optional notification identifiers.

@@ -18,8 +18,8 @@
 namespace LionWeb.Core.Test.Utilities.Cloner;
 
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1.Event;
 using M3;
+using Notification;
 
 public abstract class ClonerTestsBase
 {

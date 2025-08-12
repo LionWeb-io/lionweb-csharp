@@ -18,8 +18,8 @@
 namespace LionWeb.Protocol.Delta;
 
 using Core;
-using Core.M1.Event;
 using Core.M2;
+using Core.Notification;
 using Core.Serialization;
 using Message.Command;
 using Message.Event;

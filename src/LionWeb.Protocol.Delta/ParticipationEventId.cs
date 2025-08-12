@@ -17,7 +17,7 @@
 
 namespace LionWeb.Protocol.Delta;
 
-using Core.M1.Event;
+using Core.Notification;
 
 /// Internal event id based on delta protocol <see cref="LionWeb.Protocol.Delta.Message.Event.CommandSource"/>.
 public record ParticipationNotificationId(ParticipationId ParticipationId, CommandId CommandId) : INotificationId;

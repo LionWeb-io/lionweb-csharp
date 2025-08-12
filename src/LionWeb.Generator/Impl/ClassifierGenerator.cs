@@ -18,9 +18,9 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
-using Core.M1.Event.Partition;
 using Core.M2;
 using Core.M3;
+using Core.Notification.Partition;
 using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;

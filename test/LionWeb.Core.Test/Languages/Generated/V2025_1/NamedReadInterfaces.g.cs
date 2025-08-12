@@ -6,12 +6,12 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.NamedLangReadInterfaces;
 using LionWeb.Core;
-using LionWeb.Core.M1.Event;
-using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
+using Notification;
+using Notification.Partition.Emitter;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;

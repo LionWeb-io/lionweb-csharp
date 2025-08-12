@@ -19,8 +19,8 @@ namespace LionWeb.Protocol.Delta.Test;
 
 using Client;
 using Core;
-using Core.M1.Event;
 using Core.M3;
+using Core.Notification;
 using Core.Serialization;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Utilities;

@@ -19,8 +19,8 @@
 
 namespace LionWeb.Core.M2;
 
-using M1.Event;
 using M3;
+using Notification;
 using System.Diagnostics.CodeAnalysis;
 
 /// The definition of the LionCore language containing the built-ins:

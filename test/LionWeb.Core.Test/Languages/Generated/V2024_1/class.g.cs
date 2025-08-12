@@ -6,10 +6,10 @@
 #nullable enable
 namespace @namespace.@int.@public.V2024_1;
 using LionWeb.Core;
-using LionWeb.Core.M1.Event;
-using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Partition.Emitter;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;

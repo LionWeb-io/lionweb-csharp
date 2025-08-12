@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.NodeApi.Dynamic;
 
-using M1.Event.Partition;
+using Notification.Partition;
 
 [TestClass]
 public class PropertyTests_Listener : DynamicNodeTestsBase

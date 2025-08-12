@@ -18,10 +18,10 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
-using Core.M1.Event;
-using Core.M1.Event.Partition.Emitter;
 using Core.M2;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;

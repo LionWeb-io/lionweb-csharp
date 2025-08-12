@@ -18,11 +18,11 @@
 namespace LionWeb.Core;
 
 using M1;
-using M1.Event;
-using M1.Event.Partition;
-using M1.Event.Partition.Emitter;
 using M2;
 using M3;
+using Notification;
+using Notification.Partition;
+using Notification.Partition.Emitter;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;

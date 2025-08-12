@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1.Event.Partition;
+using Notification.Partition;
 
 [TestClass]
 public class ContainmentTests_Single_Optional_Listener

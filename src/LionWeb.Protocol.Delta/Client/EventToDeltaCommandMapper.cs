@@ -17,8 +17,8 @@
 
 namespace LionWeb.Protocol.Delta.Client;
 
-using Core.M1.Event;
-using Core.M1.Event.Partition;
+using Core.Notification;
+using Core.Notification.Partition;
 using Message.Command;
 
 public class EventToDeltaCommandMapper

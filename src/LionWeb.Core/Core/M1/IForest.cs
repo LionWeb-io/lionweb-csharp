@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
-using Event.Forest;
+using Notification.Forest;
 using Utilities;
 
 /// A collection of model trees, represented by each trees' <see cref="IPartitionInstance">partition</see> (aka root node).

@@ -17,7 +17,7 @@
 
 namespace LionWeb.Protocol.Delta.Repository;
 
-using Core.M1.Event;
+using Core.Notification;
 using Message.Command;
 
 public class DeltaCommandToEventMapper
