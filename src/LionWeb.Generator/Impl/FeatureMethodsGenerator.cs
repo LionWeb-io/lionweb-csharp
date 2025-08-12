@@ -182,11 +182,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
     [
         SafeNodesVar(containment),
-        SetContainmentEventVariable(containment),
-        EventCollectOldDataCall(),
+        SetContainmentEmitterVariable(containment),
+        EmitterCollectOldDataCall(),
         RemoveSelfParentCall(containment),
         OptionalAddRangeCall(containment),
-        EventRaiseEventCall(),
+        EmitterNotifyCall(),
         ReturnTrue()
     ];
 
@@ -194,11 +194,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         SafeNodesVar(containment),
         AssureNonEmptyCall(containment),
-        SetContainmentEventVariable(containment),
-        EventCollectOldDataCall(),
+        SetContainmentEmitterVariable(containment),
+        EmitterCollectOldDataCall(),
         RemoveSelfParentCall(containment),
         RequiredAddRangeCall(containment),
-        EventRaiseEventCall(),
+        EmitterNotifyCall(),
         ReturnTrue()
     ];
 
@@ -207,11 +207,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         SafeNodesVar(reference),
         AssureNotNullCall(reference),
         AssureNotNullMembersCall(reference),
-        SetReferenceEventVariable(reference),
-        EventCollectOldDataCall(),
+        SetReferenceEmitterVariable(reference),
+        EmitterCollectOldDataCall(),
         ClearFieldCall(reference),
         ReferenceAddRangeCall(reference),
-        EventRaiseEventCall(),
+        EmitterNotifyCall(),
         ReturnTrue()
     ];
 
@@ -219,11 +219,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         SafeNodesVar(reference),
         AssureNonEmptyCall(reference),
-        SetReferenceEventVariable(reference),
-        EventCollectOldDataCall(),
+        SetReferenceEmitterVariable(reference),
+        EmitterCollectOldDataCall(),
         ClearFieldCall(reference),
         ReferenceAddRangeCall(reference),
-        EventRaiseEventCall(),
+        EmitterNotifyCall(),
         ReturnTrue()
     ];
 
@@ -234,18 +234,18 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("AddRange")),
             AsArguments([IdentifierName("safeNodes")])));
 
-    private LocalDeclarationStatementSyntax SetContainmentEventVariable(Containment containment) =>
+    private LocalDeclarationStatementSyntax SetContainmentEmitterVariable(Containment containment) =>
         Variable(
-            "notification",
+            "emitter",
             AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType())),
             NewCall([
                 MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("notificationId")
             ])
         );
 
-    private LocalDeclarationStatementSyntax SetReferenceEventVariable(Reference reference) =>
+    private LocalDeclarationStatementSyntax SetReferenceEmitterVariable(Reference reference) =>
         Variable(
-            "notification",
+            "emitter",
             AsType(typeof(ReferenceSetNotificationEmitter<>), AsType(reference.GetFeatureType())),
             NewCall([
                 MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference), IdentifierName("notificationId")

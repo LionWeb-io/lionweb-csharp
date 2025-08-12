@@ -97,10 +97,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     {
         List<StatementSyntax> setterBody =
         [
-            PropertyEventVariable(),
-            EventCollectOldDataCall(),
+            PropertyEmitterVariable(),
+            EmitterCollectOldDataCall(),
             AssignFeatureField(),
-            EventRaiseEventCall(),
+            EmitterNotifyCall(),
             ReturnStatement(This())
         ];
         if (IsReferenceType(property))
@@ -116,9 +116,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
     }
 
-    private LocalDeclarationStatementSyntax PropertyEventVariable() =>
+    private LocalDeclarationStatementSyntax PropertyEmitterVariable() =>
         Variable(
-            "notification",
+            "emitter",
             AsType(typeof(PropertyNotificationEmitter)),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
@@ -177,10 +177,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }
             .Concat(
                 OptionalFeatureSetter([
-                    PropertyEventVariable(),
-                    EventCollectOldDataCall(),
+                    PropertyEmitterVariable(),
+                    EmitterCollectOldDataCall(),
                     AssignFeatureField(),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
             );
@@ -194,12 +194,12 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             TryGet(true)
         }.Concat(RequiredFeatureSetter([
                 AsureNotNullCall(),
-                SingleContainmentEventVariable(),
-                EventCollectOldDataCall(),
+                SingleContainmentEmitterVariable(),
+                EmitterCollectOldDataCall(),
                 SetParentNullCall(containment),
                 AttachChildCall(),
                 AssignFeatureField(),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ], true)
             .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
@@ -215,18 +215,18 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             }
             .Concat(
             OptionalFeatureSetter([
-                SingleContainmentEventVariable(),
-                EventCollectOldDataCall(),
+                SingleContainmentEmitterVariable(),
+                EmitterCollectOldDataCall(),
                 SetParentNullCall(containment),
                 AttachChildCall(),
                 AssignFeatureField(),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ], true));
 
-    private LocalDeclarationStatementSyntax SingleContainmentEventVariable() =>
+    private LocalDeclarationStatementSyntax SingleContainmentEmitterVariable() =>
         Variable(
-            "notification",
+            "emitter",
             AsType(typeof(ContainmentSingleNotificationEmitter<>), AsType(feature.GetFeatureType(), writeable:true)),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
@@ -241,18 +241,18 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             }
             .Concat(RequiredFeatureSetter([
                     AsureNotNullCall(),
-                    ReferenceEventVariable(),
-                    EventCollectOldDataCall(),
+                    ReferenceEmitterVariable(),
+                    EmitterCollectOldDataCall(),
                     AssignFeatureField(),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
                 .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
             );
 
-    private LocalDeclarationStatementSyntax ReferenceEventVariable() =>
+    private LocalDeclarationStatementSyntax ReferenceEmitterVariable() =>
         Variable(
-            "notification",
+            "emitter",
             AsType(typeof(ReferenceSingleNotificationEmitter)),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
@@ -260,10 +260,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }
             .Concat(OptionalFeatureSetter([
-                ReferenceEventVariable(),
-                EventCollectOldDataCall(),
+                ReferenceEmitterVariable(),
+                EmitterCollectOldDataCall(),
                 AssignFeatureField(),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ]));
 
@@ -278,10 +278,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             LinkAdder(containment, [
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
-                    AddMultipleContainmentEventVariable(Null()),
-                    EventCollectOldDataCall(),
+                    AddMultipleContainmentEmitterVariable(Null()),
+                    EmitterCollectOldDataCall(),
                     RequiredAddRangeCall(containment),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
                 .Select(a => XdocRequiredAdder(a, containment))
@@ -291,10 +291,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
                     AssureNoSelfMoveCall(containment),
-                    AddMultipleContainmentEventVariable(IdentifierName("index")),
-                    EventCollectOldDataCall(),
+                    AddMultipleContainmentEmitterVariable(IdentifierName("index")),
+                    EmitterCollectOldDataCall(),
                     InsertRangeCall(containment),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
                 .Select(i => XdocRequiredInserter(i, containment))
@@ -342,10 +342,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(containment),
                 AssureNotNullMembersCall(containment),
-                AddMultipleContainmentEventVariable(Null()),
-                EventCollectOldDataCall(),
+                AddMultipleContainmentEmitterVariable(Null()),
+                EmitterCollectOldDataCall(),
                 OptionalAddRangeCall(containment),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -355,10 +355,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 AssureNotNullCall(containment),
                 AssureNoSelfMoveCall(containment),
                 AssureNotNullMembersCall(containment),
-                AddMultipleContainmentEventVariable(IdentifierName("index")),
-                EventCollectOldDataCall(),
+                AddMultipleContainmentEmitterVariable(IdentifierName("index")),
+                EmitterCollectOldDataCall(),
                 InsertRangeCall(containment),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -368,9 +368,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ])
         );
 
-    private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(ExpressionSyntax index) =>
+    private LocalDeclarationStatementSyntax AddMultipleContainmentEmitterVariable(ExpressionSyntax index) =>
         Variable(
-            "notification",
+            "emitter",
             AsType(typeof(ContainmentAddMultipleNotificationEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([
                 MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index, IdentifierName("notificationId")
@@ -389,10 +389,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
-                    AddMultipleReferenceEventVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
-                    EventCollectOldDataCall(),
+                    AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
+                    EmitterCollectOldDataCall(),
                     SimpleAddRangeCall(reference),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
                 .Select(a => XdocRequiredAdder(a, reference))
@@ -402,10 +402,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
-                    AddMultipleReferenceEventVariable(IdentifierName("index")),
-                    EventCollectOldDataCall(),
+                    AddMultipleReferenceEmitterVariable(IdentifierName("index")),
+                    EmitterCollectOldDataCall(),
                     SimpleInsertRangeCall(reference),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
                 .Select(i => XdocRequiredInserter(i, reference))
@@ -421,9 +421,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 .Select(r => XdocRequiredRemover(r, reference))
         );
 
-    private LocalDeclarationStatementSyntax AddMultipleReferenceEventVariable(ExpressionSyntax index) =>
+    private LocalDeclarationStatementSyntax AddMultipleReferenceEmitterVariable(ExpressionSyntax index) =>
         Variable(
-            "notification",
+            "emitter",
             AsType(typeof(ReferenceAddMultipleNotificationEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([
                 MetaProperty(feature), This(), IdentifierName("safeNodes"), index, IdentifierName("notificationId")
@@ -441,10 +441,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
-                AddMultipleReferenceEventVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
-                EventCollectOldDataCall(),
+                AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
+                EmitterCollectOldDataCall(),
                 SimpleAddRangeCall(reference),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -453,10 +453,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
-                AddMultipleReferenceEventVariable(IdentifierName("index")),
-                EventCollectOldDataCall(),
+                AddMultipleReferenceEmitterVariable(IdentifierName("index")),
+                EmitterCollectOldDataCall(),
                 SimpleInsertRangeCall(reference),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
