@@ -66,7 +66,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                             var notificationId = GetNotificationId();
                             var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment,
                                 added.RightIndex, added.Element, old.Parent, old.Containment, old.Index, notificationId);
-                            RaiseOriginMoveEvent(old, notification);
+                            RaiseOriginMoveNotification(old, notification);
                             PartitionCommander.Raise(notification);
                             break;
 

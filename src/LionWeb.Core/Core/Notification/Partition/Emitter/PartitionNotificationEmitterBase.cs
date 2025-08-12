@@ -29,13 +29,13 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
 {
     protected readonly IPartitionInstance? DestinationPartition;
 
-    /// <see cref="IPartitionCommander"/> to use for our events, if any.
+    /// <see cref="IPartitionCommander"/> to use for our notifications, if any.
     protected readonly IPartitionCommander? PartitionCommander;
 
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly INotifiableNode DestinationParent;
 
-    /// The event ID associated with the event emitter
+    /// The notification ID associated with the notification emitter
     private readonly INotificationId? _notificationId;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Feature"/>.</param>
@@ -55,14 +55,14 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     public abstract void Notify();
 
     /// <summary>
-    /// Whether this event should execute at all.
+    /// Whether this emitter should execute at all.
     /// </summary>
     [MemberNotNullWhen(true, nameof(PartitionCommander))]
     protected abstract bool IsActive();
 
     /// <summary>
-    /// Retrieves the event ID associated with the event emitter.
-    /// If no event ID is set, it creates a new event ID.
+    /// Retrieves the notification ID associated with the notification emitter.
+    /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
     protected INotificationId GetNotificationId() => _notificationId ?? PartitionCommander.CreateEventId();
 }

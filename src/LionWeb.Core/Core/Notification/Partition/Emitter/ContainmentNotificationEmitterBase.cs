@@ -66,7 +66,7 @@ public abstract class ContainmentNotificationEmitterBase<T> : PartitionNotificat
         Index Index,
         IPartitionInstance? Partition);
 
-    protected void RaiseOriginMoveEvent(OldContainmentInfo old, ChildMovedFromOtherContainmentNotification notification)
+    protected void RaiseOriginMoveNotification(OldContainmentInfo old, ChildMovedFromOtherContainmentNotification notification)
     {
         if (old.Partition != null && old.Partition != DestinationPartition)
             old.Partition.GetCommander()?.Raise(notification);

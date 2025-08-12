@@ -58,7 +58,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
                     var notificationId = GetNotificationId();
                     var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, _newIndex, added, old.Parent,
                         old.Index, notificationId);
-                    RaiseOriginMoveEvent(old, notification);
+                    RaiseOriginMoveNotification(old, notification);
                     PartitionCommander.Raise(notification);
                     break;
 

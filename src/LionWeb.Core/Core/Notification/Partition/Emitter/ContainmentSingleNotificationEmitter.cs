@@ -111,7 +111,7 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                 var notificationId = GetNotificationId();
                 var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, 0, _newValue,
                     _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, notificationId);
-                RaiseOriginMoveEvent(_oldContainmentInfo, notification);
+                RaiseOriginMoveNotification(_oldContainmentInfo, notification);
                 PartitionCommander.Raise(notification);
                 break;
 
