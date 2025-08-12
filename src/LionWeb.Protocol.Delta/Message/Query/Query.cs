@@ -82,7 +82,7 @@ public abstract record DeltaQueryBase(
 
 #region Subscription
 
-public interface IDeltaQuerySubscription : IDeltaQuery;
+public interface ISubscriptionDeltaQuery : IDeltaQuery;
 
 #region SubscribeToChangingPartitions
 
@@ -92,12 +92,12 @@ public record SubscribeToChangingPartitionsRequest(
     bool Partitions,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQuerySubscription, IDeltaQueryRequest;
+) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryRequest;
 
 public record SubscribeToChangingPartitionsResponse(
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQuerySubscription, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -107,13 +107,13 @@ public record SubscribeToPartitionContentsRequest(
     TargetNode Partition,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQuerySubscription, IDeltaQueryRequest;
+) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryRequest;
 
 public record SubscribeToPartitionContentsResponse(
     DeltaSerializationChunk Contents,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQuerySubscription, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -123,12 +123,12 @@ public record UnsubscribeFromPartitionContentsRequest(
     TargetNode Partition,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQuerySubscription, IDeltaQueryRequest;
+) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryRequest;
 
 public record UnsubscribeFromPartitionContentsResponse(
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQuerySubscription, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, ProtocolMessages), ISubscriptionDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -136,7 +136,7 @@ public record UnsubscribeFromPartitionContentsResponse(
 
 #region Participation
 
-public interface IDeltaQueryParticipation : IDeltaQuery;
+public interface IParticipationDeltaQuery : IDeltaQuery;
 
 #region SignOn
 
@@ -145,7 +145,7 @@ public record SignOnRequest(
     ClientId ClientId,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryParticipation, IDeltaQueryRequest
+) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryRequest
 {
     /// <inheritdoc />
     [JsonIgnore]
@@ -156,7 +156,7 @@ public record SignOnResponse(
     ParticipationId ParticipationId,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryParticipation, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -165,12 +165,12 @@ public record SignOnResponse(
 public record SignOffRequest(
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryParticipation, IDeltaQueryRequest;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryRequest;
 
 public record SignOffResponse(
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryParticipation, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -181,13 +181,13 @@ public record ReconnectRequest(
     EventSequenceNumber LastReceivedSequenceNumber,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryParticipation, IDeltaQueryRequest;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryRequest;
 
 public record ReconnectResponse(
     EventSequenceNumber LastSentSequenceNumber,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryParticipation, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
@@ -195,7 +195,7 @@ public record ReconnectResponse(
 
 #region Miscellaneous
 
-public interface IDeltaQueryMiscellaneous : IDeltaQuery;
+public interface IMiscellaneousDeltaQuery : IDeltaQuery;
 
 #region GetAvailableIds
 
@@ -203,13 +203,13 @@ public record GetAvailableIdsRequest(
     int count,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryMiscellaneous, IDeltaQueryRequest;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
 
 public record GetAvailableIdsResponse(
     FreeId[] Ids,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryMiscellaneous, IDeltaQueryResponse
+) : DeltaQueryBase(QueryId, ProtocolMessages), IMiscellaneousDeltaQuery, IDeltaQueryResponse
 {
     /// <inheritdoc />
     public virtual bool Equals(GetAvailableIdsResponse? other)
@@ -259,13 +259,13 @@ public record GetAvailableIdsResponse(
 public record ListPartitionsRequest(
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryMiscellaneous, IDeltaQueryRequest;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IMiscellaneousDeltaQuery, IDeltaQueryRequest;
 
 public record ListPartitionsResponse(
     DeltaSerializationChunk Partitions,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IDeltaQueryMiscellaneous, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IMiscellaneousDeltaQuery, IDeltaQueryResponse;
 
 #endregion
 
