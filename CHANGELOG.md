@@ -9,9 +9,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - tbd
 
 ### Added
-* Introduced `INotifiableNode`.
+* Introduced `INotifiableNode`. Represents nodes that support notifications.
 * Introduced `INotification` to make a clear distinction between delta protocol-specific events and LionWeb internal event system.
-* Introduced `INotificationId`.
+* Introduced `INotificationId`. Represents globally unique id of a notification.
 * Added `LionWebVersions` _2025.1_ and _2025.1-compatible_. No content differences to _2024.1_ so far.
 * Added `EnumerationLiteralIdentityComparer` and `KeyedIdentityComparer`.
 * Added `bool IReadableNode.TryGet(Feature, out object? value)`.
