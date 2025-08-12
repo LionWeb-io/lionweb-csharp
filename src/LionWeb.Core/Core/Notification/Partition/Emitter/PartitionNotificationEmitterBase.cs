@@ -39,7 +39,7 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
 
     /// The notification ID associated with the notification emitter
     private readonly INotificationId? _notificationId;
-    private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
+    private readonly INotificationIdProvider _eventIdProvider = new NotificationIdProvider(null);
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Feature"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by notification emitters</param>

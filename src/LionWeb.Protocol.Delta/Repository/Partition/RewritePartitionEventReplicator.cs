@@ -59,11 +59,11 @@ internal class RewriteRemotePartitionEventReplicator(
     object? sender)
     : RemotePartitionEventReplicator(localPartition, sharedNodeMap, filter, sender)
 {
-    private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
+    private readonly INotificationIdProvider _eventIdProvider = new NotificationIdProvider(null);
 
     protected override void SuppressEventForwarding(IPartitionNotification partitionEvent, Action action)
     {
-        var eventId = _eventIdProvider.CreateEventId();
+        var eventId = _eventIdProvider.CreateNotificationId();
         var originalEventId = partitionEvent.NotificationId;
         replacingFilter.RegisterReplacementEventId(eventId, originalEventId);
         Filter.RegisterEventId(eventId);

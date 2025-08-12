@@ -49,10 +49,10 @@ public interface IPartitionProcessor : IEventProcessor<IPartitionNotification>
 public class PartitionEventProcessor(object? sender)
     : ModelEventProcessorBase<IPartitionNotification>(sender), IPartitionProcessor
 {
-    private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(sender);
+    private readonly INotificationIdProvider _eventIdProvider = new NotificationIdProvider(sender);
 
     /// <inheritdoc />
     public INotificationId CreateEventId() => 
-        _eventIdProvider.CreateEventId();
+        _eventIdProvider.CreateNotificationId();
 }
 ;

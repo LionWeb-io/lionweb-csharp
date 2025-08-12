@@ -46,14 +46,14 @@ public class Forest : IForest
 {
     private readonly HashSet<IPartitionInstance> _partitions;
     private readonly ForestEventProcessor _eventProcessor;
-    private readonly IEventIdProvider  _eventIdProvider;
+    private readonly INotificationIdProvider  _eventIdProvider;
 
     /// <inheritdoc cref="IForest"/>
     public Forest()
     {
         _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
         _eventProcessor = new ForestEventProcessor(this);
-        _eventIdProvider = new EventIdProvider(this);
+        _eventIdProvider = new NotificationIdProvider(this);
     }
 
     /// <inheritdoc />
@@ -65,7 +65,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _eventProcessor.Receive(new PartitionAddedNotification(partition, eventId ?? _eventIdProvider.CreateEventId()));
+                _eventProcessor.Receive(new PartitionAddedNotification(partition, eventId ?? _eventIdProvider.CreateNotificationId()));
         }
     }
 
@@ -75,7 +75,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _eventProcessor.Receive(new PartitionDeletedNotification(partition, eventId ?? _eventIdProvider.CreateEventId()));
+                _eventProcessor.Receive(new PartitionDeletedNotification(partition, eventId ?? _eventIdProvider.CreateNotificationId()));
         }
     }
 

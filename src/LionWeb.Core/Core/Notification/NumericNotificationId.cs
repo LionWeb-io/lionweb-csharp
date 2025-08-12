@@ -15,16 +15,15 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event;
+namespace LionWeb.Core.Notification;
 
-using Notification;
 using Utilities;
 
-/// Internal event id based on a string and an increasing number.
-public record NumericEventId(string Base, int Id) : INotificationId
+/// Notification id based on a string and an increasing number.
+public record NumericNotificationId(string Base, int Id) : INotificationId
 {
     /// <inheritdoc />
-    public virtual bool Equals(NumericEventId? other)
+    public virtual bool Equals(NumericNotificationId? other)
     {
         if (other is null)
         {
@@ -49,24 +48,24 @@ public record NumericEventId(string Base, int Id) : INotificationId
     }
 }
 
-public interface IEventIdProvider
+public interface INotificationIdProvider
 {
-    INotificationId CreateEventId();
+    INotificationId CreateNotificationId();
 }
 
-public class EventIdProvider : IEventIdProvider
+public class NotificationIdProvider : INotificationIdProvider
 {
     // Unique per instance
-    private readonly EventId _eventIdBase;
+    private readonly EventId _notificationIdBase;
 
     private int _nextId = 0;
 
-    public EventIdProvider(object? sender)
+    public NotificationIdProvider(object? sender)
     {
-        _eventIdBase = sender as string ?? IdUtils.NewId();
+        _notificationIdBase = sender as string ?? IdUtils.NewId();
     }
 
     /// <inheritdoc />
-    public virtual INotificationId CreateEventId() =>
-        new NumericEventId(_eventIdBase, _nextId++);
+    public virtual INotificationId CreateNotificationId() =>
+        new NumericNotificationId(_notificationIdBase, _nextId++);
 }
