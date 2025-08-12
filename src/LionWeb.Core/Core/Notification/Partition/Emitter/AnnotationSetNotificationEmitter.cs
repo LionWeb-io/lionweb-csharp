@@ -30,7 +30,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
     /// <param name="setValues">Newly set values.</param>
     /// <param name="existingValues">Values previously present in <see cref="IReadableNode.GetAnnotations"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    public AnnotationSetNotificationEmitter(NodeBase destinationParent,
+    public AnnotationSetNotificationEmitter(INotifiableNode destinationParent,
         List<INode>? setValues,
         List<INode> existingValues,
         INotificationId? notificationId = null) : base(destinationParent, setValues, notificationId)

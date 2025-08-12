@@ -33,14 +33,14 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     protected readonly IPartitionCommander? PartitionCommander;
 
     /// Owner of the represented <see cref="Feature"/>.
-    protected readonly NodeBase DestinationParent;
+    protected readonly INotifiableNode DestinationParent;
 
     /// The event ID associated with the event emitter
     private readonly INotificationId? _notificationId;
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Feature"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by notification emitters</param>
-    protected PartitionNotificationEmitterBase(NodeBase destinationParent, INotificationId? notificationId = null)
+    protected PartitionNotificationEmitterBase(INotifiableNode destinationParent, INotificationId? notificationId = null)
     {
         DestinationParent = destinationParent;
         _notificationId = notificationId;

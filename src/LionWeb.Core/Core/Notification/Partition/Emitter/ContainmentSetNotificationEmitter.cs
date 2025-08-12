@@ -33,7 +33,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
     /// <param name="existingValues">Values previously present in <paramref name="containment"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
     public ContainmentSetNotificationEmitter(Containment containment,
-        NodeBase destinationParent,
+        INotifiableNode destinationParent,
         List<T>? setValues,
         List<T> existingValues, INotificationId? notificationId = null) : base(containment, destinationParent, setValues, notificationId)
     {

@@ -29,7 +29,7 @@ public abstract class AnnotationNotificationEmitterBase : PartitionNotificationE
     /// <param name="destinationParent"> Owner of the represented <see cref="Annotation"/>s.</param>
     /// <param name="newValues">Newly set values.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    protected AnnotationNotificationEmitterBase(NodeBase destinationParent, List<INode>? newValues, INotificationId? notificationId = null) : base(destinationParent, notificationId)
+    protected AnnotationNotificationEmitterBase(INotifiableNode destinationParent, List<INode>? newValues, INotificationId? notificationId = null) : base(destinationParent, notificationId)
     {
         NewValues = newValues?.ToDictionary<INode, INode, OldAnnotationInfo?>(k => k, _ => null) ?? [];
     }

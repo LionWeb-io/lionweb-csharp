@@ -28,7 +28,7 @@ public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBa
     /// Raises either <see cref="ReferenceAddedNotification"/>, <see cref="ReferenceDeletedNotification"/> or
     /// <see cref="ReferenceChangedNotification"/> for <paramref name="reference"/>,
     /// depending on <paramref name="oldTarget"/> and <paramref name="newTarget"/>.
-    public ReferenceSingleNotificationEmitter(Reference reference, NodeBase destinationParent, IReadableNode? newTarget,
+    public ReferenceSingleNotificationEmitter(Reference reference, INotifiableNode destinationParent, IReadableNode? newTarget,
         IReadableNode? oldTarget, INotificationId? notificationId = null) : base(reference, destinationParent, notificationId)
     {
         _newTarget = newTarget;

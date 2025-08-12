@@ -34,7 +34,7 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
     /// <param name="newValue">Newly set value.</param>
     /// <param name="oldValue">Previous value of <paramref name="containment"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    public ContainmentSingleNotificationEmitter(Containment containment, NodeBase destinationParent, T? newValue, T? oldValue,
+    public ContainmentSingleNotificationEmitter(Containment containment, INotifiableNode destinationParent, T? newValue, T? oldValue,
         INotificationId? notificationId = null)
         : base(containment, destinationParent, notificationId)
     {

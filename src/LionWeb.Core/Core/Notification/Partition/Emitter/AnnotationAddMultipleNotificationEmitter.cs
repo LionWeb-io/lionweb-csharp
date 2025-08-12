@@ -32,7 +32,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
     /// <param name="existingValues">Values already present in <see cref="IReadableNode.GetAnnotations"/>.</param>
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <see cref="Annotation"/>s.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    public AnnotationAddMultipleNotificationEmitter(NodeBase destinationParent,
+    public AnnotationAddMultipleNotificationEmitter(INotifiableNode destinationParent,
         List<INode>? addedValues,
         List<INode> existingValues, Index? startIndex = null, INotificationId? notificationId = null) : base(destinationParent, addedValues, notificationId)
     {

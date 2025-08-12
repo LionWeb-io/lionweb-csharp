@@ -30,7 +30,7 @@ public abstract class ContainmentMultipleNotificationEmitterBase<T> : Containmen
     /// <param name="destinationParent"> Owner of the represented <paramref name="containment"/>.</param>
     /// <param name="newValues">Newly set values.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
-    protected ContainmentMultipleNotificationEmitterBase(Containment containment, NodeBase destinationParent,
+    protected ContainmentMultipleNotificationEmitterBase(Containment containment, INotifiableNode destinationParent,
         List<T>? newValues, INotificationId? notificationId = null) :
         base(containment, destinationParent, notificationId)
     {

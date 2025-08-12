@@ -23,7 +23,7 @@ public abstract class ReferenceMultipleNotificationEmitterBase<T> : ReferenceNot
 {
     protected readonly List<T> SafeNodes;
 
-    protected ReferenceMultipleNotificationEmitterBase(Reference reference, NodeBase destinationParent, List<T> safeNodes,
+    protected ReferenceMultipleNotificationEmitterBase(Reference reference, INotifiableNode destinationParent, List<T> safeNodes,
         INotificationId? notificationId) : base(reference, destinationParent, notificationId)
     {
         SafeNodes = safeNodes;

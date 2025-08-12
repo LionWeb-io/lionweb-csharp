@@ -34,7 +34,7 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
     /// <param name="startIndex">Optional index where we add <paramref name="addedValues"/> to <paramref name="containment"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by this notification emitter.</param>
     public ContainmentAddMultipleNotificationEmitter(Containment containment,
-        NodeBase destinationParent,
+        INotifiableNode destinationParent,
         List<T>? addedValues,
         List<T> existingValues,
         Index? startIndex = null,

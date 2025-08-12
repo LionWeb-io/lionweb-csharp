@@ -30,7 +30,7 @@ public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INod
     /// Raises either <see cref="PropertyAddedNotification"/>, <see cref="PropertyDeletedNotification"/> or
     /// <see cref="PropertyChangedNotification"/> for <paramref name="property"/>,
     /// depending on <paramref name="oldValue"/> and <paramref name="newValue"/>.
-    public PropertyNotificationEmitter(Property property, NodeBase destinationParent, object? newValue, object? oldValue,
+    public PropertyNotificationEmitter(Property property, INotifiableNode destinationParent, object? newValue, object? oldValue,
         INotificationId? notificationId = null) :
         base(destinationParent, notificationId)
     {
