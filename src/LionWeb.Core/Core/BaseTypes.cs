@@ -403,10 +403,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     {
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleNotificationEmitter evt = new(this, safeAnnotations, _annotations, startIndex: null, notificationId: notificationId);
-        evt.CollectOldData();
+        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations, startIndex: null, notificationId: notificationId);
+        notification.CollectOldData();
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
-        evt.Notify();
+        notification.Notify();
     }
 
     /// <inheritdoc />
@@ -415,10 +415,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleNotificationEmitter evt = new(this, safeAnnotations, _annotations, startIndex: index, notificationId: notificationId);
-        evt.CollectOldData();
+        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations, startIndex: index, notificationId: notificationId);
+        notification.CollectOldData();
         _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
-        evt.Notify();
+        notification.Notify();
     }
 
     /// <inheritdoc />
@@ -475,11 +475,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 throw new InvalidValueException(feature, value);
             var safeNodes = M2Extensions.AsNodes<INode>(value).ToList();
             AssureAnnotations(safeNodes);
-            AnnotationSetNotificationEmitter evt = new(this, safeNodes, _annotations, notificationId);
-            evt.CollectOldData();
+            AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations, notificationId);
+            notification.CollectOldData();
             RemoveSelfParent(_annotations.ToList(), _annotations, null);
             _annotations.AddRange(SetSelfParent(safeNodes, null));
-            evt.Notify();
+            notification.Notify();
             return true;
         }
 
