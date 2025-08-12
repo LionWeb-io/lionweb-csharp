@@ -21,10 +21,8 @@ using Client;
 using Client.Forest;
 using Client.Partition;
 using Core;
-using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Processor;
 using Core.M3;
+using Core.Notification;
 using Core.Serialization;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Utilities;
@@ -228,7 +226,7 @@ internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 
     public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
     public void ReceiveMessageFromClient(IDeltaMessageContext context) => ReceiveFromClient?.Invoke(null, context);
-    public IDeltaContent Convert(IEvent internalEvent) => _mapper.Map(internalEvent);
+    public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
 }
 
 internal class DeltaClientConnector : IDeltaClientConnector
@@ -255,5 +253,5 @@ internal class DeltaClientConnector : IDeltaClientConnector
     public event EventHandler<IDeltaContent>? ReceiveFromRepository;
 
     public void ReceiveMessageFromRepository(IDeltaContent context) => ReceiveFromRepository?.Invoke(null, context);
-    public IDeltaContent Convert(IEvent internalEvent) => _mapper.Map(internalEvent);
+    public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
 }

@@ -19,10 +19,12 @@ namespace LionWeb.Protocol.Delta.Repository.Partition;
 
 using Core;
 using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Partition;
 using Core.M2;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition;
+using Core.Serialization;
+using Message;
 using Message.Command;
 using System.Collections;
 
@@ -32,7 +34,7 @@ public class DeltaCommandToPartitionEventMapper(
     DeserializerBuilder deserializerBuilder)
     : DeltaCommandToEventMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
 {
-    public IPartitionEvent Map(IDeltaCommand command) =>
+    public IPartitionNotification Map(IDeltaCommand command) =>
         command switch
         {
             AddProperty a => OnAddProperty(a),
@@ -58,11 +60,11 @@ public class DeltaCommandToPartitionEventMapper(
 
     #region Properties
 
-    private PropertyAddedEvent OnAddProperty(AddProperty addPropertyEvent)
+    private PropertyAddedNotification OnAddProperty(AddProperty addPropertyEvent)
     {
         var parent = ToNode(addPropertyEvent.Node);
         var property = ToProperty(addPropertyEvent.Property, parent);
-        return new PropertyAddedEvent(
+        return new PropertyAddedNotification(
             parent,
             property,
             ToPropertyValue(parent, property, addPropertyEvent.NewValue),
@@ -70,11 +72,11 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private PropertyDeletedEvent OnDeleteProperty(DeleteProperty deletePropertyEvent)
+    private PropertyDeletedNotification OnDeleteProperty(DeleteProperty deletePropertyEvent)
     {
         var parent = ToNode(deletePropertyEvent.Node);
         var property = ToProperty(deletePropertyEvent.Property, parent);
-        return new PropertyDeletedEvent(
+        return new PropertyDeletedNotification(
             parent,
             property,
             parent.Get(property) ?? throw new UnsetFeatureException(property),
@@ -82,11 +84,11 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private PropertyChangedEvent OnChangeProperty(ChangeProperty changePropertyEvent)
+    private PropertyChangedNotification OnChangeProperty(ChangeProperty changePropertyEvent)
     {
         var parent = ToNode(changePropertyEvent.Node);
         var property = ToProperty(changePropertyEvent.Property, parent);
-        return new PropertyChangedEvent(
+        return new PropertyChangedNotification(
             parent,
             property,
             ToPropertyValue(parent, property, changePropertyEvent.NewValue),
@@ -99,12 +101,12 @@ public class DeltaCommandToPartitionEventMapper(
 
     #region Children
 
-    private ChildAddedEvent OnAddChild(AddChild command)
+    private ChildAddedNotification OnAddChild(AddChild command)
     {
         var parent = ToNode(command.Parent);
         var containment = ToContainment(command.Containment, parent);
 
-        return new ChildAddedEvent(
+        return new ChildAddedNotification(
             parent,
             Deserialize(command.NewChild),
             containment,
@@ -113,12 +115,12 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private ChildDeletedEvent OnDeleteChild(DeleteChild command)
+    private ChildDeletedNotification OnDeleteChild(DeleteChild command)
     {
         var parent = ToNode(command.Parent);
         var containment = ToContainment(command.Containment, parent);
 
-        return new ChildDeletedEvent(
+        return new ChildDeletedNotification(
             M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[command.Index],
             parent,
             containment,
@@ -127,11 +129,11 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private ChildReplacedEvent OnReplaceChild(ReplaceChild command)
+    private ChildReplacedNotification OnReplaceChild(ReplaceChild command)
     {
         var parent = ToNode(command.Parent);
         var containment = ToContainment(command.Containment, parent);
-        return new ChildReplacedEvent(
+        return new ChildReplacedNotification(
             Deserialize(command.NewChild),
             M2Extensions.AsNodes<IWritableNode>(parent.Get(containment)).ToList()[command.Index],
             parent,
@@ -141,7 +143,7 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private ChildMovedFromOtherContainmentEvent OnMoveChildFromOtherContainment(MoveChildFromOtherContainment command)
+    private ChildMovedFromOtherContainmentNotification OnMoveChildFromOtherContainment(MoveChildFromOtherContainment command)
     {
         var movedChild = ToNode(command.MovedChild);
         var oldParent = (IWritableNode)movedChild.GetParent();
@@ -150,7 +152,7 @@ public class DeltaCommandToPartitionEventMapper(
         var newContainment = ToContainment(command.NewContainment, newParent);
         var oldIndex = GetChildIndex(oldParent, oldContainment, movedChild);
 
-        return new ChildMovedFromOtherContainmentEvent(
+        return new ChildMovedFromOtherContainmentNotification(
             newParent,
             newContainment,
             command.NewIndex,
@@ -162,7 +164,7 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private ChildMovedAndReplacedFromOtherContainmentEvent OnMoveAndReplaceChildFromOtherContainment(MoveAndReplaceChildFromOtherContainment command)
+    private ChildMovedAndReplacedFromOtherContainmentNotification OnMoveAndReplaceChildFromOtherContainment(MoveAndReplaceChildFromOtherContainment command)
     {
         var movedChild = ToNode(command.MovedChild);
         var oldParent = (IWritableNode)movedChild.GetParent();
@@ -172,7 +174,7 @@ public class DeltaCommandToPartitionEventMapper(
         var replacedChild = ToNode(command.ReplacedChild);
         var oldIndex = GetChildIndex(oldParent, oldContainment, movedChild);
 
-        return new ChildMovedAndReplacedFromOtherContainmentEvent(
+        return new ChildMovedAndReplacedFromOtherContainmentNotification(
             newParent,
             newContainment,
             command.NewIndex,
@@ -185,7 +187,7 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
     
-    private ChildMovedAndReplacedFromOtherContainmentInSameParentEvent 
+    private ChildMovedAndReplacedFromOtherContainmentInSameParentNotification 
         OnMoveAndReplaceChildFromOtherContainmentInSameParent(MoveAndReplaceChildFromOtherContainmentInSameParent command)
     {
         var movedChild = ToNode(command.MovedChild);
@@ -195,7 +197,7 @@ public class DeltaCommandToPartitionEventMapper(
         var oldContainment = parent.GetContainmentOf(movedChild);
         var oldIndex = GetChildIndex(parent, oldContainment, movedChild);
         
-        return new ChildMovedAndReplacedFromOtherContainmentInSameParentEvent(
+        return new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
             newContainment,
             command.NewIndex,
             movedChild,
@@ -207,7 +209,7 @@ public class DeltaCommandToPartitionEventMapper(
             );
     }
 
-    private ChildMovedFromOtherContainmentInSameParentEvent OnMoveChildFromOtherContainmentInSameParent(
+    private ChildMovedFromOtherContainmentInSameParentNotification OnMoveChildFromOtherContainmentInSameParent(
         MoveChildFromOtherContainmentInSameParent command)
     {
         var movedChild = ToNode(command.MovedChild);
@@ -216,7 +218,7 @@ public class DeltaCommandToPartitionEventMapper(
         var newContainment = ToContainment(command.NewContainment, parent);
         var oldIndex = GetChildIndex(parent, oldContainment, movedChild);
 
-        return new ChildMovedFromOtherContainmentInSameParentEvent(
+        return new ChildMovedFromOtherContainmentInSameParentNotification(
             newContainment,
             command.NewIndex,
             movedChild,
@@ -227,14 +229,14 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private ChildMovedInSameContainmentEvent OnMoveChildInSameContainment(MoveChildInSameContainment command)
+    private ChildMovedInSameContainmentNotification OnMoveChildInSameContainment(MoveChildInSameContainment command)
     {
         var movedChild = ToNode(command.MovedChild);
         var parent = (IWritableNode)movedChild.GetParent();
         var containment = parent.GetContainmentOf(movedChild);
         var oldIndex = GetChildIndex(parent, containment, movedChild);
 
-        return new ChildMovedInSameContainmentEvent(
+        return new ChildMovedInSameContainmentNotification(
             command.NewIndex,
             movedChild,
             parent,
@@ -276,10 +278,10 @@ public class DeltaCommandToPartitionEventMapper(
 
     #region Annotations
 
-    private AnnotationAddedEvent OnAddAnnotation(AddAnnotation addAnnotationEvent)
+    private AnnotationAddedNotification OnAddAnnotation(AddAnnotation addAnnotationEvent)
     {
         var parent = ToNode(addAnnotationEvent.Parent);
-        return new AnnotationAddedEvent(
+        return new AnnotationAddedNotification(
             parent,
             Deserialize(addAnnotationEvent.NewAnnotation),
             addAnnotationEvent.Index,
@@ -287,11 +289,11 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private AnnotationDeletedEvent OnDeleteAnnotation(DeleteAnnotation deleteAnnotationEvent)
+    private AnnotationDeletedNotification OnDeleteAnnotation(DeleteAnnotation deleteAnnotationEvent)
     {
         var parent = ToNode(deleteAnnotationEvent.Parent);
         var deletedAnnotation = parent.GetAnnotations()[deleteAnnotationEvent.Index];
-        return new AnnotationDeletedEvent(
+        return new AnnotationDeletedNotification(
             deletedAnnotation as IWritableNode ?? throw new InvalidValueException(null, deletedAnnotation),
             parent,
             deleteAnnotationEvent.Index,
@@ -299,12 +301,12 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private AnnotationMovedFromOtherParentEvent OnMoveAnnotationFromOtherParent(MoveAnnotationFromOtherParent moveAnnotationEvent)
+    private AnnotationMovedFromOtherParentNotification OnMoveAnnotationFromOtherParent(MoveAnnotationFromOtherParent moveAnnotationEvent)
     {
         var movedAnnotation = ToNode(moveAnnotationEvent.MovedAnnotation);
         var oldParent = (IWritableNode)movedAnnotation.GetParent();
         var newParent = ToNode(moveAnnotationEvent.NewParent);
-        return new AnnotationMovedFromOtherParentEvent(
+        return new AnnotationMovedFromOtherParentNotification(
             newParent,
             moveAnnotationEvent.NewIndex,
             movedAnnotation,
@@ -314,11 +316,11 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private AnnotationMovedInSameParentEvent OnMoveAnnotationInSameParent(MoveAnnotationInSameParent moveAnnotationEvent)
+    private AnnotationMovedInSameParentNotification OnMoveAnnotationInSameParent(MoveAnnotationInSameParent moveAnnotationEvent)
     {
         var movedAnnotation = ToNode(moveAnnotationEvent.MovedAnnotation);
         var parent = (IWritableNode)movedAnnotation.GetParent();
-        return new AnnotationMovedInSameParentEvent(
+        return new AnnotationMovedInSameParentNotification(
             moveAnnotationEvent.NewIndex,
             movedAnnotation,
             parent,
@@ -331,11 +333,11 @@ public class DeltaCommandToPartitionEventMapper(
 
     #region References
 
-    private ReferenceAddedEvent OnAddReference(AddReference addReferenceEvent)
+    private ReferenceAddedNotification OnAddReference(AddReference addReferenceEvent)
     {
         var parent = ToNode(addReferenceEvent.Parent);
         var reference = ToReference(addReferenceEvent.Reference, parent);
-        return new ReferenceAddedEvent(
+        return new ReferenceAddedNotification(
             parent,
             reference,
             addReferenceEvent.Index,
@@ -344,11 +346,11 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private ReferenceDeletedEvent OnDeleteReference(DeleteReference deleteReferenceEvent)
+    private ReferenceDeletedNotification OnDeleteReference(DeleteReference deleteReferenceEvent)
     {
         var parent = ToNode(deleteReferenceEvent.Parent);
         var reference = ToReference(deleteReferenceEvent.Reference, parent);
-        return new ReferenceDeletedEvent(
+        return new ReferenceDeletedNotification(
             parent,
             reference,
             deleteReferenceEvent.Index,
@@ -357,11 +359,11 @@ public class DeltaCommandToPartitionEventMapper(
         );
     }
 
-    private ReferenceChangedEvent OnChangeReference(ChangeReference changeReferenceEvent)
+    private ReferenceChangedNotification OnChangeReference(ChangeReference changeReferenceEvent)
     {
         var parent = ToNode(changeReferenceEvent.Parent);
         var reference = ToReference(changeReferenceEvent.Reference, parent);
-        return new ReferenceChangedEvent(
+        return new ReferenceChangedNotification(
             parent,
             reference,
             changeReferenceEvent.Index,
@@ -372,4 +374,38 @@ public class DeltaCommandToPartitionEventMapper(
     }
 
     #endregion
+
+
+    private static INotificationId ToEventId(IDeltaCommand command) =>
+        new ParticipationNotificationId(command.InternalParticipationId, command.CommandId);
+
+    private IWritableNode ToNode(TargetNode nodeId)
+    {
+        if (_sharedNodeMap.TryGetValue(nodeId, out var node) && node is IWritableNode w)
+            return w;
+
+        // TODO change to correct exception 
+        throw new NotImplementedException();
+    }
+
+    private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
+    {
+        if (_sharedKeyedMap.TryGetValue(Compress(deltaReference), out var e) && e is T c)
+            return c;
+
+        throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
+    }
+
+    private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
+        CompressedMetaPointer.Create(metaPointer, true);
+
+    private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
+    {
+        var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
+        if (nodes is [IWritableNode w])
+            return w;
+
+        // TODO change to correct exception 
+        throw new NotImplementedException();
+    }
 }

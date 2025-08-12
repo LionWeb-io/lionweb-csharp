@@ -17,15 +17,14 @@
 
 namespace LionWeb.Protocol.Delta.Client;
 
-using Core.M1.Event;
-using Message;
+using Core.Notification;
 
 public interface IClientConnector<T>
 {
     Task SendToRepository(T content);
     event EventHandler<T> ReceiveFromRepository;
 
-    T Convert(IEvent internalEvent);
+    T Convert(INotification notification);
 }
 
 public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;

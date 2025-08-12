@@ -18,10 +18,10 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
-using Core.M1.Event;
-using Core.M1.Event.Partition.Emitter;
 using Core.M2;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition.Emitter;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Names;
@@ -87,13 +87,13 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         Method("SetInternal", AsType(typeof(bool)), [
                 Param("feature", NullableType(AsType(typeof(Feature)))),
                 Param("value", NullableType(AsType(typeof(object)))),
-                ParamWithDefaultNullValue("eventId", AsType(typeof(IEventId)))
+                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
             .Xdoc(XdocInheritDoc())
             .WithBody(AsStatements(new List<StatementSyntax>
                 {
-                    IfStatement(ParseExpression("base.SetInternal(feature, value, eventId)"),
+                    IfStatement(ParseExpression("base.SetInternal(feature, value, notificationId)"),
                         ReturnTrue())
                 }
                 .Concat(FeaturesToImplement(classifier).Select(GenSetInternal))
@@ -130,7 +130,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(property)), AsArguments([IdentifierName("v"), IdentifierName("eventId")]))),
+                        IdentifierName(FeatureSet(property)), AsArguments([IdentifierName("v"), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
@@ -144,7 +144,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(property)), AsArguments([CastValueType(property), IdentifierName("eventId")]))),
+                        IdentifierName(FeatureSet(property)), AsArguments([CastValueType(property), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
@@ -158,7 +158,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(link)), AsArguments([IdentifierName("v"), IdentifierName("eventId")]))),
+                        IdentifierName(FeatureSet(link)), AsArguments([IdentifierName("v"), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
@@ -172,7 +172,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link), IdentifierName("eventId")]))),
+                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
@@ -182,11 +182,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
     [
         SafeNodesVar(containment),
-        SetContainmentEventVariable(containment),
-        EventCollectOldDataCall(),
+        SetContainmentEmitterVariable(containment),
+        EmitterCollectOldDataCall(),
         RemoveSelfParentCall(containment),
         OptionalAddRangeCall(containment),
-        EventRaiseEventCall(),
+        EmitterNotifyCall(),
         ReturnTrue()
     ];
 
@@ -194,11 +194,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         SafeNodesVar(containment),
         AssureNonEmptyCall(containment),
-        SetContainmentEventVariable(containment),
-        EventCollectOldDataCall(),
+        SetContainmentEmitterVariable(containment),
+        EmitterCollectOldDataCall(),
         RemoveSelfParentCall(containment),
         RequiredAddRangeCall(containment),
-        EventRaiseEventCall(),
+        EmitterNotifyCall(),
         ReturnTrue()
     ];
 
@@ -207,11 +207,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         SafeNodesVar(reference),
         AssureNotNullCall(reference),
         AssureNotNullMembersCall(reference),
-        SetReferenceEventVariable(reference),
-        EventCollectOldDataCall(),
+        SetReferenceEmitterVariable(reference),
+        EmitterCollectOldDataCall(),
         ClearFieldCall(reference),
         ReferenceAddRangeCall(reference),
-        EventRaiseEventCall(),
+        EmitterNotifyCall(),
         ReturnTrue()
     ];
 
@@ -219,11 +219,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     [
         SafeNodesVar(reference),
         AssureNonEmptyCall(reference),
-        SetReferenceEventVariable(reference),
-        EventCollectOldDataCall(),
+        SetReferenceEmitterVariable(reference),
+        EmitterCollectOldDataCall(),
         ClearFieldCall(reference),
         ReferenceAddRangeCall(reference),
-        EventRaiseEventCall(),
+        EmitterNotifyCall(),
         ReturnTrue()
     ];
 
@@ -234,21 +234,21 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         ExpressionStatement(InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("AddRange")),
             AsArguments([IdentifierName("safeNodes")])));
 
-    private LocalDeclarationStatementSyntax SetContainmentEventVariable(Containment containment) =>
+    private LocalDeclarationStatementSyntax SetContainmentEmitterVariable(Containment containment) =>
         Variable(
-            "evt",
-            AsType(typeof(ContainmentSetEventEmitter<>), AsType(containment.GetFeatureType())),
+            "emitter",
+            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType())),
             NewCall([
-                MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("eventId")
+                MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("notificationId")
             ])
         );
 
-    private LocalDeclarationStatementSyntax SetReferenceEventVariable(Reference reference) =>
+    private LocalDeclarationStatementSyntax SetReferenceEmitterVariable(Reference reference) =>
         Variable(
-            "evt",
-            AsType(typeof(ReferenceSetEventEmitter<>), AsType(reference.GetFeatureType())),
+            "emitter",
+            AsType(typeof(ReferenceSetNotificationEmitter<>), AsType(reference.GetFeatureType())),
             NewCall([
-                MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference), IdentifierName("eventId")
+                MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference), IdentifierName("notificationId")
             ])
         );
 

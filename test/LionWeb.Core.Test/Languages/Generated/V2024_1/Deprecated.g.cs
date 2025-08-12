@@ -6,10 +6,10 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang;
 using LionWeb.Core;
-using LionWeb.Core.M1.Event;
-using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Partition.Emitter;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
@@ -194,37 +194,37 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Multiple Containment</remarks>
         [Obsolete("deprChild comment")]
-	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes, IEventId? eventId = null)
+	public DeprConcept AddDeprChild(IEnumerable<DeprIface> nodes, INotificationId? notificationId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		ContainmentAddMultipleEventEmitter<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, null, eventId);
-		evt.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, null, notificationId);
+		emitter.CollectOldData();
 		_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         [Obsolete("deprChild comment")]
-	public DeprConcept InsertDeprChild(int index, IEnumerable<DeprIface> nodes, IEventId? eventId = null)
+	public DeprConcept InsertDeprChild(int index, IEnumerable<DeprIface> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _deprChild);
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 		AssureNoSelfMove(index, safeNodes, _deprChild);
 		AssureNotNullMembers(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild);
-		ContainmentAddMultipleEventEmitter<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, index, eventId);
-		evt.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, index, notificationId);
+		emitter.CollectOldData();
 		_deprChild.InsertRange(index, SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
 	/// <remarks>Optional Multiple Containment</remarks>
         [Obsolete("deprChild comment")]
-	public DeprConcept RemoveDeprChild(IEnumerable<DeprIface> nodes, IEventId? eventId = null)
+	public DeprConcept RemoveDeprChild(IEnumerable<DeprIface> nodes, INotificationId? notificationId = null)
 	{
 		RemoveSelfParent(nodes?.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild, ContainmentRemover<DeprIface>(DeprecatedLanguage.Instance.DeprConcept_deprChild));
 		return this;
@@ -247,12 +247,12 @@ public partial class DeprConcept : ConceptInstanceBase
 
 	/// <remarks>Optional Property</remarks>
         [Obsolete("deprProp comment")]
-	public DeprConcept SetDeprProp(string? value, IEventId? eventId = null)
+	public DeprConcept SetDeprProp(string? value, INotificationId? notificationId = null)
 	{
-		PropertyEventEmitter evt = new(DeprecatedLanguage.Instance.DeprConcept_deprProp, this, value, _deprProp, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprProp, this, value, _deprProp, notificationId);
+		emitter.CollectOldData();
 		_deprProp = value;
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
@@ -276,13 +276,13 @@ public partial class DeprConcept : ConceptInstanceBase
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
         [Obsolete("deprRef comment")]
-	public DeprConcept SetDeprRef(DeprAnnotation value, IEventId? eventId = null)
+	public DeprConcept SetDeprRef(DeprAnnotation value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, DeprecatedLanguage.Instance.DeprConcept_deprRef);
-		ReferenceSingleEventEmitter evt = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, value, _deprRef, eventId);
-		evt.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprRef, this, value, _deprRef, notificationId);
+		emitter.CollectOldData();
 		_deprRef = value;
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
@@ -319,18 +319,18 @@ public partial class DeprConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, IEventId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (DeprecatedLanguage.Instance.DeprConcept_deprChild.EqualsIdentity(feature))
 		{
 			var safeNodes = DeprecatedLanguage.Instance.DeprConcept_deprChild.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang.DeprIface>(value).ToList();
-			ContainmentSetEventEmitter<DeprIface> evt = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, eventId);
-			evt.CollectOldData();
+			ContainmentSetNotificationEmitter<DeprIface> emitter = new(DeprecatedLanguage.Instance.DeprConcept_deprChild, this, safeNodes, _deprChild, notificationId);
+			emitter.CollectOldData();
 			RemoveSelfParent(_deprChild.ToList(), _deprChild, DeprecatedLanguage.Instance.DeprConcept_deprChild);
 			_deprChild.AddRange(SetSelfParent(safeNodes, DeprecatedLanguage.Instance.DeprConcept_deprChild));
-			evt.RaiseEvent();
+			emitter.Notify();
 			return true;
 		}
 
@@ -338,7 +338,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		{
 			if (value is null or string)
 			{
-				SetDeprProp((string?)value, eventId);
+				SetDeprProp((string?)value, notificationId);
 				return true;
 			}
 
@@ -349,7 +349,7 @@ public partial class DeprConcept : ConceptInstanceBase
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2024_1.DeprecatedLang.DeprAnnotation v)
 			{
-				SetDeprRef(v, eventId);
+				SetDeprRef(v, notificationId);
 				return true;
 			}
 

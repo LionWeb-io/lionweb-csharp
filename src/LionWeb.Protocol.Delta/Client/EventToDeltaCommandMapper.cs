@@ -17,10 +17,8 @@
 
 namespace LionWeb.Protocol.Delta.Client;
 
-using Core.M1.Event;
-using Core.M1.Event.Forest;
-using Core.M1.Event.Partition;
-using Forest;
+using Core.Notification;
+using Core.Notification.Partition;
 using Message.Command;
 using Partition;
 
@@ -35,11 +33,11 @@ public class EventToDeltaCommandMapper
         _forestMapper = forestMapper;
     }
 
-    public IDeltaCommand Map(IEvent @event) =>
-        @event switch
+    public IDeltaCommand Map(INotification notification) =>
+        notification switch
         {
-            IPartitionEvent e => _partitionMapper.Map(e),
-            IForestEvent e => _forestMapper.Map(e),
-            _ => throw new NotImplementedException(@event.GetType().Name)
+            IPartitionNotification e => _partitionMapper.Map(e),
+            IForestNotification e => _forestMapper.Map(e),
+            _ => throw new NotImplementedException(notification.GetType().Name)
         };
 }

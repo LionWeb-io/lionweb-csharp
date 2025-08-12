@@ -17,8 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
-using Event;
-using Event.Forest;
+using Notification.Forest;
 using Utilities;
 
 /// A collection of model trees, represented by each trees' <see cref="IPartitionInstance">partition</see> (aka root node).
@@ -63,7 +62,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _eventProcessor.Receive(new PartitionAddedEvent(partition, eventId ?? _eventIdProvider.CreateEventId()));
+                _eventProcessor.Receive(new PartitionAddedNotification(partition, eventId ?? _eventIdProvider.CreateEventId()));
         }
     }
 
@@ -73,7 +72,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _eventProcessor.Receive(new PartitionDeletedEvent(partition, eventId ?? _eventIdProvider.CreateEventId()));
+                _eventProcessor.Receive(new PartitionDeletedNotification(partition, eventId ?? _eventIdProvider.CreateEventId()));
         }
     }
 

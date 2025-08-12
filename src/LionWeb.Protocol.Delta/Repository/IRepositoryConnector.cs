@@ -17,14 +17,14 @@
 
 namespace LionWeb.Protocol.Delta.Repository;
 
-using Core.M1.Event;
+using Core.Notification;
 
 public interface IRepositoryConnector<T>
 {
     Task SendToClient(IClientInfo clientInfo, T content);
     Task SendToAllClients(T content);
     event EventHandler<IMessageContext<T>> ReceiveFromClient;
-    T Convert(IEvent internalEvent);
+    T Convert(INotification notification);
 }
 
 public interface IMessageContext<T>

@@ -21,8 +21,8 @@ using Core.Serialization;
 using Core.Utilities;
 using Languages.Generated.V2024_1.SDTLang;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1.Event;
 using M3;
+using Notification;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -506,7 +506,7 @@ public class HasherTests
 
         public void DetachFromParent() { }
 
-        public void Set(Feature feature, object? value, IEventId? eventId = null) { }
+        public void Set(Feature feature, object? value, INotificationId? eventId = null) { }
 
         public void SetParent(INode? parent) { }
 
@@ -514,21 +514,21 @@ public class HasherTests
 
         public Containment? GetContainmentOf(INode child) => null;
 
-        public void AddAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null) { }
+        public void AddAnnotations(IEnumerable<INode> annotations, INotificationId? eventId = null) { }
 
-        public void InsertAnnotations(Int32 index, IEnumerable<INode> annotations, IEventId? eventId = null) { }
+        public void InsertAnnotations(Int32 index, IEnumerable<INode> annotations, INotificationId? eventId = null) { }
 
-        public bool RemoveAnnotations(IEnumerable<INode> annotations, IEventId? eventId = null) => false;
+        public bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? eventId = null) => false;
 
         public IReadOnlyList<Coord> Fixpoints { get => []; init { } }
-        public IShape AddFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null) => this;
+        public IShape AddFixpoints(IEnumerable<Coord> nodes, INotificationId? eventId = null) => this;
 
-        public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes, IEventId? eventId = null) => this;
+        public IShape InsertFixpoints(int index, IEnumerable<Coord> nodes, INotificationId? eventId = null) => this;
 
-        public IShape RemoveFixpoints(IEnumerable<Coord> nodes, IEventId? eventId = null) => this;
+        public IShape RemoveFixpoints(IEnumerable<Coord> nodes, INotificationId? eventId = null) => this;
         
         public string Uuid { get => null; set { } }
-        public IShape SetUuid(string value, IEventId? eventId = null) => this;
+        public IShape SetUuid(string value, INotificationId? eventId = null) => this;
     }
 
     [TestMethod]

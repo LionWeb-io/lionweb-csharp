@@ -20,6 +20,7 @@ namespace LionWeb.Core.Test.Listener;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
+using Notification.Forest;
 using M1.Event;
 using M1.Event.Forest;
 using M1.Event.Processor;

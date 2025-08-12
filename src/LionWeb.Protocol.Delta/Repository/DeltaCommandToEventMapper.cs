@@ -17,7 +17,7 @@
 
 namespace LionWeb.Protocol.Delta.Repository;
 
-using Core.M1.Event;
+using Core.Notification;
 using Message.Command;
 using Partition;
 
@@ -30,7 +30,7 @@ public class DeltaCommandToEventMapper
         _partitionMapper = partitionMapper;
     }
 
-    public IEvent Map(IDeltaCommand command) =>
+    public INotification Map(IDeltaCommand command) =>
         command switch
         {
             IForestDeltaCommand c => _partitionMapper.Map(c),
