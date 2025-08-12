@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1.Event.Partition;
 using M2;
 using M3;
 using Notification;
@@ -131,7 +132,7 @@ public class DynamicNode : NodeBase
             _settings.Remove(property);
             if (oldValue != null)
             {
-                commander?.Raise(new PropertyDeletedNotification(this, property, oldValue, commander.CreateEventId()));
+                processor?.Receive(new PropertyDeletedNotification(this, property, oldValue, processor.CreateEventId()));
             }
 
             return true;
@@ -140,10 +141,10 @@ public class DynamicNode : NodeBase
         var newValue = VersionSpecifics.PrepareSetProperty(property, value);
         if (oldValue != null)
         {
-            commander?.Raise(new PropertyChangedNotification(this, property, newValue, oldValue, commander.CreateEventId()));
+            processor?.Receive(new PropertyChangedNotification(this, property, newValue, oldValue, processor.CreateEventId()));
         } else
         {
-            commander?.Raise(new PropertyAddedNotification(this, property, newValue, commander.CreateEventId()));
+            processor?.Receive(new PropertyAddedNotification(this, property, newValue, processor.CreateEventId()));
         }
 
         _settings[property] = newValue;

@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1.Event.Processor;
 using Notification.Partition;
 using Comparer = Core.Utilities.Comparer;
 
@@ -830,24 +831,24 @@ public class EventTests_Twoway
     #endregion
 
 
-    private Tuple<IEventProcessor<IPartitionEvent>, IEventProcessor<IPartitionEvent>>
+    private Tuple<IEventProcessor<IPartitionNotification>, IEventProcessor<IPartitionNotification>>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = CreateReplicator(node, "nodeReplicator");
         var cloneReplicator = CreateReplicator(clone, "cloneReplicator");
         
-        var cloneProcessorA = new NodeCloneProcessor<IPartitionEvent>(node.GetId());
+        var cloneProcessorA = new NodeCloneProcessor<IPartitionNotification>(node.GetId());
         IProcessor.Connect(replicator, cloneProcessorA);
         IProcessor.Connect(cloneProcessorA, cloneReplicator);
      
-        var cloneProcessorB = new NodeCloneProcessor<IPartitionEvent>(clone.GetId());
+        var cloneProcessorB = new NodeCloneProcessor<IPartitionNotification>(clone.GetId());
         IProcessor.Connect(cloneReplicator, cloneProcessorB);
         IProcessor.Connect(cloneProcessorB, replicator);
      
         return Tuple.Create(replicator, cloneReplicator);
     }
-    private static IEventProcessor<IPartitionEvent> CreateReplicator(IPartitionInstance clone, object? sender) =>
-        PartitionEventReplicator.Create(clone, new(), sender);
+    private static IEventProcessor<IPartitionNotification> CreateReplicator(IPartitionInstance clone, object? sender) =>
+        PartitionNotificationReplicator.Create(clone, new(), sender);
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {

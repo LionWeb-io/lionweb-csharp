@@ -22,6 +22,9 @@ using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
 using Core.M1.Event.Processor;
+using Core.Notification;
+using Core.Notification.Forest;
+using Core.Notification.Partition;
 using Message;
 
 public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> : IDisposable
@@ -31,9 +34,9 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 {
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
-    private readonly IEventProcessor<IForestEvent> _forestEventReplicator;
+    private readonly IEventProcessor<IForestNotification> _forestEventReplicator;
 
-    public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, IEventProcessor<IForestEvent> forestEventReplicator)
+    public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, IEventProcessor<IForestNotification> forestEventReplicator)
     {
         _sharedNodeMap = sharedNodeMap;
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
@@ -79,8 +82,8 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
         }
     }
 
-    protected abstract IPartitionEvent MapPartition(TPartition partitionContent);
-    protected abstract IForestEvent MapForest(TForest forestContent);
+    protected abstract IPartitionNotification MapPartition(TPartition partitionContent);
+    protected abstract IForestNotification MapForest(TForest forestContent);
 
     #endregion
 }

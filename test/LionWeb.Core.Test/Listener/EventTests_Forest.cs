@@ -123,11 +123,11 @@ public class EventTests_Forest
 
     #endregion
 
-    private static IEventProcessor<IForestEvent> CreateReplicator(Forest cloneForest, Forest originalForest)
+    private static IEventProcessor<IForestNotification> CreateReplicator(Forest cloneForest, Forest originalForest)
     {
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
-        var replicator = ForestEventReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
-        var cloneProcessor = new NodeCloneProcessor<IForestEvent>(cloneForest);
+        var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
+        var cloneProcessor = new NodeCloneProcessor<IForestNotification>(cloneForest);
         IProcessor.Connect(originalForest.GetProcessor(), cloneProcessor);
         IProcessor.Connect(cloneProcessor, replicator);
 
@@ -143,28 +143,28 @@ public class EventTests_Forest
     }
 }
 
-internal class TestLocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap) : EventProcessorBase<IForestEvent>(sender)
+internal class TestLocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap) : EventProcessorBase<IForestNotification>(sender)
 {
-    public override void Receive(IForestEvent message)
+    public override void Receive(IForestNotification message)
     {
         switch (message)
         {
-            case PartitionAddedEvent partitionAddedEvent:
+            case PartitionAddedNotification partitionAddedEvent:
                 OnLocalPartitionAdded(partitionAddedEvent);
                 break;
-            case PartitionDeletedEvent partitionDeletedEvent:
+            case PartitionDeletedNotification partitionDeletedEvent:
                 OnLocalPartitionDeleted(partitionDeletedEvent);
                 break;
         }
     }
     
-    private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
+    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedEvent)
     {
         var partitionReplicator = sharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
         IProcessor.Connect(partitionAddedEvent.NewPartition.GetProcessor(), partitionReplicator);
     }
 
-    private void OnLocalPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent)
+    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent)
     {
         throw new NotImplementedException();
     }

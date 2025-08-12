@@ -15,24 +15,9 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-<<<<<<<< HEAD:src/LionWeb.Protocol.Delta/Client/ILionWebClient.cs
-namespace LionWeb.Protocol.Delta.Client;
-
-public interface ILionWebClient
-{
-    private const string _magenta = "\x1b[95m";
-    private const string _bold = "\x1b[1m";
-    private const string _unbold = "\x1b[22m";
-    private const string _defaultColor = "\x1b[39m";
-
-    public const string HeaderColor_Start = _magenta + _bold;
-    public const string HeaderColor_End = _unbold + _defaultColor;
-}
-========
 namespace LionWeb.Core.Notification.Forest;
 
 /// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestPublisher"/> events.
 /// <param name="sender">Optional sender of the events.</param>
 public class ForestEventHandler(object? sender)
-    : EventHandlerBase<IForestNotification>(sender), IForestPublisher, IForestCommander;
->>>>>>>> main:src/LionWeb.Core/Core/Notification/Forest/ForestEventHandler.cs
+    : EventHandlerBase<IForestNotification>(sender);

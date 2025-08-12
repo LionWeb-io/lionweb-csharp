@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using M1.Event.Processor;
 using Notification;
 using Notification.Partition;
 using System.Reflection;
@@ -33,9 +34,9 @@ public class EventTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        node.GetProcessor().Subscribe<PropertyAddedEvent>((sender, args) => { } );
-        node.GetProcessor().Subscribe<PropertyChangedEvent>((sender, args) => { });
-        node.GetProcessor().Subscribe<IPartitionEvent>((sender, args) => { });
+        node.GetProcessor().Subscribe<PropertyAddedNotification>((sender, args) => { } );
+        node.GetProcessor().Subscribe<PropertyChangedNotification>((sender, args) => { });
+        node.GetProcessor().Subscribe<IPartitionNotification>((sender, args) => { });
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -50,9 +51,9 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetProcessor().Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
+        node.GetProcessor().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
         
-        node.GetProcessor().Subscribe<PropertyChangedEvent>((sender, args) => {});
+        node.GetProcessor().Subscribe<PropertyChangedNotification>((sender, args) => {});
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -68,13 +69,13 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetProcessor().Subscribe<PropertyAddedEvent>((sender, args) => addedCount++);
+        node.GetProcessor().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
         
         int changedCount = 0;
-        node.GetProcessor().Subscribe<PropertyChangedEvent>((sender, args) => changedCount++);
+        node.GetProcessor().Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
 
         int allCount = 0;
-        node.GetProcessor().Subscribe<IPartitionEvent>((sender, args) => allCount++);
+        node.GetProcessor().Subscribe<IPartitionNotification>((sender, args) => allCount++);
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -97,10 +98,10 @@ public class EventTests_Infrastructure
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
         int nodeCount = 0;
-        node.GetProcessor().Subscribe<IPartitionEvent>((sender, args) => nodeCount++);
+        node.GetProcessor().Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
         
         int cloneCount = 0;
-        clone.GetProcessor().Subscribe<IPartitionEvent>((sender, args) => cloneCount++);
+        clone.GetProcessor().Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
         
         circle.Name = "Hello";
         cloneCircle.Name = "World";
@@ -130,22 +131,22 @@ public class EventTests_Infrastructure
         Assert.AreEqual(0, ReplicatorEventIds(cloneReplicator).Count);
     }
 
-    private static HashSet<IEventId> ReplicatorEventIds(IEventProcessor<IPartitionEvent> replicator)
+    private static HashSet<INotificationId> ReplicatorEventIds(IEventProcessor<IPartitionNotification> replicator)
     {
-        var fieldInfoFilter = typeof(CompositeEventProcessor<IPartitionEvent>).GetRuntimeFields().First(f => f.Name == "_lastProcessor");
-        var filter = (EventIdFilteringEventProcessor<IPartitionEvent>) fieldInfoFilter.GetValue(replicator);
+        var fieldInfoFilter = typeof(CompositeEventProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_lastProcessor");
+        var filter = (EventIdFilteringEventProcessor<IPartitionNotification>) fieldInfoFilter.GetValue(replicator);
      
-        var fieldInfoEvents = typeof(EventIdFilteringEventProcessor<IPartitionEvent>).GetRuntimeFields().First(f => f.Name == "_eventIds");
+        var fieldInfoEvents = typeof(EventIdFilteringEventProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_eventIds");
         var eventIds = fieldInfoEvents.GetValue(filter);
         
-        return (HashSet<IEventId>)eventIds!;
+        return (HashSet<INotificationId>)eventIds!;
     }
 
-    private Tuple<IEventProcessor<IPartitionEvent>, IEventProcessor<IPartitionEvent>>
+    private Tuple<IEventProcessor<IPartitionNotification>, IEventProcessor<IPartitionNotification>>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
-        var replicator = PartitionEventReplicator.Create(clone, new(), "cloneReplicator");
-        var cloneReplicator = PartitionEventReplicator.Create(node, new(), "nodeReplicator");
+        var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");
+        var cloneReplicator = PartitionNotificationReplicator.Create(node, new(), "nodeReplicator");
         
         IProcessor.Connect(cloneReplicator, replicator);
         IProcessor.Connect(replicator, cloneReplicator);

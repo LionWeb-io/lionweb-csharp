@@ -22,6 +22,9 @@ using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
 using Core.M1.Event.Processor;
+using Core.Notification;
+using Core.Notification.Forest;
+using Core.Notification.Partition;
 using Forest;
 using Message.Command;
 using Partition;
@@ -37,7 +40,7 @@ public class DeltaProtocolCommandReceiver
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder,
-        IEventProcessor<IForestEvent> forestEventReplicator)
+        IEventProcessor<IForestNotification> forestEventReplicator)
         : base(sharedNodeMap, sharedPartitionReplicatorMap, forestEventReplicator)
     {
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
@@ -45,10 +48,10 @@ public class DeltaProtocolCommandReceiver
     }
 
     /// <inheritdoc />
-    protected override IPartitionEvent MapPartition(IPartitionDeltaCommand partitionContent) =>
+    protected override IPartitionNotification MapPartition(IPartitionDeltaCommand partitionContent) =>
         _partitionMapper.Map(partitionContent);
 
     /// <inheritdoc />
-    protected override IForestEvent MapForest(IForestDeltaCommand forestContent) =>
+    protected override IForestNotification MapForest(IForestDeltaCommand forestContent) =>
         _forestMapper.Map(forestContent);
 }

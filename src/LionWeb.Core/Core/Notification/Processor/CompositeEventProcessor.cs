@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.M1.Event.Processor;
 
+using Notification;
+
 /// Composes two or more <see cref="IEventProcessor{TEvent}"/>s.
 ///
 /// Every message this processor <see cref="Receive">receives</see>
@@ -25,7 +27,7 @@ namespace LionWeb.Core.M1.Event.Processor;
 /// The last component <see cref="IProcessor{TReceive,TSend}.Send">sends</see> to
 /// this processor's <i>following</i> processors.
 public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
-    where TEvent : class, IEvent
+    where TEvent : class, INotification
 {
     private readonly IEventProcessor<TEvent> _firstProcessor;
     private readonly IEventProcessor<TEvent> _lastProcessor;

@@ -18,8 +18,9 @@
 namespace LionWeb.Core.Notification.Forest;
 
 using M1;
+using M1.Event.Forest;
+using M1.Event.Processor;
 using Partition;
-using Processor;
 using System.Diagnostics;
 
 /// Replicates notifications for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
@@ -36,7 +37,7 @@ public static class ForestNotificationReplicator
             new LocalForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, internalSender);
 
         var result = new CompositeEventProcessor<IForestNotification>([remoteReplicator, filter],
-            sender ?? $"Composite of {nameof(ForestEventReplicator)} {localForest}");
+            sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
 
         var forestProcessor = localForest.GetProcessor();
         if (forestProcessor != null)
@@ -49,7 +50,7 @@ public static class ForestNotificationReplicator
     }
 }
 
-public class RemoteForestEventReplicator : RemoteEventReplicatorBase<IForestEvent>
+public class RemoteForestEventReplicator : RemoteEventReplicatorBase<IForestNotification>
 {
     private readonly IForest _localForest;
 
@@ -81,33 +82,34 @@ public class RemoteForestEventReplicator : RemoteEventReplicatorBase<IForestEven
     // }
 
     /// <inheritdoc />
-    protected override void ProcessEvent(object? sender, IForestNotification? forestEvent)
+    protected override void ProcessEvent(IForestNotification? forestEvent)
     {
         Debug.WriteLine($"{this.GetType()}: processing event {forestEvent}");
         switch (forestEvent)
         {
             case PartitionAddedNotification a:
-                OnRemoteNewPartition(null, a);
+                OnRemoteNewPartition(a);
                 break;
 
             case PartitionDeletedNotification a:
-                OnRemotePartitionDeleted(null, a);
+                OnRemotePartitionDeleted(a);
                 break;
         }
     }
+
 
     private void OnRemoteNewPartition(PartitionAddedNotification partitionAddedEvent) =>
         SuppressEventForwarding(partitionAddedEvent, () =>
         {
             var newPartition = partitionAddedEvent.NewPartition;
-            _localForest.AddPartitions([newPartition], partitionAddedEvent.EventId);
+            _localForest.AddPartitions([newPartition], partitionAddedEvent.NotificationId);
         });
 
     private void OnRemotePartitionDeleted(PartitionDeletedNotification partitionDeletedEvent) =>
         SuppressEventForwarding(partitionDeletedEvent, () =>
         {
             var localPartition = (IPartitionInstance)Lookup(partitionDeletedEvent.DeletedPartition.GetId());
-            _localForest.RemovePartitions([localPartition], partitionDeletedEvent.EventId);
+            _localForest.RemovePartitions([localPartition], partitionDeletedEvent.NotificationId);
         });
 }
 
@@ -146,7 +148,7 @@ public class LocalForestEventReplicator : EventProcessorBase<IForestNotification
 
     protected virtual IEventProcessor<IPartitionNotification> CreatePartitionEventReplicator(IPartitionInstance partition,
         string sender) =>
-        PartitionEventReplicator.Create(partition, _sharedNodeMap, sender);
+        PartitionNotificationReplicator.Create(partition, _sharedNodeMap, sender);
 
     internal void RegisterPartition(IPartitionInstance partition)
     {

@@ -24,6 +24,7 @@ using Core;
 using Core.M1;
 using Core.M1.Event;
 using Core.M3;
+using Core.Notification;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Utilities;
 using Message;
@@ -193,7 +194,7 @@ class RepositoryConnector : IDeltaRepositoryConnector
 
     public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
 
-    public IDeltaContent Convert(IEvent internalEvent) =>
+    public IDeltaContent Convert(INotification internalEvent) =>
         _mapper.Map(internalEvent);
 
     public void MessageFromClient(ClientInfo clientInfo, byte[] encoded) =>
@@ -247,7 +248,7 @@ class ClientConnector : IDeltaClientConnector
 
     public event EventHandler<IDeltaContent>? ReceiveFromRepository;
 
-    public IDeltaContent Convert(IEvent internalEvent) =>
+    public IDeltaContent Convert(INotification internalEvent) =>
         _mapper.Map(internalEvent);
 
     public void MessageFromRepository(byte[] encoded) =>

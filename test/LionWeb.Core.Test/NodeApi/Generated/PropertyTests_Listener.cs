@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1.Event.Partition;
+using Notification.Partition;
 
 [TestClass]
 public class PropertyTests_Listener
@@ -31,7 +32,7 @@ public class PropertyTests_Listener
         parent.Documentation = doc;
 
         int events = 0;
-        parent.GetProcessor().Subscribe<PropertyAddedEvent>((_, args) =>
+        parent.GetProcessor().Subscribe<PropertyAddedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -53,7 +54,7 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int events = 0;
-        parent.GetProcessor().Subscribe<PropertyDeletedEvent>((_, args) =>
+        parent.GetProcessor().Subscribe<PropertyDeletedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -75,7 +76,7 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int events = 0;
-        parent.GetProcessor().Subscribe<PropertyChangedEvent>((_, args) =>
+        parent.GetProcessor().Subscribe<PropertyChangedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(doc, args.Node);
@@ -85,8 +86,8 @@ public class PropertyTests_Listener
         });
 
         int badEvents = 0;
-        parent.GetProcessor().Subscribe<PropertyAddedEvent>((_, _) => badEvents++);
-        parent.GetProcessor().Subscribe<PropertyDeletedEvent>((_, _) => badEvents++);
+        parent.GetProcessor().Subscribe<PropertyAddedNotification>((_, _) => badEvents++);
+        parent.GetProcessor().Subscribe<PropertyDeletedNotification>((_, _) => badEvents++);
 
         doc.Text = "bye";
 
@@ -102,7 +103,7 @@ public class PropertyTests_Listener
         parent.AddShapes([circle]);
 
         int events = 0;
-        parent.GetProcessor().Subscribe<PropertyAddedEvent>((_, args) =>
+        parent.GetProcessor().Subscribe<PropertyAddedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
@@ -124,7 +125,7 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int events = 0;
-        parent.GetProcessor().Subscribe<PropertyDeletedEvent>((_, args) =>
+        parent.GetProcessor().Subscribe<PropertyDeletedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
@@ -145,7 +146,7 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int events = 0;
-        parent.GetProcessor().Subscribe<PropertyChangedEvent>((_, args) =>
+        parent.GetProcessor().Subscribe<PropertyChangedNotification>((_, args) =>
         {
             events++;
             Assert.AreSame(circle, args.Node);
@@ -155,8 +156,8 @@ public class PropertyTests_Listener
         });
 
         int badEvents = 0;
-        parent.GetProcessor().Subscribe<PropertyAddedEvent>((_, _) => badEvents++);
-        parent.GetProcessor().Subscribe<PropertyDeletedEvent>((_, _) => badEvents++);
+        parent.GetProcessor().Subscribe<PropertyAddedNotification>((_, _) => badEvents++);
+        parent.GetProcessor().Subscribe<PropertyDeletedNotification>((_, _) => badEvents++);
 
         circle.Uuid = "bye";
 

@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1.Event.Processor;
 
+using Notification;
 using Partition;
 using Utilities;
 
@@ -26,7 +27,7 @@ using Utilities;
 /// Example: We receive a <see cref="PropertyAddedEvent"/> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-public abstract class RemoteEventReplicatorBase<TEvent> : EventProcessorBase<TEvent> where TEvent : class, IEvent
+public abstract class RemoteEventReplicatorBase<TEvent> : EventProcessorBase<TEvent> where TEvent : class, INotification
 {
     protected readonly SharedNodeMap SharedNodeMap;
     protected readonly EventIdFilteringEventProcessor<TEvent> Filter;
@@ -62,7 +63,7 @@ public abstract class RemoteEventReplicatorBase<TEvent> : EventProcessorBase<TEv
     /// Uses <see cref="EventIdFilteringEventProcessor{TEvent}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
     protected virtual void SuppressEventForwarding(TEvent @event, Action action)
     {
-        IEventId eventId = @event.EventId;
+        var eventId = @event.NotificationId;
         Filter.RegisterEventId(eventId);
 
         try

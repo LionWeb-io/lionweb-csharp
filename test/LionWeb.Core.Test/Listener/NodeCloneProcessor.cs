@@ -21,79 +21,82 @@ using M1.Event;
 using M1.Event.Forest;
 using M1.Event.Partition;
 using M1.Event.Processor;
+using Notification;
+using Notification.Forest;
+using Notification.Partition;
 
 internal class NodeCloneProcessor<TEvent>(object? sender) : EventProcessorBase<TEvent>(sender)
-    where TEvent : IEvent
+    where TEvent : INotification
 {
     public override void Receive(TEvent message)
     {
-        IEvent result = message switch
+        INotification result = message switch
         {
-            PartitionAddedEvent e => e with { NewPartition = Clone(e.NewPartition) },
-            PartitionDeletedEvent e => e with { DeletedPartition = Clone(e.DeletedPartition) },
-            AnnotationAddedEvent e => e with { NewAnnotation = Clone(e.NewAnnotation), Parent = Clone(e.Parent) },
-            AnnotationDeletedEvent e => e with
+            PartitionAddedNotification e => e with { NewPartition = Clone(e.NewPartition) },
+            PartitionDeletedNotification e => e with { DeletedPartition = Clone(e.DeletedPartition) },
+            AnnotationAddedNotification e => e with { NewAnnotation = Clone(e.NewAnnotation), Parent = Clone(e.Parent) },
+            AnnotationDeletedNotification e => e with
             {
                 DeletedAnnotation = Clone(e.DeletedAnnotation), Parent = Clone(e.Parent)
             },
-            AnnotationMovedAndReplacedFromOtherParentEvent e => e with
+            AnnotationMovedAndReplacedFromOtherParentNotification e => e with
             {
                 MovedAnnotation = Clone(e.MovedAnnotation),
                 ReplacedAnnotation = Clone(e.ReplacedAnnotation),
                 NewParent = Clone(e.NewParent),
                 OldParent = Clone(e.OldParent)
             },
-            AnnotationMovedAndReplacedInSameParentEvent e => e with
+            AnnotationMovedAndReplacedInSameParentNotification e => e with
             {
                 MovedAnnotation = Clone(e.MovedAnnotation),
                 Parent = Clone(e.Parent),
                 ReplacedAnnotation = Clone(e.ReplacedAnnotation)
             },
-            AnnotationMovedFromOtherParentEvent e => e with
+            AnnotationMovedFromOtherParentNotification e => e with
             {
                 MovedAnnotation = Clone(e.MovedAnnotation),
                 NewParent = Clone(e.NewParent),
                 OldParent = Clone(e.OldParent)
             },
-            AnnotationMovedInSameParentEvent e => e with
+            AnnotationMovedInSameParentNotification e => e with
             {
                 MovedAnnotation = Clone(e.MovedAnnotation), Parent = Clone(e.Parent)
             },
-            AnnotationReplacedEvent e => e with
+            AnnotationReplacedNotification e => e with
             {
                 NewAnnotation = Clone(e.NewAnnotation),
                 Parent = Clone(e.Parent),
                 ReplacedAnnotation = Clone(e.ReplacedAnnotation)
             },
-            ChildAddedEvent e => e with { NewChild = Clone(e.NewChild), Parent = Clone(e.Parent) },
-            ChildDeletedEvent e => e with { DeletedChild = Clone(e.DeletedChild), Parent = Clone(e.Parent) },
-            ChildMovedAndReplacedFromOtherContainmentEvent e => e with
+            ChildAddedNotification e => e with { NewChild = Clone(e.NewChild), Parent = Clone(e.Parent) },
+            ChildDeletedNotification e => e with { DeletedChild = Clone(e.DeletedChild), Parent = Clone(e.Parent) },
+            ChildMovedAndReplacedFromOtherContainmentNotification e => e with
             {
                 NewParent = Clone(e.NewParent),
                 MovedChild = Clone(e.MovedChild),
                 OldParent = Clone(e.OldParent),
                 ReplacedChild = Clone(e.ReplacedChild)
             },
-            ChildMovedAndReplacedFromOtherContainmentInSameParentEvent e => e with
+            ChildMovedAndReplacedFromOtherContainmentInSameParentNotification e => e with
             {
                 MovedChild = Clone(e.MovedChild), Parent = Clone(e.Parent), ReplacedChild = Clone(e.ReplacedChild)
             },
-            ChildMovedAndReplacedInSameContainmentEvent e => e with
+            ChildMovedAndReplacedInSameContainmentNotification e => e with
             {
                 MovedChild = Clone(e.MovedChild), Parent = Clone(e.Parent), ReplacedChild = Clone(e.ReplacedChild)
             },
-            ChildMovedFromOtherContainmentEvent e => e with
+            ChildMovedFromOtherContainmentNotification e => e with
             {
                 MovedChild = Clone(e.MovedChild), NewParent = Clone(e.NewParent), OldParent = Clone(e.OldParent)
             },
-            ChildMovedFromOtherContainmentInSameParentEvent e => e with
+            ChildMovedFromOtherContainmentInSameParentNotification e => e with
             {
                 MovedChild = Clone(e.MovedChild), Parent = Clone(e.Parent)
             },
-            ChildMovedInSameContainmentEvent e => e with { MovedChild = Clone(e.MovedChild), Parent = Clone(e.Parent) },
-            ChildReplacedEvent e => e with { NewChild = Clone(e.NewChild) },
-            ClassifierChangedEvent e => e with { Node = Clone(e.Node) },
-            EntryMovedAndReplacedFromOtherReferenceEvent
+            ChildMovedInSameContainmentNotification e => e with { MovedChild = Clone(e.MovedChild), Parent = Clone(e.Parent) },
+            ChildReplacedNotification e => e with { NewChild = Clone(e.NewChild) },
+            ClassifierChangedNotification e => e with { Node = Clone(e.Node) },
+            EntryMovedAndReplacedFromOtherReferenceNotification
             {
                 MovedTarget: ReferenceTarget m, ReplacedTarget: ReferenceTarget r
             } e => e with
@@ -103,7 +106,7 @@ internal class NodeCloneProcessor<TEvent>(object? sender) : EventProcessorBase<T
                 OldParent = Clone(e.OldParent),
                 ReplacedTarget = r with { Reference = Clone(r.Reference) }
             },
-            EntryMovedAndReplacedFromOtherReferenceInSameParentEvent
+            EntryMovedAndReplacedFromOtherReferenceInSameParentNotification
             {
                 MovedTarget: ReferenceTarget m, ReplacedTarget: ReferenceTarget r
             } e => e with
@@ -112,7 +115,7 @@ internal class NodeCloneProcessor<TEvent>(object? sender) : EventProcessorBase<T
                 Parent = Clone(e.Parent),
                 ReplacedTarget = r with { Reference = Clone(r.Reference) }
             },
-            EntryMovedAndReplacedInSameReferenceEvent
+            EntryMovedAndReplacedInSameReferenceNotification
             {
                 MovedTarget: ReferenceTarget m, ReplacedTarget: ReferenceTarget r
             } e => e with
@@ -121,46 +124,46 @@ internal class NodeCloneProcessor<TEvent>(object? sender) : EventProcessorBase<T
                 Parent = Clone(e.Parent),
                 ReplacedTarget = r with { Reference = Clone(r.Reference) }
             },
-            EntryMovedFromOtherReferenceEvent { MovedTarget: ReferenceTarget m } e => e with
+            EntryMovedFromOtherReferenceNotification { MovedTarget: ReferenceTarget m } e => e with
             {
                 MovedTarget = m with { Reference = Clone(m.Reference), },
                 NewParent = Clone(e.NewParent),
                 OldParent = Clone(e.OldParent)
             },
-            EntryMovedFromOtherReferenceInSameParentEvent { MovedTarget: ReferenceTarget m } e => e with
+            EntryMovedFromOtherReferenceInSameParentNotification { MovedTarget: ReferenceTarget m } e => e with
             {
                 MovedTarget = m with { Reference = Clone(m.Reference), }, Parent = Clone(e.Parent)
             },
-            EntryMovedInSameReferenceEvent { Target: ReferenceTarget t } e => e with
+            EntryMovedInSameReferenceNotification { Target: ReferenceTarget t } e => e with
             {
                 Parent = Clone(e.Parent), Target = t with { Reference = Clone(t.Reference) }
             },
-            PropertyAddedEvent e => e with { Node = Clone(e.Node), },
-            PropertyChangedEvent e => e with { Node = Clone(e.Node) },
-            PropertyDeletedEvent e => e with { Node = Clone(e.Node) },
-            ReferenceAddedEvent { NewTarget: ReferenceTarget t } e => e with
+            PropertyAddedNotification e => e with { Node = Clone(e.Node), },
+            PropertyChangedNotification e => e with { Node = Clone(e.Node) },
+            PropertyDeletedNotification e => e with { Node = Clone(e.Node) },
+            ReferenceAddedNotification { NewTarget: ReferenceTarget t } e => e with
             {
                 NewTarget = t with { Reference = Clone(t.Reference) }, Parent = Clone(e.Parent)
             },
-            ReferenceChangedEvent { NewTarget: ReferenceTarget n, OldTarget: ReferenceTarget o } e => e with
+            ReferenceChangedNotification { NewTarget: ReferenceTarget n, OldTarget: ReferenceTarget o } e => e with
             {
                 NewTarget = n with { Reference = Clone(n.Reference) },
                 OldTarget = o with { Reference = Clone(n.Reference) },
                 Parent = Clone(e.Parent),
             },
-            ReferenceDeletedEvent { DeletedTarget: ReferenceTarget t } e => e with
+            ReferenceDeletedNotification { DeletedTarget: ReferenceTarget t } e => e with
             {
                 DeletedTarget = t with { Reference = Clone(t.Reference) }, Parent = Clone(e.Parent)
             },
-            ReferenceResolveInfoAddedEvent e => e with { Parent = Clone(e.Parent), Target = Clone(e.Target) },
-            ReferenceResolveInfoChangedEvent e => e with { Parent = Clone(e.Parent), Target = Clone(e.Target) },
-            ReferenceResolveInfoDeletedEvent e => e with { Parent = Clone(e.Parent), Target = Clone(e.Target) },
-            ReferenceTargetAddedEvent e => e with { NewTarget = Clone(e.NewTarget), Parent = Clone(e.Parent) },
-            ReferenceTargetChangedEvent e => e with
+            ReferenceResolveInfoAddedNotification e => e with { Parent = Clone(e.Parent), Target = Clone(e.Target) },
+            ReferenceResolveInfoChangedNotification e => e with { Parent = Clone(e.Parent), Target = Clone(e.Target) },
+            ReferenceResolveInfoDeletedNotification e => e with { Parent = Clone(e.Parent), Target = Clone(e.Target) },
+            ReferenceTargetAddedNotification e => e with { NewTarget = Clone(e.NewTarget), Parent = Clone(e.Parent) },
+            ReferenceTargetChangedNotification e => e with
             {
                 NewTarget = Clone(e.NewTarget), OldTarget = Clone(e.OldTarget), Parent = Clone(e.Parent)
             },
-            ReferenceTargetDeletedEvent e => e with { DeletedTarget = Clone(e.DeletedTarget), Parent = Clone(e.Parent) }
+            ReferenceTargetDeletedNotification e => e with { DeletedTarget = Clone(e.DeletedTarget), Parent = Clone(e.Parent) }
         };
         Send((TEvent)result);
     }

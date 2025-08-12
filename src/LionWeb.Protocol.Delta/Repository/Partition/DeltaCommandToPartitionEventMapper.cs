@@ -23,8 +23,6 @@ using Core.M2;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Partition;
-using Core.Serialization;
-using Message;
 using Message.Command;
 using System.Collections;
 
@@ -374,38 +372,4 @@ public class DeltaCommandToPartitionEventMapper(
     }
 
     #endregion
-
-
-    private static INotificationId ToEventId(IDeltaCommand command) =>
-        new ParticipationNotificationId(command.InternalParticipationId, command.CommandId);
-
-    private IWritableNode ToNode(TargetNode nodeId)
-    {
-        if (_sharedNodeMap.TryGetValue(nodeId, out var node) && node is IWritableNode w)
-            return w;
-
-        // TODO change to correct exception 
-        throw new NotImplementedException();
-    }
-
-    private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
-    {
-        if (_sharedKeyedMap.TryGetValue(Compress(deltaReference), out var e) && e is T c)
-            return c;
-
-        throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
-    }
-
-    private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
-        CompressedMetaPointer.Create(metaPointer, true);
-
-    private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
-    {
-        var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
-        if (nodes is [IWritableNode w])
-            return w;
-
-        // TODO change to correct exception 
-        throw new NotImplementedException();
-    }
 }

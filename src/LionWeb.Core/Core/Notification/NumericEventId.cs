@@ -17,10 +17,11 @@
 
 namespace LionWeb.Core.M1.Event;
 
+using Notification;
 using Utilities;
 
 /// Internal event id based on a string and an increasing number.
-public record NumericEventId(string Base, int Id) : IEventId
+public record NumericEventId(string Base, int Id) : INotificationId
 {
     /// <inheritdoc />
     public virtual bool Equals(NumericEventId? other)
@@ -50,7 +51,7 @@ public record NumericEventId(string Base, int Id) : IEventId
 
 public interface IEventIdProvider
 {
-    IEventId CreateEventId();
+    INotificationId CreateEventId();
 }
 
 public class EventIdProvider : IEventIdProvider
@@ -66,6 +67,6 @@ public class EventIdProvider : IEventIdProvider
     }
 
     /// <inheritdoc />
-    public virtual IEventId CreateEventId() =>
+    public virtual INotificationId CreateEventId() =>
         new NumericEventId(_eventIdBase, _nextId++);
 }

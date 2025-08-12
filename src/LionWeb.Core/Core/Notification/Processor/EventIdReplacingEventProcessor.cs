@@ -17,28 +17,30 @@
 
 namespace LionWeb.Core.M1.Event.Processor;
 
+using Notification;
+
 /// TODO: Do we really need this class?
 /// Replaces all <see cref="RegisterReplacementEventId">registered event ids</see>.
 public class EventIdReplacingEventProcessor<TEvent>(object? sender)
-    : FilteringEventProcessor<TEvent>(sender) where TEvent : class, IEvent
+    : FilteringEventProcessor<TEvent>(sender) where TEvent : class, INotification
 {
-    private readonly Dictionary<IEventId, IEventId> _originalEventIds = [];
+    private readonly Dictionary<INotificationId, INotificationId> _originalEventIds = [];
 
     /// Replaces id <paramref name="eventId"/> of future events with <paramref name="replacement"/>.
-    public void RegisterReplacementEventId(IEventId eventId, IEventId replacement) =>
+    public void RegisterReplacementEventId(INotificationId eventId, INotificationId replacement) =>
         _originalEventIds[eventId] = replacement;
 
     /// Stops replacing id <paramref name="eventId"/> of future events.
-    public void UnregisterReplacementEventId(IEventId eventId) =>
+    public void UnregisterReplacementEventId(INotificationId eventId) =>
         _originalEventIds.Remove(eventId);
 
     /// <inheritdoc />
     protected override TEvent Filter(TEvent @event)
     {
         TEvent result = @event;
-        if (_originalEventIds.TryGetValue(@event.EventId, out var replacement))
+        if (_originalEventIds.TryGetValue(@event.NotificationId, out var replacement))
         {
-            result.EventId = replacement;
+            result.NotificationId = replacement;
         }
 
         return result;

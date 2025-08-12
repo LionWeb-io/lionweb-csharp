@@ -22,6 +22,7 @@ using Core.M3;
 using Core.Notification;
 using Core.Notification.Partition;
 using Message.Command;
+using Partition;
 
 public class DeltaProtocolPartitionCommandReceiver
 {

@@ -17,12 +17,13 @@
 
 namespace LionWeb.Core.M1.Event.Processor;
 
+using Notification;
 using System.Diagnostics;
 
 /// Forwards <see cref="Receive">received</see> events if the event passes <see cref="Filter"/>.
 public abstract class FilteringEventProcessor<TEvent>(object? sender)
     : /*IDisposable,*/ EventProcessorBase<TEvent>(sender)
-    where TEvent : class, IEvent
+    where TEvent : class, INotification
 {
 
     /// Unsubscribes all registered <see cref="Subscribe{TSubscribedEvent}">subscribers</see>.
@@ -43,7 +44,7 @@ public abstract class FilteringEventProcessor<TEvent>(object? sender)
     public override void Receive(TEvent message)
     {
         var filtered = Filter(message);
-        Debug.WriteLine($"Forwarding event id {message.EventId}: {filtered?.EventId}");
+        Debug.WriteLine($"Forwarding event id {message.NotificationId}: {filtered?.NotificationId}");
         if (filtered is not null)
             Send(filtered);
     }
@@ -56,22 +57,22 @@ public abstract class FilteringEventProcessor<TEvent>(object? sender)
 }
 
 /// Suppresses all events with <see cref="RegisterEventId">registered event ids</see>.
-public class EventIdFilteringEventProcessor<TEvent>(object? sender) : FilteringEventProcessor<TEvent>(sender) where TEvent : class, IEvent
+public class EventIdFilteringEventProcessor<TEvent>(object? sender) : FilteringEventProcessor<TEvent>(sender) where TEvent : class, INotification
 {
-    private readonly HashSet<IEventId> _eventIds = [];
+    private readonly HashSet<INotificationId> _eventIds = [];
 
     /// Suppresses future events with <paramref name="eventId"/> from <see cref="IProcessor{TReceive,TSend}.Send">sending</see>.
-    public void RegisterEventId(IEventId eventId) =>
+    public void RegisterEventId(INotificationId eventId) =>
         _eventIds.Add(eventId);
 
     /// <see cref="IProcessor{TReceive,TSend}.Send">Sends</see> future events with <paramref name="eventId"/>.
-    public void UnregisterEventId(IEventId eventId) =>
+    public void UnregisterEventId(INotificationId eventId) =>
         _eventIds.Remove(eventId);
 
     /// <inheritdoc />
     protected override TEvent? Filter(TEvent @event)
     {
-        var result = !_eventIds.Contains(@event.EventId);
+        var result = !_eventIds.Contains(@event.NotificationId);
         return result ? @event : null;
     }
 }

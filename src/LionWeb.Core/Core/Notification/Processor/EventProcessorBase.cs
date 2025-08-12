@@ -18,6 +18,9 @@
 namespace LionWeb.Core.M1.Event.Processor;
 
 using Forest;
+using Notification;
+using Notification.Forest;
+using Notification.Partition;
 using Partition;
 using System.Reflection;
 
@@ -32,7 +35,7 @@ public abstract class EventProcessorBase
             .GetExecutingAssembly()
             .GetTypes();
 
-        List<Type> baseTypes = [typeof(IEvent), typeof(IForestEvent), typeof(IPartitionEvent)];
+        List<Type> baseTypes = [typeof(INotification), typeof(IForestNotification), typeof(IPartitionNotification)];
 
         return baseTypes
             .SelectMany(baseType => allTypes
@@ -44,7 +47,7 @@ public abstract class EventProcessorBase
 }
 
 /// <inheritdoc cref="EventProcessorBase"/>
-public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventProcessor<TEvent> where TEvent : IEvent
+public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventProcessor<TEvent> where TEvent : INotification
 {
     protected readonly object Sender;
     private readonly Dictionary<Type, int> _subscribedEvents = [];

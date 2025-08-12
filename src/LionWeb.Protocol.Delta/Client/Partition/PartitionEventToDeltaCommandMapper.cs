@@ -18,9 +18,6 @@
 namespace LionWeb.Protocol.Delta.Client.Partition;
 
 using Core;
-using Core.M1;
-using Core.M3;
-using Core.Notification;
 using Core.Notification.Partition;
 using Core.Serialization;
 using Message.Command;
@@ -249,22 +246,4 @@ public class PartitionEventToDeltaCommandMapper(ICommandIdProvider commandIdProv
         );
 
     #endregion
-
-    private DeltaSerializationChunk ToDeltaChunk(IReadableNode node)
-    {
-        var serializer = new Serializer(_lionWebVersion);
-        return new DeltaSerializationChunk(serializer.Serialize(M1Extensions.Descendants(node, true, true)).ToArray());
-    }
-
-    private CommandId ToCommandId(INotification notification) =>
-        notification.NotificationId switch
-        {
-            ParticipationNotificationId pei => pei.CommandId,
-            _ => _commandIdProvider.Create()
-        };
-}
-
-public interface ICommandIdProvider
-{
-    CommandId Create();
 }

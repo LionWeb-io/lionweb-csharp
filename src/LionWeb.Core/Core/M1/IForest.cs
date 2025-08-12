@@ -17,6 +17,9 @@
 
 namespace LionWeb.Core.M1;
 
+using Event;
+using Event.Forest;
+using Notification;
 using Notification.Forest;
 using Utilities;
 
@@ -29,10 +32,10 @@ public interface IForest
     public IReadOnlySet<IPartitionInstance> Partitions { get; }
 
     /// Adds <paramref name="partitions"/> to <c>this</c> forest.
-    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, IEventId? eventId = null);
+    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? eventId = null);
 
     /// Removes <paramref name="partitions"/> from <c>this</c> forest.
-    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, IEventId? eventId = null);
+    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? eventId = null);
 
     /// <c>this</c> forest's processor, if any.
     IForestProcessor? GetProcessor();
@@ -57,7 +60,7 @@ public class Forest : IForest
     public IReadOnlySet<IPartitionInstance> Partitions => _partitions;
 
     /// <inheritdoc />
-    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, IEventId? eventId = null)
+    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? eventId = null)
     {
         foreach (var partition in partitions)
         {
@@ -67,7 +70,7 @@ public class Forest : IForest
     }
 
     /// <inheritdoc />
-    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, IEventId? eventId = null)
+    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? eventId = null)
     {
         foreach (var partition in partitions)
         {

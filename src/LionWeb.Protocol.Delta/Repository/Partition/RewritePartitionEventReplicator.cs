@@ -21,21 +21,23 @@ using Core;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M1.Event.Processor;
+using Core.Notification;
+using Core.Notification.Partition;
 
 internal static class RewritePartitionEventReplicator
 {
-    public static new IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition,
+    public static new IEventProcessor<IPartitionNotification> Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
-        var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(internalSender);
-        var replacingFilter = new EventIdReplacingEventProcessor<IPartitionEvent>(internalSender);
+        var filter = new EventIdFilteringEventProcessor<IPartitionNotification>(internalSender);
+        var replacingFilter = new EventIdReplacingEventProcessor<IPartitionNotification>(internalSender);
         var remoteReplicator =
             new RewriteRemotePartitionEventReplicator(localPartition, filter, replacingFilter, sharedNodeMap,
                 internalSender);
         var localReplicator = new LocalPartitionEventReplicator(sharedNodeMap, internalSender);
 
-        var result = new CompositeEventProcessor<IPartitionEvent>([replacingFilter, remoteReplicator, filter],
+        var result = new CompositeEventProcessor<IPartitionNotification>([replacingFilter, remoteReplicator, filter],
             sender ?? $"Composite of {nameof(RewritePartitionEventReplicator)} {localPartition.GetId()}");
 
         var partitionProcessor = localPartition.GetProcessor();
@@ -51,18 +53,18 @@ internal static class RewritePartitionEventReplicator
 
 internal class RewriteRemotePartitionEventReplicator(
     IPartitionInstance localPartition,
-    EventIdFilteringEventProcessor<IPartitionEvent> filter,
-    EventIdReplacingEventProcessor<IPartitionEvent> replacingFilter,
+    EventIdFilteringEventProcessor<IPartitionNotification> filter,
+    EventIdReplacingEventProcessor<IPartitionNotification> replacingFilter,
     SharedNodeMap sharedNodeMap,
     object? sender)
     : RemotePartitionEventReplicator(localPartition, sharedNodeMap, filter, sender)
 {
     private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
 
-    protected override void SuppressEventForwarding(IPartitionEvent partitionEvent, Action action)
+    protected override void SuppressEventForwarding(IPartitionNotification partitionEvent, Action action)
     {
-        IEventId eventId = _eventIdProvider.CreateEventId();
-        var originalEventId = partitionEvent.EventId;
+        var eventId = _eventIdProvider.CreateEventId();
+        var originalEventId = partitionEvent.NotificationId;
         replacingFilter.RegisterReplacementEventId(eventId, originalEventId);
         Filter.RegisterEventId(eventId);
 

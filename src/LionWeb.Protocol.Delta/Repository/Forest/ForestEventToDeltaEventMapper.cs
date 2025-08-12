@@ -19,6 +19,7 @@ namespace LionWeb.Protocol.Delta.Repository.Forest;
 
 using Core;
 using Core.M1.Event.Forest;
+using Core.Notification.Forest;
 using Message.Event;
 
 public class ForestEventToDeltaEventMapper(
@@ -26,22 +27,22 @@ public class ForestEventToDeltaEventMapper(
     LionWebVersions lionWebVersion)
     : EventToDeltaEventMapperBase(participationIdProvider, lionWebVersion)
 {
-    public IDeltaEvent Map(IForestEvent forestEvent) =>
+    public IDeltaEvent Map(IForestNotification forestEvent) =>
         forestEvent switch
         {
-            PartitionAddedEvent a => OnPartitionAdded(a),
-            PartitionDeletedEvent a => OnPartitionDeleted(a),
+            PartitionAddedNotification a => OnPartitionAdded(a),
+            PartitionDeletedNotification a => OnPartitionDeleted(a),
             _ => throw new NotImplementedException(forestEvent.GetType().Name)
         };
 
-    private PartitionAdded OnPartitionAdded(PartitionAddedEvent partitionAddedEvent) =>
+    private PartitionAdded OnPartitionAdded(PartitionAddedNotification partitionAddedEvent) =>
         new(
             ToDeltaChunk(partitionAddedEvent.NewPartition),
             ToCommandSources(partitionAddedEvent),
             []
         );
 
-    private PartitionDeleted OnPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent) =>
+    private PartitionDeleted OnPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent) =>
         new(
             partitionDeletedEvent.DeletedPartition.GetId(),
             ToDescendants(partitionDeletedEvent.DeletedPartition),

@@ -21,6 +21,8 @@ using Client;
 using Client.Forest;
 using Client.Partition;
 using Core;
+using Core.M1;
+using Core.M1.Event.Processor;
 using Core.M3;
 using Core.Notification;
 using Core.Serialization;

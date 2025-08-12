@@ -50,7 +50,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
             switch (old)
             {
                 case null:
-                    PartitionCommander.Raise(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
+                    PartitionProcessor.Receive(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
                         GetNotificationId()));
                     break;
 
@@ -59,7 +59,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
                     var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, _newIndex, added, old.Parent,
                         old.Index, notificationId);
                     RaiseOriginMoveNotification(old, notification);
-                    PartitionCommander.Raise(notification);
+                    PartitionProcessor.Receive(notification);
                     break;
 
 
@@ -68,7 +68,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
                     break;
 
                 case not null when old.Parent == DestinationParent:
-                    PartitionCommander.Raise(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
+                    PartitionProcessor.Receive(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
                         old.Index, GetNotificationId()));
                     break;
 
@@ -83,7 +83,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
     /// <inheritdoc />
     [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(AnnotationAddedNotification),
             typeof(AnnotationMovedFromOtherParentNotification),
             typeof(AnnotationMovedInSameParentNotification)

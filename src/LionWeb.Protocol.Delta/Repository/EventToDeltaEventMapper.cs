@@ -18,7 +18,9 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Notification.Partition;
+using Forest;
 using Message.Event;
 using Partition;
 

@@ -22,6 +22,8 @@ using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition;
 using Core.Serialization;
 using Message;
 using Message.Command;
@@ -66,8 +68,8 @@ public abstract class DeltaCommandToEventMapperBase
         return new ReferenceTarget(resolveInfo, target);
     }
 
-    protected static IEventId ToEventId(IDeltaCommand command) =>
-        new ParticipationEventId(command.InternalParticipationId, command.CommandId);
+    protected static INotificationId ToEventId(IDeltaCommand command) =>
+        new ParticipationNotificationId(command.InternalParticipationId, command.CommandId);
 
     protected IWritableNode ToNode(TargetNode nodeId)
     {

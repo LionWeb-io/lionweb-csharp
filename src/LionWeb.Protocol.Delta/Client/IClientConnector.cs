@@ -18,6 +18,7 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core.Notification;
+using Message;
 
 public interface IClientConnector<T>
 {
@@ -29,7 +30,7 @@ public interface IClientConnector<T>
 
 public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
 
-public interface IEventClientConnector : IClientConnector<IEvent>
+public interface IEventClientConnector : IClientConnector<INotification>
 {
-    IEvent IClientConnector<IEvent>.Convert(IEvent internalEvent) => internalEvent;
+    INotification IClientConnector<INotification>.Convert(INotification internalEvent) => internalEvent;
 }

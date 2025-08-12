@@ -23,20 +23,23 @@ using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
 using Core.M1.Event.Processor;
+using Core.Notification;
+using Core.Notification.Forest;
+using Core.Notification.Partition;
 using Partition;
 
 internal static class RewriteForestEventReplicator
 {
-    public static new IEventProcessor<IForestEvent> Create(IForest localForest,
+    public static new IEventProcessor<IForestNotification> Create(IForest localForest,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
-        var filter = new EventIdFilteringEventProcessor<IForestEvent>(internalSender);
-        var replacingFilter = new EventIdReplacingEventProcessor<IForestEvent>(internalSender);
+        var filter = new EventIdFilteringEventProcessor<IForestNotification>(internalSender);
+        var replacingFilter = new EventIdReplacingEventProcessor<IForestNotification>(internalSender);
         var remoteReplicator = new RewriteRemoteForestEventReplicator(localForest, sharedNodeMap, filter, replacingFilter, internalSender);
         var localReplicator = new RewriteLocalForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, internalSender);
         
-        var result = new CompositeEventProcessor<IForestEvent>([replacingFilter, remoteReplicator, filter],
+        var result = new CompositeEventProcessor<IForestNotification>([replacingFilter, remoteReplicator, filter],
             sender ?? $"Composite of {nameof(RewriteForestEventReplicator)} {localForest}");
 
         var forestProcessor = localForest.GetProcessor();
@@ -53,17 +56,17 @@ internal static class RewriteForestEventReplicator
 internal class RewriteRemoteForestEventReplicator(
     IForest localForest,
     SharedNodeMap sharedNodeMap,
-    EventIdFilteringEventProcessor<IForestEvent> filter,
-    EventIdReplacingEventProcessor<IForestEvent> replacingFilter,
+    EventIdFilteringEventProcessor<IForestNotification> filter,
+    EventIdReplacingEventProcessor<IForestNotification> replacingFilter,
     object? sender
 ) : RemoteForestEventReplicator(localForest, sharedNodeMap, filter, sender)
 {
     private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
 
-    protected override void SuppressEventForwarding(IForestEvent forestEvent, Action action)
+    protected override void SuppressEventForwarding(IForestNotification forestEvent, Action action)
     {
-        IEventId eventId = _eventIdProvider.CreateEventId();
-        var originalEventId = forestEvent.EventId;
+        var eventId = _eventIdProvider.CreateEventId();
+        var originalEventId = forestEvent.NotificationId;
         replacingFilter.RegisterReplacementEventId(eventId, originalEventId);
         Filter.RegisterEventId(eventId);
 
@@ -85,7 +88,7 @@ internal class RewriteLocalForestEventReplicator(
     object? sender)
     : LocalForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, sender)
 {
-    protected override IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition,
+    protected override IEventProcessor<IPartitionNotification> CreatePartitionEventReplicator(IPartitionInstance partition,
         string sender) =>
         RewritePartitionEventReplicator.Create(partition, sharedNodeMap, sender);
 }

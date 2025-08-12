@@ -17,8 +17,10 @@
 
 namespace LionWeb.Core.M1.Event.Processor;
 
+using Notification;
+
 internal class EventHandlerProcessor<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
-    : IEventProcessor<TSubscribedEvent> where TSubscribedEvent : IEvent
+    : IEventProcessor<TSubscribedEvent> where TSubscribedEvent : INotification
 {
     public void Dispose()
     {

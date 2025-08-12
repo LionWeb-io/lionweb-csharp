@@ -22,6 +22,8 @@ using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition;
 using Core.Serialization;
 using Message;
 
@@ -50,10 +52,10 @@ public abstract class EventToDeltaCommandMapperBase
         return new DeltaSerializationChunk(serializer.Serialize(M1Extensions.Descendants(node, true, true)).ToArray());
     }
 
-    protected CommandId ToCommandId(IEvent @event) =>
-        @event.EventId switch
+    protected CommandId ToCommandId(INotification @event) =>
+        @event.NotificationId switch
         {
-            ParticipationEventId pei => pei.CommandId,
+            ParticipationNotificationId pei => pei.CommandId,
             _ => _commandIdProvider.Create()
         };
 }

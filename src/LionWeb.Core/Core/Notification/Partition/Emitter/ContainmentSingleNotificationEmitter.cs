@@ -70,37 +70,37 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                 break;
 
             case (not null, null, _):
-                PartitionCommander.Raise(new ChildDeletedNotification(_oldValue, DestinationParent, Containment, 0,
+                PartitionProcessor.Receive(new ChildDeletedNotification(_oldValue, DestinationParent, Containment, 0,
                     GetNotificationId()));
                 break;
 
             case (null, not null, null):
-                PartitionCommander.Raise(new ChildAddedNotification(DestinationParent, _newValue, Containment, 0,
+                PartitionProcessor.Receive(new ChildAddedNotification(DestinationParent, _newValue, Containment, 0,
                     GetNotificationId()));
                 break;
 
             case (not null, not null, null):
-                PartitionCommander.Raise(new ChildReplacedNotification(_newValue, _oldValue, DestinationParent, Containment, 0,
+                PartitionProcessor.Receive(new ChildReplacedNotification(_newValue, _oldValue, DestinationParent, Containment, 0,
                     GetNotificationId()));
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, 0, _newValue,
+                PartitionProcessor.Receive(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, 0, _newValue,
                     DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index,
                     GetNotificationId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(Containment, 0,
+                PartitionProcessor.Receive(new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(Containment, 0,
                     _newValue, DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, _oldValue,
                     GetNotificationId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent != DestinationParent:
-                PartitionCommander.Raise(new ChildMovedAndReplacedFromOtherContainmentNotification(DestinationParent,
+                PartitionProcessor.Receive(new ChildMovedAndReplacedFromOtherContainmentNotification(DestinationParent,
                     Containment, 0, _newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index, _oldValue,
                     GetNotificationId()));
@@ -112,7 +112,7 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                 var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, 0, _newValue,
                     _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, notificationId);
                 RaiseOriginMoveNotification(_oldContainmentInfo, notification);
-                PartitionCommander.Raise(notification);
+                PartitionProcessor.Receive(notification);
                 break;
 
             default:
@@ -124,7 +124,7 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
     [MemberNotNullWhen(true, nameof(PartitionProcessor))]
     [MemberNotNullWhen(true, nameof(_oldContainmentInfo))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionProcessor != null && PartitionProcessor.CanReceive(
             typeof(ChildAddedNotification),
             typeof(ChildDeletedNotification),
             typeof(ChildReplacedNotification),

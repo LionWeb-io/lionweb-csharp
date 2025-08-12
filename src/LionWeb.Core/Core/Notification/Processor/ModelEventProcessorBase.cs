@@ -17,11 +17,13 @@
 
 namespace LionWeb.Core.M1.Event.Processor;
 
+using Notification;
+
 /// Forwards all <see cref="Receive">received</see> events unchanged to <i>following</i> processors,
 /// and to EventHandlers <see cref="Subscribe{TSubscribedEvent}">subscribed</see> to specific events.
 public abstract class ModelEventProcessorBase<TEvent>(object? sender)
     : EventProcessorBase<TEvent>(sender)
-    where TEvent : IEvent
+    where TEvent : INotification
 {
     /// <inheritdoc />
     public override void Receive(TEvent message) =>

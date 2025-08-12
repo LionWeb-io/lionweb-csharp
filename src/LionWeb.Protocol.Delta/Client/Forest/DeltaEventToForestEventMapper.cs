@@ -21,6 +21,8 @@ using Core;
 using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
+using Core.Notification;
+using Core.Notification.Forest;
 using Message.Event;
 
 public class DeltaEventToForestEventMapper(
@@ -29,7 +31,7 @@ public class DeltaEventToForestEventMapper(
     DeserializerBuilder deserializerBuilder)
     : DeltaEventToEventMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
 {
-    public IForestEvent Map(IDeltaEvent deltaEvent) =>
+    public IForestNotification Map(IDeltaEvent deltaEvent) =>
         deltaEvent switch
         {
             PartitionAdded a => OnPartitionAdded(a),
@@ -37,13 +39,13 @@ public class DeltaEventToForestEventMapper(
             _ => throw new NotImplementedException(deltaEvent.GetType().Name)
         };
 
-    private PartitionAddedEvent OnPartitionAdded(PartitionAdded partitionAdded) =>
+    private PartitionAddedNotification OnPartitionAdded(PartitionAdded partitionAdded) =>
         new(
             (IPartitionInstance)Deserialize(partitionAdded.NewPartition),
             ToEventId(partitionAdded)
         );
 
-    private PartitionDeletedEvent OnPartitionDeleted(PartitionDeleted partitionDeleted) =>
+    private PartitionDeletedNotification OnPartitionDeleted(PartitionDeleted partitionDeleted) =>
         new(
             (IPartitionInstance)ToNode(partitionDeleted.DeletedPartition),
             ToEventId(partitionDeleted)

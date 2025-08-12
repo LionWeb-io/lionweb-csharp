@@ -17,17 +17,17 @@
 
 namespace LionWeb.Core.M1.Event.Forest;
 
-using Partition;
+using Notification.Partition;
 using Processor;
 
 public class SharedPartitionReplicatorMap
 {
-    private readonly Dictionary<NodeId, IEventProcessor<IPartitionEvent>> _localPartitionReplicators = [];
+    private readonly Dictionary<NodeId, IEventProcessor<IPartitionNotification>> _localPartitionReplicators = [];
 
-    public IEventProcessor<IPartitionEvent> Lookup(NodeId partitionId) =>
+    public IEventProcessor<IPartitionNotification> Lookup(NodeId partitionId) =>
         _localPartitionReplicators[partitionId];
 
-    public void Register(NodeId partitionId, IEventProcessor<IPartitionEvent> replicator)
+    public void Register(NodeId partitionId, IEventProcessor<IPartitionNotification> replicator)
     {
         if (!_localPartitionReplicators.TryAdd(partitionId, replicator))
             throw new ArgumentException(

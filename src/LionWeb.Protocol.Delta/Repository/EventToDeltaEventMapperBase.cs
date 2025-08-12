@@ -21,6 +21,7 @@ using Core;
 using Core.M1;
 using Core.M1.Event;
 using Core.M3;
+using Core.Notification;
 using Message;
 using Message.Event;
 
@@ -50,18 +51,18 @@ public abstract class EventToDeltaEventMapperBase
     protected TargetNode[] ToDescendants(IReadableNode node) =>
         M1Extensions.Descendants(node, false, true).Select(n => n.GetId()).ToArray();
 
-    protected CommandSource[] ToCommandSources(IEvent internalEvent)
+    protected CommandSource[] ToCommandSources(INotification internalEvent)
     {
         ParticipationId participationId;
         EventId commandId;
-        if (internalEvent.EventId is ParticipationEventId pei)
+        if (internalEvent.NotificationId is ParticipationNotificationId pei)
         {
             participationId = pei.ParticipationId;
             commandId = pei.CommandId;
         } else
         {
             participationId = _participationIdProvider.ParticipationId;
-            commandId = internalEvent.EventId.ToString();
+            commandId = internalEvent.NotificationId.ToString();
         }
 
         return [new CommandSource(participationId, commandId)];

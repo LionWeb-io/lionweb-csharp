@@ -21,8 +21,10 @@ using Client;
 using Client.Partition;
 using Core;
 using Core.M1;
+using Core.M1.Event.Forest;
 using Core.M3;
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Listener;
@@ -51,7 +53,7 @@ public class EventsTestSerialized : EventTestsBase
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
         
-        var replicator = ForestEventReplicator.Create(cloneForest, sharedPartitionReplicatorMap, sharedNodeMap, "cloneReplicator");
+        var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, sharedNodeMap, "cloneReplicator");
 
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
@@ -62,7 +64,7 @@ public class EventsTestSerialized : EventTestsBase
         );
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetProcessor().Subscribe<IPartitionEvent>((sender, partitionEvent) =>
+        node.GetProcessor().Subscribe<IPartitionNotification>((sender, partitionEvent) =>
         {
             var deltaCommand = new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionEvent);
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));

@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core;
 
+using M1.Event.Partition;
 using M2;
 using M3;
 using Notification;

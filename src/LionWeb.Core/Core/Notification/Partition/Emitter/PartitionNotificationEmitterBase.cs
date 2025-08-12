@@ -18,6 +18,8 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M1;
+using M1.Event;
+using M1.Event.Partition;
 using M3;
 using System.Diagnostics.CodeAnalysis;
 
@@ -65,5 +67,5 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// Retrieves the notification ID associated with the notification emitter.
     /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
-    protected INotificationId GetNotificationId() => _notificationId ?? PartitionCommander.CreateEventId();
+    protected INotificationId GetNotificationId() => _notificationId ?? PartitionProcessor.CreateEventId();
 }
