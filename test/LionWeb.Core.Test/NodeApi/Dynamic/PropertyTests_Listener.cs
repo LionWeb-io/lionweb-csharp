@@ -29,10 +29,10 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         var doc = newDocumentation("d");
         parent.Set(Geometry_documentation, doc);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<PropertyAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(Documentation_text, args.Property);
             Assert.AreEqual("hello", args.NewValue);
@@ -40,7 +40,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
 
         doc.Set(Documentation_text, "hello");
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -51,10 +51,10 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         parent.Set(Geometry_documentation, doc);
         doc.Set(Documentation_text, "hello");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<PropertyDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(Documentation_text, args.Property);
             Assert.AreEqual("hello", args.OldValue);
@@ -62,7 +62,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         doc.Set(Documentation_text, null);
 
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -73,23 +73,23 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         parent.Set(Geometry_documentation, doc);
         doc.Set(Documentation_text, "hello");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<PropertyChangedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(Documentation_text, args.Property);
             Assert.AreEqual("hello", args.OldValue);
             Assert.AreEqual("bye", args.NewValue);
         });
 
-        int badEvents = 0;
-        parent.GetProcessor().Subscribe<PropertyAddedNotification>((_, _) => badEvents++);
-        parent.GetProcessor().Subscribe<PropertyDeletedNotification>((_, _) => badEvents++);
+        int badNotifications = 0;
+        parent.GetProcessor().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
+        parent.GetProcessor().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
 
         doc.Set(Documentation_text, "bye");
 
-        Assert.AreEqual(1, events);
-        Assert.AreEqual(0, badEvents);
+        Assert.AreEqual(1, notifications);
+        Assert.AreEqual(0, badNotifications);
     }
 }

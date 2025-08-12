@@ -56,7 +56,7 @@ public interface INotificationIdProvider
 public class NotificationIdProvider : INotificationIdProvider
 {
     // Unique per instance
-    private readonly EventId _notificationIdBase;
+    private readonly NotificationId _notificationIdBase;
 
     private int _nextId = 0;
 

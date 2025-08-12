@@ -32,10 +32,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -43,7 +43,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.AddAnnotations([bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -53,10 +53,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -64,7 +64,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { bom });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -76,10 +76,10 @@ public class ContainmentTests_Annotation_Listener
         var oldParent = new Line("oldParent");
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(oldParent, args.OldParent);
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(line, args.NewParent);
@@ -89,7 +89,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.AddAnnotations([bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -101,10 +101,10 @@ public class ContainmentTests_Annotation_Listener
         var oldParent = new Line("oldParent");
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(oldParent, args.OldParent);
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(line, args.NewParent);
@@ -114,7 +114,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { bom });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -125,10 +125,10 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
         line.AddAnnotations([bom, new Documentation("doc")]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreEqual(0, args.OldIndex);
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.NewIndex);
@@ -137,7 +137,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.AddAnnotations([bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -149,10 +149,10 @@ public class ContainmentTests_Annotation_Listener
         var doc = new Documentation("doc");
         line.AddAnnotations([bom, doc]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreEqual(0, args.OldIndex);
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.NewIndex);
@@ -161,7 +161,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { doc, bom });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -172,12 +172,12 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
         line.AddAnnotations([new Documentation("doc"), bom]);
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
 
         line.AddAnnotations([bom]);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -189,12 +189,12 @@ public class ContainmentTests_Annotation_Listener
         var doc = new Documentation("doc");
         line.AddAnnotations([doc, bom]);
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
 
         line.Set(null, new List<INode> { doc, bom });
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     #region Insert
@@ -206,10 +206,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -217,7 +217,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.InsertAnnotations(0, [bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -229,10 +229,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -240,7 +240,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.InsertAnnotations(0, [bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -252,10 +252,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -263,7 +263,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { bom, doc });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -275,10 +275,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -286,7 +286,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.InsertAnnotations(1, [bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -298,10 +298,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -309,7 +309,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { doc, bom });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -322,10 +322,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, docB]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -333,7 +333,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.InsertAnnotations(0, [bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -346,10 +346,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, docB]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -357,7 +357,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { bom, docA, docB });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -370,10 +370,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, docB]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -381,7 +381,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.InsertAnnotations(1, [bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -394,10 +394,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, docB]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -405,7 +405,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { docA, bom, docB });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -418,10 +418,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, docB]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -429,7 +429,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.InsertAnnotations(2, [bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -442,10 +442,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, docB]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(bom, args.NewAnnotation);
@@ -453,7 +453,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { docA, docB, bom });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -468,10 +468,10 @@ public class ContainmentTests_Annotation_Listener
         var oldParent = new Line("oldParent");
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(oldParent, args.OldParent);
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(line, args.NewParent);
@@ -481,7 +481,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.InsertAnnotations(2, [bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -496,10 +496,10 @@ public class ContainmentTests_Annotation_Listener
         var oldParent = new Line("oldParent");
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(oldParent, args.OldParent);
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(line, args.NewParent);
@@ -509,7 +509,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { docA, docB, bom });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -522,10 +522,10 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
         line.AddAnnotations([docA, bom, docB]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(2, args.NewIndex);
@@ -534,7 +534,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.InsertAnnotations(2, [bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -547,10 +547,10 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
         line.AddAnnotations([docA, bom, docB]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreEqual(1, args.OldIndex);
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(2, args.NewIndex);
@@ -559,7 +559,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { docA, docB, bom });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -572,12 +572,12 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
         line.AddAnnotations([docA, bom, docB]);
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
 
         line.InsertAnnotations(1, [bom]);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -590,12 +590,12 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
         line.AddAnnotations([docA, bom, docB]);
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
 
         line.Set(null, new List<INode> { docA, bom, docB });
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     #endregion
@@ -609,12 +609,12 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -626,12 +626,12 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc]);
         var bom = new BillOfMaterials("myId");
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -642,10 +642,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([bom]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.DeletedAnnotation);
@@ -653,7 +653,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -664,10 +664,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([bom]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.DeletedAnnotation);
@@ -675,7 +675,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> {  });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -687,10 +687,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([bom, doc]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.DeletedAnnotation);
@@ -698,7 +698,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -710,10 +710,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([bom, doc]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.DeletedAnnotation);
@@ -721,7 +721,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { doc });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -733,10 +733,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([doc, bom]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(bom, args.DeletedAnnotation);
@@ -744,7 +744,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -756,10 +756,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([doc, bom]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(bom, args.DeletedAnnotation);
@@ -767,7 +767,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { doc });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -780,10 +780,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([docA, bom, docB]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(bom, args.DeletedAnnotation);
@@ -791,7 +791,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.RemoveAnnotations([bom]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -804,10 +804,10 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         line.AddAnnotations([docA, bom, docB]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(bom, args.DeletedAnnotation);
@@ -815,7 +815,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, new List<INode> { docA, docB });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #endregion
@@ -831,12 +831,12 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         var values = new INode[0];
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
 
         line.AddAnnotations(values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -846,12 +846,12 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         var values = new INode[0];
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
 
         line.Set(null, values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -861,12 +861,12 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         var values = new INode[0];
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
 
         line.InsertAnnotations(0, values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -876,12 +876,12 @@ public class ContainmentTests_Annotation_Listener
         var parent = new Geometry("parent") { Shapes = [line] };
         var values = new INode[0];
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
 
@@ -894,10 +894,10 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom]);
         var values = new List<BillOfMaterials>();
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(bom, args.DeletedAnnotation);
@@ -905,7 +905,7 @@ public class ContainmentTests_Annotation_Listener
 
         line.Set(null, values);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #endregion
@@ -921,18 +921,18 @@ public class ContainmentTests_Annotation_Listener
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(values[events], args.NewAnnotation);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(values[notifications], args.NewAnnotation);
+            notifications++;
         });
 
         line.AddAnnotations(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -944,18 +944,18 @@ public class ContainmentTests_Annotation_Listener
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(values[events], args.NewAnnotation);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(values[notifications], args.NewAnnotation);
+            notifications++;
         });
 
         line.Set(null, values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     #region Insert
@@ -969,18 +969,18 @@ public class ContainmentTests_Annotation_Listener
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(values[events], args.NewAnnotation);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(values[notifications], args.NewAnnotation);
+            notifications++;
         });
 
         line.InsertAnnotations(0, values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -992,18 +992,18 @@ public class ContainmentTests_Annotation_Listener
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(values[events], args.NewAnnotation);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(values[notifications], args.NewAnnotation);
+            notifications++;
         });
 
         line.Set(null, values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1018,18 +1018,18 @@ public class ContainmentTests_Annotation_Listener
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1 + events, args.Index);
-            Assert.AreEqual(values[events], args.NewAnnotation);
-            events++;
+            Assert.AreEqual(1 + notifications, args.Index);
+            Assert.AreEqual(values[notifications], args.NewAnnotation);
+            notifications++;
         });
 
         line.InsertAnnotations(1, values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1044,18 +1044,18 @@ public class ContainmentTests_Annotation_Listener
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(1 + events, args.Index);
-            Assert.AreEqual(values[events], args.NewAnnotation);
-            events++;
+            Assert.AreEqual(1 + notifications, args.Index);
+            Assert.AreEqual(values[notifications], args.NewAnnotation);
+            notifications++;
         });
 
         line.Set(null, new List<INode> { docA, valueA, valueB, docB });
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     #endregion
@@ -1072,18 +1072,18 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([valueA, valueB]);
         var values = new List<INode>() { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1096,18 +1096,18 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([valueA, valueB]);
         var values = new List<INode>() { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.Set(null, new List<INode> { });
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1119,12 +1119,12 @@ public class ContainmentTests_Annotation_Listener
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -1139,12 +1139,12 @@ public class ContainmentTests_Annotation_Listener
         var valueB = new BillOfMaterials("sB");
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -1158,18 +1158,18 @@ public class ContainmentTests_Annotation_Listener
         var valueA = new BillOfMaterials("sA");
         var values = new INode[] { valueA, docA };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(docA, args.DeletedAnnotation);
-            events++;
+            notifications++;
         });
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -1183,18 +1183,18 @@ public class ContainmentTests_Annotation_Listener
         var valueA = new BillOfMaterials("sA");
         var values = new INode[] { valueA, docA };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(docA, args.DeletedAnnotation);
-            events++;
+            notifications++;
         });
 
         line.Set(null, new List<INode> { docB });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -1207,18 +1207,18 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1231,18 +1231,18 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.Set(null, new List<INode> {  });
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1256,18 +1256,18 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc, valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1281,18 +1281,18 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc, valueA, valueB]);
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.Set(null, new List<INode> { doc });
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1307,18 +1307,18 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, valueA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1333,18 +1333,18 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, valueA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.Set(null, new List<INode> { docA, docB });
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1359,19 +1359,19 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([valueA, docA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         int[] indices = [0, 1];
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(indices[events], args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(indices[notifications], args.Index);
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.RemoveAnnotations(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -1386,19 +1386,19 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([valueA, docA, valueB, docB]);
         var values = new INode[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         int[] indices = [0, 1];
         parent.GetProcessor().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
-            Assert.AreEqual(indices[events], args.Index);
-            Assert.AreEqual(values[events], args.DeletedAnnotation);
-            events++;
+            Assert.AreEqual(indices[notifications], args.Index);
+            Assert.AreEqual(values[notifications], args.DeletedAnnotation);
+            notifications++;
         });
 
         line.Set(null, new List<INode> { docA, docB });
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     #endregion

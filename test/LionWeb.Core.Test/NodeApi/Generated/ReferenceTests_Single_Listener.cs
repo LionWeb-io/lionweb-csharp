@@ -31,10 +31,10 @@ public class ReferenceTests_Single_Listener
         partition.AddShapes([source]);
         var reference = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -43,7 +43,7 @@ public class ReferenceTests_Single_Listener
 
         source.AltSource = reference;
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -54,10 +54,10 @@ public class ReferenceTests_Single_Listener
         partition.AddShapes([source]);
         var reference = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -66,7 +66,7 @@ public class ReferenceTests_Single_Listener
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, reference);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -78,10 +78,10 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
         source.AltSource = reference;
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -90,7 +90,7 @@ public class ReferenceTests_Single_Listener
 
         source.AltSource = null;
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -102,10 +102,10 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
         source.AltSource = reference;
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -114,7 +114,7 @@ public class ReferenceTests_Single_Listener
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, null);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -127,10 +127,10 @@ public class ReferenceTests_Single_Listener
         source.AltSource = oldTarget;
         var newTarget = new Line("newTarget");
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceChangedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -138,14 +138,14 @@ public class ReferenceTests_Single_Listener
             Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         });
 
-        int badEvents = 0;
-        partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => badEvents++);
-        partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => badEvents++);
+        int badNotifications = 0;
+        partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => badNotifications++);
+        partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => badNotifications++);
 
         source.AltSource = newTarget;
 
-        Assert.AreEqual(1, events);
-        Assert.AreEqual(0, badEvents);
+        Assert.AreEqual(1, notifications);
+        Assert.AreEqual(0, badNotifications);
     }
 
     [TestMethod]
@@ -158,10 +158,10 @@ public class ReferenceTests_Single_Listener
         source.AltSource = oldTarget;
         var newTarget = new Line("newTarget");
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceChangedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_altSource, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -169,14 +169,14 @@ public class ReferenceTests_Single_Listener
             Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         });
 
-        int badEvents = 0;
-        partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => badEvents++);
-        partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => badEvents++);
+        int badNotifications = 0;
+        partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => badNotifications++);
+        partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => badNotifications++);
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_altSource, newTarget);
 
-        Assert.AreEqual(1, events);
-        Assert.AreEqual(0, badEvents);
+        Assert.AreEqual(1, notifications);
+        Assert.AreEqual(0, badNotifications);
     }
 
     [TestMethod]
@@ -187,10 +187,10 @@ public class ReferenceTests_Single_Listener
         partition.AddShapes([source]);
         var reference = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -199,7 +199,7 @@ public class ReferenceTests_Single_Listener
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, reference);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -211,10 +211,10 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
         source.Source = reference;
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -223,7 +223,7 @@ public class ReferenceTests_Single_Listener
 
         Assert.ThrowsException<InvalidValueException>(() => source.Source = null);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -235,10 +235,10 @@ public class ReferenceTests_Single_Listener
         var reference = new Line("myId");
         source.Source = reference;
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -248,7 +248,7 @@ public class ReferenceTests_Single_Listener
         Assert.ThrowsException<InvalidValueException>(() =>
             source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, null));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -261,10 +261,10 @@ public class ReferenceTests_Single_Listener
         source.Source = oldTarget;
         var newTarget = new Line("newTarget");
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceChangedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -272,14 +272,14 @@ public class ReferenceTests_Single_Listener
             Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         });
 
-        int badEvents = 0;
-        partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => badEvents++);
-        partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => badEvents++);
+        int badNotifications = 0;
+        partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => badNotifications++);
+        partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => badNotifications++);
 
         source.Source = newTarget;
 
-        Assert.AreEqual(1, events);
-        Assert.AreEqual(0, badEvents);
+        Assert.AreEqual(1, notifications);
+        Assert.AreEqual(0, badNotifications);
     }
     
     [TestMethod]
@@ -292,10 +292,10 @@ public class ReferenceTests_Single_Listener
         source.Source = oldTarget;
         var newTarget = new Line("newTarget");
 
-        int events = 0;
+        int notifications = 0;
         partition.GetProcessor().Subscribe<ReferenceChangedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(source, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_source, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -303,13 +303,13 @@ public class ReferenceTests_Single_Listener
             Assert.AreEqual(new ReferenceTarget(null, newTarget), args.NewTarget);
         });
 
-        int badEvents = 0;
-        partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => badEvents++);
-        partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => badEvents++);
+        int badNotifications = 0;
+        partition.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => badNotifications++);
+        partition.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => badNotifications++);
 
         source.Set(ShapesLanguage.Instance.OffsetDuplicate_source, newTarget);
 
-        Assert.AreEqual(1, events);
-        Assert.AreEqual(0, badEvents);
+        Assert.AreEqual(1, notifications);
+        Assert.AreEqual(0, badNotifications);
     }
 }

@@ -33,10 +33,10 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -45,7 +45,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.AddMaterials([line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -56,10 +56,10 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -68,7 +68,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #region Insert
@@ -82,10 +82,10 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -94,7 +94,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.InsertMaterials(0, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -106,10 +106,10 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -118,7 +118,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line, circle });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -130,10 +130,10 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -142,7 +142,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.InsertMaterials(1, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -154,10 +154,10 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -166,7 +166,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circle, line });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -179,19 +179,19 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         materialGroup.InsertMaterials(0, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -204,19 +204,19 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { line, circleA, circleB });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -229,19 +229,19 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         materialGroup.InsertMaterials(1, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -254,19 +254,19 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circleA, line, circleB });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -279,19 +279,19 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         materialGroup.InsertMaterials(2, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -304,19 +304,19 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { circleA, circleB, line });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #endregion
@@ -331,12 +331,12 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -347,13 +347,13 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() =>
             materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape> { }));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -365,12 +365,12 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         materialGroup.RemoveMaterials([line]);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -381,12 +381,12 @@ public class ReferenceTests_Multiple_Required_Listener
         var materialGroup = new MaterialGroup("cs") { Materials = [line] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials([line]));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -397,12 +397,12 @@ public class ReferenceTests_Multiple_Required_Listener
         var materialGroup = new MaterialGroup("cs") { Materials = [line] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -414,10 +414,10 @@ public class ReferenceTests_Multiple_Required_Listener
         var materialGroup = new MaterialGroup("cs") { Materials = [line, circle] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -426,7 +426,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.RemoveMaterials([line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -438,10 +438,10 @@ public class ReferenceTests_Multiple_Required_Listener
         var materialGroup = new MaterialGroup("cs") { Materials = [line, circle] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -450,7 +450,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circle});
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -462,10 +462,10 @@ public class ReferenceTests_Multiple_Required_Listener
         var materialGroup = new MaterialGroup("cs") { Materials = [circle, line] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -474,7 +474,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.RemoveMaterials([line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -486,10 +486,10 @@ public class ReferenceTests_Multiple_Required_Listener
         var materialGroup = new MaterialGroup("cs") { Materials = [circle, line] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -498,7 +498,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circle});
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -511,10 +511,10 @@ public class ReferenceTests_Multiple_Required_Listener
         var materialGroup = new MaterialGroup("cs") { Materials = [circleA, line, circleB] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -523,7 +523,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.RemoveMaterials([line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -536,10 +536,10 @@ public class ReferenceTests_Multiple_Required_Listener
         var materialGroup = new MaterialGroup("cs") { Materials = [circleA, line, circleB] };
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -548,7 +548,7 @@ public class ReferenceTests_Multiple_Required_Listener
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{circleA, circleB});
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #endregion
@@ -565,12 +565,12 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[0];
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.AddMaterials(values));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -581,12 +581,12 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[0];
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() =>         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{}));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -597,12 +597,12 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[0];
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.InsertMaterials(0, values));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -613,12 +613,12 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[0];
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -631,13 +631,13 @@ public class ReferenceTests_Multiple_Required_Listener
         materialGroup.AddMaterials([value]);
         var values = new List<Coord>();
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(
             () => materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, values));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     #endregion
@@ -654,19 +654,19 @@ public class ReferenceTests_Multiple_Required_Listener
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.NewTarget);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            notifications++;
         });
 
         materialGroup.AddMaterials(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -679,19 +679,19 @@ public class ReferenceTests_Multiple_Required_Listener
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.NewTarget);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            notifications++;
         });
 
         materialGroup.Set(ShapesLanguage.Instance.MaterialGroup_materials, new List<IShape>{valueA,valueB});
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     #region Insert
@@ -706,19 +706,19 @@ public class ReferenceTests_Multiple_Required_Listener
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.NewTarget);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            notifications++;
         });
 
         materialGroup.InsertMaterials(0, values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -733,19 +733,19 @@ public class ReferenceTests_Multiple_Required_Listener
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(1 + events, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.NewTarget);
-            events++;
+            Assert.AreEqual(1 + notifications, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            notifications++;
         });
 
         materialGroup.InsertMaterials(1, values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     #endregion
@@ -762,12 +762,12 @@ public class ReferenceTests_Multiple_Required_Listener
         var valueB = new Line("sB");
         var values = new List<IShape> { valueA, valueB };
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
 
@@ -781,12 +781,12 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => materialGroup.RemoveMaterials(values));
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -801,12 +801,12 @@ public class ReferenceTests_Multiple_Required_Listener
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => events++);
+        int notifications = 0;
+        parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         materialGroup.RemoveMaterials(values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -820,19 +820,19 @@ public class ReferenceTests_Multiple_Required_Listener
         var valueA = new Line("sA");
         var values = new IShape[] { valueA, circleA };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, circleA), args.DeletedTarget);
-            events++;
+            notifications++;
         });
 
         materialGroup.RemoveMaterials(values);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -846,19 +846,19 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.DeletedTarget);
-            events++;
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            notifications++;
         });
 
         materialGroup.RemoveMaterials(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -873,19 +873,19 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.DeletedTarget);
-            events++;
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            notifications++;
         });
 
         materialGroup.RemoveMaterials(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -900,20 +900,20 @@ public class ReferenceTests_Multiple_Required_Listener
         parent.AddAnnotations([new BillOfMaterials("bom") { DefaultGroup = materialGroup }]);
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         int[] indexes = { 0, 1 };
         parent.GetProcessor().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(materialGroup, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.MaterialGroup_materials, args.Reference);
-            Assert.AreEqual(indexes[events], args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.DeletedTarget);
-            events++;
+            Assert.AreEqual(indexes[notifications], args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            notifications++;
         });
 
         materialGroup.RemoveMaterials(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     #endregion

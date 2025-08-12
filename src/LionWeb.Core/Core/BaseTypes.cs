@@ -127,8 +127,8 @@ public interface IConceptInstance<out T> : IReadableNode<T>, IConceptInstance wh
 /// <inheritdoc />
 public interface IPartitionInstance : IConceptInstance
 {
-    /// Optional hook to raise partition events.
-    /// Optional hook to listen to partition events.
+    /// Optional hook to raise partition notifications.
+    /// Optional hook to listen to partition notifications.
     /// Not supported by every implementation. 
     IPartitionProcessor? GetProcessor() => null;
 }
