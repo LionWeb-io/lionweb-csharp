@@ -18,6 +18,7 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.M1;
+using Core.M1.Event.Partition;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Partition;
@@ -26,11 +27,11 @@ using Partition;
 
 public class DeltaProtocolPartitionCommandReceiver
 {
-    private readonly PartitionEventHandler _eventHandler;
+    private readonly PartitionEventProcessor _eventHandler;
     private readonly DeltaCommandToPartitionEventMapper _mapper;
 
     public DeltaProtocolPartitionCommandReceiver(
-        PartitionEventHandler eventHandler,
+        PartitionEventProcessor eventHandler,
         SharedNodeMap sharedNodeMap,
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
@@ -43,6 +44,6 @@ public class DeltaProtocolPartitionCommandReceiver
     public void Receive(IDeltaCommand deltaCommand)
     {
         IPartitionNotification partitionCommand = _mapper.Map(deltaCommand);
-        _eventHandler.Raise(partitionCommand);
+        _eventHandler.Receive(partitionCommand);
     }
 }
