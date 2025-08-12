@@ -236,7 +236,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private LocalDeclarationStatementSyntax SetContainmentEventVariable(Containment containment) =>
         Variable(
-            "evt",
+            "notification",
             AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType())),
             NewCall([
                 MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("notificationId")
@@ -245,7 +245,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     private LocalDeclarationStatementSyntax SetReferenceEventVariable(Reference reference) =>
         Variable(
-            "evt",
+            "notification",
             AsType(typeof(ReferenceSetNotificationEmitter<>), AsType(reference.GetFeatureType())),
             NewCall([
                 MetaProperty(reference), This(), IdentifierName("safeNodes"), FeatureField(reference), IdentifierName("notificationId")

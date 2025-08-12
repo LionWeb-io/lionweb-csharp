@@ -70,10 +70,10 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
 
     protected ExpressionStatementSyntax EventCollectOldDataCall() =>
         ExpressionStatement(
-            InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("CollectOldData"))));
+            InvocationExpression(MemberAccess(IdentifierName("notification"), IdentifierName("CollectOldData"))));
 
     protected ExpressionStatementSyntax EventRaiseEventCall() =>
-        ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("Notify"))));
+        ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("notification"), IdentifierName("Notify"))));
 
     protected ExpressionStatementSyntax OptionalAddRangeCall(Containment containment) =>
         ExpressionStatement(InvocationExpression(

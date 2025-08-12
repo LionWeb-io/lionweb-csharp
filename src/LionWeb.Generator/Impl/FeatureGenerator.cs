@@ -118,7 +118,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private LocalDeclarationStatementSyntax PropertyEventVariable() =>
         Variable(
-            "evt",
+            "notification",
             AsType(typeof(PropertyNotificationEmitter)),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
@@ -226,7 +226,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private LocalDeclarationStatementSyntax SingleContainmentEventVariable() =>
         Variable(
-            "evt",
+            "notification",
             AsType(typeof(ContainmentSingleNotificationEmitter<>), AsType(feature.GetFeatureType(), writeable:true)),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
@@ -252,7 +252,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private LocalDeclarationStatementSyntax ReferenceEventVariable() =>
         Variable(
-            "evt",
+            "notification",
             AsType(typeof(ReferenceSingleNotificationEmitter)),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
@@ -370,7 +370,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(ExpressionSyntax index) =>
         Variable(
-            "evt",
+            "notification",
             AsType(typeof(ContainmentAddMultipleNotificationEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([
                 MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index, IdentifierName("notificationId")
@@ -423,7 +423,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private LocalDeclarationStatementSyntax AddMultipleReferenceEventVariable(ExpressionSyntax index) =>
         Variable(
-            "evt",
+            "notification",
             AsType(typeof(ReferenceAddMultipleNotificationEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([
                 MetaProperty(feature), This(), IdentifierName("safeNodes"), index, IdentifierName("notificationId")
