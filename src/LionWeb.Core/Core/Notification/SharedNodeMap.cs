@@ -68,7 +68,7 @@ public class SharedNodeMap : IDisposable
     /// <inheritdoc />
     public virtual void Dispose() { }
 
-    protected virtual bool TryAdd(NodeId nodeId, IReadableNode node) => 
+    protected virtual bool TryAdd(NodeId nodeId, IReadableNode node) =>
         _map.TryAdd(nodeId, node);
 
     protected virtual bool TryRemove(NodeId nodeId, [MaybeNullWhen(false)] out IReadableNode node)
@@ -116,9 +116,9 @@ public class PartitionSharedNodeMap : SharedNodeMap
     {
         if (!base.TryRemove(nodeId, out node))
             return false;
-        
+
         _owningPartition.Remove(node.GetId());
-        
+
         return true;
     }
 }

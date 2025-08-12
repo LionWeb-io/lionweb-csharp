@@ -18,15 +18,15 @@
 namespace LionWeb.Core.M1.Event.Forest;
 
 using Notification.Forest;
-using Processor;
+using Notification.Processor;
 
 /// Provides events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
 /// Raises events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-public interface IForestProcessor : IEventProcessor<IForestNotification>;
+public interface IForestProcessor : INotificationProcessor<IForestNotification>;
 
-/// Forwards all <see cref="ModelEventProcessorBase{IForestEvent}.Receive">received</see> events
+/// Forwards all <see cref="ModelNotificationProcessorBase{TEvent}.Receive">received</see> events
 /// unchanged to <i>following</i> processors,
-/// and to EventHandlers <see cref="ModelEventProcessorBase{IForestEvent}.Subscribe{TSubscribedEvent}">subscribed</see>
+/// and to EventHandlers <see cref="ModelNotificationProcessorBase{TEvent}.Subscribe{TSubscribedEvent}">subscribed</see>
 /// to specific events.
-public class ForestEventProcessor(object? sender)
-    : ModelEventProcessorBase<IForestNotification>(sender), IForestProcessor;
+public class ForestNotificationProcessor(object? sender)
+    : ModelNotificationProcessorBase<IForestNotification>(sender), IForestProcessor;

@@ -15,24 +15,24 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Processor;
+namespace LionWeb.Core.Notification.Processor;
 
-using Notification;
-using Partition;
 using Utilities;
 
-/// Replicates <see cref="Receive">received</see> events on a <i>local</i> equivalent.
+/// Replicates <see cref="Receive">received</see> notifications on a <i>local</i> equivalent.
 /// 
 /// <para>
-/// Example: We receive a <see cref="PropertyAddedEvent"/> for a node that we know <i>locally</i>.
+/// Example: We receive a <see cref="PropertyAddedNotification" /> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-public abstract class RemoteEventReplicatorBase<TEvent> : EventProcessorBase<TEvent> where TEvent : class, INotification
+public abstract class RemoteNotificationReplicatorBase<TNotification> : NotificationProcessorBase<TNotification>
+    where TNotification : class, INotification
 {
     protected readonly SharedNodeMap SharedNodeMap;
-    protected readonly EventIdFilteringEventProcessor<TEvent> Filter;
+    protected readonly NotificationIdFilteringNotificationProcessor<TNotification> Filter;
 
-    protected RemoteEventReplicatorBase(SharedNodeMap sharedNodeMap, EventIdFilteringEventProcessor<TEvent> filter,
+    protected RemoteNotificationReplicatorBase(SharedNodeMap sharedNodeMap,
+        NotificationIdFilteringNotificationProcessor<TNotification> filter,
         object? sender) : base(sender)
     {
         SharedNodeMap = sharedNodeMap;
@@ -49,10 +49,10 @@ public abstract class RemoteEventReplicatorBase<TEvent> : EventProcessorBase<TEv
     //
     //     GC.SuppressFinalize(this);
     // }
-    public override void Receive(TEvent message) =>
-        ProcessEvent(message);
+    public override void Receive(TNotification message) =>
+        ProcessNotification(message);
 
-    protected abstract void ProcessEvent(TEvent? @event);
+    protected abstract void ProcessNotification(TNotification? notification);
 
     protected INode Lookup(NodeId nodeId) =>
         (INode)SharedNodeMap[nodeId];
@@ -60,18 +60,18 @@ public abstract class RemoteEventReplicatorBase<TEvent> : EventProcessorBase<TEv
     protected INode? LookupOpt(NodeId nodeId) =>
         SharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
 
-    /// Uses <see cref="EventIdFilteringEventProcessor{TEvent}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
-    protected virtual void SuppressEventForwarding(TEvent @event, Action action)
+    /// Uses <see cref="NotificationIdFilteringNotificationProcessor{TNotification}"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
+    protected virtual void SuppressNotificationForwarding(TNotification notification, Action action)
     {
-        var eventId = @event.NotificationId;
-        Filter.RegisterEventId(eventId);
+        var notificationId = notification.NotificationId;
+        Filter.RegisterNotificationId(notificationId);
 
         try
         {
             action();
         } finally
         {
-            Filter.UnregisterEventId(eventId);
+            Filter.UnregisterNotificationId(notificationId);
         }
     }
 }

@@ -27,17 +27,17 @@ using Partition;
 
 public class DeltaProtocolPartitionEventReceiver
 {
-    private readonly PartitionEventProcessor _eventHandler;
+    private readonly PartitionNotificationProcessor _notificationHandler;
     private readonly DeltaEventToPartitionEventMapper _mapper;
 
     public DeltaProtocolPartitionEventReceiver(
-        PartitionEventProcessor eventHandler,
+        PartitionNotificationProcessor notificationHandler,
         SharedNodeMap sharedNodeMap,
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )
     {
-        _eventHandler = eventHandler;
+        _notificationHandler = notificationHandler;
         _mapper = new DeltaEventToPartitionEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
@@ -46,6 +46,6 @@ public class DeltaProtocolPartitionEventReceiver
     {
         IPartitionNotification partitionNotification = _mapper.Map(deltaEvent);
 
-        _eventHandler.Receive(partitionNotification);
+        _notificationHandler.Receive(partitionNotification);
     }
 }

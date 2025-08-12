@@ -19,9 +19,9 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1.Event.Processor;
 using Notification;
 using Notification.Partition;
+using Notification.Processor;
 using System.Reflection;
 using Comparer = Core.Utilities.Comparer;
 
@@ -131,18 +131,18 @@ public class EventTests_Infrastructure
         Assert.AreEqual(0, ReplicatorEventIds(cloneReplicator).Count);
     }
 
-    private static HashSet<INotificationId> ReplicatorEventIds(IEventProcessor<IPartitionNotification> replicator)
+    private static HashSet<INotificationId> ReplicatorEventIds(INotificationProcessor<IPartitionNotification> replicator)
     {
-        var fieldInfoFilter = typeof(CompositeEventProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_lastProcessor");
-        var filter = (EventIdFilteringEventProcessor<IPartitionNotification>) fieldInfoFilter.GetValue(replicator);
+        var fieldInfoFilter = typeof(CompositeNotificationProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_lastProcessor");
+        var filter = (NotificationIdFilteringNotificationProcessor<IPartitionNotification>) fieldInfoFilter.GetValue(replicator);
      
-        var fieldInfoEvents = typeof(EventIdFilteringEventProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_eventIds");
+        var fieldInfoEvents = typeof(NotificationIdFilteringNotificationProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_notificationIds");
         var eventIds = fieldInfoEvents.GetValue(filter);
         
         return (HashSet<INotificationId>)eventIds!;
     }
 
-    private Tuple<IEventProcessor<IPartitionNotification>, IEventProcessor<IPartitionNotification>>
+    private Tuple<INotificationProcessor<IPartitionNotification>, INotificationProcessor<IPartitionNotification>>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");

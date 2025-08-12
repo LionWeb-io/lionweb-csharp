@@ -21,9 +21,9 @@ using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 using M1.Event.Partition;
-using M1.Event.Processor;
 using Notification;
 using Notification.Partition;
+using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
 
 public abstract class EventTestsBase

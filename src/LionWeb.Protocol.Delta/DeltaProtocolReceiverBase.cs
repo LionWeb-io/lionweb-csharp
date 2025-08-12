@@ -21,10 +21,10 @@ using Core;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
-using Core.M1.Event.Processor;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
+using Core.Notification.Processor;
 using Message;
 
 public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> : IDisposable
@@ -34,13 +34,13 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 {
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
-    private readonly IEventProcessor<IForestNotification> _forestEventReplicator;
+    private readonly INotificationProcessor<IForestNotification> _forestNotificationReplicator;
 
-    public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, IEventProcessor<IForestNotification> forestEventReplicator)
+    public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, INotificationProcessor<IForestNotification> forestNotificationReplicator)
     {
         _sharedNodeMap = sharedNodeMap;
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
-        _forestEventReplicator = forestEventReplicator;
+        _forestNotificationReplicator = forestNotificationReplicator;
     }
 
     public void Init()
@@ -74,7 +74,7 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 
             case TForest forestContent:
                 var forestEvent = MapForest(forestContent);
-                _forestEventReplicator.Receive(forestEvent);
+                _forestNotificationReplicator.Receive(forestEvent);
                 break;
 
             default:

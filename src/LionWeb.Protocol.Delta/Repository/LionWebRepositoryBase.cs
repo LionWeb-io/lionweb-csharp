@@ -20,11 +20,11 @@ namespace LionWeb.Protocol.Delta.Repository;
 using Core;
 using Core.M1;
 using Core.M1.Event.Forest;
-using Core.M1.Event.Processor;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
+using Core.Notification.Processor;
 using Forest;
 
 public abstract class LionWebRepositoryBase<T> : IDisposable
@@ -35,7 +35,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
 
-    protected readonly IEventProcessor<IForestNotification> _replicator;
+    protected readonly INotificationProcessor<IForestNotification> _replicator;
 
     private long nextFreeNodeId = 0;
 
@@ -65,7 +65,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     #region Local
 
-    private class LocalForestReceiver(object? sender, LionWebRepositoryBase<T> repository) : EventProcessorBase<IForestNotification>(sender)
+    private class LocalForestReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationProcessorBase<IForestNotification>(sender)
     {
         public override void Receive(IForestNotification message)
         {
@@ -83,7 +83,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         }
     }
     
-    private class LocalPartitionReceiver(object? sender, LionWebRepositoryBase<T> repository) : EventProcessorBase<IPartitionNotification>(sender)
+    private class LocalPartitionReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationProcessorBase<IPartitionNotification>(sender)
     {
         public override void Receive(IPartitionNotification message) =>
             repository.SendEventToAllClients(sender, message);

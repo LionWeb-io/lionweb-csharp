@@ -15,43 +15,43 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Processor;
+namespace LionWeb.Core.Notification.Processor;
 
-using Notification;
-
-/// Composes two or more <see cref="IEventProcessor{TEvent}"/>s.
+/// Composes two or more <see cref="INotificationProcessor{TNotification}"/>s.
 ///
 /// Every message this processor <see cref="Receive">receives</see>
-/// is forwarded to the first <see cref="_eventProcessors">component</see>.
+/// is forwarded to the first <see cref="_notificationProcessors">component</see>.
 /// Each component is connected to the next component.
 /// The last component <see cref="IProcessor{TReceive,TSend}.Send">sends</see> to
 /// this processor's <i>following</i> processors.
-public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
-    where TEvent : class, INotification
+public class CompositeNotificationProcessor<TNotification> : INotificationProcessor<TNotification>
+    where TNotification : class, INotification
 {
-    private readonly IEventProcessor<TEvent> _firstProcessor;
-    private readonly IEventProcessor<TEvent> _lastProcessor;
-    private readonly IEnumerable<IEventProcessor<TEvent>> _eventProcessors;
+    private readonly INotificationProcessor<TNotification> _firstProcessor;
+    private readonly INotificationProcessor<TNotification> _lastProcessor;
+    private readonly IEnumerable<INotificationProcessor<TNotification>> _notificationProcessors;
     private readonly object? _sender;
 
-    public CompositeEventProcessor(List<IEventProcessor<TEvent>> eventProcessors, object? sender)
+    public CompositeNotificationProcessor(List<INotificationProcessor<TNotification>> notificationProcessors,
+        object? sender)
     {
-        _eventProcessors = eventProcessors;
+        _notificationProcessors = notificationProcessors;
         _sender = sender;
-        if(eventProcessors.Count < 2)
-            throw new ArgumentException($"{nameof(CompositeEventProcessor<TEvent>)} must get at least 2 processors");
-        
-        _firstProcessor = eventProcessors[0];
-        _lastProcessor = eventProcessors[^1];
+        if (notificationProcessors.Count < 2)
+            throw new ArgumentException(
+                $"{nameof(CompositeNotificationProcessor<TNotification>)} must get at least 2 processors");
 
-        var enumerator = eventProcessors.GetEnumerator();
+        _firstProcessor = notificationProcessors[0];
+        _lastProcessor = notificationProcessors[^1];
+
+        var enumerator = notificationProcessors.GetEnumerator();
         enumerator.MoveNext();
         var previous = enumerator.Current;
-        while(enumerator.MoveNext())
+        while (enumerator.MoveNext())
         {
             var current = enumerator.Current;
             IProcessor.Connect(previous, current);
-            
+
             previous = current;
         }
     }
@@ -60,9 +60,9 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        foreach (IEventProcessor<TEvent> eventProcessor in _eventProcessors.Reverse())
+        foreach (INotificationProcessor<TNotification> processor in _notificationProcessors.Reverse())
         {
-            eventProcessor.Dispose();
+            processor.Dispose();
         }
     }
 
@@ -71,22 +71,23 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
         _sender?.ToString() ?? GetType().Name;
 
     /// <inheritdoc />
-    public void Receive(TEvent message) =>
+    public void Receive(TNotification message) =>
         _firstProcessor.Receive(message);
 
     /// <inheritdoc />
-    public bool CanReceive(params Type[] messageTypes) => 
+    public bool CanReceive(params Type[] messageTypes) =>
         _firstProcessor.CanReceive(messageTypes);
 
-    void IProcessor<TEvent, TEvent>.Send(TEvent message) =>
+    void IProcessor<TNotification, TNotification>.Send(TNotification message) =>
         throw new ArgumentException("Should never be called");
 
-    void IProcessor<TEvent, TEvent>.Subscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) => 
+    void IProcessor<TNotification, TNotification>.Subscribe<TReceiveTo, TSendTo>(
+        IProcessor<TReceiveTo, TSendTo> receiver) =>
         _lastProcessor.Subscribe(receiver);
 
     void IProcessor.Unsubscribe<T>(IProcessor receiver) =>
         _lastProcessor.Unsubscribe<T>(receiver);
-    
+
     /// <inheritdoc />
     public void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "")
     {
@@ -95,7 +96,7 @@ public class CompositeEventProcessor<TEvent> : IEventProcessor<TEvent>
             return;
 
         Console.WriteLine($"{indent}Members:");
-        foreach (var processor in this._eventProcessors)
+        foreach (var processor in this._notificationProcessors)
         {
             processor.PrintAllReceivers(alreadyPrinted, indent + "  ");
         }

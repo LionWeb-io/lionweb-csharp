@@ -21,10 +21,10 @@ using Core.M1;
 using Core.M1.Event;
 using Core.M1.Event.Forest;
 using Core.M1.Event.Partition;
-using Core.M1.Event.Processor;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
+using Core.Notification.Processor;
 using Forest;
 using Message.Command;
 using Partition;
@@ -40,8 +40,8 @@ public class DeltaProtocolCommandReceiver
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder,
-        IEventProcessor<IForestNotification> forestEventReplicator)
-        : base(sharedNodeMap, sharedPartitionReplicatorMap, forestEventReplicator)
+        INotificationProcessor<IForestNotification> forestNotificationReplicator)
+        : base(sharedNodeMap, sharedPartitionReplicatorMap, forestNotificationReplicator)
     {
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
         _partitionMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);

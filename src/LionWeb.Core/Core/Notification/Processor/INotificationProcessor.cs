@@ -15,9 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Processor;
+namespace LionWeb.Core.Notification.Processor;
 
-using Notification;
-
-/// <see cref="IProcessor">Processor</see> that receives and sends <typeparamref name="TEvent"/>s.
-public interface IEventProcessor<in TEvent> : IProcessor<TEvent, TEvent> where TEvent : INotification;
+/// <see cref="IProcessor">Processor</see> that receives and sends <typeparamref name="TNotification"/>s.
+public interface INotificationProcessor<in TNotification> : IProcessor<TNotification, TNotification> where TNotification : INotification;

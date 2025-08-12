@@ -20,12 +20,12 @@ namespace LionWeb.Core.Test.Listener;
 using M1.Event;
 using M1.Event.Forest;
 using M1.Event.Partition;
-using M1.Event.Processor;
 using Notification;
 using Notification.Forest;
 using Notification.Partition;
+using Notification.Processor;
 
-internal class NodeCloneProcessor<TEvent>(object? sender) : EventProcessorBase<TEvent>(sender)
+internal class NodeCloneProcessor<TEvent>(object? sender) : NotificationProcessorBase<TEvent>(sender)
     where TEvent : INotification
 {
     public override void Receive(TEvent message)

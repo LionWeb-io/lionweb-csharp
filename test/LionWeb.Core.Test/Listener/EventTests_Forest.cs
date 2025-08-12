@@ -23,7 +23,7 @@ using M1;
 using Notification.Forest;
 using M1.Event;
 using M1.Event.Forest;
-using M1.Event.Processor;
+using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
@@ -123,7 +123,7 @@ public class EventTests_Forest
 
     #endregion
 
-    private static IEventProcessor<IForestNotification> CreateReplicator(Forest cloneForest, Forest originalForest)
+    private static INotificationProcessor<IForestNotification> CreateReplicator(Forest cloneForest, Forest originalForest)
     {
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
         var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
@@ -143,7 +143,7 @@ public class EventTests_Forest
     }
 }
 
-internal class TestLocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap) : EventProcessorBase<IForestNotification>(sender)
+internal class TestLocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap) : NotificationProcessorBase<IForestNotification>(sender)
 {
     public override void Receive(IForestNotification message)
     {

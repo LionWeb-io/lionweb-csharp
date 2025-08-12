@@ -15,12 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Processor;
+namespace LionWeb.Core.Notification.Processor;
 
-using Notification;
-
-internal class EventHandlerProcessor<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
-    : IEventProcessor<TSubscribedEvent> where TSubscribedEvent : INotification
+internal class NotificationHandlerProcessor<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
+    : INotificationProcessor<TSubscribedNotification> where TSubscribedNotification : INotification
 {
     public void Dispose()
     {
@@ -33,11 +31,11 @@ internal class EventHandlerProcessor<TSubscribedEvent>(EventHandler<TSubscribedE
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Receive(TSubscribedEvent message) =>
+    public void Receive(TSubscribedNotification message) =>
         handler.Invoke(null, message);
 
     /// <inheritdoc />
-    public void Send(TSubscribedEvent message) =>
+    public void Send(TSubscribedNotification message) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />

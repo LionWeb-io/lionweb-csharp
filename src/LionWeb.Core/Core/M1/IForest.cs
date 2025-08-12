@@ -45,14 +45,14 @@ public interface IForest
 public class Forest : IForest
 {
     private readonly HashSet<IPartitionInstance> _partitions;
-    private readonly ForestEventProcessor _eventProcessor;
+    private readonly ForestNotificationProcessor _notificationProcessor;
     private readonly INotificationIdProvider  _eventIdProvider;
 
     /// <inheritdoc cref="IForest"/>
     public Forest()
     {
         _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
-        _eventProcessor = new ForestEventProcessor(this);
+        _notificationProcessor = new ForestNotificationProcessor(this);
         _eventIdProvider = new NotificationIdProvider(this);
     }
 
@@ -65,7 +65,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _eventProcessor.Receive(new PartitionAddedNotification(partition, eventId ?? _eventIdProvider.CreateNotificationId()));
+                _notificationProcessor.Receive(new PartitionAddedNotification(partition, eventId ?? _eventIdProvider.CreateNotificationId()));
         }
     }
 
@@ -75,12 +75,12 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _eventProcessor.Receive(new PartitionDeletedNotification(partition, eventId ?? _eventIdProvider.CreateNotificationId()));
+                _notificationProcessor.Receive(new PartitionDeletedNotification(partition, eventId ?? _eventIdProvider.CreateNotificationId()));
         }
     }
 
     /// <inheritdoc />
-    public IForestProcessor GetProcessor() => _eventProcessor;
+    public IForestProcessor GetProcessor() => _notificationProcessor;
 
     /// <inheritdoc />
     public override string ToString() => $"{nameof(Forest)}@{GetHashCode()}";

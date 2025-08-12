@@ -20,8 +20,8 @@ namespace LionWeb.Core.Test.Listener;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1.Event.Partition;
-using M1.Event.Processor;
 using Notification.Partition;
+using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
 using EventId = string;
 
@@ -262,7 +262,7 @@ public class EventTests_MultiPartition
 
     #endregion
 
-    private static IEventProcessor<IPartitionNotification> CreateReplicator(Geometry clone, Geometry node)
+    private static INotificationProcessor<IPartitionNotification> CreateReplicator(Geometry clone, Geometry node)
     {
         var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");
         var cloneProcessor = new NodeCloneProcessor<IPartitionNotification>(node.GetId());

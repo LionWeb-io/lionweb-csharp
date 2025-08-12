@@ -17,25 +17,25 @@
 
 namespace LionWeb.Core.Notification.Partition;
 
-using LionWeb.Core.M1.Event.Processor;
 using LionWeb.Core.M3;
+using Processor;
 using System.Collections;
 using System.Diagnostics;
 
 /// Replicates events for a <i>local</i> <see cref="IPartitionInstance">partition</see>.
-/// <inheritdoc cref="RemoteEventReplicatorBase{TEvent}"/>
+/// <inheritdoc cref="RemoteNotificationReplicatorBase{TEvent}"/>
 public static class PartitionNotificationReplicator
 {
-    public static IEventProcessor<IPartitionNotification> Create(IPartitionInstance localPartition,
+    public static INotificationProcessor<IPartitionNotification> Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
-        var filter = new EventIdFilteringEventProcessor<IPartitionNotification>(internalSender);
+        var filter = new NotificationIdFilteringNotificationProcessor<IPartitionNotification>(internalSender);
         var remoteReplicator =
-            new RemotePartitionEventReplicator(localPartition, sharedNodeMap, filter, internalSender);
-        var localReplicator = new LocalPartitionEventReplicator(sharedNodeMap, internalSender);
+            new RemotePartitionNotificationReplicator(localPartition, sharedNodeMap, filter, internalSender);
+        var localReplicator = new LocalPartitionNotificationReplicator(sharedNodeMap, internalSender);
 
-        var result = new CompositeEventProcessor<IPartitionNotification>([remoteReplicator, filter],
+        var result = new CompositeNotificationProcessor<IPartitionNotification>([remoteReplicator, filter],
             sender ?? $"Composite of {nameof(PartitionNotificationReplicator)} {localPartition.GetId()}");
 
         var partitionProcessor = localPartition.GetProcessor();
@@ -49,12 +49,12 @@ public static class PartitionNotificationReplicator
     }
 }
 
-public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartitionNotification>
+public class RemotePartitionNotificationReplicator : RemoteNotificationReplicatorBase<IPartitionNotification>
 {
     private readonly IPartitionInstance _localPartition;
 
-    protected internal RemotePartitionEventReplicator(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap,
-        EventIdFilteringEventProcessor<IPartitionNotification> filter, object? sender) : base(sharedNodeMap, filter, sender)
+    protected internal RemotePartitionNotificationReplicator(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap,
+        NotificationIdFilteringNotificationProcessor<IPartitionNotification> filter, object? sender) : base(sharedNodeMap, filter, sender)
     {
         _localPartition = localPartition;
         SharedNodeMap.RegisterNode(_localPartition);
@@ -78,7 +78,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
     // }
 
     /// <inheritdoc />
-    protected override void ProcessEvent(IPartitionNotification? partitionEvent)
+    protected override void ProcessNotification(IPartitionNotification? partitionEvent)
     {
         Debug.WriteLine($"processing event {partitionEvent}");
         switch (partitionEvent)
@@ -145,7 +145,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
     #region Properties
 
     private void OnRemotePropertyAdded(PropertyAddedNotification propertyAddedEvent) =>
-        SuppressEventForwarding(propertyAddedEvent, () =>
+        SuppressNotificationForwarding(propertyAddedEvent, () =>
         {
             Debug.WriteLine(
                 $"Node {propertyAddedEvent.Node.PrintIdentity()}: Setting {propertyAddedEvent.Property} to {propertyAddedEvent.NewValue}");
@@ -154,14 +154,14 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemotePropertyDeleted(PropertyDeletedNotification propertyDeletedEvent) =>
-        SuppressEventForwarding(propertyDeletedEvent, () =>
+        SuppressNotificationForwarding(propertyDeletedEvent, () =>
         {
             Lookup(propertyDeletedEvent.Node.GetId())
                 .Set(propertyDeletedEvent.Property, null, propertyDeletedEvent.NotificationId);
         });
 
     private void OnRemotePropertyChanged(PropertyChangedNotification propertyChangedEvent) =>
-        SuppressEventForwarding(propertyChangedEvent, () =>
+        SuppressNotificationForwarding(propertyChangedEvent, () =>
         {
             Lookup(propertyChangedEvent.Node.GetId()).Set(propertyChangedEvent.Property, propertyChangedEvent.NewValue,
                 propertyChangedEvent.NotificationId);
@@ -172,7 +172,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
     #region Children
 
     private void OnRemoteChildAdded(ChildAddedNotification childAddedEvent) =>
-        SuppressEventForwarding(childAddedEvent, () =>
+        SuppressNotificationForwarding(childAddedEvent, () =>
         {
             var localParent = Lookup(childAddedEvent.Parent.GetId());
             var newChildNode = (INode)childAddedEvent.NewChild;
@@ -186,7 +186,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteChildDeleted(ChildDeletedNotification childDeletedEvent) =>
-        SuppressEventForwarding(childDeletedEvent, () =>
+        SuppressNotificationForwarding(childDeletedEvent, () =>
         {
             var localParent = Lookup(childDeletedEvent.Parent.GetId());
 
@@ -206,7 +206,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteChildReplaced(ChildReplacedNotification childReplacedEvent) =>
-        SuppressEventForwarding(childReplacedEvent, () =>
+        SuppressNotificationForwarding(childReplacedEvent, () =>
         {
             var localParent = Lookup(childReplacedEvent.Parent.GetId());
             var substituteNode = (INode)childReplacedEvent.NewChild;
@@ -217,7 +217,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMovedEvent) =>
-        SuppressEventForwarding(childMovedEvent, () =>
+        SuppressNotificationForwarding(childMovedEvent, () =>
         {
             var localNewParent = Lookup(childMovedEvent.NewParent.GetId());
             var nodeToInsert = LookupOpt(childMovedEvent.MovedChild.GetId()) ?? (INode)childMovedEvent.MovedChild;
@@ -228,7 +228,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteChildMovedAndReplacedFromOtherContainment(
-        ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedEvent) => SuppressEventForwarding(
+        ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedEvent) => SuppressNotificationForwarding(
         childMovedAndReplacedEvent, () =>
         {
             var localNewParent = Lookup(childMovedAndReplacedEvent.NewParent.GetId());
@@ -253,7 +253,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
 
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParentNotification childMovedEvent) =>
-        SuppressEventForwarding(childMovedEvent, () =>
+        SuppressNotificationForwarding(childMovedEvent, () =>
         {
             var localParent = Lookup(childMovedEvent.Parent.GetId());
             var newValue = InsertContainment(localParent, childMovedEvent.NewContainment, childMovedEvent.NewIndex,
@@ -263,7 +263,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification childMovedEvent) =>
-        SuppressEventForwarding(childMovedEvent, () =>
+        SuppressNotificationForwarding(childMovedEvent, () =>
         {
             var localParent = Lookup(childMovedEvent.Parent.GetId());
             INode nodeToInsert = Lookup(childMovedEvent.MovedChild.GetId());
@@ -340,7 +340,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
     #region Annotations
 
     private void OnRemoteAnnotationAdded(AnnotationAddedNotification annotationAddedEvent) =>
-        SuppressEventForwarding(annotationAddedEvent, () =>
+        SuppressNotificationForwarding(annotationAddedEvent, () =>
         {
             var localParent = Lookup(annotationAddedEvent.Parent.GetId());
             var annotation = (INode)annotationAddedEvent.NewAnnotation;
@@ -348,7 +348,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification annotationDeletedEvent) =>
-        SuppressEventForwarding(annotationDeletedEvent, () =>
+        SuppressNotificationForwarding(annotationDeletedEvent, () =>
         {
             var localParent = Lookup(annotationDeletedEvent.Parent.GetId());
             var localDeleted = Lookup(annotationDeletedEvent.DeletedAnnotation.GetId());
@@ -356,7 +356,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification annotationMovedEvent) =>
-        SuppressEventForwarding(annotationMovedEvent, () =>
+        SuppressNotificationForwarding(annotationMovedEvent, () =>
         {
             var localNewParent = Lookup(annotationMovedEvent.NewParent.GetId());
             var moved = LookupOpt(annotationMovedEvent.MovedAnnotation.GetId()) ??
@@ -365,7 +365,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification annotationMovedEvent) =>
-        SuppressEventForwarding(annotationMovedEvent, () =>
+        SuppressNotificationForwarding(annotationMovedEvent, () =>
         {
             var localParent = Lookup(annotationMovedEvent.Parent.GetId());
             INode nodeToInsert = Lookup(annotationMovedEvent.MovedAnnotation.GetId());
@@ -377,7 +377,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
     #region References
 
     private void OnRemoteReferenceAdded(ReferenceAddedNotification referenceAddedEvent) =>
-        SuppressEventForwarding(referenceAddedEvent, () =>
+        SuppressNotificationForwarding(referenceAddedEvent, () =>
         {
             var localParent = Lookup(referenceAddedEvent.Parent.GetId());
             INode target = Lookup(referenceAddedEvent.NewTarget.Reference.GetId());
@@ -388,7 +388,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteReferenceDeleted(ReferenceDeletedNotification referenceDeletedEvent) =>
-        SuppressEventForwarding(referenceDeletedEvent, () =>
+        SuppressNotificationForwarding(referenceDeletedEvent, () =>
         {
             var localParent = Lookup(referenceDeletedEvent.Parent.GetId());
 
@@ -408,7 +408,7 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
         });
 
     private void OnRemoteReferenceChanged(ReferenceChangedNotification referenceChangedEvent) =>
-        SuppressEventForwarding(referenceChangedEvent, () =>
+        SuppressNotificationForwarding(referenceChangedEvent, () =>
         {
             var localParent = Lookup(referenceChangedEvent.Parent.GetId());
 
@@ -454,8 +454,8 @@ public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartiti
     #endregion
 }
 
-public class LocalPartitionEventReplicator(SharedNodeMap sharedNodeMap, object? sender)
-    : EventProcessorBase<IPartitionNotification>(sender)
+public class LocalPartitionNotificationReplicator(SharedNodeMap sharedNodeMap, object? sender)
+    : NotificationProcessorBase<IPartitionNotification>(sender)
 {
     /// <inheritdoc />
     public override void Receive(IPartitionNotification message)

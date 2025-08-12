@@ -27,23 +27,23 @@ using Partition;
 
 public class DeltaProtocolPartitionCommandReceiver
 {
-    private readonly PartitionEventProcessor _eventHandler;
+    private readonly PartitionNotificationProcessor _notificationHandler;
     private readonly DeltaCommandToPartitionEventMapper _mapper;
 
     public DeltaProtocolPartitionCommandReceiver(
-        PartitionEventProcessor eventHandler,
+        PartitionNotificationProcessor notificationHandler,
         SharedNodeMap sharedNodeMap,
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
     )
     {
-        _eventHandler = eventHandler;
+        _notificationHandler = notificationHandler;
         _mapper = new DeltaCommandToPartitionEventMapper(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
     public void Receive(IDeltaCommand deltaCommand)
     {
         IPartitionNotification partitionCommand = _mapper.Map(deltaCommand);
-        _eventHandler.Receive(partitionCommand);
+        _notificationHandler.Receive(partitionCommand);
     }
 }

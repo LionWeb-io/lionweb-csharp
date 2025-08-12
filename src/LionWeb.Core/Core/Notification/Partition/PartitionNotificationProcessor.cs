@@ -15,20 +15,18 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Processor;
+namespace LionWeb.Core.M1.Event.Partition;
 
 using Notification;
+using Notification.Partition;
+using Notification.Processor;
 
-/// Forwards all <see cref="Receive">received</see> events unchanged to <i>following</i> processors,
-/// and to EventHandlers <see cref="Subscribe{TSubscribedEvent}">subscribed</see> to specific events.
-public abstract class ModelEventProcessorBase<TEvent>(object? sender)
-    : EventProcessorBase<TEvent>(sender)
-    where TEvent : INotification
+/// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+/// Raises events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+public interface IPartitionProcessor : INotificationProcessor<IPartitionNotification>
 {
-    /// <inheritdoc />
-    public override void Receive(TEvent message) =>
-        Send(message);
-
+    public INotificationId CreateEventId();
+    
     /// Registers <paramref name="handler"/> to be notified of events compatible with <typeparamref name="TSubscribedEvent"/>.
     /// <typeparam name="TSubscribedEvent">
     /// Type of events <paramref name="handler"/> is interested in.
@@ -36,15 +34,25 @@ public abstract class ModelEventProcessorBase<TEvent>(object? sender)
     /// will <i>not</i> reach <paramref name="handler"/>.
     /// </typeparam> 
     public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
-        where TSubscribedEvent : class, TEvent =>
-        IProcessor.Connect<TEvent, TSubscribedEvent, TSubscribedEvent>(this,
-            new EventHandlerProcessor<TSubscribedEvent>(handler)
-            {
-                ProcessorId = Sender.ToString() ?? GetType().Name
-            });
+        where TSubscribedEvent : class, IPartitionNotification;
 
     /// Unregisters <paramref name="handler"/> from notification of events.
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
     public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
-        where TSubscribedEvent : class, TEvent => throw new NotImplementedException();
+        where TSubscribedEvent : class, IPartitionNotification;
 }
+
+/// Forwards all <see cref="ModelNotificationProcessorBase{TEvent}.Receive">received</see> events
+/// unchanged to <i>following</i> processors,
+/// and to EventHandlers <see cref="ModelNotificationProcessorBase{TEvent}.Subscribe{TSubscribedEvent}">subscribed</see>
+/// to specific events.
+public class PartitionNotificationProcessor(object? sender)
+    : ModelNotificationProcessorBase<IPartitionNotification>(sender), IPartitionProcessor
+{
+    private readonly INotificationIdProvider _eventIdProvider = new NotificationIdProvider(sender);
+
+    /// <inheritdoc />
+    public INotificationId CreateEventId() => 
+        _eventIdProvider.CreateNotificationId();
+}
+;

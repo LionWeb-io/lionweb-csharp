@@ -19,8 +19,8 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1.Event.Processor;
 using Notification.Partition;
+using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
@@ -831,7 +831,7 @@ public class EventTests_Twoway
     #endregion
 
 
-    private Tuple<IEventProcessor<IPartitionNotification>, IEventProcessor<IPartitionNotification>>
+    private Tuple<INotificationProcessor<IPartitionNotification>, INotificationProcessor<IPartitionNotification>>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = CreateReplicator(node, "nodeReplicator");
@@ -847,7 +847,7 @@ public class EventTests_Twoway
      
         return Tuple.Create(replicator, cloneReplicator);
     }
-    private static IEventProcessor<IPartitionNotification> CreateReplicator(IPartitionInstance clone, object? sender) =>
+    private static INotificationProcessor<IPartitionNotification> CreateReplicator(IPartitionInstance clone, object? sender) =>
         PartitionNotificationReplicator.Create(clone, new(), sender);
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

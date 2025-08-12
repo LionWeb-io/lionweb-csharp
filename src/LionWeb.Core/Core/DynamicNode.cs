@@ -272,15 +272,15 @@ public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
 public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
 {
-    private readonly PartitionEventProcessor _eventProcessor;
+    private readonly PartitionNotificationProcessor _notificationProcessor;
 
     /// <inheritdoc />
     public DynamicPartitionInstance(NodeId id, Concept concept) : base(id, concept)
     {
-        _eventProcessor = new PartitionEventProcessor(this);
+        _notificationProcessor = new PartitionNotificationProcessor(this);
     }
 
     /// <inheritdoc />
     public IPartitionProcessor? GetProcessor() => 
-        _eventProcessor;
+        _notificationProcessor;
 }

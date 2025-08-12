@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Processor;
+namespace LionWeb.Core.Notification.Processor;
 
 /// A member in a directed graph that sends messages.
 /// Each member is <see cref="Connect{TReceiveFrom,TConnected,TSendFrom}">connected</see>
@@ -36,7 +36,7 @@ namespace LionWeb.Core.M1.Event.Processor;
 public interface IProcessor
 {
     protected string ProcessorId { get; }
-    
+
     /// All messages <see cref="IProcessor{TReceive,TSend}.Send">sent</see> by <paramref name="from"/>
     /// will be <see cref="IProcessor{TReceive,TSend}.Receive">received</see> by <paramref name="to"/>. 
     public static void Connect<TReceiveFrom, TConnected, TSendFrom>(
@@ -47,7 +47,7 @@ public interface IProcessor
     /// Unsubscribes <paramref name="receiver"/> from this.
     /// For internal use only -- each processor should unsubscribe itself from all <i>preceding</i> processors on disposal.
     protected internal void Unsubscribe<T>(IProcessor receiver);
-    
+
     protected internal void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "");
 
     protected static bool RecursionDetected(IProcessor self, List<IProcessor> alreadyPrinted, string indent)
@@ -59,7 +59,6 @@ public interface IProcessor
 
             Console.WriteLine($"{indent}Recursion ^^");
             return true;
-
         } finally
         {
             alreadyPrinted.Add(self);
@@ -70,17 +69,17 @@ public interface IProcessor
 /// A processor that receives <typeparamref name="TReceive"/> messages and sends <typeparamref name="TSend"/> messages.
 public interface IProcessor<in TReceive, in TSend> : IProcessor, IDisposable
 {
-    /// Whether anybody would receive any of the <paramref name="messageTypes"/> events.
-    /// Useful for returning eagerly from complex logic to calculate the event contents.
+    /// Whether anybody would receive any of the <paramref name="messageTypes"/> notifications.
+    /// Useful for returning eagerly from complex logic to calculate the notification contents.
     /// <value>
-    ///     <c>true</c> if someone would receive any of the <paramref name="messageTypes"/> events; <c>false</c> otherwise.
+    ///     <c>true</c> if someone would receive any of the <paramref name="messageTypes"/> notifications; <c>false</c> otherwise.
     /// </value>
     public bool CanReceive(params Type[] messageTypes);
-    
+
     /// This processor receives <paramref name="message"/>.
     /// Call this on <i>inbound</i> processors (i.e. processors that get messages from outside the processor chain).
     public void Receive(TReceive message);
-    
+
     /// This processor wants to send <paramref name="message"/>.
     /// Only this processor should use this method.
     protected void Send(TSend message);

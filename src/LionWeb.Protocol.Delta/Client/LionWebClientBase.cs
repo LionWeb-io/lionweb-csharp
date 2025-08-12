@@ -20,11 +20,11 @@ namespace LionWeb.Protocol.Delta.Client;
 using Core;
 using Core.M1;
 using Core.M1.Event.Forest;
-using Core.M1.Event.Processor;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
+using Core.Notification.Processor;
 
 public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 {
@@ -32,7 +32,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly IClientConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
-    protected readonly IEventProcessor<IForestNotification> _replicator;
+    protected readonly INotificationProcessor<IForestNotification> _replicator;
 
     private ParticipationId? _participationId;
     private readonly ClientId? _clientId;
@@ -79,7 +79,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     #region Local
     
-    private class LocalForestChangeReceiver(object? sender, LionWebClientBase<T> client) : EventProcessorBase<IForestNotification>(sender)
+    private class LocalForestChangeReceiver(object? sender, LionWebClientBase<T> client) : NotificationProcessorBase<IForestNotification>(sender)
     {
         public override void Receive(IForestNotification message)
         {
@@ -95,13 +95,13 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         }
     }
     
-    private class LocalForestReceiver(object? sender, LionWebClientBase<T> client) : EventProcessorBase<IForestNotification>(sender)
+    private class LocalForestReceiver(object? sender, LionWebClientBase<T> client) : NotificationProcessorBase<IForestNotification>(sender)
     {
         public override void Receive(IForestNotification message) => 
             client.SendEventToRepository(sender, message);
     }
     
-    private class LocalPartitionReceiver(object? sender, LionWebClientBase<T> client) : EventProcessorBase<IPartitionNotification>(sender)
+    private class LocalPartitionReceiver(object? sender, LionWebClientBase<T> client) : NotificationProcessorBase<IPartitionNotification>(sender)
     {
         public override void Receive(IPartitionNotification message) =>
             client.SendEventToRepository(sender, message);

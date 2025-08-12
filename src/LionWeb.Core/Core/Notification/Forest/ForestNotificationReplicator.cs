@@ -19,24 +19,24 @@ namespace LionWeb.Core.Notification.Forest;
 
 using M1;
 using M1.Event.Forest;
-using M1.Event.Processor;
 using Partition;
+using Processor;
 using System.Diagnostics;
 
 /// Replicates notifications for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
 /// <inheritdoc cref="NotificationReplicatorBase{TEvent,TPublisher}"/>
 public static class ForestNotificationReplicator
 {
-    public static IEventProcessor<IForestNotification> Create(IForest localForest,
+    public static INotificationProcessor<IForestNotification> Create(IForest localForest,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
-        var filter = new EventIdFilteringEventProcessor<IForestNotification>(internalSender);
-        var remoteReplicator = new RemoteForestEventReplicator(localForest, sharedNodeMap, filter, internalSender);
+        var filter = new NotificationIdFilteringNotificationProcessor<IForestNotification>(internalSender);
+        var remoteReplicator = new RemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, internalSender);
         var localReplicator =
-            new LocalForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, internalSender);
+            new LocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, internalSender);
 
-        var result = new CompositeEventProcessor<IForestNotification>([remoteReplicator, filter],
+        var result = new CompositeNotificationProcessor<IForestNotification>([remoteReplicator, filter],
             sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
 
         var forestProcessor = localForest.GetProcessor();
@@ -50,12 +50,12 @@ public static class ForestNotificationReplicator
     }
 }
 
-public class RemoteForestEventReplicator : RemoteEventReplicatorBase<IForestNotification>
+public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBase<IForestNotification>
 {
     private readonly IForest _localForest;
 
-    protected internal RemoteForestEventReplicator(IForest localForest, SharedNodeMap sharedNodeMap,
-        EventIdFilteringEventProcessor<IForestNotification> filter, object? sender) :
+    protected internal RemoteForestNotificationReplicator(IForest localForest, SharedNodeMap sharedNodeMap,
+        NotificationIdFilteringNotificationProcessor<IForestNotification> filter, object? sender) :
         base(sharedNodeMap, filter, sender)
     {
         _localForest = localForest;
@@ -82,7 +82,7 @@ public class RemoteForestEventReplicator : RemoteEventReplicatorBase<IForestNoti
     // }
 
     /// <inheritdoc />
-    protected override void ProcessEvent(IForestNotification? forestEvent)
+    protected override void ProcessNotification(IForestNotification? forestEvent)
     {
         Debug.WriteLine($"{this.GetType()}: processing event {forestEvent}");
         switch (forestEvent)
@@ -99,26 +99,26 @@ public class RemoteForestEventReplicator : RemoteEventReplicatorBase<IForestNoti
 
 
     private void OnRemoteNewPartition(PartitionAddedNotification partitionAddedEvent) =>
-        SuppressEventForwarding(partitionAddedEvent, () =>
+        SuppressNotificationForwarding(partitionAddedEvent, () =>
         {
             var newPartition = partitionAddedEvent.NewPartition;
             _localForest.AddPartitions([newPartition], partitionAddedEvent.NotificationId);
         });
 
     private void OnRemotePartitionDeleted(PartitionDeletedNotification partitionDeletedEvent) =>
-        SuppressEventForwarding(partitionDeletedEvent, () =>
+        SuppressNotificationForwarding(partitionDeletedEvent, () =>
         {
             var localPartition = (IPartitionInstance)Lookup(partitionDeletedEvent.DeletedPartition.GetId());
             _localForest.RemovePartitions([localPartition], partitionDeletedEvent.NotificationId);
         });
 }
 
-public class LocalForestEventReplicator : EventProcessorBase<IForestNotification>
+public class LocalForestNotificationReplicator : NotificationProcessorBase<IForestNotification>
 {
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
     private readonly SharedNodeMap _sharedNodeMap;
 
-    public LocalForestEventReplicator(IForest localForest, SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
+    public LocalForestNotificationReplicator(IForest localForest, SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
         SharedNodeMap sharedNodeMap, object? sender) : base(sender)
     {
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
@@ -146,7 +146,7 @@ public class LocalForestEventReplicator : EventProcessorBase<IForestNotification
         Send(message);
     }
 
-    protected virtual IEventProcessor<IPartitionNotification> CreatePartitionEventReplicator(IPartitionInstance partition,
+    protected virtual INotificationProcessor<IPartitionNotification> CreatePartitionEventReplicator(IPartitionInstance partition,
         string sender) =>
         PartitionNotificationReplicator.Create(partition, _sharedNodeMap, sender);
 

@@ -15,17 +15,14 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Processor;
+namespace LionWeb.Core.Notification.Processor;
 
 using Forest;
-using Notification;
-using Notification.Forest;
-using Notification.Partition;
 using Partition;
 using System.Reflection;
 
-/// Base for all <see cref="IProcessor">processors</see> that process <see cref="IEvent">events</see>.
-public abstract class EventProcessorBase
+/// Base for all <see cref="IProcessor">processors</see> that process <see cref="INotification">notifications</see>.
+public abstract class NotificationProcessorBase
 {
     protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
 
@@ -46,16 +43,17 @@ public abstract class EventProcessorBase
     }
 }
 
-/// <inheritdoc cref="EventProcessorBase"/>
-public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventProcessor<TEvent> where TEvent : INotification
+/// <inheritdoc cref="NotificationProcessorBase"/>
+public abstract class NotificationProcessorBase<TNotification> : NotificationProcessorBase,
+    INotificationProcessor<TNotification> where TNotification : INotification
 {
     protected readonly object Sender;
-    private readonly Dictionary<Type, int> _subscribedEvents = [];
-    private readonly Dictionary<IProcessor, EventHandler<TEvent>> _handlers = [];
+    private readonly Dictionary<Type, int> _subscribedNotifications = [];
+    private readonly Dictionary<IProcessor, EventHandler<TNotification>> _handlers = [];
 
-    /// <inheritdoc cref="EventProcessorBase"/>
-    /// <param name="sender">Optional sender of the events.</param>
-    protected EventProcessorBase(object? sender)
+    /// <inheritdoc cref="NotificationProcessorBase"/>
+    /// <param name="sender">Optional sender of the notifications.</param>
+    protected NotificationProcessorBase(object? sender)
     {
         Sender = sender ?? this;
     }
@@ -68,9 +66,9 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
         {
             UnsubscribeProcessor(processor, handler);
         }
-        
+
         return;
-        
+
         void UnsubscribeProcessor<T>(IProcessor processor, EventHandler<T> _) =>
             Unsubscribe<T>(processor);
     }
@@ -80,33 +78,35 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
         Sender.ToString() ?? GetType().Name;
 
     /// <inheritdoc />
-    public abstract void Receive(TEvent message);
+    public abstract void Receive(TNotification message);
 
-    private event EventHandler<TEvent>? InternalEvent;
+    private event EventHandler<TNotification>? InternalEvent;
 
 
     /// <inheritdoc />
     public bool CanReceive(params Type[] messageTypes) =>
         InternalEvent != null &&
-        messageTypes.Any(eventType => _subscribedEvents.TryGetValue(eventType, out var count) && count > 0);
+        messageTypes.Any(notificationType =>
+            _subscribedNotifications.TryGetValue(notificationType, out var count) && count > 0);
 
 
     /// <inheritdoc />
-    void IProcessor<TEvent, TEvent>.Send(TEvent message) =>
+    void IProcessor<TNotification, TNotification>.Send(TNotification message) =>
         Send(message);
 
     /// <inheritdoc cref="IProcessor{TReceive,TSend}.Send"/>
-    protected void Send(TEvent message) =>
+    protected void Send(TNotification message) =>
         InternalEvent?.Invoke(Sender, message);
 
     /// <inheritdoc />
-    void IProcessor<TEvent, TEvent>.Subscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) =>
+    void IProcessor<TNotification, TNotification>.Subscribe<TReceiveTo, TSendTo>(
+        IProcessor<TReceiveTo, TSendTo> receiver) =>
         Subscribe(receiver);
 
     /// <inheritdoc cref="IProcessor{TReceive,TSend}.Subscribe{TReceiveTo,TSendTo}"/>
     protected void Subscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver)
     {
-        RegisterSubscribedEvents<TReceiveTo>();
+        RegisterSubscribedNotifications<TReceiveTo>();
 
         var handler = CreateHandler(receiver);
 
@@ -115,36 +115,36 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
         InternalEvent += handler;
     }
 
-    private EventHandler<TEvent> CreateHandler<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver)
-        => (_, @event) =>
+    private EventHandler<TNotification> CreateHandler<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver)
+        => (_, notification) =>
         {
-            if (@event is TReceiveTo r)
+            if (notification is TReceiveTo r)
                 receiver.Receive(r);
         };
 
-    private void RegisterSubscribedEvents<TSubscribedEvent>()
+    private void RegisterSubscribedNotifications<TSubscribedNotification>()
     {
-        var eventType = typeof(TSubscribedEvent);
-        var allSubtype = AllSubtypes[eventType];
+        var notificationType = typeof(TSubscribedNotification);
+        var allSubtype = AllSubtypes[notificationType];
         foreach (var subtype in allSubtype)
         {
-            if (_subscribedEvents.TryGetValue(subtype, out var count))
+            if (_subscribedNotifications.TryGetValue(subtype, out var count))
             {
-                _subscribedEvents[subtype] = count + 1;
+                _subscribedNotifications[subtype] = count + 1;
             } else
             {
-                _subscribedEvents[subtype] = 1;
+                _subscribedNotifications[subtype] = 1;
             }
         }
     }
 
-    private void UnregisterSubscribedEvents<TSubscribedEvent>()
+    private void UnregisterSubscribedNotifications<TSubscribedNotification>()
     {
-        var eventType = typeof(TSubscribedEvent);
-        var allSubtypes = AllSubtypes[eventType];
+        var notificationType = typeof(TSubscribedNotification);
+        var allSubtypes = AllSubtypes[notificationType];
         foreach (var subtype in allSubtypes)
         {
-            _subscribedEvents[subtype]--;
+            _subscribedNotifications[subtype]--;
         }
     }
 
@@ -160,7 +160,7 @@ public abstract class EventProcessorBase<TEvent> : EventProcessorBase, IEventPro
 
         InternalEvent -= handler;
 
-        UnregisterSubscribedEvents<T>();
+        UnregisterSubscribedNotifications<T>();
     }
 
     /// <inheritdoc />

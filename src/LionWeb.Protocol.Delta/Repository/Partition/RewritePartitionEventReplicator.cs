@@ -20,24 +20,24 @@ namespace LionWeb.Protocol.Delta.Repository.Partition;
 using Core;
 using Core.M1.Event;
 using Core.M1.Event.Partition;
-using Core.M1.Event.Processor;
 using Core.Notification;
 using Core.Notification.Partition;
+using Core.Notification.Processor;
 
 internal static class RewritePartitionEventReplicator
 {
-    public static new IEventProcessor<IPartitionNotification> Create(IPartitionInstance localPartition,
+    public static new INotificationProcessor<IPartitionNotification> Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
-        var filter = new EventIdFilteringEventProcessor<IPartitionNotification>(internalSender);
-        var replacingFilter = new EventIdReplacingEventProcessor<IPartitionNotification>(internalSender);
+        var filter = new NotificationIdFilteringNotificationProcessor<IPartitionNotification>(internalSender);
+        var replacingFilter = new NotificationIdReplacingNotificationProcessor<IPartitionNotification>(internalSender);
         var remoteReplicator =
-            new RewriteRemotePartitionEventReplicator(localPartition, filter, replacingFilter, sharedNodeMap,
+            new RewriteRemotePartitionNotificationReplicator(localPartition, filter, replacingFilter, sharedNodeMap,
                 internalSender);
-        var localReplicator = new LocalPartitionEventReplicator(sharedNodeMap, internalSender);
+        var localReplicator = new LocalPartitionNotificationReplicator(sharedNodeMap, internalSender);
 
-        var result = new CompositeEventProcessor<IPartitionNotification>([replacingFilter, remoteReplicator, filter],
+        var result = new CompositeNotificationProcessor<IPartitionNotification>([replacingFilter, remoteReplicator, filter],
             sender ?? $"Composite of {nameof(RewritePartitionEventReplicator)} {localPartition.GetId()}");
 
         var partitionProcessor = localPartition.GetProcessor();
@@ -51,30 +51,30 @@ internal static class RewritePartitionEventReplicator
     }
 }
 
-internal class RewriteRemotePartitionEventReplicator(
+internal class RewriteRemotePartitionNotificationReplicator(
     IPartitionInstance localPartition,
-    EventIdFilteringEventProcessor<IPartitionNotification> filter,
-    EventIdReplacingEventProcessor<IPartitionNotification> replacingFilter,
+    NotificationIdFilteringNotificationProcessor<IPartitionNotification> filter,
+    NotificationIdReplacingNotificationProcessor<IPartitionNotification> replacingFilter,
     SharedNodeMap sharedNodeMap,
     object? sender)
-    : RemotePartitionEventReplicator(localPartition, sharedNodeMap, filter, sender)
+    : RemotePartitionNotificationReplicator(localPartition, sharedNodeMap, filter, sender)
 {
     private readonly INotificationIdProvider _eventIdProvider = new NotificationIdProvider(null);
 
-    protected override void SuppressEventForwarding(IPartitionNotification partitionEvent, Action action)
+    protected override void SuppressNotificationForwarding(IPartitionNotification partitionEvent, Action action)
     {
         var eventId = _eventIdProvider.CreateNotificationId();
         var originalEventId = partitionEvent.NotificationId;
-        replacingFilter.RegisterReplacementEventId(eventId, originalEventId);
-        Filter.RegisterEventId(eventId);
+        replacingFilter.RegisterReplacementNotificationId(eventId, originalEventId);
+        Filter.RegisterNotificationId(eventId);
 
         try
         {
             action();
         } finally
         {
-            Filter.UnregisterEventId(eventId);
-            replacingFilter.UnregisterReplacementEventId(eventId);
+            Filter.UnregisterNotificationId(eventId);
+            replacingFilter.UnregisterReplacementNotificationId(eventId);
         }
     }
 }
