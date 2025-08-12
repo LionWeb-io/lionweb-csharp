@@ -89,5 +89,5 @@ public partial interface BaseReferenceIface : INode
 	public IReadableNode Ref { get; set; }
 
 	/// <remarks>Required Single Reference</remarks>
-        public BaseReferenceIface SetRef(IReadableNode value, INotificationId? eventId = null);
+        public BaseReferenceIface SetRef(IReadableNode value, INotificationId? notificationId = null);
 }

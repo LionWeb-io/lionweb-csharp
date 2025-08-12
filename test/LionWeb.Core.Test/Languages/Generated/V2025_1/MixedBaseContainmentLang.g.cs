@@ -89,5 +89,5 @@ public partial interface BaseContainmentIface : INode
 	public INode Cont { get; set; }
 
 	/// <remarks>Required Single Containment</remarks>
-        public BaseContainmentIface SetCont(INode value, INotificationId? eventId = null);
+        public BaseContainmentIface SetCont(INode value, INotificationId? notificationId = null);
 }

@@ -108,36 +108,36 @@ public partial class Container : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
-        public Container AddLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> nodes, INotificationId? eventId = null)
+        public Container AddLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> nodes, INotificationId? notificationId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
-		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, null, eventId);
-		evt.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> notification = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, null, notificationId);
+		notification.CollectOldData();
 		_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Libraries and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Libraries.Count</exception>
-        public Container InsertLibraries(int index, IEnumerable<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> nodes, INotificationId? eventId = null)
+        public Container InsertLibraries(int index, IEnumerable<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _libraries);
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _libraries, MultiLanguage.Instance.Container_libraries);
 		AssureNoSelfMove(index, safeNodes, _libraries);
-		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, index, eventId);
-		evt.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> notification = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, index, notificationId);
+		notification.CollectOldData();
 		_libraries.InsertRange(index, SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If Libraries would be empty</exception>
-        public Container RemoveLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> nodes, INotificationId? eventId = null)
+        public Container RemoveLibraries(IEnumerable<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> nodes, INotificationId? notificationId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, MultiLanguage.Instance.Container_libraries);
@@ -167,19 +167,19 @@ public partial class Container : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (MultiLanguage.Instance.Container_libraries.EqualsIdentity(feature))
 		{
 			var safeNodes = MultiLanguage.Instance.Container_libraries.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library>(value).ToList();
 			AssureNonEmpty(safeNodes, MultiLanguage.Instance.Container_libraries);
-			ContainmentSetNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> evt = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, eventId);
-			evt.CollectOldData();
+			ContainmentSetNotificationEmitter<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Library> notification = new(MultiLanguage.Instance.Container_libraries, this, safeNodes, _libraries, notificationId);
+			notification.CollectOldData();
 			RemoveSelfParent(_libraries.ToList(), _libraries, MultiLanguage.Instance.Container_libraries);
 			_libraries.AddRange(SetSelfParent(safeNodes, MultiLanguage.Instance.Container_libraries));
-			evt.Notify();
+			notification.Notify();
 			return true;
 		}
 

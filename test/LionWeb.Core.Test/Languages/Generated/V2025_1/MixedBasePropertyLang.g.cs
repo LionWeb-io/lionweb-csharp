@@ -89,5 +89,5 @@ public partial interface BasePropertyIface : INode
 	public string Prop { get; set; }
 
 	/// <remarks>Required Property</remarks>
-        public BasePropertyIface SetProp(string value, INotificationId? eventId = null);
+        public BasePropertyIface SetProp(string value, INotificationId? notificationId = null);
 }

@@ -136,12 +136,12 @@ public partial class AConcept : ConceptInstanceBase
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
-        public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept? value, INotificationId? eventId = null)
+        public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleNotificationEmitter evt = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, eventId);
-		evt.CollectOldData();
+		ReferenceSingleNotificationEmitter notification = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, notificationId);
+		notification.CollectOldData();
 		_bRef = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -166,15 +166,15 @@ public partial class AConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (ALangLanguage.Instance.AConcept_BRef.EqualsIdentity(feature))
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept)
 			{
-				SetBRef((LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept?)value, eventId);
+				SetBRef((LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept?)value, notificationId);
 				return true;
 			}
 

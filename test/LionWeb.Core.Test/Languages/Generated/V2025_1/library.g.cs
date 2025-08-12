@@ -195,13 +195,13 @@ public partial class Book : ConceptInstanceBase
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Book SetAuthor(Writer value, INotificationId? eventId = null)
+        public Book SetAuthor(Writer value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_author);
-		ReferenceSingleNotificationEmitter evt = new(LibraryLanguage.Instance.Book_author, this, value, _author, eventId);
-		evt.CollectOldData();
+		ReferenceSingleNotificationEmitter notification = new(LibraryLanguage.Instance.Book_author, this, value, _author, notificationId);
+		notification.CollectOldData();
 		_author = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -220,12 +220,12 @@ public partial class Book : ConceptInstanceBase
 	}
 
 	/// <remarks>Required Property</remarks>
-        public Book SetPages(int value, INotificationId? eventId = null)
+        public Book SetPages(int value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter evt = new(LibraryLanguage.Instance.Book_pages, this, value, _pages, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Book_pages, this, value, _pages, notificationId);
+		notification.CollectOldData();
 		_pages = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -247,13 +247,13 @@ public partial class Book : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Book SetTitle(string value, INotificationId? eventId = null)
+        public Book SetTitle(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Book_title);
-		PropertyNotificationEmitter evt = new(LibraryLanguage.Instance.Book_title, this, value, _title, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Book_title, this, value, _title, notificationId);
+		notification.CollectOldData();
 		_title = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -271,12 +271,12 @@ public partial class Book : ConceptInstanceBase
 	}
 
 	/// <remarks>Optional Property</remarks>
-        public Book SetType(BookType? value, INotificationId? eventId = null)
+        public Book SetType(BookType? value, INotificationId? notificationId = null)
 	{
-		PropertyNotificationEmitter evt = new(LibraryLanguage.Instance.Book_type, this, value, _type, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Book_type, this, value, _type, notificationId);
+		notification.CollectOldData();
 		_type = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -319,15 +319,15 @@ public partial class Book : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (LibraryLanguage.Instance.Book_author.EqualsIdentity(feature))
 		{
 			if (value is LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Writer v)
 			{
-				SetAuthor(v, eventId);
+				SetAuthor(v, notificationId);
 				return true;
 			}
 
@@ -338,7 +338,7 @@ public partial class Book : ConceptInstanceBase
 		{
 			if (value is int v)
 			{
-				SetPages(v, eventId);
+				SetPages(v, notificationId);
 				return true;
 			}
 
@@ -349,7 +349,7 @@ public partial class Book : ConceptInstanceBase
 		{
 			if (value is string v)
 			{
-				SetTitle(v, eventId);
+				SetTitle(v, notificationId);
 				return true;
 			}
 
@@ -360,7 +360,7 @@ public partial class Book : ConceptInstanceBase
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.BookType)
 			{
-				SetType((LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.BookType?)value, eventId);
+				SetType((LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.BookType?)value, notificationId);
 				return true;
 			}
 
@@ -407,13 +407,13 @@ public partial class GuideBookWriter : Writer
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public GuideBookWriter SetCountries(string value, INotificationId? eventId = null)
+        public GuideBookWriter SetCountries(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.GuideBookWriter_countries);
-		PropertyNotificationEmitter evt = new(LibraryLanguage.Instance.GuideBookWriter_countries, this, value, _countries, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.GuideBookWriter_countries, this, value, _countries, notificationId);
+		notification.CollectOldData();
 		_countries = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -438,15 +438,15 @@ public partial class GuideBookWriter : Writer
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (LibraryLanguage.Instance.GuideBookWriter_countries.EqualsIdentity(feature))
 		{
 			if (value is string v)
 			{
-				SetCountries(v, eventId);
+				SetCountries(v, notificationId);
 				return true;
 			}
 
@@ -485,36 +485,36 @@ public partial class Library : ConceptInstanceBase
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
-        public Library AddBooks(IEnumerable<Book> nodes, INotificationId? eventId = null)
+        public Library AddBooks(IEnumerable<Book> nodes, INotificationId? notificationId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
-		ContainmentAddMultipleNotificationEmitter<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null, eventId);
-		evt.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<Book> notification = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, null, notificationId);
+		notification.CollectOldData();
 		_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If both Books and nodes are empty</exception>
     	/// <exception cref = "ArgumentOutOfRangeException">If index negative or greater than Books.Count</exception>
-        public Library InsertBooks(int index, IEnumerable<Book> nodes, INotificationId? eventId = null)
+        public Library InsertBooks(int index, IEnumerable<Book> nodes, INotificationId? notificationId = null)
 	{
 		AssureInRange(index, _books);
 		var safeNodes = nodes?.ToList();
 		AssureNonEmpty(safeNodes, _books, LibraryLanguage.Instance.Library_books);
 		AssureNoSelfMove(index, safeNodes, _books);
-		ContainmentAddMultipleNotificationEmitter<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, index, eventId);
-		evt.CollectOldData();
+		ContainmentAddMultipleNotificationEmitter<Book> notification = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, index, notificationId);
+		notification.CollectOldData();
 		_books.InsertRange(index, SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
 	/// <remarks>Required Multiple Containment</remarks>
     	/// <exception cref = "InvalidValueException">If Books would be empty</exception>
-        public Library RemoveBooks(IEnumerable<Book> nodes, INotificationId? eventId = null)
+        public Library RemoveBooks(IEnumerable<Book> nodes, INotificationId? notificationId = null)
 	{
 		var safeNodes = nodes?.ToList();
 		AssureNotNull(safeNodes, LibraryLanguage.Instance.Library_books);
@@ -541,13 +541,13 @@ public partial class Library : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Library SetName(string value, INotificationId? eventId = null)
+        public Library SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Library_name);
-		PropertyNotificationEmitter evt = new(LibraryLanguage.Instance.Library_name, this, value, _name, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Library_name, this, value, _name, notificationId);
+		notification.CollectOldData();
 		_name = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -578,19 +578,19 @@ public partial class Library : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (LibraryLanguage.Instance.Library_books.EqualsIdentity(feature))
 		{
 			var safeNodes = LibraryLanguage.Instance.Library_books.AsNodes<LionWeb.Core.Test.Languages.Generated.V2025_1.Library.M2.Book>(value).ToList();
 			AssureNonEmpty(safeNodes, LibraryLanguage.Instance.Library_books);
-			ContainmentSetNotificationEmitter<Book> evt = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, eventId);
-			evt.CollectOldData();
+			ContainmentSetNotificationEmitter<Book> notification = new(LibraryLanguage.Instance.Library_books, this, safeNodes, _books, notificationId);
+			notification.CollectOldData();
 			RemoveSelfParent(_books.ToList(), _books, LibraryLanguage.Instance.Library_books);
 			_books.AddRange(SetSelfParent(safeNodes, LibraryLanguage.Instance.Library_books));
-			evt.Notify();
+			notification.Notify();
 			return true;
 		}
 
@@ -598,7 +598,7 @@ public partial class Library : ConceptInstanceBase
 		{
 			if (value is string v)
 			{
-				SetName(v, eventId);
+				SetName(v, notificationId);
 				return true;
 			}
 
@@ -667,13 +667,13 @@ public partial class SpecialistBookWriter : Writer
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public SpecialistBookWriter SetSubject(string value, INotificationId? eventId = null)
+        public SpecialistBookWriter SetSubject(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.SpecialistBookWriter_subject);
-		PropertyNotificationEmitter evt = new(LibraryLanguage.Instance.SpecialistBookWriter_subject, this, value, _subject, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.SpecialistBookWriter_subject, this, value, _subject, notificationId);
+		notification.CollectOldData();
 		_subject = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -698,15 +698,15 @@ public partial class SpecialistBookWriter : Writer
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (LibraryLanguage.Instance.SpecialistBookWriter_subject.EqualsIdentity(feature))
 		{
 			if (value is string v)
 			{
-				SetSubject(v, eventId);
+				SetSubject(v, notificationId);
 				return true;
 			}
 
@@ -747,13 +747,13 @@ public partial class Writer : ConceptInstanceBase
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public Writer SetName(string value, INotificationId? eventId = null)
+        public Writer SetName(string value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, LibraryLanguage.Instance.Writer_name);
-		PropertyNotificationEmitter evt = new(LibraryLanguage.Instance.Writer_name, this, value, _name, eventId);
-		evt.CollectOldData();
+		PropertyNotificationEmitter notification = new(LibraryLanguage.Instance.Writer_name, this, value, _name, notificationId);
+		notification.CollectOldData();
 		_name = value;
-		evt.Notify();
+		notification.Notify();
 		return this;
 	}
 
@@ -778,15 +778,15 @@ public partial class Writer : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, object? value, INotificationId? eventId = null)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value, eventId))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (LibraryLanguage.Instance.Writer_name.EqualsIdentity(feature))
 		{
 			if (value is string v)
 			{
-				SetName(v, eventId);
+				SetName(v, notificationId);
 				return true;
 			}
 
