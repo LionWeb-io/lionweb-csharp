@@ -24,7 +24,7 @@ using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class EventTests_Twoway
+public class NotificationTests_Twoway
 {
     #region Properties
 

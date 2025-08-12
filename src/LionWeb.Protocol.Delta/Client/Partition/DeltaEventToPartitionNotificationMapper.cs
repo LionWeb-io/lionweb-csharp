@@ -24,11 +24,11 @@ using Core.Notification;
 using Core.Notification.Partition;
 using Message.Event;
 
-public class DeltaEventToPartitionEventMapper(
+public class DeltaEventToPartitionNotificationMapper(
     SharedNodeMap sharedNodeMap,
     SharedKeyedMap sharedKeyedMap,
     DeserializerBuilder deserializerBuilder)
-    : DeltaEventToEventMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
+    : DeltaEventToNotificationMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
 {
     public IPartitionNotification Map(IDeltaEvent deltaEvent) =>
         deltaEvent switch
@@ -43,7 +43,8 @@ public class DeltaEventToPartitionEventMapper(
             ChildMovedFromOtherContainmentInSameParent a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainment a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainment a => OnChildMovedAndReplacedFromOtherContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentInSameParent a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
+            ChildMovedAndReplacedFromOtherContainmentInSameParent a =>
+                OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
             AnnotationAdded a => OnAnnotationAdded(a),
             AnnotationDeleted a => OnAnnotationDeleted(a),
             AnnotationMovedFromOtherParent a => OnAnnotationMovedFromOtherParent(a),
@@ -64,7 +65,7 @@ public class DeltaEventToPartitionEventMapper(
             parent,
             property,
             ToPropertyValue(parent, property, propertyAddedEvent.NewValue),
-            ToEventId(propertyAddedEvent)
+            ToNotificationId(propertyAddedEvent)
         );
     }
 
@@ -76,7 +77,7 @@ public class DeltaEventToPartitionEventMapper(
             parent,
             property,
             parent.Get(property) ?? throw new UnsetFeatureException(property),
-            ToEventId(propertyDeletedEvent)
+            ToNotificationId(propertyDeletedEvent)
         );
     }
 
@@ -89,7 +90,7 @@ public class DeltaEventToPartitionEventMapper(
             property,
             ToPropertyValue(parent, property, propertyChangedEvent.NewValue),
             parent.Get(property) ?? throw new UnsetFeatureException(property),
-            ToEventId(propertyChangedEvent)
+            ToNotificationId(propertyChangedEvent)
         );
     }
 
@@ -106,7 +107,7 @@ public class DeltaEventToPartitionEventMapper(
             Deserialize(childAddedEvent.NewChild),
             containment,
             childAddedEvent.Index,
-            ToEventId(childAddedEvent)
+            ToNotificationId(childAddedEvent)
         );
     }
 
@@ -119,7 +120,7 @@ public class DeltaEventToPartitionEventMapper(
             parent,
             containment,
             childDeletedEvent.Index,
-            ToEventId(childDeletedEvent)
+            ToNotificationId(childDeletedEvent)
         );
     }
 
@@ -133,11 +134,12 @@ public class DeltaEventToPartitionEventMapper(
             parent,
             containment,
             childReplacedEvent.Index,
-            ToEventId(childReplacedEvent)
+            ToNotificationId(childReplacedEvent)
         );
     }
 
-    private ChildMovedFromOtherContainmentNotification OnChildMovedFromOtherContainment(ChildMovedFromOtherContainment childMovedEvent)
+    private ChildMovedFromOtherContainmentNotification OnChildMovedFromOtherContainment(
+        ChildMovedFromOtherContainment childMovedEvent)
     {
         var movedChild = ToNode(childMovedEvent.MovedChild);
         var oldParent = ToNode(childMovedEvent.OldParent);
@@ -152,11 +154,12 @@ public class DeltaEventToPartitionEventMapper(
             oldParent,
             oldContainment,
             childMovedEvent.OldIndex,
-            ToEventId(childMovedEvent)
+            ToNotificationId(childMovedEvent)
         );
     }
-    
-    private ChildMovedAndReplacedFromOtherContainmentNotification OnChildMovedAndReplacedFromOtherContainment(ChildMovedAndReplacedFromOtherContainment childMovedAndReplacedEvent)
+
+    private ChildMovedAndReplacedFromOtherContainmentNotification OnChildMovedAndReplacedFromOtherContainment(
+        ChildMovedAndReplacedFromOtherContainment childMovedAndReplacedEvent)
     {
         var movedChild = ToNode(childMovedAndReplacedEvent.MovedChild);
         var oldParent = (IWritableNode)movedChild.GetParent();
@@ -168,20 +171,21 @@ public class DeltaEventToPartitionEventMapper(
         var replacedChild = ToNode(childMovedAndReplacedEvent.ReplacedChild);
 
         return new ChildMovedAndReplacedFromOtherContainmentNotification(
-            newParent, 
+            newParent,
             newContainment,
             childMovedAndReplacedEvent.NewIndex,
             movedChild,
-            oldParent, 
-            oldContainment, 
+            oldParent,
+            oldContainment,
             childMovedAndReplacedEvent.OldIndex,
             replacedChild,
-            ToEventId(childMovedAndReplacedEvent)
-            );
+            ToNotificationId(childMovedAndReplacedEvent)
+        );
     }
-    
+
     private ChildMovedAndReplacedFromOtherContainmentInSameParentNotification
-        OnChildMovedAndReplacedFromOtherContainmentInSameParent(ChildMovedAndReplacedFromOtherContainmentInSameParent childMovedAndReplaced)
+        OnChildMovedAndReplacedFromOtherContainmentInSameParent(
+            ChildMovedAndReplacedFromOtherContainmentInSameParent childMovedAndReplaced)
     {
         var parent = ToNode(childMovedAndReplaced.Parent);
         var movedChild = ToNode(childMovedAndReplaced.MovedChild);
@@ -197,10 +201,10 @@ public class DeltaEventToPartitionEventMapper(
             oldContainment,
             childMovedAndReplaced.OldIndex,
             replacedChild,
-            ToEventId(childMovedAndReplaced)
+            ToNotificationId(childMovedAndReplaced)
         );
     }
-    
+
     private ChildMovedFromOtherContainmentInSameParentNotification OnChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParent childMovedEvent)
     {
@@ -215,11 +219,12 @@ public class DeltaEventToPartitionEventMapper(
             parent,
             oldContainment,
             childMovedEvent.OldIndex,
-            ToEventId(childMovedEvent)
+            ToNotificationId(childMovedEvent)
         );
     }
 
-    private ChildMovedInSameContainmentNotification OnChildMovedInSameContainment(ChildMovedInSameContainment childMovedEvent)
+    private ChildMovedInSameContainmentNotification OnChildMovedInSameContainment(
+        ChildMovedInSameContainment childMovedEvent)
     {
         var parent = ToNode(childMovedEvent.Parent);
         var movedChild = ToNode(childMovedEvent.MovedChild);
@@ -230,7 +235,7 @@ public class DeltaEventToPartitionEventMapper(
             parent,
             containment,
             childMovedEvent.OldIndex,
-            ToEventId(childMovedEvent)
+            ToNotificationId(childMovedEvent)
         );
     }
 
@@ -245,7 +250,7 @@ public class DeltaEventToPartitionEventMapper(
             parent,
             Deserialize(annotationAddedEvent.NewAnnotation),
             annotationAddedEvent.Index,
-            ToEventId(annotationAddedEvent)
+            ToNotificationId(annotationAddedEvent)
         );
     }
 
@@ -257,11 +262,12 @@ public class DeltaEventToPartitionEventMapper(
             deletedAnnotation as IWritableNode ?? throw new InvalidValueException(null, deletedAnnotation),
             parent,
             annotationDeletedEvent.Index,
-            ToEventId(annotationDeletedEvent)
+            ToNotificationId(annotationDeletedEvent)
         );
     }
 
-    private AnnotationMovedFromOtherParentNotification OnAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParent annotationMovedEvent)
+    private AnnotationMovedFromOtherParentNotification OnAnnotationMovedFromOtherParent(
+        AnnotationMovedFromOtherParent annotationMovedEvent)
     {
         var oldParent = ToNode(annotationMovedEvent.OldParent);
         var newParent = ToNode(annotationMovedEvent.NewParent);
@@ -272,11 +278,12 @@ public class DeltaEventToPartitionEventMapper(
             movedAnnotation,
             oldParent,
             annotationMovedEvent.OldIndex,
-            ToEventId(annotationMovedEvent)
+            ToNotificationId(annotationMovedEvent)
         );
     }
 
-    private AnnotationMovedInSameParentNotification OnAnnotationMovedInSameParent(AnnotationMovedInSameParent annotationMovedEvent)
+    private AnnotationMovedInSameParentNotification OnAnnotationMovedInSameParent(
+        AnnotationMovedInSameParent annotationMovedEvent)
     {
         var parent = ToNode(annotationMovedEvent.Parent);
         var movedAnnotation = ToNode(annotationMovedEvent.MovedAnnotation);
@@ -285,7 +292,7 @@ public class DeltaEventToPartitionEventMapper(
             movedAnnotation,
             parent,
             annotationMovedEvent.OldIndex,
-            ToEventId(annotationMovedEvent)
+            ToNotificationId(annotationMovedEvent)
         );
     }
 
@@ -302,7 +309,7 @@ public class DeltaEventToPartitionEventMapper(
             reference,
             referenceAddedEvent.Index,
             ToTarget(referenceAddedEvent.NewTarget, referenceAddedEvent.NewResolveInfo),
-            ToEventId(referenceAddedEvent)
+            ToNotificationId(referenceAddedEvent)
         );
     }
 
@@ -315,7 +322,7 @@ public class DeltaEventToPartitionEventMapper(
             reference,
             referenceDeletedEvent.Index,
             ToTarget(referenceDeletedEvent.DeletedTarget, referenceDeletedEvent.DeletedResolveInfo),
-            ToEventId(referenceDeletedEvent)
+            ToNotificationId(referenceDeletedEvent)
         );
     }
 
@@ -327,9 +334,9 @@ public class DeltaEventToPartitionEventMapper(
             parent,
             reference,
             referenceChangedEvent.Index,
-            ToTarget(referenceChangedEvent.NewTarget,  referenceChangedEvent.NewResolveInfo),
-            ToTarget(referenceChangedEvent.OldTarget,  referenceChangedEvent.OldResolveInfo),
-            ToEventId(referenceChangedEvent)
+            ToTarget(referenceChangedEvent.NewTarget, referenceChangedEvent.NewResolveInfo),
+            ToTarget(referenceChangedEvent.OldTarget, referenceChangedEvent.OldResolveInfo),
+            ToNotificationId(referenceChangedEvent)
         );
     }
 

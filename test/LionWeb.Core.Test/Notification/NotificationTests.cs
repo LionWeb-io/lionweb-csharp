@@ -20,13 +20,11 @@ namespace LionWeb.Core.Test.Listener;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using M1.Event.Partition;
-using Notification;
 using Notification.Partition;
 using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
 
-public abstract class EventTestsBase
+public abstract class NotificationTestsBase
 {
     protected abstract Geometry CreateReplicator(Geometry node);
 
@@ -241,8 +239,8 @@ public abstract class EventTestsBase
     }
 
     /// <summary>
-    /// This test triggers two events: ChildDeletedEvent, ChildAddedEvent
-    /// but it should trigger ChildReplacedEvent //TODO: requires fix !
+    /// This test triggers two notifications: ChildDeletedNotification, ChildAddedNotification
+    /// but it should trigger ChildReplacedNotification //TODO: requires fix !
     /// </summary>
     [TestMethod]
     public void ChildReplaced_Multiple_First()
@@ -258,8 +256,8 @@ public abstract class EventTestsBase
     }
 
     /// <summary>
-    /// This test triggers two events: ChildDeletedEvent, ChildAddedEvent
-    /// but it should trigger ChildReplacedEvent //TODO: requires fix !
+    /// This test triggers two notifications: ChildDeletedNotification, ChildAddedNotification
+    /// but it should trigger ChildReplacedNotification //TODO: requires fix !
     /// </summary>
     [TestMethod]
     public void ChildReplaced_Multiple_Last()
@@ -782,7 +780,7 @@ public abstract class EventTestsBase
 }
 
 [TestClass]
-public class EventsTest : EventTestsBase
+public class NotificationsTest : NotificationTestsBase
 {
     protected override Geometry CreateReplicator(Geometry node)
     {

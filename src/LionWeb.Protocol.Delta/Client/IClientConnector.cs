@@ -30,7 +30,7 @@ public interface IClientConnector<T>
 
 public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
 
-public interface IEventClientConnector : IClientConnector<INotification>
+public interface INotificationClientConnector : IClientConnector<INotification>
 {
-    INotification IClientConnector<INotification>.Convert(INotification internalEvent) => internalEvent;
+    INotification IClientConnector<INotification>.Convert(INotification notification) => notification;
 }

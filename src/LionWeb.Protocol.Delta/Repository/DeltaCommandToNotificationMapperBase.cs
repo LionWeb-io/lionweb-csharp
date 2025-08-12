@@ -19,8 +19,6 @@ namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
 using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Partition;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Partition;
@@ -28,13 +26,13 @@ using Core.Serialization;
 using Message;
 using Message.Command;
 
-public abstract class DeltaCommandToEventMapperBase
+public abstract class DeltaCommandToNotificationMapperBase
 {
     private SharedNodeMap _sharedNodeMap;
     private SharedKeyedMap _sharedKeyedMap;
     private DeserializerBuilder _deserializerBuilder;
 
-    protected DeltaCommandToEventMapperBase(
+    protected DeltaCommandToNotificationMapperBase(
         SharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
@@ -68,7 +66,7 @@ public abstract class DeltaCommandToEventMapperBase
         return new ReferenceTarget(resolveInfo, target);
     }
 
-    protected static INotificationId ToEventId(IDeltaCommand command) =>
+    protected static INotificationId ToNotificationId(IDeltaCommand command) =>
         new ParticipationNotificationId(command.InternalParticipationId, command.CommandId);
 
     protected IWritableNode ToNode(TargetNode nodeId)
@@ -76,7 +74,7 @@ public abstract class DeltaCommandToEventMapperBase
         if (_sharedNodeMap.TryGetValue(nodeId, out var node))
         {
             if (node is IWritableNode w) return w;
-        throw new NotImplementedException($"node: {node}");
+            throw new NotImplementedException($"node: {node}");
         }
 
         // TODO change to correct exception 

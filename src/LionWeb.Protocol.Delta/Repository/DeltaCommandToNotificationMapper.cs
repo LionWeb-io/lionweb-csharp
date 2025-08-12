@@ -15,5 +15,26 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Forest;
+namespace LionWeb.Protocol.Delta.Repository;
 
+using Core.Notification;
+using Message.Command;
+using Partition;
+
+public class DeltaCommandToNotificationMapper
+{
+    private readonly DeltaCommandToPartitionNotificationMapper _partitionMapper;
+
+    public DeltaCommandToNotificationMapper(DeltaCommandToPartitionNotificationMapper partitionMapper)
+    {
+        _partitionMapper = partitionMapper;
+    }
+
+    public INotification Map(IDeltaCommand command) =>
+        command switch
+        {
+            IForestDeltaCommand c => _partitionMapper.Map(c),
+
+            _ => throw new NotImplementedException(command.GetType().Name)
+        };
+}

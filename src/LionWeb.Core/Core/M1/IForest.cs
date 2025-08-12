@@ -17,8 +17,6 @@
 
 namespace LionWeb.Core.M1;
 
-using Event;
-using Event.Forest;
 using Notification;
 using Notification.Forest;
 using Utilities;
@@ -32,10 +30,10 @@ public interface IForest
     public IReadOnlySet<IPartitionInstance> Partitions { get; }
 
     /// Adds <paramref name="partitions"/> to <c>this</c> forest.
-    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? eventId = null);
+    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
     /// Removes <paramref name="partitions"/> from <c>this</c> forest.
-    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? eventId = null);
+    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
     /// <c>this</c> forest's processor, if any.
     IForestProcessor? GetProcessor();
@@ -46,36 +44,38 @@ public class Forest : IForest
 {
     private readonly HashSet<IPartitionInstance> _partitions;
     private readonly ForestNotificationProcessor _notificationProcessor;
-    private readonly INotificationIdProvider  _eventIdProvider;
+    private readonly INotificationIdProvider _notificationIdProvider;
 
     /// <inheritdoc cref="IForest"/>
     public Forest()
     {
         _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
         _notificationProcessor = new ForestNotificationProcessor(this);
-        _eventIdProvider = new NotificationIdProvider(this);
+        _notificationIdProvider = new NotificationIdProvider(this);
     }
 
     /// <inheritdoc />
     public IReadOnlySet<IPartitionInstance> Partitions => _partitions;
 
     /// <inheritdoc />
-    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? eventId = null)
+    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null)
     {
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _notificationProcessor.Receive(new PartitionAddedNotification(partition, eventId ?? _eventIdProvider.CreateNotificationId()));
+                _notificationProcessor.Receive(new PartitionAddedNotification(partition,
+                    notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }
 
     /// <inheritdoc />
-    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? eventId = null)
+    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null)
     {
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _notificationProcessor.Receive(new PartitionDeletedNotification(partition, eventId ?? _eventIdProvider.CreateNotificationId()));
+                _notificationProcessor.Receive(new PartitionDeletedNotification(partition,
+                    notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }
 

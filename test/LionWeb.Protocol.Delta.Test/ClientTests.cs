@@ -201,14 +201,14 @@ public class ClientTests
 
 internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 {
-    private readonly EventToDeltaCommandMapper _mapper;
+    private readonly NotificationToDeltaCommandMapper _mapper;
 
     public DeltaRepositoryConnector(LionWebVersions lionWebVersion)
     {
         var commandIdProvider = new CommandIdProvider();
-        _mapper = new EventToDeltaCommandMapper(
-            new PartitionEventToDeltaCommandMapper(commandIdProvider, lionWebVersion),
-            new ForestEventToDeltaCommandMapper(commandIdProvider, lionWebVersion)
+        _mapper = new NotificationToDeltaCommandMapper(
+            new PartitionNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion),
+            new ForestNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion)
         );
     }
 
@@ -234,15 +234,15 @@ internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 internal class DeltaClientConnector : IDeltaClientConnector
 {
     private readonly Action<IDeltaContent> _sender;
-    private readonly EventToDeltaCommandMapper _mapper;
+    private readonly NotificationToDeltaCommandMapper _mapper;
 
     public DeltaClientConnector(LionWebVersions lionWebVersion, Action<IDeltaContent> sender)
     {
         _sender = sender;
         var commandIdProvider = new CommandIdProvider();
-        _mapper = new EventToDeltaCommandMapper(
-            new PartitionEventToDeltaCommandMapper(commandIdProvider, lionWebVersion),
-            new ForestEventToDeltaCommandMapper(commandIdProvider, lionWebVersion)
+        _mapper = new NotificationToDeltaCommandMapper(
+            new PartitionNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion),
+            new ForestNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion)
         );
     }
 

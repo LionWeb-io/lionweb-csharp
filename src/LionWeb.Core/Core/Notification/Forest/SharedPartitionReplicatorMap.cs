@@ -15,10 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Forest;
+namespace LionWeb.Core.Notification.Forest;
 
-using Notification.Partition;
-using Notification.Processor;
+using Partition;
+using Processor;
 
 public class SharedPartitionReplicatorMap
 {

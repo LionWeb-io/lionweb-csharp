@@ -18,7 +18,6 @@
 namespace LionWeb.Core;
 
 using M1;
-using M1.Event.Partition;
 using M2;
 using M3;
 using Notification;
@@ -488,7 +487,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <summary>
     /// Tries to retrieve the <see cref="IPartitionInstance.GetProcessor"/> from this node's <see cref="Concept.Partition"/>.
     /// </summary>
-    /// <returns>This node's <see cref="LionWeb.Core.M1.Event.Partition.IPartitionProcessor"/>, if available.</returns>
+    /// <returns>This node's <see cref="IPartitionProcessor"/>, if available.</returns>
     protected virtual IPartitionProcessor? GetPartitionProcessor() =>
         this.GetPartition()?.GetProcessor();
 
@@ -785,7 +784,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             if (node is INode iNode)
                 SetParentInternal(iNode, null);
             if (partitionProcessor != null && remover != null)
-                remover(partitionProcessor, index, node, notificationId ?? partitionProcessor.CreateEventId());
+                remover(partitionProcessor, index, node, notificationId ?? partitionProcessor.CreateNotificationId());
         }
 
         return result;
@@ -816,7 +815,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
             storage.RemoveAt(index);
             if (partitionProcessor != null && remover != null)
-                remover(partitionProcessor, index, node, notificationId ?? partitionProcessor.CreateEventId());
+                remover(partitionProcessor, index, node, notificationId ?? partitionProcessor.CreateNotificationId());
         }
     }
 
@@ -825,17 +824,17 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         (commander, index, node, notificationId) =>
         {
             IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
-            commander.Receive(new ReferenceDeletedNotification(this, reference, index, deletedTarget, notificationId ?? commander.CreateEventId()));
+            commander.Receive(new ReferenceDeletedNotification(this, reference, index, deletedTarget, notificationId ?? commander.CreateNotificationId()));
         };
 
     /// Raises <see cref="ChildDeletedNotification"/> for <paramref name="containment"/>.
     protected Action<IPartitionProcessor, Index, T, INotificationId?> ContainmentRemover<T>(Containment containment) where T : INode =>
         (commander, index, node, notificationId) =>
-            commander.Receive(new ChildDeletedNotification(node, this, containment, index, notificationId ?? commander.CreateEventId()));
+            commander.Receive(new ChildDeletedNotification(node, this, containment, index, notificationId ?? commander.CreateNotificationId()));
 
     /// Raises <see cref="AnnotationDeletedNotification"/>.
     private void AnnotationRemover(IPartitionProcessor commander, Index index, INode node, INotificationId? notificationId = null) =>
-        commander.Receive(new AnnotationDeletedNotification(node, this, index, notificationId ?? commander.CreateEventId()));
+        commander.Receive(new AnnotationDeletedNotification(node, this, index, notificationId ?? commander.CreateNotificationId()));
 
     #endregion
 }

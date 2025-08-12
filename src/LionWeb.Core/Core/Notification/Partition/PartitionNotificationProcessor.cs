@@ -15,44 +15,41 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Partition;
+namespace LionWeb.Core.Notification.Partition;
 
-using Notification;
-using Notification.Partition;
-using Notification.Processor;
+using Processor;
 
-/// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-/// Raises events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+/// Provides notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+/// Raises notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 public interface IPartitionProcessor : INotificationProcessor<IPartitionNotification>
 {
-    public INotificationId CreateEventId();
-    
-    /// Registers <paramref name="handler"/> to be notified of events compatible with <typeparamref name="TSubscribedEvent"/>.
-    /// <typeparam name="TSubscribedEvent">
-    /// Type of events <paramref name="handler"/> is interested in.
-    /// Events raised by this publisher that are <i>not</i> compatible with <typeparamref name="TSubscribedEvent"/>
+    public INotificationId CreateNotificationId();
+
+    /// Registers <paramref name="handler"/> to be notified of notifications compatible with <typeparamref name="TSubscribedNotification"/>.
+    /// <typeparam name="TSubscribedNotification">
+    /// Type of notifications <paramref name="handler"/> is interested in.
+    /// notifications raised by this publisher that are <i>not</i> compatible with <typeparamref name="TSubscribedNotification"/>
     /// will <i>not</i> reach <paramref name="handler"/>.
     /// </typeparam> 
-    public void Subscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
-        where TSubscribedEvent : class, IPartitionNotification;
+    public void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
+        where TSubscribedNotification : class, IPartitionNotification;
 
-    /// Unregisters <paramref name="handler"/> from notification of events.
+    /// Unregisters <paramref name="handler"/> from notification of notifications.
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
-    public void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler)
-        where TSubscribedEvent : class, IPartitionNotification;
+    public void Unsubscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
+        where TSubscribedNotification : class, IPartitionNotification;
 }
 
-/// Forwards all <see cref="ModelNotificationProcessorBase{TEvent}.Receive">received</see> events
+/// Forwards all <see cref="ModelNotificationProcessorBase{TNotification}.Receive">received</see> notifications
 /// unchanged to <i>following</i> processors,
-/// and to EventHandlers <see cref="ModelNotificationProcessorBase{TEvent}.Subscribe{TSubscribedEvent}">subscribed</see>
-/// to specific events.
+/// and to EventHandlers <see cref="ModelNotificationProcessorBase{TNotification}.Subscribe{TSubscribedNotification}">subscribed</see>
+/// to specific notifications.
 public class PartitionNotificationProcessor(object? sender)
     : ModelNotificationProcessorBase<IPartitionNotification>(sender), IPartitionProcessor
 {
-    private readonly INotificationIdProvider _eventIdProvider = new NotificationIdProvider(sender);
+    private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(sender);
 
     /// <inheritdoc />
-    public INotificationId CreateEventId() => 
-        _eventIdProvider.CreateNotificationId();
+    public INotificationId CreateNotificationId() =>
+        _notificationIdProvider.CreateNotificationId();
 }
-;

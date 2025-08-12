@@ -21,13 +21,11 @@ using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 using Notification.Forest;
-using M1.Event;
-using M1.Event.Forest;
 using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class EventTests_Forest
+public class NotificationTests_Forest
 {
     #region Children
 
@@ -123,7 +121,8 @@ public class EventTests_Forest
 
     #endregion
 
-    private static INotificationProcessor<IForestNotification> CreateReplicator(Forest cloneForest, Forest originalForest)
+    private static INotificationProcessor<IForestNotification> CreateReplicator(Forest cloneForest,
+        Forest originalForest)
     {
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
         var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
@@ -143,28 +142,29 @@ public class EventTests_Forest
     }
 }
 
-internal class TestLocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap) : NotificationProcessorBase<IForestNotification>(sender)
+internal class TestLocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
+    : NotificationProcessorBase<IForestNotification>(sender)
 {
     public override void Receive(IForestNotification message)
     {
         switch (message)
         {
-            case PartitionAddedNotification partitionAddedEvent:
-                OnLocalPartitionAdded(partitionAddedEvent);
+            case PartitionAddedNotification partitionAddedNotification:
+                OnLocalPartitionAdded(partitionAddedNotification);
                 break;
-            case PartitionDeletedNotification partitionDeletedEvent:
-                OnLocalPartitionDeleted(partitionDeletedEvent);
+            case PartitionDeletedNotification partitionDeletedNotification:
+                OnLocalPartitionDeleted(partitionDeletedNotification);
                 break;
         }
     }
-    
-    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedEvent)
+
+    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)
     {
-        var partitionReplicator = sharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
-        IProcessor.Connect(partitionAddedEvent.NewPartition.GetProcessor(), partitionReplicator);
+        var partitionReplicator = sharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
+        IProcessor.Connect(partitionAddedNotification.NewPartition.GetProcessor(), partitionReplicator);
     }
 
-    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent)
+    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
     {
         throw new NotImplementedException();
     }

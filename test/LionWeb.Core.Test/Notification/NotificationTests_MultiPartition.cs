@@ -19,14 +19,13 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1.Event.Partition;
 using Notification.Partition;
 using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
-using EventId = string;
+using NotificationId = string;
 
 [TestClass]
-public class EventTests_MultiPartition
+public class NotificationTests_MultiPartition
 {
     #region Children
 
@@ -43,9 +42,9 @@ public class EventTests_MultiPartition
 
         var replicator = CreateReplicator(clone, node);
 
-        List<(EventId, IReadableNode)> deletions = [];
+        List<(NotificationId, IReadableNode)> deletions = [];
         node.GetProcessor().Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
-        List<(EventId, IReadableNode)> moves = [];
+        List<(NotificationId, IReadableNode)> moves = [];
         node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
@@ -69,10 +68,10 @@ public class EventTests_MultiPartition
 
         var replicator = CreateReplicator(clone, node);
 
-        List<(EventId, IReadableNode)> originMoves = [];
+        List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
-        List<(EventId, IReadableNode)> destinationMoves = [];
+        List<(NotificationId, IReadableNode)> destinationMoves = [];
         node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
@@ -97,10 +96,10 @@ public class EventTests_MultiPartition
 
         var replicator = CreateReplicator(clone, node);
 
-        List<(EventId, IReadableNode)> originMoves = [];
+        List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
-        List<(EventId, IReadableNode)> destinationMoves = [];
+        List<(NotificationId, IReadableNode)> destinationMoves = [];
         node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
@@ -122,9 +121,9 @@ public class EventTests_MultiPartition
 
         var replicator = CreateReplicator(clone, node);
 
-        List<(EventId, IReadableNode)> deletions = [];
+        List<(NotificationId, IReadableNode)> deletions = [];
         node.GetProcessor().Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
-        List<(EventId, IReadableNode)> moves = [];
+        List<(NotificationId, IReadableNode)> moves = [];
         node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
@@ -147,10 +146,10 @@ public class EventTests_MultiPartition
 
         var replicator = CreateReplicator(clone, node);
 
-        List<(EventId, IReadableNode)> originMoves = [];
+        List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
-        List<(EventId, IReadableNode)> destinationMoves = [];
+        List<(NotificationId, IReadableNode)> destinationMoves = [];
         node.GetProcessor()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
@@ -184,10 +183,10 @@ public class EventTests_MultiPartition
 
         var replicator = CreateReplicator(clone, node);
 
-        List<(EventId, IReadableNode)> deletions = [];
+        List<(NotificationId, IReadableNode)> deletions = [];
         node.GetProcessor()
             .Subscribe<AnnotationDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedAnnotation)));
-        List<(EventId, IReadableNode)> moves = [];
+        List<(NotificationId, IReadableNode)> moves = [];
         node.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
 
@@ -212,10 +211,10 @@ public class EventTests_MultiPartition
 
         var replicator = CreateReplicator(clone, node);
 
-        List<(EventId, IReadableNode)> originMoves = [];
+        List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
-        List<(EventId, IReadableNode)> destinationMoves = [];
+        List<(NotificationId, IReadableNode)> destinationMoves = [];
         node.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) =>
                 destinationMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
@@ -242,10 +241,10 @@ public class EventTests_MultiPartition
 
         var replicator = CreateReplicator(clone, node);
 
-        List<(EventId, IReadableNode)> originMoves = [];
+        List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
-        List<(EventId, IReadableNode)> destinationMoves = [];
+        List<(NotificationId, IReadableNode)> destinationMoves = [];
         node.GetProcessor()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) =>
                 destinationMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));

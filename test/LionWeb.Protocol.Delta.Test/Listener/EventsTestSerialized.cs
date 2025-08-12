@@ -21,7 +21,6 @@ using Client;
 using Client.Partition;
 using Core;
 using Core.M1;
-using Core.M1.Event.Forest;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
@@ -30,7 +29,7 @@ using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Listener;
 
 [TestClass]
-public class EventsTestSerialized : EventTestsBase
+public class NotificationsTestSerialized : NotificationTestsBase
 {
     protected override Geometry CreateReplicator(Geometry node)
     {
@@ -64,9 +63,9 @@ public class EventsTestSerialized : EventTestsBase
         );
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetProcessor().Subscribe<IPartitionNotification>((sender, partitionEvent) =>
+        node.GetProcessor().Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
-            var deltaCommand = new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionEvent);
+            var deltaCommand = new PartitionNotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
         });
 

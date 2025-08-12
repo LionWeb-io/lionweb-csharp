@@ -18,7 +18,6 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
-using Core.M1.Event.Partition;
 using Core.M2;
 using Core.M3;
 using Core.Notification.Partition;

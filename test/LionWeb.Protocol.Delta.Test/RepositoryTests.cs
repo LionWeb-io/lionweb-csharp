@@ -22,7 +22,6 @@ using Client.Forest;
 using Client.Partition;
 using Core;
 using Core.M1;
-using Core.M1.Event;
 using Core.M3;
 using Core.Notification;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
@@ -137,15 +136,15 @@ public class RepositoryTests
 class RepositoryConnector : IDeltaRepositoryConnector
 {
     private readonly DeltaSerializer _deltaSerializer = new();
-    private readonly EventToDeltaEventMapper _mapper;
+    private readonly NotificationToDeltaEventMapper _mapper;
     private readonly Dictionary<IClientInfo, ClientConnector> _clients = [];
 
     public RepositoryConnector(LionWebVersions lionWebVersion)
     {
         var exceptionParticipationIdProvider = new ExceptionParticipationIdProvider();
         _mapper = new(
-            new PartitionEventToDeltaEventMapper(exceptionParticipationIdProvider, lionWebVersion),
-            new ForestEventToDeltaEventMapper(exceptionParticipationIdProvider, lionWebVersion)
+            new PartitionNotificationToDeltaEventMapper(exceptionParticipationIdProvider, lionWebVersion),
+            new ForestNotificationToDeltaEventMapper(exceptionParticipationIdProvider, lionWebVersion)
         );
     }
 
@@ -194,8 +193,8 @@ class RepositoryConnector : IDeltaRepositoryConnector
 
     public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
 
-    public IDeltaContent Convert(INotification internalEvent) =>
-        _mapper.Map(internalEvent);
+    public IDeltaContent Convert(INotification notification) =>
+        _mapper.Map(notification);
 
     public void MessageFromClient(ClientInfo clientInfo, byte[] encoded) =>
         RepositoryTests.Run(() =>
@@ -208,7 +207,7 @@ class RepositoryConnector : IDeltaRepositoryConnector
 class ClientConnector : IDeltaClientConnector
 {
     private readonly DeltaSerializer _deltaSerializer = new();
-    private readonly EventToDeltaCommandMapper _mapper;
+    private readonly NotificationToDeltaCommandMapper _mapper;
     private RepositoryConnector _repositoryConnector;
     private ClientInfo _clientInfo;
 
@@ -217,8 +216,8 @@ class ClientConnector : IDeltaClientConnector
     {
         var commandIdProvider = new CommandIdProvider();
         _mapper = new(
-            new PartitionEventToDeltaCommandMapper(commandIdProvider, lionWebVersion),
-            new ForestEventToDeltaCommandMapper(commandIdProvider, lionWebVersion)
+            new PartitionNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion),
+            new ForestNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion)
         );
     }
 
@@ -248,8 +247,8 @@ class ClientConnector : IDeltaClientConnector
 
     public event EventHandler<IDeltaContent>? ReceiveFromRepository;
 
-    public IDeltaContent Convert(INotification internalEvent) =>
-        _mapper.Map(internalEvent);
+    public IDeltaContent Convert(INotification notification) =>
+        _mapper.Map(notification);
 
     public void MessageFromRepository(byte[] encoded) =>
         RepositoryTests.Run(() =>

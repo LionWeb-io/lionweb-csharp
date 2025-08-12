@@ -18,13 +18,11 @@
 namespace LionWeb.Protocol.Delta.Repository.Partition;
 
 using Core;
-using Core.M1.Event;
-using Core.M1.Event.Partition;
 using Core.Notification;
 using Core.Notification.Partition;
 using Core.Notification.Processor;
 
-internal static class RewritePartitionEventReplicator
+internal static class RewritePartitionNotificationReplicator
 {
     public static new INotificationProcessor<IPartitionNotification> Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
@@ -37,8 +35,9 @@ internal static class RewritePartitionEventReplicator
                 internalSender);
         var localReplicator = new LocalPartitionNotificationReplicator(sharedNodeMap, internalSender);
 
-        var result = new CompositeNotificationProcessor<IPartitionNotification>([replacingFilter, remoteReplicator, filter],
-            sender ?? $"Composite of {nameof(RewritePartitionEventReplicator)} {localPartition.GetId()}");
+        var result = new CompositeNotificationProcessor<IPartitionNotification>(
+            [replacingFilter, remoteReplicator, filter],
+            sender ?? $"Composite of {nameof(RewritePartitionNotificationReplicator)} {localPartition.GetId()}");
 
         var partitionProcessor = localPartition.GetProcessor();
         if (partitionProcessor != null)
@@ -59,22 +58,22 @@ internal class RewriteRemotePartitionNotificationReplicator(
     object? sender)
     : RemotePartitionNotificationReplicator(localPartition, sharedNodeMap, filter, sender)
 {
-    private readonly INotificationIdProvider _eventIdProvider = new NotificationIdProvider(null);
+    private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(null);
 
-    protected override void SuppressNotificationForwarding(IPartitionNotification partitionEvent, Action action)
+    protected override void SuppressNotificationForwarding(IPartitionNotification partitionNotification, Action action)
     {
-        var eventId = _eventIdProvider.CreateNotificationId();
-        var originalEventId = partitionEvent.NotificationId;
-        replacingFilter.RegisterReplacementNotificationId(eventId, originalEventId);
-        Filter.RegisterNotificationId(eventId);
+        var notificationId = _notificationIdProvider.CreateNotificationId();
+        var originalNotificationId = partitionNotification.NotificationId;
+        replacingFilter.RegisterReplacementNotificationId(notificationId, originalNotificationId);
+        Filter.RegisterNotificationId(notificationId);
 
         try
         {
             action();
         } finally
         {
-            Filter.UnregisterNotificationId(eventId);
-            replacingFilter.UnregisterReplacementNotificationId(eventId);
+            Filter.UnregisterNotificationId(notificationId);
+            replacingFilter.UnregisterReplacementNotificationId(notificationId);
         }
     }
 }

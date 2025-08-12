@@ -19,7 +19,6 @@ namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
 using Core.M1;
-using Core.M1.Event.Forest;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
@@ -47,7 +46,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
         SharedNodeMap = new();
         SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
-        _replicator = RewriteForestEventReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
+        _replicator = RewriteForestNotificationReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
 
         IProcessor.Connect(_replicator, new LocalForestReceiver(name, this));
 

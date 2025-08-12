@@ -15,37 +15,37 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Client.Forest;
+namespace LionWeb.Protocol.Delta.Repository.Forest;
 
 using Core;
-using Core.M1.Event.Forest;
 using Core.Notification.Forest;
-using Message.Command;
+using Message.Event;
 
-public class ForestEventToDeltaCommandMapper(
-    ICommandIdProvider commandIdProvider,
+public class ForestNotificationToDeltaEventMapper(
+    IParticipationIdProvider participationIdProvider,
     LionWebVersions lionWebVersion)
-    : EventToDeltaCommandMapperBase(commandIdProvider, lionWebVersion)
+    : NotificationToDeltaEventMapperBase(participationIdProvider, lionWebVersion)
 {
-    public IDeltaCommand Map(IForestNotification forestEvent) =>
-        forestEvent switch
+    public IDeltaEvent Map(IForestNotification forestNotification) =>
+        forestNotification switch
         {
             PartitionAddedNotification a => OnPartitionAdded(a),
             PartitionDeletedNotification a => OnPartitionDeleted(a),
-            _ => throw new NotImplementedException(forestEvent.GetType().Name)
+            _ => throw new NotImplementedException(forestNotification.GetType().Name)
         };
 
-    private AddPartition OnPartitionAdded(PartitionAddedNotification partitionAddedEvent) =>
+    private PartitionAdded OnPartitionAdded(PartitionAddedNotification partitionAddedNotification) =>
         new(
-            ToDeltaChunk(partitionAddedEvent.NewPartition),
-            ToCommandId(partitionAddedEvent),
+            ToDeltaChunk(partitionAddedNotification.NewPartition),
+            ToCommandSources(partitionAddedNotification),
             []
         );
 
-    private DeletePartition OnPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent) =>
+    private PartitionDeleted OnPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification) =>
         new(
-            partitionDeletedEvent.DeletedPartition.GetId(),
-            ToCommandId(partitionDeletedEvent),
+            partitionDeletedNotification.DeletedPartition.GetId(),
+            ToDescendants(partitionDeletedNotification.DeletedPartition),
+            ToCommandSources(partitionDeletedNotification),
             []
         );
 }

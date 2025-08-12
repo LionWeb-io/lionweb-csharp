@@ -17,10 +17,6 @@
 
 namespace LionWeb.Protocol.Delta;
 
-using Core;
-using Core.M1.Event;
-using Core.M1.Event.Forest;
-using Core.M1.Event.Partition;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
@@ -36,7 +32,9 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
     private readonly INotificationProcessor<IForestNotification> _forestNotificationReplicator;
 
-    public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, INotificationProcessor<IForestNotification> forestNotificationReplicator)
+    public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap,
+        SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
+        INotificationProcessor<IForestNotification> forestNotificationReplicator)
     {
         _sharedNodeMap = sharedNodeMap;
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
@@ -60,11 +58,11 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
         switch (deltaContent)
         {
             case TPartition partitionContent:
-                var partitionEvent = MapPartition(partitionContent);
-                if (_sharedNodeMap.TryGetPartition(partitionEvent.ContextNodeId, out var partition))
+                var partitionNotification = MapPartition(partitionContent);
+                if (_sharedNodeMap.TryGetPartition(partitionNotification.ContextNodeId, out var partition))
                 {
                     var partitionReplicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
-                    partitionReplicator.Receive(partitionEvent);
+                    partitionReplicator.Receive(partitionNotification);
                 } else
                 {
                     throw new InvalidOperationException();
@@ -73,8 +71,8 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
                 break;
 
             case TForest forestContent:
-                var forestEvent = MapForest(forestContent);
-                _forestNotificationReplicator.Receive(forestEvent);
+                var forestNotification = MapForest(forestContent);
+                _forestNotificationReplicator.Receive(forestNotification);
                 break;
 
             default:

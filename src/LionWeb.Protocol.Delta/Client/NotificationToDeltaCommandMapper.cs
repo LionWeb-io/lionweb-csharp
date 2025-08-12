@@ -15,27 +15,28 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Repository;
+namespace LionWeb.Protocol.Delta.Client;
 
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Forest;
-using Message.Event;
+using Message.Command;
 using Partition;
 
-public class EventToDeltaEventMapper
+public class NotificationToDeltaCommandMapper
 {
-    private readonly PartitionEventToDeltaEventMapper _partitionMapper;
-    private readonly ForestEventToDeltaEventMapper _forestMapper;
+    private readonly PartitionNotificationToDeltaCommandMapper _partitionMapper;
+    private readonly ForestNotificationToDeltaCommandMapper _forestMapper;
 
-    public EventToDeltaEventMapper(PartitionEventToDeltaEventMapper partitionMapper, ForestEventToDeltaEventMapper forestMapper)
+    public NotificationToDeltaCommandMapper(PartitionNotificationToDeltaCommandMapper partitionMapper,
+        ForestNotificationToDeltaCommandMapper forestMapper)
     {
         _partitionMapper = partitionMapper;
         _forestMapper = forestMapper;
     }
 
-    public IDeltaEvent Map(INotification notification) =>
+    public IDeltaCommand Map(INotification notification) =>
         notification switch
         {
             IPartitionNotification e => _partitionMapper.Map(e),

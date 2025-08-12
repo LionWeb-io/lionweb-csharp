@@ -19,17 +19,15 @@ namespace LionWeb.Protocol.Delta.Client.Forest;
 
 using Core;
 using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Forest;
 using Core.Notification;
 using Core.Notification.Forest;
 using Message.Event;
 
-public class DeltaEventToForestEventMapper(
+public class DeltaEventToForestNotificationMapper(
     SharedNodeMap sharedNodeMap,
     SharedKeyedMap sharedKeyedMap,
     DeserializerBuilder deserializerBuilder)
-    : DeltaEventToEventMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
+    : DeltaEventToNotificationMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
 {
     public IForestNotification Map(IDeltaEvent deltaEvent) =>
         deltaEvent switch
@@ -42,12 +40,12 @@ public class DeltaEventToForestEventMapper(
     private PartitionAddedNotification OnPartitionAdded(PartitionAdded partitionAdded) =>
         new(
             (IPartitionInstance)Deserialize(partitionAdded.NewPartition),
-            ToEventId(partitionAdded)
+            ToNotificationId(partitionAdded)
         );
 
     private PartitionDeletedNotification OnPartitionDeleted(PartitionDeleted partitionDeleted) =>
         new(
             (IPartitionInstance)ToNode(partitionDeleted.DeletedPartition),
-            ToEventId(partitionDeleted)
+            ToNotificationId(partitionDeleted)
         );
 }

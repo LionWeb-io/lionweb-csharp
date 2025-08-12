@@ -15,18 +15,17 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.M1.Event.Forest;
+namespace LionWeb.Core.Notification.Forest;
 
-using Notification.Forest;
-using Notification.Processor;
+using Processor;
 
-/// Provides events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-/// Raises events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
+/// Provides notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
+/// Raises notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
 public interface IForestProcessor : INotificationProcessor<IForestNotification>;
 
-/// Forwards all <see cref="ModelNotificationProcessorBase{TEvent}.Receive">received</see> events
+/// Forwards all <see cref="ModelNotificationProcessorBase{TNotification}.Receive">received</see> notifications
 /// unchanged to <i>following</i> processors,
-/// and to EventHandlers <see cref="ModelNotificationProcessorBase{TEvent}.Subscribe{TSubscribedEvent}">subscribed</see>
-/// to specific events.
+/// and to EventHandlers <see cref="ModelNotificationProcessorBase{TNotification}.Subscribe{TSubscribedNotification}">subscribed</see>
+/// to specific notifications.
 public class ForestNotificationProcessor(object? sender)
     : ModelNotificationProcessorBase<IForestNotification>(sender), IForestProcessor;

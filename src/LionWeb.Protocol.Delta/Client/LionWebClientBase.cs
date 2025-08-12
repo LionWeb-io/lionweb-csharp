@@ -19,7 +19,6 @@ namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
-using Core.M1.Event.Forest;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
@@ -85,11 +84,11 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         {
             switch (message)
             {
-                case PartitionAddedNotification partitionAddedEvent:
-                    client.OnLocalPartitionAdded(partitionAddedEvent);
+                case PartitionAddedNotification partitionAddedNotification:
+                    client.OnLocalPartitionAdded(partitionAddedNotification);
                     break;
-                case PartitionDeletedNotification partitionDeletedEvent:
-                    client.OnLocalPartitionDeleted(partitionDeletedEvent);
+                case PartitionDeletedNotification partitionDeletedNotification:
+                    client.OnLocalPartitionDeleted(partitionDeletedNotification);
                     break;
             }
         }
@@ -98,22 +97,22 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     private class LocalForestReceiver(object? sender, LionWebClientBase<T> client) : NotificationProcessorBase<IForestNotification>(sender)
     {
         public override void Receive(IForestNotification message) => 
-            client.SendEventToRepository(sender, message);
+            client.SendNotificationToRepository(sender, message);
     }
     
     private class LocalPartitionReceiver(object? sender, LionWebClientBase<T> client) : NotificationProcessorBase<IPartitionNotification>(sender)
     {
         public override void Receive(IPartitionNotification message) =>
-            client.SendEventToRepository(sender, message);
+            client.SendNotificationToRepository(sender, message);
     }
 
-    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedEvent)
+    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)
     {
-        var partitionReplicator = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
+        var partitionReplicator = SharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
         IProcessor.Connect(partitionReplicator, new LocalPartitionReceiver(_name, this));
     }
 
-    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent)
+    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
     {
         throw new NotImplementedException();
     }
@@ -145,12 +144,12 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     protected abstract Task Send(T deltaContent);
 
-    private void SendEventToRepository(object? sender, INotification? internalEvent)
+    private void SendNotificationToRepository(object? sender, INotification? notification)
     {
-        if (internalEvent == null)
+        if (notification == null)
             return;
 
-        var converted = _connector.Convert(internalEvent);
+        var converted = _connector.Convert(notification);
 
         Send(converted);
         Log("Sent to repository");

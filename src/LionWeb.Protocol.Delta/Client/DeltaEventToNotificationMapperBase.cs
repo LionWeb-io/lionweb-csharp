@@ -19,8 +19,6 @@ namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Partition;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Partition;
@@ -28,13 +26,13 @@ using Core.Serialization;
 using Message;
 using Message.Event;
 
-public abstract class DeltaEventToEventMapperBase
+public abstract class DeltaEventToNotificationMapperBase
 {
     private SharedNodeMap _sharedNodeMap;
     private SharedKeyedMap _sharedKeyedMap;
     private DeserializerBuilder _deserializerBuilder;
 
-    public DeltaEventToEventMapperBase(
+    public DeltaEventToNotificationMapperBase(
         SharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder
@@ -44,7 +42,7 @@ public abstract class DeltaEventToEventMapperBase
         _sharedKeyedMap = sharedKeyedMap;
         _deserializerBuilder = deserializerBuilder;
     }
-    
+
     protected Property ToProperty(MetaPointer deltaProperty, IReadableNode node) =>
         ToFeature<Property>(deltaProperty, node);
 
@@ -68,7 +66,7 @@ public abstract class DeltaEventToEventMapperBase
         return new ReferenceTarget(resolveInfo, target);
     }
 
-    protected static INotificationId ToEventId(IDeltaEvent deltaEvent) =>
+    protected static INotificationId ToNotificationId(IDeltaEvent deltaEvent) =>
         new ParticipationNotificationId(deltaEvent.InternalParticipationId,
             string.Join("_", deltaEvent.OriginCommands.Select(c => c.CommandId)));
 

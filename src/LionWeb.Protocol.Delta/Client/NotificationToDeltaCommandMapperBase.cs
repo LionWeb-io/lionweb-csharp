@@ -19,21 +19,19 @@ namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Partition;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Partition;
 using Core.Serialization;
 using Message;
 
-public abstract class EventToDeltaCommandMapperBase
+public abstract class NotificationToDeltaCommandMapperBase
 {
     private ICommandIdProvider _commandIdProvider;
     private LionWebVersions _lionWebVersion;
     private ISerializerVersionSpecifics _propertySerializer;
 
-    protected EventToDeltaCommandMapperBase(ICommandIdProvider commandIdProvider, LionWebVersions lionWebVersion)
+    protected NotificationToDeltaCommandMapperBase(ICommandIdProvider commandIdProvider, LionWebVersions lionWebVersion)
     {
         _commandIdProvider = commandIdProvider;
         _lionWebVersion = lionWebVersion;
@@ -52,8 +50,8 @@ public abstract class EventToDeltaCommandMapperBase
         return new DeltaSerializationChunk(serializer.Serialize(M1Extensions.Descendants(node, true, true)).ToArray());
     }
 
-    protected CommandId ToCommandId(INotification @event) =>
-        @event.NotificationId switch
+    protected CommandId ToCommandId(INotification notification) =>
+        notification.NotificationId switch
         {
             ParticipationNotificationId pei => pei.CommandId,
             _ => _commandIdProvider.Create()

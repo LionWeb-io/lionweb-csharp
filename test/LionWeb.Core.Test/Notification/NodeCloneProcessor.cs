@@ -17,18 +17,15 @@
 
 namespace LionWeb.Core.Test.Listener;
 
-using M1.Event;
-using M1.Event.Forest;
-using M1.Event.Partition;
 using Notification;
 using Notification.Forest;
 using Notification.Partition;
 using Notification.Processor;
 
-internal class NodeCloneProcessor<TEvent>(object? sender) : NotificationProcessorBase<TEvent>(sender)
-    where TEvent : INotification
+internal class NodeCloneProcessor<TNotification>(object? sender) : NotificationProcessorBase<TNotification>(sender)
+    where TNotification : INotification
 {
-    public override void Receive(TEvent message)
+    public override void Receive(TNotification message)
     {
         INotification result = message switch
         {
@@ -165,7 +162,7 @@ internal class NodeCloneProcessor<TEvent>(object? sender) : NotificationProcesso
             },
             ReferenceTargetDeletedNotification e => e with { DeletedTarget = Clone(e.DeletedTarget), Parent = Clone(e.Parent) }
         };
-        Send((TEvent)result);
+        Send((TNotification)result);
     }
 
 

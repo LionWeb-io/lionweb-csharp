@@ -26,7 +26,7 @@ using System.Reflection;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class EventTests_Infrastructure
+public class NotificationTests_Infrastructure
 {
     [TestMethod]
     public void MultiListeners_NoRead()
@@ -112,7 +112,7 @@ public class EventTests_Infrastructure
     }
     
     [TestMethod]
-    public void Twoway_NoLingeringEventIds()
+    public void Twoway_NoLingeringNotificiationIds()
     {
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
@@ -127,19 +127,19 @@ public class EventTests_Infrastructure
 
         AssertEquals([node], [clone]);
         
-        Assert.AreEqual(0, ReplicatorEventIds(replicator).Count);
-        Assert.AreEqual(0, ReplicatorEventIds(cloneReplicator).Count);
+        Assert.AreEqual(0, ReplicatorNotificationIds(replicator).Count);
+        Assert.AreEqual(0, ReplicatorNotificationIds(cloneReplicator).Count);
     }
 
-    private static HashSet<INotificationId> ReplicatorEventIds(INotificationProcessor<IPartitionNotification> replicator)
+    private static HashSet<INotificationId> ReplicatorNotificationIds(INotificationProcessor<IPartitionNotification> replicator)
     {
         var fieldInfoFilter = typeof(CompositeNotificationProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_lastProcessor");
         var filter = (NotificationIdFilteringNotificationProcessor<IPartitionNotification>) fieldInfoFilter.GetValue(replicator);
      
-        var fieldInfoEvents = typeof(NotificationIdFilteringNotificationProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_notificationIds");
-        var eventIds = fieldInfoEvents.GetValue(filter);
+        var fieldInfoNotificationIds = typeof(NotificationIdFilteringNotificationProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_notificationIds");
+        var notificationIds = fieldInfoNotificationIds.GetValue(filter);
         
-        return (HashSet<INotificationId>)eventIds!;
+        return (HashSet<INotificationId>)notificationIds!;
     }
 
     private Tuple<INotificationProcessor<IPartitionNotification>, INotificationProcessor<IPartitionNotification>>

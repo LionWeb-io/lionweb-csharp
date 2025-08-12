@@ -19,17 +19,15 @@ namespace LionWeb.Protocol.Delta.Repository.Forest;
 
 using Core;
 using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Forest;
 using Core.Notification;
 using Core.Notification.Forest;
 using Message.Command;
 
-public class DeltaCommandToForestEventMapper(
+public class DeltaCommandToForestNotificationMapper(
     SharedNodeMap sharedNodeMap,
     SharedKeyedMap sharedKeyedMap,
     DeserializerBuilder deserializerBuilder)
-    : DeltaCommandToEventMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
+    : DeltaCommandToNotificationMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
 {
     public IForestNotification Map(IDeltaCommand command) =>
         command switch
@@ -39,15 +37,15 @@ public class DeltaCommandToForestEventMapper(
             _ => throw new NotImplementedException(command.GetType().Name)
         };
 
-    private PartitionAddedNotification OnAddPartition(AddPartition addPartition) =>
+    private PartitionAddedNotification OnAddPartition(AddPartition addPartitionCommand) =>
         new(
-            (IPartitionInstance)Deserialize(addPartition.NewPartition),
-            ToEventId(addPartition)
+            (IPartitionInstance)Deserialize(addPartitionCommand.NewPartition),
+            ToNotificationId(addPartitionCommand)
         );
 
-    private PartitionDeletedNotification OnDeletePartition(DeletePartition deletePartition) =>
+    private PartitionDeletedNotification OnDeletePartition(DeletePartition deletePartitionCommand) =>
         new(
-            (IPartitionInstance)ToNode(deletePartition.DeletedPartition),
-            ToEventId(deletePartition)
+            (IPartitionInstance)ToNode(deletePartitionCommand.DeletedPartition),
+            ToNotificationId(deletePartitionCommand)
         );
 }

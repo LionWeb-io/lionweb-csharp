@@ -18,9 +18,6 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.M1;
-using Core.M1.Event;
-using Core.M1.Event.Forest;
-using Core.M1.Event.Partition;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
@@ -29,11 +26,11 @@ using Forest;
 using Message.Command;
 using Partition;
 
-public class DeltaProtocolCommandReceiver 
+public class DeltaProtocolCommandReceiver
     : DeltaProtocolReceiverBase<IDeltaCommand, IPartitionDeltaCommand, IForestDeltaCommand>
 {
-    private readonly DeltaCommandToForestEventMapper _forestMapper;
-    private readonly DeltaCommandToPartitionEventMapper _partitionMapper;
+    private readonly DeltaCommandToForestNotificationMapper _forestMapper;
+    private readonly DeltaCommandToPartitionNotificationMapper _partitionMapper;
 
     public DeltaProtocolCommandReceiver(
         PartitionSharedNodeMap sharedNodeMap,

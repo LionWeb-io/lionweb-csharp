@@ -19,19 +19,18 @@ namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
 using Core.M1;
-using Core.M1.Event;
 using Core.M3;
 using Core.Notification;
 using Message;
 using Message.Event;
 
-public abstract class EventToDeltaEventMapperBase
+public abstract class NotificationToDeltaEventMapperBase
 {
     private IParticipationIdProvider _participationIdProvider;
     private LionWebVersions _lionWebVersion;
     private ISerializerVersionSpecifics _propertySerializer;
 
-    protected EventToDeltaEventMapperBase(IParticipationIdProvider participationIdProvider,
+    protected NotificationToDeltaEventMapperBase(IParticipationIdProvider participationIdProvider,
         LionWebVersions lionWebVersion)
     {
         _lionWebVersion = lionWebVersion;
@@ -51,18 +50,18 @@ public abstract class EventToDeltaEventMapperBase
     protected TargetNode[] ToDescendants(IReadableNode node) =>
         M1Extensions.Descendants(node, false, true).Select(n => n.GetId()).ToArray();
 
-    protected CommandSource[] ToCommandSources(INotification internalEvent)
+    protected CommandSource[] ToCommandSources(INotification notification)
     {
         ParticipationId participationId;
         EventId commandId;
-        if (internalEvent.NotificationId is ParticipationNotificationId pei)
+        if (notification.NotificationId is ParticipationNotificationId pei)
         {
             participationId = pei.ParticipationId;
             commandId = pei.CommandId;
         } else
         {
             participationId = _participationIdProvider.ParticipationId;
-            commandId = internalEvent.NotificationId.ToString();
+            commandId = notification.NotificationId.ToString();
         }
 
         return [new CommandSource(participationId, commandId)];

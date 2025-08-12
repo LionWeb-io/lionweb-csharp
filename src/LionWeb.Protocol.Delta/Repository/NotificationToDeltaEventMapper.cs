@@ -15,31 +15,32 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Client;
+namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Forest;
-using Message.Command;
+using Message.Event;
 using Partition;
 
-public class EventToDeltaCommandMapper
+public class NotificationToDeltaEventMapper
 {
-    private readonly PartitionEventToDeltaCommandMapper _partitionMapper;
-    private readonly ForestEventToDeltaCommandMapper _forestMapper;
+    private readonly PartitionNotificationToDeltaEventMapper _partitionNotificationToDeltaMapper;
+    private readonly ForestNotificationToDeltaEventMapper _forestNotificationToDeltaMapper;
 
-    public EventToDeltaCommandMapper(PartitionEventToDeltaCommandMapper partitionMapper, ForestEventToDeltaCommandMapper forestMapper)
+    public NotificationToDeltaEventMapper(PartitionNotificationToDeltaEventMapper partitionNotificationToDeltaMapper,
+        ForestNotificationToDeltaEventMapper forestNotificationToDeltaMapper)
     {
-        _partitionMapper = partitionMapper;
-        _forestMapper = forestMapper;
+        _partitionNotificationToDeltaMapper = partitionNotificationToDeltaMapper;
+        _forestNotificationToDeltaMapper = forestNotificationToDeltaMapper;
     }
 
-    public IDeltaCommand Map(INotification notification) =>
+    public IDeltaEvent Map(INotification notification) =>
         notification switch
         {
-            IPartitionNotification e => _partitionMapper.Map(e),
-            IForestNotification e => _forestMapper.Map(e),
+            IPartitionNotification e => _partitionNotificationToDeltaMapper.Map(e),
+            IForestNotification e => _forestNotificationToDeltaMapper.Map(e),
             _ => throw new NotImplementedException(notification.GetType().Name)
         };
 }
