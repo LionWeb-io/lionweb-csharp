@@ -25,30 +25,39 @@ using Core.M1.Event.Partition;
 using Core.M1.Event.Processor;
 using Partition;
 
-internal class RewriteForestEventReplicator(
-    IForest localForest,
-    SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
-    SharedNodeMap sharedNodeMap,
-    EventIdFilteringEventProcessor<IForestEvent> filter,
-    EventIdReplacingEventProcessor<IForestEvent> replacingFilter,
-    object? sender
-    ) : ForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, filter, sender)
+internal static class RewriteForestEventReplicator
 {
-    public static new IEventProcessor<IForestEvent> Create(IForest localForest, SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
+    public static new IEventProcessor<IForestEvent> Create(IForest localForest,
+        SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
         var filter = new EventIdFilteringEventProcessor<IForestEvent>(internalSender);
         var replacingFilter = new EventIdReplacingEventProcessor<IForestEvent>(internalSender);
-        var replicator = new RewriteForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, filter, replacingFilter, internalSender);
-        var result = new CompositeEventProcessor<IForestEvent>([replacingFilter, replicator, filter],
+        var remoteReplicator = new RewriteRemoteForestEventReplicator(localForest, sharedNodeMap, filter, replacingFilter, internalSender);
+        var localReplicator = new RewriteLocalForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, internalSender);
+        
+        var result = new CompositeEventProcessor<IForestEvent>([replacingFilter, remoteReplicator, filter],
             sender ?? $"Composite of {nameof(RewriteForestEventReplicator)} {localForest}");
-        replicator.Init();
+
+        var forestProcessor = localForest.GetProcessor();
+        if (forestProcessor != null)
+        {
+            IProcessor.Connect(forestProcessor, localReplicator);
+            IProcessor.Connect(localReplicator, filter);
+        }
+
         return result;
     }
+}
 
-    protected override IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition, string sender) =>
-        RewritePartitionEventReplicator.Create(partition, SharedNodeMap, sender);
-
+internal class RewriteRemoteForestEventReplicator(
+    IForest localForest,
+    SharedNodeMap sharedNodeMap,
+    EventIdFilteringEventProcessor<IForestEvent> filter,
+    EventIdReplacingEventProcessor<IForestEvent> replacingFilter,
+    object? sender
+) : RemoteForestEventReplicator(localForest, sharedNodeMap, filter, sender)
+{
     private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(null);
 
     protected override void SuppressEventForwarding(IForestEvent forestEvent, Action action)
@@ -67,4 +76,16 @@ internal class RewriteForestEventReplicator(
             replacingFilter.UnregisterReplacementEventId(eventId);
         }
     }
+}
+
+internal class RewriteLocalForestEventReplicator(
+    IForest localForest,
+    SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
+    SharedNodeMap sharedNodeMap,
+    object? sender)
+    : LocalForestEventReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, sender)
+{
+    protected override IEventProcessor<IPartitionEvent> CreatePartitionEventReplicator(IPartitionInstance partition,
+        string sender) =>
+        RewritePartitionEventReplicator.Create(partition, sharedNodeMap, sender);
 }

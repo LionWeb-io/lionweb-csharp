@@ -130,7 +130,7 @@ public class EventTests_Forest
         IProcessor.Connect(originalForest.GetProcessor(), cloneProcessor);
         IProcessor.Connect(cloneProcessor, replicator);
 
-        var receiver = new LocalForestChangeReceiver(originalForest, sharedPartitionReplicatorMap);
+        var receiver = new TestLocalForestChangeReceiver(originalForest, sharedPartitionReplicatorMap);
         IProcessor.Connect(originalForest.GetProcessor(), receiver);
         return replicator;
     }
@@ -142,7 +142,7 @@ public class EventTests_Forest
     }
 }
 
-internal class LocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap) : EventProcessorBase<IForestEvent>(sender)
+internal class TestLocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap) : EventProcessorBase<IForestEvent>(sender)
 {
     public override void Receive(IForestEvent message)
     {

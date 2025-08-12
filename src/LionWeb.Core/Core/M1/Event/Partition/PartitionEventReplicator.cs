@@ -23,36 +23,41 @@ using System.Collections;
 using System.Diagnostics;
 
 /// Replicates events for a <i>local</i> <see cref="IPartitionInstance">partition</see>.
-/// <inheritdoc cref="EventReplicatorBase{TEvent}"/>
-public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent>
+/// <inheritdoc cref="RemoteEventReplicatorBase{TEvent}"/>
+public static class PartitionEventReplicator
 {
     public static IEventProcessor<IPartitionEvent> Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
         var filter = new EventIdFilteringEventProcessor<IPartitionEvent>(internalSender);
-        var replicator = new PartitionEventReplicator(localPartition, sharedNodeMap, filter, internalSender);
-        var result = new CompositeEventProcessor<IPartitionEvent>([replicator, filter],
+        var remoteReplicator =
+            new RemotePartitionEventReplicator(localPartition, sharedNodeMap, filter, internalSender);
+        var localReplicator = new LocalPartitionEventReplicator(sharedNodeMap, internalSender);
+
+        var result = new CompositeEventProcessor<IPartitionEvent>([remoteReplicator, filter],
             sender ?? $"Composite of {nameof(PartitionEventReplicator)} {localPartition.GetId()}");
-        replicator.Init();
+
+        var partitionProcessor = localPartition.GetProcessor();
+        if (partitionProcessor != null)
+        {
+            IProcessor.Connect(partitionProcessor, localReplicator);
+            IProcessor.Connect(localReplicator, filter);
+        }
+
         return result;
     }
+}
 
+public class RemotePartitionEventReplicator : RemoteEventReplicatorBase<IPartitionEvent>
+{
     private readonly IPartitionInstance _localPartition;
 
-    protected PartitionEventReplicator(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap,
+    protected internal RemotePartitionEventReplicator(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap,
         EventIdFilteringEventProcessor<IPartitionEvent> filter, object? sender) : base(sharedNodeMap, filter, sender)
     {
         _localPartition = localPartition;
-    }
-
-    protected void Init()
-    {
         SharedNodeMap.RegisterNode(_localPartition);
-
-        var partitionProcessor = _localPartition.GetProcessor();
-        if (partitionProcessor != null)
-            IProcessor.Connect(partitionProcessor, new LocalReceiver(_localPartition.GetId(), this));
     }
 
     /// <see cref="SharedNodeMap.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
@@ -71,49 +76,6 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent>
     //
     //     GC.SuppressFinalize(this);
     // }
-
-    #region Local
-
-    private class LocalReceiver(object? sender, PartitionEventReplicator replicator)
-        : EventProcessorBase<IPartitionEvent>(sender)
-    {
-        public override void Receive(IPartitionEvent message)
-        {
-            switch (message)
-            {
-                case ChildAddedEvent e:
-                    replicator.OnLocalChildAdded(e);
-                    break;
-                case ChildDeletedEvent e:
-                    replicator.OnLocalChildDeleted(e);
-                    break;
-                case AnnotationAddedEvent e:
-                    replicator.OnLocalAnnotationAdded(e);
-                    break;
-                case AnnotationDeletedEvent e:
-                    replicator.OnLocalAnnotationDeleted(e);
-                    break;
-            }
-
-            replicator.Send(message);
-        }
-    }
-
-    private void OnLocalChildAdded(ChildAddedEvent childAddedEvent) =>
-        SharedNodeMap.RegisterNode(childAddedEvent.NewChild);
-
-    private void OnLocalChildDeleted(ChildDeletedEvent childDeletedEvent) =>
-        SharedNodeMap.UnregisterNode(childDeletedEvent.DeletedChild);
-
-    private void OnLocalAnnotationAdded(AnnotationAddedEvent annotationAddedEvent) =>
-        SharedNodeMap.RegisterNode(annotationAddedEvent.NewAnnotation);
-
-    private void OnLocalAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
-        SharedNodeMap.UnregisterNode(annotationDeletedEvent.DeletedAnnotation);
-
-    #endregion
-
-    #region Remote
 
     /// <inheritdoc />
     protected override void ProcessEvent(IPartitionEvent? partitionEvent)
@@ -490,6 +452,42 @@ public class PartitionEventReplicator : EventReplicatorBase<IPartitionEvent>
     }
 
     #endregion
+}
 
-    #endregion
+public class LocalPartitionEventReplicator(SharedNodeMap sharedNodeMap, object? sender)
+    : EventProcessorBase<IPartitionEvent>(sender)
+{
+    /// <inheritdoc />
+    public override void Receive(IPartitionEvent message)
+    {
+        switch (message)
+        {
+            case ChildAddedEvent e:
+                OnLocalChildAdded(e);
+                break;
+            case ChildDeletedEvent e:
+                OnLocalChildDeleted(e);
+                break;
+            case AnnotationAddedEvent e:
+                OnLocalAnnotationAdded(e);
+                break;
+            case AnnotationDeletedEvent e:
+                OnLocalAnnotationDeleted(e);
+                break;
+        }
+
+        Send(message);
+    }
+
+    private void OnLocalChildAdded(ChildAddedEvent childAddedEvent) =>
+        sharedNodeMap.RegisterNode(childAddedEvent.NewChild);
+
+    private void OnLocalChildDeleted(ChildDeletedEvent childDeletedEvent) =>
+        sharedNodeMap.UnregisterNode(childDeletedEvent.DeletedChild);
+
+    private void OnLocalAnnotationAdded(AnnotationAddedEvent annotationAddedEvent) =>
+        sharedNodeMap.RegisterNode(annotationAddedEvent.NewAnnotation);
+
+    private void OnLocalAnnotationDeleted(AnnotationDeletedEvent annotationDeletedEvent) =>
+        sharedNodeMap.UnregisterNode(annotationDeletedEvent.DeletedAnnotation);
 }

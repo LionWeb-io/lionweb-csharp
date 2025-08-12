@@ -26,12 +26,12 @@ using Utilities;
 /// Example: We receive a <see cref="PropertyAddedEvent"/> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-public abstract class EventReplicatorBase<TEvent> : EventProcessorBase<TEvent> where TEvent : class, IEvent
+public abstract class RemoteEventReplicatorBase<TEvent> : EventProcessorBase<TEvent> where TEvent : class, IEvent
 {
     protected readonly SharedNodeMap SharedNodeMap;
     protected readonly EventIdFilteringEventProcessor<TEvent> Filter;
 
-    protected EventReplicatorBase(SharedNodeMap sharedNodeMap, EventIdFilteringEventProcessor<TEvent> filter,
+    protected RemoteEventReplicatorBase(SharedNodeMap sharedNodeMap, EventIdFilteringEventProcessor<TEvent> filter,
         object? sender) : base(sender)
     {
         SharedNodeMap = sharedNodeMap;
