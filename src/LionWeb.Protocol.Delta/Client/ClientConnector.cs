@@ -24,5 +24,5 @@ public interface IClientConnector<T>
     Task SendToRepository(T content);
     event EventHandler<T> ReceiveFromRepository;
 
-    T Convert(INotification internalNotification);
+    T Convert(INotification notification);
 }
