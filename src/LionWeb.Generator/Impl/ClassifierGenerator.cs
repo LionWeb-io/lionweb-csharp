@@ -94,13 +94,13 @@ public class ClassifierGenerator(
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
             additionalMembers.AddRange([
-                Field("_eventProcessor", AsType(typeof(PartitionNotificationProcessor)))
+                Field("_notificationProcessor", AsType(typeof(PartitionNotificationProcessor)))
                     .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
-                Method("GetProcessor", NullableType(AsType(typeof(IPartitionProcessor))), exprBody: IdentifierName("_eventProcessor"))
+                Method("GetProcessor", NullableType(AsType(typeof(IPartitionProcessor))), exprBody: IdentifierName("_notificationProcessor"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             ]);
             
-            additionalConstructorStatements.Add(Assignment("_eventProcessor", NewCall([This()])));
+            additionalConstructorStatements.Add(Assignment("_notificationProcessor", NewCall([This()])));
         }
 
         return ClassifierClass(bases, additionalMembers, additionalConstructorStatements);
