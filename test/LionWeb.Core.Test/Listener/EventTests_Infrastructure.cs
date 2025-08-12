@@ -133,27 +133,23 @@ public class EventTests_Infrastructure
 
     private static HashSet<IEventId> ReplicatorEventIds(IEventProcessor<IPartitionEvent> replicator)
     {
-        var type = typeof(EventIdFilteringEventProcessor<IPartitionEvent>);
-        var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_eventIds");
-        var value = fieldInfo.GetValue(replicator);
-        return (HashSet<IEventId>)value!;
+        var fieldInfoFilter = typeof(CompositeEventProcessor<IPartitionEvent>).GetRuntimeFields().First(f => f.Name == "_lastProcessor");
+        var filter = (EventIdFilteringEventProcessor<IPartitionEvent>) fieldInfoFilter.GetValue(replicator);
+     
+        var fieldInfoEvents = typeof(EventIdFilteringEventProcessor<IPartitionEvent>).GetRuntimeFields().First(f => f.Name == "_eventIds");
+        var eventIds = fieldInfoEvents.GetValue(filter);
+        
+        return (HashSet<IEventId>)eventIds!;
     }
 
     private Tuple<IEventProcessor<IPartitionEvent>, IEventProcessor<IPartitionEvent>>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = PartitionEventReplicator.Create(clone, new(), "cloneReplicator");
-        // replicator.Init();
         var cloneReplicator = PartitionEventReplicator.Create(node, new(), "nodeReplicator");
-        // cloneReplicator.Init();
         
         IProcessor.Connect(cloneReplicator, replicator);
         IProcessor.Connect(replicator, cloneReplicator);
-     
-        // new EventForwarder<IPartitionEvent>(cloneReplicator, replicator);
-        // new EventForwarder<IPartitionEvent>(replicator, cloneReplicator);
-        // replicator.ReplicateFrom(cloneReplicator);
-        // cloneReplicator.ReplicateFrom(replicator);
         
         return Tuple.Create(replicator, cloneReplicator);
     }

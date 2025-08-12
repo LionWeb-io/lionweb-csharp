@@ -43,8 +43,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = CreateReplicator(cloneForest);
-        IProcessor.Connect(forest.GetProcessor(), replicator);
+        var replicator = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node]);
 
@@ -67,8 +66,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = CreateReplicator(cloneForest);
-        IProcessor.Connect(forest.GetProcessor(), replicator);
+        var replicator = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node]);
 
@@ -91,8 +89,7 @@ public class EventTests_Forest
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
 
-        var replicator = CreateReplicator(cloneForest);
-        IProcessor.Connect(forest.GetProcessor(), replicator);
+        var replicator = CreateReplicator(cloneForest, forest);
 
         node.Documentation = moved;
 
@@ -112,8 +109,7 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = CreateReplicator(cloneForest);
-        IProcessor.Connect(forest.GetProcessor(), replicator);
+        var replicator = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node, originPartition]);
 
@@ -126,8 +122,18 @@ public class EventTests_Forest
 
     #endregion
 
-    private static IEventProcessor<IForestEvent> CreateReplicator(Forest cloneForest) =>
-        CloningForestEventReplicator.Create(cloneForest, new(), null);
+    private static IEventProcessor<IForestEvent> CreateReplicator(Forest cloneForest, Forest originalForest)
+    {
+        SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
+        var replicator = ForestEventReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
+        var cloneProcessor = new NodeCloneProcessor<IForestEvent>(cloneForest);
+        IProcessor.Connect(originalForest.GetProcessor(), cloneProcessor);
+        IProcessor.Connect(cloneProcessor, replicator);
+
+        var receiver = new LocalForestChangeReceiver(originalForest, sharedPartitionReplicatorMap);
+        IProcessor.Connect(originalForest.GetProcessor(), receiver);
+        return replicator;
+    }
 
     private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
     {
@@ -136,28 +142,29 @@ public class EventTests_Forest
     }
 }
 
-internal class CloningForestEventReplicator : ForestEventReplicator
+internal class LocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap) : EventProcessorBase<IForestEvent>(sender)
 {
-    public static IEventProcessor<IForestEvent> Create(IForest localForest, SharedNodeMap sharedNodeMap, object? sender)
+    public override void Receive(IForestEvent message)
     {
-        var internalSender = sender ?? localForest;
-        var filter = new EventIdFilteringEventProcessor<IForestEvent>(internalSender);
-        var replicator = new CloningForestEventReplicator(localForest, sharedNodeMap, filter, internalSender);
-        var result = new CompositeEventProcessor<IForestEvent>([replicator, filter],
-            sender ?? $"Composite of {nameof(CloningPartitionEventReplicator)} {localForest}");
-        replicator.Init();
-        return result;
+        switch (message)
+        {
+            case PartitionAddedEvent partitionAddedEvent:
+                OnLocalPartitionAdded(partitionAddedEvent);
+                break;
+            case PartitionDeletedEvent partitionDeletedEvent:
+                OnLocalPartitionDeleted(partitionDeletedEvent);
+                break;
+        }
+    }
+    
+    private void OnLocalPartitionAdded(PartitionAddedEvent partitionAddedEvent)
+    {
+        var partitionReplicator = sharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
+        IProcessor.Connect(partitionAddedEvent.NewPartition.GetProcessor(), partitionReplicator);
     }
 
-    private CloningForestEventReplicator(IForest localForest,
-        SharedNodeMap sharedNodeMap,
-        EventIdFilteringEventProcessor<IForestEvent> filter,
-        object? sender
-        ) : base(localForest, new(), sharedNodeMap, filter, sender)
+    private void OnLocalPartitionDeleted(PartitionDeletedEvent partitionDeletedEvent)
     {
+        throw new NotImplementedException();
     }
-
-
-    protected override INode AdjustRemoteNode(INode remoteNode) =>
-        SameIdCloner.Clone(remoteNode);
 }

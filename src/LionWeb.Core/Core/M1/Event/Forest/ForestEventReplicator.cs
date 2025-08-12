@@ -141,11 +141,8 @@ public class ForestEventReplicator : EventReplicatorBase<IForestEvent>
     private void OnRemoteNewPartition(PartitionAddedEvent partitionAddedEvent) =>
         SuppressEventForwarding(partitionAddedEvent, () =>
         {
-            var newPartition = (INode)partitionAddedEvent.NewPartition;
-
-            var clone = (IPartitionInstance)AdjustRemoteNode(newPartition);
-
-            _localForest.AddPartitions([clone], partitionAddedEvent.EventId);
+            var newPartition = partitionAddedEvent.NewPartition;
+            _localForest.AddPartitions([newPartition], partitionAddedEvent.EventId);
         });
 
     private void OnRemotePartitionDeleted(PartitionDeletedEvent partitionDeletedEvent) =>

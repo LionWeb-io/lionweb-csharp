@@ -34,6 +34,8 @@ public interface IPartitionProcessor : IEventProcessor<IPartitionEvent>
     /// Unregisters <paramref name="handler"/> from notification of events.
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
     void Unsubscribe<TSubscribedEvent>(EventHandler<TSubscribedEvent> handler) where TSubscribedEvent : class, IPartitionEvent;
+
+    IEventId CreateEventId();
 }
 
 /// Forwards all <see cref="ModelEventProcessorBase{IPartitionEvent}.Receive">received</see> events
@@ -42,4 +44,11 @@ public interface IPartitionProcessor : IEventProcessor<IPartitionEvent>
 /// to specific events.
 public class PartitionEventProcessor(object? sender)
     : ModelEventProcessorBase<IPartitionEvent>(sender), IPartitionProcessor
+{
+    private readonly IEventIdProvider _eventIdProvider = new EventIdProvider(sender);
+
+    /// <inheritdoc />
+    public IEventId CreateEventId() => 
+        _eventIdProvider.CreateEventId();
+}
 ;

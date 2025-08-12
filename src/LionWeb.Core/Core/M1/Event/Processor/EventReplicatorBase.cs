@@ -59,9 +59,6 @@ public abstract class EventReplicatorBase<TEvent> : EventProcessorBase<TEvent> w
     protected INode? LookupOpt(NodeId nodeId) =>
         SharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
 
-    protected virtual INode AdjustRemoteNode(INode remoteNode) =>
-        remoteNode;
-
     /// Uses <see cref="EventIdFilteringEventProcessor{TEvent}"/> to suppress forwarding events raised during executing <paramref name="action"/>. 
     protected virtual void SuppressEventForwarding(TEvent @event, Action action)
     {

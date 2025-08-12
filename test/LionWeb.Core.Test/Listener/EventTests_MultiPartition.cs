@@ -263,11 +263,10 @@ public class EventTests_MultiPartition
 
     private static IEventProcessor<IPartitionEvent> CreateReplicator(Geometry clone, Geometry node)
     {
-        var replicator = CloningPartitionEventReplicator.Create(clone, new(), "cloneReplicator");
-        IProcessor.Connect((IPartitionProcessor)node.GetProcessor(), replicator);
-        // replicator.Init();
-        // new EventForwarder<IPartitionEvent>(node.GetProcessor(), replicator);
-        // replicator.ReplicateFrom(node.GetProcessor());
+        var replicator = PartitionEventReplicator.Create(clone, new(), "cloneReplicator");
+        var cloneProcessor = new NodeCloneProcessor<IPartitionEvent>(node.GetId());
+        IProcessor.Connect((IPartitionProcessor)node.GetProcessor(), cloneProcessor);
+        IProcessor.Connect(cloneProcessor, replicator);
         
         return replicator;
     }

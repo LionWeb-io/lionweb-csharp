@@ -835,22 +835,20 @@ public class EventTests_Twoway
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = CreateReplicator(node, "nodeReplicator");
-        // replicator.Init();
         var cloneReplicator = CreateReplicator(clone, "cloneReplicator");
-        // cloneReplicator.Init();
         
-        IProcessor.Connect(cloneReplicator, replicator);
-        IProcessor.Connect(replicator, cloneReplicator);
+        var cloneProcessorA = new NodeCloneProcessor<IPartitionEvent>(node.GetId());
+        IProcessor.Connect(replicator, cloneProcessorA);
+        IProcessor.Connect(cloneProcessorA, cloneReplicator);
      
-        // new EventForwarder<IPartitionEvent>(cloneReplicator, replicator);
-        // new EventForwarder<IPartitionEvent>(replicator, cloneReplicator);
-        // replicator.ReplicateFrom(cloneReplicator);
-        // cloneReplicator.ReplicateFrom(replicator);
-        
+        var cloneProcessorB = new NodeCloneProcessor<IPartitionEvent>(clone.GetId());
+        IProcessor.Connect(cloneReplicator, cloneProcessorB);
+        IProcessor.Connect(cloneProcessorB, replicator);
+     
         return Tuple.Create(replicator, cloneReplicator);
     }
-    private static IEventProcessor<IPartitionEvent> CreateReplicator(IPartitionInstance clone, object? sender) => 
-        CloningPartitionEventReplicator.Create(clone, new(), sender);
+    private static IEventProcessor<IPartitionEvent> CreateReplicator(IPartitionInstance clone, object? sender) =>
+        PartitionEventReplicator.Create(clone, new(), sender);
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {

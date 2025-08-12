@@ -475,7 +475,7 @@ public abstract class EventTestsBase
         node.AddAnnotations([new BillOfMaterials("bof")]);
 
         var clone = CreateReplicator(node);
-        
+
         ((IProcessor)node.GetProcessor()).PrintAllReceivers([]);
         // return;
 
@@ -786,8 +786,10 @@ public class EventsTest : EventTestsBase
     {
         var clone = Clone(node);
 
-        var replicator = CloningPartitionEventReplicator.Create(clone, new(), node.GetId());
-        IProcessor.Connect((IPartitionProcessor)node.GetProcessor(), replicator);
+        var replicator = PartitionEventReplicator.Create(clone, new(), node.GetId());
+        var cloneProcessor = new NodeCloneProcessor<IPartitionEvent>(node.GetId());
+        IProcessor.Connect((IPartitionProcessor)node.GetProcessor(), cloneProcessor);
+        IProcessor.Connect(cloneProcessor, replicator);
 
         return clone;
     }
