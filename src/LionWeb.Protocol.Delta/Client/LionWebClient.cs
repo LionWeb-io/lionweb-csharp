@@ -32,7 +32,7 @@ public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
 
 public interface IEventClientConnector : IClientConnector<INotification>
 {
-    INotification IClientConnector<INotification>.Convert(INotification internalNotification) => internalNotification;
+    INotification IClientConnector<INotification>.Convert(INotification notification) => notification;
 }
 
 public class LionWebClient : LionWebClientBase<IDeltaContent>
