@@ -78,14 +78,14 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
                     break;
             }
             
-            repository.SendEventToAllClients(sender, message);
+            repository.SendNotificationToAllClients(sender, message);
         }
     }
     
     private class LocalPartitionReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IPartitionNotification>(sender)
     {
         public override void Receive(IPartitionNotification message) =>
-            repository.SendEventToAllClients(sender, message);
+            repository.SendNotificationToAllClients(sender, message);
     }
 
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedEvent)
@@ -115,12 +115,12 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     protected abstract Task Send(IClientInfo clientInfo, T deltaContent);
     protected abstract Task SendAll(T deltaContent);
 
-    private void SendEventToAllClients(object? sender, INotification? internalEvent)
+    private void SendNotificationToAllClients(object? sender, INotification? notification)
     {
-        if (internalEvent == null)
+        if (notification == null)
             return;
 
-        var converted = _connector.Convert(internalEvent);
+        var converted = _connector.Convert(notification);
         SendAll(converted);
     }
 
