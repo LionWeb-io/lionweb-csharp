@@ -26,7 +26,7 @@ using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
-using Core.Test.Listener;
+using Core.Test.Notification;
 using Message.Command;
 
 [TestClass]

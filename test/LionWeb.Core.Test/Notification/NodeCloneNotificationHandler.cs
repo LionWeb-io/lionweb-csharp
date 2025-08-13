@@ -15,12 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Listener;
+namespace LionWeb.Core.Test.Notification;
 
-using Notification;
-using Notification.Forest;
-using Notification.Handler;
-using Notification.Partition;
+using Core.Notification;
+using Core.Notification.Forest;
+using Core.Notification.Handler;
+using Core.Notification.Partition;
 
 internal class NodeCloneNotificationHandler<TNotification>(object? sender) : NotificationHandlerBase<TNotification>(sender)
     where TNotification : INotification

@@ -17,8 +17,8 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
+using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
-using Notification.Partition;
 
 [TestClass]
 public class ReferenceTests_Single_Listener
