@@ -22,21 +22,26 @@ using Core.M1;
 using Core.M3;
 using Message;
 
-public class LionWebTestRepository(
-    LionWebVersions lionWebVersion,
-    List<Language> languages,
-    string name,
-    IForest forest,
-    IRepositoryConnector<IDeltaContent> connector)
-    : LionWebRepository(lionWebVersion, languages, name, forest, connector)
+public class LionWebTestRepository : LionWebRepository
 {
     public const int _sleepInterval = 100;
     
     private long _messageCount;
+
+    public LionWebTestRepository(LionWebVersions lionWebVersion,
+        List<Language> languages,
+        string name,
+        IForest forest,
+        IRepositoryConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, forest, connector)
+    {
+        CommunicationError += (_, exception) => Exceptions.Add(exception);
+    }
+
     public long MessageCount => Interlocked.Read(ref _messageCount);
     private void IncrementMessageCount() => Interlocked.Increment(ref _messageCount);
     public long WaitCount { get; set; }
 
+    public List<Exception> Exceptions { get; } = [];
 
     private void WaitForCount(long count)
     {

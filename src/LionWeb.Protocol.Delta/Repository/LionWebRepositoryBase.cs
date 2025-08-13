@@ -62,6 +62,11 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         SharedNodeMap.Dispose();
     }
 
+    public event EventHandler<Exception> CommunicationError;
+    
+    protected void OnCommunicationError(Exception ex) =>
+        CommunicationError?.Invoke(this, ex);
+
     #region Local
 
     private class LocalForestReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IForestNotification>(sender)

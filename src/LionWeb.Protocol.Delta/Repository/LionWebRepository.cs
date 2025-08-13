@@ -106,6 +106,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         } catch (Exception e)
         {
             Log(e.ToString());
+            OnCommunicationError(e);
         }
     }
 
@@ -116,29 +117,43 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     /// <inheritdoc />
     protected override async Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
     {
-        Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
-        await _connector.SendToClient(clientInfo, deltaContent);
+        try
+        {
+            Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
+            await _connector.SendToClient(clientInfo, deltaContent);
+        } catch (Exception e)
+        {
+            OnCommunicationError(e);
+        }
     }
 
     /// <inheritdoc />
     protected override async Task SendAll(IDeltaContent deltaContent)
     {
-        switch (deltaContent)
+        try
         {
-            case IDeltaEvent deltaEvent:
-                var commandSource = deltaEvent is { OriginCommands: { } cmds }
-                    ? cmds.First()
-                    : null;
-                Log(
-                    $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})", true);
-                break;
+            switch (deltaContent)
+            {
+                case IDeltaEvent deltaEvent:
+                    var commandSource = deltaEvent is { OriginCommands: { } cmds }
+                        ? cmds.First()
+                        : null;
+                    Log(
+                        $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})",
+                        true);
+                    break;
 
             default:
                 Log($"sending: {deltaContent.GetType().Name}", true);
                 break;
         }
 
-        await _connector.SendToAllClients(deltaContent);
+            await _connector.SendToAllClients(deltaContent);
+        } catch (Exception e)
+        {
+            Log(e.ToString());
+            OnCommunicationError(e);
+        }
     }
 
     #endregion

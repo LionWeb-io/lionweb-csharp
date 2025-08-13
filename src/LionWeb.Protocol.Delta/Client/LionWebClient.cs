@@ -109,6 +109,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         } catch (Exception e)
         {
             Log(e.ToString());
+            OnCommunicationError(e);
         }
     }
 
@@ -188,14 +189,21 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     /// <inheritdoc />
     protected override async Task Send(IDeltaContent deltaContent)
     {
-        if (deltaContent.RequiresParticipationId)
-            deltaContent.InternalParticipationId = ParticipationId;
+        try
+        {
+            if (deltaContent.RequiresParticipationId)
+                deltaContent.InternalParticipationId = ParticipationId;
 
-        if (deltaContent is IDeltaCommand { CommandId: { } commandId })
-            _ownCommands.TryAdd(commandId, true);
+            if (deltaContent is IDeltaCommand { CommandId: { } commandId })
+                _ownCommands.TryAdd(commandId, true);
 
-        Log($"sending: {deltaContent.GetType().Name}", true);
-        await _connector.SendToRepository(deltaContent);
+            Log($"sending: {deltaContent.GetType().Name}", true);
+            await _connector.SendToRepository(deltaContent);
+        } catch (Exception e)
+        {
+            Log(e.ToString());
+            OnCommunicationError(e);
+        }
     }
 
     #endregion

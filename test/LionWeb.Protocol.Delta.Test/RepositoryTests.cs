@@ -64,6 +64,14 @@ public class RepositoryTests
         _bClient = CreateClient("B", out _bForest, out _bConnector);
     }
 
+    [TestCleanup]
+    public void AssertNoExceptions()
+    {
+        AssertNoExceptions(_repository.Exceptions);
+        AssertNoExceptions(_aClient.Exceptions);
+        AssertNoExceptions(_bClient.Exceptions);
+    }
+
     private LionWebTestClient CreateClient(string name, out IForest forest, out ClientConnector connector)
     {
         var participation = $"{name}Participation";
@@ -124,6 +132,9 @@ public class RepositoryTests
         Assert.IsTrue(differences.Count == 0,
             differences.DescribeAll(new() { LeftDescription = "a", RightDescription = "b" }));
     }
+    
+    protected void AssertNoExceptions(List<Exception> exceptions) =>
+        Assert.AreEqual(0, exceptions.Count, string.Join(Environment.NewLine, exceptions));
 
     public static void Run(Action action)
         // => Task.Run(() =>
