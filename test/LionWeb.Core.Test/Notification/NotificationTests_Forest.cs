@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification.Forest;
 using Core.Notification.Handler;
+using Core.Notification.Partition;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
@@ -126,7 +127,7 @@ public class NotificationTests_Forest
     {
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
         var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
-        var cloneHandler = new NodeCloneNotificationHandler<IForestNotification>(cloneForest);
+        var cloneHandler = new NodeCloneNotificationHandler<IForestNotification>("forestCloner");
         INotificationHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);
         INotificationHandler.Connect(cloneHandler, replicator);
 
@@ -161,7 +162,9 @@ internal class TestLocalForestChangeNotificationHandler(object? sender, SharedPa
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)
     {
         var partitionReplicator = sharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
-        INotificationHandler.Connect(partitionAddedNotification.NewPartition.GetNotificationHandler(), partitionReplicator);
+        var cloneHandler = new NodeCloneNotificationHandler<IPartitionNotification>($"partitionCloner.{partitionAddedNotification.NewPartition.GetId()}");
+        INotificationHandler.Connect(partitionAddedNotification.NewPartition.GetNotificationHandler(), cloneHandler);
+        INotificationHandler.Connect(cloneHandler, partitionReplicator);
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
