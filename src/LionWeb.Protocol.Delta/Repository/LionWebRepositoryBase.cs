@@ -48,8 +48,15 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
         _replicator = RewriteForestNotificationReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
 
+        if(forest.GetNotificationHandler() is { } proc)
+            INotificationHandler.Connect(proc, new LocalForestChangeNotificationHandler(name, this));
         INotificationHandler.Connect(_replicator, new LocalForestReceiver(name, this));
 
+        foreach (IPartitionInstance partitionInstance in forest.Partitions)
+        {
+            RegisterPartition(partitionInstance);
+        }
+        
         _connector.ReceiveFromClient += OnReceiveFromClient;
     }
 
@@ -63,6 +70,22 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     }
 
     #region Local
+    
+    private class LocalForestChangeNotificationHandler(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IForestNotification>(sender)
+    {
+        public override void Receive(IForestNotification message)
+        {
+            switch (message)
+            {
+                case PartitionAddedNotification partitionAddedNotification:
+                    repository.OnLocalPartitionAdded(partitionAddedNotification);
+                    break;
+                case PartitionDeletedNotification partitionDeletedNotification:
+                    repository.OnLocalPartitionDeleted(partitionDeletedNotification);
+                    break;
+            }
+        }
+    }
 
     private class LocalForestReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IForestNotification>(sender)
     {
@@ -90,7 +113,13 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedEvent)
     {
-        var notificationHandler = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
+        IPartitionInstance partitionInstance = partitionAddedEvent.NewPartition;
+        RegisterPartition(partitionInstance);
+    }
+
+    private void RegisterPartition(IPartitionInstance partitionInstance)
+    {
+        var notificationHandler = SharedPartitionReplicatorMap.Lookup(partitionInstance.GetId());
         INotificationHandler.Connect(notificationHandler, new LocalPartitionReceiver(_name, this));
     }
 
