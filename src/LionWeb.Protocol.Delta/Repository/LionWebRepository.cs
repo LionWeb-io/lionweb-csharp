@@ -42,7 +42,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
 
-        SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
         _commandReceiver = new DeltaProtocolCommandReceiver(
             SharedNodeMap,
