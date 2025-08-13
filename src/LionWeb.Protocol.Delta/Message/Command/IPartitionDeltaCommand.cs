@@ -332,7 +332,7 @@ public record MoveAndReplaceEntryInSameReference(
     ProtocolMessage[]? ProtocolMessages
 ) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
-public record AddReferenceResolveInfo(
+public record AddReferenceResolveInfoCommand(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,

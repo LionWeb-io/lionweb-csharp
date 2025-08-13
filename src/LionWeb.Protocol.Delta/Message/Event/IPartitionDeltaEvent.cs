@@ -1130,7 +1130,7 @@ public record EntryMovedAndReplacedInSameReference(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
-public record ReferenceResolveInfoAdded(
+public record ReferenceResolveInfoAddedEvent(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,

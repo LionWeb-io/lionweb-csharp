@@ -261,7 +261,7 @@ public abstract class JsonTestsBase
         new(TargetNode(), MetaPointer(), Index(), TargetNode(),
             ResolveInfo(), Index(), TargetNode(), ResolveInfo(), CommandId(), ProtocolMessages());
 
-    protected static AddReferenceResolveInfo CreateAddReferenceResolveInfo() =>
+    protected static AddReferenceResolveInfoCommand CreateAddReferenceResolveInfoCommand() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
             CommandId(), ProtocolMessages());
 
@@ -330,7 +330,7 @@ public abstract class JsonTestsBase
         [CreateMoveAndReplaceEntryFromOtherReference()],
         [CreateMoveAndReplaceEntryFromOtherReferenceInSameParent()],
         [CreateMoveAndReplaceEntryInSameReference()],
-        [CreateAddReferenceResolveInfo()],
+        [CreateAddReferenceResolveInfoCommand()],
         [CreateDeleteReferenceResolveInfo()],
         [CreateChangeReferenceResolveInfo()],
         [CreateAddReferenceTarget()],
@@ -510,7 +510,7 @@ public abstract class JsonTestsBase
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Index(), TargetNode(), ResolveInfo(),
             Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
-    protected static ReferenceResolveInfoAdded CreateReferenceResolveInfoAdded() =>
+    protected static ReferenceResolveInfoAddedEvent CreateReferenceResolveInfoAddedEvent() =>
         new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(), Origin(), ProtocolMessages())
         {
             SequenceNumber = Sequence()
@@ -596,7 +596,7 @@ public abstract class JsonTestsBase
         [CreateEntryMovedAndReplacedFromOtherReference()],
         [CreateEntryMovedAndReplacedFromOtherReferenceInSameParent()],
         [CreateEntryMovedAndReplacedInSameReference()],
-        [CreateReferenceResolveInfoAdded()],
+        [CreateReferenceResolveInfoAddedEvent()],
         [CreateReferenceResolveInfoDeleted()],
         [CreateReferenceResolveInfoChanged()],
         [CreateReferenceTargetAdded()],
