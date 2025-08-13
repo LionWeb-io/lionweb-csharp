@@ -159,7 +159,7 @@ public record MoveAndReplaceChildInSameContainment(
 
 public interface IAnnotationCommand : IPartitionDeltaCommand;
 
-public record AddAnnotation(
+public record AddAnnotationCommand(
     TargetNode Parent,
     DeltaSerializationChunk NewAnnotation,
     Index Index,

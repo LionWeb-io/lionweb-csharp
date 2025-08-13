@@ -193,7 +193,7 @@ public abstract class JsonTestsBase
 
     #region Annotations
 
-    protected static AddAnnotation CreateAddAnnotation() =>
+    protected static AddAnnotationCommand CreateAddAnnotationCommand() =>
         new(TargetNode(), Chunk(), Index(), CommandId(), ProtocolMessages());
 
     protected static DeleteAnnotation CreateDeleteAnnotation() =>
@@ -314,7 +314,7 @@ public abstract class JsonTestsBase
         [CreateMoveAndReplaceChildFromOtherContainment()],
         [CreateMoveAndReplaceChildFromOtherContainmentInSameParent()],
         [CreateMoveAndReplaceChildInSameContainment()],
-        [CreateAddAnnotation()],
+        [CreateAddAnnotationCommand()],
         [CreateDeleteAnnotation()],
         [CreateReplaceAnnotation()],
         [CreateMoveAnnotationFromOtherParent()],
@@ -429,7 +429,7 @@ public abstract class JsonTestsBase
 
     #region Annotations
 
-    protected static AnnotationAdded CreateAnnotationAdded() =>
+    protected static AnnotationAddedEvent CreateAnnotationAddedEvent() =>
         new(TargetNode(), Chunk(), Index(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static AnnotationDeleted CreateAnnotationDeleted() =>
@@ -580,7 +580,7 @@ public abstract class JsonTestsBase
         [CreateChildMovedAndReplacedFromOtherContainment()],
         [CreateChildMovedAndReplacedFromOtherContainmentInSameParent()],
         [CreateChildMovedAndReplacedInSameContainment()],
-        [CreateAnnotationAdded()],
+        [CreateAnnotationAddedEvent()],
         [CreateAnnotationDeleted()],
         [CreateAnnotationReplaced()],
         [CreateAnnotationMovedFromOtherParent()],

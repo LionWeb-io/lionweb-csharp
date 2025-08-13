@@ -634,7 +634,7 @@ public interface IAnnotationEvent : IPartitionDeltaEvent
     TargetNode Parent { get; }
 };
 
-public record AnnotationAdded(
+public record AnnotationAddedEvent(
     TargetNode Parent,
     DeltaSerializationChunk NewAnnotation,
     Index Index,

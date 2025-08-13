@@ -59,7 +59,7 @@ public class DeltaCommandToPartitionEventMapper
             MoveChildInSameContainment a => OnMoveChildInSameContainment(a),
             MoveAndReplaceChildFromOtherContainment a => OnMoveAndReplaceChildFromOtherContainment(a),
             MoveAndReplaceChildFromOtherContainmentInSameParent a => OnMoveAndReplaceChildFromOtherContainmentInSameParent(a),
-            AddAnnotation a => OnAddAnnotation(a),
+            AddAnnotationCommand a => OnAddAnnotation(a),
             DeleteAnnotation a => OnDeleteAnnotation(a),
             MoveAnnotationFromOtherParent a => OnMoveAnnotationFromOtherParent(a),
             MoveAnnotationInSameParent a => OnMoveAnnotationInSameParent(a),
@@ -299,14 +299,14 @@ public class DeltaCommandToPartitionEventMapper
 
     #region Annotations
 
-    private AnnotationAddedNotification OnAddAnnotation(AddAnnotation addAnnotationEvent)
+    private AnnotationAddedNotification OnAddAnnotation(AddAnnotationCommand addAnnotationCommand)
     {
-        var parent = ToNode(addAnnotationEvent.Parent);
+        var parent = ToNode(addAnnotationCommand.Parent);
         return new AnnotationAddedNotification(
             parent,
-            Deserialize(addAnnotationEvent.NewAnnotation),
-            addAnnotationEvent.Index,
-            ToEventId(addAnnotationEvent)
+            Deserialize(addAnnotationCommand.NewAnnotation),
+            addAnnotationCommand.Index,
+            ToEventId(addAnnotationCommand)
         );
     }
 

@@ -58,7 +58,7 @@ public class DeltaEventToPartitionEventMapper
             ChildMovedInSameContainment a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainment a => OnChildMovedAndReplacedFromOtherContainment(a),
             ChildMovedAndReplacedFromOtherContainmentInSameParent a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
-            AnnotationAdded a => OnAnnotationAdded(a),
+            AnnotationAddedEvent a => OnAnnotationAdded(a),
             AnnotationDeleted a => OnAnnotationDeleted(a),
             AnnotationMovedFromOtherParent a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedInSameParent a => OnAnnotationMovedInSameParent(a),
@@ -262,7 +262,7 @@ public class DeltaEventToPartitionEventMapper
 
     #region Annotations
 
-    private AnnotationAddedNotification OnAnnotationAdded(AnnotationAdded annotationAddedEvent)
+    private AnnotationAddedNotification OnAnnotationAdded(AnnotationAddedEvent annotationAddedEvent)
     {
         var parent = ToNode(annotationAddedEvent.Parent);
         return new AnnotationAddedNotification(

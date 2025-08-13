@@ -187,7 +187,7 @@ public class PartitionEventToDeltaCommandMapper
 
     #region Annotations
 
-    private AddAnnotation OnAnnotationAdded(AnnotationAddedNotification annotationAddedNotification) =>
+    private AddAnnotationCommand OnAnnotationAdded(AnnotationAddedNotification annotationAddedNotification) =>
         new(
             annotationAddedNotification.Parent.GetId(),
             ToDeltaChunk(annotationAddedNotification.NewAnnotation),
