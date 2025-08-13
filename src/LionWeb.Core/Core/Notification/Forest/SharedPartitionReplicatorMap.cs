@@ -17,7 +17,23 @@
 
 namespace LionWeb.Core.Notification.Forest;
 
-/// Forwards <see cref="IForestCommander"/> commands to <see cref="IForestPublisher"/> events.
-/// <param name="sender">Optional sender of the events.</param>
-public class ForestEventHandler(object? sender)
-    : EventHandlerBase<IForestNotification>(sender), IForestPublisher, IForestCommander;
+using Handler;
+using Partition;
+
+public class SharedPartitionReplicatorMap
+{
+    private readonly Dictionary<NodeId, INotificationHandler<IPartitionNotification>> _localPartitionReplicators = [];
+
+    public INotificationHandler<IPartitionNotification> Lookup(NodeId partitionId) =>
+        _localPartitionReplicators[partitionId];
+
+    public void Register(NodeId partitionId, INotificationHandler<IPartitionNotification> replicator)
+    {
+        if (!_localPartitionReplicators.TryAdd(partitionId, replicator))
+            throw new ArgumentException(
+                $"Duplicate partition replicator: {partitionId}: {replicator} {Lookup(partitionId)}");
+    }
+
+    public void Unregister(NodeId partitionId) =>
+        _localPartitionReplicators.Remove(partitionId);
+}

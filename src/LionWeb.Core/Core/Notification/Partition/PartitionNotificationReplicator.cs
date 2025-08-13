@@ -17,284 +17,273 @@
 
 namespace LionWeb.Core.Notification.Partition;
 
+using Handler;
 using M3;
 using System.Collections;
 using System.Diagnostics;
 
 /// Replicates notifications for a <i>local</i> <see cref="IPartitionInstance">partition</see>.
-/// <inheritdoc cref="NotificationReplicatorBase{TEvent,TPublisher}"/>
-public class PartitionNotificationReplicator : NotificationReplicatorBase<IPartitionNotification, IPartitionPublisher>, IPartitionPublisher
+/// <inheritdoc cref="RemoteNotificationReplicatorBase{TNotification}"/>
+public static class PartitionNotificationReplicator
+{
+    public static INotificationHandler<IPartitionNotification> Create(IPartitionInstance localPartition,
+        SharedNodeMap sharedNodeMap, object? sender)
+    {
+        var internalSender = sender ?? localPartition.GetId();
+        var filter = new IdFilteringNotificationHandler<IPartitionNotification>(internalSender);
+        var remoteReplicator =
+            new RemotePartitionNotificationReplicator(localPartition, sharedNodeMap, filter, internalSender);
+        var localReplicator = new LocalPartitionNotificationReplicator(sharedNodeMap, internalSender);
+
+        var result = new CompositeNotificationHandler<IPartitionNotification>([remoteReplicator, filter],
+            sender ?? $"Composite of {nameof(PartitionNotificationReplicator)} {localPartition.GetId()}");
+
+        var partitionHandler = localPartition.GetNotificationHandler();
+        if (partitionHandler != null)
+        {
+            INotificationHandler.Connect(partitionHandler, localReplicator);
+            INotificationHandler.Connect(localReplicator, filter);
+        }
+
+        return result;
+    }
+}
+
+public class RemotePartitionNotificationReplicator : RemoteNotificationReplicatorBase<IPartitionNotification>
 {
     private readonly IPartitionInstance _localPartition;
 
-    public PartitionNotificationReplicator(IPartitionInstance localPartition,
-        SharedNodeMap sharedNodeMap = null) : base(localPartition.GetPublisher(),
-        localPartition.GetCommander(), sharedNodeMap)
+    protected internal RemotePartitionNotificationReplicator(IPartitionInstance localPartition,
+        SharedNodeMap sharedNodeMap,
+        IdFilteringNotificationHandler<IPartitionNotification> filter, object? sender) : base(
+        sharedNodeMap, filter, sender)
     {
         _localPartition = localPartition;
-        Init();
+        SharedNodeMap.RegisterNode(_localPartition);
     }
+
+    /// <see cref="SharedNodeMap.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
+    /// and <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">unsubscribes</see> from it.
+    // public override void Dispose()
+    // {
+    //     base.Dispose();
+    //
+    //     SharedNodeMap.UnregisterNode(_localPartition);
+    //
+    //     var localPublisher = _localPartition.GetPublisher();
+    //     if (localPublisher == null)
+    //         return;
+    //
+    //     localPublisher.Unsubscribe<IPartitionEvent>(LocalHandler);
+    //
+    //     GC.SuppressFinalize(this);
+    // }
 
     /// <inheritdoc />
-    protected override void ProcessEvent(object? sender, IPartitionNotification? partitionEvent)
+    protected override void ProcessNotification(IPartitionNotification? partitionNotification)
     {
-        Debug.WriteLine($"{sender}: processing event {partitionEvent}");
-        switch (partitionEvent)
-        {
-            case PropertyAddedNotification a:
-                OnRemotePropertyAdded(a);
-                break;
-            case PropertyDeletedNotification a:
-                OnRemotePropertyDeleted(a);
-                break;
-            case PropertyChangedNotification a:
-                OnRemotePropertyChanged(a);
-                break;
-            case ChildAddedNotification a:
-                OnRemoteChildAdded(a);
-                break;
-            case ChildDeletedNotification a:
-                OnRemoteChildDeleted(a);
-                break;
-            case ChildReplacedNotification a:
-                OnRemoteChildReplaced(a);
-                break;
-            case ChildMovedFromOtherContainmentNotification a:
-                OnRemoteChildMovedFromOtherContainment(a);
-                break;
-            case ChildMovedFromOtherContainmentInSameParentNotification a:
-                OnRemoteChildMovedFromOtherContainmentInSameParent(a);
-                break;
-            case ChildMovedInSameContainmentNotification a:
-                OnRemoteChildMovedInSameContainment(a);
-                break;
-            case ChildMovedAndReplacedFromOtherContainmentNotification a:
-                OnRemoteChildMovedAndReplacedFromOtherContainment(a);
-                break;
-            case ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a:
-                OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(a);
-                break;
-            case AnnotationAddedNotification a:
-                OnRemoteAnnotationAdded(a);
-                break;
-            case AnnotationDeletedNotification a:
-                OnRemoteAnnotationDeleted(a);
-                break;
-            case AnnotationMovedFromOtherParentNotification a:
-                OnRemoteAnnotationMovedFromOtherParent(a);
-                break;
-            case AnnotationMovedInSameParentNotification a:
-                OnRemoteAnnotationMovedInSameParent(a);
-                break;
-            case ReferenceAddedNotification a:
-                OnRemoteReferenceAdded(a);
-                break;
-            case ReferenceDeletedNotification a:
-                OnRemoteReferenceDeleted(a);
-                break;
-            case ReferenceChangedNotification a:
-                OnRemoteReferenceChanged(a);
-                break;
-            default:
-                throw new ArgumentException($"Can not process event due to unknown {partitionEvent}!");
-        }
-    }
-
-    private void Init()
-    {
-        RegisterNode(_localPartition);
-
-        var publisher = _localPartition.GetPublisher();
-        if (publisher == null)
-            return;
-
-        publisher.Subscribe<IPartitionNotification>(LocalHandler);
-    }
-
-    /// <see cref="NotificationReplicatorBase{TEvent,TPublisher}.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
-    /// and <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">unsubscribes</see> from it.
-    public override void Dispose()
-    {
-        base.Dispose();
-
-        UnregisterNode(_localPartition);
-
-        var localPublisher = _localPartition.GetPublisher();
-        if (localPublisher == null)
-            return;
-
-        localPublisher.Unsubscribe<IPartitionNotification>(LocalHandler);
-
-        GC.SuppressFinalize(this);
-    }
-
-    #region Local
-
-    private void LocalHandler(object? sender, IPartitionNotification partitionNotification)
-    {
+        Debug.WriteLine($"processing notification {partitionNotification}");
         switch (partitionNotification)
         {
-            case ChildAddedNotification a:
-                OnLocalChildAdded(a);
+            case PropertyAddedNotification e:
+                OnRemotePropertyAdded(e);
                 break;
-            case ChildDeletedNotification a:
-                OnLocalChildDeleted(a);
+            case PropertyDeletedNotification e:
+                OnRemotePropertyDeleted(e);
                 break;
-            case AnnotationAddedNotification a:
-                OnLocalAnnotationAdded(a);
+            case PropertyChangedNotification e:
+                OnRemotePropertyChanged(e);
                 break;
-            case AnnotationDeletedNotification a:
-                OnLocalAnnotationDeleted(a);
+            case ChildAddedNotification e:
+                OnRemoteChildAdded(e);
                 break;
+            case ChildDeletedNotification e:
+                OnRemoteChildDeleted(e);
+                break;
+            case ChildReplacedNotification e:
+                OnRemoteChildReplaced(e);
+                break;
+            case ChildMovedFromOtherContainmentNotification e:
+                OnRemoteChildMovedFromOtherContainment(e);
+                break;
+            case ChildMovedFromOtherContainmentInSameParentNotification e:
+                OnRemoteChildMovedFromOtherContainmentInSameParent(e);
+                break;
+            case ChildMovedInSameContainmentNotification e:
+                OnRemoteChildMovedInSameContainment(e);
+                break;
+            case ChildMovedAndReplacedFromOtherContainmentNotification e:
+                OnRemoteChildMovedAndReplacedFromOtherContainment(e);
+                break;
+            case ChildMovedAndReplacedFromOtherContainmentInSameParentNotification e:
+                OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(e);
+                break;
+            case AnnotationAddedNotification e:
+                OnRemoteAnnotationAdded(e);
+                break;
+            case AnnotationDeletedNotification e:
+                OnRemoteAnnotationDeleted(e);
+                break;
+            case AnnotationMovedFromOtherParentNotification e:
+                OnRemoteAnnotationMovedFromOtherParent(e);
+                break;
+            case AnnotationMovedInSameParentNotification e:
+                OnRemoteAnnotationMovedInSameParent(e);
+                break;
+            case ReferenceAddedNotification e:
+                OnRemoteReferenceAdded(e);
+                break;
+            case ReferenceDeletedNotification e:
+                OnRemoteReferenceDeleted(e);
+                break;
+            case ReferenceChangedNotification e:
+                OnRemoteReferenceChanged(e);
+                break;
+            default:
+                throw new ArgumentException($"Can not process notification due to unknown {partitionNotification}!");
         }
     }
-
-    private void OnLocalChildAdded(ChildAddedNotification childAddedNotification) =>
-        RegisterNode(childAddedNotification.NewChild);
-
-    private void OnLocalChildDeleted(ChildDeletedNotification childDeletedNotification) =>
-        UnregisterNode(childDeletedNotification.DeletedChild);
-
-    private void OnLocalAnnotationAdded(AnnotationAddedNotification annotationAddedNotification) =>
-        RegisterNode(annotationAddedNotification.NewAnnotation);
-
-    private void OnLocalAnnotationDeleted(AnnotationDeletedNotification annotationDeletedNotification) =>
-        UnregisterNode(annotationDeletedNotification.DeletedAnnotation);
-
-    #endregion
-
-
-    #region Remote
 
     #region Properties
 
-    private void OnRemotePropertyAdded(PropertyAddedNotification propertyAddedNotification) =>
-        SuppressEventForwarding(propertyAddedNotification, () =>
+    private void OnRemotePropertyAdded(PropertyAddedNotification propertyAdded) =>
+        SuppressNotificationForwarding(propertyAdded, () =>
         {
             Debug.WriteLine(
-                $"Node {propertyAddedNotification.Node.PrintIdentity()}: Setting {propertyAddedNotification.Property} to {propertyAddedNotification.NewValue}");
-            Lookup(propertyAddedNotification.Node.GetId()).Set(propertyAddedNotification.Property, propertyAddedNotification.NewValue, propertyAddedNotification.NotificationId);
+                $"Node {propertyAdded.Node.PrintIdentity()}: Setting {propertyAdded.Property} to {propertyAdded.NewValue}");
+            Lookup(propertyAdded.Node.GetId()).Set(propertyAdded.Property, propertyAdded.NewValue,
+                propertyAdded.NotificationId);
         });
 
-    private void OnRemotePropertyDeleted(PropertyDeletedNotification propertyDeletedNotification) =>
-        SuppressEventForwarding(propertyDeletedNotification, () =>
+    private void OnRemotePropertyDeleted(PropertyDeletedNotification propertyDeleted) =>
+        SuppressNotificationForwarding(propertyDeleted, () =>
         {
-            Lookup(propertyDeletedNotification.Node.GetId()).Set(propertyDeletedNotification.Property, null, propertyDeletedNotification.NotificationId);
+            Lookup(propertyDeleted.Node.GetId())
+                .Set(propertyDeleted.Property, null, propertyDeleted.NotificationId);
         });
 
-    private void OnRemotePropertyChanged(PropertyChangedNotification propertyChangedNotification) =>
-        SuppressEventForwarding(propertyChangedNotification, () =>
+    private void OnRemotePropertyChanged(PropertyChangedNotification propertyChanged) =>
+        SuppressNotificationForwarding(propertyChanged, () =>
         {
-            Lookup(propertyChangedNotification.Node.GetId()).Set(propertyChangedNotification.Property, propertyChangedNotification.NewValue, propertyChangedNotification.NotificationId);
+            Lookup(propertyChanged.Node.GetId()).Set(propertyChanged.Property, propertyChanged.NewValue,
+                propertyChanged.NotificationId);
         });
 
     #endregion
 
     #region Children
 
-    private void OnRemoteChildAdded(ChildAddedNotification childAddedNotification) =>
-        SuppressEventForwarding(childAddedNotification, () =>
+    private void OnRemoteChildAdded(ChildAddedNotification childAdded) =>
+        SuppressNotificationForwarding(childAdded, () =>
         {
-            var localParent = Lookup(childAddedNotification.Parent.GetId());
-            var newChildNode = (INode)childAddedNotification.NewChild;
-
-            var clone = Clone(newChildNode);
+            var localParent = Lookup(childAdded.Parent.GetId());
+            var newChildNode = (INode)childAdded.NewChild;
 
             Debug.WriteLine(
-                $"Parent {localParent.PrintIdentity()}: Adding {clone.PrintIdentity()} to {childAddedNotification.Containment} at {childAddedNotification.Index}");
-            var newValue = InsertContainment(localParent, childAddedNotification.Containment, childAddedNotification.Index, clone);
+                $"Parent {localParent.PrintIdentity()}: Adding {newChildNode.PrintIdentity()} to {childAdded.Containment} at {childAdded.Index}");
+            var newValue = InsertContainment(localParent, childAdded.Containment, childAdded.Index,
+                newChildNode);
 
-            localParent.Set(childAddedNotification.Containment, newValue, childAddedNotification.NotificationId);
+            localParent.Set(childAdded.Containment, newValue, childAdded.NotificationId);
         });
 
-    private void OnRemoteChildDeleted(ChildDeletedNotification childDeletedNotification) =>
-        SuppressEventForwarding(childDeletedNotification, () =>
+    private void OnRemoteChildDeleted(ChildDeletedNotification childDeleted) =>
+        SuppressNotificationForwarding(childDeleted, () =>
         {
-            var localParent = Lookup(childDeletedNotification.Parent.GetId());
+            var localParent = Lookup(childDeleted.Parent.GetId());
 
             object? newValue = null;
-            if (childDeletedNotification.Containment.Multiple)
+            if (childDeleted.Containment.Multiple)
             {
-                var existingChildren = localParent.Get(childDeletedNotification.Containment);
+                var existingChildren = localParent.Get(childDeleted.Containment);
                 if (existingChildren is IList l)
                 {
                     var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.RemoveAt(childDeletedNotification.Index);
+                    children.RemoveAt(childDeleted.Index);
                     newValue = children;
                 }
             }
 
-            localParent.Set(childDeletedNotification.Containment, newValue, childDeletedNotification.NotificationId);
+            localParent.Set(childDeleted.Containment, newValue, childDeleted.NotificationId);
         });
 
-    private void OnRemoteChildReplaced(ChildReplacedNotification childReplacedNotification) =>
-        SuppressEventForwarding(childReplacedNotification, () =>
+    private void OnRemoteChildReplaced(ChildReplacedNotification childReplaced) =>
+        SuppressNotificationForwarding(childReplaced, () =>
         {
-            var localParent = Lookup(childReplacedNotification.Parent.GetId());
-            var substituteNode = Clone((INode)childReplacedNotification.NewChild);
-            var newValue = ReplaceContainment(localParent, childReplacedNotification.Containment, childReplacedNotification.Index, substituteNode);
+            var localParent = Lookup(childReplaced.Parent.GetId());
+            var substituteNode = (INode)childReplaced.NewChild;
+            var newValue = ReplaceContainment(localParent, childReplaced.Containment, childReplaced.Index,
+                substituteNode);
 
-            localParent.Set(childReplacedNotification.Containment, newValue, childReplacedNotification.NotificationId);
+            localParent.Set(childReplaced.Containment, newValue, childReplaced.NotificationId);
         });
 
-    private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMovedNotification) =>
-        SuppressEventForwarding(childMovedNotification, () =>
+    private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMoved) =>
+        SuppressNotificationForwarding(childMoved, () =>
         {
-            var localNewParent = Lookup(childMovedNotification.NewParent.GetId());
-            var nodeToInsert = LookupOpt(childMovedNotification.MovedChild.GetId()) ?? Clone((INode)childMovedNotification.MovedChild);
-            var newValue = InsertContainment(localNewParent, childMovedNotification.NewContainment, childMovedNotification.NewIndex, nodeToInsert);
+            var localNewParent = Lookup(childMoved.NewParent.GetId());
+            var nodeToInsert = LookupOpt(childMoved.MovedChild.GetId()) ?? (INode)childMoved.MovedChild;
+            var newValue = InsertContainment(localNewParent, childMoved.NewContainment, childMoved.NewIndex,
+                nodeToInsert);
 
-            localNewParent.Set(childMovedNotification.NewContainment, newValue, childMovedNotification.NotificationId);
+            localNewParent.Set(childMoved.NewContainment, newValue, childMoved.NotificationId);
         });
 
-    private void OnRemoteChildMovedAndReplacedFromOtherContainment(ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedNotification) => SuppressEventForwarding(childMovedAndReplacedNotification, () =>
-    {
-        var localNewParent = Lookup(childMovedAndReplacedNotification.NewParent.GetId());
-        var substituteNode = Lookup(childMovedAndReplacedNotification.MovedChild.GetId());
-        var newValue = ReplaceContainment(localNewParent, childMovedAndReplacedNotification.NewContainment, childMovedAndReplacedNotification.NewIndex,
-            substituteNode);
+    private void OnRemoteChildMovedAndReplacedFromOtherContainment(
+        ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplaced) => SuppressNotificationForwarding(
+        childMovedAndReplaced, () =>
+        {
+            var localNewParent = Lookup(childMovedAndReplaced.NewParent.GetId());
+            var substituteNode = Lookup(childMovedAndReplaced.MovedChild.GetId());
+            var newValue = ReplaceContainment(localNewParent, childMovedAndReplaced.NewContainment,
+                childMovedAndReplaced.NewIndex,
+                substituteNode);
 
-        localNewParent.Set(childMovedAndReplacedNotification.NewContainment, newValue, childMovedAndReplacedNotification.NotificationId);
-    });
+            localNewParent.Set(childMovedAndReplaced.NewContainment, newValue, childMovedAndReplaced.NotificationId);
+        });
 
-    private void OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(ChildMovedAndReplacedFromOtherContainmentInSameParentNotification childMovedAndReplacedNotification)
+    private void OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(
+        ChildMovedAndReplacedFromOtherContainmentInSameParentNotification childMovedAndReplaced)
     {
-        var parent = Lookup(childMovedAndReplacedNotification.Parent.GetId());
-        var substituteNode = Lookup(childMovedAndReplacedNotification.MovedChild.GetId());
-        var newValue = ReplaceContainment(parent, childMovedAndReplacedNotification.NewContainment, childMovedAndReplacedNotification.NewIndex, substituteNode);
-        
-        parent.Set(childMovedAndReplacedNotification.NewContainment, newValue);
+        var parent = Lookup(childMovedAndReplaced.Parent.GetId());
+        var substituteNode = Lookup(childMovedAndReplaced.MovedChild.GetId());
+        var newValue = ReplaceContainment(parent, childMovedAndReplaced.NewContainment,
+            childMovedAndReplaced.NewIndex, substituteNode);
+
+        parent.Set(childMovedAndReplaced.NewContainment, newValue);
     }
-    
-    private void OnRemoteChildMovedFromOtherContainmentInSameParent(ChildMovedFromOtherContainmentInSameParentNotification childMovedNotification) =>
-        SuppressEventForwarding(childMovedNotification, () =>
-        {
-            var localParent = Lookup(childMovedNotification.Parent.GetId());
-            var newValue = InsertContainment(localParent, childMovedNotification.NewContainment, childMovedNotification.NewIndex,
-                Lookup(childMovedNotification.MovedChild.GetId()));
 
-            localParent.Set(childMovedNotification.NewContainment, newValue, childMovedNotification.NotificationId);
+    private void OnRemoteChildMovedFromOtherContainmentInSameParent(
+        ChildMovedFromOtherContainmentInSameParentNotification childMoved) =>
+        SuppressNotificationForwarding(childMoved, () =>
+        {
+            var localParent = Lookup(childMoved.Parent.GetId());
+            var newValue = InsertContainment(localParent, childMoved.NewContainment, childMoved.NewIndex,
+                Lookup(childMoved.MovedChild.GetId()));
+
+            localParent.Set(childMoved.NewContainment, newValue, childMoved.NotificationId);
         });
 
-    private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification childMovedNotification) =>
-        SuppressEventForwarding(childMovedNotification, () =>
+    private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification childMoved) =>
+        SuppressNotificationForwarding(childMoved, () =>
         {
-            var localParent = Lookup(childMovedNotification.Parent.GetId());
-            INode nodeToInsert = Lookup(childMovedNotification.MovedChild.GetId());
+            var localParent = Lookup(childMoved.Parent.GetId());
+            INode nodeToInsert = Lookup(childMoved.MovedChild.GetId());
             object newValue = nodeToInsert;
-            var existingChildren = localParent.Get(childMovedNotification.Containment);
+            var existingChildren = localParent.Get(childMoved.Containment);
             if (existingChildren is IList l)
             {
                 var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                children.RemoveAt(childMovedNotification.OldIndex);
-                children.Insert(childMovedNotification.NewIndex, nodeToInsert);
+                children.RemoveAt(childMoved.OldIndex);
+                children.Insert(childMoved.NewIndex, nodeToInsert);
                 newValue = children;
             }
 
-            localParent.Set(childMovedNotification.Containment, newValue, childMovedNotification.NotificationId);
+            localParent.Set(childMoved.Containment, newValue, childMoved.NotificationId);
         });
 
-    private static object ReplaceContainment(INode localParent, Containment containment, Index index, INode substituteNode)
+    private static object ReplaceContainment(INode localParent, Containment containment, Index index,
+        INode substituteNode)
     {
         if (localParent.TryGet(containment, out var existingChildren))
         {
@@ -352,91 +341,93 @@ public class PartitionNotificationReplicator : NotificationReplicatorBase<IParti
 
     #region Annotations
 
-    private void OnRemoteAnnotationAdded(AnnotationAddedNotification annotationAddedNotification) =>
-        SuppressEventForwarding(annotationAddedNotification, () =>
+    private void OnRemoteAnnotationAdded(AnnotationAddedNotification annotationAdded) =>
+        SuppressNotificationForwarding(annotationAdded, () =>
         {
-            var localParent = Lookup(annotationAddedNotification.Parent.GetId());
-            var clone = Clone((INode)annotationAddedNotification.NewAnnotation);
-            localParent.InsertAnnotations(annotationAddedNotification.Index, [clone], annotationAddedNotification.NotificationId);
+            var localParent = Lookup(annotationAdded.Parent.GetId());
+            var annotation = (INode)annotationAdded.NewAnnotation;
+            localParent.InsertAnnotations(annotationAdded.Index, [annotation], annotationAdded.NotificationId);
         });
 
-    private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification annotationDeletedNotification) =>
-        SuppressEventForwarding(annotationDeletedNotification, () =>
+    private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification annotationDeleted) =>
+        SuppressNotificationForwarding(annotationDeleted, () =>
         {
-            var localParent = Lookup(annotationDeletedNotification.Parent.GetId());
-            var localDeleted = Lookup(annotationDeletedNotification.DeletedAnnotation.GetId());
-            localParent.RemoveAnnotations([localDeleted], annotationDeletedNotification.NotificationId);
+            var localParent = Lookup(annotationDeleted.Parent.GetId());
+            var localDeleted = Lookup(annotationDeleted.DeletedAnnotation.GetId());
+            localParent.RemoveAnnotations([localDeleted], annotationDeleted.NotificationId);
         });
 
-    private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification annotationMovedNotification) =>
-        SuppressEventForwarding(annotationMovedNotification, () =>
+    private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification annotationMoved) =>
+        SuppressNotificationForwarding(annotationMoved, () =>
         {
-            var localNewParent = Lookup(annotationMovedNotification.NewParent.GetId());
-            var moved = LookupOpt(annotationMovedNotification.MovedAnnotation.GetId()) ?? Clone((INode)annotationMovedNotification.MovedAnnotation);
-            localNewParent.InsertAnnotations(annotationMovedNotification.NewIndex, [moved], annotationMovedNotification.NotificationId);
+            var localNewParent = Lookup(annotationMoved.NewParent.GetId());
+            var moved = LookupOpt(annotationMoved.MovedAnnotation.GetId()) ??
+                        (INode)annotationMoved.MovedAnnotation;
+            localNewParent.InsertAnnotations(annotationMoved.NewIndex, [moved], annotationMoved.NotificationId);
         });
 
-    private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification annotationMovedNotification) =>
-        SuppressEventForwarding(annotationMovedNotification, () =>
+    private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification annotationMoved) =>
+        SuppressNotificationForwarding(annotationMoved, () =>
         {
-            var localParent = Lookup(annotationMovedNotification.Parent.GetId());
-            INode nodeToInsert = Lookup(annotationMovedNotification.MovedAnnotation.GetId());
-            localParent.InsertAnnotations(annotationMovedNotification.NewIndex, [nodeToInsert], annotationMovedNotification.NotificationId);
+            var localParent = Lookup(annotationMoved.Parent.GetId());
+            INode nodeToInsert = Lookup(annotationMoved.MovedAnnotation.GetId());
+            localParent.InsertAnnotations(annotationMoved.NewIndex, [nodeToInsert], annotationMoved.NotificationId);
         });
 
     #endregion
 
     #region References
 
-    private void OnRemoteReferenceAdded(ReferenceAddedNotification referenceAddedNotification) =>
-        SuppressEventForwarding(referenceAddedNotification, () =>
+    private void OnRemoteReferenceAdded(ReferenceAddedNotification referenceAdded) =>
+        SuppressNotificationForwarding(referenceAdded, () =>
         {
-            var localParent = Lookup(referenceAddedNotification.Parent.GetId());
-            INode target = Lookup(referenceAddedNotification.NewTarget.Reference.GetId());
-            var newValue = InsertReference(localParent, referenceAddedNotification.Reference, referenceAddedNotification.Index, target);
+            var localParent = Lookup(referenceAdded.Parent.GetId());
+            INode target = Lookup(referenceAdded.NewTarget.Reference.GetId());
+            var newValue = InsertReference(localParent, referenceAdded.Reference, referenceAdded.Index,
+                target);
 
-            localParent.Set(referenceAddedNotification.Reference, newValue, referenceAddedNotification.NotificationId);
+            localParent.Set(referenceAdded.Reference, newValue, referenceAdded.NotificationId);
         });
 
-    private void OnRemoteReferenceDeleted(ReferenceDeletedNotification referenceDeletedNotification) =>
-        SuppressEventForwarding(referenceDeletedNotification, () =>
+    private void OnRemoteReferenceDeleted(ReferenceDeletedNotification referenceDeleted) =>
+        SuppressNotificationForwarding(referenceDeleted, () =>
         {
-            var localParent = Lookup(referenceDeletedNotification.Parent.GetId());
+            var localParent = Lookup(referenceDeleted.Parent.GetId());
 
             object newValue = null;
-            if (referenceDeletedNotification.Reference.Multiple)
+            if (referenceDeleted.Reference.Multiple)
             {
-                var existingTargets = localParent.Get(referenceDeletedNotification.Reference);
+                var existingTargets = localParent.Get(referenceDeleted.Reference);
                 if (existingTargets is IList l)
                 {
                     var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.RemoveAt(referenceDeletedNotification.Index);
+                    targets.RemoveAt(referenceDeleted.Index);
                     newValue = targets;
                 }
             }
 
-            localParent.Set(referenceDeletedNotification.Reference, newValue, referenceDeletedNotification.NotificationId);
+            localParent.Set(referenceDeleted.Reference, newValue, referenceDeleted.NotificationId);
         });
 
-    private void OnRemoteReferenceChanged(ReferenceChangedNotification referenceChangedNotification) =>
-        SuppressEventForwarding(referenceChangedNotification, () =>
+    private void OnRemoteReferenceChanged(ReferenceChangedNotification referenceChanged) =>
+        SuppressNotificationForwarding(referenceChanged, () =>
         {
-            var localParent = Lookup(referenceChangedNotification.Parent.GetId());
+            var localParent = Lookup(referenceChanged.Parent.GetId());
 
-            object newValue = Lookup(referenceChangedNotification.NewTarget.Reference.GetId());
-            if (referenceChangedNotification.Reference.Multiple)
+            object newValue = Lookup(referenceChanged.NewTarget.Reference.GetId());
+            if (referenceChanged.Reference.Multiple)
             {
-                var existingTargets = localParent.Get(referenceChangedNotification.Reference);
+                var existingTargets = localParent.Get(referenceChanged.Reference);
                 if (existingTargets is IList l)
                 {
                     var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.Insert(referenceChangedNotification.Index, (IReadableNode)newValue);
-                    targets.RemoveAt(referenceChangedNotification.Index + 1);
+                    targets.Insert(referenceChanged.Index, (IReadableNode)newValue);
+                    targets.RemoveAt(referenceChanged.Index + 1);
                     newValue = targets;
                 }
             }
 
-            localParent.Set(referenceChangedNotification.Reference, newValue,  referenceChangedNotification.NotificationId);
+            localParent.Set(referenceChanged.Reference, newValue, referenceChanged.NotificationId);
         });
 
     private static object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
@@ -463,6 +454,42 @@ public class PartitionNotificationReplicator : NotificationReplicatorBase<IParti
     }
 
     #endregion
+}
 
-    #endregion
+public class LocalPartitionNotificationReplicator(SharedNodeMap sharedNodeMap, object? sender)
+    : NotificationHandlerBase<IPartitionNotification>(sender)
+{
+    /// <inheritdoc />
+    public override void Receive(IPartitionNotification message)
+    {
+        switch (message)
+        {
+            case ChildAddedNotification e:
+                OnLocalChildAdded(e);
+                break;
+            case ChildDeletedNotification e:
+                OnLocalChildDeleted(e);
+                break;
+            case AnnotationAddedNotification e:
+                OnLocalAnnotationAdded(e);
+                break;
+            case AnnotationDeletedNotification e:
+                OnLocalAnnotationDeleted(e);
+                break;
+        }
+
+        Send(message);
+    }
+
+    private void OnLocalChildAdded(ChildAddedNotification childAdded) =>
+        sharedNodeMap.RegisterNode(childAdded.NewChild);
+
+    private void OnLocalChildDeleted(ChildDeletedNotification childDeleted) =>
+        sharedNodeMap.UnregisterNode(childDeleted.DeletedChild);
+
+    private void OnLocalAnnotationAdded(AnnotationAddedNotification annotationAdded) =>
+        sharedNodeMap.RegisterNode(annotationAdded.NewAnnotation);
+
+    private void OnLocalAnnotationDeleted(AnnotationDeletedNotification annotationDeleted) =>
+        sharedNodeMap.UnregisterNode(annotationDeleted.DeletedAnnotation);
 }
