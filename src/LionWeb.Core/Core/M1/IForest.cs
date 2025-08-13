@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.M1;
 
+using Notification;
 using Notification.Forest;
 using Utilities;
 
@@ -29,10 +30,10 @@ public interface IForest
     public IReadOnlySet<IPartitionInstance> Partitions { get; }
 
     /// Adds <paramref name="partitions"/> to <c>this</c> forest.
-    public void AddPartitions(IEnumerable<IPartitionInstance> partitions);
+    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
     /// Removes <paramref name="partitions"/> from <c>this</c> forest.
-    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions);
+    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
     /// <c>this</c> forest's notification handler, if any.
     IForestNotificationHandler? GetNotificationHandler();
@@ -57,7 +58,7 @@ public class Forest : IForest
     public IReadOnlySet<IPartitionInstance> Partitions => _partitions;
 
     /// <inheritdoc />
-    public void AddPartitions(IEnumerable<IPartitionInstance> partitions)
+    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null)
     {
         foreach (var partition in partitions)
         {
@@ -68,7 +69,7 @@ public class Forest : IForest
     }
 
     /// <inheritdoc />
-    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions)
+    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null)
     {
         foreach (var partition in partitions)
         {
