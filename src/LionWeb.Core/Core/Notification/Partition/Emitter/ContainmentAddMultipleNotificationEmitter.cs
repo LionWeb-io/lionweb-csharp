@@ -55,7 +55,7 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
             switch (old)
             {
                 case null:
-                    PartitionCommander.Raise(new ChildAddedNotification(DestinationParent, added, Containment, _newIndex,
+                    PartitionHandler.Receive(new ChildAddedNotification(DestinationParent, added, Containment, _newIndex,
                         GetNotificationId()));
                     break;
 
@@ -64,7 +64,7 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
                     var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, _newIndex, added,
                         old.Parent, old.Containment, old.Index, notificationId);
                     RaiseOriginMoveNotification(old, notification);
-                    PartitionCommander.Raise(notification);
+                    PartitionHandler.Receive(notification);
                     break;
 
                 case not null when old.Parent == DestinationParent && old.Containment == Containment && old.Index == _newIndex:
@@ -76,14 +76,14 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
                         _newIndex--;
                     if (old.Index != _newIndex)
                     {
-                        PartitionCommander.Raise(new ChildMovedInSameContainmentNotification(_newIndex, added, DestinationParent,
+                        PartitionHandler.Receive(new ChildMovedInSameContainmentNotification(_newIndex, added, DestinationParent,
                             old.Containment, old.Index, GetNotificationId()));
                     }
 
                     break;
 
                 case not null when old.Parent == DestinationParent && old.Containment != Containment:
-                    PartitionCommander.Raise(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, _newIndex,
+                    PartitionHandler.Receive(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, _newIndex,
                         added, DestinationParent, old.Containment, old.Index, GetNotificationId()));
                     break;
 
@@ -96,9 +96,9 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionHandler != null && PartitionHandler.CanReceive(
             typeof(ChildAddedNotification),
             typeof(ChildMovedFromOtherContainmentNotification),
             typeof(ChildMovedFromOtherContainmentInSameParentNotification),

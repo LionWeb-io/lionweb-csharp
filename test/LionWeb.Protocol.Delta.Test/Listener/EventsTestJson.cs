@@ -58,7 +58,7 @@ public class EventsTestJson : EventTestsBase
         var deltaSerializer = new DeltaSerializer();
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetPublisher().Subscribe<IPartitionNotification>((sender, partitionEvent) =>
+        node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
             var command = new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionEvent);
             var json = deltaSerializer.Serialize(command);

@@ -50,15 +50,15 @@ public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotif
         foreach (var node in SafeNodes)
         {
             IReferenceTarget newTarget = new ReferenceTarget(null, node);
-            PartitionCommander.Raise(new ReferenceAddedNotification(DestinationParent, Reference, index++, newTarget,
+            PartitionHandler.Receive(new ReferenceAddedNotification(DestinationParent, Reference, index++, newTarget,
                 GetNotificationId()));
         }
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionHandler != null && PartitionHandler.CanReceive(
             typeof(ReferenceAddedNotification)
         );
 }

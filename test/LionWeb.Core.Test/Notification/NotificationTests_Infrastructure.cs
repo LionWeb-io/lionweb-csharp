@@ -33,9 +33,9 @@ public class EventTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        node.GetPublisher().Subscribe<PropertyAddedNotification>((sender, args) => { } );
-        node.GetPublisher().Subscribe<PropertyChangedNotification>((sender, args) => { });
-        node.GetPublisher().Subscribe<IPartitionNotification>((sender, args) => { });
+        node.GetNotificationHandler().Subscribe<PropertyAddedNotification>((sender, args) => { } );
+        node.GetNotificationHandler().Subscribe<PropertyChangedNotification>((sender, args) => { });
+        node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, args) => { });
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -50,9 +50,9 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetPublisher().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
+        node.GetNotificationHandler().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
         
-        node.GetPublisher().Subscribe<PropertyChangedNotification>((sender, args) => {});
+        node.GetNotificationHandler().Subscribe<PropertyChangedNotification>((sender, args) => {});
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -68,13 +68,13 @@ public class EventTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetPublisher().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
+        node.GetNotificationHandler().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
         
         int changedCount = 0;
-        node.GetPublisher().Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
+        node.GetNotificationHandler().Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
 
         int allCount = 0;
-        node.GetPublisher().Subscribe<IPartitionNotification>((sender, args) => allCount++);
+        node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, args) => allCount++);
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -101,10 +101,10 @@ public class EventTests_Infrastructure
         cloneReplicator.ReplicateFrom(replicator);
 
         int nodeCount = 0;
-        node.GetPublisher().Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
+        node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
         
         int cloneCount = 0;
-        clone.GetPublisher().Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
+        clone.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
         
         circle.Name = "Hello";
         cloneCircle.Name = "World";
@@ -134,11 +134,11 @@ public class EventTests_Infrastructure
 
         AssertEquals([node], [clone]);
         
-        Assert.AreEqual(0, ReplicatorEventIds(replicator).Count);
-        Assert.AreEqual(0, ReplicatorEventIds(cloneReplicator).Count);
+        Assert.AreEqual(0, ReplicatorNotificationIds(replicator).Count);
+        Assert.AreEqual(0, ReplicatorNotificationIds(cloneReplicator).Count);
     }
 
-    private static HashSet<INotificationId> ReplicatorEventIds(PartitionNotificationReplicator replicator)
+    private static HashSet<INotificationId> ReplicatorNotificationIds(INotificationHandler<IPartitionNotification> replicator)
     {
         var type = typeof(NotificationIdFilteringNotificationForwarder<IPartitionNotification, IPartitionPublisher>);
         var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_notificationIds");

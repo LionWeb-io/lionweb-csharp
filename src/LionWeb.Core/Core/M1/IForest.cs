@@ -34,24 +34,21 @@ public interface IForest
     /// Removes <paramref name="partitions"/> from <c>this</c> forest.
     public void RemovePartitions(IEnumerable<IPartitionInstance> partitions);
 
-    /// <c>this</c> forest's publisher, if any.
-    IForestPublisher? GetPublisher();
-
-    /// <c>this</c> forest's commander, if any.
-    IForestCommander? GetCommander();
+    /// <c>this</c> forest's notification handler, if any.
+    IForestNotificationHandler? GetNotificationHandler();
 }
 
 /// <inheritdoc />
 public class Forest : IForest
 {
     private readonly HashSet<IPartitionInstance> _partitions;
-    private readonly ForestEventHandler _eventHandler;
+    private readonly IForestNotificationHandler _notificationHandler;
 
     /// <inheritdoc cref="IForest"/>
     public Forest()
     {
         _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
-        _eventHandler = new ForestEventHandler(this);
+        _notificationHandler = new ForestNotificationHandler(this);
     }
 
     /// <inheritdoc />
@@ -63,7 +60,8 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _eventHandler.Raise(new PartitionAddedNotification(partition, _eventHandler.CreateEventId()));
+                _notificationHandler.Receive(new PartitionAddedNotification(partition,
+                    notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }
 
@@ -73,13 +71,14 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _eventHandler.Raise(new PartitionDeletedNotification(partition, _eventHandler.CreateEventId()));
+                _notificationHandler.Receive(new PartitionDeletedNotification(partition,
+                    notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }
 
     /// <inheritdoc />
-    public IForestPublisher GetPublisher() => _eventHandler;
+    public IForestNotificationHandler GetNotificationHandler() => _notificationHandler;
 
     /// <inheritdoc />
-    public IForestCommander GetCommander() => _eventHandler;
+    public override string ToString() => $"{nameof(Forest)}@{GetHashCode()}";
 }

@@ -17,8 +17,8 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
+using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
-using Notification.Partition;
 
 [TestClass]
 public class PropertyTests_Listener
@@ -30,10 +30,10 @@ public class PropertyTests_Listener
         var doc = new Documentation("d");
         parent.Documentation = doc;
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<PropertyAddedNotification>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.Property);
             Assert.AreEqual("hello", args.NewValue);
@@ -41,7 +41,7 @@ public class PropertyTests_Listener
 
         doc.Text = "hello";
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -52,10 +52,10 @@ public class PropertyTests_Listener
         parent.Documentation = doc;
         doc.Text = "hello";
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<PropertyDeletedNotification>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.Property);
             Assert.AreEqual("hello", args.OldValue);
@@ -63,7 +63,7 @@ public class PropertyTests_Listener
         doc.Text = null;
 
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -74,24 +74,24 @@ public class PropertyTests_Listener
         parent.Documentation = doc;
         doc.Text = "hello";
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<PropertyChangedNotification>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationHandler().Subscribe<PropertyChangedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(doc, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.Documentation_text, args.Property);
             Assert.AreEqual("hello", args.OldValue);
             Assert.AreEqual("bye", args.NewValue);
         });
 
-        int badEvents = 0;
-        parent.GetPublisher().Subscribe<PropertyAddedNotification>((_, _) => badEvents++);
-        parent.GetPublisher().Subscribe<PropertyDeletedNotification>((_, _) => badEvents++);
+        int badNotifications = 0;
+        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
 
         doc.Text = "bye";
 
-        Assert.AreEqual(1, events);
-        Assert.AreEqual(0, badEvents);
+        Assert.AreEqual(1, notifications);
+        Assert.AreEqual(0, badNotifications);
     }
     
     [TestMethod]
@@ -101,10 +101,10 @@ public class PropertyTests_Listener
         var circle = new Circle("d");
         parent.AddShapes([circle]);
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<PropertyAddedNotification>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(circle, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
             Assert.AreEqual("hello", args.NewValue);
@@ -112,7 +112,7 @@ public class PropertyTests_Listener
 
         circle.Uuid = "hello";
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -123,17 +123,17 @@ public class PropertyTests_Listener
         parent.AddShapes([circle]);
         circle.Uuid = "hello";
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<PropertyDeletedNotification>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(circle, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
             Assert.AreEqual("hello", args.OldValue);
         });
         Assert.ThrowsException<InvalidValueException>(() => circle.Uuid = null);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -144,23 +144,23 @@ public class PropertyTests_Listener
         parent.AddShapes([circle]);
         circle.Uuid = "hello";
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<PropertyChangedNotification>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationHandler().Subscribe<PropertyChangedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(circle, args.Node);
             Assert.AreSame(ShapesLanguage.Instance.IShape_uuid, args.Property);
             Assert.AreEqual("hello", args.OldValue);
             Assert.AreEqual("bye", args.NewValue);
         });
 
-        int badEvents = 0;
-        parent.GetPublisher().Subscribe<PropertyAddedNotification>((_, _) => badEvents++);
-        parent.GetPublisher().Subscribe<PropertyDeletedNotification>((_, _) => badEvents++);
+        int badNotifications = 0;
+        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
 
         circle.Uuid = "bye";
 
-        Assert.AreEqual(1, events);
-        Assert.AreEqual(0, badEvents);
+        Assert.AreEqual(1, notifications);
+        Assert.AreEqual(0, badNotifications);
     }
 }
