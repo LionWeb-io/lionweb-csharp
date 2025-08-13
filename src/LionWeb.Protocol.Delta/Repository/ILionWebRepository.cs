@@ -15,9 +15,15 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Forest;
+namespace LionWeb.Protocol.Delta.Repository;
 
-/// Provides events for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-/// <seealso cref="IForestCommander"/>
-/// <seealso cref="ForestEventHandler"/>
-public interface IForestPublisher : IPublisher<IForestNotification>;
+public interface ILionWebRepository
+{
+    private const string _cyan = "\x1b[96m";
+    private const string _bold = "\x1b[1m";
+    private const string _unbold = "\x1b[22m";
+    private const string _defaultColor = "\x1b[39m";
+    
+    public const string HeaderColor_Start = _cyan + _bold;
+    public const string HeaderColor_End =  _unbold + _defaultColor;
+}
