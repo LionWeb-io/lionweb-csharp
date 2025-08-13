@@ -745,7 +745,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <exception cref="InvalidValueException">If <paramref name="node"/> is <c>null</c> or not an instance of <typeparamref name="T"/>.</exception>
     protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link, INotificationId? notificationId = null)
         where T : class, INode =>
-        RemoveSelfParent(AsList<T>(node, link), storage, link);
+        RemoveSelfParent(AsList<T>(node, link), storage, link, notificationId: notificationId);
 
     /// <summary>
     /// Removes all members of <paramref name="list"/> from <paramref name="storage"/>, and sets their parent to <c>null</c>.
