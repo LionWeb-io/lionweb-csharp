@@ -902,7 +902,7 @@
           "$ref": "#/$defs/ChangeReferenceResolveInfo"
         },
         {
-          "$ref": "#/$defs/AddReferenceTarget"
+          "$ref": "#/$defs/AddReferenceTargetCommand"
         },
         {
           "$ref": "#/$defs/DeleteReferenceTarget"
@@ -2211,10 +2211,10 @@
       "minProperties": 8,
       "maxProperties": 9
     },
-    "AddReferenceTarget": {
+    "AddReferenceTargetCommand": {
       "properties": {
         "messageKind": {
-          "const": "AddReferenceTarget"
+          "const": "AddReferenceTargetCommand"
         },
         "parent": {
           "$ref": "#/$defs/targetNode"
@@ -2467,7 +2467,7 @@
           "$ref": "#/$defs/ReferenceResolveInfoChanged"
         },
         {
-          "$ref": "#/$defs/ReferenceTargetAdded"
+          "$ref": "#/$defs/ReferenceTargetAddedEvent"
         },
         {
           "$ref": "#/$defs/ReferenceTargetDeleted"
@@ -4054,10 +4054,10 @@
       "minProperties": 9,
       "maxProperties": 10
     },
-    "ReferenceTargetAdded": {
+    "ReferenceTargetAddedEvent": {
       "properties": {
         "messageKind": {
-          "const": "ReferenceTargetAdded"
+          "const": "ReferenceTargetAddedEvent"
         },
         "parent": {
           "$ref": "#/$defs/targetNode"

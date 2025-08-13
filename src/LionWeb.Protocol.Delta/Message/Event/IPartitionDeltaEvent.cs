@@ -1158,7 +1158,7 @@ public record ReferenceResolveInfoChanged(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
-public record ReferenceTargetAdded(
+public record ReferenceTargetAddedEvent(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,

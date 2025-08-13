@@ -273,7 +273,7 @@ public abstract class JsonTestsBase
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
             ResolveInfo(), CommandId(), ProtocolMessages());
 
-    protected static AddReferenceTarget CreateAddReferenceTarget() =>
+    protected static AddReferenceTargetCommand CreateAddReferenceTargetCommand() =>
         new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(),
             CommandId(), ProtocolMessages());
 
@@ -333,7 +333,7 @@ public abstract class JsonTestsBase
         [CreateAddReferenceResolveInfoCommand()],
         [CreateDeleteReferenceResolveInfo()],
         [CreateChangeReferenceResolveInfo()],
-        [CreateAddReferenceTarget()],
+        [CreateAddReferenceTargetCommand()],
         [CreateDeleteReferenceTarget()],
         [CreateChangeReferenceTarget()],
         [CreateCompositeCommand()]
@@ -526,7 +526,7 @@ public abstract class JsonTestsBase
         new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(), ResolveInfo(), Origin(),
             ProtocolMessages()) { SequenceNumber = Sequence() };
 
-    protected static ReferenceTargetAdded CreateReferenceTargetAdded() =>
+    protected static ReferenceTargetAddedEvent CreateReferenceTargetAddedEvent() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
         {
             SequenceNumber = Sequence()
@@ -599,7 +599,7 @@ public abstract class JsonTestsBase
         [CreateReferenceResolveInfoAddedEvent()],
         [CreateReferenceResolveInfoDeleted()],
         [CreateReferenceResolveInfoChanged()],
-        [CreateReferenceTargetAdded()],
+        [CreateReferenceTargetAddedEvent()],
         [CreateReferenceTargetDeleted()],
         [CreateReferenceTargetChanged()],
         [CreateCompositeEvent()],

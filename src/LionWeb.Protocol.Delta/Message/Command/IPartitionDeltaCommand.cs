@@ -363,7 +363,7 @@ public record ChangeReferenceResolveInfo(
     ProtocolMessage[]? ProtocolMessages
 ) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
 
-public record AddReferenceTarget(
+public record AddReferenceTargetCommand(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
