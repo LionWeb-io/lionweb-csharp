@@ -18,11 +18,19 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core.Notification;
+using Message;
 
-public interface IClientConnector<T> 
+public interface IClientConnector<T>
 {
     Task SendToRepository(T content);
     event EventHandler<T> ReceiveFromRepository;
 
     T Convert(INotification notification);
+}
+
+public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
+
+public interface INotificationClientConnector : IClientConnector<INotification>
+{
+    INotification IClientConnector<INotification>.Convert(INotification notification) => notification;
 }

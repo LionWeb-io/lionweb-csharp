@@ -15,11 +15,15 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Partition;
+namespace LionWeb.Protocol.Delta.Client;
 
-using M3;
+public interface ILionWebClient
+{
+    private const string _magenta = "\x1b[95m";
+    private const string _bold = "\x1b[1m";
+    private const string _unbold = "\x1b[22m";
+    private const string _defaultColor = "\x1b[39m";
 
-/// Provides events about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-/// <seealso cref="IPartitionCommander"/>
-/// <seealso cref="PartitionEventHandler"/>
-public interface IPartitionPublisher : IPublisher<IPartitionNotification>;
+    public const string HeaderColor_Start = _magenta + _bold;
+    public const string HeaderColor_End = _unbold + _defaultColor;
+}
