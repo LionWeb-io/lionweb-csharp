@@ -18,22 +18,29 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Notification.Partition;
+using Forest;
 using Message.Event;
+using Partition;
 
-public class EventToDeltaEventMapper
+public class NotificationToDeltaEventMapper
 {
-    private readonly PartitionEventToDeltaEventMapper _partitionMapper;
+    private readonly PartitionNotificationToDeltaEventMapper _partitionNotificationToDeltaMapper;
+    private readonly ForestNotificationToDeltaEventMapper _forestNotificationToDeltaMapper;
 
-    public EventToDeltaEventMapper(PartitionEventToDeltaEventMapper partitionMapper)
+    public NotificationToDeltaEventMapper(PartitionNotificationToDeltaEventMapper partitionNotificationToDeltaMapper,
+        ForestNotificationToDeltaEventMapper forestNotificationToDeltaMapper)
     {
-        _partitionMapper = partitionMapper;
+        _partitionNotificationToDeltaMapper = partitionNotificationToDeltaMapper;
+        _forestNotificationToDeltaMapper = forestNotificationToDeltaMapper;
     }
 
     public IDeltaEvent Map(INotification notification) =>
         notification switch
         {
-            IPartitionNotification e => _partitionMapper.Map(e),
+            IPartitionNotification e => _partitionNotificationToDeltaMapper.Map(e),
+            IForestNotification e => _forestNotificationToDeltaMapper.Map(e),
             _ => throw new NotImplementedException(notification.GetType().Name)
         };
 }
