@@ -19,31 +19,31 @@ namespace LionWeb.Protocol.Delta.Repository.Partition;
 
 using Core;
 using Core.Notification;
+using Core.Notification.Handler;
 using Core.Notification.Partition;
-using Core.Notification.Processor;
 
 internal static class RewritePartitionNotificationReplicator
 {
-    public static new INotificationProcessor<IPartitionNotification> Create(IPartitionInstance localPartition,
+    public static new INotificationHandler<IPartitionNotification> Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
-        var filter = new NotificationIdFilteringNotificationProcessor<IPartitionNotification>(internalSender);
-        var replacingFilter = new NotificationIdReplacingNotificationProcessor<IPartitionNotification>(internalSender);
+        var filter = new IdFilteringNotificationHandler<IPartitionNotification>(internalSender);
+        var replacingFilter = new NotificationIdReplacingNotificationHandler<IPartitionNotification>(internalSender);
         var remoteReplicator =
             new RewriteRemotePartitionNotificationReplicator(localPartition, filter, replacingFilter, sharedNodeMap,
                 internalSender);
         var localReplicator = new LocalPartitionNotificationReplicator(sharedNodeMap, internalSender);
 
-        var result = new CompositeNotificationProcessor<IPartitionNotification>(
+        var result = new CompositeNotificationHandler<IPartitionNotification>(
             [replacingFilter, remoteReplicator, filter],
             sender ?? $"Composite of {nameof(RewritePartitionNotificationReplicator)} {localPartition.GetId()}");
 
-        var partitionProcessor = localPartition.GetProcessor();
-        if (partitionProcessor != null)
+        var partitionHandler = localPartition.GetNotificationHandler();
+        if (partitionHandler != null)
         {
-            IProcessor.Connect(partitionProcessor, localReplicator);
-            IProcessor.Connect(localReplicator, filter);
+            IHandler.Connect(partitionHandler, localReplicator);
+            IHandler.Connect(localReplicator, filter);
         }
 
         return result;
@@ -52,8 +52,8 @@ internal static class RewritePartitionNotificationReplicator
 
 internal class RewriteRemotePartitionNotificationReplicator(
     IPartitionInstance localPartition,
-    NotificationIdFilteringNotificationProcessor<IPartitionNotification> filter,
-    NotificationIdReplacingNotificationProcessor<IPartitionNotification> replacingFilter,
+    IdFilteringNotificationHandler<IPartitionNotification> filter,
+    NotificationIdReplacingNotificationHandler<IPartitionNotification> replacingFilter,
     SharedNodeMap sharedNodeMap,
     object? sender)
     : RemotePartitionNotificationReplicator(localPartition, sharedNodeMap, filter, sender)

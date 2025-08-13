@@ -19,10 +19,10 @@ namespace LionWeb.Core.Test.Listener;
 
 using Notification;
 using Notification.Forest;
+using Notification.Handler;
 using Notification.Partition;
-using Notification.Processor;
 
-internal class NodeCloneProcessor<TNotification>(object? sender) : NotificationProcessorBase<TNotification>(sender)
+internal class NodeCloneNotificationHandler<TNotification>(object? sender) : NotificationHandlerBase<TNotification>(sender)
     where TNotification : INotification
 {
     public override void Receive(TNotification message)

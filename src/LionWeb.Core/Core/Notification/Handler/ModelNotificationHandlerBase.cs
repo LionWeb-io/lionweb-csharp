@@ -15,12 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Processor;
+namespace LionWeb.Core.Notification.Handler;
 
-/// Forwards all <see cref="Receive">received</see> notifications unchanged to <i>following</i> processors,
+/// Forwards all <see cref="Receive">received</see> notifications unchanged to <i>following</i> notification handlers,
 /// and to EventHandlers <see cref="Subscribe{TSubscribedNotification}">subscribed</see> to specific notifications.
-public abstract class ModelNotificationProcessorBase<TNotification>(object? sender)
-    : NotificationProcessorBase<TNotification>(sender)
+public abstract class ModelNotificationHandlerBase<TNotification>(object? sender)
+    : NotificationHandlerBase<TNotification>(sender)
     where TNotification : INotification
 {
     /// <inheritdoc />
@@ -35,10 +35,10 @@ public abstract class ModelNotificationProcessorBase<TNotification>(object? send
     /// </typeparam> 
     public void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
         where TSubscribedNotification : class, TNotification =>
-        IProcessor.Connect<TNotification, TSubscribedNotification, TSubscribedNotification>(this,
-            new NotificationHandlerProcessor<TSubscribedNotification>(handler)
+        IHandler.Connect<TNotification, TSubscribedNotification, TSubscribedNotification>(this,
+            new NotificationHandlerHandler<TSubscribedNotification>(handler)
             {
-                ProcessorId = Sender.ToString() ?? GetType().Name
+                NotificationHandlerId = Sender.ToString() ?? GetType().Name
             });
 
     /// Unregisters <paramref name="handler"/> from notification of notifications.

@@ -20,8 +20,8 @@ namespace LionWeb.Core.Test.Listener;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
+using Notification.Handler;
 using Notification.Partition;
-using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
 
 public abstract class NotificationTestsBase
@@ -476,7 +476,7 @@ public abstract class NotificationTestsBase
 
         var clone = CreateReplicator(node);
 
-        ((IProcessor)node.GetProcessor()).PrintAllReceivers([]);
+        ((IHandler)node.GetNotificationHandler()).PrintAllReceivers([]);
         // return;
 
         var added = new BillOfMaterials("added");
@@ -787,9 +787,9 @@ public class NotificationsTest : NotificationTestsBase
         var clone = Clone(node);
 
         var replicator = PartitionNotificationReplicator.Create(clone, new(), node.GetId());
-        var cloneProcessor = new NodeCloneProcessor<IPartitionNotification>(node.GetId());
-        IProcessor.Connect((IPartitionProcessor)node.GetProcessor(), cloneProcessor);
-        IProcessor.Connect(cloneProcessor, replicator);
+        var cloneHandler = new NodeCloneNotificationHandler<IPartitionNotification>(node.GetId());
+        IHandler.Connect((IPartitionNotificationHandler)node.GetNotificationHandler(), cloneHandler);
+        IHandler.Connect(cloneHandler, replicator);
 
         return clone;
     }

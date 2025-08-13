@@ -19,8 +19,8 @@ namespace LionWeb.Protocol.Delta;
 
 using Core.Notification;
 using Core.Notification.Forest;
+using Core.Notification.Handler;
 using Core.Notification.Partition;
-using Core.Notification.Processor;
 using Message;
 
 public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> : IDisposable
@@ -30,11 +30,11 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 {
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
-    private readonly INotificationProcessor<IForestNotification> _forestNotificationReplicator;
+    private readonly INotificationHandler<IForestNotification> _forestNotificationReplicator;
 
     public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
-        INotificationProcessor<IForestNotification> forestNotificationReplicator)
+        INotificationHandler<IForestNotification> forestNotificationReplicator)
     {
         _sharedNodeMap = sharedNodeMap;
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;

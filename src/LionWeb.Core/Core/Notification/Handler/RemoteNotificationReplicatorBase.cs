@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Processor;
+namespace LionWeb.Core.Notification.Handler;
 
 using Utilities;
 
@@ -25,14 +25,14 @@ using Utilities;
 /// Example: We receive a <see cref="PropertyAddedNotification" /> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-public abstract class RemoteNotificationReplicatorBase<TNotification> : NotificationProcessorBase<TNotification>
+public abstract class RemoteNotificationReplicatorBase<TNotification> : NotificationHandlerBase<TNotification>
     where TNotification : class, INotification
 {
     protected readonly SharedNodeMap SharedNodeMap;
-    protected readonly NotificationIdFilteringNotificationProcessor<TNotification> Filter;
+    protected readonly IdFilteringNotificationHandler<TNotification> Filter;
 
     protected RemoteNotificationReplicatorBase(SharedNodeMap sharedNodeMap,
-        NotificationIdFilteringNotificationProcessor<TNotification> filter,
+        IdFilteringNotificationHandler<TNotification> filter,
         object? sender) : base(sender)
     {
         SharedNodeMap = sharedNodeMap;
@@ -60,7 +60,7 @@ public abstract class RemoteNotificationReplicatorBase<TNotification> : Notifica
     protected INode? LookupOpt(NodeId nodeId) =>
         SharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
 
-    /// Uses <see cref="NotificationIdFilteringNotificationProcessor{TNotification}"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
+    /// Uses <see cref="IdFilteringNotificationHandler{TNotification}"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
     protected virtual void SuppressNotificationForwarding(TNotification notification, Action action)
     {
         var notificationId = notification.NotificationId;

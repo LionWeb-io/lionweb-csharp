@@ -21,7 +21,7 @@ using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 using Notification.Forest;
-using Notification.Processor;
+using Notification.Handler;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
@@ -121,17 +121,17 @@ public class NotificationTests_Forest
 
     #endregion
 
-    private static INotificationProcessor<IForestNotification> CreateReplicator(Forest cloneForest,
+    private static INotificationHandler<IForestNotification> CreateReplicator(Forest cloneForest,
         Forest originalForest)
     {
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
         var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
-        var cloneProcessor = new NodeCloneProcessor<IForestNotification>(cloneForest);
-        IProcessor.Connect(originalForest.GetProcessor(), cloneProcessor);
-        IProcessor.Connect(cloneProcessor, replicator);
+        var cloneHandler = new NodeCloneNotificationHandler<IForestNotification>(cloneForest);
+        IHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);
+        IHandler.Connect(cloneHandler, replicator);
 
-        var receiver = new TestLocalForestChangeReceiver(originalForest, sharedPartitionReplicatorMap);
-        IProcessor.Connect(originalForest.GetProcessor(), receiver);
+        var receiver = new TestLocalForestChangeNotificationHandler(originalForest, sharedPartitionReplicatorMap);
+        IHandler.Connect(originalForest.GetNotificationHandler(), receiver);
         return replicator;
     }
 
@@ -142,8 +142,8 @@ public class NotificationTests_Forest
     }
 }
 
-internal class TestLocalForestChangeReceiver(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
-    : NotificationProcessorBase<IForestNotification>(sender)
+internal class TestLocalForestChangeNotificationHandler(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
+    : NotificationHandlerBase<IForestNotification>(sender)
 {
     public override void Receive(IForestNotification message)
     {
@@ -161,7 +161,7 @@ internal class TestLocalForestChangeReceiver(object? sender, SharedPartitionRepl
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)
     {
         var partitionReplicator = sharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
-        IProcessor.Connect(partitionAddedNotification.NewPartition.GetProcessor(), partitionReplicator);
+        IHandler.Connect(partitionAddedNotification.NewPartition.GetNotificationHandler(), partitionReplicator);
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)

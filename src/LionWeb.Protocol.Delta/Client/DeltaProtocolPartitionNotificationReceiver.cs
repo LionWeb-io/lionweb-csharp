@@ -26,11 +26,11 @@ using Partition;
 
 public class DeltaProtocolPartitionNotificationReceiver
 {
-    private readonly PartitionNotificationProcessor _notificationHandler;
+    private readonly PartitionNotificationHandler _notificationHandler;
     private readonly DeltaEventToPartitionNotificationMapper _mapper;
 
     public DeltaProtocolPartitionNotificationReceiver(
-        PartitionNotificationProcessor notificationHandler,
+        PartitionNotificationHandler notificationHandler,
         SharedNodeMap sharedNodeMap,
         Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap,
         DeserializerBuilder deserializerBuilder

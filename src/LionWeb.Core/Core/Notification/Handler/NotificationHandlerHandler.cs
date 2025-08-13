@@ -15,16 +15,16 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Processor;
+namespace LionWeb.Core.Notification.Handler;
 
-internal class NotificationHandlerProcessor<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
-    : INotificationProcessor<TSubscribedNotification> where TSubscribedNotification : INotification
+internal class NotificationHandlerHandler<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
+    : INotificationHandler<TSubscribedNotification> where TSubscribedNotification : INotification
 {
     public void Dispose()
     {
     }
 
-    public required string ProcessorId { get; init; }
+    public required string NotificationHandlerId { get; init; }
 
     /// <inheritdoc />
     public bool CanReceive(params Type[] messageTypes) =>
@@ -39,21 +39,21 @@ internal class NotificationHandlerProcessor<TSubscribedNotification>(EventHandle
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Subscribe<TReceiveTo, TSendTo>(IProcessor<TReceiveTo, TSendTo> receiver) =>
+    public void Subscribe<TReceiveTo, TSendTo>(IHandler<TReceiveTo, TSendTo> receiver) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    void IProcessor.Unsubscribe<T>(IProcessor receiver) =>
+    void IHandler.Unsubscribe<T>(IHandler receiver) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void PrintAllReceivers(List<IProcessor> alreadyPrinted, string indent = "")
+    public void PrintAllReceivers(List<IHandler> alreadyPrinted, string indent = "")
     {
         Console.WriteLine($"{indent}{this.GetType().Name}");
-        if (IProcessor.RecursionDetected(this, alreadyPrinted, indent))
+        if (IHandler.RecursionDetected(this, alreadyPrinted, indent))
             return;
 
-        if (handler is IProcessor p)
+        if (handler is IHandler p)
             p.PrintAllReceivers(alreadyPrinted, indent + "  ");
         else
             Console.WriteLine($"{indent}{handler}");

@@ -35,22 +35,22 @@ public interface IForest
     /// Removes <paramref name="partitions"/> from <c>this</c> forest.
     public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
-    /// <c>this</c> forest's processor, if any.
-    IForestProcessor? GetProcessor();
+    /// <c>this</c> forest's notification handler, if any.
+    IForestNotificationHandler? GetNotificationHandler();
 }
 
 /// <inheritdoc />
 public class Forest : IForest
 {
     private readonly HashSet<IPartitionInstance> _partitions;
-    private readonly ForestNotificationProcessor _notificationProcessor;
+    private readonly ForestNotificationHandler _notificationHandler;
     private readonly INotificationIdProvider _notificationIdProvider;
 
     /// <inheritdoc cref="IForest"/>
     public Forest()
     {
         _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
-        _notificationProcessor = new ForestNotificationProcessor(this);
+        _notificationHandler = new ForestNotificationHandler(this);
         _notificationIdProvider = new NotificationIdProvider(this);
     }
 
@@ -63,7 +63,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _notificationProcessor.Receive(new PartitionAddedNotification(partition,
+                _notificationHandler.Receive(new PartitionAddedNotification(partition,
                     notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }
@@ -74,13 +74,13 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _notificationProcessor.Receive(new PartitionDeletedNotification(partition,
+                _notificationHandler.Receive(new PartitionDeletedNotification(partition,
                     notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }
 
     /// <inheritdoc />
-    public IForestProcessor GetProcessor() => _notificationProcessor;
+    public IForestNotificationHandler GetNotificationHandler() => _notificationHandler;
 
     /// <inheritdoc />
     public override string ToString() => $"{nameof(Forest)}@{GetHashCode()}";

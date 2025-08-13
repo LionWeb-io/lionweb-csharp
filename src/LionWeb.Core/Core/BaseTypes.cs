@@ -130,7 +130,7 @@ public interface IPartitionInstance : IConceptInstance
     /// Optional hook to raise partition notifications.
     /// Optional hook to listen to partition notifications.
     /// Not supported by every implementation. 
-    IPartitionProcessor? GetProcessor() => null;
+    IPartitionNotificationHandler? GetNotificationHandler() => null;
 }
 
 /// <inheritdoc cref="IPartitionInstance" />
@@ -485,11 +485,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <summary>
-    /// Tries to retrieve the <see cref="IPartitionInstance.GetProcessor"/> from this node's <see cref="Concept.Partition"/>.
+    /// Tries to retrieve the <see cref="IPartitionInstance.GetNotificationHandler"/> from this node's <see cref="Concept.Partition"/>.
     /// </summary>
-    /// <returns>This node's <see cref="IPartitionProcessor"/>, if available.</returns>
-    protected virtual IPartitionProcessor? GetPartitionProcessor() =>
-        this.GetPartition()?.GetProcessor();
+    /// <returns>This node's <see cref="IPartitionNotificationHandler"/>, if available.</returns>
+    protected virtual IPartitionNotificationHandler? GetPartitionNotificationHandler() =>
+        this.GetPartition()?.GetNotificationHandler();
 
     #region Helpers
 
@@ -758,19 +758,19 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
     /// <param name="remover">
     ///     Optional Action to call for each removed element of <paramref name="list"/>.
-    ///     Only called if <see cref="GetPartitionProcessor"/> is available.
+    ///     Only called if <see cref="GetPartitionNotificationHandler"/> is available.
     /// </param>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link, Action<IPartitionProcessor, Index, T, INotificationId?>? remover = null, INotificationId? notificationId = null)
+    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link, Action<IPartitionNotificationHandler, Index, T, INotificationId?>? remover = null, INotificationId? notificationId = null)
         where T : IReadableNode
     {
         AssureNotNull(list, link);
         AssureNotNullMembers(list, link);
 
-        var partitionProcessor = GetPartitionProcessor();
+        var partitionHandler = GetPartitionNotificationHandler();
 
         bool result = false;
         foreach (T node in list)
@@ -783,8 +783,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             result = true;
             if (node is INode iNode)
                 SetParentInternal(iNode, null);
-            if (partitionProcessor != null && remover != null)
-                remover(partitionProcessor, index, node, notificationId ?? partitionProcessor.CreateNotificationId());
+            if (partitionHandler != null && remover != null)
+                remover(partitionHandler, index, node, notificationId ?? partitionHandler.CreateNotificationId());
         }
 
         return result;
@@ -798,14 +798,14 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="storage">Storage of nodes.</param>
     /// <param name="remover">
     ///     Optional Action to call for each removed element of <paramref name="safeNodes"/>.
-    ///     Only called if <see cref="GetPartitionProcessor"/> is available.
+    ///     Only called if <see cref="GetPartitionNotificationHandler"/> is available.
     /// </param>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
-    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionProcessor, Index, T, INotificationId?>? remover, INotificationId? notificationId = null)
+    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionNotificationHandler, Index, T, INotificationId?>? remover, INotificationId? notificationId = null)
         where T : IReadableNode
     {
-        var partitionProcessor = GetPartitionProcessor();
+        var partitionHandler = GetPartitionNotificationHandler();
 
         foreach (var node in safeNodes)
         {
@@ -814,13 +814,13 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 continue;
 
             storage.RemoveAt(index);
-            if (partitionProcessor != null && remover != null)
-                remover(partitionProcessor, index, node, notificationId ?? partitionProcessor.CreateNotificationId());
+            if (partitionHandler != null && remover != null)
+                remover(partitionHandler, index, node, notificationId ?? partitionHandler.CreateNotificationId());
         }
     }
 
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
-    protected Action<IPartitionProcessor, Index, T, INotificationId?> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
+    protected Action<IPartitionNotificationHandler, Index, T, INotificationId?> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
         (commander, index, node, notificationId) =>
         {
             IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
@@ -828,12 +828,12 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         };
 
     /// Raises <see cref="ChildDeletedNotification"/> for <paramref name="containment"/>.
-    protected Action<IPartitionProcessor, Index, T, INotificationId?> ContainmentRemover<T>(Containment containment) where T : INode =>
+    protected Action<IPartitionNotificationHandler, Index, T, INotificationId?> ContainmentRemover<T>(Containment containment) where T : INode =>
         (commander, index, node, notificationId) =>
             commander.Receive(new ChildDeletedNotification(node, this, containment, index, notificationId ?? commander.CreateNotificationId()));
 
     /// Raises <see cref="AnnotationDeletedNotification"/>.
-    private void AnnotationRemover(IPartitionProcessor commander, Index index, INode node, INotificationId? notificationId = null) =>
+    private void AnnotationRemover(IPartitionNotificationHandler commander, Index index, INode node, INotificationId? notificationId = null) =>
         commander.Receive(new AnnotationDeletedNotification(node, this, index, notificationId ?? commander.CreateNotificationId()));
 
     #endregion

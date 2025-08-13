@@ -63,7 +63,7 @@ public class NotificationsTestSerialized : NotificationTestsBase
         );
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetProcessor().Subscribe<IPartitionNotification>((sender, partitionNotification) =>
+        node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
             var deltaCommand = new PartitionNotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));

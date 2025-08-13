@@ -15,12 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Processor;
+namespace LionWeb.Core.Notification.Handler;
 
 /// TODO: Do we really need this class?
 /// Replaces all <see cref="RegisterReplacementNotificationId">registered notification ids</see>.
-public class NotificationIdReplacingNotificationProcessor<TNotification>(object? sender)
-    : FilteringNotificationProcessor<TNotification>(sender) where TNotification : class, INotification
+public class NotificationIdReplacingNotificationHandler<TNotification>(object? sender)
+    : FilteringNotificationHandler<TNotification>(sender) where TNotification : class, INotification
 {
     private readonly Dictionary<INotificationId, INotificationId> _originalNotificationIds = [];
 

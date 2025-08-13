@@ -20,8 +20,8 @@ namespace LionWeb.Protocol.Delta.Client;
 using Core.M1;
 using Core.Notification;
 using Core.Notification.Forest;
+using Core.Notification.Handler;
 using Core.Notification.Partition;
-using Core.Notification.Processor;
 using Forest;
 using Message.Event;
 using Partition;
@@ -37,7 +37,7 @@ public class DeltaProtocolEventReceiver
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder,
-        INotificationProcessor<IForestNotification> forestNotificationReplicator)
+        INotificationHandler<IForestNotification> forestNotificationReplicator)
         : base(sharedNodeMap, sharedPartitionReplicatorMap, forestNotificationReplicator)
     {
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);

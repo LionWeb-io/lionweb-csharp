@@ -19,8 +19,8 @@ namespace LionWeb.Core.Test.Listener;
 
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Notification.Handler;
 using Notification.Partition;
-using Notification.Processor;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
@@ -831,23 +831,23 @@ public class NotificationTests_Twoway
     #endregion
 
 
-    private Tuple<INotificationProcessor<IPartitionNotification>, INotificationProcessor<IPartitionNotification>>
+    private Tuple<INotificationHandler<IPartitionNotification>, INotificationHandler<IPartitionNotification>>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = CreateReplicator(node, "nodeReplicator");
         var cloneReplicator = CreateReplicator(clone, "cloneReplicator");
         
-        var cloneProcessorA = new NodeCloneProcessor<IPartitionNotification>(node.GetId());
-        IProcessor.Connect(replicator, cloneProcessorA);
-        IProcessor.Connect(cloneProcessorA, cloneReplicator);
+        var cloneHandlerA = new NodeCloneNotificationHandler<IPartitionNotification>(node.GetId());
+        IHandler.Connect(replicator, cloneHandlerA);
+        IHandler.Connect(cloneHandlerA, cloneReplicator);
      
-        var cloneProcessorB = new NodeCloneProcessor<IPartitionNotification>(clone.GetId());
-        IProcessor.Connect(cloneReplicator, cloneProcessorB);
-        IProcessor.Connect(cloneProcessorB, replicator);
+        var cloneHandlerB = new NodeCloneNotificationHandler<IPartitionNotification>(clone.GetId());
+        IHandler.Connect(cloneReplicator, cloneHandlerB);
+        IHandler.Connect(cloneHandlerB, replicator);
      
         return Tuple.Create(replicator, cloneReplicator);
     }
-    private static INotificationProcessor<IPartitionNotification> CreateReplicator(IPartitionInstance clone, object? sender) =>
+    private static INotificationHandler<IPartitionNotification> CreateReplicator(IPartitionInstance clone, object? sender) =>
         PartitionNotificationReplicator.Create(clone, new(), sender);
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

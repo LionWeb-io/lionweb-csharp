@@ -58,18 +58,18 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
             {
                 case ListAdded<T> added:
                     IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
-                    PartitionProcessor.Receive(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, newTarget,
+                    PartitionHandler.Receive(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, newTarget,
                         GetNotificationId()));
                     break;
                 case ListMoved<T> moved:
                     IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
-                    PartitionProcessor.Receive(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
+                    PartitionHandler.Receive(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
                         moved.LeftIndex, target,
                         GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
                     IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
-                    PartitionProcessor.Receive(new ReferenceDeletedNotification(DestinationParent, Reference, deleted.LeftIndex,
+                    PartitionHandler.Receive(new ReferenceDeletedNotification(DestinationParent, Reference, deleted.LeftIndex,
                         deletedTarget, GetNotificationId()));
                     break;
             }
@@ -77,9 +77,9 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
+    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionProcessor != null && PartitionProcessor.CanReceive(
+        PartitionHandler != null && PartitionHandler.CanReceive(
             typeof(ReferenceAddedNotification),
             typeof(EntryMovedInSameReferenceNotification),
             typeof(ReferenceDeletedNotification)

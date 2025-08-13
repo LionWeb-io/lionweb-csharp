@@ -17,32 +17,32 @@
 
 namespace LionWeb.Core.Notification.Forest;
 
+using Handler;
 using M1;
 using Partition;
-using Processor;
 using System.Diagnostics;
 
 /// Replicates notifications for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
 /// <inheritdoc cref="RemoteNotificationReplicatorBase{TNotification}"/>
 public static class ForestNotificationReplicator
 {
-    public static INotificationProcessor<IForestNotification> Create(IForest localForest,
+    public static INotificationHandler<IForestNotification> Create(IForest localForest,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
-        var filter = new NotificationIdFilteringNotificationProcessor<IForestNotification>(internalSender);
+        var filter = new IdFilteringNotificationHandler<IForestNotification>(internalSender);
         var remoteReplicator = new RemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, internalSender);
         var localReplicator =
             new LocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, internalSender);
 
-        var result = new CompositeNotificationProcessor<IForestNotification>([remoteReplicator, filter],
+        var result = new CompositeNotificationHandler<IForestNotification>([remoteReplicator, filter],
             sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
 
-        var forestProcessor = localForest.GetProcessor();
-        if (forestProcessor != null)
+        var forestHandler = localForest.GetNotificationHandler();
+        if (forestHandler != null)
         {
-            IProcessor.Connect(forestProcessor, localReplicator);
-            IProcessor.Connect(localReplicator, filter);
+            IHandler.Connect(forestHandler, localReplicator);
+            IHandler.Connect(localReplicator, filter);
         }
 
         return result;
@@ -54,7 +54,7 @@ public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBa
     private readonly IForest _localForest;
 
     protected internal RemoteForestNotificationReplicator(IForest localForest, SharedNodeMap sharedNodeMap,
-        NotificationIdFilteringNotificationProcessor<IForestNotification> filter, object? sender) :
+        IdFilteringNotificationHandler<IForestNotification> filter, object? sender) :
         base(sharedNodeMap, filter, sender)
     {
         _localForest = localForest;
@@ -112,7 +112,7 @@ public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBa
         });
 }
 
-public class LocalForestNotificationReplicator : NotificationProcessorBase<IForestNotification>
+public class LocalForestNotificationReplicator : NotificationHandlerBase<IForestNotification>
 {
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
     private readonly SharedNodeMap _sharedNodeMap;
@@ -145,7 +145,7 @@ public class LocalForestNotificationReplicator : NotificationProcessorBase<IFore
         Send(message);
     }
 
-    protected virtual INotificationProcessor<IPartitionNotification> CreatePartitionNotificationReplicator(IPartitionInstance partition,
+    protected virtual INotificationHandler<IPartitionNotification> CreatePartitionNotificationReplicator(IPartitionInstance partition,
         string sender) =>
         PartitionNotificationReplicator.Create(partition, _sharedNodeMap, sender);
 

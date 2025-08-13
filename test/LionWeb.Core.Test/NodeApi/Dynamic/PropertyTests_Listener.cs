@@ -30,7 +30,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         parent.Set(Geometry_documentation, doc);
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<PropertyAddedNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(doc, args.Node);
@@ -52,7 +52,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         doc.Set(Documentation_text, "hello");
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<PropertyDeletedNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(doc, args.Node);
@@ -74,7 +74,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         doc.Set(Documentation_text, "hello");
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<PropertyChangedNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<PropertyChangedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(doc, args.Node);
@@ -84,8 +84,8 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         });
 
         int badNotifications = 0;
-        parent.GetProcessor().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
-        parent.GetProcessor().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
 
         doc.Set(Documentation_text, "bye");
 

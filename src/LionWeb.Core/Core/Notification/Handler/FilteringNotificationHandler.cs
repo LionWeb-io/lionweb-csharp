@@ -15,13 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Processor;
+namespace LionWeb.Core.Notification.Handler;
 
 using System.Diagnostics;
 
 /// Forwards <see cref="Receive">received</see> notifications if the notification passes <see cref="Filter"/>.
-public abstract class FilteringNotificationProcessor<TNotification>(object? sender)
-    : /*IDisposable,*/ NotificationProcessorBase<TNotification>(sender)
+public abstract class FilteringNotificationHandler<TNotification>(object? sender)
+    : /*IDisposable,*/ NotificationHandlerBase<TNotification>(sender)
     where TNotification : class, INotification
 {
 
@@ -49,22 +49,22 @@ public abstract class FilteringNotificationProcessor<TNotification>(object? send
     }
 
 
-    /// Determines whether <paramref name="notification"/> will be <see cref="IProcessor{TReceive,TSend}.Send">sent</see> to <i>following</i> processors.
+    /// Determines whether <paramref name="notification"/> will be <see cref="IHandler{TReceive,TSend}.Send">sent</see> to <i>following</i> notification handlers.
     /// <param name="notification">Notification to check.</param>
     /// <returns>the notification to send, or <c>null</c>.</returns>
     protected abstract TNotification? Filter(TNotification notification);
 }
 
 /// Suppresses all notifications with <see cref="RegisterNotificationId">registered notification ids</see>.
-public class NotificationIdFilteringNotificationProcessor<TNotification>(object? sender) : FilteringNotificationProcessor<TNotification>(sender) where TNotification : class, INotification
+public class IdFilteringNotificationHandler<TNotification>(object? sender) : FilteringNotificationHandler<TNotification>(sender) where TNotification : class, INotification
 {
     private readonly HashSet<INotificationId> _notificationIds = [];
 
-    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="IProcessor{TReceive,TSend}.Send">sending</see>.
+    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="IHandler{TReceive,TSend}.Send">sending</see>.
     public void RegisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Add(notificationId);
 
-    /// <see cref="IProcessor{TReceive,TSend}.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
+    /// <see cref="IHandler{TReceive,TSend}.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
     public void UnregisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Remove(notificationId);
 

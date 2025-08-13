@@ -24,7 +24,7 @@ using Core;
 using Core.M1;
 using Core.M3;
 using Core.Notification;
-using Core.Notification.Processor;
+using Core.Notification.Handler;
 using Core.Serialization;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Utilities;

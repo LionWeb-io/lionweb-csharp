@@ -21,33 +21,33 @@ using Core;
 using Core.M1;
 using Core.Notification;
 using Core.Notification.Forest;
+using Core.Notification.Handler;
 using Core.Notification.Partition;
-using Core.Notification.Processor;
 using Partition;
 
 internal static class RewriteForestNotificationReplicator
 {
-    public static new INotificationProcessor<IForestNotification> Create(IForest localForest,
+    public static new INotificationHandler<IForestNotification> Create(IForest localForest,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
-        var filter = new NotificationIdFilteringNotificationProcessor<IForestNotification>(internalSender);
-        var replacingFilter = new NotificationIdReplacingNotificationProcessor<IForestNotification>(internalSender);
+        var filter = new IdFilteringNotificationHandler<IForestNotification>(internalSender);
+        var replacingFilter = new NotificationIdReplacingNotificationHandler<IForestNotification>(internalSender);
         var remoteReplicator =
             new RewriteRemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, replacingFilter,
                 internalSender);
         var localReplicator = new RewriteLocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap,
             sharedNodeMap, internalSender);
 
-        var result = new CompositeNotificationProcessor<IForestNotification>(
+        var result = new CompositeNotificationHandler<IForestNotification>(
             [replacingFilter, remoteReplicator, filter],
             sender ?? $"Composite of {nameof(RewriteForestNotificationReplicator)} {localForest}");
 
-        var forestProcessor = localForest.GetProcessor();
-        if (forestProcessor != null)
+        var forestHandler = localForest.GetNotificationHandler();
+        if (forestHandler != null)
         {
-            IProcessor.Connect(forestProcessor, localReplicator);
-            IProcessor.Connect(localReplicator, filter);
+            IHandler.Connect(forestHandler, localReplicator);
+            IHandler.Connect(localReplicator, filter);
         }
 
         return result;
@@ -57,8 +57,8 @@ internal static class RewriteForestNotificationReplicator
 internal class RewriteRemoteForestNotificationReplicator(
     IForest localForest,
     SharedNodeMap sharedNodeMap,
-    NotificationIdFilteringNotificationProcessor<IForestNotification> filter,
-    NotificationIdReplacingNotificationProcessor<IForestNotification> replacingFilter,
+    IdFilteringNotificationHandler<IForestNotification> filter,
+    NotificationIdReplacingNotificationHandler<IForestNotification> replacingFilter,
     object? sender
 ) : RemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, sender)
 {
@@ -89,7 +89,7 @@ internal class RewriteLocalForestNotificationReplicator(
     object? sender)
     : LocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, sender)
 {
-    protected override INotificationProcessor<IPartitionNotification> CreatePartitionNotificationReplicator(
+    protected override INotificationHandler<IPartitionNotification> CreatePartitionNotificationReplicator(
         IPartitionInstance partition, string sender) =>
         RewritePartitionNotificationReplicator.Create(partition, sharedNodeMap, sender);
 }

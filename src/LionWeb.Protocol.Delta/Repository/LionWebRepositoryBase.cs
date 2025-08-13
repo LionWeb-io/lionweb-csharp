@@ -22,8 +22,8 @@ using Core.M1;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
+using Core.Notification.Handler;
 using Core.Notification.Partition;
-using Core.Notification.Processor;
 using Forest;
 
 public abstract class LionWebRepositoryBase<T> : IDisposable
@@ -34,7 +34,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
 
-    protected readonly INotificationProcessor<IForestNotification> _replicator;
+    protected readonly INotificationHandler<IForestNotification> _replicator;
 
     private long nextFreeNodeId = 0;
 
@@ -48,7 +48,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
         _replicator = RewriteForestNotificationReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
 
-        IProcessor.Connect(_replicator, new LocalForestReceiver(name, this));
+        IHandler.Connect(_replicator, new LocalForestReceiver(name, this));
 
         _connector.ReceiveFromClient += OnReceiveFromClient;
     }
@@ -64,7 +64,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     #region Local
 
-    private class LocalForestReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationProcessorBase<IForestNotification>(sender)
+    private class LocalForestReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IForestNotification>(sender)
     {
         public override void Receive(IForestNotification message)
         {
@@ -82,7 +82,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         }
     }
     
-    private class LocalPartitionReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationProcessorBase<IPartitionNotification>(sender)
+    private class LocalPartitionReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IPartitionNotification>(sender)
     {
         public override void Receive(IPartitionNotification message) =>
             repository.SendEventToAllClients(sender, message);
@@ -90,8 +90,8 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedEvent)
     {
-        var eventProcessor = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
-        IProcessor.Connect(eventProcessor, new LocalPartitionReceiver(_name, this));
+        var notificationHandler = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
+        IHandler.Connect(notificationHandler, new LocalPartitionReceiver(_name, this));
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent)

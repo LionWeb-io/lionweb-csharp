@@ -17,8 +17,8 @@
 
 namespace LionWeb.Core.Notification.Partition;
 
+using Handler;
 using M3;
-using Processor;
 using System.Collections;
 using System.Diagnostics;
 
@@ -26,23 +26,23 @@ using System.Diagnostics;
 /// <inheritdoc cref="RemoteNotificationReplicatorBase{TNotification}"/>
 public static class PartitionNotificationReplicator
 {
-    public static INotificationProcessor<IPartitionNotification> Create(IPartitionInstance localPartition,
+    public static INotificationHandler<IPartitionNotification> Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
-        var filter = new NotificationIdFilteringNotificationProcessor<IPartitionNotification>(internalSender);
+        var filter = new IdFilteringNotificationHandler<IPartitionNotification>(internalSender);
         var remoteReplicator =
             new RemotePartitionNotificationReplicator(localPartition, sharedNodeMap, filter, internalSender);
         var localReplicator = new LocalPartitionNotificationReplicator(sharedNodeMap, internalSender);
 
-        var result = new CompositeNotificationProcessor<IPartitionNotification>([remoteReplicator, filter],
+        var result = new CompositeNotificationHandler<IPartitionNotification>([remoteReplicator, filter],
             sender ?? $"Composite of {nameof(PartitionNotificationReplicator)} {localPartition.GetId()}");
 
-        var partitionProcessor = localPartition.GetProcessor();
-        if (partitionProcessor != null)
+        var partitionHandler = localPartition.GetNotificationHandler();
+        if (partitionHandler != null)
         {
-            IProcessor.Connect(partitionProcessor, localReplicator);
-            IProcessor.Connect(localReplicator, filter);
+            IHandler.Connect(partitionHandler, localReplicator);
+            IHandler.Connect(localReplicator, filter);
         }
 
         return result;
@@ -55,7 +55,7 @@ public class RemotePartitionNotificationReplicator : RemoteNotificationReplicato
 
     protected internal RemotePartitionNotificationReplicator(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap,
-        NotificationIdFilteringNotificationProcessor<IPartitionNotification> filter, object? sender) : base(
+        IdFilteringNotificationHandler<IPartitionNotification> filter, object? sender) : base(
         sharedNodeMap, filter, sender)
     {
         _localPartition = localPartition;
@@ -457,7 +457,7 @@ public class RemotePartitionNotificationReplicator : RemoteNotificationReplicato
 }
 
 public class LocalPartitionNotificationReplicator(SharedNodeMap sharedNodeMap, object? sender)
-    : NotificationProcessorBase<IPartitionNotification>(sender)
+    : NotificationHandlerBase<IPartitionNotification>(sender)
 {
     /// <inheritdoc />
     public override void Receive(IPartitionNotification message)

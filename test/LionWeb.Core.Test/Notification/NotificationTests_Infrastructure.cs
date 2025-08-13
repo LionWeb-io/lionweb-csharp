@@ -20,8 +20,8 @@ namespace LionWeb.Core.Test.Listener;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using Notification;
+using Notification.Handler;
 using Notification.Partition;
-using Notification.Processor;
 using System.Reflection;
 using Comparer = Core.Utilities.Comparer;
 
@@ -34,9 +34,9 @@ public class NotificationTests_Infrastructure
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        node.GetProcessor().Subscribe<PropertyAddedNotification>((sender, args) => { } );
-        node.GetProcessor().Subscribe<PropertyChangedNotification>((sender, args) => { });
-        node.GetProcessor().Subscribe<IPartitionNotification>((sender, args) => { });
+        node.GetNotificationHandler().Subscribe<PropertyAddedNotification>((sender, args) => { } );
+        node.GetNotificationHandler().Subscribe<PropertyChangedNotification>((sender, args) => { });
+        node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, args) => { });
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -51,9 +51,9 @@ public class NotificationTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetProcessor().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
+        node.GetNotificationHandler().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
         
-        node.GetProcessor().Subscribe<PropertyChangedNotification>((sender, args) => {});
+        node.GetNotificationHandler().Subscribe<PropertyChangedNotification>((sender, args) => {});
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -69,13 +69,13 @@ public class NotificationTests_Infrastructure
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetProcessor().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
+        node.GetNotificationHandler().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
         
         int changedCount = 0;
-        node.GetProcessor().Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
+        node.GetNotificationHandler().Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
 
         int allCount = 0;
-        node.GetProcessor().Subscribe<IPartitionNotification>((sender, args) => allCount++);
+        node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, args) => allCount++);
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -98,10 +98,10 @@ public class NotificationTests_Infrastructure
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
         int nodeCount = 0;
-        node.GetProcessor().Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
+        node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
         
         int cloneCount = 0;
-        clone.GetProcessor().Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
+        clone.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
         
         circle.Name = "Hello";
         cloneCircle.Name = "World";
@@ -131,25 +131,25 @@ public class NotificationTests_Infrastructure
         Assert.AreEqual(0, ReplicatorNotificationIds(cloneReplicator).Count);
     }
 
-    private static HashSet<INotificationId> ReplicatorNotificationIds(INotificationProcessor<IPartitionNotification> replicator)
+    private static HashSet<INotificationId> ReplicatorNotificationIds(INotificationHandler<IPartitionNotification> replicator)
     {
-        var fieldInfoFilter = typeof(CompositeNotificationProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_lastProcessor");
-        var filter = (NotificationIdFilteringNotificationProcessor<IPartitionNotification>) fieldInfoFilter.GetValue(replicator);
+        var fieldInfoFilter = typeof(CompositeNotificationHandler<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_lastHandler");
+        var filter = (IdFilteringNotificationHandler<IPartitionNotification>) fieldInfoFilter.GetValue(replicator);
      
-        var fieldInfoNotificationIds = typeof(NotificationIdFilteringNotificationProcessor<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_notificationIds");
+        var fieldInfoNotificationIds = typeof(IdFilteringNotificationHandler<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_notificationIds");
         var notificationIds = fieldInfoNotificationIds.GetValue(filter);
         
         return (HashSet<INotificationId>)notificationIds!;
     }
 
-    private Tuple<INotificationProcessor<IPartitionNotification>, INotificationProcessor<IPartitionNotification>>
+    private Tuple<INotificationHandler<IPartitionNotification>, INotificationHandler<IPartitionNotification>>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");
         var cloneReplicator = PartitionNotificationReplicator.Create(node, new(), "nodeReplicator");
         
-        IProcessor.Connect(cloneReplicator, replicator);
-        IProcessor.Connect(replicator, cloneReplicator);
+        IHandler.Connect(cloneReplicator, replicator);
+        IHandler.Connect(replicator, cloneReplicator);
         
         return Tuple.Create(replicator, cloneReplicator);
     }

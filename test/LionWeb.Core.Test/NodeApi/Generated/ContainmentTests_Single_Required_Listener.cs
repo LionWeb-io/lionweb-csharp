@@ -33,7 +33,7 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -55,7 +55,7 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -77,7 +77,7 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildAddedNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -100,7 +100,7 @@ public class ContainmentTests_Single_Required_Listener
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -126,7 +126,7 @@ public class ContainmentTests_Single_Required_Listener
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -153,7 +153,7 @@ public class ContainmentTests_Single_Required_Listener
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildMovedAndReplacedFromOtherContainmentNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildMovedAndReplacedFromOtherContainmentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -181,7 +181,7 @@ public class ContainmentTests_Single_Required_Listener
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildMovedAndReplacedFromOtherContainmentNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildMovedAndReplacedFromOtherContainmentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -207,7 +207,7 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
@@ -231,7 +231,7 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
@@ -256,7 +256,7 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
@@ -282,7 +282,7 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
@@ -310,7 +310,7 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildReplacedNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildReplacedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -334,7 +334,7 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildReplacedNotification>((_, args) =>
+        parent.GetNotificationHandler().Subscribe<ChildReplacedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -357,12 +357,12 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
         offsetDuplicate.Offset = oldCoord;
 
@@ -377,12 +377,12 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, oldCoord);
 
@@ -402,12 +402,12 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => offsetDuplicate.Offset = null);
 
@@ -421,12 +421,12 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
         int notifications = 0;
-        parent.GetProcessor().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildAddedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
-        parent.GetProcessor().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationHandler().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => offsetDuplicate.Offset = null);
 

@@ -124,14 +124,14 @@ public class DynamicNode : NodeBase
 
     private bool SetProperty(Property property, object? value)
     {
-        var processor = GetPartitionProcessor();
+        var partitionHandler = GetPartitionNotificationHandler();
         _settings.TryGetValue(property, out var oldValue);
         if (value == null && property.Optional)
         {
             _settings.Remove(property);
             if (oldValue != null)
             {
-                processor?.Receive(new PropertyDeletedNotification(this, property, oldValue, processor.CreateNotificationId()));
+                partitionHandler?.Receive(new PropertyDeletedNotification(this, property, oldValue, partitionHandler.CreateNotificationId()));
             }
 
             return true;
@@ -140,10 +140,10 @@ public class DynamicNode : NodeBase
         var newValue = VersionSpecifics.PrepareSetProperty(property, value);
         if (oldValue != null)
         {
-            processor?.Receive(new PropertyChangedNotification(this, property, newValue, oldValue, processor.CreateNotificationId()));
+            partitionHandler?.Receive(new PropertyChangedNotification(this, property, newValue, oldValue, partitionHandler.CreateNotificationId()));
         } else
         {
-            processor?.Receive(new PropertyAddedNotification(this, property, newValue, processor.CreateNotificationId()));
+            partitionHandler?.Receive(new PropertyAddedNotification(this, property, newValue, partitionHandler.CreateNotificationId()));
         }
 
         _settings[property] = newValue;
@@ -271,15 +271,15 @@ public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
 public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
 {
-    private readonly PartitionNotificationProcessor _notificationProcessor;
+    private readonly PartitionNotificationHandler _notificationHandler;
 
     /// <inheritdoc />
     public DynamicPartitionInstance(NodeId id, Concept concept) : base(id, concept)
     {
-        _notificationProcessor = new PartitionNotificationProcessor(this);
+        _notificationHandler = new PartitionNotificationHandler(this);
     }
 
     /// <inheritdoc />
-    public IPartitionProcessor? GetProcessor() => 
-        _notificationProcessor;
+    public IPartitionNotificationHandler? GetNotificationHandler() => 
+        _notificationHandler;
 }

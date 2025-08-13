@@ -29,8 +29,8 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
 {
     protected readonly IPartitionInstance? DestinationPartition;
 
-    /// <see cref="IPartitionProcessor"/> to use for our notifications, if any.
-    protected readonly IPartitionProcessor? PartitionProcessor;
+    /// <see cref="IPartitionNotificationHandler"/> to use for our notifications, if any.
+    protected readonly IPartitionNotificationHandler? PartitionHandler;
 
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly INotifiableNode DestinationParent;
@@ -46,7 +46,7 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
         DestinationParent = destinationParent;
         _notificationId = notificationId;
         DestinationPartition = destinationParent.GetPartition();
-        PartitionProcessor = DestinationPartition?.GetProcessor();
+        PartitionHandler = DestinationPartition?.GetNotificationHandler();
     }
 
     /// Logic to execute <i>before</i> any changes to the underlying nodes.
@@ -58,12 +58,12 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// <summary>
     /// Whether this emitter should execute at all.
     /// </summary>
-    [MemberNotNullWhen(true, nameof(PartitionProcessor))]
+    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected abstract bool IsActive();
 
     /// <summary>
     /// Retrieves the notification ID associated with the notification emitter.
     /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
-    protected INotificationId GetNotificationId() => _notificationId ?? PartitionProcessor.CreateNotificationId();
+    protected INotificationId GetNotificationId() => _notificationId ?? PartitionHandler.CreateNotificationId();
 }
