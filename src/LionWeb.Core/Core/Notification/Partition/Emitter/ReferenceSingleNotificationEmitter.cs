@@ -48,17 +48,17 @@ public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBa
         {
             case (null, { } v):
                 IReferenceTarget newTarget = new ReferenceTarget(null, v);
-                PartitionCommander.Raise(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
+                PartitionHandler.Receive(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
                     GetNotificationId()));
                 break;
             case ({ } o, null):
                 IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
-                PartitionCommander.Raise(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
+                PartitionHandler.Receive(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
                     GetNotificationId()));
                 break;
             case ({ } o, { } n):
                 IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
-                PartitionCommander.Raise(new ReferenceChangedNotification(DestinationParent, Reference, 0,
+                PartitionHandler.Receive(new ReferenceChangedNotification(DestinationParent, Reference, 0,
                     new ReferenceTarget(null, n), replacedTarget,
                     GetNotificationId()));
                 break;
@@ -66,9 +66,9 @@ public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBa
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionCommander != null && PartitionCommander.CanRaise(
+        PartitionHandler != null && PartitionHandler.CanReceive(
             typeof(ReferenceAddedNotification),
             typeof(ReferenceDeletedNotification),
             typeof(ReferenceChangedNotification)

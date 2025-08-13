@@ -101,7 +101,7 @@ public class NodeBaseTests
     #region Set method with notificationId parameter set to null
 
     [TestMethod]
-    public void Set_NodeBase_with_null_eventId()
+    public void Set_NodeBase_with_null_notificationId()
     {
         var coord = new Coord("coord");
         
@@ -113,7 +113,7 @@ public class NodeBaseTests
     }
     
     [TestMethod]
-    public void Set_INode_with_null_eventId()
+    public void Set_INode_with_null_notificationId()
     {
         var coord = new Coord("coord");
         
@@ -125,7 +125,7 @@ public class NodeBaseTests
     }
     
     [TestMethod]
-    public void Set_INotifiableNode_with_null_eventId()
+    public void Set_INotifiableNode_with_null_notificationId()
     {
         var coord = new Coord("coord");
         
@@ -137,7 +137,7 @@ public class NodeBaseTests
     }
 
     [TestMethod]
-    public void Set_INotifiableNode_Generic_with_null_eventId()
+    public void Set_INotifiableNode_Generic_with_null_notificationId()
     {
         var coord = new Coord("coord");
         

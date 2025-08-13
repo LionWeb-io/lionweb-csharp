@@ -35,6 +35,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{49B2FB80-3
 		docs\parents.pdf = docs\parents.pdf
 		docs\LionWeb-intro-CSharp.adoc = docs\LionWeb-intro-CSharp.adoc
 		docs\LionWeb-intro-CSharp.pdf = docs\LionWeb-intro-CSharp.pdf
+		docs\notificationHandlers-allSteps.drawio.svg = docs\notificationHandlers-allSteps.drawio.svg
+		docs\notificationHandlers-localSteps.drawio.svg = docs\notificationHandlers-localSteps.drawio.svg
+		docs\notificationHandlers-noSteps.drawio.svg = docs\notificationHandlers-noSteps.drawio.svg
+		docs\notificationHandlers-remoteSteps.drawio.svg = docs\notificationHandlers-remoteSteps.drawio.svg
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Generator", "src\LionWeb.Generator\LionWeb.Generator.csproj", "{D654BC85-5FF7-4186-BEF4-389472FB167D}"

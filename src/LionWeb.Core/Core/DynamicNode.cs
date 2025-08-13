@@ -124,14 +124,14 @@ public class DynamicNode : NodeBase
 
     private bool SetProperty(Property property, object? value)
     {
-        var commander = GetPartitionCommander();
+        var partitionHandler = GetPartitionNotificationHandler();
         _settings.TryGetValue(property, out var oldValue);
         if (value == null && property.Optional)
         {
             _settings.Remove(property);
             if (oldValue != null)
             {
-                commander?.Raise(new PropertyDeletedNotification(this, property, oldValue, commander.CreateEventId()));
+                partitionHandler?.Receive(new PropertyDeletedNotification(this, property, oldValue, partitionHandler.CreateNotificationId()));
             }
 
             return true;
@@ -140,10 +140,10 @@ public class DynamicNode : NodeBase
         var newValue = VersionSpecifics.PrepareSetProperty(property, value);
         if (oldValue != null)
         {
-            commander?.Raise(new PropertyChangedNotification(this, property, newValue, oldValue, commander.CreateEventId()));
+            partitionHandler?.Receive(new PropertyChangedNotification(this, property, newValue, oldValue, partitionHandler.CreateNotificationId()));
         } else
         {
-            commander?.Raise(new PropertyAddedNotification(this, property, newValue, commander.CreateEventId()));
+            partitionHandler?.Receive(new PropertyAddedNotification(this, property, newValue, partitionHandler.CreateNotificationId()));
         }
 
         _settings[property] = newValue;
@@ -271,17 +271,15 @@ public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
 public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
 {
-    private readonly PartitionEventHandler _eventHandler;
+    private readonly IPartitionNotificationHandler _notificationHandler;
 
     /// <inheritdoc />
     public DynamicPartitionInstance(NodeId id, Concept concept) : base(id, concept)
     {
-        _eventHandler = new PartitionEventHandler(this);
+        _notificationHandler = new PartitionNotificationHandler(this);
     }
 
     /// <inheritdoc />
-    public IPartitionPublisher GetPublisher() => _eventHandler;
-
-    /// <inheritdoc />
-    public IPartitionCommander GetCommander() => _eventHandler;
+    public IPartitionNotificationHandler? GetNotificationHandler() => 
+        _notificationHandler;
 }

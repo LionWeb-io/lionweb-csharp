@@ -24,9 +24,9 @@ using Core.Serialization;
 
 public class DeltaUtils
 {
-    public static Dictionary<CompressedMetaPointer, IKeyed> BuildSharedKeyMap(IEnumerable<Language> languages)
+    public static SharedKeyedMap BuildSharedKeyMap(IEnumerable<Language> languages)
     {
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = [];
+        SharedKeyedMap sharedKeyedMap = [];
 
         foreach (IKeyed keyed in languages.SelectMany(l => M1Extensions.Descendants<IKeyed>(l)))
         {

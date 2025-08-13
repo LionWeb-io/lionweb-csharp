@@ -29,8 +29,8 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
 {
     protected readonly IPartitionInstance? DestinationPartition;
 
-    /// <see cref="IPartitionCommander"/> to use for our notifications, if any.
-    protected readonly IPartitionCommander? PartitionCommander;
+    /// <see cref="IPartitionNotificationHandler"/> to use for our notifications, if any.
+    protected readonly IPartitionNotificationHandler? PartitionHandler;
 
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly INotifiableNode DestinationParent;
@@ -40,12 +40,13 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
 
     /// <param name="destinationParent"> Owner of the represented <see cref="Feature"/>.</param>
     /// <param name="notificationId">The notification ID of the notification emitted by notification emitters</param>
-    protected PartitionNotificationEmitterBase(INotifiableNode destinationParent, INotificationId? notificationId = null)
+    protected PartitionNotificationEmitterBase(INotifiableNode destinationParent,
+        INotificationId? notificationId = null)
     {
         DestinationParent = destinationParent;
         _notificationId = notificationId;
         DestinationPartition = destinationParent.GetPartition();
-        PartitionCommander = DestinationPartition?.GetCommander();
+        PartitionHandler = DestinationPartition?.GetNotificationHandler();
     }
 
     /// Logic to execute <i>before</i> any changes to the underlying nodes.
@@ -57,12 +58,12 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// <summary>
     /// Whether this emitter should execute at all.
     /// </summary>
-    [MemberNotNullWhen(true, nameof(PartitionCommander))]
+    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected abstract bool IsActive();
 
     /// <summary>
     /// Retrieves the notification ID associated with the notification emitter.
     /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
-    protected INotificationId GetNotificationId() => _notificationId ?? PartitionCommander.CreateEventId();
+    protected INotificationId GetNotificationId() => _notificationId ?? PartitionHandler.CreateNotificationId();
 }

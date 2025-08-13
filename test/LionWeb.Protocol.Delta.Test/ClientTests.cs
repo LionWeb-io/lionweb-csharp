@@ -18,9 +18,13 @@
 namespace LionWeb.Protocol.Delta.Test;
 
 using Client;
+using Client.Forest;
+using Client.Partition;
 using Core;
+using Core.M1;
 using Core.M3;
 using Core.Notification;
+using Core.Notification.Handler;
 using Core.Serialization;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Utilities;
@@ -32,10 +36,12 @@ using Repository;
 public class ClientTests
 {
     private readonly DeltaRepositoryConnector _repositoryConnector;
+    private readonly IForest _repositoryForest;
     private readonly Geometry _repositoryPartition;
     private readonly LionWebTestRepository _repository;
 
     private readonly DeltaClientConnector _clientConnector;
+    private readonly IForest _clientForest;
     private readonly Geometry _clientPartition;
     private readonly LionWebTestClient _client;
     private readonly IClientInfo _clientInfo;
@@ -51,36 +57,46 @@ public class ClientTests
             content => _repositoryConnector.ReceiveMessageFromClient(new DeltaMessageContext(_clientInfo, content)));
         _repositoryConnector.Sender = content => _clientConnector.ReceiveMessageFromRepository(content);
 
-        _repositoryPartition = new Geometry("partition");
-        _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryPartition,
+        _repositoryForest = new Forest();
+        _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryForest,
             _repositoryConnector);
 
-        _clientPartition = Clone(_repositoryPartition);
-        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientPartition, _clientConnector);
+        _clientForest = new Forest();
+        _clientPartition = new Geometry("partition");
+        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector);
         _client.ParticipationId = _clientInfo.ParticipationId;
+        
+        _clientForest.AddPartitions([_clientPartition]);
+        _repository.WaitForReceived(1);
+        _repositoryPartition = (Geometry)_repositoryForest.Partitions.First();
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public void ConnectionWorks()
     {
         _clientPartition.Documentation = new Documentation("doc");
+
+         _repository.WaitForReceived(1);
 
         AssertEquals(_clientPartition, _repositoryPartition);
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public async Task SignOn()
     {
         var signOnResponse = await _client.SignOn();
-        
+
         Assert.AreEqual("clientParticipation", signOnResponse.ParticipationId);
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public async Task GetAvailableIds()
     {
         var availableIdsResponse = await _client.GetAvailableIds(11);
-        
+
         Assert.AreEqual(11, availableIdsResponse.Ids.Length);
         foreach (var freeId in availableIdsResponse.Ids)
         {
@@ -89,24 +105,27 @@ public class ClientTests
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public async Task GetAvailableIds_SomeAlreadyUsed()
     {
         await _client.SignOn();
 
         var usedNodeId = "repoProvidedId-6";
         _clientPartition.Documentation = new Documentation(usedNodeId);
-        
+
         var availableIdsResponse = await _client.GetAvailableIds(11);
-        
+
         Assert.AreEqual(11, availableIdsResponse.Ids.Length);
         foreach (var freeId in availableIdsResponse.Ids)
         {
             Assert.IsTrue(IdUtils.IsValid(freeId));
         }
+
         Assert.IsFalse(availableIdsResponse.Ids.Contains(usedNodeId));
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public void InOrderEvents()
     {
         _repositoryConnector.SendToAllClients(ChildAdded(0));
@@ -118,6 +137,7 @@ public class ClientTests
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public void OutOfOrderEvents()
     {
         _repositoryConnector.SendToAllClients(PropertyAdded(1));
@@ -161,7 +181,7 @@ public class ClientTests
             ShapesLanguage.Instance.Documentation_text.ToMetaPointer(),
             "changed text",
             "text",
-            [new CommandSource(_clientInfo.ParticipationId, "cmdY")],
+            [new CommandSource(_clientInfo.ParticipationId, "cmdZ")],
             null
         ) { SequenceNumber = sequenceNumber };
 
@@ -181,12 +201,15 @@ public class ClientTests
 
 internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 {
-    private readonly EventToDeltaCommandMapper _mapper;
+    private readonly NotificationToDeltaCommandMapper _mapper;
 
     public DeltaRepositoryConnector(LionWebVersions lionWebVersion)
     {
-        _mapper = new EventToDeltaCommandMapper(
-            new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion));
+        var commandIdProvider = new CommandIdProvider();
+        _mapper = new NotificationToDeltaCommandMapper(
+            new PartitionNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion),
+            new ForestNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion)
+        );
     }
 
     public Action<IDeltaContent> Sender { get; set; }
@@ -211,13 +234,16 @@ internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 internal class DeltaClientConnector : IDeltaClientConnector
 {
     private readonly Action<IDeltaContent> _sender;
-    private readonly EventToDeltaCommandMapper _mapper;
+    private readonly NotificationToDeltaCommandMapper _mapper;
 
     public DeltaClientConnector(LionWebVersions lionWebVersion, Action<IDeltaContent> sender)
     {
         _sender = sender;
-        _mapper = new EventToDeltaCommandMapper(
-            new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion));
+        var commandIdProvider = new CommandIdProvider();
+        _mapper = new NotificationToDeltaCommandMapper(
+            new PartitionNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion),
+            new ForestNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion)
+        );
     }
 
     public Task SendToRepository(IDeltaContent content)

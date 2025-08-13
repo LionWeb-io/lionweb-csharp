@@ -20,7 +20,6 @@ namespace LionWeb.Protocol.Delta.Client;
 using Core;
 using Core.M1;
 using Core.M3;
-using Core.Notification;
 using Core.Utilities;
 using Message;
 using Message.Command;
@@ -28,19 +27,13 @@ using Message.Event;
 using Message.Query;
 using System.Collections.Concurrent;
 
-public interface IDeltaClientConnector : IClientConnector<IDeltaContent>;
-
-public interface IEventClientConnector : IClientConnector<INotification>
-{
-    INotification IClientConnector<INotification>.Convert(INotification notification) => notification;
-}
-
 public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
-    private readonly DeltaProtocolPartitionEventReceiver _eventReceiver;
+    private readonly DeltaProtocolEventReceiver _eventReceiver;
     
     private readonly ConcurrentDictionary<EventSequenceNumber, IDeltaEvent> _unprocessedEvents = [];
     private readonly ConcurrentDictionary<CommandId, bool> _ownCommands = [];
+    private readonly ConcurrentDictionary<QueryId, TaskCompletionSource<IDeltaQueryResponse>> _queryResponses = [];
 
     #region EventSequenceNumber
 
@@ -53,8 +46,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     public LionWebClient(LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
-        IPartitionInstance partition,
-        IClientConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, partition, connector)
+        IForest forest,
+        IClientConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, forest, connector)
     {
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
@@ -62,55 +55,28 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
 
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
-        _eventReceiver = new DeltaProtocolPartitionEventReceiver(
-            PartitionEventHandler,
+        _eventReceiver = new DeltaProtocolEventReceiver(
             SharedNodeMap,
+            SharedPartitionReplicatorMap,
             sharedKeyedMap,
-            deserializerBuilder
+            deserializerBuilder,
+            _replicator
         );
+        
+        _eventReceiver.Init();
     }
 
     /// <inheritdoc />
-    public override async Task<SignOnResponse> SignOn()
+    public override void Dispose()
     {
-        var signOnResponse = await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId, IdUtils.NewId(), null));
-        ParticipationId = signOnResponse.ParticipationId;
-        return signOnResponse;
+        GC.SuppressFinalize(this);
+        _eventReceiver.Dispose();
+        base.Dispose();
     }
 
-    /// <inheritdoc />
-    public override async Task<SignOffResponse> SignOff() =>
-        await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(IdUtils.NewId(), null));
-
-    /// <inheritdoc />
-    public override async Task<GetAvailableIdsResponse> GetAvailableIds(int count) => 
-        await Query<GetAvailableIdsResponse, GetAvailableIdsRequest>(new GetAvailableIdsRequest(count, IdUtils.NewId(), null));
-
-    private readonly ConcurrentDictionary<QueryId, TaskCompletionSource<IDeltaQueryResponse>> _queryResponses = [];
-    
-    private async Task<TResponse> Query<TResponse, TRequest>(TRequest request) where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest 
-    {
-        var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
-        _queryResponses[request.QueryId] = tcs;
-        await Send(request);
-        var response = await tcs.Task;
-        return response as TResponse ?? throw new ArgumentException(response.GetType().Name);
-    }
-
-    /// <inheritdoc />
-    protected override async Task Send(IDeltaContent deltaContent)
-    {
-        if (deltaContent.RequiresParticipationId)
-            deltaContent.InternalParticipationId = ParticipationId;
-
-        if (deltaContent is IDeltaCommand { CommandId: { } commandId })
-            _ownCommands.TryAdd(commandId, true);
-
-        Log($"sending: {deltaContent.GetType().Name}", true);
-        await _connector.SendToRepository(deltaContent);
-    }
+    #region Remote
 
     /// <inheritdoc />
     protected override void Receive(IDeltaContent content)
@@ -130,9 +96,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                     Log($"received response: {response})");
                     if (_queryResponses.TryRemove(response.QueryId, out var tcs))
                     {
-                        // Log($"trying to set result");
                         var x = tcs.TrySetResult(response);
-                        // Log($"tried to set result: {x}");
                     }
 
                     break;
@@ -151,7 +115,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     private void ReceiveEvent(IDeltaEvent deltaEvent)
     {
         Log(
-            $"received event: {deltaEvent.GetType()}({deltaEvent.OriginCommands},{deltaEvent.SequenceNumber})");
+            $"received event: {deltaEvent.GetType()}({string.Join(",", deltaEvent.OriginCommands.Select(oc => $"{oc.ParticipationId}:{oc.CommandId}"))},{deltaEvent.SequenceNumber})");
 
         CommandSource? commandSource = deltaEvent.OriginCommands.FirstOrDefault();
 
@@ -191,44 +155,50 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             _eventReceiver.Receive(deltaEvent);
         }
     }
-}
-
-public class LionWebTestClient(
-    LionWebVersions lionWebVersion,
-    List<Language> languages,
-    string name,
-    IPartitionInstance partition,
-    IDeltaClientConnector connector)
-    : LionWebClient(lionWebVersion, languages, name, partition, connector)
-{
-    private const int SleepInterval = 100;
-
-    #region MessageCount
-
-    private long _messageCount;
-
-    public long MessageCount => Interlocked.Read(ref _messageCount);
-    private void IncrementMessageCount() => Interlocked.Increment(ref _messageCount);
-
-    private void WaitForCount(long count)
-    {
-        while (MessageCount < count)
-        {
-            Thread.Sleep(SleepInterval);
-        }
-    }
-
-    public void WaitForReplies(int delta) =>
-        WaitForCount(MessageCount + delta);
 
     #endregion
 
+    #region Send
+
     /// <inheritdoc />
-    protected override void Receive(IDeltaContent content)
+    public override async Task<SignOnResponse> SignOn()
     {
-        IncrementMessageCount();
-        base.Receive(content);
+        var signOnResponse = await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId, IdUtils.NewId(), null));
+        ParticipationId = signOnResponse.ParticipationId;
+        return signOnResponse;
     }
+
+    /// <inheritdoc />
+    public override async Task<SignOffResponse> SignOff() =>
+        await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(IdUtils.NewId(), null));
+
+    /// <inheritdoc />
+    public override async Task<GetAvailableIdsResponse> GetAvailableIds(int count) => 
+        await Query<GetAvailableIdsResponse, GetAvailableIdsRequest>(new GetAvailableIdsRequest(count, IdUtils.NewId(), null));
+
+    private async Task<TResponse> Query<TResponse, TRequest>(TRequest request) where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest 
+    {
+        var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
+        _queryResponses[request.QueryId] = tcs;
+        await Send(request);
+        var response = await tcs.Task;
+        return response as TResponse ?? throw new ArgumentException(response.GetType().Name);
+    }
+
+    /// <inheritdoc />
+    protected override async Task Send(IDeltaContent deltaContent)
+    {
+        if (deltaContent.RequiresParticipationId)
+            deltaContent.InternalParticipationId = ParticipationId;
+
+        if (deltaContent is IDeltaCommand { CommandId: { } commandId })
+            _ownCommands.TryAdd(commandId, true);
+
+        Log($"sending: {deltaContent.GetType().Name}", true);
+        await _connector.SendToRepository(deltaContent);
+    }
+
+    #endregion
 }
 
 public class CommandIdProvider : ICommandIdProvider

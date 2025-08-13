@@ -20,13 +20,14 @@ namespace LionWeb.Core.Notification;
 using M1;
 using System.Diagnostics.CodeAnalysis;
 
+/// <see cref="NodeId">NodeId</see> -&gt; <see cref="IReadableNode"/> mapping,
+/// shared between all notification handlers in one client or repository.  
 public class SharedNodeMap : IDisposable
 {
     private readonly Dictionary<NodeId, IReadableNode> _map = [];
 
-    public event EventHandler<IReadableNode>? OnAdded;
-    public event EventHandler<IReadableNode>? OnRemoved;
-
+    /// Registers <paramref name="newNode"/> (and all its <see cref="M1Extensions.Descendants">descendants</see>) with this map.
+    /// <exception cref="DuplicateNodeIdException">If <paramref name="newNode"/>'s node id already has been registered.</exception>
     public void RegisterNode(IReadableNode newNode)
     {
         foreach (var node in M1Extensions.Descendants(newNode, true, true))
@@ -36,91 +37,88 @@ public class SharedNodeMap : IDisposable
         }
     }
 
-    public void UnregisterNode(IReadableNode newNode)
+    /// Removes <paramref name="removedNode"/> (and all its <see cref="M1Extensions.Descendants">descendants</see>) from this map.
+    public void UnregisterNode(IReadableNode removedNode)
     {
-        foreach (var node in M1Extensions.Descendants(newNode, true, true))
+        foreach (var node in M1Extensions.Descendants(removedNode, true, true))
         {
-            TryRemove(node.GetId());
+            TryRemove(node.GetId(), out _);
         }
     }
 
+    /// Retrieves the node mapped to <paramref name="nodeId"/>.
+    /// <exception cref="InvalidIdException">If <paramref name="nodeId"/> has not been <see cref="RegisterNode">registered</see>.</exception>
     public IReadableNode this[NodeId nodeId]
     {
-        get => _map[nodeId];
+        get => _map[nodeId] ?? throw new InvalidIdException(nodeId);
     }
 
-    public IReadableNode? GetValueOrDefault(NodeId nodeId)
-        => _map.GetValueOrDefault(nodeId);
+    /// Retrieves the node mapped to <paramref name="nodeId"/>, if any.
+    public bool TryGetValue(NodeId nodeId, [NotNullWhen(true)] out IReadableNode? node)
+        => _map.TryGetValue(nodeId, out node);
 
-    public bool TryGetValue(NodeId targetNode, [NotNullWhen(true)] out IReadableNode? node)
-        => _map.TryGetValue(targetNode, out node);
+    /// Retrieves all mapped nodes.
+    public IEnumerable<IReadableNode> Values
+        => _map.Values;
 
-    public IEnumerable<IReadableNode> Values => _map.Values;
-
+    /// Checks whether <paramref name="nodeId"/> has been mapped.
     public bool ContainsKey(NodeId nodeId)
         => _map.ContainsKey(nodeId);
 
     /// <inheritdoc />
     public virtual void Dispose() { }
 
-    private bool TryAdd(NodeId nodeId, IReadableNode node)
-    {
-        var result = _map.TryAdd(nodeId, node);
-        if (result)
-            OnAdded?.Invoke(this, node);
-        return result;
-    }
+    protected virtual bool TryAdd(NodeId nodeId, IReadableNode node) =>
+        _map.TryAdd(nodeId, node);
 
-    private bool TryRemove(NodeId nodeId)
+    protected virtual bool TryRemove(NodeId nodeId, [MaybeNullWhen(false)] out IReadableNode node)
     {
-        if (_map.Remove(nodeId, out var node))
+        if (_map.Remove(nodeId, out node))
         {
-            OnRemoved?.Invoke(this, node);
             return true;
         }
 
-        ;
         return false;
     }
 }
 
+/// <inheritdoc />
+/// Also keeps track of the owning <see cref="IPartitionInstance">partition</see> for each <see cref="NodeId">nodeId</see>. 
 public class PartitionSharedNodeMap : SharedNodeMap
 {
     private readonly Dictionary<NodeId, IPartitionInstance> _owningPartition = [];
 
-    public event EventHandler<IPartitionInstance>? OnPartitionAdded;
-    public event EventHandler<IPartitionInstance>? OnPartitionRemoved;
-
-    public PartitionSharedNodeMap()
-    {
-        OnAdded += OnNodeAdded;
-        OnRemoved += OnNodeRemoved;
-    }
-
     /// <inheritdoc />
     public override void Dispose()
     {
-        OnAdded -= OnNodeAdded;
-        OnRemoved -= OnNodeRemoved;
         base.Dispose();
     }
 
-    private void OnNodeAdded(object? _, IReadableNode node)
-    {
-        var partition = node.GetPartition();
-        if (partition is null)
-            return;
-
-        _owningPartition[node.GetId()] = partition;
-        OnPartitionAdded?.Invoke(this, partition);
-    }
-
-    private void OnNodeRemoved(object? _, IReadableNode node)
-    {
-        if (_owningPartition.Remove(node.GetId(), out var removed))
-            OnPartitionRemoved?.Invoke(this, removed);
-    }
-
+    /// Retrieves the partition owning <paramref name="nodeId"/>, if any.
     public bool TryGetPartition(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition)
         => _owningPartition.TryGetValue(nodeId, out partition);
+
+    /// <inheritdoc />
+    protected override bool TryAdd(NodeId nodeId, IReadableNode node)
+    {
+        if (!base.TryAdd(nodeId, node))
+            return false;
+
+        var partition = node.GetPartition();
+        if (partition is not null)
+            _owningPartition[node.GetId()] = partition;
+
+        return true;
+    }
+
+    /// <inheritdoc />
+    protected override bool TryRemove(NodeId nodeId, [MaybeNullWhen(false)] out IReadableNode node)
+    {
+        if (!base.TryRemove(nodeId, out node))
+            return false;
+
+        _owningPartition.Remove(node.GetId());
+
+        return true;
+    }
 }

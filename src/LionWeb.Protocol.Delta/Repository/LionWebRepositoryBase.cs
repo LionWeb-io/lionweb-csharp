@@ -18,55 +18,109 @@
 namespace LionWeb.Protocol.Delta.Repository;
 
 using Core;
+using Core.M1;
 using Core.M3;
 using Core.Notification;
+using Core.Notification.Forest;
+using Core.Notification.Handler;
 using Core.Notification.Partition;
+using Forest;
 
-public interface ILionWebRepository
+public abstract class LionWebRepositoryBase<T> : IDisposable
 {
-    private const string _cyan = "\x1b[96m";
-    private const string _bold = "\x1b[1m";
-    private const string _unbold = "\x1b[22m";
-    private const string _defaultColor = "\x1b[39m";
-    
-    public const string HeaderColor_Start = _cyan + _bold;
-    public const string HeaderColor_End =  _unbold + _defaultColor;
-}
-
-public abstract class LionWebRepositoryBase<T>
-{
-    protected readonly string _name;
+    private readonly string _name;
     protected readonly IRepositoryConnector<T> _connector;
-    protected readonly SharedNodeMap SharedNodeMap;
-    protected readonly PartitionEventHandler PartitionEventHandler;
+    protected readonly PartitionSharedNodeMap SharedNodeMap;
+
+    protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
+
+    protected readonly INotificationHandler<IForestNotification> _replicator;
 
     private long nextFreeNodeId = 0;
 
-    protected long _messageCount;
-    public long MessageCount => Interlocked.Read(ref _messageCount);
-
     public LionWebRepositoryBase(LionWebVersions lionWebVersion, List<Language> languages, string name,
-        IPartitionInstance partition, IRepositoryConnector<T> connector)
+        IForest forest, IRepositoryConnector<T> connector)
     {
         _name = name;
         _connector = connector;
 
         SharedNodeMap = new();
-        PartitionEventHandler = new PartitionEventHandler(name);
-        var replicator = new RewritePartitionNotificationReplicator(partition, SharedNodeMap);
-        replicator.ReplicateFrom(PartitionEventHandler);
+        SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
+        _replicator = RewriteForestNotificationReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
 
-        replicator.Subscribe<IPartitionNotification>(SendPartitionEventToAllClients);
+        INotificationHandler.Connect(_replicator, new LocalForestReceiver(name, this));
 
-        connector.ReceiveFromClient += (_, content) => Receive(content);
+        _connector.ReceiveFromClient += OnReceiveFromClient;
     }
 
-    private void SendPartitionEventToAllClients(object? sender, IPartitionNotification? partitionEvent)
+    /// <inheritdoc />
+    public virtual void Dispose()
     {
-        if (partitionEvent == null)
+        GC.SuppressFinalize(this);
+        _connector.ReceiveFromClient -= OnReceiveFromClient;
+        // _replicator.Dispose();
+        SharedNodeMap.Dispose();
+    }
+
+    #region Local
+
+    private class LocalForestReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IForestNotification>(sender)
+    {
+        public override void Receive(IForestNotification message)
+        {
+            switch (message)
+            {
+                case PartitionAddedNotification partitionAddedEvent:
+                    repository.OnLocalPartitionAdded(partitionAddedEvent);
+                    break;
+                case PartitionDeletedNotification partitionDeletedEvent:
+                    repository.OnLocalPartitionDeleted(partitionDeletedEvent);
+                    break;
+            }
+            
+            repository.SendNotificationToAllClients(sender, message);
+        }
+    }
+    
+    private class LocalPartitionReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IPartitionNotification>(sender)
+    {
+        public override void Receive(IPartitionNotification message) =>
+            repository.SendNotificationToAllClients(sender, message);
+    }
+
+    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedEvent)
+    {
+        var notificationHandler = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
+        INotificationHandler.Connect(notificationHandler, new LocalPartitionReceiver(_name, this));
+    }
+
+    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent)
+    {
+        throw new NotImplementedException();
+    }
+
+    #endregion
+
+    #region Remote
+
+    protected abstract Task Receive(IMessageContext<T> content);
+
+    private void OnReceiveFromClient(object? _, IMessageContext<T> content) =>
+        Receive(content);
+
+    #endregion
+
+    #region Send
+
+    protected abstract Task Send(IClientInfo clientInfo, T deltaContent);
+    protected abstract Task SendAll(T deltaContent);
+
+    private void SendNotificationToAllClients(object? sender, INotification? notification)
+    {
+        if (notification == null)
             return;
 
-        var converted = _connector.Convert(partitionEvent);
+        var converted = _connector.Convert(notification);
         SendAll(converted);
     }
 
@@ -84,6 +138,8 @@ public abstract class LionWebRepositoryBase<T>
         }
     }
 
+    #endregion
+
     protected virtual void Log(string message, bool header = false)
     {
         var prependedMessage = $"{_name}: {message}";
@@ -91,9 +147,4 @@ public abstract class LionWebRepositoryBase<T>
             ? $"{ILionWebRepository.HeaderColor_Start}{prependedMessage}{ILionWebRepository.HeaderColor_End}"
             : prependedMessage);
     }
-
-    protected abstract Task Send(IClientInfo clientInfo, T deltaContent);
-    protected abstract Task SendAll(T deltaContent);
-
-    protected abstract Task Receive(IMessageContext<T> content);
 }
