@@ -97,7 +97,7 @@ public interface IContainmentEvent : IFeatureEvent
     MetaPointer IFeatureEvent.Feature => Containment;
 };
 
-public record ChildAdded(
+public record ChildAddedEvent(
     TargetNode Parent,
     DeltaSerializationChunk NewChild,
     MetaPointer Containment,

@@ -74,7 +74,7 @@ public record ChangeProperty(
 
 public interface IContainmentCommand : IFeatureCommand;
 
-public record AddChild(
+public record AddChildCommand(
     TargetNode Parent,
     DeltaSerializationChunk NewChild,
     MetaPointer Containment,

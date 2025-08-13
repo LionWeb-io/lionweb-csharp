@@ -818,7 +818,7 @@
           "$ref": "#/$defs/ChangeProperty"
         },
         {
-          "$ref": "#/$defs/AddChild"
+          "$ref": "#/$defs/AddChildCommand"
         },
         {
           "$ref": "#/$defs/DeleteChild"
@@ -1103,10 +1103,10 @@
       "minProperties": 5,
       "maxProperties": 6
     },
-    "AddChild": {
+    "AddChildCommand": {
       "properties": {
         "messageKind": {
-          "const": "AddChild"
+          "const": "AddChildCommand"
         },
         "parent": {
           "$ref": "#/$defs/targetNode"
@@ -2383,7 +2383,7 @@
           "$ref": "#/$defs/PropertyChanged"
         },
         {
-          "$ref": "#/$defs/ChildAdded"
+          "$ref": "#/$defs/ChildAddedEvent"
         },
         {
           "$ref": "#/$defs/ChildDeleted"
@@ -2694,10 +2694,10 @@
       "minProperties": 7,
       "maxProperties": 8
     },
-    "ChildAdded": {
+    "ChildAddedEvent": {
       "properties": {
         "messageKind": {
-          "const": "ChildAdded"
+          "const": "ChildAddedEvent"
         },
         "parent": {
           "$ref": "#/$defs/targetNode"

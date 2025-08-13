@@ -100,7 +100,7 @@ public class PartitionEventToDeltaEventMapper
 
     #region Children
 
-    private ChildAdded OnChildAdded(ChildAddedNotification childAddedNotification) =>
+    private ChildAddedEvent OnChildAdded(ChildAddedNotification childAddedNotification) =>
         new(
             childAddedNotification.Parent.GetId(),
             ToDeltaChunk(childAddedNotification.NewChild),

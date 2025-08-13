@@ -128,7 +128,7 @@ public class ClientTests
             _clientPartition);
     }
 
-    private ChildAdded ChildAdded(EventSequenceNumber sequenceNumber) =>
+    private ChildAddedEvent ChildAdded(EventSequenceNumber sequenceNumber) =>
         new("partition",
             new DeltaSerializationChunk([
                 new SerializedNode()

@@ -50,7 +50,7 @@ public class DeltaEventToPartitionEventMapper
             PropertyAdded a => OnPropertyAdded(a),
             PropertyDeleted a => OnPropertyDeleted(a),
             PropertyChanged a => OnPropertyChanged(a),
-            ChildAdded a => OnChildAdded(a),
+            ChildAddedEvent a => OnChildAdded(a),
             ChildDeleted a => OnChildDeleted(a),
             ChildReplaced a => OnChildReplaced(a),
             ChildMovedFromOtherContainment a => OnChildMovedFromOtherContainment(a),
@@ -118,7 +118,7 @@ public class DeltaEventToPartitionEventMapper
 
     #region Children
 
-    private ChildAddedNotification OnChildAdded(ChildAdded childAddedEvent)
+    private ChildAddedNotification OnChildAdded(ChildAddedEvent childAddedEvent)
     {
         var parent = ToNode(childAddedEvent.Parent);
         var containment = ToContainment(childAddedEvent.Containment, parent);

@@ -154,7 +154,7 @@ public abstract class JsonTestsBase
 
     #region Children
 
-    protected static AddChild CreateAddChild() =>
+    protected static AddChildCommand CreateAddChildCommand() =>
         new(TargetNode(), Chunk(), MetaPointer(), Index(), CommandId(), ProtocolMessages());
 
     protected static DeleteChild CreateDeleteChild() =>
@@ -305,7 +305,7 @@ public abstract class JsonTestsBase
         [CreateAddProperty()],
         [CreateDeleteProperty()],
         [CreateChangeProperty()],
-        [CreateAddChild()],
+        [CreateAddChildCommand()],
         [CreateDeleteChild()],
         [CreateReplaceChild()],
         [CreateMoveChildFromOtherContainment()],
@@ -378,7 +378,7 @@ public abstract class JsonTestsBase
 
     #region Children
 
-    protected static ChildAdded CreateChildAdded() =>
+    protected static ChildAddedEvent CreateChildAddedEvent() =>
         new(TargetNode(), Chunk(), MetaPointer(), Index(), Origin(), ProtocolMessages())
         {
             SequenceNumber = Sequence()
@@ -571,7 +571,7 @@ public abstract class JsonTestsBase
         [CreatePropertyAdded()],
         [CreatePropertyDeleted()],
         [CreatePropertyChanged()],
-        [CreateChildAdded()],
+        [CreateChildAddedEvent()],
         [CreateChildDeleted()],
         [CreateChildReplaced()],
         [CreateChildMovedFromOtherContainment()],

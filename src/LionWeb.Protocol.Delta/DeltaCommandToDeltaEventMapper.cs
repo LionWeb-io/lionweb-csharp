@@ -41,7 +41,7 @@ public class DeltaCommandToDeltaEventMapper
             AddProperty a => new PropertyAdded(a.Node, a.Property, a.NewValue, OriginCommands(a), []),
             DeleteProperty a => new PropertyDeleted(a.Node, a.Property, null, OriginCommands(a), []),
             ChangeProperty a => new PropertyChanged(a.Node, a.Property, a.NewValue, null, OriginCommands(a), []),
-            AddChild a => new ChildAdded(a.Parent, a.NewChild, a.Containment, a.Index, OriginCommands(a), []),
+            AddChildCommand a => new ChildAddedEvent(a.Parent, a.NewChild, a.Containment, a.Index, OriginCommands(a), []),
             DeleteChild a => new ChildDeleted(a.DeletedChild, [], a.Parent, a.Containment, a.Index, OriginCommands(a), []),
             ReplaceChild a => new ChildReplaced(a.NewChild, a.ReplacedChild, [], a.Parent, a.Containment, a.Index , OriginCommands(a), []),
             MoveChildFromOtherContainment a => new ChildMovedFromOtherContainment(a.NewParent, a.NewContainment, a.NewIndex, a.MovedChild, GetParent(a.MovedChild), GetContainment(a.MovedChild), GetIndex(a.MovedChild), OriginCommands(a), []),

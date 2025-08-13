@@ -99,7 +99,7 @@ public class PartitionEventToDeltaCommandMapper
 
     #region Children
 
-    private AddChild OnChildAdded(ChildAddedNotification childAddedNotification) =>
+    private AddChildCommand OnChildAdded(ChildAddedNotification childAddedNotification) =>
         new(
             childAddedNotification.Parent.GetId(),
             ToDeltaChunk(childAddedNotification.NewChild),
