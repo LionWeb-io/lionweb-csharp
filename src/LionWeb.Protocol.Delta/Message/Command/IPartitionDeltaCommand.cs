@@ -222,7 +222,7 @@ public record MoveAndReplaceAnnotationInSameParent(
 
 public interface IReferenceCommand : IFeatureCommand;
 
-public record AddReference(
+public record AddReferenceCommand(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,

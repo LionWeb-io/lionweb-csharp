@@ -1001,7 +1001,7 @@ public interface IReferenceEvent : IFeatureEvent
     MetaPointer IFeatureEvent.Feature => Reference;
 };
 
-public record ReferenceAdded(
+public record ReferenceAddedEvent(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,

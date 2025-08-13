@@ -62,7 +62,7 @@ public class DeltaEventToPartitionEventMapper
             AnnotationDeleted a => OnAnnotationDeleted(a),
             AnnotationMovedFromOtherParent a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedInSameParent a => OnAnnotationMovedInSameParent(a),
-            ReferenceAdded a => OnReferenceAdded(a),
+            ReferenceAddedEvent a => OnReferenceAdded(a),
             ReferenceDeleted a => OnReferenceDeleted(a),
             ReferenceChanged a => OnReferenceChanged(a),
             _ => throw new NotImplementedException(deltaEvent.GetType().Name)
@@ -317,7 +317,7 @@ public class DeltaEventToPartitionEventMapper
 
     #region References
 
-    private ReferenceAddedNotification OnReferenceAdded(ReferenceAdded referenceAddedEvent)
+    private ReferenceAddedNotification OnReferenceAdded(ReferenceAddedEvent referenceAddedEvent)
     {
         var parent = ToNode(referenceAddedEvent.Parent);
         var reference = ToReference(referenceAddedEvent.Reference, parent);

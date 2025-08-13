@@ -252,7 +252,7 @@ public class PartitionEventToDeltaEventMapper
 
     #region References
 
-    private ReferenceAdded OnReferenceAdded(ReferenceAddedNotification referenceAddedNotification) =>
+    private ReferenceAddedEvent OnReferenceAdded(ReferenceAddedNotification referenceAddedNotification) =>
         new(
             referenceAddedNotification.Parent.GetId(),
             referenceAddedNotification.Reference.ToMetaPointer(),

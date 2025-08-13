@@ -227,7 +227,7 @@ public class PartitionEventToDeltaCommandMapper
 
     #region References
 
-    private AddReference OnReferenceAdded(ReferenceAddedNotification referenceAddedNotification) =>
+    private AddReferenceCommand OnReferenceAdded(ReferenceAddedNotification referenceAddedNotification) =>
         new(
             referenceAddedNotification.Parent.GetId(),
             referenceAddedNotification.Reference.ToMetaPointer(),

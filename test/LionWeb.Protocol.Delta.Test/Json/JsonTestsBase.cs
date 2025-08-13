@@ -222,7 +222,7 @@ public abstract class JsonTestsBase
 
     #region References
 
-    protected static AddReference CreateAddReference() =>
+    protected static AddReferenceCommand CreateAddReferenceCommand() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), CommandId(),
             ProtocolMessages());
 
@@ -321,7 +321,7 @@ public abstract class JsonTestsBase
         [CreateMoveAnnotationInSameParent()],
         [CreateMoveAndReplaceAnnotationFromOtherParent()],
         [CreateMoveAndReplaceAnnotationInSameParent()],
-        [CreateAddReference()],
+        [CreateAddReferenceCommand()],
         [CreateDeleteReference()],
         [CreateChangeReference()],
         [CreateMoveEntryFromOtherReference()],
@@ -467,7 +467,7 @@ public abstract class JsonTestsBase
 
     #region References
 
-    protected static ReferenceAdded CreateReferenceAdded() =>
+    protected static ReferenceAddedEvent CreateReferenceAddedEvent() =>
         new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(), Origin(), ProtocolMessages())
         {
             SequenceNumber = Sequence()
@@ -587,7 +587,7 @@ public abstract class JsonTestsBase
         [CreateAnnotationMovedInSameParent()],
         [CreateAnnotationMovedAndReplacedFromOtherParent()],
         [CreateAnnotationMovedAndReplacedInSameParent()],
-        [CreateReferenceAdded()],
+        [CreateReferenceAddedEvent()],
         [CreateReferenceDeleted()],
         [CreateReferenceChanged()],
         [CreateEntryMovedFromOtherReference()],

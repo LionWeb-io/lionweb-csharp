@@ -54,7 +54,7 @@ public class DeltaCommandToDeltaEventMapper
             ReplaceAnnotation a => new AnnotationReplaced(a.NewAnnotation,a.ReplacedAnnotation, [], a.Parent, a.Index, OriginCommands(a), []),
             MoveAnnotationFromOtherParent a => new AnnotationMovedFromOtherParent(a.NewParent, a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), []),
             MoveAnnotationInSameParent a => new AnnotationMovedInSameParent(a.NewIndex, a.MovedAnnotation, GetParent(a.MovedAnnotation), GetAnnotationIndex(a.MovedAnnotation), OriginCommands(a), []),
-            AddReference a => new ReferenceAdded(a.Parent, a.Reference, a.Index, a.NewTarget, a.NewResolveInfo, OriginCommands(a), []),
+            AddReferenceCommand a => new ReferenceAddedEvent(a.Parent, a.Reference, a.Index, a.NewTarget, a.NewResolveInfo, OriginCommands(a), []),
             DeleteReference a => new ReferenceDeleted(a.Parent, a.Reference, a.Index, a.DeletedTarget, a.DeletedResolveInfo, OriginCommands(a), []),
             ChangeReference a => new ReferenceChanged(a.Parent, a.Reference, a.Index, a.NewTarget, a.NewResolveInfo, a.OldTarget, a.OldResolveInfo, OriginCommands(a), []),
         };

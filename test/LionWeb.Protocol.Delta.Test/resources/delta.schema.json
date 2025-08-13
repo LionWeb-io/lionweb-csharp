@@ -866,7 +866,7 @@
           "$ref": "#/$defs/MoveAndReplaceAnnotationInSameParent"
         },
         {
-          "$ref": "#/$defs/AddReference"
+          "$ref": "#/$defs/AddReferenceCommand"
         },
         {
           "$ref": "#/$defs/DeleteReference"
@@ -1647,10 +1647,10 @@
       "minProperties": 5,
       "maxProperties": 6
     },
-    "AddReference": {
+    "AddReferenceCommand": {
       "properties": {
         "messageKind": {
-          "const": "AddReference"
+          "const": "AddReferenceCommand"
         },
         "parent": {
           "$ref": "#/$defs/targetNode"
@@ -2431,7 +2431,7 @@
           "$ref": "#/$defs/AnnotationMovedAndReplacedInSameParent"
         },
         {
-          "$ref": "#/$defs/ReferenceAdded"
+          "$ref": "#/$defs/ReferenceAddedEvent"
         },
         {
           "$ref": "#/$defs/ReferenceDeleted"
@@ -3442,10 +3442,10 @@
       "minProperties": 9,
       "maxProperties": 10
     },
-    "ReferenceAdded": {
+    "ReferenceAddedEvent": {
       "properties": {
         "messageKind": {
-          "const": "ReferenceAdded"
+          "const": "ReferenceAddedEvent"
         },
         "parent": {
           "$ref": "#/$defs/targetNode"
