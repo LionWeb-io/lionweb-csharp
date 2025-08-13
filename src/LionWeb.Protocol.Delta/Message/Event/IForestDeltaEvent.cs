@@ -22,7 +22,7 @@ using System.Text;
 
 public interface IForestDeltaEvent : IDeltaEvent;
 
-public record PartitionAdded(
+public record PartitionAddedEvent(
     DeltaSerializationChunk NewPartition,
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IForestDeltaEvent;

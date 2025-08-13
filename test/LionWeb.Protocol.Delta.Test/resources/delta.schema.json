@@ -800,7 +800,7 @@
           "$ref": "#/$defs/CommandResponse"
         },
         {
-          "$ref": "#/$defs/AddPartition"
+          "$ref": "#/$defs/AddPartitionCommand"
         },
         {
           "$ref": "#/$defs/DeletePartition"
@@ -935,10 +935,10 @@
       "minProperties": 2,
       "maxProperties": 3
     },
-    "AddPartition": {
+    "AddPartitionCommand": {
       "properties": {
         "messageKind": {
-          "const": "AddPartition"
+          "const": "AddPartitionCommand"
         },
         "newPartition": {
           "$ref": "#/$defs/DeltaSerializationChunk"
@@ -2365,7 +2365,7 @@
     "Events": {
       "anyOf": [
         {
-          "$ref": "#/$defs/PartitionAdded"
+          "$ref": "#/$defs/PartitionAddedEvent"
         },
         {
           "$ref": "#/$defs/PartitionDeleted"
@@ -2486,10 +2486,10 @@
         }
       ]
     },
-    "PartitionAdded": {
+    "PartitionAddedEvent": {
       "properties": {
         "messageKind": {
-          "const": "PartitionAdded"
+          "const": "PartitionAddedEvent"
         },
         "newPartition": {
           "$ref": "#/$defs/DeltaSerializationChunk"

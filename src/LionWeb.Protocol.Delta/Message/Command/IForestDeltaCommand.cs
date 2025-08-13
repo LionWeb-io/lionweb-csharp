@@ -19,7 +19,7 @@ namespace LionWeb.Protocol.Delta.Message.Command;
 
 public interface IForestDeltaCommand : IDeltaCommand;
 
-public record AddPartition(
+public record AddPartitionCommand(
     DeltaSerializationChunk NewPartition,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages

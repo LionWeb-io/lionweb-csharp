@@ -124,7 +124,7 @@ public abstract class JsonTestsBase
     protected static CommandResponse CreateCommandResponse() =>
         new(CommandId(), ProtocolMessages());
 
-    protected static AddPartition CreateAddPartition() =>
+    protected static AddPartitionCommand CreateAddPartitionCommand() =>
         new(Chunk(), CommandId(), ProtocolMessages());
 
     protected static DeletePartition CreateDeletePartition() =>
@@ -299,7 +299,7 @@ public abstract class JsonTestsBase
     protected static IEnumerable<object[]> CollectCommandMessages() =>
     [
         [CreateCommandResponse()],
-        [CreateAddPartition()],
+        [CreateAddPartitionCommand()],
         [CreateDeletePartition()],
         [CreateChangeClassifier()],
         [CreateAddPropertyCommand()],
@@ -345,7 +345,7 @@ public abstract class JsonTestsBase
 
     #region Partitions
 
-    protected static PartitionAdded CreatePartitionAdded() =>
+    protected static PartitionAddedEvent CreatePartitionAddedEvent() =>
         new(Chunk(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     protected static PartitionDeleted CreatePartitionDeleted() =>
@@ -565,7 +565,7 @@ public abstract class JsonTestsBase
 
     protected static IEnumerable<object[]> CollectEventMessages() =>
     [
-        [CreatePartitionAdded()],
+        [CreatePartitionAddedEvent()],
         [CreatePartitionDeleted()],
         [CreateClassifierChanged()],
         [CreatePropertyAddedEvent()],
