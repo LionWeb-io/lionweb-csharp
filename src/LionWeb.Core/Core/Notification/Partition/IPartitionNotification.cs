@@ -22,11 +22,17 @@ using TargetNode = IReadableNode;
 using SemanticPropertyValue = object;
 
 /// All LionWeb notifications relating to a partition.
-public interface IPartitionNotification : INotification;
+public interface IPartitionNotification : INotification
+{
+    public NodeId ContextNodeId { get; }
+}
 
 public abstract record APartitionNotification(INotificationId NotificationId) : IPartitionNotification
 {
     public INotificationId NotificationId { get; set; } = NotificationId;
+
+    /// <inheritdoc />
+    public abstract NodeId ContextNodeId { get; }
 }
 
 #region Nodes
@@ -38,7 +44,11 @@ public record ClassifierChangedNotification(
     IWritableNode Node,
     Classifier NewClassifier,
     Classifier OldClassifier,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Node.GetId();
+}
 
 #endregion
 
@@ -52,7 +62,11 @@ public record PropertyAddedNotification(
     Property Property,
     SemanticPropertyValue NewValue,
     INotificationId NotificationId)
-    : APartitionNotification(NotificationId);
+    : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Node.GetId();
+}
 
 /// <param name="Node"></param>
 /// <param name="Property"></param>
@@ -62,7 +76,11 @@ public record PropertyDeletedNotification(
     Property Property,
     SemanticPropertyValue OldValue,
     INotificationId NotificationId)
-    : APartitionNotification(NotificationId);
+    : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Node.GetId();
+}
 
 /// <param name="Node"></param>
 /// <param name="Property"></param>
@@ -73,7 +91,11 @@ public record PropertyChangedNotification(
     Property Property,
     SemanticPropertyValue NewValue,
     SemanticPropertyValue OldValue,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Node.GetId();
+}
 
 #endregion
 
@@ -88,7 +110,11 @@ public record ChildAddedNotification(
     IWritableNode NewChild,
     Containment Containment,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="DeletedChild"></param>
 /// <param name="Parent"></param>
@@ -99,7 +125,11 @@ public record ChildDeletedNotification(
     IWritableNode Parent,
     Containment Containment,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewChild"></param>
 /// <param name="ReplacedChild"></param>
@@ -112,7 +142,11 @@ public record ChildReplacedNotification(
     IWritableNode Parent,
     Containment Containment,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewContainment"></param>
@@ -129,7 +163,11 @@ public record ChildMovedFromOtherContainmentNotification(
     IWritableNode OldParent,
     Containment OldContainment,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="NewContainment"></param>
 /// <param name="NewIndex"></param>
@@ -144,7 +182,11 @@ public record ChildMovedFromOtherContainmentInSameParentNotification(
     IWritableNode Parent,
     Containment OldContainment,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedChild"></param>
@@ -157,7 +199,11 @@ public record ChildMovedInSameContainmentNotification(
     IWritableNode Parent,
     Containment Containment,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewContainment"></param>
@@ -175,7 +221,11 @@ public record ChildMovedAndReplacedFromOtherContainmentNotification(
     Containment OldContainment,
     Index OldIndex,
     IWritableNode ReplacedChild,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="NewContainment"></param>
 /// <param name="NewIndex"></param>
@@ -191,7 +241,11 @@ public record ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
     Containment OldContainment,
     Index OldIndex,
     IWritableNode ReplacedChild,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedChild"></param>
@@ -205,7 +259,11 @@ public record ChildMovedAndReplacedInSameContainmentNotification(
     Containment Containment,
     IWritableNode ReplacedChild,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 #endregion
 
@@ -219,7 +277,11 @@ public record AnnotationAddedNotification(
     IWritableNode NewAnnotation,
     Index Index,
     INotificationId NotificationId)
-    : APartitionNotification(NotificationId);
+    : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="DeletedAnnotation"></param>
 /// <param name="Parent"></param>
@@ -229,7 +291,11 @@ public record AnnotationDeletedNotification(
     IWritableNode Parent,
     Index Index,
     INotificationId NotificationId)
-    : APartitionNotification(NotificationId);
+    : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewAnnotation"></param>
 /// <param name="ReplacedAnnotation"></param>
@@ -240,7 +306,11 @@ public record AnnotationReplacedNotification(
     IWritableNode ReplacedAnnotation,
     IWritableNode Parent,
     Index Index,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewIndex"></param>
@@ -253,7 +323,11 @@ public record AnnotationMovedFromOtherParentNotification(
     IWritableNode MovedAnnotation,
     IWritableNode OldParent,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedAnnotation"></param>
@@ -264,7 +338,11 @@ public record AnnotationMovedInSameParentNotification(
     IWritableNode MovedAnnotation,
     IWritableNode Parent,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewIndex"></param>
@@ -278,7 +356,11 @@ public record AnnotationMovedAndReplacedFromOtherParentNotification(
     IWritableNode OldParent,
     Index OldIndex,
     IWritableNode ReplacedAnnotation,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="NewIndex"></param>
 /// <param name="MovedAnnotation"></param>
@@ -290,7 +372,11 @@ public record AnnotationMovedAndReplacedInSameParentNotification(
     IWritableNode Parent,
     Index OldIndex,
     IWritableNode ReplacedAnnotation,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 #endregion
 
@@ -305,7 +391,11 @@ public record ReferenceAddedNotification(
     Reference Reference,
     Index Index,
     IReferenceTarget NewTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -316,7 +406,11 @@ public record ReferenceDeletedNotification(
     Reference Reference,
     Index Index,
     IReferenceTarget DeletedTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -329,7 +423,11 @@ public record ReferenceChangedNotification(
     Index Index,
     IReferenceTarget NewTarget,
     IReferenceTarget OldTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewReference"></param>
@@ -346,7 +444,11 @@ public record EntryMovedFromOtherReferenceNotification(
     IWritableNode OldParent,
     Reference OldReference,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="NewReference"></param>
@@ -361,7 +463,11 @@ public record EntryMovedFromOtherReferenceInSameParentNotification(
     IReferenceTarget MovedTarget,
     Reference OldReference,
     Index OldIndex,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -374,7 +480,11 @@ public record EntryMovedInSameReferenceNotification(
     Index OldIndex,
     Index NewIndex,
     IReferenceTarget Target,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="NewParent"></param>
 /// <param name="NewReference"></param>
@@ -392,7 +502,11 @@ public record EntryMovedAndReplacedFromOtherReferenceNotification(
     Reference OldReference,
     Index OldIndex,
     IReferenceTarget ReplacedTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => NewParent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="NewReference"></param>
@@ -408,7 +522,11 @@ public record EntryMovedAndReplacedFromOtherReferenceInSameParentNotification(
     Reference OldReference,
     Index OldIndex,
     IReferenceTarget ReplacedTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -422,7 +540,11 @@ public record EntryMovedAndReplacedInSameReferenceNotification(
     IReferenceTarget MovedTarget,
     Index OldIndex,
     IReferenceTarget ReplacedTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -435,7 +557,11 @@ public record ReferenceResolveInfoAddedNotification(
     Index Index,
     ResolveInfo NewResolveInfo,
     TargetNode Target,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -448,7 +574,11 @@ public record ReferenceResolveInfoDeletedNotification(
     Index Index,
     TargetNode Target,
     ResolveInfo DeletedResolveInfo,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -463,7 +593,11 @@ public record ReferenceResolveInfoChangedNotification(
     ResolveInfo NewResolveInfo,
     TargetNode? Target,
     ResolveInfo ReplacedResolveInfo,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -476,7 +610,11 @@ public record ReferenceTargetAddedNotification(
     Index Index,
     TargetNode NewTarget,
     ResolveInfo ResolveInfo,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -489,7 +627,11 @@ public record ReferenceTargetDeletedNotification(
     Index Index,
     ResolveInfo ResolveInfo,
     TargetNode DeletedTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 /// <param name="Parent"></param>
 /// <param name="Reference"></param>
@@ -504,6 +646,10 @@ public record ReferenceTargetChangedNotification(
     TargetNode NewTarget,
     ResolveInfo? ResolveInfo,
     TargetNode OldTarget,
-    INotificationId NotificationId) : APartitionNotification(NotificationId);
+    INotificationId NotificationId) : APartitionNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override NodeId ContextNodeId => Parent.GetId();
+}
 
 #endregion
