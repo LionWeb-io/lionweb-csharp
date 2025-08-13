@@ -43,12 +43,14 @@ public class Forest : IForest
 {
     private readonly HashSet<IPartitionInstance> _partitions;
     private readonly IForestNotificationHandler _notificationHandler;
+    private readonly INotificationIdProvider _notificationIdProvider;
 
     /// <inheritdoc cref="IForest"/>
     public Forest()
     {
         _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
         _notificationHandler = new ForestNotificationHandler(this);
+        _notificationIdProvider = new NotificationIdProvider(this);
     }
 
     /// <inheritdoc />
