@@ -15,16 +15,16 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Listener;
+namespace LionWeb.Core.Test.Notification;
 
+using Core.Notification.Handler;
+using Core.Notification.Partition;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using Notification;
-using Notification.Partition;
 using Comparer = Core.Utilities.Comparer;
 
-public abstract class EventTestsBase
+public abstract class NotificationTestsBase
 {
     protected abstract Geometry CreateReplicator(Geometry node);
 
@@ -237,15 +237,15 @@ public abstract class EventTestsBase
 
         AssertEquals([node], [clone]);
     }
-    
+
     /// <summary>
-    /// This test triggers two events: ChildDeletedEvent, ChildAddedEvent
-    /// but it should trigger ChildReplacedEvent //TODO: requires fix !
+    /// This test triggers two notifications: ChildDeletedNotification, ChildAddedNotification
+    /// but it should trigger ChildReplacedNotification //TODO: requires fix !
     /// </summary>
     [TestMethod]
     public void ChildReplaced_Multiple_First()
     {
-        var node = new Geometry("a") { Shapes = [new Circle("replaced"), new Circle("child")]};
+        var node = new Geometry("a") { Shapes = [new Circle("replaced"), new Circle("child")] };
 
         var clone = CreateReplicator(node);
 
@@ -256,13 +256,13 @@ public abstract class EventTestsBase
     }
 
     /// <summary>
-    /// This test triggers two events: ChildDeletedEvent, ChildAddedEvent
-    /// but it should trigger ChildReplacedEvent //TODO: requires fix !
+    /// This test triggers two notifications: ChildDeletedNotification, ChildAddedNotification
+    /// but it should trigger ChildReplacedNotification //TODO: requires fix !
     /// </summary>
     [TestMethod]
     public void ChildReplaced_Multiple_Last()
     {
-        var node = new Geometry("a") { Shapes = [new Circle("child"), new Circle("replaced")]};
+        var node = new Geometry("a") { Shapes = [new Circle("child"), new Circle("replaced")] };
 
         var clone = CreateReplicator(node);
 
@@ -271,7 +271,6 @@ public abstract class EventTestsBase
 
         AssertEquals([node], [clone]);
     }
-
 
     #endregion
 
@@ -314,34 +313,32 @@ public abstract class EventTestsBase
         var moved = new Documentation("moved");
         var node = new Geometry("a")
         {
-            Documentation = new Documentation("replaced"),
-            Shapes = [new Line("l") { ShapeDocs = moved }]
+            Documentation = new Documentation("replaced"), Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        
+
         var clone = CreateReplicator(node);
 
         node.Documentation = moved;
 
         AssertEquals([node], [clone]);
     }
-    
+
     [TestMethod]
     public void ChildMovedAndReplacedFromOtherContainment_Single_ReplaceWith()
     {
         var moved = new Documentation("moved");
         var node = new Geometry("a")
         {
-            Documentation = new Documentation("replaced"),
-            Shapes = [new Line("l") { ShapeDocs = moved }]
+            Documentation = new Documentation("replaced"), Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        
+
         var clone = CreateReplicator(node);
 
         node.Documentation.ReplaceWith(moved);
 
         AssertEquals([node], [clone]);
     }
-    
+
     [TestMethod]
     public void ChildMovedAndReplacedFromOtherContainment_Multiple()
     {
@@ -356,7 +353,7 @@ public abstract class EventTestsBase
 
         AssertEquals([node], [clone]);
     }
-    
+
     #endregion
 
     #region ChildMovedAndReplacedFromOtherContainmentInSameParent
@@ -366,24 +363,24 @@ public abstract class EventTestsBase
     {
         var line = new Line("l") { Start = new Coord("moved"), End = new Coord("replaced") };
         var node = new Geometry("a") { Shapes = [line] };
-        
+
         var clone = CreateReplicator(node);
-        
+
         line.End = line.Start;
 
         AssertEquals([node], [clone]);
     }
-    
+
     [TestMethod]
     public void ChildMovedAndReplacedFromOtherContainmentInSameParent_Single_ReplaceWith()
     {
         var line = new Line("l") { Start = new Coord("moved"), End = new Coord("replaced") };
         var node = new Geometry("a") { Shapes = [line] };
-        
+
         var clone = CreateReplicator(node);
 
         line.End.ReplaceWith(line.Start);
-        
+
         AssertEquals([node], [clone]);
     }
 
@@ -478,6 +475,9 @@ public abstract class EventTestsBase
         node.AddAnnotations([new BillOfMaterials("bof")]);
 
         var clone = CreateReplicator(node);
+
+        ((INotificationHandler)node.GetNotificationHandler()).PrintAllReceivers([]);
+        // return;
 
         var added = new BillOfMaterials("added");
         node.InsertAnnotations(0, [added]);
@@ -780,14 +780,16 @@ public abstract class EventTestsBase
 }
 
 [TestClass]
-public class EventsTest : EventTestsBase
+public class NotificationsTest : NotificationTestsBase
 {
     protected override Geometry CreateReplicator(Geometry node)
     {
         var clone = Clone(node);
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = PartitionNotificationReplicator.Create(clone, new(), node.GetId());
+        var cloneHandler = new NodeCloneNotificationHandler<IPartitionNotification>(node.GetId());
+        INotificationHandler.Connect((IPartitionNotificationHandler)node.GetNotificationHandler(), cloneHandler);
+        INotificationHandler.Connect(cloneHandler, replicator);
 
         return clone;
     }

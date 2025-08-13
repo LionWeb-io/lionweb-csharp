@@ -40,8 +40,7 @@ public class NotificationTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> deletions = [];
         node.GetNotificationHandler().Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
@@ -67,8 +66,7 @@ public class NotificationTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationHandler()
@@ -96,8 +94,7 @@ public class NotificationTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationHandler()
@@ -122,8 +119,7 @@ public class NotificationTests_MultiPartition
 
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> deletions = [];
         node.GetNotificationHandler().Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
@@ -148,8 +144,7 @@ public class NotificationTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationHandler()
@@ -186,8 +181,7 @@ public class NotificationTests_MultiPartition
         cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
         var clone = new Geometry("a") { Shapes = [cloneOrigin] };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> deletions = [];
         node.GetNotificationHandler()
@@ -215,8 +209,7 @@ public class NotificationTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationHandler()
@@ -246,8 +239,7 @@ public class NotificationTests_MultiPartition
 
         var clone = new Geometry("a") { };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        replicator.ReplicateFrom(node.GetPublisher());
+        var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationHandler()
@@ -268,6 +260,16 @@ public class NotificationTests_MultiPartition
     #endregion
 
     #endregion
+
+    private static INotificationHandler<IPartitionNotification> CreateReplicator(Geometry clone, Geometry node)
+    {
+        var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");
+        var cloneHandler = new NodeCloneNotificationHandler<IPartitionNotification>(node.GetId());
+        INotificationHandler.Connect((IPartitionNotificationHandler)node.GetNotificationHandler(), cloneHandler);
+        INotificationHandler.Connect(cloneHandler, replicator);
+        
+        return replicator;
+    }
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {

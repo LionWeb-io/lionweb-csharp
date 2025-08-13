@@ -15,16 +15,18 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Listener;
+namespace LionWeb.Core.Test.Notification;
 
+using Core.Notification.Forest;
+using Core.Notification.Handler;
+using Core.Notification.Partition;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using Notification.Forest;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class EventTests_Forest
+public class NotificationTests_Forest
 {
     #region Children
 
@@ -41,9 +43,8 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = new ForestNotificationReplicator(cloneForest);
-        replicator.ReplicateFrom(forest.GetPublisher());
-        
+        var replicator = CreateReplicator(cloneForest, forest);
+
         forest.AddPartitions([node]);
 
         node.AddShapes([moved]);
@@ -57,7 +58,7 @@ public class EventTests_Forest
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originPartition = new Geometry("g") { Shapes = [origin] };
-        
+
         var node = new Geometry("a") { Shapes = [] };
 
         var forest = new Forest();
@@ -65,9 +66,8 @@ public class EventTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = new ForestNotificationReplicator(cloneForest);
-        replicator.ReplicateFrom(forest.GetPublisher());
-        
+        var replicator = CreateReplicator(cloneForest, forest);
+
         forest.AddPartitions([node]);
 
         node.AddShapes([moved]);
@@ -83,14 +83,13 @@ public class EventTests_Forest
 
         var forest = new Forest();
         forest.AddPartitions([node]);
-        
+
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
 
-        var replicator = new ForestNotificationReplicator(cloneForest);
-        replicator.ReplicateFrom(forest.GetPublisher());
+        var replicator = CreateReplicator(cloneForest, forest);
 
         node.Documentation = moved;
 
@@ -103,15 +102,14 @@ public class EventTests_Forest
     {
         var moved = new Documentation("moved");
         var originPartition = new Geometry("g") { Shapes = [new Line("l") { ShapeDocs = moved }] };
-        
+
         var node = new Geometry("a") { };
 
         var forest = new Forest();
 
         var cloneForest = new Forest();
 
-        var replicator = new ForestNotificationReplicator(cloneForest);
-        replicator.ReplicateFrom(forest.GetPublisher());
+        var replicator = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node, originPartition]);
 
@@ -124,9 +122,53 @@ public class EventTests_Forest
 
     #endregion
 
+    private static INotificationHandler<IForestNotification> CreateReplicator(Forest cloneForest,
+        Forest originalForest)
+    {
+        SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
+        var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
+        var cloneHandler = new NodeCloneNotificationHandler<IForestNotification>("forestCloner");
+        INotificationHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);
+        INotificationHandler.Connect(cloneHandler, replicator);
+
+        var receiver = new TestLocalForestChangeNotificationHandler(originalForest, sharedPartitionReplicatorMap);
+        INotificationHandler.Connect(originalForest.GetNotificationHandler(), receiver);
+        return replicator;
+    }
+
     private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
     {
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+    }
+}
+
+internal class TestLocalForestChangeNotificationHandler(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
+    : NotificationHandlerBase<IForestNotification>(sender)
+{
+    public override void Receive(IForestNotification message)
+    {
+        switch (message)
+        {
+            case PartitionAddedNotification partitionAddedNotification:
+                OnLocalPartitionAdded(partitionAddedNotification);
+                break;
+            case PartitionDeletedNotification partitionDeletedNotification:
+                OnLocalPartitionDeleted(partitionDeletedNotification);
+                break;
+        }
+    }
+
+    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)
+    {
+        var partitionReplicator = sharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
+        var cloneHandler = new NodeCloneNotificationHandler<IPartitionNotification>($"partitionCloner.{partitionAddedNotification.NewPartition.GetId()}");
+        INotificationHandler.Connect(partitionAddedNotification.NewPartition.GetNotificationHandler(), cloneHandler);
+        INotificationHandler.Connect(cloneHandler, partitionReplicator);
+    }
+
+    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
+    {
+        throw new NotImplementedException();
     }
 }

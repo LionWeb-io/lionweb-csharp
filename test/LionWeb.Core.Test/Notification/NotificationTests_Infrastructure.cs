@@ -15,17 +15,18 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Test.Listener;
+namespace LionWeb.Core.Test.Notification;
 
+using Core.Notification;
+using Core.Notification.Handler;
+using Core.Notification.Partition;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using Notification;
-using Notification.Partition;
 using System.Reflection;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class EventTests_Infrastructure
+public class NotificationTests_Infrastructure
 {
     [TestMethod]
     public void MultiListeners_NoRead()
@@ -94,11 +95,7 @@ public class EventTests_Infrastructure
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        var cloneReplicator = new PartitionNotificationReplicator(node);
-        
-        replicator.ReplicateFrom(cloneReplicator);
-        cloneReplicator.ReplicateFrom(replicator);
+        var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
         int nodeCount = 0;
         node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
@@ -115,7 +112,7 @@ public class EventTests_Infrastructure
     }
     
     [TestMethod]
-    public void Twoway_NoLingeringEventIds()
+    public void Twoway_NoLingeringNotificiationIds()
     {
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
@@ -123,12 +120,8 @@ public class EventTests_Infrastructure
         var cloneCircle = new Circle("c");
         var clone = new Geometry("a") { Shapes = [cloneCircle] };
 
-        var replicator = new PartitionNotificationReplicator(clone);
-        var cloneReplicator = new PartitionNotificationReplicator(node);
+        var (replicator, cloneReplicator) = CreateReplicators(node, clone);
         
-        replicator.ReplicateFrom(cloneReplicator);
-        cloneReplicator.ReplicateFrom(replicator);
-
         circle.Name = "Hello";
         cloneCircle.Name = "World";
 
@@ -140,12 +133,26 @@ public class EventTests_Infrastructure
 
     private static HashSet<INotificationId> ReplicatorNotificationIds(INotificationHandler<IPartitionNotification> replicator)
     {
-        var type = typeof(NotificationIdFilteringNotificationForwarder<IPartitionNotification, IPartitionPublisher>);
-        var fieldInfo = type.GetRuntimeFields().First(f => f.Name == "_notificationIds");
-        var value = fieldInfo.GetValue(replicator);
-        return (HashSet<INotificationId>)value!;
+        var fieldInfoFilter = typeof(CompositeNotificationHandler<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_lastHandler");
+        var filter = (IdFilteringNotificationHandler<IPartitionNotification>) fieldInfoFilter.GetValue(replicator);
+     
+        var fieldInfoNotificationIds = typeof(IdFilteringNotificationHandler<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_notificationIds");
+        var notificationIds = fieldInfoNotificationIds.GetValue(filter);
+        
+        return (HashSet<INotificationId>)notificationIds!;
     }
 
+    private Tuple<INotificationHandler<IPartitionNotification>, INotificationHandler<IPartitionNotification>>
+        CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
+    {
+        var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");
+        var cloneReplicator = PartitionNotificationReplicator.Create(node, new(), "nodeReplicator");
+        
+        INotificationHandler.Connect(cloneReplicator, replicator);
+        INotificationHandler.Connect(replicator, cloneReplicator);
+        
+        return Tuple.Create(replicator, cloneReplicator);
+    }
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();

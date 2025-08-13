@@ -15,20 +15,21 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Test.Listener;
+namespace LionWeb.Protocol.Delta.Test.Handler;
 
 using Client;
+using Client.Partition;
 using Core;
 using Core.M1;
 using Core.M3;
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
-using Core.Test.Listener;
-using Message.Command;
+using Core.Test.Notification;
 
 [TestClass]
-public class EventsTestJson : EventTestsBase
+public class NotificationsTestSerialized : NotificationTestsBase
 {
     protected override Geometry CreateReplicator(Geometry node)
     {
@@ -37,37 +38,37 @@ public class EventsTestJson : EventTestsBase
         var lionWebVersion = LionWebVersions.v2024_1;
         List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
 
-        SharedNodeMap sharedNodeMap = new();
-
-        var partitionEventHandler = new PartitionEventHandler(null);
+        PartitionSharedNodeMap sharedNodeMap = new();
 
         var deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
                 .WithLanguages(languages)
             ;
 
-        var eventReceiver = new DeltaProtocolPartitionEventReceiver(
-            partitionEventHandler,
-            sharedNodeMap,
-            sharedKeyedMap,
-            deserializerBuilder
-        );
+        var sharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
 
-        var deltaSerializer = new DeltaSerializer();
+        var cloneForest = new Forest();
+        cloneForest.AddPartitions([clone]);
+        
+        var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, sharedNodeMap, "cloneReplicator");
+
+        var eventReceiver = new DeltaProtocolEventReceiver(
+            sharedNodeMap,
+            sharedPartitionReplicatorMap,
+            sharedKeyedMap,
+            deserializerBuilder,
+            replicator
+        );
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
         node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
-            var command = new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionEvent);
-            var json = deltaSerializer.Serialize(command);
-            var deserialized = deltaSerializer.Deserialize<IDeltaCommand>(json);
-            eventReceiver.Receive(commandToEventMapper.Map(deserialized));
+            var deltaCommand = new PartitionNotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
+            eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
         });
 
-        var replicator = new PartitionNotificationReplicator(clone, sharedNodeMap);
-        replicator.ReplicateFrom(partitionEventHandler);
         return clone;
     }
 }
