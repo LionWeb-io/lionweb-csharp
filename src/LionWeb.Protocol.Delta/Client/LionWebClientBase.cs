@@ -93,7 +93,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
                     client.OnLocalPartitionAdded(partitionAddedNotification);
                     break;
                 case PartitionDeletedNotification partitionDeletedNotification:
-                    client.OnLocalPartitionDeleted(partitionDeletedNotification);
+                    // nothing to do
                     break;
             }
         }
@@ -115,11 +115,6 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     {
         var partitionReplicator = SharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
         INotificationHandler.Connect(partitionReplicator, new LocalPartitionNotificationHandler(_name, this));
-    }
-
-    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
-    {
-        throw new NotImplementedException();
     }
 
     #endregion

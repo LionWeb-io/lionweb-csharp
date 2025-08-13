@@ -143,10 +143,10 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                         true);
                     break;
 
-            default:
-                Log($"sending: {deltaContent.GetType().Name}", true);
-                break;
-        }
+                default:
+                    Log($"sending: {deltaContent.GetType().Name}", true);
+                    break;
+            }
 
             await _connector.SendToAllClients(deltaContent);
         } catch (Exception e)

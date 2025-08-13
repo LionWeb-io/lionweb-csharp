@@ -25,6 +25,7 @@ using Core.M1;
 using Core.M3;
 using Core.Notification;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
+using Core.Test.Languages.Generated.V2023_1.TestLanguage;
 using Core.Utilities;
 using Message;
 using Message.Event;
@@ -53,7 +54,7 @@ public class RepositoryTests
     public RepositoryTests()
     {
         _lionWebVersion = LionWebVersions.v2023_1;
-        _languages = [ShapesLanguage.Instance];
+        _languages = [ShapesLanguage.Instance, TestLanguageLanguage.Instance];
 
         _repositoryForest = new Forest();
         _repositoryConnector = new(_lionWebVersion);
@@ -87,38 +88,61 @@ public class RepositoryTests
 
     [TestMethod]
     [Timeout(6000)]
-    public async Task Partition()
+    public void NewPartition()
     {
-        // await _aClient.SignOn();
-        // _aClient.WaitForReceived(1);
-        //
-        // await _bClient.SignOn();
-        // _bClient.WaitForReceived(1);
-
         _aForest.AddPartitions([new Geometry("partition")]);
-        _bClient.WaitForReceived(1);
+        WaitForReceived(1);
 
+        AssertEquals(_aForest.Partitions, _bForest.Partitions);
+    }
+    
+    [TestMethod]
+    [Timeout(6000)]
+    public void NewPartitions()
+    {
+        _aForest.AddPartitions([new Geometry("partitionA"), new LinkTestConcept("partitionB")]);
+        WaitForReceived(2);
+
+        AssertEquals(_aForest.Partitions, _bForest.Partitions);
+    }
+    
+    [TestMethod]
+    [Timeout(6000)]
+    public void RemovePartition()
+    {
+        _aForest.AddPartitions([new Geometry("geo")]);
+        WaitForReceived(1);
+
+        var bLink = new LinkTestConcept("link");
+        _bForest.AddPartitions([bLink]);
+        WaitForReceived(1);
+
+        var aLink = (LinkTestConcept)_aForest.Partitions.Last();
+        _aForest.RemovePartitions([aLink]);
+        WaitForReceived(1);
+
+        bLink.Name = "hello";
+        Assert.IsFalse(aLink.TryGetName(out _));
+        
+        aLink.Name = "bye";
+        Assert.AreEqual("hello", bLink.Name);
+
+        Assert.AreEqual("geo", _bForest.Partitions.First().GetId());
         AssertEquals(_aForest.Partitions, _bForest.Partitions);
     }
 
     [TestMethod]
-    // [Timeout(6000)]
-    public async Task PartitionAnnotation()
+    [Timeout(6000)]
+    public void PartitionAnnotation()
     {
-        // await _aClient.SignOn();
-        // _aClient.WaitForReceived(1);
-        //
-        // await _bClient.SignOn();
-        // _bClient.WaitForReceived(1);
-
         _aForest.AddPartitions([new Geometry("partition")]);
-        _bClient.WaitForReceived(1);
+        WaitForReceived(1);
 
         var bPartition = (Geometry)_bForest.Partitions.First();
         Assert.IsNotNull(bPartition);
         
         bPartition.AddAnnotations([new BillOfMaterials("bom")]);
-        _aClient.WaitForReceived(1);
+        WaitForReceived(1);
 
         AssertEquals(_aForest.Partitions, _bForest.Partitions);
     }
@@ -142,6 +166,12 @@ public class RepositoryTests
         action();
     }
     // );
+
+    private void WaitForReceived(int delta = 1)
+    {
+        _aClient.WaitForReceived(delta);
+        _bClient.WaitForReceived(delta);
+    }
 }
 
 class RepositoryConnector : IDeltaRepositoryConnector

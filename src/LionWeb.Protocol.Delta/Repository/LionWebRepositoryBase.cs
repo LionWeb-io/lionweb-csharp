@@ -79,7 +79,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
                     repository.OnLocalPartitionAdded(partitionAddedEvent);
                     break;
                 case PartitionDeletedNotification partitionDeletedEvent:
-                    repository.OnLocalPartitionDeleted(partitionDeletedEvent);
+                    // nothing to do
                     break;
             }
             
@@ -97,11 +97,6 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     {
         var notificationHandler = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
         INotificationHandler.Connect(notificationHandler, new LocalPartitionReceiver(_name, this));
-    }
-
-    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent)
-    {
-        throw new NotImplementedException();
     }
 
     #endregion
