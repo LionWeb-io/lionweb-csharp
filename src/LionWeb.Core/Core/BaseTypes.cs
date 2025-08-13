@@ -50,7 +50,7 @@ public interface IReadableNode
     /// <seealso cref="IWritableNode.InsertAnnotations"/>
     /// <seealso cref="IWritableNode.RemoveAnnotations"/>
     public IReadOnlyList<IReadableNode> GetAnnotations();
-    
+
     /// The <see cref="Classifier"/> that <c>this</c> node is an instance of.
     public Classifier GetClassifier();
 
@@ -64,7 +64,7 @@ public interface IReadableNode
     /// <seealso cref="IWritableNode.Set"/>
     /// <see cref="CollectAllSetFeatures"/>
     public object? Get(Feature feature);
-    
+
     /// <summary>
     /// Tries to get the value of the given <paramref name="feature"/> on <c>this</c> node.
     /// </summary>
@@ -308,10 +308,12 @@ public interface INode : INotifiableNode<INode>;
 public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
 {
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
-    protected virtual IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
+    protected virtual IBuiltInsLanguage _builtIns =>
+        new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
 
     /// The <see cref="ILionCoreLanguage"/> variant used for this node.
-    protected virtual ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.LionCore).Value;
+    protected virtual ILionCoreLanguage _m3 =>
+        new Lazy<ILionCoreLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.LionCore).Value;
 
 
     /// <summary>
