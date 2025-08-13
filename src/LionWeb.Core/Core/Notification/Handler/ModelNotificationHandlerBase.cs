@@ -35,8 +35,8 @@ public abstract class ModelNotificationHandlerBase<TNotification>(object? sender
     /// </typeparam> 
     public void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
         where TSubscribedNotification : class, TNotification =>
-        IHandler.Connect<TNotification, TSubscribedNotification, TSubscribedNotification>(this,
-            new NotificationHandlerHandler<TSubscribedNotification>(handler)
+        INotificationHandler.Connect<TSubscribedNotification>(this,
+            new NativeEventNotificationHandler<TSubscribedNotification>(handler)
             {
                 NotificationHandlerId = Sender.ToString() ?? GetType().Name
             });

@@ -48,7 +48,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
         _replicator = RewriteForestNotificationReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
 
-        IHandler.Connect(_replicator, new LocalForestReceiver(name, this));
+        INotificationHandler.Connect(_replicator, new LocalForestReceiver(name, this));
 
         _connector.ReceiveFromClient += OnReceiveFromClient;
     }
@@ -91,7 +91,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedEvent)
     {
         var notificationHandler = SharedPartitionReplicatorMap.Lookup(partitionAddedEvent.NewPartition.GetId());
-        IHandler.Connect(notificationHandler, new LocalPartitionReceiver(_name, this));
+        INotificationHandler.Connect(notificationHandler, new LocalPartitionReceiver(_name, this));
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent)

@@ -21,7 +21,7 @@ using Forest;
 using Partition;
 using System.Reflection;
 
-/// Base for all <see cref="IHandler">notification handlers</see> that process <see cref="INotification">notifications</see>.
+/// Base for all <see cref="INotificationHandler">notification handlers</see> that process <see cref="INotification">notifications</see>.
 public abstract class NotificationHandlerBase
 {
     protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
@@ -49,7 +49,7 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
 {
     protected readonly object Sender;
     private readonly Dictionary<Type, int> _subscribedNotifications = [];
-    private readonly Dictionary<IHandler, EventHandler<TNotification>> _handlers = [];
+    private readonly Dictionary<INotificationHandler, EventHandler<TNotification>> _handlers = [];
 
     /// <inheritdoc cref="NotificationHandlerBase"/>
     /// <param name="sender">Optional sender of the notifications.</param>
@@ -69,7 +69,7 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
 
         return;
 
-        void UnsubscribeHandler<T>(IHandler notificationHandler, EventHandler<T> _) =>
+        void UnsubscribeHandler<T>(INotificationHandler notificationHandler, EventHandler<T> _) =>
             Unsubscribe<T>(notificationHandler);
     }
 
@@ -91,22 +91,22 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
 
 
     /// <inheritdoc />
-    void IHandler<TNotification, TNotification>.Send(TNotification message) =>
+    void INotificationHandler<TNotification>.Send(TNotification message) =>
         Send(message);
 
-    /// <inheritdoc cref="IHandler{TReceive,TSend}.Send"/>
+    /// <inheritdoc cref="INotificationHandler{TNotification}.Send"/>
     protected void Send(TNotification message) =>
         InternalEvent?.Invoke(Sender, message);
 
     /// <inheritdoc />
-    void IHandler<TNotification, TNotification>.Subscribe<TReceiveTo, TSendTo>(
-        IHandler<TReceiveTo, TSendTo> receiver) =>
+    void INotificationHandler<TNotification>.Subscribe<TSubscribedNotification>(
+        INotificationHandler<TSubscribedNotification> receiver) =>
         Subscribe(receiver);
 
-    /// <inheritdoc cref="IHandler{TReceive,TSend}.Subscribe{TReceiveTo,TSendTo}"/>
-    protected void Subscribe<TReceiveTo, TSendTo>(IHandler<TReceiveTo, TSendTo> receiver)
+    /// <inheritdoc cref="INotificationHandler{TNotification}.Subscribe{TSubscribedNotification}"/>
+    protected void Subscribe<TSubscribedNotification>(INotificationHandler<TSubscribedNotification> receiver) where TSubscribedNotification : INotification
     {
-        RegisterSubscribedNotifications<TReceiveTo>();
+        RegisterSubscribedNotifications<TSubscribedNotification>();
 
         var handler = CreateHandler(receiver);
 
@@ -115,10 +115,10 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
         InternalEvent += handler;
     }
 
-    private EventHandler<TNotification> CreateHandler<TReceiveTo, TSendTo>(IHandler<TReceiveTo, TSendTo> receiver)
-        => (_, notification) =>
+    private EventHandler<TNotification> CreateHandler<TSubscribedNotification>(INotificationHandler<TSubscribedNotification> receiver) where TSubscribedNotification : INotification =>
+        (_, notification) =>
         {
-            if (notification is TReceiveTo r)
+            if (notification is TSubscribedNotification r)
                 receiver.Receive(r);
         };
 
@@ -149,11 +149,11 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
     }
 
     /// <inheritdoc />
-    void IHandler.Unsubscribe<T>(IHandler receiver) =>
+    void INotificationHandler.Unsubscribe<T>(INotificationHandler receiver) =>
         Unsubscribe<T>(receiver);
 
-    /// <inheritdoc cref="IHandler.Unsubscribe{T}"/>
-    private void Unsubscribe<T>(IHandler receiver)
+    /// <inheritdoc cref="INotificationHandler.Unsubscribe{T}"/>
+    private void Unsubscribe<T>(INotificationHandler receiver)
     {
         if (!_handlers.Remove(receiver, out var handler))
             return;
@@ -164,10 +164,10 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
     }
 
     /// <inheritdoc />
-    public void PrintAllReceivers(List<IHandler> alreadyPrinted, string indent = "")
+    public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "")
     {
         Console.WriteLine($"{indent}{this.GetType().Name}({Sender})");
-        if (IHandler.RecursionDetected(this, alreadyPrinted, indent))
+        if (INotificationHandler.RecursionDetected(this, alreadyPrinted, indent))
             return;
 
         Console.WriteLine($"{indent}Handlers:");

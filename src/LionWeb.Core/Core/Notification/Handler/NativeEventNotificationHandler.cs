@@ -17,8 +17,8 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
-internal class NotificationHandlerHandler<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
-    : INotificationHandler<TSubscribedNotification> where TSubscribedNotification : INotification
+internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotification> handler)
+    : INotificationHandler<TNotification> where TNotification : INotification
 {
     public void Dispose()
     {
@@ -31,29 +31,30 @@ internal class NotificationHandlerHandler<TSubscribedNotification>(EventHandler<
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Receive(TSubscribedNotification message) =>
+    public void Receive(TNotification message) =>
         handler.Invoke(null, message);
 
     /// <inheritdoc />
-    public void Send(TSubscribedNotification message) =>
+    public void Send(TNotification message) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Subscribe<TReceiveTo, TSendTo>(IHandler<TReceiveTo, TSendTo> receiver) =>
+    public void Subscribe<TSubscribedNotification>(INotificationHandler<TSubscribedNotification> receiver)
+        where TSubscribedNotification : INotification =>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    void IHandler.Unsubscribe<T>(IHandler receiver) =>
+    void INotificationHandler.Unsubscribe<T>(INotificationHandler receiver) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void PrintAllReceivers(List<IHandler> alreadyPrinted, string indent = "")
+    public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "")
     {
         Console.WriteLine($"{indent}{this.GetType().Name}");
-        if (IHandler.RecursionDetected(this, alreadyPrinted, indent))
+        if (INotificationHandler.RecursionDetected(this, alreadyPrinted, indent))
             return;
 
-        if (handler is IHandler p)
+        if (handler is INotificationHandler p)
             p.PrintAllReceivers(alreadyPrinted, indent + "  ");
         else
             Console.WriteLine($"{indent}{handler}");

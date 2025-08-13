@@ -41,8 +41,8 @@ public static class PartitionNotificationReplicator
         var partitionHandler = localPartition.GetNotificationHandler();
         if (partitionHandler != null)
         {
-            IHandler.Connect(partitionHandler, localReplicator);
-            IHandler.Connect(localReplicator, filter);
+            INotificationHandler.Connect(partitionHandler, localReplicator);
+            INotificationHandler.Connect(localReplicator, filter);
         }
 
         return result;

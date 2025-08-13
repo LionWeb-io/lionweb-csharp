@@ -22,7 +22,7 @@ namespace LionWeb.Core.Notification.Handler;
 /// Every message this notification handler <see cref="Receive">receives</see>
 /// is forwarded to the first <see cref="_notificationHandlers">component</see>.
 /// Each component is connected to the next component.
-/// The last component <see cref="IHandler{TReceive,TSend}.Send">sends</see> to
+/// The last component <see cref="INotificationHandler{TNotification}.Send">sends</see> to
 /// this notification handler's <i>following</i> notification handlers.
 public class CompositeNotificationHandler<TNotification> : INotificationHandler<TNotification>
     where TNotification : class, INotification
@@ -50,7 +50,7 @@ public class CompositeNotificationHandler<TNotification> : INotificationHandler<
         while (enumerator.MoveNext())
         {
             var current = enumerator.Current;
-            IHandler.Connect(previous, current);
+            INotificationHandler.Connect(previous, current);
 
             previous = current;
         }
@@ -78,21 +78,21 @@ public class CompositeNotificationHandler<TNotification> : INotificationHandler<
     public bool CanReceive(params Type[] messageTypes) =>
         _firstHandler.CanReceive(messageTypes);
 
-    void IHandler<TNotification, TNotification>.Send(TNotification message) =>
+    void INotificationHandler<TNotification>.Send(TNotification message) =>
         throw new ArgumentException("Should never be called");
 
-    void IHandler<TNotification, TNotification>.Subscribe<TReceiveTo, TSendTo>(
-        IHandler<TReceiveTo, TSendTo> receiver) =>
+    void INotificationHandler<TNotification>.Subscribe<TSubscribedNotification>(
+        INotificationHandler<TSubscribedNotification> receiver) =>
         _lastHandler.Subscribe(receiver);
 
-    void IHandler.Unsubscribe<T>(IHandler receiver) =>
+    void INotificationHandler.Unsubscribe<T>(INotificationHandler receiver) =>
         _lastHandler.Unsubscribe<T>(receiver);
 
     /// <inheritdoc />
-    public void PrintAllReceivers(List<IHandler> alreadyPrinted, string indent = "")
+    public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "")
     {
         Console.WriteLine($"{indent}{this.GetType().Name}({_sender})");
-        if (IHandler.RecursionDetected(this, alreadyPrinted, indent))
+        if (INotificationHandler.RecursionDetected(this, alreadyPrinted, indent))
             return;
 
         Console.WriteLine($"{indent}Members:");

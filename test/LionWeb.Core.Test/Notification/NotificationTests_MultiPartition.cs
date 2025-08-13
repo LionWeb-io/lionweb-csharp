@@ -265,8 +265,8 @@ public class NotificationTests_MultiPartition
     {
         var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");
         var cloneHandler = new NodeCloneNotificationHandler<IPartitionNotification>(node.GetId());
-        IHandler.Connect((IPartitionNotificationHandler)node.GetNotificationHandler(), cloneHandler);
-        IHandler.Connect(cloneHandler, replicator);
+        INotificationHandler.Connect((IPartitionNotificationHandler)node.GetNotificationHandler(), cloneHandler);
+        INotificationHandler.Connect(cloneHandler, replicator);
         
         return replicator;
     }

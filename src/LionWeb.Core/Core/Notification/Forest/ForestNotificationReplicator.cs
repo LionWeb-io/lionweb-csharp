@@ -41,8 +41,8 @@ public static class ForestNotificationReplicator
         var forestHandler = localForest.GetNotificationHandler();
         if (forestHandler != null)
         {
-            IHandler.Connect(forestHandler, localReplicator);
-            IHandler.Connect(localReplicator, filter);
+            INotificationHandler.Connect(forestHandler, localReplicator);
+            INotificationHandler.Connect(localReplicator, filter);
         }
 
         return result;
