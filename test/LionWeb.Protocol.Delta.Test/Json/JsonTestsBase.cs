@@ -134,7 +134,7 @@ public abstract class JsonTestsBase
 
     #region Nodes
 
-    protected static ChangeClassifier CreateChangeClassifier() =>
+    protected static ChangeClassifierCommand CreateChangeClassifierCommand() =>
         new(TargetNode(), MetaPointer(), CommandId(), ProtocolMessages());
 
     #endregion
@@ -301,7 +301,7 @@ public abstract class JsonTestsBase
         [CreateCommandResponse()],
         [CreateAddPartitionCommand()],
         [CreateDeletePartition()],
-        [CreateChangeClassifier()],
+        [CreateChangeClassifierCommand()],
         [CreateAddPropertyCommand()],
         [CreateDeleteProperty()],
         [CreateChangeProperty()],
@@ -355,7 +355,7 @@ public abstract class JsonTestsBase
 
     #region Nodes
 
-    protected static ClassifierChanged CreateClassifierChanged() =>
+    protected static ClassifierChangedEvent CreateClassifierChangedEvent() =>
         new(TargetNode(), MetaPointer(), MetaPointer(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
 
     #endregion
@@ -567,7 +567,7 @@ public abstract class JsonTestsBase
     [
         [CreatePartitionAddedEvent()],
         [CreatePartitionDeleted()],
-        [CreateClassifierChanged()],
+        [CreateClassifierChangedEvent()],
         [CreatePropertyAddedEvent()],
         [CreatePropertyDeleted()],
         [CreatePropertyChanged()],

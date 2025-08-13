@@ -806,7 +806,7 @@
           "$ref": "#/$defs/DeletePartition"
         },
         {
-          "$ref": "#/$defs/ChangeClassifier"
+          "$ref": "#/$defs/ChangeClassifierCommand"
         },
         {
           "$ref": "#/$defs/AddPropertyCommand"
@@ -983,10 +983,10 @@
       "minProperties": 3,
       "maxProperties": 4
     },
-    "ChangeClassifier": {
+    "ChangeClassifierCommand": {
       "properties": {
         "messageKind": {
-          "const": "ChangeClassifier"
+          "const": "ChangeClassifierCommand"
         },
         "node": {
           "$ref": "#/$defs/targetNode"
@@ -2371,7 +2371,7 @@
           "$ref": "#/$defs/PartitionDeleted"
         },
         {
-          "$ref": "#/$defs/ClassifierChanged"
+          "$ref": "#/$defs/ClassifierChangedEvent"
         },
         {
           "$ref": "#/$defs/PropertyAddedEvent"
@@ -2546,10 +2546,10 @@
       "minProperties": 5,
       "maxProperties": 6
     },
-    "ClassifierChanged": {
+    "ClassifierChangedEvent": {
       "properties": {
         "messageKind": {
-          "const": "ClassifierChanged"
+          "const": "ClassifierChangedEvent"
         },
         "node": {
           "$ref": "#/$defs/targetNode"

@@ -25,7 +25,7 @@ public interface IPartitionDeltaCommand : IDeltaCommand;
 
 public interface INodeCommand : IPartitionDeltaCommand;
 
-public record ChangeClassifier(
+public record ChangeClassifierCommand(
     TargetNode Node,
     MetaPointer NewClassifier,
     CommandId CommandId,

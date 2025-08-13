@@ -27,7 +27,7 @@ public interface IPartitionDeltaEvent : IDeltaEvent;
 
 public interface INodeEvent : IPartitionDeltaEvent;
 
-public record ClassifierChanged(
+public record ClassifierChangedEvent(
     TargetNode Node,
     MetaPointer NewClassifier,
     MetaPointer OldClassifier,
