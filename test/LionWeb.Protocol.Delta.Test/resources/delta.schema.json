@@ -809,7 +809,7 @@
           "$ref": "#/$defs/ChangeClassifier"
         },
         {
-          "$ref": "#/$defs/AddProperty"
+          "$ref": "#/$defs/AddPropertyCommand"
         },
         {
           "$ref": "#/$defs/DeleteProperty"
@@ -1011,10 +1011,10 @@
       "minProperties": 4,
       "maxProperties": 5
     },
-    "AddProperty": {
+    "AddPropertyCommand": {
       "properties": {
         "messageKind": {
-          "const": "AddProperty"
+          "const": "AddPropertyCommand"
         },
         "node": {
           "$ref": "#/$defs/targetNode"
@@ -2374,7 +2374,7 @@
           "$ref": "#/$defs/ClassifierChanged"
         },
         {
-          "$ref": "#/$defs/PropertyAdded"
+          "$ref": "#/$defs/PropertyAddedEvent"
         },
         {
           "$ref": "#/$defs/PropertyDeleted"
@@ -2582,10 +2582,10 @@
       "minProperties": 6,
       "maxProperties": 7
     },
-    "PropertyAdded": {
+    "PropertyAddedEvent": {
       "properties": {
         "messageKind": {
-          "const": "PropertyAdded"
+          "const": "PropertyAddedEvent"
         },
         "node": {
           "$ref": "#/$defs/targetNode"

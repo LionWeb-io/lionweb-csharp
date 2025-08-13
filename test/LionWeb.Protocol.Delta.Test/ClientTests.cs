@@ -148,7 +148,7 @@ public class ClientTests
             null
         ) { SequenceNumber = sequenceNumber };
 
-    private PropertyAdded PropertyAdded(EventSequenceNumber sequenceNumber) =>
+    private PropertyAddedEvent PropertyAdded(EventSequenceNumber sequenceNumber) =>
         new("doc",
             ShapesLanguage.Instance.Documentation_text.ToMetaPointer(),
             "text",

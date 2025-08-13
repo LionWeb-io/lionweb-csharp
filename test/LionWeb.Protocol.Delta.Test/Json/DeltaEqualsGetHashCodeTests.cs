@@ -51,9 +51,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void AddProperty_Different_Self()
     {
-        var a = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
+        var a = new AddPropertyCommand("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
             CreateProtocolMessages("msgA"));
-        var b = new AddProperty("b", new MetaPointer("myLang", "v0", "key"), "x", "aa",
+        var b = new AddPropertyCommand("b", new MetaPointer("myLang", "v0", "key"), "x", "aa",
             CreateProtocolMessages("msgA"));
 
         Assert.IsFalse(a.Equals(b));
@@ -63,9 +63,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void AddProperty_Different_Generic()
     {
-        var a = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
+        var a = new AddPropertyCommand("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
             CreateProtocolMessages("msgA"));
-        var b = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
+        var b = new AddPropertyCommand("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
             CreateProtocolMessages("msgB"));
 
         Assert.IsFalse(a.Equals(b));
@@ -75,9 +75,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void AddProperty_Same()
     {
-        var a = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
+        var a = new AddPropertyCommand("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
             CreateProtocolMessages("msgA"));
-        var b = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
+        var b = new AddPropertyCommand("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",
             CreateProtocolMessages("msgA"));
 
         Assert.IsTrue(a.Equals(b));
@@ -133,9 +133,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void PropertyAdded_Different_Self()
     {
-        var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
+        var a = new PropertyAddedEvent("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
             CreateProtocolMessages("msgA"));
-        var b = new PropertyAdded("b", new MetaPointer("myLang", "v0", "key"), "vv",  [new CommandSource("x", "y")],
+        var b = new PropertyAddedEvent("b", new MetaPointer("myLang", "v0", "key"), "vv",  [new CommandSource("x", "y")],
             CreateProtocolMessages("msgA"));
 
         Assert.IsFalse(a.Equals(b));
@@ -145,9 +145,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void PropertyAdded_Different_Generic()
     {
-        var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
+        var a = new PropertyAddedEvent("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
             CreateProtocolMessages("msgA"));
-        var b = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("z", "y")],
+        var b = new PropertyAddedEvent("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("z", "y")],
             CreateProtocolMessages("msgA"));
 
         Assert.IsFalse(a.Equals(b));
@@ -157,9 +157,9 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     [TestMethod]
     public void PropertyAdded_Same()
     {
-        var a = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
+        var a = new PropertyAddedEvent("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
             CreateProtocolMessages("msgA"));
-        var b = new PropertyAdded("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
+        var b = new PropertyAddedEvent("a", new MetaPointer("myLang", "v0", "key"), "vv", [new CommandSource("x", "y")],
             CreateProtocolMessages("msgA"));
 
         Assert.IsTrue(a.Equals(b));

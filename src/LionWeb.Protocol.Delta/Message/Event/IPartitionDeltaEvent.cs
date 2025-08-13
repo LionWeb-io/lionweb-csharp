@@ -61,7 +61,7 @@ public interface IPropertyEvent : IFeatureEvent
     MetaPointer IFeatureEvent.Feature => Property;
 };
 
-public record PropertyAdded(
+public record PropertyAddedEvent(
     TargetNode Node,
     MetaPointer Property,
     PropertyValue NewValue,

@@ -45,7 +45,7 @@ public interface IPropertyCommand : IFeatureCommand
     MetaPointer Property { get; }
 };
 
-public record AddProperty(
+public record AddPropertyCommand(
     TargetNode Node,
     MetaPointer Property,
     PropertyValue NewValue,

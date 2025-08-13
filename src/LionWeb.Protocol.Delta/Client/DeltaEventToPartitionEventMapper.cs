@@ -47,7 +47,7 @@ public class DeltaEventToPartitionEventMapper
     public IPartitionNotification Map(IDeltaEvent deltaEvent) =>
         deltaEvent switch
         {
-            PropertyAdded a => OnPropertyAdded(a),
+            PropertyAddedEvent a => OnPropertyAdded(a),
             PropertyDeleted a => OnPropertyDeleted(a),
             PropertyChanged a => OnPropertyChanged(a),
             ChildAddedEvent a => OnChildAdded(a),
@@ -70,7 +70,7 @@ public class DeltaEventToPartitionEventMapper
 
     #region Properties
 
-    private PropertyAddedNotification OnPropertyAdded(PropertyAdded propertyAddedEvent)
+    private PropertyAddedNotification OnPropertyAdded(PropertyAddedEvent propertyAddedEvent)
     {
         var parent = ToNode(propertyAddedEvent.Node);
         var property = ToProperty(propertyAddedEvent.Property, parent);

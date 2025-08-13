@@ -66,7 +66,7 @@ public class PartitionEventToDeltaCommandMapper
 
     #region Properties
 
-    private AddProperty OnPropertyAdded(PropertyAddedNotification propertyAddedNotification) =>
+    private AddPropertyCommand OnPropertyAdded(PropertyAddedNotification propertyAddedNotification) =>
         new(
             propertyAddedNotification.Node.GetId(),
             propertyAddedNotification.Property.ToMetaPointer(),

@@ -47,10 +47,10 @@ public class DeltaToStringTests : JsonTestsBase
     [TestMethod]
     public void AddProperty()
     {
-        var input = new AddProperty(TargetNode(), MetaPointer(), PropertyValue(), CommandId(),
+        var input = new AddPropertyCommand(TargetNode(), MetaPointer(), PropertyValue(), CommandId(),
             ProtocolMessages());
         Assert.AreEqual(
-            "AddProperty { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 1, Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, NewValue = 1 }",
+            "AddPropertyCommand { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 1, Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, NewValue = 1 }",
             input.ToString());
     }
 
@@ -74,12 +74,12 @@ public class DeltaToStringTests : JsonTestsBase
     [TestMethod]
     public void PropertyAdded()
     {
-        var input = new PropertyAdded(TargetNode(), MetaPointer(), PropertyValue(), Origin(), ProtocolMessages())
+        var input = new PropertyAddedEvent(TargetNode(), MetaPointer(), PropertyValue(), Origin(), ProtocolMessages())
         {
             SequenceNumber = Sequence()
         };
         Assert.AreEqual(
-            "PropertyAdded { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 2 }, CommandSource { ParticipationId = myParticipation, CommandId = 3 }], Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, NewValue = 1 }",
+            "PropertyAddedEvent { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], SequenceNumber = 0, OriginCommands = [CommandSource { ParticipationId = myParticipation, CommandId = 2 }, CommandSource { ParticipationId = myParticipation, CommandId = 3 }], Node = 1, Property = MetaPointer { Language = myLang, Version = v0, Key = 1 }, NewValue = 1 }",
             input.ToString());
     }
 

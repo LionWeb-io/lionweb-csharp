@@ -38,7 +38,7 @@ public class DeltaCommandToDeltaEventMapper
     public IDeltaEvent Map(IDeltaCommand deltaCommand) =>
         deltaCommand switch
         {
-            AddProperty a => new PropertyAdded(a.Node, a.Property, a.NewValue, OriginCommands(a), []),
+            AddPropertyCommand a => new PropertyAddedEvent(a.Node, a.Property, a.NewValue, OriginCommands(a), []),
             DeleteProperty a => new PropertyDeleted(a.Node, a.Property, null, OriginCommands(a), []),
             ChangeProperty a => new PropertyChanged(a.Node, a.Property, a.NewValue, null, OriginCommands(a), []),
             AddChildCommand a => new ChildAddedEvent(a.Parent, a.NewChild, a.Containment, a.Index, OriginCommands(a), []),
