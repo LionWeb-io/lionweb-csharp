@@ -28,11 +28,13 @@ public class LionWebTestClient : LionWebClient
 
     private long _messageCount;
 
-    public LionWebTestClient(LionWebVersions lionWebVersion,
+    public LionWebTestClient(
+        LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
         IForest forest,
-        IDeltaClientConnector connector) : base(lionWebVersion, languages, name, forest, connector)
+        IDeltaClientConnector connector
+    ) : base(lionWebVersion, languages, name, forest, connector)
     {
         CommunicationError += (_, exception) => Exceptions.Add(exception);
     }

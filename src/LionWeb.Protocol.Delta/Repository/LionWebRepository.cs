@@ -29,7 +29,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
     private readonly DeltaProtocolCommandReceiver _commandReceiver;
 
-    public LionWebRepository(LionWebVersions lionWebVersion,
+    public LionWebRepository(
+        LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
         IForest forest,

@@ -25,25 +25,27 @@ using Message;
 public class LionWebTestRepository : LionWebRepository
 {
     public const int _sleepInterval = 100;
-    
-    public LionWebTestRepository(LionWebVersions lionWebVersion,
+
+    public LionWebTestRepository(
+        LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
         IForest forest,
-        IRepositoryConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, forest, connector)
+        IRepositoryConnector<IDeltaContent> connector
+    ) : base(lionWebVersion, languages, name, forest, connector)
     {
         CommunicationError += (_, exception) => Exceptions.Add(exception);
     }
-    
+
     public List<Exception> Exceptions { get; } = [];
-    
+
     #region message received count
-    
+
     private long _messageReceivedCount;
     public long MessageReceivedCount => Interlocked.Read(ref _messageReceivedCount);
     private void IncrementMessageReceivedCount() => Interlocked.Increment(ref _messageReceivedCount);
     public long WaitReceivedCount { get; set; }
-    
+
     private void WaitForReceivedCount(long count)
     {
         while (MessageReceivedCount < count)
@@ -66,14 +68,14 @@ public class LionWebTestRepository : LionWebRepository
     }
 
     #endregion
-    
+
     #region message sent count
 
     private long _messageSentCount;
     public long MessageSentCount => Interlocked.Read(ref _messageSentCount);
     private void IncrementMessageSentCount() => Interlocked.Increment(ref _messageSentCount);
     public long WaitSentCount { get; set; }
-    
+
     private void WaitForSentCount(long count)
     {
         while (MessageSentCount < count)
@@ -88,7 +90,7 @@ public class LionWebTestRepository : LionWebRepository
     public void WaitForSent(int delta) =>
         WaitForSentCount(WaitSentCount += delta);
 
-    
+
     protected override Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
     {
         var result = base.Send(clientInfo, deltaContent);

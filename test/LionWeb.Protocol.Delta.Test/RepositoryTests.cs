@@ -167,7 +167,7 @@ public class RepositoryTests
     }
     // );
 
-    private void WaitForReceived(int delta = 1)
+    private void WaitForReceived(int delta)
     {
         _aClient.WaitForReceived(delta);
         _bClient.WaitForReceived(delta);
