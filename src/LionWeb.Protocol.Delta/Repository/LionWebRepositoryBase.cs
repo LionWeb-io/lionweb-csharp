@@ -50,7 +50,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
         if(forest.GetNotificationHandler() is { } proc)
             INotificationHandler.Connect(proc, new LocalForestChangeNotificationHandler(name, this));
-        INotificationHandler.Connect(_replicator, new LocalForestReceiver(name, this));
+        INotificationHandler.Connect(_replicator, new LocalForestNotificationHandler(name, this));
 
         foreach (IPartitionInstance partitionInstance in forest.Partitions)
         {
@@ -87,13 +87,13 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         }
     }
 
-    private class LocalForestReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IForestNotification>(sender)
+    private class LocalForestNotificationHandler(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IForestNotification>(sender)
     {
         public override void Receive(IForestNotification message) => 
             repository.SendNotificationToAllClients(sender, message);
     }
     
-    private class LocalPartitionReceiver(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IPartitionNotification>(sender)
+    private class LocalPartitionNotificationHandler(object? sender, LionWebRepositoryBase<T> repository) : NotificationHandlerBase<IPartitionNotification>(sender)
     {
         public override void Receive(IPartitionNotification message) =>
             repository.SendNotificationToAllClients(sender, message);
@@ -108,7 +108,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     private void RegisterPartition(IPartitionInstance partitionInstance)
     {
         var notificationHandler = SharedPartitionReplicatorMap.Lookup(partitionInstance.GetId());
-        INotificationHandler.Connect(notificationHandler, new LocalPartitionReceiver(_name, this));
+        INotificationHandler.Connect(notificationHandler, new LocalPartitionNotificationHandler(_name, this));
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedEvent)
