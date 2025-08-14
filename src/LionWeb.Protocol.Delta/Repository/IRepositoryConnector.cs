@@ -37,5 +37,5 @@ public interface IClientInfo
 {
     ParticipationId ParticipationId { get; }
     
-    EventSequenceNumber GetAndIncrementSequenceNumber();
+    EventSequenceNumber IncrementAndGetSequenceNumber();
 }

@@ -185,7 +185,7 @@ class RepositoryConnector : IDeltaRepositoryConnector
     {
         if (content is IDeltaEvent ev)
         {
-            ev.SequenceNumber = clientInfo.GetAndIncrementSequenceNumber();
+            ev.SequenceNumber = clientInfo.IncrementAndGetSequenceNumber();
         }
 
         return content;
