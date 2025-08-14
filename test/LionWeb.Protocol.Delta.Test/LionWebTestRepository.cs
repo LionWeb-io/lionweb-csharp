@@ -26,8 +26,6 @@ public class LionWebTestRepository : LionWebRepository
 {
     public const int _sleepInterval = 100;
     
-    private long _messageCount;
-
     public LionWebTestRepository(LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
@@ -36,18 +34,21 @@ public class LionWebTestRepository : LionWebRepository
     {
         CommunicationError += (_, exception) => Exceptions.Add(exception);
     }
-
-    public long MessageCount => Interlocked.Read(ref _messageCount);
-    private void IncrementMessageCount() => Interlocked.Increment(ref _messageCount);
-    public long WaitCount { get; set; }
-
+    
     public List<Exception> Exceptions { get; } = [];
-
-    private void WaitForCount(long count)
+    
+    #region message received count
+    
+    private long _messageReceivedCount;
+    public long MessageReceivedCount => Interlocked.Read(ref _messageReceivedCount);
+    private void IncrementMessageReceivedCount() => Interlocked.Increment(ref _messageReceivedCount);
+    public long WaitReceivedCount { get; set; }
+    
+    private void WaitForReceivedCount(long count)
     {
-        while (MessageCount < count)
+        while (MessageReceivedCount < count)
         {
-            Log($"{nameof(MessageCount)}: {MessageCount} vs. {nameof(count)}: {count}");
+            Log($"{nameof(MessageReceivedCount)}: {MessageReceivedCount} vs. {nameof(count)}: {count}");
             Thread.Sleep(_sleepInterval);
         }
     }
@@ -55,12 +56,52 @@ public class LionWebTestRepository : LionWebRepository
     /// Wait until <paramref name="delta"/> <i>more</i> messages than at the last call have been received.
     /// Counts any kind of <see cref="IDeltaContent">delta message</see>.
     public void WaitForReceived(int delta) =>
-        WaitForCount(WaitCount += delta);
+        WaitForReceivedCount(WaitReceivedCount += delta);
 
     /// <inheritdoc />
     protected override Task Receive(IMessageContext<IDeltaContent> messageContext)
     {
-        IncrementMessageCount();
+        IncrementMessageReceivedCount();
         return base.Receive(messageContext);
     }
+
+    #endregion
+    
+    #region message sent count
+
+    private long _messageSentCount;
+    public long MessageSentCount => Interlocked.Read(ref _messageSentCount);
+    private void IncrementMessageSentCount() => Interlocked.Increment(ref _messageSentCount);
+    public long WaitSentCount { get; set; }
+    
+    private void WaitForSentCount(long count)
+    {
+        while (MessageSentCount < count)
+        {
+            Log($"{nameof(MessageSentCount)}: {MessageSentCount} vs. {nameof(count)}: {count}");
+            Thread.Sleep(_sleepInterval);
+        }
+    }
+
+    /// Wait until <paramref name="delta"/> <i>more</i> messages than at the last call have been sent.
+    /// Counts any kind of <see cref="IDeltaContent">delta message</see>.
+    public void WaitForSent(int delta) =>
+        WaitForSentCount(WaitSentCount += delta);
+
+    
+    protected override Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
+    {
+        var result = base.Send(clientInfo, deltaContent);
+        IncrementMessageSentCount();
+        return result;
+    }
+
+    protected override Task SendAll(IDeltaContent deltaContent)
+    {
+        var result = base.SendAll(deltaContent);
+        IncrementMessageSentCount();
+        return result;
+    }
+
+    #endregion
 }

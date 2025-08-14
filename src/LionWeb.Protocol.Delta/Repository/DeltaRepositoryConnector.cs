@@ -38,5 +38,5 @@ public record ClientInfo : IClientInfo
     }
 
     /// <inheritdoc />
-    public EventSequenceNumber GetAndIncrementSequenceNumber() => Interlocked.Increment(ref _nextSequenceNumber) - 1;
+    public EventSequenceNumber IncrementAndGetSequenceNumber() => Interlocked.Increment(ref _nextSequenceNumber) - 1;
 }
