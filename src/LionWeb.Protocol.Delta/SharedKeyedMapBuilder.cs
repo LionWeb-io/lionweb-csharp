@@ -22,8 +22,11 @@ using Core.M2;
 using Core.M3;
 using Core.Serialization;
 
+/// <inheritdoc cref="BuildSharedKeyMap"/>
 public class SharedKeyedMapBuilder
 {
+    /// Builds a map of <see cref="CompressedMetaPointer">meta-pointers</see> to
+    /// all <see cref="IKeyed">keyed language elements</see> within, or (transitively) used by, <paramref name="languages"/>.
     public static SharedKeyedMap BuildSharedKeyMap(IEnumerable<Language> languages) =>
         new SharedKeyedMapBuilder().Build(languages);
 
