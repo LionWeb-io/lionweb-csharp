@@ -9,10 +9,18 @@
 
     <ItemGroup>
         <PackageReference Include="JsonSchema.Net" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk"/>
-        <PackageReference Include="Microsoft.Testing.Extensions.TrxReport" />
-        <PackageReference Include="MSTest.TestAdapter"/>
-        <PackageReference Include="MSTest.TestFramework"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Testing.Extensions.TrxReport">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="MSTest.TestAdapter">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="MSTest.TestFramework">
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
         <PackageReference Include="coverlet.collector">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -20,6 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
       <ProjectReference Include="..\..\src\LionWeb.Protocol.Delta\LionWeb.Protocol.Delta.csproj" />
       <ProjectReference Include="..\LionWeb.Core.Test\LionWeb.Core.Test.csproj" />
     </ItemGroup>

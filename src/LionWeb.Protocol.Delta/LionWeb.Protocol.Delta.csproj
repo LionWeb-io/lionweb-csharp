@@ -9,6 +9,11 @@
         <RootNamespace>LionWeb.Protocol.Delta</RootNamespace>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
     <ItemGroup>
         <InternalsVisibleTo Include="LionWeb.Protocol.Delta.Test" />
     </ItemGroup>
