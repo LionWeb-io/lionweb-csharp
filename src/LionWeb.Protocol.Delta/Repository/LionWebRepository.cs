@@ -29,7 +29,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
     private readonly DeltaProtocolCommandReceiver _commandReceiver;
 
-    public LionWebRepository(LionWebVersions lionWebVersion,
+    public LionWebRepository(
+        LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
         IForest forest,
@@ -42,7 +43,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
 
-        SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
         _commandReceiver = new DeltaProtocolCommandReceiver(
             SharedNodeMap,
@@ -106,6 +107,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         } catch (Exception e)
         {
             Log(e.ToString());
+            OnCommunicationError(e);
         }
     }
 
@@ -116,29 +118,43 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     /// <inheritdoc />
     protected override async Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
     {
-        Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
-        await _connector.SendToClient(clientInfo, deltaContent);
+        try
+        {
+            Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
+            await _connector.SendToClient(clientInfo, deltaContent);
+        } catch (Exception e)
+        {
+            OnCommunicationError(e);
+        }
     }
 
     /// <inheritdoc />
     protected override async Task SendAll(IDeltaContent deltaContent)
     {
-        switch (deltaContent)
+        try
         {
-            case IDeltaEvent deltaEvent:
-                var commandSource = deltaEvent is { OriginCommands: { } cmds }
-                    ? cmds.First()
-                    : null;
-                Log(
-                    $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})", true);
-                break;
+            switch (deltaContent)
+            {
+                case IDeltaEvent deltaEvent:
+                    var commandSource = deltaEvent is { OriginCommands: { } cmds }
+                        ? cmds.First()
+                        : null;
+                    Log(
+                        $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})",
+                        true);
+                    break;
 
-            default:
-                Log($"sending: {deltaContent.GetType().Name}", true);
-                break;
+                default:
+                    Log($"sending: {deltaContent.GetType().Name}", true);
+                    break;
+            }
+
+            await _connector.SendToAllClients(deltaContent);
+        } catch (Exception e)
+        {
+            Log(e.ToString());
+            OnCommunicationError(e);
         }
-
-        await _connector.SendToAllClients(deltaContent);
     }
 
     #endregion

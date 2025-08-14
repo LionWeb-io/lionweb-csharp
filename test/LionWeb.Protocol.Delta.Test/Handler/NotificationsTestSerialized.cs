@@ -38,7 +38,7 @@ public class NotificationsTestSerialized : NotificationTestsBase
         var lionWebVersion = LionWebVersions.v2024_1;
         List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
 
-        SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
         PartitionSharedNodeMap sharedNodeMap = new();
 

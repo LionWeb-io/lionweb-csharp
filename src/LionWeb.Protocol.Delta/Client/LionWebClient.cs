@@ -30,7 +30,7 @@ using System.Collections.Concurrent;
 public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
     private readonly DeltaProtocolEventReceiver _eventReceiver;
-    
+
     private readonly ConcurrentDictionary<EventSequenceNumber, IDeltaEvent> _unprocessedEvents = [];
     private readonly ConcurrentDictionary<CommandId, bool> _ownCommands = [];
     private readonly ConcurrentDictionary<QueryId, TaskCompletionSource<IDeltaQueryResponse>> _queryResponses = [];
@@ -43,11 +43,13 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
     #endregion
 
-    public LionWebClient(LionWebVersions lionWebVersion,
+    public LionWebClient(
+        LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
         IForest forest,
-        IClientConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, forest, connector)
+        IClientConnector<IDeltaContent> connector
+    ) : base(lionWebVersion, languages, name, forest, connector)
     {
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
@@ -55,7 +57,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
 
-        SharedKeyedMap sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
         _eventReceiver = new DeltaProtocolEventReceiver(
             SharedNodeMap,
@@ -64,7 +66,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             deserializerBuilder,
             _replicator
         );
-        
+
         _eventReceiver.Init();
     }
 
@@ -84,7 +86,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         try
         {
             Log($"received {content.GetType().Name}", true);
-            
+
             switch (content)
             {
                 case IDeltaEvent deltaEvent:
@@ -109,6 +111,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         } catch (Exception e)
         {
             Log(e.ToString());
+            OnCommunicationError(e);
         }
     }
 
@@ -163,7 +166,9 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     /// <inheritdoc />
     public override async Task<SignOnResponse> SignOn()
     {
-        var signOnResponse = await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId, IdUtils.NewId(), null));
+        var signOnResponse =
+            await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId,
+                IdUtils.NewId(), null));
         ParticipationId = signOnResponse.ParticipationId;
         return signOnResponse;
     }
@@ -173,10 +178,12 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(IdUtils.NewId(), null));
 
     /// <inheritdoc />
-    public override async Task<GetAvailableIdsResponse> GetAvailableIds(int count) => 
-        await Query<GetAvailableIdsResponse, GetAvailableIdsRequest>(new GetAvailableIdsRequest(count, IdUtils.NewId(), null));
+    public override async Task<GetAvailableIdsResponse> GetAvailableIds(int count) =>
+        await Query<GetAvailableIdsResponse, GetAvailableIdsRequest>(
+            new GetAvailableIdsRequest(count, IdUtils.NewId(), null));
 
-    private async Task<TResponse> Query<TResponse, TRequest>(TRequest request) where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest 
+    private async Task<TResponse> Query<TResponse, TRequest>(TRequest request)
+        where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest
     {
         var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
         _queryResponses[request.QueryId] = tcs;
@@ -188,14 +195,21 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     /// <inheritdoc />
     protected override async Task Send(IDeltaContent deltaContent)
     {
-        if (deltaContent.RequiresParticipationId)
-            deltaContent.InternalParticipationId = ParticipationId;
+        try
+        {
+            if (deltaContent.RequiresParticipationId)
+                deltaContent.InternalParticipationId = ParticipationId;
 
-        if (deltaContent is IDeltaCommand { CommandId: { } commandId })
-            _ownCommands.TryAdd(commandId, true);
+            if (deltaContent is IDeltaCommand { CommandId: { } commandId })
+                _ownCommands.TryAdd(commandId, true);
 
-        Log($"sending: {deltaContent.GetType().Name}", true);
-        await _connector.SendToRepository(deltaContent);
+            Log($"sending: {deltaContent.GetType().Name}", true);
+            await _connector.SendToRepository(deltaContent);
+        } catch (Exception e)
+        {
+            Log(e.ToString());
+            OnCommunicationError(e);
+        }
     }
 
     #endregion

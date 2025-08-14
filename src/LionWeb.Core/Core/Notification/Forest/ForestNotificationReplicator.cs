@@ -149,14 +149,18 @@ public class LocalForestNotificationReplicator : NotificationHandlerBase<IForest
         string sender) =>
         PartitionNotificationReplicator.Create(partition, _sharedNodeMap, sender);
 
-    internal void RegisterPartition(IPartitionInstance partition)
+    private void RegisterPartition(IPartitionInstance partition)
     {
         var replicator = CreatePartitionNotificationReplicator(partition, $"{Sender}.{partition.GetId()}");
         _sharedPartitionReplicatorMap.Register(partition.GetId(), replicator);
     }
 
-    internal void UnregisterPartition(IPartitionInstance partition) =>
+    private void UnregisterPartition(IPartitionInstance partition)
+    {
+        var replicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
+        replicator.Dispose();
         _sharedPartitionReplicatorMap.Unregister(partition.GetId());
+    }
 
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAdded) =>
         RegisterPartition(partitionAdded.NewPartition);

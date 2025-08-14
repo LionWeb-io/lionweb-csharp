@@ -49,8 +49,13 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         init => _clientId = value;
     }
 
-    public LionWebClientBase(LionWebVersions lionWebVersion, List<Language> languages, string name,
-        IForest forest, IClientConnector<T> connector)
+    public LionWebClientBase(
+        LionWebVersions lionWebVersion,
+        List<Language> languages,
+        string name,
+        IForest forest,
+        IClientConnector<T> connector
+    )
     {
         _lionWebVersion = lionWebVersion;
         _name = name;
@@ -59,8 +64,8 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         SharedNodeMap = new();
         SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
         _replicator = ForestNotificationReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
-        
-        if(forest.GetNotificationHandler() is { } proc)
+
+        if (forest.GetNotificationHandler() is { } proc)
             INotificationHandler.Connect(proc, new LocalForestChangeNotificationHandler(name, this));
         INotificationHandler.Connect(_replicator, new LocalForestNotificationHandler(name, this));
 
@@ -76,9 +81,15 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         SharedNodeMap.Dispose();
     }
 
+    public event EventHandler<Exception> CommunicationError;
+
+    protected void OnCommunicationError(Exception ex) =>
+        CommunicationError?.Invoke(this, ex);
+
     #region Local
-    
-    private class LocalForestChangeNotificationHandler(object? sender, LionWebClientBase<T> client) : NotificationHandlerBase<IForestNotification>(sender)
+
+    private class LocalForestChangeNotificationHandler(object? sender, LionWebClientBase<T> client)
+        : NotificationHandlerBase<IForestNotification>(sender)
     {
         public override void Receive(IForestNotification message)
         {
@@ -88,19 +99,21 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
                     client.OnLocalPartitionAdded(partitionAddedNotification);
                     break;
                 case PartitionDeletedNotification partitionDeletedNotification:
-                    client.OnLocalPartitionDeleted(partitionDeletedNotification);
+                    // nothing to do
                     break;
             }
         }
     }
-    
-    private class LocalForestNotificationHandler(object? sender, LionWebClientBase<T> client) : NotificationHandlerBase<IForestNotification>(sender)
+
+    private class LocalForestNotificationHandler(object? sender, LionWebClientBase<T> client)
+        : NotificationHandlerBase<IForestNotification>(sender)
     {
-        public override void Receive(IForestNotification message) => 
+        public override void Receive(IForestNotification message) =>
             client.SendNotificationToRepository(sender, message);
     }
-    
-    private class LocalPartitionNotificationHandler(object? sender, LionWebClientBase<T> client) : NotificationHandlerBase<IPartitionNotification>(sender)
+
+    private class LocalPartitionNotificationHandler(object? sender, LionWebClientBase<T> client)
+        : NotificationHandlerBase<IPartitionNotification>(sender)
     {
         public override void Receive(IPartitionNotification message) =>
             client.SendNotificationToRepository(sender, message);
@@ -110,11 +123,6 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     {
         var partitionReplicator = SharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
         INotificationHandler.Connect(partitionReplicator, new LocalPartitionNotificationHandler(_name, this));
-    }
-
-    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
-    {
-        throw new NotImplementedException();
     }
 
     #endregion
