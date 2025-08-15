@@ -95,8 +95,13 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
         Send(message);
 
     /// <inheritdoc cref="INotificationHandler{TNotification}.Send"/>
-    protected void Send(TNotification message) =>
-        InternalEvent?.Invoke(Sender, message);
+    protected virtual void Send(TNotification message) =>
+        SendWithSender(Sender, message);
+
+    /// This notification handler wants to send <paramref name="message"/> with <paramref name="sender"/>.
+    /// Only this notification handler should use this method.
+    protected void SendWithSender(object? sender, TNotification message) =>
+        InternalEvent?.Invoke(sender, message);
 
     /// <inheritdoc />
     void INotificationHandler<TNotification>.Subscribe<TSubscribedNotification>(
@@ -104,7 +109,8 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
         Subscribe(receiver);
 
     /// <inheritdoc cref="INotificationHandler{TNotification}.Subscribe{TSubscribedNotification}"/>
-    protected void Subscribe<TSubscribedNotification>(INotificationHandler<TSubscribedNotification> receiver) where TSubscribedNotification : INotification
+    protected void Subscribe<TSubscribedNotification>(INotificationHandler<TSubscribedNotification> receiver)
+        where TSubscribedNotification : INotification
     {
         RegisterSubscribedNotifications<TSubscribedNotification>();
 
@@ -115,10 +121,17 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
         InternalEvent += handler;
     }
 
-    private EventHandler<TNotification> CreateHandler<TSubscribedNotification>(INotificationHandler<TSubscribedNotification> receiver) where TSubscribedNotification : INotification =>
-        (_, notification) =>
+    private EventHandler<TNotification> CreateHandler<TSubscribedNotification>(
+        INotificationHandler<TSubscribedNotification> receiver) where TSubscribedNotification : INotification =>
+        (sender, notification) =>
         {
-            if (notification is TSubscribedNotification r)
+            if (notification is not TSubscribedNotification r)
+                return;
+
+            if (sender is IPartitionNotificationHandler correspondingSender &&
+                receiver is IForestNotificationHandler forestHandler && r is IForestNotification forestNotification)
+                forestHandler.Receive(correspondingSender, forestNotification);
+            else
                 receiver.Receive(r);
         };
 
