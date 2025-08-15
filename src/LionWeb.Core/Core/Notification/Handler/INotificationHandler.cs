@@ -17,6 +17,8 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
+using System.Reflection;
+
 /// A member in a directed graph that sends messages.
 /// Each member is <see cref="Connect">connected</see>
 /// <i>from</i> one or more <i>preceding</i> notification handlers, and
@@ -45,6 +47,9 @@ public interface INotificationHandler : IDisposable
     /// This notification handler receives <paramref name="message"/>.
     /// Call this on <i>inbound</i> notification handlers (i.e. notification handlers that get messages from outside the notification handler chain).
     public void Receive(INotification message);
+    
+    public void Receive(INotificationHandler correspondingHandler, INotification notification) =>
+        Receive(notification);
 
     /// This notification handler wants to send <paramref name="message"/>.
     /// Only this notification handler should use this method.

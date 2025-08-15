@@ -57,6 +57,9 @@ public abstract class NotificationHandlerBase : INotificationHandler
     /// <inheritdoc />
     public abstract void Receive(INotification message);
 
+    public virtual void Receive(INotificationHandler correspondingHandler, INotification notification) => 
+        Receive(notification);
+    
     private event EventHandler<INotification>? InternalEvent;
 
 
@@ -103,6 +106,12 @@ public abstract class NotificationHandlerBase : INotificationHandler
         {
             if (notification is not TSubscribedNotification r)
                 return;
+            
+            if (sender is INotificationHandler handler)
+            {
+                receiver.Receive(handler, r);
+                return;
+            }
 
             if (sender is IPartitionNotificationHandler correspondingSender &&
                 receiver is IForestNotificationHandler forestHandler && r is IForestNotification forestNotification)

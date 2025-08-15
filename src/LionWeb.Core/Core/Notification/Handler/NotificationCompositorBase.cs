@@ -17,19 +17,20 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
+using Forest;
+
 /// Base class to compose several <typeparamref name="TNotification"/> into one <see cref="CompositeNotification"/>.
 ///
 /// We keep a stack of composites.
 /// Every time a new composite is <see cref="Push">pushed</see>, that composite is added to the previous one (if any).
-public abstract class NotificationCompositorBase<TNotification> : NotificationHandlerBase
-    where TNotification : INotification
+public class NotificationCompositor : NotificationHandlerBase 
 {
     private readonly INotificationIdProvider _idProvider;
 
     protected readonly Stack<CompositeNotification> _composites = [];
 
-    /// <inheritdoc cref="NotificationCompositorBase{TNotification}"/>
-    protected NotificationCompositorBase(object? notificationHandlerId) : base(notificationHandlerId)
+    /// <inheritdoc cref="NotificationCompositorBase"/>
+    public NotificationCompositor(object? notificationHandlerId) : base(notificationHandlerId)
     {
         _idProvider = new NotificationIdProvider(notificationHandlerId);
     }
@@ -57,7 +58,49 @@ public abstract class NotificationCompositorBase<TNotification> : NotificationHa
     {
         var result = _composites.Pop();
         if (send)
-            Send((TNotification)(object)result);
+            Send(result);
         return result;
+    }
+
+    public override void Receive(INotification notification)
+    {
+        if (!TryAdd(notification))
+            Send(notification);
+    }
+
+    /// <inheritdoc />
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
+    {
+        switch (notification)
+        {
+            case PartitionAddedNotification n:
+                RegisterPartition(correspondingHandler, n.NewPartition);
+                break;
+            case PartitionDeletedNotification n:
+                UnregisterPartition(correspondingHandler, n.DeletedPartition);
+                break;
+        }
+
+        if (!TryAdd(notification))
+            Send(notification);
+    }
+
+    protected internal bool TryAdd(INotification notification)
+    {
+        if (!_composites.TryPeek(out var composite))
+            return false;
+
+        composite.AddPart(notification);
+        return true;
+    }
+
+    private void RegisterPartition(INotificationHandler correspondingHandler, IPartitionInstance partition)
+    {
+        INotificationHandler.Connect(correspondingHandler, this);
+    }
+
+    private void UnregisterPartition(INotificationHandler correspondingHandler, IPartitionInstance partition)
+    {
+        correspondingHandler.Unsubscribe(this);
     }
 }
