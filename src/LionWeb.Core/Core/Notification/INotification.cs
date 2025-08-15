@@ -17,10 +17,6 @@
 
 namespace LionWeb.Core.Notification;
 
-using Forest;
-using Partition;
-using System.Text;
-
 /// Any notification in the LionWeb notification system.
 public interface INotification
 {
@@ -30,94 +26,3 @@ public interface INotification
 
 /// ID of a notification in the LionWeb notification system.
 public interface INotificationId;
-
-public record CompositeNotification : IForestNotification, IPartitionNotification
-{
-    private readonly List<INotification> _parts;
-
-    public CompositeNotification(IEnumerable<INotification> Parts,
-        INotificationId NotificationId)
-    {
-        _parts = Parts.ToList();
-        this.NotificationId = NotificationId;
-    }
-
-    public CompositeNotification(INotificationId NotificationId) : this([], NotificationId)
-    {
-    }
-
-    public IReadOnlyList<INotification> Parts => _parts.AsReadOnly();
-
-    public void AddPart(INotification part) =>
-        _parts.Add(part);
-
-    /// <inheritdoc />
-    public INotificationId NotificationId { get; set; }
-
-    /// <inheritdoc />
-    public NodeId ContextNodeId => throw new NotImplementedException();
-
-    /// <inheritdoc />
-    public virtual bool Equals(CompositeNotification? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return NotificationId.Equals(other.NotificationId) &&
-               Parts.SequenceEqual(other.Parts);
-    }
-
-    /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        var hashCode = new HashCode();
-        hashCode.Add(NotificationId.GetHashCode());
-        foreach (var part in Parts)
-        {
-            hashCode.Add(part);
-        }
-
-        return hashCode.ToHashCode();
-    }
-
-    protected virtual bool PrintMembers(StringBuilder builder)
-    {
-        builder.Append(nameof(NotificationId));
-        builder.Append(" = ");
-        builder.Append(NotificationId);
-        builder.Append(", ");
-        builder.Append(nameof(Parts));
-        builder.Append(" = ");
-
-        builder.Append('[');
-        bool first = true;
-        foreach (var part in Parts)
-        {
-            if (first)
-            {
-                first = false;
-            } else
-            {
-                builder.Append(", ");
-            }
-
-            builder.Append(part);
-        }
-        builder.Append(']');
-
-        return true;
-    }
-
-    public void Deconstruct(out IReadOnlyList<INotification> Parts, out INotificationId NotificationId)
-    {
-        Parts = this.Parts;
-        NotificationId = this.NotificationId;
-    }
-}

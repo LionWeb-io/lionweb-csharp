@@ -18,12 +18,19 @@
 namespace LionWeb.Core.Notification.Forest;
 
 /// All LionWeb notifications relating to a forest.
-public interface IForestNotification : INotification;
+public interface IForestNotification : INotification
+{
+    /// Partition of this notification
+    IPartitionInstance Partition { get; }
+}
 
 public abstract record AForestNotification(INotificationId NotificationId) : IForestNotification
 {
     /// <inheritdoc />
     public INotificationId NotificationId { get; set; } = NotificationId;
+
+    /// <inheritdoc />
+    public abstract IPartitionInstance Partition { get; }
 }
 
 /// A partition has been deleted from this forest.
@@ -31,11 +38,19 @@ public abstract record AForestNotification(INotificationId NotificationId) : IFo
 public record PartitionDeletedNotification(
     IPartitionInstance DeletedPartition,
     INotificationId NotificationId)
-    : AForestNotification(NotificationId);
+    : AForestNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override IPartitionInstance Partition => DeletedPartition;
+}
 
 /// A new partition has been added to this forest.
 /// <param name="NewPartition">The newly added partition.</param>
 public record PartitionAddedNotification(
     IPartitionInstance NewPartition,
     INotificationId NotificationId)
-    : AForestNotification(NotificationId);
+    : AForestNotification(NotificationId)
+{
+    /// <inheritdoc />
+    public override IPartitionInstance Partition => NewPartition;
+}

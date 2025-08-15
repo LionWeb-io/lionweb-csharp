@@ -17,27 +17,42 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
-public abstract class NotificationCompsitorBase<TNotification> : NotificationHandlerBase<TNotification>
+/// Base class to compose several <typeparamref name="TNotification"/> into one <see cref="CompositeNotification"/>.
+///
+/// We keep a stack of composites.
+/// Every time a new composite is <see cref="Push">pushed</see>, that composite is added to the previous one (if any).
+public abstract class NotificationCompositorBase<TNotification> : NotificationHandlerBase<TNotification>
     where TNotification : INotification
 {
     private readonly INotificationIdProvider _idProvider;
 
     protected readonly Stack<CompositeNotification> _composites = [];
 
-    protected NotificationCompsitorBase(object? notificationHandlerId) : base(notificationHandlerId)
+    /// <inheritdoc cref="NotificationCompositorBase{TNotification}"/>
+    protected NotificationCompositorBase(object? notificationHandlerId) : base(notificationHandlerId)
     {
         _idProvider = new NotificationIdProvider(notificationHandlerId);
     }
 
+    /// Pushes a new composite, and adds it to the previous one (if any).
     public CompositeNotification Push() =>
         Push(new CompositeNotification(_idProvider.CreateNotificationId()));
 
+    /// Pushes <paramref name="composite"/>, and adds it to the previous one (if any).
+    /// <returns><paramref name="composite"/></returns>
     public T Push<T>(T composite) where T : CompositeNotification
     {
+        if (_composites.TryPeek(out CompositeNotification previous))
+            previous.AddPart(composite);
+
         _composites.Push(composite);
         return composite;
     }
 
+    /// Pops the previous composite.
+    /// <param name="send">If <c>true</c>, sends the popped composite to <i>following</i> handlers.</param>
+    /// <returns>The previous composite</returns>
+    /// <exception cref="InvalidOperationException">If there's no previous composite.</exception>
     public CompositeNotification Pop(bool send)
     {
         var result = _composites.Pop();

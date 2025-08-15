@@ -18,36 +18,39 @@
 namespace LionWeb.Core.Notification.Forest;
 
 using Handler;
-using M1;
 using Partition;
 
-public class ForestNotificationCompositor : NotificationCompsitorBase<IForestNotification>
+/// <inheritdoc cref="NotificationCompositorBase{TNotification}"/>
+///
+/// Composes notifications across several partitions, and changes to partitions within a forest.
+///
+/// Automatically handles partitions added <i>after</i> this compositor has been connected;
+/// cannot handle partitions already existing in the connected forest beforehand. 
+public class ForestNotificationCompositor(object? handlerId)
+    : NotificationCompositorBase<IForestNotification>(handlerId), IForestNotificationHandler
 {
     private readonly Dictionary<NodeId, PartitionNotificationCompositor> _partitionCompositors = [];
 
-    public ForestNotificationCompositor(IForest forest, object? handlerId) : base(handlerId)
-    {
-        foreach (var partition in forest.Partitions)
-            RegisterPartition(partition);
-    }
-
     /// <inheritdoc />
-    public override void Receive(IForestNotification message)
+    public void Receive(IPartitionNotificationHandler correspondingHandler, IForestNotification message)
     {
         switch (message)
         {
             case PartitionAddedNotification n:
-                RegisterPartition(n.NewPartition);
+                RegisterPartition(correspondingHandler, n.NewPartition);
                 break;
             case PartitionDeletedNotification n:
-                UnregisterPartition(n.DeletedPartition);
+                UnregisterPartition(correspondingHandler, n.DeletedPartition);
                 break;
         }
 
         if (!TryAdd(message))
             Send(message);
     }
-    
+
+    /// <inheritdoc />
+    public override void Receive(IForestNotification message) => throw new NotImplementedException();
+
     protected internal bool TryAdd(INotification notification)
     {
         if (!_composites.TryPeek(out var composite))
@@ -56,23 +59,28 @@ public class ForestNotificationCompositor : NotificationCompsitorBase<IForestNot
         composite.AddPart(notification);
         return true;
     }
-    
+
     protected virtual PartitionNotificationCompositor CreateCompositor(IPartitionInstance partition, string sender) =>
         new(sender, this);
 
-    private void RegisterPartition(IPartitionInstance partition)
+    private void RegisterPartition(IPartitionNotificationHandler correspondingHandler, IPartitionInstance partition)
     {
         var partitionId = partition.GetId();
         var compositor = CreateCompositor(partition, $"{Sender}.{partitionId}");
         if (!_partitionCompositors.TryAdd(partitionId, compositor))
             throw new ArgumentException(
                 $"Duplicate partition compositor: {partitionId}: {compositor} {_partitionCompositors[partitionId]}");
+
+        INotificationHandler.Connect(correspondingHandler, compositor);
     }
 
-    private void UnregisterPartition(IPartitionInstance partition)
+    private void UnregisterPartition(IPartitionNotificationHandler correspondingHandler, IPartitionInstance partition)
     {
         var partitionId = partition.GetId();
-        if (!_partitionCompositors.Remove(partitionId))
+        if (!_partitionCompositors.Remove(partitionId, out var partitionCompositor))
             throw new ArgumentException($"Unknown partition compositor: {partitionId}");
+
+        correspondingHandler.Unsubscribe<IPartitionNotificationHandler>(partitionCompositor);
+        partitionCompositor.Dispose();
     }
 }

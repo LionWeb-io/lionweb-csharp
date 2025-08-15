@@ -20,20 +20,28 @@ namespace LionWeb.Core.Notification.Partition;
 using Forest;
 using Handler;
 
-public class PartitionNotificationCompositor : NotificationCompsitorBase<IPartitionNotification>
+/// <inheritdoc cref="PartitionNotificationCompositor(object, ForestNotificationCompositor)"/>
+public class PartitionNotificationCompositor : NotificationCompositorBase<IPartitionNotification>
 {
     private readonly ForestNotificationCompositor? _forestCompositor;
 
-    public PartitionNotificationCompositor(object? notificationHandlerId, ForestNotificationCompositor? forestCompositor) : base(notificationHandlerId)
+    /// <inheritdoc />
+    /// If <paramref name="forestCompositor"/> is set and has a composite, we add newly <see cref="Receive">received</see>
+    /// to the forest's composite. 
+    public PartitionNotificationCompositor(
+        object? notificationHandlerId,
+        ForestNotificationCompositor? forestCompositor
+    ) : base(notificationHandlerId)
     {
         _forestCompositor = forestCompositor;
     }
 
+    /// <inheritdoc />
     public override void Receive(IPartitionNotification message)
     {
         if (_forestCompositor != null && _forestCompositor.TryAdd(message))
             return;
-                
+
         if (_composites.TryPeek(out var composite))
             composite.AddPart(message);
         else
