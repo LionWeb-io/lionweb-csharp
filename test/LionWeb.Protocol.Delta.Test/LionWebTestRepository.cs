@@ -55,10 +55,10 @@ public class LionWebTestRepository : LionWebRepository
         }
     }
 
-    /// Wait until <paramref name="delta"/> <i>more</i> messages than at the last call have been received.
+    /// Wait until <paramref name="numberOfMessages"/> <i>more</i> messages than at the last call have been received.
     /// Counts any kind of <see cref="IDeltaContent">delta message</see>.
-    public void WaitForReceived(int delta) =>
-        WaitForReceivedCount(WaitReceivedCount += delta);
+    public void WaitForReceived(int numberOfMessages) =>
+        WaitForReceivedCount(WaitReceivedCount += numberOfMessages);
 
     /// <inheritdoc />
     protected override Task Receive(IMessageContext<IDeltaContent> messageContext)
