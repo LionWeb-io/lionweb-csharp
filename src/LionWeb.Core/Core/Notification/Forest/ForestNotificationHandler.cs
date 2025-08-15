@@ -22,10 +22,10 @@ using Partition;
 
 /// Provides notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
 /// Raises notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-public interface IForestNotificationHandler : INotificationHandler<IForestNotification>
+public interface IForestNotificationHandler : INotificationHandler
 {
-    /// <inheritdoc cref="INotificationHandler{TNotification}.Receive"/>
-    /// If used (instead of <see cref="INotificationHandler{TNotification}.Receive"/>), <paramref name="correspondingHandler"/>
+    /// <inheritdoc cref="IINotificationHandlerReceive"/>
+    /// If used (instead of <see cref="IINotificationHandlerReceive"/>), <paramref name="correspondingHandler"/>
     /// is the <i>preceding</i> handler for <paramref name="message"/>.<see cref="IForestNotification.Partition"/>.
     public void Receive(IPartitionNotificationHandler correspondingHandler, IForestNotification message) =>
         Receive(message);
@@ -39,10 +39,19 @@ public class ForestNotificationHandler(object? sender)
     : ModelNotificationHandlerBase<IForestNotification>(sender), IForestNotificationHandler
 {
     /// <inheritdoc />
-    public void Receive(IPartitionNotificationHandler correspondingHandler, IForestNotification message) => 
+    public void Receive(IPartitionNotificationHandler correspondingHandler, IForestNotification message) =>
         Receive(message);
 
     /// <inheritdoc />
-    protected override void Send(IForestNotification message) =>
-        SendWithSender(message.Partition.GetNotificationHandler(), message);
+    protected override void Send(INotification message)
+    {
+        switch (message)
+        {
+            case IForestNotification f:
+                SendWithSender(f.Partition.GetNotificationHandler(), message);
+                return;
+            default:
+                throw new NotImplementedException();
+        }
+    }
 }

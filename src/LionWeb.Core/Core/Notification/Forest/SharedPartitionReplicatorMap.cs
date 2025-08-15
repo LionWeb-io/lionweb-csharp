@@ -18,16 +18,15 @@
 namespace LionWeb.Core.Notification.Forest;
 
 using Handler;
-using Partition;
 
 public class SharedPartitionReplicatorMap
 {
-    private readonly Dictionary<NodeId, INotificationHandler<IPartitionNotification>> _localPartitionReplicators = [];
+    private readonly Dictionary<NodeId, INotificationHandler> _localPartitionReplicators = [];
 
-    public INotificationHandler<IPartitionNotification> Lookup(NodeId partitionId) =>
+    public INotificationHandler Lookup(NodeId partitionId) =>
         _localPartitionReplicators[partitionId];
 
-    public void Register(NodeId partitionId, INotificationHandler<IPartitionNotification> replicator)
+    public void Register(NodeId partitionId, INotificationHandler replicator)
     {
         if (!_localPartitionReplicators.TryAdd(partitionId, replicator))
             throw new ArgumentException(

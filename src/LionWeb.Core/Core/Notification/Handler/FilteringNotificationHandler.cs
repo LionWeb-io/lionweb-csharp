@@ -20,9 +20,7 @@ namespace LionWeb.Core.Notification.Handler;
 using System.Diagnostics;
 
 /// Forwards <see cref="Receive">received</see> notifications if the notification passes <see cref="Filter"/>.
-public abstract class FilteringNotificationHandler<TNotification>(object? sender)
-    : /*IDisposable,*/ NotificationHandlerBase<TNotification>(sender)
-    where TNotification : class, INotification
+public abstract class FilteringNotificationHandler(object? sender) : NotificationHandlerBase(sender)
 {
 
     /// Unsubscribes all registered <see cref="Subscribe{TSubscribedEvent}">subscribers</see>.
@@ -40,7 +38,7 @@ public abstract class FilteringNotificationHandler<TNotification>(object? sender
     // }
 
     /// <inheritdoc />
-    public override void Receive(TNotification message)
+    public override void Receive(INotification message)
     {
         var filtered = Filter(message);
         Debug.WriteLine($"Forwarding notification id {message.NotificationId}: {filtered?.NotificationId}");
@@ -52,11 +50,11 @@ public abstract class FilteringNotificationHandler<TNotification>(object? sender
     /// Determines whether <paramref name="notification"/> will be <see cref="IHandler{TReceive,TSend}.Send">sent</see> to <i>following</i> notification handlers.
     /// <param name="notification">Notification to check.</param>
     /// <returns>the notification to send, or <c>null</c>.</returns>
-    protected abstract TNotification? Filter(TNotification notification);
+    protected abstract INotification? Filter(INotification notification);
 }
 
 /// Suppresses all notifications with <see cref="RegisterNotificationId">registered notification ids</see>.
-public class IdFilteringNotificationHandler<TNotification>(object? sender) : FilteringNotificationHandler<TNotification>(sender) where TNotification : class, INotification
+public class IdFilteringNotificationHandler(object? sender) : FilteringNotificationHandler(sender)
 {
     private readonly HashSet<INotificationId> _notificationIds = [];
 
@@ -69,7 +67,7 @@ public class IdFilteringNotificationHandler<TNotification>(object? sender) : Fil
         _notificationIds.Remove(notificationId);
 
     /// <inheritdoc />
-    protected override TNotification? Filter(TNotification notification)
+    protected override INotification? Filter(INotification notification)
     {
         var result = !_notificationIds.Contains(notification.NotificationId);
         return result ? notification : null;

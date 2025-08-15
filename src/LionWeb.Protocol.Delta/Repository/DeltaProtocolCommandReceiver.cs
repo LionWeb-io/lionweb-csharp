@@ -37,7 +37,7 @@ public class DeltaProtocolCommandReceiver
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
         SharedKeyedMap sharedKeyedMap,
         DeserializerBuilder deserializerBuilder,
-        INotificationHandler<IForestNotification> forestNotificationReplicator)
+        INotificationHandler forestNotificationReplicator)
         : base(sharedNodeMap, sharedPartitionReplicatorMap, forestNotificationReplicator)
     {
         _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);

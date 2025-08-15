@@ -24,18 +24,18 @@ using Core.Notification.Partition;
 
 internal static class RewritePartitionNotificationReplicator
 {
-    public static new INotificationHandler<IPartitionNotification> Create(IPartitionInstance localPartition,
+    public static new INotificationHandler Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
-        var filter = new IdFilteringNotificationHandler<IPartitionNotification>(internalSender);
-        var replacingFilter = new IdReplacingNotificationHandler<IPartitionNotification>(internalSender);
+        var filter = new IdFilteringNotificationHandler(internalSender);
+        var replacingFilter = new IdReplacingNotificationHandler(internalSender);
         var remoteReplicator =
             new RewriteRemotePartitionNotificationReplicator(localPartition, filter, replacingFilter, sharedNodeMap,
                 internalSender);
         var localReplicator = new LocalPartitionNotificationReplicator(sharedNodeMap, internalSender);
 
-        var result = new CompositeNotificationHandler<IPartitionNotification>(
+        var result = new CompositeNotificationHandler(
             [replacingFilter, remoteReplicator, filter],
             sender ?? $"Composite of {nameof(RewritePartitionNotificationReplicator)} {localPartition.GetId()}");
 
@@ -52,15 +52,15 @@ internal static class RewritePartitionNotificationReplicator
 
 internal class RewriteRemotePartitionNotificationReplicator(
     IPartitionInstance localPartition,
-    IdFilteringNotificationHandler<IPartitionNotification> filter,
-    IdReplacingNotificationHandler<IPartitionNotification> replacingFilter,
+    IdFilteringNotificationHandler filter,
+    IdReplacingNotificationHandler replacingFilter,
     SharedNodeMap sharedNodeMap,
     object? sender)
     : RemotePartitionNotificationReplicator(localPartition, sharedNodeMap, filter, sender)
 {
     private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(null);
 
-    protected override void SuppressNotificationForwarding(IPartitionNotification partitionNotification, Action action)
+    protected override void SuppressNotificationForwarding(INotification partitionNotification, Action action)
     {
         var notificationId = _notificationIdProvider.CreateNotificationId();
         var originalNotificationId = partitionNotification.NotificationId;

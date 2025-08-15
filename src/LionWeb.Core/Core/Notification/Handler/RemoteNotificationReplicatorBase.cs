@@ -25,14 +25,13 @@ using Utilities;
 /// Example: We receive a <see cref="PropertyAddedNotification" /> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-public abstract class RemoteNotificationReplicatorBase<TNotification> : NotificationHandlerBase<TNotification>
-    where TNotification : class, INotification
+public abstract class RemoteNotificationReplicatorBase : NotificationHandlerBase
 {
     protected readonly SharedNodeMap SharedNodeMap;
-    protected readonly IdFilteringNotificationHandler<TNotification> Filter;
+    protected readonly IdFilteringNotificationHandler Filter;
 
     protected RemoteNotificationReplicatorBase(SharedNodeMap sharedNodeMap,
-        IdFilteringNotificationHandler<TNotification> filter,
+        IdFilteringNotificationHandler filter,
         object? sender) : base(sender)
     {
         SharedNodeMap = sharedNodeMap;
@@ -49,10 +48,10 @@ public abstract class RemoteNotificationReplicatorBase<TNotification> : Notifica
     //
     //     GC.SuppressFinalize(this);
     // }
-    public override void Receive(TNotification message) =>
+    public override void Receive(INotification message) =>
         ProcessNotification(message);
 
-    protected abstract void ProcessNotification(TNotification? notification);
+    protected abstract void ProcessNotification(INotification? notification);
 
     protected INode Lookup(NodeId nodeId) =>
         (INode)SharedNodeMap[nodeId];
@@ -60,8 +59,8 @@ public abstract class RemoteNotificationReplicatorBase<TNotification> : Notifica
     protected INode? LookupOpt(NodeId nodeId) =>
         SharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
 
-    /// Uses <see cref="IdFilteringNotificationHandler{TNotification}"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
-    protected virtual void SuppressNotificationForwarding(TNotification notification, Action action)
+    /// Uses <see cref="IdFilteringNotificationHandler"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
+    protected virtual void SuppressNotificationForwarding(INotification notification, Action action)
     {
         var notificationId = notification.NotificationId;
         Filter.RegisterNotificationId(notificationId);

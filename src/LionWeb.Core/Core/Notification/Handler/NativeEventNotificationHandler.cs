@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Notification.Handler;
 
 internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotification> handler)
-    : INotificationHandler<TNotification> where TNotification : INotification
+    : INotificationHandler where TNotification : INotification
 {
     public void Dispose()
     {
@@ -31,20 +31,22 @@ internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotif
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Receive(TNotification message) =>
-        handler.Invoke(null, message);
+    public void Receive(INotification message)
+    {
+        if (message is TNotification notification)
+            handler.Invoke(null, notification);
+    }
 
     /// <inheritdoc />
-    public void Send(TNotification message) =>
+    public void Send(INotification message) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Subscribe<TSubscribedNotification>(INotificationHandler<TSubscribedNotification> receiver)
-        where TSubscribedNotification : INotification =>
+    public void Subscribe(INotificationHandler receiver) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    void INotificationHandler.Unsubscribe<T>(INotificationHandler receiver) =>
+    void INotificationHandler.Unsubscribe(INotificationHandler receiver) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />

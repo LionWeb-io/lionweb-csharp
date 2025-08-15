@@ -23,21 +23,21 @@ using Partition;
 using System.Diagnostics;
 
 /// Replicates notifications for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
-/// <inheritdoc cref="RemoteNotificationReplicatorBase{TNotification}"/>
+/// <inheritdoc cref="RemoteNotificationReplicatorBase"/>
 public static class ForestNotificationReplicator
 {
-    public static INotificationHandler<IForestNotification> Create(IForest localForest,
+    public static INotificationHandler Create(IForest localForest,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
-        var filter = new IdFilteringNotificationHandler<IForestNotification>(internalSender);
+        var filter = new IdFilteringNotificationHandler(internalSender);
         var remoteReplicator =
             new RemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, internalSender);
         var localReplicator =
             new LocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap,
                 internalSender);
 
-        var result = new CompositeNotificationHandler<IForestNotification>([remoteReplicator, filter],
+        var result = new CompositeNotificationHandler([remoteReplicator, filter],
             sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
 
         var forestHandler = localForest.GetNotificationHandler();
@@ -51,13 +51,12 @@ public static class ForestNotificationReplicator
     }
 }
 
-public class RemoteForestNotificationReplicator :
-    RemoteNotificationReplicatorBase<IForestNotification>, IForestNotificationHandler
+public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBase, IForestNotificationHandler
 {
     private readonly IForest _localForest;
 
     protected internal RemoteForestNotificationReplicator(IForest localForest, SharedNodeMap sharedNodeMap,
-        IdFilteringNotificationHandler<IForestNotification> filter, object? sender) :
+        IdFilteringNotificationHandler filter, object? sender) :
         base(sharedNodeMap, filter, sender)
     {
         _localForest = localForest;
@@ -84,7 +83,7 @@ public class RemoteForestNotificationReplicator :
     // }
 
     /// <inheritdoc />
-    protected override void ProcessNotification(IForestNotification? forestNotification)
+    protected override void ProcessNotification(INotification? forestNotification)
     {
         Debug.WriteLine($"{this.GetType()}: processing notification {forestNotification}");
         switch (forestNotification)
@@ -115,7 +114,7 @@ public class RemoteForestNotificationReplicator :
         });
 }
 
-public class LocalForestNotificationReplicator : NotificationHandlerBase<IForestNotification>,
+public class LocalForestNotificationReplicator : NotificationHandlerBase,
     IForestNotificationHandler
 {
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
@@ -138,7 +137,7 @@ public class LocalForestNotificationReplicator : NotificationHandlerBase<IForest
     }
 
     /// <inheritdoc />
-    public override void Receive(IForestNotification message)
+    public override void Receive(INotification message)
     {
         switch (message)
         {
@@ -151,19 +150,19 @@ public class LocalForestNotificationReplicator : NotificationHandlerBase<IForest
         }
     }
 
-    protected virtual INotificationHandler<IPartitionNotification> CreatePartitionNotificationReplicator(
+    protected virtual INotificationHandler CreatePartitionNotificationReplicator(
         IPartitionInstance partition,
         string sender) =>
         PartitionNotificationReplicator.Create(partition, _sharedNodeMap, sender);
 
-    private INotificationHandler<IPartitionNotification> RegisterPartition(IPartitionInstance partition)
+    private INotificationHandler RegisterPartition(IPartitionInstance partition)
     {
         var replicator = CreatePartitionNotificationReplicator(partition, $"{Sender}.{partition.GetId()}");
         _sharedPartitionReplicatorMap.Register(partition.GetId(), replicator);
         return replicator;
     }
 
-    private INotificationHandler<IPartitionNotification> UnregisterPartition(IPartitionInstance partition)
+    private INotificationHandler UnregisterPartition(IPartitionInstance partition)
     {
         var replicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
         replicator.Dispose();

@@ -49,7 +49,7 @@ public class ForestNotificationCompositor(object? handlerId)
     }
 
     /// <inheritdoc />
-    public override void Receive(IForestNotification message) => throw new NotImplementedException();
+    public override void Receive(INotification message) => throw new NotImplementedException();
 
     protected internal bool TryAdd(INotification notification)
     {
@@ -80,7 +80,7 @@ public class ForestNotificationCompositor(object? handlerId)
         if (!_partitionCompositors.Remove(partitionId, out var partitionCompositor))
             throw new ArgumentException($"Unknown partition compositor: {partitionId}");
 
-        correspondingHandler.Unsubscribe<IPartitionNotificationHandler>(partitionCompositor);
+        correspondingHandler.Unsubscribe(partitionCompositor);
         partitionCompositor.Dispose();
     }
 }

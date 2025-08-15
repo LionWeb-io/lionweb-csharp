@@ -23,7 +23,6 @@ using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Handler;
-using Core.Notification.Partition;
 using Forest;
 
 public abstract class LionWebRepositoryBase<T> : IDisposable
@@ -34,7 +33,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
 
-    protected readonly INotificationHandler<IForestNotification> _replicator;
+    protected readonly INotificationHandler _replicator;
 
     private long nextFreeNodeId = 0;
 
@@ -83,9 +82,9 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     #region Local
 
     private class LocalForestChangeNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : NotificationHandlerBase<IForestNotification>(sender)
+        : NotificationHandlerBase(sender)
     {
-        public override void Receive(IForestNotification message)
+        public override void Receive(INotification message)
         {
             switch (message)
             {
@@ -100,16 +99,16 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     }
 
     private class LocalForestNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : NotificationHandlerBase<IForestNotification>(sender)
+        : NotificationHandlerBase(sender)
     {
-        public override void Receive(IForestNotification message) =>
+        public override void Receive(INotification message) =>
             repository.SendNotificationToAllClients(sender, message);
     }
 
     private class LocalPartitionNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : NotificationHandlerBase<IPartitionNotification>(sender)
+        : NotificationHandlerBase(sender)
     {
-        public override void Receive(IPartitionNotification message) =>
+        public override void Receive(INotification message) =>
             repository.SendNotificationToAllClients(sender, message);
     }
 

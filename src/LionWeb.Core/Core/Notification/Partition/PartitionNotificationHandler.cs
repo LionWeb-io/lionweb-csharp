@@ -21,7 +21,7 @@ using Handler;
 
 /// Provides notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 /// Raises notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-public interface IPartitionNotificationHandler : INotificationHandler<IPartitionNotification>
+public interface IPartitionNotificationHandler : INotificationHandler
 {
     public INotificationId CreateNotificationId();
 

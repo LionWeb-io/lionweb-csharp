@@ -275,7 +275,7 @@ internal class ForestEventCounter() : NotificationCompositorBase<IForestNotifica
 {
     public int Count { get; private set; }
     
-    public override void Receive(IForestNotification message) =>
+    public override void Receive(INotification message) =>
         Count++;
 }
 
@@ -283,6 +283,6 @@ internal class PartitionEventCounter() : NotificationCompositorBase<IPartitionNo
 {
     public int Count { get; private set; }
     
-    public override void Receive(IPartitionNotification message) =>
+    public override void Receive(INotification message) =>
         Count++;
 }

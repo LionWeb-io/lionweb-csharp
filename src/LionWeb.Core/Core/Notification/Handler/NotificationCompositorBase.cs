@@ -21,7 +21,7 @@ namespace LionWeb.Core.Notification.Handler;
 ///
 /// We keep a stack of composites.
 /// Every time a new composite is <see cref="Push">pushed</see>, that composite is added to the previous one (if any).
-public abstract class NotificationCompositorBase<TNotification> : NotificationHandlerBase<TNotification>
+public abstract class NotificationCompositorBase<TNotification> : NotificationHandlerBase
     where TNotification : INotification
 {
     private readonly INotificationIdProvider _idProvider;

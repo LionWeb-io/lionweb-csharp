@@ -19,8 +19,8 @@ namespace LionWeb.Core.Notification.Handler;
 
 /// TODO: Do we really need this class?
 /// Replaces all <see cref="RegisterReplacementNotificationId">registered notification ids</see>.
-public class IdReplacingNotificationHandler<TNotification>(object? sender)
-    : FilteringNotificationHandler<TNotification>(sender) where TNotification : class, INotification
+public class IdReplacingNotificationHandler(object? sender)
+    : FilteringNotificationHandler(sender)
 {
     private readonly Dictionary<INotificationId, INotificationId> _originalNotificationIds = [];
 
@@ -33,9 +33,9 @@ public class IdReplacingNotificationHandler<TNotification>(object? sender)
         _originalNotificationIds.Remove(notificationId);
 
     /// <inheritdoc />
-    protected override TNotification Filter(TNotification notification)
+    protected override INotification Filter(INotification notification)
     {
-        TNotification result = notification;
+        INotification result = notification;
         if (_originalNotificationIds.TryGetValue(notification.NotificationId, out var replacement))
         {
             result.NotificationId = replacement;

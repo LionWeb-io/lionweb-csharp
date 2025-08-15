@@ -37,7 +37,7 @@ public class PartitionNotificationCompositor : NotificationCompositorBase<IParti
     }
 
     /// <inheritdoc />
-    public override void Receive(IPartitionNotification message)
+    public override void Receive(INotification message)
     {
         if (_forestCompositor != null && _forestCompositor.TryAdd(message))
             return;

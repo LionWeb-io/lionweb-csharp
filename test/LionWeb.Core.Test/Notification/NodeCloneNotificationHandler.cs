@@ -22,10 +22,10 @@ using Core.Notification.Forest;
 using Core.Notification.Handler;
 using Core.Notification.Partition;
 
-internal class NodeCloneNotificationHandler<TNotification>(object? sender) : NotificationHandlerBase<TNotification>(sender)
+internal class NodeCloneNotificationHandler<TNotification>(object? sender) : NotificationHandlerBase(sender)
     where TNotification : INotification
 {
-    public override void Receive(TNotification message)
+    public override void Receive(INotification message)
     {
         INotification result = message switch
         {

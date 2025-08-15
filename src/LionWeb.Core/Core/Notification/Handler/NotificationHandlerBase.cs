@@ -22,34 +22,11 @@ using Partition;
 using System.Reflection;
 
 /// Base for all <see cref="INotificationHandler">notification handlers</see> that process <see cref="INotification">notifications</see>.
-public abstract class NotificationHandlerBase
-{
-    protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
-
-    private static ILookup<Type, Type> InitAllSubtypes()
-    {
-        Type[] allTypes = Assembly
-            .GetExecutingAssembly()
-            .GetTypes();
-
-        List<Type> baseTypes = [typeof(INotification), typeof(IForestNotification), typeof(IPartitionNotification)];
-
-        return baseTypes
-            .SelectMany(baseType => allTypes
-                .Where(subType => subType.IsAssignableTo(baseType))
-                .SelectMany(subType => new List<(Type, Type)> { (baseType, subType), (subType, subType) })
-            )
-            .ToLookup(k => k.Item1, e => e.Item2);
-    }
-}
-
-/// <inheritdoc cref="NotificationHandlerBase"/>
-public abstract class NotificationHandlerBase<TNotification> : NotificationHandlerBase,
-    INotificationHandler<TNotification> where TNotification : INotification
+public abstract class NotificationHandlerBase : INotificationHandler
 {
     protected readonly object Sender;
     private readonly Dictionary<Type, int> _subscribedNotifications = [];
-    private readonly Dictionary<INotificationHandler, EventHandler<TNotification>> _handlers = [];
+    private readonly Dictionary<INotificationHandler, EventHandler<INotification>> _handlers = [];
 
     /// <inheritdoc cref="NotificationHandlerBase"/>
     /// <param name="sender">Optional sender of the notifications.</param>
@@ -70,7 +47,7 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
         return;
 
         void UnsubscribeHandler<T>(INotificationHandler notificationHandler, EventHandler<T> _) =>
-            Unsubscribe<T>(notificationHandler);
+            Unsubscribe(notificationHandler);
     }
 
     /// <inheritdoc />
@@ -78,9 +55,9 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
         Sender.ToString() ?? GetType().Name;
 
     /// <inheritdoc />
-    public abstract void Receive(TNotification message);
+    public abstract void Receive(INotification message);
 
-    private event EventHandler<TNotification>? InternalEvent;
+    private event EventHandler<INotification>? InternalEvent;
 
 
     /// <inheritdoc />
@@ -91,38 +68,37 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
 
 
     /// <inheritdoc />
-    void INotificationHandler<TNotification>.Send(TNotification message) =>
+    void INotificationHandler.Send(INotification message) =>
         Send(message);
 
-    /// <inheritdoc cref="INotificationHandler{TNotification}.Send"/>
-    protected virtual void Send(TNotification message) =>
+    /// <inheritdoc cref="IINotificationHandlerSend"/>
+    protected virtual void Send(INotification message) =>
         SendWithSender(Sender, message);
 
     /// This notification handler wants to send <paramref name="message"/> with <paramref name="sender"/>.
     /// Only this notification handler should use this method.
-    protected void SendWithSender(object? sender, TNotification message) =>
+    protected void SendWithSender(object? sender, INotification message) =>
         InternalEvent?.Invoke(sender, message);
 
     /// <inheritdoc />
-    void INotificationHandler<TNotification>.Subscribe<TSubscribedNotification>(
-        INotificationHandler<TSubscribedNotification> receiver) =>
-        Subscribe(receiver);
+    void INotificationHandler.Subscribe(INotificationHandler receiver) =>
+        Subscribe<INotification>(receiver);
 
-    /// <inheritdoc cref="INotificationHandler{TNotification}.Subscribe{TSubscribedNotification}"/>
-    protected void Subscribe<TSubscribedNotification>(INotificationHandler<TSubscribedNotification> receiver)
+    /// <inhINotificationHandler.SubscribedNotification}"/>
+    protected void Subscribe<TSubscribedNotification>(INotificationHandler receiver)
         where TSubscribedNotification : INotification
     {
         RegisterSubscribedNotifications<TSubscribedNotification>();
 
-        var handler = CreateHandler(receiver);
+        var handler = CreateHandler<INotification>(receiver);
 
         _handlers[receiver] = handler;
 
         InternalEvent += handler;
     }
 
-    private EventHandler<TNotification> CreateHandler<TSubscribedNotification>(
-        INotificationHandler<TSubscribedNotification> receiver) where TSubscribedNotification : INotification =>
+    private EventHandler<INotification> CreateHandler<TSubscribedNotification>(
+        INotificationHandler receiver) where TSubscribedNotification : INotification =>
         (sender, notification) =>
         {
             if (notification is not TSubscribedNotification r)
@@ -151,9 +127,9 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
         }
     }
 
-    private void UnregisterSubscribedNotifications<TSubscribedNotification>()
+    private void UnregisterSubscribedNotifications()
     {
-        var notificationType = typeof(TSubscribedNotification);
+        var notificationType = typeof(INotification);
         var allSubtypes = AllSubtypes[notificationType];
         foreach (var subtype in allSubtypes)
         {
@@ -162,18 +138,14 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
     }
 
     /// <inheritdoc />
-    void INotificationHandler.Unsubscribe<T>(INotificationHandler receiver) =>
-        Unsubscribe<T>(receiver);
-
-    /// <inheritdoc cref="INotificationHandler.Unsubscribe{T}"/>
-    private void Unsubscribe<T>(INotificationHandler receiver)
+    public void Unsubscribe(INotificationHandler receiver)
     {
         if (!_handlers.Remove(receiver, out var handler))
             return;
 
         InternalEvent -= handler;
 
-        UnregisterSubscribedNotifications<T>();
+        UnregisterSubscribedNotifications();
     }
 
     /// <inheritdoc />
@@ -188,5 +160,23 @@ public abstract class NotificationHandlerBase<TNotification> : NotificationHandl
         {
             handler.PrintAllReceivers(alreadyPrinted, indent + "  ");
         }
+    }
+    
+    protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
+
+    private static ILookup<Type, Type> InitAllSubtypes()
+    {
+        Type[] allTypes = Assembly
+            .GetExecutingAssembly()
+            .GetTypes();
+
+        List<Type> baseTypes = [typeof(INotification), typeof(IForestNotification), typeof(IPartitionNotification)];
+
+        return baseTypes
+            .SelectMany(baseType => allTypes
+                .Where(subType => subType.IsAssignableTo(baseType))
+                .SelectMany(subType => new List<(Type, Type)> { (baseType, subType), (subType, subType) })
+            )
+            .ToLookup(k => k.Item1, e => e.Item2);
     }
 }

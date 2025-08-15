@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification;
 
+using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Handler;
 using Core.Notification.Partition;
@@ -122,7 +123,7 @@ public class NotificationTests_Forest
 
     #endregion
 
-    private static INotificationHandler<IForestNotification> CreateReplicator(Forest cloneForest,
+    private static INotificationHandler CreateReplicator(Forest cloneForest,
         Forest originalForest)
     {
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
@@ -144,9 +145,9 @@ public class NotificationTests_Forest
 }
 
 internal class TestLocalForestChangeNotificationHandler(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
-    : NotificationHandlerBase<IForestNotification>(sender)
+    : NotificationHandlerBase(sender)
 {
-    public override void Receive(IForestNotification message)
+    public override void Receive(INotification message)
     {
         switch (message)
         {

@@ -831,7 +831,7 @@ public class NotificationTests_Twoway
     #endregion
 
 
-    private Tuple<INotificationHandler<IPartitionNotification>, INotificationHandler<IPartitionNotification>>
+    private Tuple<INotificationHandler, INotificationHandler>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = CreateReplicator(node, "nodeReplicator");
@@ -847,7 +847,7 @@ public class NotificationTests_Twoway
      
         return Tuple.Create(replicator, cloneReplicator);
     }
-    private static INotificationHandler<IPartitionNotification> CreateReplicator(IPartitionInstance clone, object? sender) =>
+    private static INotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
         PartitionNotificationReplicator.Create(clone, new(), sender);
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

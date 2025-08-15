@@ -17,29 +17,28 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
-/// Composes two or more <see cref="INotificationHandler{TNotification}"/>s.
+/// Composes two or more <see cref="INotificationHandler"/>s.
 ///
 /// Every message this notification handler <see cref="Receive">receives</see>
 /// is forwarded to the first <see cref="_notificationHandlers">component</see>.
 /// Each component is connected to the next component.
-/// The last component <see cref="INotificationHandler{TNotification}.Send">sends</see> to
+/// The last component <see cref="IINotificationHandlerSend">sends</see> to
 /// this notification handler's <i>following</i> notification handlers.
-public class CompositeNotificationHandler<TNotification> : INotificationHandler<TNotification>
-    where TNotification : class, INotification
+public class CompositeNotificationHandler : INotificationHandler
 {
-    private readonly INotificationHandler<TNotification> _firstHandler;
-    private readonly INotificationHandler<TNotification> _lastHandler;
-    private readonly IEnumerable<INotificationHandler<TNotification>> _notificationHandlers;
+    private readonly INotificationHandler _firstHandler;
+    private readonly INotificationHandler _lastHandler;
+    private readonly IEnumerable<INotificationHandler> _notificationHandlers;
     private readonly object? _sender;
 
-    public CompositeNotificationHandler(List<INotificationHandler<TNotification>> notificationHandlers,
+    public CompositeNotificationHandler(List<INotificationHandler> notificationHandlers,
         object? sender)
     {
         _notificationHandlers = notificationHandlers;
         _sender = sender;
         if (notificationHandlers.Count < 2)
             throw new ArgumentException(
-                $"{nameof(CompositeNotificationHandler<TNotification>)} must get at least 2 notification handlers");
+                $"{nameof(CompositeNotificationHandler)} must get at least 2 notification handlers");
 
         _firstHandler = notificationHandlers[0];
         _lastHandler = notificationHandlers[^1];
@@ -60,7 +59,7 @@ public class CompositeNotificationHandler<TNotification> : INotificationHandler<
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        foreach (INotificationHandler<TNotification> handler in _notificationHandlers.Reverse())
+        foreach (INotificationHandler handler in _notificationHandlers.Reverse())
         {
             handler.Dispose();
         }
@@ -71,22 +70,21 @@ public class CompositeNotificationHandler<TNotification> : INotificationHandler<
         _sender?.ToString() ?? GetType().Name;
 
     /// <inheritdoc />
-    public void Receive(TNotification message) =>
+    public void Receive(INotification message) =>
         _firstHandler.Receive(message);
 
     /// <inheritdoc />
     public bool CanReceive(params Type[] messageTypes) =>
         _firstHandler.CanReceive(messageTypes);
 
-    void INotificationHandler<TNotification>.Send(TNotification message) =>
+    void INotificationHandler.Send(INotification message) =>
         throw new ArgumentException("Should never be called");
 
-    void INotificationHandler<TNotification>.Subscribe<TSubscribedNotification>(
-        INotificationHandler<TSubscribedNotification> receiver) =>
+    void INotificationHandler.Subscribe(INotificationHandler receiver) =>
         _lastHandler.Subscribe(receiver);
 
-    void INotificationHandler.Unsubscribe<T>(INotificationHandler receiver) =>
-        _lastHandler.Unsubscribe<T>(receiver);
+    void INotificationHandler.Unsubscribe(INotificationHandler receiver) =>
+        _lastHandler.Unsubscribe(receiver);
 
     /// <inheritdoc />
     public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "")
