@@ -34,6 +34,9 @@ public class SharedPartitionReplicatorMap
                 $"Duplicate partition replicator: {partitionId}: {replicator} {Lookup(partitionId)}");
     }
 
-    public void Unregister(NodeId partitionId) =>
-        _localPartitionReplicators.Remove(partitionId);
+    public void Unregister(NodeId partitionId)
+    {
+        if (!_localPartitionReplicators.Remove(partitionId))
+            throw new ArgumentException($"Unknown partition replicator: {partitionId}");
+    }
 }

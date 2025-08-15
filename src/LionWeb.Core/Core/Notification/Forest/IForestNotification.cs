@@ -22,6 +22,7 @@ public interface IForestNotification : INotification;
 
 public abstract record AForestNotification(INotificationId NotificationId) : IForestNotification
 {
+    /// <inheritdoc />
     public INotificationId NotificationId { get; set; } = NotificationId;
 }
 
