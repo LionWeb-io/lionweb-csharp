@@ -167,10 +167,10 @@ public class RepositoryTests
     }
     // );
 
-    private void WaitForReceived(int numberOfMessages)
+    private void WaitForReceived(int delta)
     {
-        _aClient.WaitForReceived(numberOfMessages);
-        _bClient.WaitForReceived(numberOfMessages);
+        _aClient.WaitForReceived(delta);
+        _bClient.WaitForReceived(delta);
     }
 }
 

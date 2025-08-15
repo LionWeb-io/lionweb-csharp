@@ -55,12 +55,12 @@ public class LionWebTestClient : LionWebClient
         }
     }
 
-    /// Wait until <paramref name="numberOfMessages"/> <i>more</i> messages than at the last call have been received.
+    /// Wait until <paramref name="delta"/> <i>more</i> messages than at the last call have been received.
     /// Counts any kind of <see cref="IDeltaContent">delta message</see>.
-    public void WaitForReceived(int numberOfMessages)
+    public void WaitForReceived(int delta)
     {
-        Log($"{nameof(WaitCount)}: {WaitCount} numberOfMessages: {numberOfMessages}");
-        WaitForCount(WaitCount += numberOfMessages);
+        Log($"{nameof(WaitCount)}: {WaitCount} delta: {delta}");
+        WaitForCount(WaitCount += delta);
     }
 
     /// <inheritdoc />
