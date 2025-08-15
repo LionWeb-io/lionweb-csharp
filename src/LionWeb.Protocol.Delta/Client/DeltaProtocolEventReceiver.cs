@@ -22,15 +22,12 @@ using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Handler;
 using Core.Notification.Partition;
-using Forest;
 using Message.Event;
-using Partition;
 
 public class DeltaProtocolEventReceiver
     : DeltaProtocolReceiverBase<IDeltaEvent, IPartitionDeltaEvent, IForestDeltaEvent>
 {
-    private readonly DeltaEventToForestNotificationMapper _forestMapper;
-    private readonly DeltaEventToPartitionNotificationMapper _partitionMapper;
+    private readonly DeltaEventToNotificationMapper _mapper;
 
     public DeltaProtocolEventReceiver(
         PartitionSharedNodeMap sharedNodeMap,
@@ -40,15 +37,14 @@ public class DeltaProtocolEventReceiver
         INotificationHandler forestNotificationReplicator)
         : base(sharedNodeMap, sharedPartitionReplicatorMap, forestNotificationReplicator)
     {
-        _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
-        _partitionMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
+        _mapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
     /// <inheritdoc />
     protected override IPartitionNotification MapPartition(IPartitionDeltaEvent partitionContent) =>
-        _partitionMapper.Map(partitionContent);
+        (IPartitionNotification)_mapper.Map(partitionContent);
 
     /// <inheritdoc />
     protected override IForestNotification MapForest(IForestDeltaEvent forestContent) =>
-        _forestMapper.Map(forestContent);
+        (IForestNotification)_mapper.Map(forestContent);
 }

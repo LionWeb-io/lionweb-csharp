@@ -15,24 +15,41 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Client.Partition;
+namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
 using Core.M1;
 using Core.M2;
+using Core.M3;
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Notification.Partition;
+using Core.Serialization;
+using Message;
 using Message.Event;
 
-public class DeltaEventToPartitionNotificationMapper(
-    SharedNodeMap sharedNodeMap,
-    SharedKeyedMap sharedKeyedMap,
-    DeserializerBuilder deserializerBuilder)
-    : DeltaEventToNotificationMapperBase(sharedNodeMap, sharedKeyedMap, deserializerBuilder)
+public class DeltaEventToNotificationMapper
 {
-    public IPartitionNotification Map(IDeltaEvent deltaEvent) =>
+    private readonly SharedNodeMap _sharedNodeMap;
+    private readonly SharedKeyedMap _sharedKeyedMap;
+    private readonly DeserializerBuilder _deserializerBuilder;
+
+    public DeltaEventToNotificationMapper(
+        SharedNodeMap sharedNodeMap,
+        SharedKeyedMap sharedKeyedMap,
+        DeserializerBuilder deserializerBuilder
+    )
+    {
+        _sharedNodeMap = sharedNodeMap;
+        _sharedKeyedMap = sharedKeyedMap;
+        _deserializerBuilder = deserializerBuilder;
+    }
+
+    public INotification Map(IDeltaEvent deltaEvent) =>
         deltaEvent switch
         {
+            PartitionAdded a => OnPartitionAdded(a),
+            PartitionDeleted a => OnPartitionDeleted(a),
             PropertyAdded a => OnPropertyAdded(a),
             PropertyDeleted a => OnPropertyDeleted(a),
             PropertyChanged a => OnPropertyChanged(a),
@@ -54,6 +71,22 @@ public class DeltaEventToPartitionNotificationMapper(
             ReferenceChanged a => OnReferenceChanged(a),
             _ => throw new NotImplementedException(deltaEvent.GetType().Name)
         };
+
+    #region Partitions
+
+    private PartitionAddedNotification OnPartitionAdded(PartitionAdded partitionAdded) =>
+        new(
+            (IPartitionInstance)Deserialize(partitionAdded.NewPartition),
+            ToNotificationId(partitionAdded)
+        );
+
+    private PartitionDeletedNotification OnPartitionDeleted(PartitionDeleted partitionDeleted) =>
+        new(
+            (IPartitionInstance)ToNode(partitionDeleted.DeletedPartition),
+            ToNotificationId(partitionDeleted)
+        );
+
+    #endregion
 
     #region Properties
 
@@ -93,6 +126,13 @@ public class DeltaEventToPartitionNotificationMapper(
             ToNotificationId(propertyChangedEvent)
         );
     }
+
+    private Property ToProperty(MetaPointer deltaProperty, IReadableNode node) =>
+        ToFeature<Property>(deltaProperty, node);
+
+    private SemanticPropertyValue ToPropertyValue(IReadableNode node, Property property, PropertyValue value) =>
+        _deserializerBuilder.Build().VersionSpecifics.ConvertDatatype(node, property, property.Type, value) ??
+        throw new InvalidValueException(property, value);
 
     #endregion
 
@@ -239,6 +279,9 @@ public class DeltaEventToPartitionNotificationMapper(
         );
     }
 
+    private Containment ToContainment(MetaPointer deltaContainment, IReadableNode node) =>
+        ToFeature<Containment>(deltaContainment, node);
+
     #endregion
 
     #region Annotations
@@ -340,5 +383,52 @@ public class DeltaEventToPartitionNotificationMapper(
         );
     }
 
+    private Reference ToReference(MetaPointer deltaReference, IReadableNode node) =>
+        ToFeature<Reference>(deltaReference, node);
+
+    private IReferenceTarget ToTarget(TargetNode? targetNode, ResolveInfo? resolveInfo)
+    {
+        IReadableNode? target = null;
+        if (targetNode != null &&
+            _sharedNodeMap.TryGetValue(targetNode, out var node))
+            target = node;
+
+        return new ReferenceTarget(resolveInfo, target);
+    }
+
     #endregion
+
+    private static INotificationId ToNotificationId(IDeltaEvent deltaEvent) =>
+        new ParticipationNotificationId(deltaEvent.InternalParticipationId,
+            string.Join("_", deltaEvent.OriginCommands.Select(c => c.CommandId)));
+
+    private IWritableNode ToNode(TargetNode nodeId)
+    {
+        if (_sharedNodeMap.TryGetValue(nodeId, out var node) && node is IWritableNode w)
+            return w;
+
+        // TODO change to correct exception 
+        throw new NotImplementedException(nodeId);
+    }
+
+    private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
+    {
+        if (_sharedKeyedMap.TryGetValue(Compress(deltaReference), out var e) && e is T c)
+            return c;
+
+        throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
+    }
+
+    private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
+        CompressedMetaPointer.Create(metaPointer, true);
+
+    private IWritableNode Deserialize(DeltaSerializationChunk deltaChunk)
+    {
+        var nodes = _deserializerBuilder.Build().Deserialize(deltaChunk.Nodes, _sharedNodeMap.Values);
+        if (nodes is [IWritableNode w])
+            return w;
+
+        // TODO change to correct exception 
+        throw new NotImplementedException();
+    }
 }

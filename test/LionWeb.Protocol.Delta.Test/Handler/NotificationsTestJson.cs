@@ -18,7 +18,6 @@
 namespace LionWeb.Protocol.Delta.Test.Handler;
 
 using Client;
-using Client.Partition;
 using Core;
 using Core.M1;
 using Core.M3;
@@ -68,7 +67,7 @@ public class NotificationsTestJson : NotificationTestsBase
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
         node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
-            var command = new PartitionNotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
+            var command = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
             var json = deltaSerializer.Serialize(command);
             var deserialized = deltaSerializer.Deserialize<IDeltaCommand>(json);
             eventReceiver.Receive(commandToEventMapper.Map(deserialized));

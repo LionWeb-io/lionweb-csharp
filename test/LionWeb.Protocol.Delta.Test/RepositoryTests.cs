@@ -18,8 +18,6 @@
 namespace LionWeb.Protocol.Delta.Test;
 
 using Client;
-using Client.Forest;
-using Client.Partition;
 using Core;
 using Core.M1;
 using Core.M3;
@@ -30,8 +28,6 @@ using Core.Utilities;
 using Message;
 using Message.Event;
 using Repository;
-using Repository.Forest;
-using Repository.Partition;
 using System.Text;
 
 [TestClass]
@@ -182,11 +178,7 @@ class RepositoryConnector : IDeltaRepositoryConnector
 
     public RepositoryConnector(LionWebVersions lionWebVersion)
     {
-        var exceptionParticipationIdProvider = new ExceptionParticipationIdProvider();
-        _mapper = new(
-            new PartitionNotificationToDeltaEventMapper(exceptionParticipationIdProvider, lionWebVersion),
-            new ForestNotificationToDeltaEventMapper(exceptionParticipationIdProvider, lionWebVersion)
-        );
+        _mapper = new(new ExceptionParticipationIdProvider(), lionWebVersion);
     }
 
     public void AddClient(IClientInfo clientInfo, ClientConnector clientConnector) =>
@@ -255,11 +247,7 @@ class ClientConnector : IDeltaClientConnector
 
     public ClientConnector(LionWebVersions lionWebVersion)
     {
-        var commandIdProvider = new CommandIdProvider();
-        _mapper = new(
-            new PartitionNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion),
-            new ForestNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion)
-        );
+        _mapper = new(new CommandIdProvider(), lionWebVersion);
     }
 
     public void Connect(ParticipationId participationId, RepositoryConnector repositoryConnector)
