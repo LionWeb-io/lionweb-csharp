@@ -1037,8 +1037,8 @@ public record EntryMovedFromOtherReference(
     TargetNode OldParent,
     MetaPointer OldReference,
     Index OldIndex,
-    TargetNode? Target,
-    ResolveInfo? ResolveInfo,
+    TargetNode? movedTarget,
+    ResolveInfo? movedResolveInfo,
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
 {
@@ -1057,8 +1057,8 @@ public record EntryMovedFromOtherReferenceInSameParent(
     Index NewIndex,
     MetaPointer OldReference,
     Index OldIndex,
-    TargetNode? Target,
-    ResolveInfo? ResolveInfo,
+    TargetNode? movedTarget,
+    ResolveInfo? movedResolveInfo,
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent
 {
@@ -1072,8 +1072,8 @@ public record EntryMovedInSameReference(
     MetaPointer Reference,
     Index OldIndex,
     Index NewIndex,
-    TargetNode? Target,
-    ResolveInfo? ResolveInfo,
+    TargetNode? movedTarget,
+    ResolveInfo? movedResolveInfo,
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
@@ -1154,7 +1154,7 @@ public record ReferenceResolveInfoChanged(
     Index Index,
     ResolveInfo NewResolveInfo,
     TargetNode? Target,
-    ResolveInfo ReplacedResolveInfo,
+    ResolveInfo oldResolveInfo,
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IReferenceEvent;
 
