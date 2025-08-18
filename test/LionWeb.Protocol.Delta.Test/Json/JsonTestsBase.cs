@@ -121,9 +121,6 @@ public abstract class JsonTestsBase
 
     #region Partitions
 
-    protected static CommandResponse CreateCommandResponse() =>
-        new(CommandId(), ProtocolMessages());
-
     protected static AddPartition CreateAddPartition() =>
         new(Chunk(), CommandId(), ProtocolMessages());
 
@@ -298,7 +295,6 @@ public abstract class JsonTestsBase
 
     protected static IEnumerable<object[]> CollectCommandMessages() =>
     [
-        [CreateCommandResponse()],
         [CreateAddPartition()],
         [CreateDeletePartition()],
         [CreateChangeClassifier()],

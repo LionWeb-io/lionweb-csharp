@@ -77,14 +77,6 @@ public abstract record DeltaCommandBase(
     }
 }
 
-public record CommandResponse(CommandId CommandId, ProtocolMessage[]? ProtocolMessages)
-    : DeltaContentBase(ProtocolMessages), IDeltaContent
-{
-    /// <inheritdoc />
-    [JsonIgnore]
-    public override string Id => CommandId;
-}
-
 public record CompositeCommand(
     IDeltaCommand[] Parts,
     CommandId CommandId,
