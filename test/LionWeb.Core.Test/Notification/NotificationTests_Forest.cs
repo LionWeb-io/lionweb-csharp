@@ -147,9 +147,9 @@ public class NotificationTests_Forest
 internal class TestLocalForestChangeNotificationHandler(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
     : NotificationHandlerBase(sender)
 {
-    public override void Receive(INotification message)
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
     {
-        switch (message)
+        switch (notification)
         {
             case PartitionAddedNotification partitionAddedNotification:
                 OnLocalPartitionAdded(partitionAddedNotification);

@@ -30,7 +30,7 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     protected readonly IPartitionInstance? DestinationPartition;
 
     /// <see cref="IPartitionNotificationHandler"/> to use for our notifications, if any.
-    protected readonly IPartitionNotificationHandler? PartitionHandler;
+    private readonly IPartitionNotificationHandler? PartitionHandler;
 
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly INotifiableNode DestinationParent;
@@ -66,4 +66,10 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
     protected INotificationId GetNotificationId() => _notificationId ?? PartitionHandler.CreateNotificationId();
+    
+    protected void InitiateNotification(INotification notification) =>
+        PartitionHandler?.InitiateNotification(notification);
+    
+    protected bool CanReceive(params Type[] notificationTypes) =>
+        PartitionHandler?.CanReceive(notificationTypes) ?? false;
 }

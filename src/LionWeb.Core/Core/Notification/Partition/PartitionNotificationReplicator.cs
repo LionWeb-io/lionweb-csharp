@@ -460,9 +460,9 @@ public class LocalPartitionNotificationReplicator(SharedNodeMap sharedNodeMap, o
     : NotificationHandlerBase(sender)
 {
     /// <inheritdoc />
-    public override void Receive(INotification message)
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification) 
     {
-        switch (message)
+        switch (notification)
         {
             case ChildAddedNotification e:
                 OnLocalChildAdded(e);
@@ -478,7 +478,7 @@ public class LocalPartitionNotificationReplicator(SharedNodeMap sharedNodeMap, o
                 break;
         }
 
-        Send(message);
+        Send(notification);
     }
 
     private void OnLocalChildAdded(ChildAddedNotification childAdded) =>

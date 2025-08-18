@@ -38,13 +38,15 @@ public abstract class FilteringNotificationHandler(object? sender) : Notificatio
     // }
 
     /// <inheritdoc />
-    public override void Receive(INotification message)
+    
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
     {
-        var filtered = Filter(message);
-        Debug.WriteLine($"Forwarding notification id {message.NotificationId}: {filtered?.NotificationId}");
+        var filtered = Filter(notification);
+        Debug.WriteLine($"Forwarding notification id {notification.NotificationId}: {filtered?.NotificationId}");
         if (filtered is not null)
             Send(filtered);
     }
+
 
 
     /// Determines whether <paramref name="notification"/> will be <see cref="IHandler{TReceive,TSend}.Send">sent</see> to <i>following</i> notification handlers.

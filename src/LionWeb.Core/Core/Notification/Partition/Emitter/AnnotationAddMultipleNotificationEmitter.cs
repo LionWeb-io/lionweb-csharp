@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 
 #region Annotation
 
@@ -50,7 +49,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
             switch (old)
             {
                 case null:
-                    PartitionHandler.Receive(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
+                    InitiateNotification(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
                         GetNotificationId()));
                     break;
 
@@ -59,7 +58,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
                     var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, _newIndex, added, old.Parent,
                         old.Index, notificationId);
                     RaiseOriginMoveNotification(old, notification);
-                    PartitionHandler.Receive(notification);
+                    InitiateNotification(notification);
                     break;
 
 
@@ -68,7 +67,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
                     break;
 
                 case not null when old.Parent == DestinationParent:
-                    PartitionHandler.Receive(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
+                    InitiateNotification(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
                         old.Index, GetNotificationId()));
                     break;
 
@@ -81,9 +80,8 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        CanReceive(
             typeof(AnnotationAddedNotification),
             typeof(AnnotationMovedFromOtherParentNotification),
             typeof(AnnotationMovedInSameParentNotification)

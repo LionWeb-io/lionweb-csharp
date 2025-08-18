@@ -70,8 +70,8 @@ public class CompositeNotificationHandler : INotificationHandler
         _sender?.ToString() ?? GetType().Name;
 
     /// <inheritdoc />
-    public void Receive(INotification message) =>
-        _firstHandler.Receive(message);
+    public void Receive(INotificationHandler correspondingHandler, INotification notification) => 
+        _firstHandler.Receive(correspondingHandler, notification);
 
     /// <inheritdoc />
     public bool CanReceive(params Type[] messageTypes) =>

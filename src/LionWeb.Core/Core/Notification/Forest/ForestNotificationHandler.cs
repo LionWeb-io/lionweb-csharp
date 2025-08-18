@@ -24,11 +24,10 @@ using Partition;
 /// Raises notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
 public interface IForestNotificationHandler : INotificationHandler
 {
-    /// <inheritdoc cref="IINotificationHandlerReceive"/>
-    /// If used (instead of <see cref="IINotificationHandlerReceive"/>), <paramref name="correspondingHandler"/>
-    /// is the <i>preceding</i> handler for <paramref name="message"/>.<see cref="IForestNotification.Partition"/>.
-    public void Receive(IPartitionNotificationHandler correspondingHandler, IForestNotification message) =>
-        Receive(message);
+    public void InitiateNotification(INotification notification) =>
+        // Receive(this, notification);
+        Send(notification);
+
 }
 
 /// Forwards all <see cref="ModelNotificationHandlerBase{TNotification}.Receive">received</see> notifications
@@ -38,10 +37,6 @@ public interface IForestNotificationHandler : INotificationHandler
 public class ForestNotificationHandler(object? sender)
     : ModelNotificationHandlerBase<IForestNotification>(sender), IForestNotificationHandler
 {
-    /// <inheritdoc />
-    public void Receive(IPartitionNotificationHandler correspondingHandler, IForestNotification message) =>
-        Receive(message);
-
     /// <inheritdoc />
     protected override void Send(INotification message)
     {

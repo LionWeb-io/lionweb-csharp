@@ -58,7 +58,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            PartitionHandler.Receive(new ChildAddedNotification(DestinationParent, added.Element, Containment,
+                            InitiateNotification(new ChildAddedNotification(DestinationParent, added.Element, Containment,
                                 added.RightIndex, GetNotificationId()));
                             break;
 
@@ -67,12 +67,12 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                             var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment,
                                 added.RightIndex, added.Element, old.Parent, old.Containment, old.Index, notificationId);
                             RaiseOriginMoveNotification(old, notification);
-                            PartitionHandler.Receive(notification);
+                            InitiateNotification(notification);
                             break;
 
 
                         case { } old when old.Parent == DestinationParent && old.Containment != Containment:
-                            PartitionHandler.Receive(new ChildMovedFromOtherContainmentInSameParentNotification(Containment,
+                            InitiateNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment,
                                 added.RightIndex, added.Element, DestinationParent, old.Containment, old.Index,
                                 GetNotificationId()));
                             break;
@@ -84,11 +84,11 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                     break;
 
                 case ListMoved<T> moved:
-                    PartitionHandler.Receive(new ChildMovedInSameContainmentNotification(moved.RightIndex, moved.LeftElement,
+                    InitiateNotification(new ChildMovedInSameContainmentNotification(moved.RightIndex, moved.LeftElement,
                         DestinationParent, Containment, moved.LeftIndex, GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
-                    PartitionHandler.Receive(new ChildDeletedNotification(deleted.Element, DestinationParent, Containment,
+                    InitiateNotification(new ChildDeletedNotification(deleted.Element, DestinationParent, Containment,
                         deleted.LeftIndex, GetNotificationId()));
                     break;
             }
@@ -96,9 +96,8 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        CanReceive(
             typeof(ChildAddedNotification),
             typeof(ChildDeletedNotification),
             typeof(ChildMovedFromOtherContainmentNotification),

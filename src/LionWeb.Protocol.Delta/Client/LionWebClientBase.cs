@@ -90,9 +90,9 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     private class LocalForestChangeNotificationHandler(object? sender, LionWebClientBase<T> client)
         : NotificationHandlerBase(sender)
     {
-        public override void Receive(INotification message)
+        public override void Receive(INotificationHandler correspondingHandler, INotification notification)
         {
-            switch (message)
+            switch (notification)
             {
                 case PartitionAddedNotification partitionAddedNotification:
                     client.OnLocalPartitionAdded(partitionAddedNotification);
@@ -107,15 +107,15 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     private class LocalForestNotificationHandler(object? sender, LionWebClientBase<T> client)
         : NotificationHandlerBase(sender)
     {
-        public override void Receive(INotification message) =>
-            client.SendNotificationToRepository(sender, message);
+        public override void Receive(INotificationHandler correspondingHandler, INotification notification) =>
+            client.SendNotificationToRepository(sender, notification);
     }
 
     private class LocalPartitionNotificationHandler(object? sender, LionWebClientBase<T> client)
         : NotificationHandlerBase(sender)
     {
-        public override void Receive(INotification message) =>
-            client.SendNotificationToRepository(sender, message);
+        public override void Receive(INotificationHandler correspondingHandler, INotification notification) =>
+            client.SendNotificationToRepository(sender, notification);
     }
 
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)

@@ -62,7 +62,7 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
                 if (_sharedNodeMap.TryGetPartition(partitionNotification.ContextNodeId, out var partition))
                 {
                     var partitionReplicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
-                    partitionReplicator.Receive(partitionNotification);
+                    partitionReplicator.Receive(null, partitionNotification);
                 } else
                 {
                     throw new InvalidOperationException();
@@ -72,7 +72,7 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 
             case TForest forestContent:
                 var forestNotification = MapForest(forestContent);
-                _forestNotificationReplicator.Receive(forestNotification);
+                _forestNotificationReplicator.Receive(null, forestNotification);
                 break;
 
             default:

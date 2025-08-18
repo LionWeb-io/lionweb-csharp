@@ -821,20 +821,20 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
     protected Action<IPartitionNotificationHandler, Index, T, INotificationId?> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
-        (commander, index, node, notificationId) =>
+        (handler, index, node, notificationId) =>
         {
             IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
-            commander.Receive(new ReferenceDeletedNotification(this, reference, index, deletedTarget, notificationId ?? commander.CreateNotificationId()));
+            handler.InitiateNotification(new ReferenceDeletedNotification(this, reference, index, deletedTarget, notificationId ?? handler.CreateNotificationId()));
         };
 
     /// Raises <see cref="ChildDeletedNotification"/> for <paramref name="containment"/>.
     protected Action<IPartitionNotificationHandler, Index, T, INotificationId?> ContainmentRemover<T>(Containment containment) where T : INode =>
-        (commander, index, node, notificationId) =>
-            commander.Receive(new ChildDeletedNotification(node, this, containment, index, notificationId ?? commander.CreateNotificationId()));
+        (handler, index, node, notificationId) =>
+            handler.InitiateNotification(new ChildDeletedNotification(node, this, containment, index, notificationId ?? handler.CreateNotificationId()));
 
     /// Raises <see cref="AnnotationDeletedNotification"/>.
-    private void AnnotationRemover(IPartitionNotificationHandler commander, Index index, INode node, INotificationId? notificationId = null) =>
-        commander.Receive(new AnnotationDeletedNotification(node, this, index, notificationId ?? commander.CreateNotificationId()));
+    private void AnnotationRemover(IPartitionNotificationHandler handler, Index index, INode node, INotificationId? notificationId = null) =>
+        handler.InitiateNotification(new AnnotationDeletedNotification(node, this, index, notificationId ?? handler.CreateNotificationId()));
 
     #endregion
 }

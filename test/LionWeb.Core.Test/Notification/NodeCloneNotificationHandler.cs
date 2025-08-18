@@ -25,9 +25,9 @@ using Core.Notification.Partition;
 internal class NodeCloneNotificationHandler<TNotification>(object? sender) : NotificationHandlerBase(sender)
     where TNotification : INotification
 {
-    public override void Receive(INotification message)
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
     {
-        INotification result = message switch
+        INotification result = notification switch
         {
             PartitionAddedNotification e => e with { NewPartition = Clone(e.NewPartition) },
             PartitionDeletedNotification e => e with { DeletedPartition = Clone(e.DeletedPartition) },

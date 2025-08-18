@@ -43,7 +43,7 @@ public class NotificationCompositor : NotificationHandlerBase
     /// <returns><paramref name="composite"/></returns>
     public T Push<T>(T composite) where T : CompositeNotification
     {
-        if (_composites.TryPeek(out CompositeNotification previous))
+        if (_composites.TryPeek(out CompositeNotification? previous))
             previous.AddPart(composite);
 
         _composites.Push(composite);
@@ -60,12 +60,6 @@ public class NotificationCompositor : NotificationHandlerBase
         if (send)
             Send(result);
         return result;
-    }
-
-    public override void Receive(INotification notification)
-    {
-        if (!TryAdd(notification))
-            Send(notification);
     }
 
     /// <inheritdoc />

@@ -48,9 +48,11 @@ public abstract class RemoteNotificationReplicatorBase : NotificationHandlerBase
     //
     //     GC.SuppressFinalize(this);
     // }
-    public override void Receive(INotification message) =>
-        ProcessNotification(message);
-
+    
+    /// <inheritdoc />
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification) => 
+        ProcessNotification(notification);
+    
     protected abstract void ProcessNotification(INotification? notification);
 
     protected INode Lookup(NodeId nodeId) =>

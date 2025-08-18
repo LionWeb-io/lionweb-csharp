@@ -137,9 +137,9 @@ public class LocalForestNotificationReplicator : NotificationHandlerBase,
     }
 
     /// <inheritdoc />
-    public override void Receive(INotification message)
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
     {
-        switch (message)
+        switch (notification)
         {
             case PartitionAddedNotification partitionAdded:
                 OnLocalPartitionAdded(partitionAdded);
@@ -149,6 +149,7 @@ public class LocalForestNotificationReplicator : NotificationHandlerBase,
                 break;
         }
     }
+
 
     protected virtual INotificationHandler CreatePartitionNotificationReplicator(
         IPartitionInstance partition,

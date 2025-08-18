@@ -51,24 +51,23 @@ public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INod
         switch (_oldValue, _newValue)
         {
             case (null, { } v):
-                PartitionHandler.Receive(new PropertyAddedNotification(DestinationParent, _property, v,
+                InitiateNotification(new PropertyAddedNotification(DestinationParent, _property, v,
                     GetNotificationId()));
                 break;
             case ({ } o, null):
-                PartitionHandler.Receive(new PropertyDeletedNotification(DestinationParent, _property, o,
+                InitiateNotification(new PropertyDeletedNotification(DestinationParent, _property, o,
                     GetNotificationId()));
                 break;
             case ({ } o, { } n):
-                PartitionHandler.Receive(new PropertyChangedNotification(DestinationParent, _property, n, o,
+                InitiateNotification(new PropertyChangedNotification(DestinationParent, _property, n, o,
                     GetNotificationId()));
                 break;
         }
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        CanReceive(
             typeof(PropertyAddedNotification),
             typeof(PropertyDeletedNotification),
             typeof(PropertyChangedNotification)

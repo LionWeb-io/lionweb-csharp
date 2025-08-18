@@ -58,18 +58,18 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
             {
                 case ListAdded<T> added:
                     IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
-                    PartitionHandler.Receive(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, newTarget,
+                    InitiateNotification(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, newTarget,
                         GetNotificationId()));
                     break;
                 case ListMoved<T> moved:
                     IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
-                    PartitionHandler.Receive(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
+                    InitiateNotification(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
                         moved.LeftIndex, target,
                         GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
                     IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
-                    PartitionHandler.Receive(new ReferenceDeletedNotification(DestinationParent, Reference, deleted.LeftIndex,
+                    InitiateNotification(new ReferenceDeletedNotification(DestinationParent, Reference, deleted.LeftIndex,
                         deletedTarget, GetNotificationId()));
                     break;
             }
@@ -77,9 +77,8 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        CanReceive(
             typeof(ReferenceAddedNotification),
             typeof(EntryMovedInSameReferenceNotification),
             typeof(ReferenceDeletedNotification)

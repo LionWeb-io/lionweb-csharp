@@ -56,7 +56,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            PartitionHandler.Receive(new AnnotationAddedNotification(DestinationParent, added.Element,
+                            InitiateNotification(new AnnotationAddedNotification(DestinationParent, added.Element,
                                 added.RightIndex, GetNotificationId()));
                             break;
 
@@ -65,7 +65,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
                             var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, added.RightIndex,
                                 added.Element, old.Parent, old.Index, notificationId);
                             RaiseOriginMoveNotification(old, notification);
-                            PartitionHandler.Receive(notification);
+                            InitiateNotification(notification);
                             break;
 
 
@@ -76,12 +76,12 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
                     break;
 
                 case ListMoved<INode> moved:
-                    PartitionHandler.Receive(new AnnotationMovedInSameParentNotification(moved.RightIndex, moved.LeftElement,
+                    InitiateNotification(new AnnotationMovedInSameParentNotification(moved.RightIndex, moved.LeftElement,
                         DestinationParent, moved.LeftIndex, GetNotificationId()));
                     break;
 
                 case ListDeleted<INode> deleted:
-                    PartitionHandler.Receive(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,
+                    InitiateNotification(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,
                         GetNotificationId()));
                     break;
             }
@@ -89,9 +89,8 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        CanReceive(
             typeof(AnnotationAddedNotification),
             typeof(AnnotationDeletedNotification),
             typeof(AnnotationMovedFromOtherParentNotification),

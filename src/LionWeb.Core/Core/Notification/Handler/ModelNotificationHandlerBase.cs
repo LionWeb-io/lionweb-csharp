@@ -24,8 +24,8 @@ public abstract class ModelNotificationHandlerBase<TNotification>(object? sender
     where TNotification : INotification
 {
     /// <inheritdoc />
-    public override void Receive(INotification message) =>
-        Send(message);
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification) => 
+        SendWithSender(correspondingHandler, notification);
 
     /// Registers <paramref name="handler"/> to be notified of notifications compatible with <typeparamref name="TSubscribedNotification"/>.
     /// <typeparam name="TSubscribedNotification">

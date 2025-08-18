@@ -274,15 +274,13 @@ public class CompositorTests
 internal class ForestEventCounter() : NotificationHandlerBase(null)
 {
     public int Count { get; private set; }
-    
-    public override void Receive(INotification message) =>
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification) => 
         Count++;
 }
 
 internal class PartitionEventCounter() : NotificationHandlerBase(null)
 {
     public int Count { get; private set; }
-    
-    public override void Receive(INotification message) =>
+    public override void Receive(INotificationHandler correspondingHandler, INotification notification) => 
         Count++;
 }

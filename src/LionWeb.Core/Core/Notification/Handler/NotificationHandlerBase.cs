@@ -55,10 +55,7 @@ public abstract class NotificationHandlerBase : INotificationHandler
         Sender.ToString() ?? GetType().Name;
 
     /// <inheritdoc />
-    public abstract void Receive(INotification message);
-
-    public virtual void Receive(INotificationHandler correspondingHandler, INotification notification) => 
-        Receive(notification);
+    public abstract void Receive(INotificationHandler correspondingHandler, INotification notification);
     
     private event EventHandler<INotification>? InternalEvent;
 
@@ -76,7 +73,7 @@ public abstract class NotificationHandlerBase : INotificationHandler
 
     /// <inheritdoc cref="IINotificationHandlerSend"/>
     protected virtual void Send(INotification message) =>
-        SendWithSender(Sender, message);
+        SendWithSender(this, message);
 
     /// This notification handler wants to send <paramref name="message"/> with <paramref name="sender"/>.
     /// Only this notification handler should use this method.
@@ -117,7 +114,7 @@ public abstract class NotificationHandlerBase : INotificationHandler
                 receiver is IForestNotificationHandler forestHandler && r is IForestNotification forestNotification)
                 forestHandler.Receive(correspondingSender, forestNotification);
             else
-                receiver.Receive(r);
+                receiver.Receive(null, r);
         };
 
     private void RegisterSubscribedNotifications<TSubscribedNotification>()

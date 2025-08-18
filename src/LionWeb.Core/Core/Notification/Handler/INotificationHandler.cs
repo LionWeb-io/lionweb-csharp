@@ -44,12 +44,9 @@ public interface INotificationHandler : IDisposable
     /// </value>
     public bool CanReceive(params Type[] messageTypes);
 
-    /// This notification handler receives <paramref name="message"/>.
+    /// This notification handler receives <paramref name="notification"/>.
     /// Call this on <i>inbound</i> notification handlers (i.e. notification handlers that get messages from outside the notification handler chain).
-    public void Receive(INotification message);
-    
-    public void Receive(INotificationHandler correspondingHandler, INotification notification) =>
-        Receive(notification);
+    public void Receive(INotificationHandler correspondingHandler, INotification notification);
 
     /// This notification handler wants to send <paramref name="message"/>.
     /// Only this notification handler should use this method.

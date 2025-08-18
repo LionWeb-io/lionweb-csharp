@@ -62,6 +62,6 @@ public abstract class AnnotationNotificationEmitterBase : PartitionNotificationE
     protected void RaiseOriginMoveNotification(OldAnnotationInfo old, AnnotationMovedFromOtherParentNotification notification)
     {
         if (old.Partition != null && old.Partition != DestinationPartition)
-            old.Partition.GetNotificationHandler()?.Receive(notification);
+            old.Partition.GetNotificationHandler()?.InitiateNotification(notification);
     }
 }

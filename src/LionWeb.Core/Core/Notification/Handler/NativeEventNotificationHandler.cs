@@ -31,10 +31,10 @@ internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotif
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Receive(INotification message)
+    public void Receive(INotificationHandler correspondingHandler, INotification notification) 
     {
-        if (message is TNotification notification)
-            handler.Invoke(null, notification);
+        if (notification is TNotification n)
+            handler.Invoke(correspondingHandler, n);
     }
 
     /// <inheritdoc />
