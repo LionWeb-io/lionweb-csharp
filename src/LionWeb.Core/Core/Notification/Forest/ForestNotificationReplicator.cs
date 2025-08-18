@@ -26,7 +26,7 @@ using System.Diagnostics;
 /// <inheritdoc cref="RemoteNotificationReplicatorBase"/>
 public static class ForestNotificationReplicator
 {
-    public static INotificationHandler Create(IForest localForest,
+    public static IConnectingNotificationHandler Create(IForest localForest,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
@@ -51,7 +51,7 @@ public static class ForestNotificationReplicator
     }
 }
 
-public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBase, IForestNotificationHandler
+public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBase
 {
     private readonly IForest _localForest;
 
@@ -114,8 +114,7 @@ public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBa
         });
 }
 
-public class LocalForestNotificationReplicator : NotificationHandlerBase,
-    IForestNotificationHandler
+public class LocalForestNotificationReplicator : NotificationHandlerBase, IConnectingNotificationHandler
 {
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
     private readonly SharedNodeMap _sharedNodeMap;
@@ -137,7 +136,7 @@ public class LocalForestNotificationReplicator : NotificationHandlerBase,
     }
 
     /// <inheritdoc />
-    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
     {
         switch (notification)
         {
@@ -151,7 +150,7 @@ public class LocalForestNotificationReplicator : NotificationHandlerBase,
     }
 
 
-    protected virtual INotificationHandler CreatePartitionNotificationReplicator(
+    protected virtual IConnectingNotificationHandler CreatePartitionNotificationReplicator(
         IPartitionInstance partition,
         string sender) =>
         PartitionNotificationReplicator.Create(partition, _sharedNodeMap, sender);

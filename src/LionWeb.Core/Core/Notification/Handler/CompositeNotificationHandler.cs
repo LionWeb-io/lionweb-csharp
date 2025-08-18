@@ -24,14 +24,14 @@ namespace LionWeb.Core.Notification.Handler;
 /// Each component is connected to the next component.
 /// The last component <see cref="IINotificationHandlerSend">sends</see> to
 /// this notification handler's <i>following</i> notification handlers.
-public class CompositeNotificationHandler : INotificationHandler
+public class CompositeNotificationHandler : IConnectingNotificationHandler
 {
-    private readonly INotificationHandler _firstHandler;
-    private readonly INotificationHandler _lastHandler;
-    private readonly IEnumerable<INotificationHandler> _notificationHandlers;
+    private readonly IConnectingNotificationHandler _firstHandler;
+    private readonly IConnectingNotificationHandler _lastHandler;
+    private readonly IEnumerable<IConnectingNotificationHandler> _notificationHandlers;
     private readonly object? _sender;
 
-    public CompositeNotificationHandler(List<INotificationHandler> notificationHandlers,
+    public CompositeNotificationHandler(List<IConnectingNotificationHandler> notificationHandlers,
         object? sender)
     {
         _notificationHandlers = notificationHandlers;
@@ -70,20 +70,20 @@ public class CompositeNotificationHandler : INotificationHandler
         _sender?.ToString() ?? GetType().Name;
 
     /// <inheritdoc />
-    public void Receive(INotificationHandler correspondingHandler, INotification notification) => 
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
         _firstHandler.Receive(correspondingHandler, notification);
 
     /// <inheritdoc />
-    public bool CanReceive(params Type[] messageTypes) =>
-        _firstHandler.CanReceive(messageTypes);
+    public bool Handles(params Type[] notificationTypes) =>
+        _firstHandler.Handles(notificationTypes);
 
-    void INotificationHandler.Send(INotification message) =>
+    void ISendingNotificationHandler.Send(INotification notification) =>
         throw new ArgumentException("Should never be called");
 
-    void INotificationHandler.Subscribe(INotificationHandler receiver) =>
+    void ISendingNotificationHandler.Subscribe(IReceivingNotificationHandler receiver) =>
         _lastHandler.Subscribe(receiver);
 
-    void INotificationHandler.Unsubscribe(INotificationHandler receiver) =>
+    void ISendingNotificationHandler.Unsubscribe(IReceivingNotificationHandler receiver) =>
         _lastHandler.Unsubscribe(receiver);
 
     /// <inheritdoc />

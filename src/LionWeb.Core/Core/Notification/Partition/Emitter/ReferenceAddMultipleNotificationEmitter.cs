@@ -57,7 +57,7 @@ public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotif
 
     /// <inheritdoc />
     protected override bool IsActive() =>
-        CanReceive(
+        Handles(
             typeof(ReferenceAddedNotification)
         );
 }

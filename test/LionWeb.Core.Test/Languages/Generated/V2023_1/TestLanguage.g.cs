@@ -5,6 +5,8 @@
 #pragma warning disable 1591
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.TestLanguage;
+
+using Core.Notification.Handler;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;

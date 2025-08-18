@@ -20,7 +20,6 @@ namespace LionWeb.Core.Test.Notification;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Handler;
-using Core.Notification.Partition;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
@@ -128,7 +127,7 @@ public class NotificationTests_Forest
     {
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
         var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
-        var cloneHandler = new NodeCloneNotificationHandler<IForestNotification>("forestCloner");
+        var cloneHandler = new NodeCloneNotificationHandler("forestCloner");
         INotificationHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);
         INotificationHandler.Connect(cloneHandler, replicator);
 
@@ -145,9 +144,9 @@ public class NotificationTests_Forest
 }
 
 internal class TestLocalForestChangeNotificationHandler(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
-    : NotificationHandlerBase(sender)
+    : NotificationHandlerBase(sender), IReceivingNotificationHandler
 {
-    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
     {
         switch (notification)
         {
@@ -163,7 +162,7 @@ internal class TestLocalForestChangeNotificationHandler(object? sender, SharedPa
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)
     {
         var partitionReplicator = sharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
-        var cloneHandler = new NodeCloneNotificationHandler<IPartitionNotification>($"partitionCloner.{partitionAddedNotification.NewPartition.GetId()}");
+        var cloneHandler = new NodeCloneNotificationHandler($"partitionCloner.{partitionAddedNotification.NewPartition.GetId()}");
         INotificationHandler.Connect(partitionAddedNotification.NewPartition.GetNotificationHandler(), cloneHandler);
         INotificationHandler.Connect(cloneHandler, partitionReplicator);
     }

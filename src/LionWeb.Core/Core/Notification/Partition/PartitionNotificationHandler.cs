@@ -21,7 +21,7 @@ using Handler;
 
 /// Provides notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 /// Raises notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-public interface IPartitionNotificationHandler : INotificationHandler
+public interface IPartitionNotificationHandler : IInboundNotificationHandler
 {
     public INotificationId CreateNotificationId();
 
@@ -38,9 +38,6 @@ public interface IPartitionNotificationHandler : INotificationHandler
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
     public void Unsubscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
         where TSubscribedNotification : class, IPartitionNotification;
-    
-    public void InitiateNotification(INotification notification) =>
-        Receive(this, notification);
 }
 
 /// Forwards all <see cref="ModelNotificationHandlerBase{TNotification}.Receive">received</see> notifications

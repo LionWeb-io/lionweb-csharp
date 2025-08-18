@@ -142,7 +142,7 @@ public class NotificationTests_Infrastructure
         return (HashSet<INotificationId>)notificationIds!;
     }
 
-    private Tuple<INotificationHandler, INotificationHandler>
+    private Tuple<IConnectingNotificationHandler, IConnectingNotificationHandler>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");

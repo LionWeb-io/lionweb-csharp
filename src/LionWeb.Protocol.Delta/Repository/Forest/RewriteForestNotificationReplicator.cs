@@ -26,7 +26,7 @@ using Partition;
 
 internal static class RewriteForestNotificationReplicator
 {
-    public static new INotificationHandler Create(IForest localForest,
+    public static new IConnectingNotificationHandler Create(IForest localForest,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
@@ -88,7 +88,7 @@ internal class RewriteLocalForestNotificationReplicator(
     object? sender)
     : LocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, sender)
 {
-    protected override INotificationHandler CreatePartitionNotificationReplicator(
+    protected override IConnectingNotificationHandler CreatePartitionNotificationReplicator(
         IPartitionInstance partition, string sender) =>
         RewritePartitionNotificationReplicator.Create(partition, sharedNodeMap, sender);
 }

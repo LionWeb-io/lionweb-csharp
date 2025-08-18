@@ -22,16 +22,19 @@ using Core.Notification.Forest;
 using Core.Notification.Handler;
 using Core.Notification.Partition;
 
-internal class NodeCloneNotificationHandler<TNotification>(object? sender) : NotificationHandlerBase(sender)
-    where TNotification : INotification
+internal class NodeCloneNotificationHandler(object? sender)
+    : NotificationHandlerBase(sender), IConnectingNotificationHandler
 {
-    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
     {
         INotification result = notification switch
         {
             PartitionAddedNotification e => e with { NewPartition = Clone(e.NewPartition) },
             PartitionDeletedNotification e => e with { DeletedPartition = Clone(e.DeletedPartition) },
-            AnnotationAddedNotification e => e with { NewAnnotation = Clone(e.NewAnnotation), Parent = Clone(e.Parent) },
+            AnnotationAddedNotification e => e with
+            {
+                NewAnnotation = Clone(e.NewAnnotation), Parent = Clone(e.Parent)
+            },
             AnnotationDeletedNotification e => e with
             {
                 DeletedAnnotation = Clone(e.DeletedAnnotation), Parent = Clone(e.Parent)
@@ -90,7 +93,10 @@ internal class NodeCloneNotificationHandler<TNotification>(object? sender) : Not
             {
                 MovedChild = Clone(e.MovedChild), Parent = Clone(e.Parent)
             },
-            ChildMovedInSameContainmentNotification e => e with { MovedChild = Clone(e.MovedChild), Parent = Clone(e.Parent) },
+            ChildMovedInSameContainmentNotification e => e with
+            {
+                MovedChild = Clone(e.MovedChild), Parent = Clone(e.Parent)
+            },
             ChildReplacedNotification e => e with { NewChild = Clone(e.NewChild) },
             ClassifierChangedNotification e => e with { Node = Clone(e.Node) },
             EntryMovedAndReplacedFromOtherReferenceNotification
@@ -160,9 +166,12 @@ internal class NodeCloneNotificationHandler<TNotification>(object? sender) : Not
             {
                 NewTarget = Clone(e.NewTarget), OldTarget = Clone(e.OldTarget), Parent = Clone(e.Parent)
             },
-            ReferenceTargetDeletedNotification e => e with { DeletedTarget = Clone(e.DeletedTarget), Parent = Clone(e.Parent) }
+            ReferenceTargetDeletedNotification e => e with
+            {
+                DeletedTarget = Clone(e.DeletedTarget), Parent = Clone(e.Parent)
+            }
         };
-        Send((TNotification)result);
+        Send(result);
     }
 
 

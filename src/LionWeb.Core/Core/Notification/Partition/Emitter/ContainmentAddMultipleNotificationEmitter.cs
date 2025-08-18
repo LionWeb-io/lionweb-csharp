@@ -97,7 +97,7 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
 
     /// <inheritdoc />
     protected override bool IsActive() =>
-        CanReceive(
+        Handles(
             typeof(ChildAddedNotification),
             typeof(ChildMovedFromOtherContainmentNotification),
             typeof(ChildMovedFromOtherContainmentInSameParentNotification),

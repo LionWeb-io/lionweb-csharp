@@ -23,7 +23,7 @@ using Forest;
 ///
 /// We keep a stack of composites.
 /// Every time a new composite is <see cref="Push">pushed</see>, that composite is added to the previous one (if any).
-public class NotificationCompositor : NotificationHandlerBase 
+public class NotificationCompositor : NotificationHandlerBase, IConnectingNotificationHandler
 {
     private readonly INotificationIdProvider _idProvider;
 
@@ -63,7 +63,7 @@ public class NotificationCompositor : NotificationHandlerBase
     }
 
     /// <inheritdoc />
-    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
     {
         switch (notification)
         {
@@ -88,12 +88,12 @@ public class NotificationCompositor : NotificationHandlerBase
         return true;
     }
 
-    private void RegisterPartition(INotificationHandler correspondingHandler, IPartitionInstance partition)
+    private void RegisterPartition(ISendingNotificationHandler correspondingHandler, IPartitionInstance partition)
     {
         INotificationHandler.Connect(correspondingHandler, this);
     }
 
-    private void UnregisterPartition(INotificationHandler correspondingHandler, IPartitionInstance partition)
+    private void UnregisterPartition(ISendingNotificationHandler correspondingHandler, IPartitionInstance partition)
     {
         correspondingHandler.Unsubscribe(this);
     }

@@ -22,11 +22,11 @@ using Partition;
 using System.Reflection;
 
 /// Base for all <see cref="INotificationHandler">notification handlers</see> that process <see cref="INotification">notifications</see>.
-public abstract class NotificationHandlerBase : INotificationHandler
+public abstract class NotificationHandlerBase : IFilterReceivingNotificationHandler, ISendingNotificationHandler
 {
     protected readonly object Sender;
     private readonly Dictionary<Type, int> _subscribedNotifications = [];
-    private readonly Dictionary<INotificationHandler, EventHandler<INotification>> _handlers = [];
+    private readonly Dictionary<IReceivingNotificationHandler, EventHandler<INotification>> _handlers = [];
 
     /// <inheritdoc cref="NotificationHandlerBase"/>
     /// <param name="sender">Optional sender of the notifications.</param>
@@ -46,7 +46,7 @@ public abstract class NotificationHandlerBase : INotificationHandler
 
         return;
 
-        void UnsubscribeHandler<T>(INotificationHandler notificationHandler, EventHandler<T> _) =>
+        void UnsubscribeHandler<T>(IReceivingNotificationHandler notificationHandler, EventHandler<T> _) =>
             Unsubscribe(notificationHandler);
     }
 
@@ -54,26 +54,23 @@ public abstract class NotificationHandlerBase : INotificationHandler
     public string NotificationHandlerId =>
         Sender.ToString() ?? GetType().Name;
 
-    /// <inheritdoc />
-    public abstract void Receive(INotificationHandler correspondingHandler, INotification notification);
-    
     private event EventHandler<INotification>? InternalEvent;
 
 
     /// <inheritdoc />
-    public bool CanReceive(params Type[] messageTypes) =>
+    public bool Handles(params Type[] notificationTypes) =>
         InternalEvent != null &&
-        messageTypes.Any(notificationType =>
+        notificationTypes.Any(notificationType =>
             _subscribedNotifications.TryGetValue(notificationType, out var count) && count > 0);
 
 
     /// <inheritdoc />
-    void INotificationHandler.Send(INotification message) =>
-        Send(message);
+    void ISendingNotificationHandler.Send(INotification notification) =>
+        Send(notification);
 
     /// <inheritdoc cref="IINotificationHandlerSend"/>
-    protected virtual void Send(INotification message) =>
-        SendWithSender(this, message);
+    protected virtual void Send(INotification notification) =>
+        SendWithSender(this, notification);
 
     /// This notification handler wants to send <paramref name="message"/> with <paramref name="sender"/>.
     /// Only this notification handler should use this method.
@@ -81,11 +78,11 @@ public abstract class NotificationHandlerBase : INotificationHandler
         InternalEvent?.Invoke(sender, message);
 
     /// <inheritdoc />
-    void INotificationHandler.Subscribe(INotificationHandler receiver) =>
+    void ISendingNotificationHandler.Subscribe(IReceivingNotificationHandler receiver) =>
         Subscribe<INotification>(receiver);
 
     /// <inhINotificationHandler.SubscribedNotification}"/>
-    protected void Subscribe<TSubscribedNotification>(INotificationHandler receiver)
+    protected void Subscribe<TSubscribedNotification>(IReceivingNotificationHandler receiver)
         where TSubscribedNotification : INotification
     {
         RegisterSubscribedNotifications<TSubscribedNotification>();
@@ -98,23 +95,19 @@ public abstract class NotificationHandlerBase : INotificationHandler
     }
 
     private EventHandler<INotification> CreateHandler<TSubscribedNotification>(
-        INotificationHandler receiver) where TSubscribedNotification : INotification =>
+        IReceivingNotificationHandler receiver) where TSubscribedNotification : INotification =>
         (sender, notification) =>
         {
             if (notification is not TSubscribedNotification r)
                 return;
-            
-            if (sender is INotificationHandler handler)
+
+            if (sender is ISendingNotificationHandler handler)
             {
                 receiver.Receive(handler, r);
                 return;
             }
 
-            if (sender is IPartitionNotificationHandler correspondingSender &&
-                receiver is IForestNotificationHandler forestHandler && r is IForestNotification forestNotification)
-                forestHandler.Receive(correspondingSender, forestNotification);
-            else
-                receiver.Receive(null, r);
+            receiver.Receive(null, r);
         };
 
     private void RegisterSubscribedNotifications<TSubscribedNotification>()
@@ -144,7 +137,7 @@ public abstract class NotificationHandlerBase : INotificationHandler
     }
 
     /// <inheritdoc />
-    public void Unsubscribe(INotificationHandler receiver)
+    public void Unsubscribe(IReceivingNotificationHandler receiver)
     {
         if (!_handlers.Remove(receiver, out var handler))
             return;
@@ -167,7 +160,7 @@ public abstract class NotificationHandlerBase : INotificationHandler
             handler.PrintAllReceivers(alreadyPrinted, indent + "  ");
         }
     }
-    
+
     protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
 
     private static ILookup<Type, Type> InitAllSubtypes()

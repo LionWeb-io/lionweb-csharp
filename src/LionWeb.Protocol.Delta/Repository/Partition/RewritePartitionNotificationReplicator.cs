@@ -24,7 +24,7 @@ using Core.Notification.Partition;
 
 internal static class RewritePartitionNotificationReplicator
 {
-    public static new INotificationHandler Create(IPartitionInstance localPartition,
+    public static new IConnectingNotificationHandler Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();

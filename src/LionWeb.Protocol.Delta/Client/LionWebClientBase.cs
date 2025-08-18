@@ -30,7 +30,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly IClientConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
-    protected readonly INotificationHandler _replicator;
+    protected readonly IConnectingNotificationHandler _replicator;
 
     private ParticipationId? _participationId;
     private readonly ClientId? _clientId;
@@ -88,9 +88,9 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     #region Local
 
     private class LocalForestChangeNotificationHandler(object? sender, LionWebClientBase<T> client)
-        : NotificationHandlerBase(sender)
+        : NotificationHandlerBase(sender),IConnectingNotificationHandler
     {
-        public override void Receive(INotificationHandler correspondingHandler, INotification notification)
+        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
         {
             switch (notification)
             {
@@ -105,16 +105,16 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     }
 
     private class LocalForestNotificationHandler(object? sender, LionWebClientBase<T> client)
-        : NotificationHandlerBase(sender)
+        : NotificationHandlerBase(sender),IConnectingNotificationHandler
     {
-        public override void Receive(INotificationHandler correspondingHandler, INotification notification) =>
+        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) =>
             client.SendNotificationToRepository(sender, notification);
     }
 
     private class LocalPartitionNotificationHandler(object? sender, LionWebClientBase<T> client)
-        : NotificationHandlerBase(sender)
+        : NotificationHandlerBase(sender),IConnectingNotificationHandler
     {
-        public override void Receive(INotificationHandler correspondingHandler, INotification notification) =>
+        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) =>
             client.SendNotificationToRepository(sender, notification);
     }
 

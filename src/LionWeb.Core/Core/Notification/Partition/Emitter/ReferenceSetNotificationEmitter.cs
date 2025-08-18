@@ -78,7 +78,7 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
 
     /// <inheritdoc />
     protected override bool IsActive() =>
-        CanReceive(
+        Handles(
             typeof(ReferenceAddedNotification),
             typeof(EntryMovedInSameReferenceNotification),
             typeof(ReferenceDeletedNotification)

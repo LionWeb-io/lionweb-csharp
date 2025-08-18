@@ -25,7 +25,7 @@ using Utilities;
 /// Example: We receive a <see cref="PropertyAddedNotification" /> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-public abstract class RemoteNotificationReplicatorBase : NotificationHandlerBase
+public abstract class RemoteNotificationReplicatorBase : NotificationHandlerBase, IConnectingNotificationHandler
 {
     protected readonly SharedNodeMap SharedNodeMap;
     protected readonly IdFilteringNotificationHandler Filter;
@@ -48,11 +48,11 @@ public abstract class RemoteNotificationReplicatorBase : NotificationHandlerBase
     //
     //     GC.SuppressFinalize(this);
     // }
-    
+
     /// <inheritdoc />
-    public override void Receive(INotificationHandler correspondingHandler, INotification notification) => 
+    public void Receive(ISendingNotificationHandler notificationHandler, INotification notification) =>
         ProcessNotification(notification);
-    
+
     protected abstract void ProcessNotification(INotification? notification);
 
     protected INode Lookup(NodeId nodeId) =>

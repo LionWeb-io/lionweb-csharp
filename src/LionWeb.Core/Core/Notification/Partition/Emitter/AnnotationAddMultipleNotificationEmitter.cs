@@ -81,7 +81,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
 
     /// <inheritdoc />
     protected override bool IsActive() =>
-        CanReceive(
+        Handles(
             typeof(AnnotationAddedNotification),
             typeof(AnnotationMovedFromOtherParentNotification),
             typeof(AnnotationMovedInSameParentNotification)

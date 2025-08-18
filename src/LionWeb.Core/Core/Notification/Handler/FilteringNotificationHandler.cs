@@ -20,9 +20,9 @@ namespace LionWeb.Core.Notification.Handler;
 using System.Diagnostics;
 
 /// Forwards <see cref="Receive">received</see> notifications if the notification passes <see cref="Filter"/>.
-public abstract class FilteringNotificationHandler(object? sender) : NotificationHandlerBase(sender)
+public abstract class FilteringNotificationHandler(object? sender)
+    : NotificationHandlerBase(sender), IConnectingNotificationHandler
 {
-
     /// Unsubscribes all registered <see cref="Subscribe{TSubscribedEvent}">subscribers</see>.
     // public virtual void Dispose()
     // {
@@ -38,15 +38,13 @@ public abstract class FilteringNotificationHandler(object? sender) : Notificatio
     // }
 
     /// <inheritdoc />
-    
-    public override void Receive(INotificationHandler correspondingHandler, INotification notification)
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
     {
         var filtered = Filter(notification);
         Debug.WriteLine($"Forwarding notification id {notification.NotificationId}: {filtered?.NotificationId}");
         if (filtered is not null)
             Send(filtered);
     }
-
 
 
     /// Determines whether <paramref name="notification"/> will be <see cref="IHandler{TReceive,TSend}.Send">sent</see> to <i>following</i> notification handlers.

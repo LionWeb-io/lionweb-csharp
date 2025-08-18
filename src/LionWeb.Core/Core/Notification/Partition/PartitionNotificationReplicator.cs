@@ -26,7 +26,7 @@ using System.Diagnostics;
 /// <inheritdoc cref="RemoteNotificationReplicatorBase"/>
 public static class PartitionNotificationReplicator
 {
-    public static INotificationHandler Create(IPartitionInstance localPartition,
+    public static IConnectingNotificationHandler Create(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
@@ -457,10 +457,10 @@ public class RemotePartitionNotificationReplicator : RemoteNotificationReplicato
 }
 
 public class LocalPartitionNotificationReplicator(SharedNodeMap sharedNodeMap, object? sender)
-    : NotificationHandlerBase(sender)
+    : NotificationHandlerBase(sender),IConnectingNotificationHandler
 {
     /// <inheritdoc />
-    public override void Receive(INotificationHandler correspondingHandler, INotification notification) 
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) 
     {
         switch (notification)
         {

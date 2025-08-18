@@ -30,11 +30,11 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 {
     private readonly PartitionSharedNodeMap _sharedNodeMap;
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
-    private readonly INotificationHandler _forestNotificationReplicator;
+    private readonly IConnectingNotificationHandler _forestNotificationReplicator;
 
     public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
-        INotificationHandler forestNotificationReplicator)
+        IConnectingNotificationHandler forestNotificationReplicator)
     {
         _sharedNodeMap = sharedNodeMap;
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;

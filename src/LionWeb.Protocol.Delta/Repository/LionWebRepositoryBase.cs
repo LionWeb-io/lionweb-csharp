@@ -33,7 +33,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
 
-    protected readonly INotificationHandler _replicator;
+    protected readonly IConnectingNotificationHandler _replicator;
 
     private long nextFreeNodeId = 0;
 
@@ -82,9 +82,9 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     #region Local
 
     private class LocalForestChangeNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : NotificationHandlerBase(sender)
+        : NotificationHandlerBase(sender),IConnectingNotificationHandler
     {
-        public override void Receive(INotificationHandler correspondingHandler, INotification notification)
+        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
         {
             switch (notification)
             {
@@ -99,16 +99,16 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     }
 
     private class LocalForestNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : NotificationHandlerBase(sender)
+        : NotificationHandlerBase(sender),IConnectingNotificationHandler
     {
-        public override void Receive(INotificationHandler correspondingHandler, INotification notification) => 
+        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
             repository.SendNotificationToAllClients(sender, notification);
     }
 
     private class LocalPartitionNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : NotificationHandlerBase(sender)
+        : NotificationHandlerBase(sender),IConnectingNotificationHandler
     {
-        public override void Receive(INotificationHandler correspondingHandler, INotification notification) => 
+        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
             repository.SendNotificationToAllClients(sender, notification);
     }
 

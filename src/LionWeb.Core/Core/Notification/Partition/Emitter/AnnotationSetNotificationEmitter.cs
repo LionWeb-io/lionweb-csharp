@@ -90,7 +90,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
 
     /// <inheritdoc />
     protected override bool IsActive() =>
-        CanReceive(
+        Handles(
             typeof(AnnotationAddedNotification),
             typeof(AnnotationDeletedNotification),
             typeof(AnnotationMovedFromOtherParentNotification),

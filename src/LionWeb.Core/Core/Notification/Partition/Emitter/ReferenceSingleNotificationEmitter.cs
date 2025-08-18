@@ -67,7 +67,7 @@ public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBa
 
     /// <inheritdoc />
     protected override bool IsActive() =>
-        CanReceive(
+        Handles(
             typeof(ReferenceAddedNotification),
             typeof(ReferenceDeletedNotification),
             typeof(ReferenceChangedNotification)

@@ -123,7 +123,7 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
     /// <inheritdoc />
     [MemberNotNullWhen(true, nameof(_oldContainmentInfo))]
     protected override bool IsActive() =>
-        CanReceive(
+        Handles(
             typeof(ChildAddedNotification),
             typeof(ChildDeletedNotification),
             typeof(ChildReplacedNotification),

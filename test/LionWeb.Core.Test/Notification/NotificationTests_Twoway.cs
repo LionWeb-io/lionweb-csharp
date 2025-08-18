@@ -831,23 +831,23 @@ public class NotificationTests_Twoway
     #endregion
 
 
-    private Tuple<INotificationHandler, INotificationHandler>
+    private Tuple<IConnectingNotificationHandler, IConnectingNotificationHandler>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = CreateReplicator(node, "nodeReplicator");
         var cloneReplicator = CreateReplicator(clone, "cloneReplicator");
         
-        var cloneHandlerA = new NodeCloneNotificationHandler<IPartitionNotification>(node.GetId());
+        var cloneHandlerA = new NodeCloneNotificationHandler(node.GetId());
         INotificationHandler.Connect(replicator, cloneHandlerA);
         INotificationHandler.Connect(cloneHandlerA, cloneReplicator);
      
-        var cloneHandlerB = new NodeCloneNotificationHandler<IPartitionNotification>(clone.GetId());
+        var cloneHandlerB = new NodeCloneNotificationHandler(clone.GetId());
         INotificationHandler.Connect(cloneReplicator, cloneHandlerB);
         INotificationHandler.Connect(cloneHandlerB, replicator);
      
         return Tuple.Create(replicator, cloneReplicator);
     }
-    private static INotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
+    private static IConnectingNotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
         PartitionNotificationReplicator.Create(clone, new(), sender);
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)

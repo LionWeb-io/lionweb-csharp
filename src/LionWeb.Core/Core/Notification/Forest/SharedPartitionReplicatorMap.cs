@@ -21,12 +21,12 @@ using Handler;
 
 public class SharedPartitionReplicatorMap
 {
-    private readonly Dictionary<NodeId, INotificationHandler> _localPartitionReplicators = [];
+    private readonly Dictionary<NodeId, IConnectingNotificationHandler> _localPartitionReplicators = [];
 
-    public INotificationHandler Lookup(NodeId partitionId) =>
+    public IConnectingNotificationHandler Lookup(NodeId partitionId) =>
         _localPartitionReplicators[partitionId];
 
-    public void Register(NodeId partitionId, INotificationHandler replicator)
+    public void Register(NodeId partitionId, IConnectingNotificationHandler replicator)
     {
         if (!_localPartitionReplicators.TryAdd(partitionId, replicator))
             throw new ArgumentException(

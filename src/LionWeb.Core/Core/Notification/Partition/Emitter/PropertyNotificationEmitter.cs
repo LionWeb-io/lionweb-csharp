@@ -67,7 +67,7 @@ public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INod
 
     /// <inheritdoc />
     protected override bool IsActive() =>
-        CanReceive(
+        Handles(
             typeof(PropertyAddedNotification),
             typeof(PropertyDeletedNotification),
             typeof(PropertyChangedNotification)

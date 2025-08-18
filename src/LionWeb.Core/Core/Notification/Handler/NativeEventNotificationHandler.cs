@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Notification.Handler;
 
 internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotification> handler)
-    : INotificationHandler where TNotification : INotification
+    : IReceivingNotificationHandler where TNotification : INotification
 {
     public void Dispose()
     {
@@ -27,27 +27,15 @@ internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotif
     public required string NotificationHandlerId { get; init; }
 
     /// <inheritdoc />
-    public bool CanReceive(params Type[] messageTypes) =>
+    public bool Handles(params Type[] notificationTypes) =>
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Receive(INotificationHandler correspondingHandler, INotification notification) 
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) 
     {
         if (notification is TNotification n)
             handler.Invoke(correspondingHandler, n);
     }
-
-    /// <inheritdoc />
-    public void Send(INotification message) =>
-        throw new NotImplementedException();
-
-    /// <inheritdoc />
-    public void Subscribe(INotificationHandler receiver) =>
-        throw new NotImplementedException();
-
-    /// <inheritdoc />
-    void INotificationHandler.Unsubscribe(INotificationHandler receiver) =>
-        throw new NotImplementedException();
 
     /// <inheritdoc />
     public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "")

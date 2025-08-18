@@ -70,6 +70,6 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     protected void InitiateNotification(INotification notification) =>
         PartitionHandler?.InitiateNotification(notification);
     
-    protected bool CanReceive(params Type[] notificationTypes) =>
-        PartitionHandler?.CanReceive(notificationTypes) ?? false;
+    protected bool Handles(params Type[] notificationTypes) =>
+        PartitionHandler?.Handles(notificationTypes) ?? false;
 }
