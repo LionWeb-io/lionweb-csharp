@@ -15,34 +15,40 @@
 // SPDX-FileCopyrightText: 2025 LionWeb Project
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Repository.Forest;
+namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.M1;
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Notification.Handler;
 
 internal static class RewriteForestNotificationReplicator
 {
-    public static new IConnectingNotificationHandler Create(IForest localForest, SharedNodeMap sharedNodeMap, object? sender)
+    public static IConnectingNotificationHandler Create(
+        IForest localForest,
+        SharedNodeMap sharedNodeMap,
+        object? sender
+    )
     {
-        var internalSender = sender ?? localForest;
-        var filter = new IdFilteringNotificationHandler(internalSender);
-        var replacingFilter = new IdReplacingNotificationHandler(internalSender);
-        var remoteReplicator =
-            new RewriteRemoteNotificationReplicator(localForest, sharedNodeMap, filter, replacingFilter,
-                internalSender);
-        var localReplicator = new LocalNotificationReplicator(localForest, sharedNodeMap, internalSender);
+        IdReplacingNotificationHandler replacingFilter = null!;
+        var parts = ForestNotificationReplicator.CreateInternal(localForest,
+            sharedNodeMap,
+            sender,
+            (filter, s) =>
+            {
+                replacingFilter = new IdReplacingNotificationHandler(s);
+                return new RewriteRemoteNotificationReplicator(
+                    localForest,
+                    sharedNodeMap,
+                    filter,
+                    replacingFilter,
+                    s
+                );
+            });
 
         var result = new CompositeNotificationHandler(
-            [replacingFilter, remoteReplicator, filter],
+            parts.Prepend(replacingFilter).ToList(),
             sender ?? $"Composite of {nameof(RewriteForestNotificationReplicator)} {localForest}");
-
-        var forestHandler = localForest.GetNotificationHandler();
-        if (forestHandler == null)
-            return result;
-
-        INotificationHandler.Connect(forestHandler, localReplicator);
-        INotificationHandler.Connect(localReplicator, filter);
 
         return result;
     }

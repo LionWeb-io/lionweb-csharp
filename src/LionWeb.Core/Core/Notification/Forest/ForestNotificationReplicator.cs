@@ -24,16 +24,38 @@ using M1;
 /// <inheritdoc cref="RemoteNotificationReplicator"/>
 public static class ForestNotificationReplicator
 {
-    public static IConnectingNotificationHandler Create(IForest localForest, SharedNodeMap sharedNodeMap,
-        object? sender)
+    public static IConnectingNotificationHandler Create(
+        IForest localForest,
+        SharedNodeMap sharedNodeMap,
+        object? sender
+    )
+    {
+        var parts = CreateInternal(
+            localForest,
+            sharedNodeMap,
+            sender,
+            (filter, s) => new RemoteNotificationReplicator(localForest, sharedNodeMap, filter, s)
+        );
+
+        var result = new CompositeNotificationHandler(parts,
+            sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
+
+        return result;
+    }
+
+    public static List<IConnectingNotificationHandler> CreateInternal(
+        IForest localForest,
+        SharedNodeMap sharedNodeMap,
+        object? sender,
+        Func<IdFilteringNotificationHandler, object, RemoteNotificationReplicator> remoteNotificationReplicator
+    )
     {
         var internalSender = sender ?? localForest;
         var filter = new IdFilteringNotificationHandler(internalSender);
-        var remoteReplicator = new RemoteNotificationReplicator(localForest, sharedNodeMap, filter, internalSender);
+        var remoteReplicator = remoteNotificationReplicator(filter, internalSender);
         var localReplicator = new LocalNotificationReplicator(localForest, sharedNodeMap, internalSender);
 
-        var result = new CompositeNotificationHandler([remoteReplicator, filter],
-            sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
+        var result = new List<IConnectingNotificationHandler> { remoteReplicator, filter };
 
         var forestHandler = localForest.GetNotificationHandler();
         if (forestHandler == null)
