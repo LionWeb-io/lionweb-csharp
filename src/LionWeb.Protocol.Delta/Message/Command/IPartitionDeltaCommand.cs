@@ -356,7 +356,6 @@ public record ChangeReferenceResolveInfo(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode? Target,
     ResolveInfo OldResolveInfo,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
