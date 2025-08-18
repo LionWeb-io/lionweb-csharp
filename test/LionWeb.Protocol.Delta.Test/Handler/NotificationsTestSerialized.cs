@@ -50,7 +50,7 @@ public class NotificationsTestSerialized : NotificationTestsBase
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
         
-        var replicator = ForestNotificationReplicator.Create(cloneForest, sharedNodeMap, "cloneReplicator");
+        var replicator = ForestReplicator.Create(cloneForest, sharedNodeMap, "cloneReplicator");
 
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,

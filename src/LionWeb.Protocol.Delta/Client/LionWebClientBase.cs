@@ -60,7 +60,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        _replicator = ForestNotificationReplicator.Create(forest, SharedNodeMap, _name);
+        _replicator = ForestReplicator.Create(forest, SharedNodeMap, _name);
 
         INotificationHandler.Connect(_replicator, new LocalForestNotificationHandler(name, this));
 

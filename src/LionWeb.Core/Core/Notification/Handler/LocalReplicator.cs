@@ -21,11 +21,11 @@ using Forest;
 using M1;
 using Partition;
 
-public class LocalNotificationReplicator : NotificationHandlerBase, IConnectingNotificationHandler
+public class LocalReplicator : NotificationHandlerBase, IConnectingNotificationHandler
 {
     private readonly SharedNodeMap _sharedNodeMap;
 
-    public LocalNotificationReplicator(
+    public LocalReplicator(
         IForest? localForest,
         SharedNodeMap sharedNodeMap,
         object? sender

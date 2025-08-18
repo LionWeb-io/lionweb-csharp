@@ -848,7 +848,7 @@ public class NotificationTests_Twoway
         return Tuple.Create(replicator, cloneReplicator);
     }
     private static IConnectingNotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
-        PartitionNotificationReplicator.Create(clone, new(), sender);
+        PartitionReplicator.Create(clone, new(), sender);
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {

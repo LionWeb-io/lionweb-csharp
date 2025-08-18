@@ -22,7 +22,7 @@ using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Handler;
 
-internal static class RewriteForestNotificationReplicator
+internal static class RewriteForestReplicator
 {
     public static IConnectingNotificationHandler Create(
         IForest localForest,
@@ -31,13 +31,13 @@ internal static class RewriteForestNotificationReplicator
     )
     {
         IdReplacingNotificationHandler replacingFilter = null!;
-        var parts = ForestNotificationReplicator.CreateInternal(localForest,
+        var parts = ForestReplicator.CreateInternal(localForest,
             sharedNodeMap,
             sender,
             (filter, s) =>
             {
                 replacingFilter = new IdReplacingNotificationHandler(s);
-                return new RewriteRemoteNotificationReplicator(
+                return new RewriteRemoteReplicator(
                     localForest,
                     sharedNodeMap,
                     filter,
@@ -48,19 +48,19 @@ internal static class RewriteForestNotificationReplicator
 
         var result = new CompositeNotificationHandler(
             parts.Prepend(replacingFilter).ToList(),
-            sender ?? $"Composite of {nameof(RewriteForestNotificationReplicator)} {localForest}");
+            sender ?? $"Composite of {nameof(RewriteForestReplicator)} {localForest}");
 
         return result;
     }
 }
 
-internal class RewriteRemoteNotificationReplicator(
+internal class RewriteRemoteReplicator(
     IForest? localForest,
     SharedNodeMap sharedNodeMap,
     IdFilteringNotificationHandler filter,
     IdReplacingNotificationHandler replacingFilter,
     object? sender
-) : RemoteNotificationReplicator(localForest, sharedNodeMap, filter, sender)
+) : RemoteReplicator(localForest, sharedNodeMap, filter, sender)
 {
     private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(null);
 

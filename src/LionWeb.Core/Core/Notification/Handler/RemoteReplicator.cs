@@ -30,14 +30,14 @@ using System.Diagnostics;
 /// Example: We receive a <see cref="PropertyAddedNotification" /> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-public class RemoteNotificationReplicator : NotificationHandlerBase, IConnectingNotificationHandler
+public class RemoteReplicator : NotificationHandlerBase, IConnectingNotificationHandler
 {
     private readonly IForest? _localForest;
 
     private readonly SharedNodeMap _sharedNodeMap;
     protected readonly IdFilteringNotificationHandler Filter;
 
-    public RemoteNotificationReplicator(
+    public RemoteReplicator(
         IForest? localForest,
         SharedNodeMap sharedNodeMap,
         IdFilteringNotificationHandler filter,

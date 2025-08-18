@@ -21,8 +21,8 @@ using Handler;
 using M1;
 
 /// Replicates notifications for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
-/// <inheritdoc cref="RemoteNotificationReplicator"/>
-public static class ForestNotificationReplicator
+/// <inheritdoc cref="RemoteReplicator"/>
+public static class ForestReplicator
 {
     public static IConnectingNotificationHandler Create(
         IForest localForest,
@@ -34,11 +34,11 @@ public static class ForestNotificationReplicator
             localForest,
             sharedNodeMap,
             sender,
-            (filter, s) => new RemoteNotificationReplicator(localForest, sharedNodeMap, filter, s)
+            (filter, s) => new RemoteReplicator(localForest, sharedNodeMap, filter, s)
         );
 
         var result = new CompositeNotificationHandler(parts,
-            sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
+            sender ?? $"Composite of {nameof(ForestReplicator)} {localForest}");
 
         return result;
     }
@@ -47,13 +47,13 @@ public static class ForestNotificationReplicator
         IForest localForest,
         SharedNodeMap sharedNodeMap,
         object? sender,
-        Func<IdFilteringNotificationHandler, object, RemoteNotificationReplicator> remoteNotificationReplicator
+        Func<IdFilteringNotificationHandler, object, RemoteReplicator> remoteNotificationReplicator
     )
     {
         var internalSender = sender ?? localForest;
         var filter = new IdFilteringNotificationHandler(internalSender);
         var remoteReplicator = remoteNotificationReplicator(filter, internalSender);
-        var localReplicator = new LocalNotificationReplicator(localForest, sharedNodeMap, internalSender);
+        var localReplicator = new LocalReplicator(localForest, sharedNodeMap, internalSender);
 
         var result = new List<IConnectingNotificationHandler> { remoteReplicator, filter };
 

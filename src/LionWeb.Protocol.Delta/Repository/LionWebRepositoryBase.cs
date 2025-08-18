@@ -45,7 +45,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        _replicator = RewriteForestNotificationReplicator.Create(forest, SharedNodeMap, _name);
+        _replicator = RewriteForestReplicator.Create(forest, SharedNodeMap, _name);
 
         INotificationHandler.Connect(_replicator, new LocalForestNotificationHandler(name, this));
 
