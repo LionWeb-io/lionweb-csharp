@@ -345,7 +345,6 @@ public record DeleteReferenceResolveInfo(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode Target,
     ResolveInfo DeletedResolveInfo,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
