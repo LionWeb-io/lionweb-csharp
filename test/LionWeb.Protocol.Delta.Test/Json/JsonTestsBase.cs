@@ -262,7 +262,7 @@ public abstract class JsonTestsBase
             ResolveInfo(), Index(), TargetNode(), ResolveInfo(), CommandId(), ProtocolMessages());
 
     protected static AddReferenceResolveInfo CreateAddReferenceResolveInfo() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
+        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(),
             CommandId(), ProtocolMessages());
 
     protected static DeleteReferenceResolveInfo CreateDeleteReferenceResolveInfo() =>

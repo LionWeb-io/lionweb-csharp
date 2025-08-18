@@ -336,7 +336,6 @@ public record AddReferenceResolveInfo(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode Target,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
