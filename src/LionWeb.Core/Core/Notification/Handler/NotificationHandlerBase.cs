@@ -89,9 +89,8 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
 
         var handler = CreateHandler<INotification>(receiver);
 
-        _handlers[receiver] = handler;
-
-        InternalEvent += handler;
+        if (_handlers.TryAdd(receiver, handler))
+            InternalEvent += handler;
     }
 
     private EventHandler<INotification> CreateHandler<TSubscribedNotification>(

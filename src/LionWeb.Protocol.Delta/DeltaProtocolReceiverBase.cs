@@ -23,7 +23,7 @@ using Core.Notification.Handler;
 using Core.Notification.Partition;
 using Message;
 
-public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> : IDisposable
+public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> : NotificationHandlerBase, IInboundNotificationHandler
     where TContent : IDeltaContent
     where TPartition : TContent, IDeltaContent
     where TForest : TContent, IDeltaContent
@@ -34,11 +34,13 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 
     public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap,
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
-        IConnectingNotificationHandler forestNotificationReplicator)
+        IConnectingNotificationHandler forestNotificationReplicator) : base(null)
     {
         _sharedNodeMap = sharedNodeMap;
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
         _forestNotificationReplicator = forestNotificationReplicator;
+        
+        INotificationHandler.Connect(this, forestNotificationReplicator);
     }
 
     public void Init()
@@ -59,20 +61,23 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
         {
             case TPartition partitionContent:
                 var partitionNotification = MapPartition(partitionContent);
-                if (_sharedNodeMap.TryGetPartition(partitionNotification.ContextNodeId, out var partition))
-                {
-                    var partitionReplicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
-                    partitionReplicator.Receive(null, partitionNotification);
-                } else
-                {
-                    throw new InvalidOperationException();
-                }
+                InitiateNotification(partitionNotification);
+                // _forestNotificationReplicator.Receive(null, partitionNotification);
+                // if (_sharedNodeMap.TryGetPartition(partitionNotification.ContextNodeId, out var partition))
+                // {
+                //     var partitionReplicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
+                //     partitionReplicator.Receive(null, partitionNotification);
+                // } else
+                // {
+                //     throw new InvalidOperationException();
+                // }
 
                 break;
 
             case TForest forestContent:
                 var forestNotification = MapForest(forestContent);
-                _forestNotificationReplicator.Receive(null, forestNotification);
+                InitiateNotification(forestNotification);
+                // _forestNotificationReplicator.Receive(null, forestNotification);
                 break;
 
             default:
@@ -84,4 +89,7 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
     protected abstract IForestNotification MapForest(TForest forestContent);
 
     #endregion
+
+    public void InitiateNotification(INotification notification) => 
+        Send(notification);
 }

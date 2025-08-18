@@ -62,7 +62,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
         SharedNodeMap = new();
         SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
-        _replicator = ForestNotificationReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
+        _replicator = ForestNotificationReplicator.Create(forest, SharedNodeMap, _name);
 
         if (forest.GetNotificationHandler() is { } proc)
             INotificationHandler.Connect(proc, new LocalForestChangeNotificationHandler(name, this));
@@ -120,8 +120,8 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)
     {
-        var partitionReplicator = SharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
-        INotificationHandler.Connect(partitionReplicator, new LocalPartitionNotificationHandler(_name, this));
+        // var partitionReplicator = SharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
+        // INotificationHandler.Connect(partitionReplicator, new LocalPartitionNotificationHandler(_name, this));
     }
 
     #endregion

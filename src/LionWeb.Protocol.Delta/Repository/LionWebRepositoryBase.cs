@@ -120,8 +120,8 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     private void RegisterPartition(IPartitionInstance partitionInstance)
     {
-        var notificationHandler = SharedPartitionReplicatorMap.Lookup(partitionInstance.GetId());
-        INotificationHandler.Connect(notificationHandler, new LocalPartitionNotificationHandler(_name, this));
+        // var notificationHandler = SharedPartitionReplicatorMap.Lookup(partitionInstance.GetId());
+        // INotificationHandler.Connect(notificationHandler, new LocalPartitionNotificationHandler(_name, this));
     }
 
     #endregion

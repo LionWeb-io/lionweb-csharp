@@ -19,23 +19,17 @@ namespace LionWeb.Core.Notification.Forest;
 
 using Handler;
 using M1;
-using Partition;
-using System.Diagnostics;
 
 /// Replicates notifications for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
-/// <inheritdoc cref="RemoteNotificationReplicatorBase"/>
+/// <inheritdoc cref="RemoteNotificationReplicator"/>
 public static class ForestNotificationReplicator
 {
-    public static IConnectingNotificationHandler Create(IForest localForest,
-        SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
+    public static IConnectingNotificationHandler Create(IForest localForest, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
         var filter = new IdFilteringNotificationHandler(internalSender);
-        var remoteReplicator =
-            new RemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, internalSender);
-        var localReplicator =
-            new LocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap,
-                internalSender);
+        var remoteReplicator = new RemoteNotificationReplicator(localForest, sharedNodeMap, filter, internalSender);
+        var localReplicator = new LocalNotificationReplicator(localForest, sharedNodeMap, internalSender);
 
         var result = new CompositeNotificationHandler([remoteReplicator, filter],
             sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
@@ -48,137 +42,5 @@ public static class ForestNotificationReplicator
         }
 
         return result;
-    }
-}
-
-public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBase
-{
-    private readonly IForest _localForest;
-
-    protected internal RemoteForestNotificationReplicator(IForest localForest, SharedNodeMap sharedNodeMap,
-        IdFilteringNotificationHandler filter, object? sender) :
-        base(sharedNodeMap, filter, sender)
-    {
-        _localForest = localForest;
-    }
-
-    /// <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">Unsubscribes</see>
-    /// from the <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>. 
-    // public override void Dispose()
-    // {
-    //     base.Dispose();
-    //
-    //     foreach (var localPartition in _localPartitionReplicators.Values)
-    //     {
-    //         localPartition.Dispose();
-    //     }
-    //
-    //     var forestListener = _localForest.GetPublisher();
-    //     if (forestListener == null)
-    //         return;
-    //
-    //     forestListener.Unsubscribe<IForestEvent>(LocalHandler);
-    //
-    //     GC.SuppressFinalize(this);
-    // }
-
-    /// <inheritdoc />
-    protected override void ProcessNotification(INotification? forestNotification)
-    {
-        Debug.WriteLine($"{this.GetType()}: processing notification {forestNotification}");
-        switch (forestNotification)
-        {
-            case PartitionAddedNotification a:
-                OnRemoteNewPartition(a);
-                break;
-
-            case PartitionDeletedNotification a:
-                OnRemotePartitionDeleted(a);
-                break;
-        }
-    }
-
-
-    private void OnRemoteNewPartition(PartitionAddedNotification partitionAdded) =>
-        SuppressNotificationForwarding(partitionAdded, () =>
-        {
-            var newPartition = partitionAdded.NewPartition;
-            _localForest.AddPartitions([newPartition], partitionAdded.NotificationId);
-        });
-
-    private void OnRemotePartitionDeleted(PartitionDeletedNotification partitionDeleted) =>
-        SuppressNotificationForwarding(partitionDeleted, () =>
-        {
-            var localPartition = (IPartitionInstance)Lookup(partitionDeleted.DeletedPartition.GetId());
-            _localForest.RemovePartitions([localPartition], partitionDeleted.NotificationId);
-        });
-}
-
-public class LocalForestNotificationReplicator : NotificationHandlerBase, IConnectingNotificationHandler
-{
-    private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
-    private readonly SharedNodeMap _sharedNodeMap;
-
-    public LocalForestNotificationReplicator(
-        IForest localForest,
-        SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
-        SharedNodeMap sharedNodeMap,
-        object? sender
-    ) : base(sender)
-    {
-        _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
-        _sharedNodeMap = sharedNodeMap;
-
-        foreach (var partition in localForest.Partitions)
-        {
-            RegisterPartition(partition);
-        }
-    }
-
-    /// <inheritdoc />
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
-    {
-        switch (notification)
-        {
-            case PartitionAddedNotification partitionAdded:
-                OnLocalPartitionAdded(partitionAdded);
-                break;
-            case PartitionDeletedNotification partitionDeleted:
-                OnLocalPartitionDeleted(partitionDeleted);
-                break;
-        }
-    }
-
-
-    protected virtual IConnectingNotificationHandler CreatePartitionNotificationReplicator(
-        IPartitionInstance partition,
-        string sender) =>
-        PartitionNotificationReplicator.Create(partition, _sharedNodeMap, sender);
-
-    private INotificationHandler RegisterPartition(IPartitionInstance partition)
-    {
-        var replicator = CreatePartitionNotificationReplicator(partition, $"{Sender}.{partition.GetId()}");
-        _sharedPartitionReplicatorMap.Register(partition.GetId(), replicator);
-        return replicator;
-    }
-
-    private INotificationHandler UnregisterPartition(IPartitionInstance partition)
-    {
-        var replicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
-        replicator.Dispose();
-        _sharedPartitionReplicatorMap.Unregister(partition.GetId());
-        return replicator;
-    }
-
-    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAdded)
-    {
-        var replicator = RegisterPartition(partitionAdded.NewPartition);
-        SendWithSender(replicator, partitionAdded);
-    }
-
-    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeleted)
-    {
-        var replicator = UnregisterPartition(partitionDeleted.DeletedPartition);
-        SendWithSender(replicator, partitionDeleted);
     }
 }

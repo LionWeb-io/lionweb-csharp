@@ -75,7 +75,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             content.InternalParticipationId = messageContext.ClientInfo.ParticipationId;
             Log(
                 $"received {content.GetType().Name} for {messageContext.ClientInfo.ParticipationId}", true);
-            Log(content.ToString());
+            // Log(content.ToString());
 
             switch (content)
             {

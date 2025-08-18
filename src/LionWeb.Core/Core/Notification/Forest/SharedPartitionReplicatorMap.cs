@@ -23,8 +23,13 @@ public class SharedPartitionReplicatorMap
 {
     private readonly Dictionary<NodeId, IConnectingNotificationHandler> _localPartitionReplicators = [];
 
-    public IConnectingNotificationHandler Lookup(NodeId partitionId) =>
-        _localPartitionReplicators[partitionId];
+    public IConnectingNotificationHandler Lookup(NodeId partitionId)
+    {
+        if (_localPartitionReplicators.TryGetValue(partitionId, out var result))
+            return result;
+        
+        throw new ArgumentException($"Partition replicator for {partitionId} does not exist");
+    }
 
     public void Register(NodeId partitionId, IConnectingNotificationHandler replicator)
     {

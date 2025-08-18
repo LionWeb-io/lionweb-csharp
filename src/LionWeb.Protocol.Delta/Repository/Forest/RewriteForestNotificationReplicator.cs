@@ -17,12 +17,10 @@
 
 namespace LionWeb.Protocol.Delta.Repository.Forest;
 
-using Core;
 using Core.M1;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Handler;
-using Partition;
 
 internal static class RewriteForestNotificationReplicator
 {
@@ -33,33 +31,32 @@ internal static class RewriteForestNotificationReplicator
         var filter = new IdFilteringNotificationHandler(internalSender);
         var replacingFilter = new IdReplacingNotificationHandler(internalSender);
         var remoteReplicator =
-            new RewriteRemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, replacingFilter,
+            new RewriteRemoteNotificationReplicator(localForest, sharedNodeMap, filter, replacingFilter,
                 internalSender);
-        var localReplicator = new RewriteLocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap,
-            sharedNodeMap, internalSender);
+        var localReplicator = new LocalNotificationReplicator(localForest, sharedNodeMap, internalSender);
 
         var result = new CompositeNotificationHandler(
             [replacingFilter, remoteReplicator, filter],
             sender ?? $"Composite of {nameof(RewriteForestNotificationReplicator)} {localForest}");
 
         var forestHandler = localForest.GetNotificationHandler();
-        if (forestHandler != null)
-        {
-            INotificationHandler.Connect(forestHandler, localReplicator);
-            INotificationHandler.Connect(localReplicator, filter);
-        }
+        if (forestHandler == null)
+            return result;
+
+        INotificationHandler.Connect(forestHandler, localReplicator);
+        INotificationHandler.Connect(localReplicator, filter);
 
         return result;
     }
 }
 
-internal class RewriteRemoteForestNotificationReplicator(
-    IForest localForest,
+internal class RewriteRemoteNotificationReplicator(
+    IForest? localForest,
     SharedNodeMap sharedNodeMap,
     IdFilteringNotificationHandler filter,
     IdReplacingNotificationHandler replacingFilter,
     object? sender
-) : RemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, sender)
+) : RemoteNotificationReplicator(localForest, sharedNodeMap, filter, sender)
 {
     private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(null);
 
@@ -79,16 +76,4 @@ internal class RewriteRemoteForestNotificationReplicator(
             replacingFilter.UnregisterReplacementNotificationId(notificationId);
         }
     }
-}
-
-internal class RewriteLocalForestNotificationReplicator(
-    IForest localForest,
-    SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
-    SharedNodeMap sharedNodeMap,
-    object? sender)
-    : LocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, sender)
-{
-    protected override IConnectingNotificationHandler CreatePartitionNotificationReplicator(
-        IPartitionInstance partition, string sender) =>
-        RewritePartitionNotificationReplicator.Create(partition, sharedNodeMap, sender);
 }

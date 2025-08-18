@@ -126,12 +126,12 @@ public class NotificationTests_Forest
         Forest originalForest)
     {
         SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
-        var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, new(), null);
+        var replicator = ForestNotificationReplicator.Create(cloneForest, new(), null);
         var cloneHandler = new NodeCloneNotificationHandler("forestCloner");
         INotificationHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);
         INotificationHandler.Connect(cloneHandler, replicator);
 
-        var receiver = new TestLocalForestChangeNotificationHandler(originalForest, sharedPartitionReplicatorMap);
+        var receiver = new TestLocalForestChangeNotificationHandler(originalForest, cloneHandler);
         INotificationHandler.Connect(originalForest.GetNotificationHandler(), receiver);
         return replicator;
     }
@@ -143,7 +143,7 @@ public class NotificationTests_Forest
     }
 }
 
-internal class TestLocalForestChangeNotificationHandler(object? sender, SharedPartitionReplicatorMap sharedPartitionReplicatorMap)
+internal class TestLocalForestChangeNotificationHandler(object? sender, NodeCloneNotificationHandler cloneHandler)
     : NotificationHandlerBase(sender), IReceivingNotificationHandler
 {
     public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
@@ -161,10 +161,7 @@ internal class TestLocalForestChangeNotificationHandler(object? sender, SharedPa
 
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)
     {
-        var partitionReplicator = sharedPartitionReplicatorMap.Lookup(partitionAddedNotification.NewPartition.GetId());
-        var cloneHandler = new NodeCloneNotificationHandler($"partitionCloner.{partitionAddedNotification.NewPartition.GetId()}");
         INotificationHandler.Connect(partitionAddedNotification.NewPartition.GetNotificationHandler(), cloneHandler);
-        INotificationHandler.Connect(cloneHandler, partitionReplicator);
     }
 
     private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)

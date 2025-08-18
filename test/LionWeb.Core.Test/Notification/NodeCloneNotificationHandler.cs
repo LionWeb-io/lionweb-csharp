@@ -25,6 +25,10 @@ using Core.Notification.Partition;
 internal class NodeCloneNotificationHandler(object? sender)
     : NotificationHandlerBase(sender), IConnectingNotificationHandler
 {
+    private readonly Dictionary<IReadableNode, IReadableNode> _memoization = [];
+
+    private readonly Dictionary<ISendingNotificationHandler, ISendingNotificationHandler> _handlerMemoization = [];
+
     public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
     {
         INotification result = notification switch
@@ -171,10 +175,18 @@ internal class NodeCloneNotificationHandler(object? sender)
                 DeletedTarget = Clone(e.DeletedTarget), Parent = Clone(e.Parent)
             }
         };
-        Send(result);
+
+        if (result is IForestNotification f)
+        {
+            _handlerMemoization[correspondingHandler] = f.Partition.GetNotificationHandler();
+            SendWithSender(f.Partition.GetNotificationHandler(), f);
+        } else
+            SendWithSender(_handlerMemoization.GetValueOrDefault(correspondingHandler, correspondingHandler), result);
     }
 
 
-    private static T Clone<T>(T node) where T : class?, IReadableNode? =>
-        (T)SameIdCloner.Clone((INode)node);
+    private T Clone<T>(T node) where T : class?, IReadableNode? =>
+        (T)(_memoization.TryGetValue(node, out var result)
+            ? result
+            : _memoization[node] = SameIdCloner.Clone((INode)node));
 }
