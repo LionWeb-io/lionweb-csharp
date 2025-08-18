@@ -274,7 +274,7 @@ public abstract class JsonTestsBase
             ResolveInfo(), CommandId(), ProtocolMessages());
 
     protected static AddReferenceTarget CreateAddReferenceTarget() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(),
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
             CommandId(), ProtocolMessages());
 
     protected static DeleteReferenceTarget CreateDeleteReferenceTarget() =>
