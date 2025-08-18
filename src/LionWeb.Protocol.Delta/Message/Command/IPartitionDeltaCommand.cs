@@ -384,7 +384,6 @@ public record ChangeReferenceTarget(
     MetaPointer Reference,
     Index Index,
     TargetNode OldTarget,
-    ResolveInfo? ResolveInfo,
     TargetNode NewTarget,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages

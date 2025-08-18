@@ -282,7 +282,7 @@ public abstract class JsonTestsBase
             CommandId(), ProtocolMessages());
 
     protected static ChangeReferenceTarget CreateChangeReferenceTarget() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
             TargetNode(), CommandId(), ProtocolMessages());
 
     #endregion
