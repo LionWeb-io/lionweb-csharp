@@ -18,37 +18,14 @@
 namespace LionWeb.Protocol.Delta;
 
 using Core.Notification;
-using Core.Notification.Forest;
 using Core.Notification.Handler;
-using Core.Notification.Partition;
 using Message;
 
-public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> : NotificationHandlerBase, IInboundNotificationHandler
+public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationHandlerBase(null), IInboundNotificationHandler
     where TContent : IDeltaContent
-    where TPartition : TContent, IDeltaContent
-    where TForest : TContent, IDeltaContent
 {
-    private readonly PartitionSharedNodeMap _sharedNodeMap;
-    private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
-    private readonly IConnectingNotificationHandler _forestNotificationReplicator;
-
-    public DeltaProtocolReceiverBase(PartitionSharedNodeMap sharedNodeMap,
-        SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
-        IConnectingNotificationHandler forestNotificationReplicator) : base(null)
-    {
-        _sharedNodeMap = sharedNodeMap;
-        _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
-        _forestNotificationReplicator = forestNotificationReplicator;
-        
-        INotificationHandler.Connect(this, forestNotificationReplicator);
-    }
-
-    public void Init()
-    {
-    }
-
     /// <inheritdoc />
-    public void Dispose()
+    public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
     }
@@ -57,39 +34,15 @@ public abstract class DeltaProtocolReceiverBase<TContent, TPartition, TForest> :
 
     public void Receive(TContent deltaContent)
     {
-        switch (deltaContent)
-        {
-            case TPartition partitionContent:
-                var partitionNotification = MapPartition(partitionContent);
-                InitiateNotification(partitionNotification);
-                // _forestNotificationReplicator.Receive(null, partitionNotification);
-                // if (_sharedNodeMap.TryGetPartition(partitionNotification.ContextNodeId, out var partition))
-                // {
-                //     var partitionReplicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
-                //     partitionReplicator.Receive(null, partitionNotification);
-                // } else
-                // {
-                //     throw new InvalidOperationException();
-                // }
-
-                break;
-
-            case TForest forestContent:
-                var forestNotification = MapForest(forestContent);
-                InitiateNotification(forestNotification);
-                // _forestNotificationReplicator.Receive(null, forestNotification);
-                break;
-
-            default:
-                throw new InvalidOperationException(deltaContent.ToString());
-        }
+        var notification = Map(deltaContent);
+        InitiateNotification(notification);
     }
 
-    protected abstract IPartitionNotification MapPartition(TPartition partitionContent);
-    protected abstract IForestNotification MapForest(TForest forestContent);
+    protected abstract INotification Map(TContent content);
 
     #endregion
 
-    public void InitiateNotification(INotification notification) => 
+    /// <inheritdoc />
+    public void InitiateNotification(INotification notification) =>
         Send(notification);
 }

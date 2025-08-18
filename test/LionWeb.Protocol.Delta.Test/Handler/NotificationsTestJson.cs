@@ -23,6 +23,7 @@ using Core.M1;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
+using Core.Notification.Handler;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Notification;
@@ -47,8 +48,6 @@ public class NotificationsTestJson : NotificationTestsBase
                 .WithLanguages(languages)
             ;
 
-        var sharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
-
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
         
@@ -56,11 +55,11 @@ public class NotificationsTestJson : NotificationTestsBase
 
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
-            sharedPartitionReplicatorMap,
             sharedKeyedMap,
-            deserializerBuilder,
-            replicator
+            deserializerBuilder
         );
+        
+        INotificationHandler.Connect(eventReceiver, replicator);
 
         var deltaSerializer = new DeltaSerializer();
 

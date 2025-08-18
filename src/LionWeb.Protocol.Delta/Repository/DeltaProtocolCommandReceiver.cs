@@ -19,32 +19,21 @@ namespace LionWeb.Protocol.Delta.Repository;
 
 using Core.M1;
 using Core.Notification;
-using Core.Notification.Forest;
-using Core.Notification.Handler;
-using Core.Notification.Partition;
 using Message.Command;
 
-public class DeltaProtocolCommandReceiver
-    : DeltaProtocolReceiverBase<IDeltaCommand, IPartitionDeltaCommand, IForestDeltaCommand>
+public class DeltaProtocolCommandReceiver : DeltaProtocolReceiverBase<IDeltaCommand>
 {
     private readonly DeltaCommandToNotificationMapper _mapper;
 
     public DeltaProtocolCommandReceiver(
         PartitionSharedNodeMap sharedNodeMap,
-        SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
         SharedKeyedMap sharedKeyedMap,
-        DeserializerBuilder deserializerBuilder,
-        IConnectingNotificationHandler forestNotificationReplicator)
-        : base(sharedNodeMap, sharedPartitionReplicatorMap, forestNotificationReplicator)
+        DeserializerBuilder deserializerBuilder)
     {
         _mapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
     /// <inheritdoc />
-    protected override IPartitionNotification MapPartition(IPartitionDeltaCommand partitionContent) =>
-        (IPartitionNotification)_mapper.Map(partitionContent);
-
-    /// <inheritdoc />
-    protected override IForestNotification MapForest(IForestDeltaCommand forestContent) =>
-        (IForestNotification)_mapper.Map(forestContent);
+    protected override INotification Map(IDeltaCommand content) => 
+        _mapper.Map(content);
 }

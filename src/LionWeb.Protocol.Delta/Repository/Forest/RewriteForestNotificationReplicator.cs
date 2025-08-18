@@ -19,13 +19,11 @@ namespace LionWeb.Protocol.Delta.Repository.Forest;
 
 using Core.M1;
 using Core.Notification;
-using Core.Notification.Forest;
 using Core.Notification.Handler;
 
 internal static class RewriteForestNotificationReplicator
 {
-    public static new IConnectingNotificationHandler Create(IForest localForest,
-        SharedPartitionReplicatorMap sharedPartitionReplicatorMap, SharedNodeMap sharedNodeMap, object? sender)
+    public static new IConnectingNotificationHandler Create(IForest localForest, SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localForest;
         var filter = new IdFilteringNotificationHandler(internalSender);

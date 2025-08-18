@@ -125,7 +125,6 @@ public class NotificationTests_Forest
     private static INotificationHandler CreateReplicator(Forest cloneForest,
         Forest originalForest)
     {
-        SharedPartitionReplicatorMap sharedPartitionReplicatorMap = new();
         var replicator = ForestNotificationReplicator.Create(cloneForest, new(), null);
         var cloneHandler = new NodeCloneNotificationHandler("forestCloner");
         INotificationHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);

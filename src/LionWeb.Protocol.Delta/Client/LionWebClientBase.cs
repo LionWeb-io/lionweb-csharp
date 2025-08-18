@@ -34,7 +34,6 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     private ParticipationId? _participationId;
     private readonly ClientId? _clientId;
-    protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
 
     protected internal ParticipationId ParticipationId
     {
@@ -61,7 +60,6 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
         _replicator = ForestNotificationReplicator.Create(forest, SharedNodeMap, _name);
 
         if (forest.GetNotificationHandler() is { } proc)

@@ -31,8 +31,6 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     protected readonly IRepositoryConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
 
-    protected readonly SharedPartitionReplicatorMap SharedPartitionReplicatorMap;
-
     protected readonly IConnectingNotificationHandler _replicator;
 
     private long nextFreeNodeId = 0;
@@ -49,9 +47,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         _connector = connector;
 
         SharedNodeMap = new();
-        SharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
-        _replicator =
-            RewriteForestNotificationReplicator.Create(forest, SharedPartitionReplicatorMap, SharedNodeMap, _name);
+        _replicator = RewriteForestNotificationReplicator.Create(forest, SharedNodeMap, _name);
 
         if (forest.GetNotificationHandler() is { } proc)
             INotificationHandler.Connect(proc, new LocalForestChangeNotificationHandler(name, this));
@@ -82,7 +78,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     #region Local
 
     private class LocalForestChangeNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : NotificationHandlerBase(sender),IConnectingNotificationHandler
+        : NotificationHandlerBase(sender), IConnectingNotificationHandler
     {
         public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
         {
@@ -99,16 +95,16 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     }
 
     private class LocalForestNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : NotificationHandlerBase(sender),IConnectingNotificationHandler
+        : NotificationHandlerBase(sender), IConnectingNotificationHandler
     {
-        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
+        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) =>
             repository.SendNotificationToAllClients(sender, notification);
     }
 
     private class LocalPartitionNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : NotificationHandlerBase(sender),IConnectingNotificationHandler
+        : NotificationHandlerBase(sender), IConnectingNotificationHandler
     {
-        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
+        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) =>
             repository.SendNotificationToAllClients(sender, notification);
     }
 
