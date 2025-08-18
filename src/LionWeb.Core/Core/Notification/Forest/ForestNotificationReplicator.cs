@@ -31,9 +31,11 @@ public static class ForestNotificationReplicator
     {
         var internalSender = sender ?? localForest;
         var filter = new IdFilteringNotificationHandler<IForestNotification>(internalSender);
-        var remoteReplicator = new RemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, internalSender);
+        var remoteReplicator =
+            new RemoteForestNotificationReplicator(localForest, sharedNodeMap, filter, internalSender);
         var localReplicator =
-            new LocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap, internalSender);
+            new LocalForestNotificationReplicator(localForest, sharedPartitionReplicatorMap, sharedNodeMap,
+                internalSender);
 
         var result = new CompositeNotificationHandler<IForestNotification>([remoteReplicator, filter],
             sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
@@ -49,7 +51,8 @@ public static class ForestNotificationReplicator
     }
 }
 
-public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBase<IForestNotification>
+public class RemoteForestNotificationReplicator :
+    RemoteNotificationReplicatorBase<IForestNotification>, IForestNotificationHandler
 {
     private readonly IForest _localForest;
 
@@ -112,13 +115,18 @@ public class RemoteForestNotificationReplicator : RemoteNotificationReplicatorBa
         });
 }
 
-public class LocalForestNotificationReplicator : NotificationHandlerBase<IForestNotification>
+public class LocalForestNotificationReplicator : NotificationHandlerBase<IForestNotification>,
+    IForestNotificationHandler
 {
     private readonly SharedPartitionReplicatorMap _sharedPartitionReplicatorMap;
     private readonly SharedNodeMap _sharedNodeMap;
 
-    public LocalForestNotificationReplicator(IForest localForest, SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
-        SharedNodeMap sharedNodeMap, object? sender) : base(sender)
+    public LocalForestNotificationReplicator(
+        IForest localForest,
+        SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
+        SharedNodeMap sharedNodeMap,
+        object? sender
+    ) : base(sender)
     {
         _sharedPartitionReplicatorMap = sharedPartitionReplicatorMap;
         _sharedNodeMap = sharedNodeMap;
@@ -141,30 +149,37 @@ public class LocalForestNotificationReplicator : NotificationHandlerBase<IForest
                 OnLocalPartitionDeleted(partitionDeleted);
                 break;
         }
-
-        Send(message);
     }
 
-    protected virtual INotificationHandler<IPartitionNotification> CreatePartitionNotificationReplicator(IPartitionInstance partition,
+    protected virtual INotificationHandler<IPartitionNotification> CreatePartitionNotificationReplicator(
+        IPartitionInstance partition,
         string sender) =>
         PartitionNotificationReplicator.Create(partition, _sharedNodeMap, sender);
 
-    private void RegisterPartition(IPartitionInstance partition)
+    private INotificationHandler<IPartitionNotification> RegisterPartition(IPartitionInstance partition)
     {
         var replicator = CreatePartitionNotificationReplicator(partition, $"{Sender}.{partition.GetId()}");
         _sharedPartitionReplicatorMap.Register(partition.GetId(), replicator);
+        return replicator;
     }
 
-    private void UnregisterPartition(IPartitionInstance partition)
+    private INotificationHandler<IPartitionNotification> UnregisterPartition(IPartitionInstance partition)
     {
         var replicator = _sharedPartitionReplicatorMap.Lookup(partition.GetId());
         replicator.Dispose();
         _sharedPartitionReplicatorMap.Unregister(partition.GetId());
+        return replicator;
     }
 
-    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAdded) =>
-        RegisterPartition(partitionAdded.NewPartition);
+    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAdded)
+    {
+        var replicator = RegisterPartition(partitionAdded.NewPartition);
+        SendWithSender(replicator, partitionAdded);
+    }
 
-    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeleted) =>
-        UnregisterPartition(partitionDeleted.DeletedPartition);
+    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeleted)
+    {
+        var replicator = UnregisterPartition(partitionDeleted.DeletedPartition);
+        SendWithSender(replicator, partitionDeleted);
+    }
 }
