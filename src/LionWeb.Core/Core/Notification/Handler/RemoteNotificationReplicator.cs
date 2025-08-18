@@ -46,21 +46,7 @@ public class RemoteNotificationReplicator : NotificationHandlerBase, IConnecting
         _localForest = localForest;
         _sharedNodeMap = sharedNodeMap;
         Filter = filter;
-        
-        if (localForest == null)
-            return;
     }
-
-    /// unsubscribes from all <see cref="ReplicateFrom">replicated publishers</see>.
-    // public override void Dispose()
-    // {
-    //     foreach (var publisher in _publishers)
-    //     {
-    //         publisher.Unsubscribe<TEvent>(ProcessEvent);
-    //     }
-    //
-    //     GC.SuppressFinalize(this);
-    // }
 
     /// <inheritdoc />
     public void Receive(ISendingNotificationHandler notificationHandler, INotification notification)
@@ -149,7 +135,7 @@ public class RemoteNotificationReplicator : NotificationHandlerBase, IConnecting
         SuppressNotificationForwarding(partitionDeleted, () =>
         {
             notificationHandler.Unsubscribe(this);
-            var localPartition = (IPartitionInstance)LookupOpt(partitionDeleted.DeletedPartition.GetId());
+            var localPartition = (IPartitionInstance?)LookupOpt(partitionDeleted.DeletedPartition.GetId());
             if (localPartition != null)
                 _localForest?.RemovePartitions([localPartition], partitionDeleted.NotificationId);
         });
@@ -406,7 +392,7 @@ public class RemoteNotificationReplicator : NotificationHandlerBase, IConnecting
         {
             var localParent = Lookup(referenceDeleted.Parent.GetId());
 
-            object newValue = null;
+            object? newValue = null;
             if (referenceDeleted.Reference.Multiple)
             {
                 var existingTargets = localParent.Get(referenceDeleted.Reference);

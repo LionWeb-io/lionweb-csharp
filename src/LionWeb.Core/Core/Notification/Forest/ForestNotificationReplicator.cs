@@ -24,7 +24,8 @@ using M1;
 /// <inheritdoc cref="RemoteNotificationReplicator"/>
 public static class ForestNotificationReplicator
 {
-    public static IConnectingNotificationHandler Create(IForest localForest, SharedNodeMap sharedNodeMap, object? sender)
+    public static IConnectingNotificationHandler Create(IForest localForest, SharedNodeMap sharedNodeMap,
+        object? sender)
     {
         var internalSender = sender ?? localForest;
         var filter = new IdFilteringNotificationHandler(internalSender);
@@ -35,11 +36,11 @@ public static class ForestNotificationReplicator
             sender ?? $"Composite of {nameof(ForestNotificationReplicator)} {localForest}");
 
         var forestHandler = localForest.GetNotificationHandler();
-        if (forestHandler != null)
-        {
-            INotificationHandler.Connect(forestHandler, localReplicator);
-            INotificationHandler.Connect(localReplicator, filter);
-        }
+        if (forestHandler == null)
+            return result;
+
+        INotificationHandler.Connect(forestHandler, localReplicator);
+        INotificationHandler.Connect(localReplicator, filter);
 
         return result;
     }

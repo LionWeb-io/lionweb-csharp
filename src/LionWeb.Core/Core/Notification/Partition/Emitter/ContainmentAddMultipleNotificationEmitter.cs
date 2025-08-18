@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 
 /// Encapsulates notification-related logic and data for <i>adding</i> or <i>inserting</i> of <see cref="Containment"/>s.
 /// <typeparam name="T">Type of nodes of the represented <see cref="Containment"/>.</typeparam>

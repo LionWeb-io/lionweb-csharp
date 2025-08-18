@@ -30,7 +30,7 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     protected readonly IPartitionInstance? DestinationPartition;
 
     /// <see cref="IPartitionNotificationHandler"/> to use for our notifications, if any.
-    private readonly IPartitionNotificationHandler? PartitionHandler;
+    private readonly IPartitionNotificationHandler? _partitionHandler;
 
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly INotifiableNode DestinationParent;
@@ -46,7 +46,7 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
         DestinationParent = destinationParent;
         _notificationId = notificationId;
         DestinationPartition = destinationParent.GetPartition();
-        PartitionHandler = DestinationPartition?.GetNotificationHandler();
+        _partitionHandler = DestinationPartition?.GetNotificationHandler();
     }
 
     /// Logic to execute <i>before</i> any changes to the underlying nodes.
@@ -58,18 +58,18 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// <summary>
     /// Whether this emitter should execute at all.
     /// </summary>
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
+    [MemberNotNullWhen(true, nameof(_partitionHandler))]
     protected abstract bool IsActive();
 
     /// <summary>
     /// Retrieves the notification ID associated with the notification emitter.
     /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
-    protected INotificationId GetNotificationId() => _notificationId ?? PartitionHandler.CreateNotificationId();
+    protected INotificationId GetNotificationId() => _notificationId ?? _partitionHandler.CreateNotificationId();
     
     protected void InitiateNotification(INotification notification) =>
-        PartitionHandler?.InitiateNotification(notification);
+        _partitionHandler?.InitiateNotification(notification);
     
     protected bool Handles(params Type[] notificationTypes) =>
-        PartitionHandler?.Handles(notificationTypes) ?? false;
+        _partitionHandler?.Handles(notificationTypes) ?? false;
 }

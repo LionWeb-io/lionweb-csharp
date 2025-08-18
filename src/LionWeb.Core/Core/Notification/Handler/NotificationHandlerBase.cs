@@ -36,7 +36,7 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
     }
 
     /// <inheritdoc />
-    public void Dispose()
+    public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
         foreach (var (notificationHandler, eventHandler) in _handlers)
@@ -68,7 +68,7 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
     void ISendingNotificationHandler.Send(INotification notification) =>
         Send(notification);
 
-    /// <inheritdoc cref="IINotificationHandlerSend"/>
+    /// <inheritdoc cref="ISendingNotificationHandler.Send"/>
     protected virtual void Send(INotification notification) =>
         SendWithSender(this, notification);
 
@@ -81,8 +81,8 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
     void ISendingNotificationHandler.Subscribe(IReceivingNotificationHandler receiver) =>
         Subscribe<INotification>(receiver);
 
-    /// <inhINotificationHandler.SubscribedNotification}"/>
-    protected void Subscribe<TSubscribedNotification>(IReceivingNotificationHandler receiver)
+    /// <inheritdoc cref="ISendingNotificationHandler.Subscribe"/>
+    private void Subscribe<TSubscribedNotification>(IReceivingNotificationHandler receiver)
         where TSubscribedNotification : INotification
     {
         RegisterSubscribedNotifications<TSubscribedNotification>();
@@ -112,7 +112,7 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
     private void RegisterSubscribedNotifications<TSubscribedNotification>()
     {
         var notificationType = typeof(TSubscribedNotification);
-        var allSubtype = AllSubtypes[notificationType];
+        var allSubtype = _allSubtypes[notificationType];
         foreach (var subtype in allSubtype)
         {
             if (_subscribedNotifications.TryGetValue(subtype, out var count))
@@ -128,7 +128,7 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
     private void UnregisterSubscribedNotifications()
     {
         var notificationType = typeof(INotification);
-        var allSubtypes = AllSubtypes[notificationType];
+        var allSubtypes = _allSubtypes[notificationType];
         foreach (var subtype in allSubtypes)
         {
             _subscribedNotifications[subtype]--;
@@ -160,7 +160,8 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
         }
     }
 
-    protected static readonly ILookup<Type, Type> AllSubtypes = InitAllSubtypes();
+    private static readonly ILookup<Type, Type> _allSubtypes =
+        InitAllSubtypes();
 
     private static ILookup<Type, Type> InitAllSubtypes()
     {

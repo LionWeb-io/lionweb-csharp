@@ -23,20 +23,6 @@ using System.Diagnostics;
 public abstract class FilteringNotificationHandler(object? sender)
     : NotificationHandlerBase(sender), IConnectingNotificationHandler
 {
-    /// Unsubscribes all registered <see cref="Subscribe{TSubscribedEvent}">subscribers</see>.
-    // public virtual void Dispose()
-    // {
-    //     if (_localPublisher == null)
-    //         return;
-    //
-    //     foreach (var handler in _forwardingHandlers.Values)
-    //     {
-    //         _localPublisher.Unsubscribe(handler);
-    //     }
-    //     
-    //     GC.SuppressFinalize(this);
-    // }
-
     /// <inheritdoc />
     public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
     {
@@ -46,8 +32,7 @@ public abstract class FilteringNotificationHandler(object? sender)
             Send(filtered);
     }
 
-
-    /// Determines whether <paramref name="notification"/> will be <see cref="IHandler{TReceive,TSend}.Send">sent</see> to <i>following</i> notification handlers.
+    /// Determines whether <paramref name="notification"/> will be <see cref="ISendingNotificationHandler.Send">sent</see> to <i>following</i> notification handlers.
     /// <param name="notification">Notification to check.</param>
     /// <returns>the notification to send, or <c>null</c>.</returns>
     protected abstract INotification? Filter(INotification notification);
@@ -58,11 +43,11 @@ public class IdFilteringNotificationHandler(object? sender) : FilteringNotificat
 {
     private readonly HashSet<INotificationId> _notificationIds = [];
 
-    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="IHandler{TReceive,TSend}.Send">sending</see>.
+    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="ISendingNotificationHandler.Send">sending</see>.
     public void RegisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Add(notificationId);
 
-    /// <see cref="IHandler{TReceive,TSend}.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
+    /// <see cref="ISendingNotificationHandler.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
     public void UnregisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Remove(notificationId);
 

@@ -25,7 +25,7 @@ public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationHandle
     where TContent : IDeltaContent
 {
     /// <inheritdoc />
-    public virtual void Dispose()
+    public override void Dispose()
     {
         GC.SuppressFinalize(this);
     }

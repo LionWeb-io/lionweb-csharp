@@ -22,7 +22,7 @@ namespace LionWeb.Core.Notification.Handler;
 /// Every message this notification handler <see cref="Receive">receives</see>
 /// is forwarded to the first <see cref="_notificationHandlers">component</see>.
 /// Each component is connected to the next component.
-/// The last component <see cref="IINotificationHandlerSend">sends</see> to
+/// The last component <see cref="ISendingNotificationHandler.Send">sends</see> to
 /// this notification handler's <i>following</i> notification handlers.
 public class CompositeNotificationHandler : IConnectingNotificationHandler
 {
@@ -59,7 +59,7 @@ public class CompositeNotificationHandler : IConnectingNotificationHandler
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        foreach (INotificationHandler handler in _notificationHandlers.Reverse())
+        foreach (var handler in _notificationHandlers.Reverse())
         {
             handler.Dispose();
         }

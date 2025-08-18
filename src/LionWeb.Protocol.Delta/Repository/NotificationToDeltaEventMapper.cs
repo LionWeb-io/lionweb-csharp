@@ -56,7 +56,8 @@ public class NotificationToDeltaEventMapper
             ChildMovedFromOtherContainmentInSameParentNotification a => OnChildMovedFromOtherContainmentInSameParent(a),
             ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
-            ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
+            ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a =>
+                OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
             AnnotationDeletedNotification a => OnAnnotationDeleted(a),
             AnnotationMovedFromOtherParentNotification a => OnAnnotationMovedFromOtherParent(a),
@@ -85,14 +86,15 @@ public class NotificationToDeltaEventMapper
         );
 
     #endregion
-    
+
     #region Properties
 
     private PropertyAdded OnPropertyAdded(PropertyAddedNotification propertyAddedNotification) =>
         new(
             propertyAddedNotification.Node.GetId(),
             propertyAddedNotification.Property.ToMetaPointer(),
-            ToDelta(propertyAddedNotification.Node, propertyAddedNotification.Property, propertyAddedNotification.NewValue)!,
+            ToDelta(propertyAddedNotification.Node, propertyAddedNotification.Property,
+                propertyAddedNotification.NewValue)!,
             ToCommandSources(propertyAddedNotification),
             []
         );
@@ -101,7 +103,8 @@ public class NotificationToDeltaEventMapper
         new(
             propertyDeletedNotification.Node.GetId(),
             propertyDeletedNotification.Property.ToMetaPointer(),
-            ToDelta(propertyDeletedNotification.Node, propertyDeletedNotification.Property, propertyDeletedNotification.OldValue)!,
+            ToDelta(propertyDeletedNotification.Node, propertyDeletedNotification.Property,
+                propertyDeletedNotification.OldValue)!,
             ToCommandSources(propertyDeletedNotification),
             []
         );
@@ -110,8 +113,10 @@ public class NotificationToDeltaEventMapper
         new(
             propertyChangedNotification.Node.GetId(),
             propertyChangedNotification.Property.ToMetaPointer(),
-            ToDelta(propertyChangedNotification.Node, propertyChangedNotification.Property, propertyChangedNotification.NewValue)!,
-            ToDelta(propertyChangedNotification.Node, propertyChangedNotification.Property, propertyChangedNotification.OldValue)!,
+            ToDelta(propertyChangedNotification.Node, propertyChangedNotification.Property,
+                propertyChangedNotification.NewValue)!,
+            ToDelta(propertyChangedNotification.Node, propertyChangedNotification.Property,
+                propertyChangedNotification.OldValue)!,
             ToCommandSources(propertyChangedNotification),
             []
         );
@@ -171,7 +176,8 @@ public class NotificationToDeltaEventMapper
         );
 
     private ChildMovedAndReplacedFromOtherContainment
-        OnChildMovedAndReplacedFromOtherContainment(ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedNotification) =>
+        OnChildMovedAndReplacedFromOtherContainment(
+            ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplacedNotification) =>
         new(
             childMovedAndReplacedNotification.NewParent.GetId(),
             childMovedAndReplacedNotification.NewContainment.ToMetaPointer(),
@@ -182,7 +188,7 @@ public class NotificationToDeltaEventMapper
             childMovedAndReplacedNotification.OldIndex,
             childMovedAndReplacedNotification.ReplacedChild.GetId(),
             ToDescendants(childMovedAndReplacedNotification.ReplacedChild),
-            ToCommandSources(childMovedAndReplacedNotification), 
+            ToCommandSources(childMovedAndReplacedNotification),
             []
         );
 
@@ -201,7 +207,7 @@ public class NotificationToDeltaEventMapper
             ToCommandSources(childMovedAndReplacedNotification),
             []
         );
-    
+
     private ChildMovedFromOtherContainmentInSameParent OnChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParentNotification childMovedNotification) =>
         new(
@@ -215,7 +221,8 @@ public class NotificationToDeltaEventMapper
             []
         );
 
-    private ChildMovedInSameContainment OnChildMovedInSameContainment(ChildMovedInSameContainmentNotification childMovedNotification) =>
+    private ChildMovedInSameContainment OnChildMovedInSameContainment(
+        ChildMovedInSameContainmentNotification childMovedNotification) =>
         new(
             childMovedNotification.NewIndex,
             childMovedNotification.MovedChild.GetId(),
@@ -261,7 +268,8 @@ public class NotificationToDeltaEventMapper
             []
         );
 
-    private AnnotationMovedInSameParent OnAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification annotationMovedNotification) =>
+    private AnnotationMovedInSameParent OnAnnotationMovedInSameParent(
+        AnnotationMovedInSameParentNotification annotationMovedNotification) =>
         new(
             annotationMovedNotification.NewIndex,
             annotationMovedNotification.MovedAnnotation.GetId(),

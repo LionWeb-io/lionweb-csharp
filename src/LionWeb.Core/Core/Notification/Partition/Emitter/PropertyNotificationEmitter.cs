@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 
 /// Encapsulates notification-related logic and data for <i>adding</i> or <i>changing</i> or <i>deleting</i> of <see cref="Property"/>s.
 public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INode>

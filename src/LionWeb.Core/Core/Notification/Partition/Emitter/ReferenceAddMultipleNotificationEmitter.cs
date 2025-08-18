@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 
 public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotificationEmitterBase<T> where T : IReadableNode
 {

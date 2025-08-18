@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 using Utilities.ListComparer;
 
 /// Encapsulates notification-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Containment"/>s.

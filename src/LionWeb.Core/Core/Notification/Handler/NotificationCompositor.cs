@@ -19,17 +19,16 @@ namespace LionWeb.Core.Notification.Handler;
 
 using Forest;
 
-/// Base class to compose several <typeparamref name="TNotification"/> into one <see cref="CompositeNotification"/>.
+/// Compose several <see cref="INotification">notifications</see> into one <see cref="CompositeNotification"/>.
 ///
 /// We keep a stack of composites.
 /// Every time a new composite is <see cref="Push">pushed</see>, that composite is added to the previous one (if any).
 public class NotificationCompositor : NotificationHandlerBase, IConnectingNotificationHandler
 {
     private readonly INotificationIdProvider _idProvider;
+    private readonly Stack<CompositeNotification> _composites = [];
 
-    protected readonly Stack<CompositeNotification> _composites = [];
-
-    /// <inheritdoc cref="NotificationCompositorBase"/>
+    /// <inheritdoc cref="NotificationCompositor"/>
     public NotificationCompositor(object? notificationHandlerId) : base(notificationHandlerId)
     {
         _idProvider = new NotificationIdProvider(notificationHandlerId);
@@ -67,11 +66,11 @@ public class NotificationCompositor : NotificationHandlerBase, IConnectingNotifi
     {
         switch (notification)
         {
-            case PartitionAddedNotification n:
-                RegisterPartition(correspondingHandler, n.NewPartition);
+            case PartitionAddedNotification:
+                RegisterPartition(correspondingHandler);
                 break;
-            case PartitionDeletedNotification n:
-                UnregisterPartition(correspondingHandler, n.DeletedPartition);
+            case PartitionDeletedNotification:
+                UnregisterPartition(correspondingHandler);
                 break;
         }
 
@@ -79,7 +78,7 @@ public class NotificationCompositor : NotificationHandlerBase, IConnectingNotifi
             Send(notification);
     }
 
-    protected internal bool TryAdd(INotification notification)
+    private bool TryAdd(INotification notification)
     {
         if (!_composites.TryPeek(out var composite))
             return false;
@@ -88,13 +87,9 @@ public class NotificationCompositor : NotificationHandlerBase, IConnectingNotifi
         return true;
     }
 
-    private void RegisterPartition(ISendingNotificationHandler correspondingHandler, IPartitionInstance partition)
-    {
+    private void RegisterPartition(ISendingNotificationHandler correspondingHandler) =>
         INotificationHandler.Connect(correspondingHandler, this);
-    }
 
-    private void UnregisterPartition(ISendingNotificationHandler correspondingHandler, IPartitionInstance partition)
-    {
+    private void UnregisterPartition(ISendingNotificationHandler correspondingHandler) =>
         correspondingHandler.Unsubscribe(this);
-    }
 }

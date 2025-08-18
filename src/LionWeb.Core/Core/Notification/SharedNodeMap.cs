@@ -88,12 +88,6 @@ public class PartitionSharedNodeMap : SharedNodeMap
 {
     private readonly Dictionary<NodeId, IPartitionInstance> _owningPartition = [];
 
-    /// <inheritdoc />
-    public override void Dispose()
-    {
-        base.Dispose();
-    }
-
     /// Retrieves the partition owning <paramref name="nodeId"/>, if any.
     public bool TryGetPartition(NodeId nodeId, [NotNullWhen(true)] out IPartitionInstance? partition)
         => _owningPartition.TryGetValue(nodeId, out partition);

@@ -97,7 +97,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                     Log($"received response: {response})");
                     if (_queryResponses.TryRemove(response.QueryId, out var tcs))
                     {
-                        var x = tcs.TrySetResult(response);
+                        tcs.TrySetResult(response);
                     }
 
                     break;
@@ -216,8 +216,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
 public class CommandIdProvider : ICommandIdProvider
 {
-    private int nextId = 0;
+    private int _nextId = 0;
 
     /// <inheritdoc />
-    public string Create() => (++nextId).ToString();
+    public string Create() => (++_nextId).ToString();
 }

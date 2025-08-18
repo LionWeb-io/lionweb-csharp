@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
-/// Forwards all <see cref="Receive">received</see> notifications unchanged to <i>following</i> notification handlers,
+/// Forwards all <see cref="InitiateNotification">received</see> notifications unchanged to <i>following</i> notification handlers,
 /// and to EventHandlers <see cref="Subscribe{TSubscribedNotification}">subscribed</see> to specific notifications.
 public abstract class ModelNotificationHandlerBase<TNotification>(object? sender)
     : NotificationHandlerBase(sender), IInboundNotificationHandler

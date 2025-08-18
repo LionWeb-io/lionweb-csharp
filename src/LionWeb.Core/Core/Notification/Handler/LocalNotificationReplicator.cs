@@ -38,7 +38,9 @@ public class LocalNotificationReplicator : NotificationHandlerBase, IConnectingN
 
         foreach (var partition in localForest.Partitions)
         {
-            RegisterPartition(partition.GetNotificationHandler(), partition);
+            var handler = partition.GetNotificationHandler();
+            if (handler != null)
+                RegisterPartition(handler, partition);
         }
     }
 
@@ -87,21 +89,17 @@ public class LocalNotificationReplicator : NotificationHandlerBase, IConnectingN
     }
 
     private void OnLocalPartitionAdded(ISendingNotificationHandler correspondingHandler,
-        PartitionAddedNotification partitionAdded)
-    {
+        PartitionAddedNotification partitionAdded) =>
         RegisterPartition(correspondingHandler, partitionAdded.NewPartition);
-    }
 
     private void OnLocalPartitionDeleted(ISendingNotificationHandler correspondingHandler,
-        PartitionDeletedNotification partitionDeleted)
-    {
+        PartitionDeletedNotification partitionDeleted) =>
         UnregisterPartition(correspondingHandler, partitionDeleted.DeletedPartition);
-    }
 
     #endregion
 
     #region Partition
-    
+
     private void OnLocalChildAdded(ChildAddedNotification childAdded) =>
         _sharedNodeMap.RegisterNode(childAdded.NewChild);
 
