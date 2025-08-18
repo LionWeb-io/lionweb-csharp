@@ -374,7 +374,6 @@ public record DeleteReferenceTarget(
     MetaPointer Reference,
     Index Index,
     TargetNode DeletedTarget,
-    ResolveInfo ResolveInfo,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
 ) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
