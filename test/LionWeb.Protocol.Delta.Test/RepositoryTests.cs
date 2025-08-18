@@ -91,7 +91,7 @@ public class RepositoryTests
 
         AssertEquals(_aForest.Partitions, _bForest.Partitions);
     }
-    
+
     [TestMethod]
     [Timeout(6000)]
     public void NewPartitions()
@@ -101,7 +101,7 @@ public class RepositoryTests
 
         AssertEquals(_aForest.Partitions, _bForest.Partitions);
     }
-    
+
     [TestMethod]
     [Timeout(6000)]
     public void RemovePartition()
@@ -119,7 +119,7 @@ public class RepositoryTests
 
         bLink.Name = "hello";
         Assert.IsFalse(aLink.TryGetName(out _));
-        
+
         aLink.Name = "bye";
         Assert.AreEqual("hello", bLink.Name);
 
@@ -136,7 +136,7 @@ public class RepositoryTests
 
         var bPartition = (Geometry)_bForest.Partitions.First();
         Assert.IsNotNull(bPartition);
-        
+
         bPartition.AddAnnotations([new BillOfMaterials("bom")]);
         WaitForReceived(1);
 
@@ -152,16 +152,9 @@ public class RepositoryTests
         Assert.IsTrue(differences.Count == 0,
             differences.DescribeAll(new() { LeftDescription = "a", RightDescription = "b" }));
     }
-    
+
     protected void AssertNoExceptions(List<Exception> exceptions) =>
         Assert.AreEqual(0, exceptions.Count, string.Join(Environment.NewLine, exceptions));
-
-    public static void Run(Action action)
-        // => Task.Run(() =>
-    {
-        action();
-    }
-    // );
 
     private void WaitForReceived(int numberOfMessages)
     {
@@ -188,11 +181,8 @@ class RepositoryConnector : IDeltaRepositoryConnector
     {
         if (_clients.TryGetValue(clientInfo, out var clientConnector))
         {
-            RepositoryTests.Run(() =>
-            {
-                var encoded = Encode(clientInfo, content);
-                clientConnector.MessageFromRepository(encoded);
-            });
+            var encoded = Encode(clientInfo, content);
+            clientConnector.MessageFromRepository(encoded);
         }
     }
 
@@ -200,11 +190,8 @@ class RepositoryConnector : IDeltaRepositoryConnector
     {
         foreach ((var clientInfo, var clientConnector) in _clients)
         {
-            RepositoryTests.Run(() =>
-            {
-                var encoded = Encode(clientInfo, content);
-                clientConnector.MessageFromRepository(encoded);
-            });
+            var encoded = Encode(clientInfo, content);
+            clientConnector.MessageFromRepository(encoded);
         }
     }
 
@@ -229,12 +216,11 @@ class RepositoryConnector : IDeltaRepositoryConnector
     public IDeltaContent Convert(INotification notification) =>
         _mapper.Map(notification);
 
-    public void MessageFromClient(ClientInfo clientInfo, byte[] encoded) =>
-        RepositoryTests.Run(() =>
-        {
-            var deltaContent = _deltaSerializer.Deserialize<IDeltaContent>(Encoding.UTF8.GetString(encoded));
-            ReceiveFromClient?.Invoke(this, new DeltaMessageContext(clientInfo, deltaContent));
-        });
+    public void MessageFromClient(ClientInfo clientInfo, byte[] encoded)
+    {
+        var deltaContent = _deltaSerializer.Deserialize<IDeltaContent>(Encoding.UTF8.GetString(encoded));
+        ReceiveFromClient?.Invoke(this, new DeltaMessageContext(clientInfo, deltaContent));
+    }
 }
 
 class ClientConnector : IDeltaClientConnector
@@ -259,11 +245,8 @@ class ClientConnector : IDeltaClientConnector
 
     public Task SendToRepository(IDeltaContent content)
     {
-        RepositoryTests.Run(() =>
-        {
-            var encoded = Encode(content);
-            _repositoryConnector.MessageFromClient(_clientInfo, encoded);
-        });
+        var encoded = Encode(content);
+        _repositoryConnector.MessageFromClient(_clientInfo, encoded);
 
         return Task.CompletedTask;
     }
@@ -279,10 +262,9 @@ class ClientConnector : IDeltaClientConnector
     public IDeltaContent Convert(INotification notification) =>
         _mapper.Map(notification);
 
-    public void MessageFromRepository(byte[] encoded) =>
-        RepositoryTests.Run(() =>
-        {
-            var deltaContent = _deltaSerializer.Deserialize<IDeltaContent>(Encoding.UTF8.GetString(encoded));
-            ReceiveFromRepository?.Invoke(this, deltaContent);
-        });
+    public void MessageFromRepository(byte[] encoded)
+    {
+        var deltaContent = _deltaSerializer.Deserialize<IDeltaContent>(Encoding.UTF8.GetString(encoded));
+        ReceiveFromRepository?.Invoke(this, deltaContent);
+    }
 }
