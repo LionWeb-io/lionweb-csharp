@@ -62,7 +62,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         SharedNodeMap = new();
         _replicator = ForestReplicator.Create(forest, SharedNodeMap, _name);
 
-        INotificationHandler.Connect(_replicator, new LocalForestNotificationHandler(name, this));
+        INotificationHandler.Connect(_replicator, new LocalNotificationHandler(name, this));
 
         _connector.ReceiveFromRepository += OnReceiveFromRepository;
     }
@@ -83,11 +83,20 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     #region Local
 
-    private class LocalForestNotificationHandler(object? sender, LionWebClientBase<T> client)
-        : NotificationHandlerBase(sender),IConnectingNotificationHandler
+    private class LocalNotificationHandler(object? sender, LionWebClientBase<T> client)
+        : IReceivingNotificationHandler
     {
         public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) =>
             client.SendNotificationToRepository(sender, notification);
+
+        public void Dispose() { }
+
+        public string NotificationHandlerId => sender?.ToString() ?? GetType().Name;
+
+        public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "") =>
+            throw new NotImplementedException();
+
+        public bool Handles(params Type[] notificationTypes) => throw new NotImplementedException();
     }
 
     #endregion
