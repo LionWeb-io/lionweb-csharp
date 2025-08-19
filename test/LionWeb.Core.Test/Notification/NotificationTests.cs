@@ -476,7 +476,6 @@ public abstract class NotificationTestsBase
 
         var clone = CreateReplicator(node);
 
-        ((INotificationHandler)node.GetNotificationHandler()).PrintAllReceivers([]);
         // return;
 
         var added = new BillOfMaterials("added");

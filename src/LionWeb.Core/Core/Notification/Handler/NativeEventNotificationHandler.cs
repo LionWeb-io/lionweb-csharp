@@ -24,8 +24,6 @@ internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotif
     {
     }
 
-    public required string NotificationHandlerId { get; init; }
-
     /// <inheritdoc />
     public bool Handles(params Type[] notificationTypes) =>
         throw new NotImplementedException();
@@ -35,18 +33,5 @@ internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotif
     {
         if (notification is TNotification n)
             handler.Invoke(correspondingHandler, n);
-    }
-
-    /// <inheritdoc />
-    public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "")
-    {
-        Console.WriteLine($"{indent}{this.GetType().Name}");
-        if (INotificationHandler.RecursionDetected(this, alreadyPrinted, indent))
-            return;
-
-        if (handler is INotificationHandler p)
-            p.PrintAllReceivers(alreadyPrinted, indent + "  ");
-        else
-            Console.WriteLine($"{indent}{handler}");
     }
 }

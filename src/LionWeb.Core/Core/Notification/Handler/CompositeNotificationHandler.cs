@@ -66,10 +66,6 @@ public class CompositeNotificationHandler : IConnectingNotificationHandler
     }
 
     /// <inheritdoc />
-    public string NotificationHandlerId =>
-        _sender?.ToString() ?? GetType().Name;
-
-    /// <inheritdoc />
     public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
         _firstHandler.Receive(correspondingHandler, notification);
 
@@ -85,18 +81,4 @@ public class CompositeNotificationHandler : IConnectingNotificationHandler
 
     void ISendingNotificationHandler.Unsubscribe(IReceivingNotificationHandler receiver) =>
         _lastHandler.Unsubscribe(receiver);
-
-    /// <inheritdoc />
-    public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "")
-    {
-        Console.WriteLine($"{indent}{this.GetType().Name}({_sender})");
-        if (INotificationHandler.RecursionDetected(this, alreadyPrinted, indent))
-            return;
-
-        Console.WriteLine($"{indent}Members:");
-        foreach (var handler in this._notificationHandlers)
-        {
-            handler.PrintAllReceivers(alreadyPrinted, indent + "  ");
-        }
-    }
 }

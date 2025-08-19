@@ -50,10 +50,6 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
             Unsubscribe(notificationHandler);
     }
 
-    /// <inheritdoc />
-    public string NotificationHandlerId =>
-        Sender.ToString() ?? GetType().Name;
-
     private event EventHandler<INotification>? InternalEvent;
 
 
@@ -144,20 +140,6 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
         InternalEvent -= handler;
 
         UnregisterSubscribedNotifications();
-    }
-
-    /// <inheritdoc />
-    public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "")
-    {
-        Console.WriteLine($"{indent}{this.GetType().Name}({Sender})");
-        if (INotificationHandler.RecursionDetected(this, alreadyPrinted, indent))
-            return;
-
-        Console.WriteLine($"{indent}Handlers:");
-        foreach (var handler in this._handlers.Keys)
-        {
-            handler.PrintAllReceivers(alreadyPrinted, indent + "  ");
-        }
     }
 
     private static readonly ILookup<Type, Type> _allSubtypes =

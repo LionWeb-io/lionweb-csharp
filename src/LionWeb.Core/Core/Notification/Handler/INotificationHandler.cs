@@ -35,32 +35,12 @@ namespace LionWeb.Core.Notification.Handler;
 /// </para>
 public interface INotificationHandler : IDisposable
 {
-    protected string NotificationHandlerId { get; }
-
     /// All notifications <see cref="ISendingNotificationHandler.Send">sent</see> by <paramref name="from"/>
     /// will be <see cref="IReceivingNotificationHandler.Receive">received</see> by <paramref name="to"/>. 
     public static void Connect(
         ISendingNotificationHandler from,
         IReceivingNotificationHandler to) =>
         from.Subscribe(to);
-
-    protected internal void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "");
-
-    protected static bool RecursionDetected(INotificationHandler self, List<INotificationHandler> alreadyPrinted,
-        string indent)
-    {
-        try
-        {
-            if (!alreadyPrinted.Contains(self))
-                return false;
-
-            Console.WriteLine($"{indent}Recursion ^^");
-            return true;
-        } finally
-        {
-            alreadyPrinted.Add(self);
-        }
-    }
 }
 
 /// A <see cref="INotificationHandler">notification handler</see> that can <see cref="Send"/> notifications

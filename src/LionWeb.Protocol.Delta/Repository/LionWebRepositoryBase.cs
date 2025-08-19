@@ -76,11 +76,8 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
         public void Dispose() { }
 
-        public string NotificationHandlerId => sender?.ToString() ?? GetType().Name;
-
-        public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "") => throw new NotImplementedException();
-
-        public bool Handles(params Type[] notificationTypes) => throw new NotImplementedException();
+        public bool Handles(params Type[] notificationTypes) =>
+            true;
     }
 
     #endregion
