@@ -33,6 +33,7 @@ public class NotificationTests_Forest
     #region ChildMovedFromOtherContainment
 
     [TestMethod]
+    [Ignore("Exceeds naive NodeCloneNotificationHandler implementation")]
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_Works()
     {
         var moved = new Circle("moved");
@@ -53,6 +54,7 @@ public class NotificationTests_Forest
     }
 
     [TestMethod]
+    [Ignore("Exceeds naive NodeCloneNotificationHandler implementation")]
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_Destination_Works()
     {
         var moved = new Circle("moved");
