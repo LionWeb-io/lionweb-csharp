@@ -22,6 +22,7 @@ using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Handler;
 
+// TODO: Add docs once functionality (and usage) is clear.
 internal static class RewriteForestReplicator
 {
     public static IConnectingNotificationHandler Create(

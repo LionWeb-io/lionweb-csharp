@@ -40,7 +40,7 @@ public interface IPartitionNotificationHandler : IInboundNotificationHandler
         where TSubscribedNotification : class, IPartitionNotification;
 }
 
-/// Forwards all <see cref="IInboundNotificationHandler.InitiateNotification">received</see> notifications
+/// Forwards all <see cref="IInboundNotificationHandler.InitiateNotification">initiated</see> notifications
 /// unchanged to <i>following</i> notification handlers,
 /// and to EventHandlers <see cref="ModelNotificationHandlerBase{TNotification}.Subscribe{TSubscribedNotification}">subscribed</see>
 /// to specific notifications.

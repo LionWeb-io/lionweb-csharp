@@ -65,7 +65,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             sharedKeyedMap,
             deserializerBuilder
         );
-        
+
         INotificationHandler.Connect(_eventReceiver, _replicator);
     }
 

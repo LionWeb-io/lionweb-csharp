@@ -21,6 +21,10 @@ using Forest;
 using M1;
 using Partition;
 
+/// Replicates all notifications from a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
+/// Keeps track of <i>locally</i> <see cref="OnLocalPartitionAdded">added</see> and <see cref="OnLocalPartitionDeleted">deleted</see>
+/// partitions, and updates the <see cref="SharedNodeMap"/> with <i>locally</i> <see cref="SharedNodeMap.RegisterNode">added</see>
+/// and <see cref="SharedNodeMap.UnregisterNode">removed</see> nodes. 
 public class LocalReplicator : NotificationHandlerBase, IConnectingNotificationHandler
 {
     private readonly SharedNodeMap _sharedNodeMap;

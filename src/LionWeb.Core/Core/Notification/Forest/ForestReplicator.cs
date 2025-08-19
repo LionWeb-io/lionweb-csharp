@@ -24,6 +24,46 @@ using M1;
 /// <inheritdoc cref="RemoteReplicator"/>
 public static class ForestReplicator
 {
+    /// Builds up the ForestReplicator Composite part:
+    /// <code>
+    ///
+    /// +-------------------------------------------------+
+    /// | Remote receiver, e.g. DeltaProtocolReceiverBase |
+    /// +--╫----------------------------------------------+
+    ///    ║ 7,8
+    ///    ║ +--------------------------------------------------------------------------+
+    ///    ║ | ForestReplicator Composite                                               |
+    ///    ║ +--------------------+------------------+----------------------------------+
+    ///    ╚═╪═» <see cref="RemoteReplicator"/> | <see cref="LocalReplicator"/> ═╪═» <see cref="IdFilteringNotificationHandler"/> |
+    ///      |                    |          ^       |                               ║  |
+    ///      +-------------╫------+----------╫-------+-------------------------------╫--+
+    ///        9           ║             3,4 ║ 11      5   12                        ║
+    /// +---------------+  ║  +-----------+--╫-------------------------+   +---------╫------------------+
+    /// | Local changes ╪══╩══╪═» <see cref="IForest"/> | <see cref="IForestNotificationHandler"/> |   |         v                  |
+    /// +---------------+     +-----------+----------------------------+   | Remote sender, e.g.        |
+    ///   1                                 2   10                         | LionWebClientBase.         |
+    ///                                                                    |   LocalNotificationHandler |
+    ///                                                                    +----------------------------+
+    ///                                                                      6
+    /// </code>
+    /// <list type="number">
+    /// <item>On side A, we change a <see cref="IForest"/> locally.</item>
+    /// <item>On side A, the <see cref="IForestNotificationHandler"/> picks up the change.</item>
+    /// <item>On side A, the <see cref="LocalReplicator"/> receives the notification.</item>
+    /// <item>On side A, the <see cref="LocalReplicator"/> updates <see cref="SharedNodeMap">internal look-up structures</see>, and forwards the notification.</item>
+    /// <item>On side A, the <see cref="IdFilteringNotificationHandler"/> doesn't suppress the notification, and forwards it.</item>
+    /// <item>On side A, the remote sender transmits the notification.</item>
+    /// <item>On side B, the remote receiver receives the notification.</item>
+    /// <item>On side B, the remote receiver maps the incoming notification to a local one, with locally known nodes.</item>
+    /// <item>
+    ///   On side B, the <see cref="RemoteReplicator"/> interprets the notification,
+    ///   instructs the <see cref="IdFilteringNotificationHandler"/> to ignore the upcoming notification,
+    ///   and changes the <see cref="IForest"/> locally.
+    /// </item>
+    /// <item>On side B, the <see cref="IForestNotificationHandler"/> picks up the change.</item>
+    /// <item>On side B, the <see cref="LocalReplicator"/> updates <see cref="SharedNodeMap">internal look-up structures</see>, and forwards the notification.</item>
+    /// <item>On side B, the <see cref="IdFilteringNotificationHandler"/> suppresses the notification.</item>
+    /// </list>
     public static IConnectingNotificationHandler Create(
         IForest localForest,
         SharedNodeMap sharedNodeMap,

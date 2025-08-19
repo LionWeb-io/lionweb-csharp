@@ -19,8 +19,11 @@ namespace LionWeb.Core.Notification.Handler;
 
 using Utilities;
 
+/// <inheritdoc />
+/// Maintains the same node id for cloned nodes.
 public class SameIdCloner : Cloner
 {
+    /// <inheritdoc />
     public SameIdCloner(IEnumerable<INode> inputNodes) : base(inputNodes)
     {
     }
@@ -29,6 +32,7 @@ public class SameIdCloner : Cloner
     public static new T Clone<T>(T node) where T : class, INode =>
         (T)new SameIdCloner([node]).Clone()[node];
 
+    /// <inheritdoc />
     protected override NodeId GetNewId(INode remoteNode) =>
         remoteNode.GetId();
 }
