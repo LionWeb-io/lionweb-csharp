@@ -336,7 +336,6 @@ public record AddReferenceResolveInfo(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode Target,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
@@ -346,7 +345,6 @@ public record DeleteReferenceResolveInfo(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode Target,
     ResolveInfo DeletedResolveInfo,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
@@ -356,7 +354,6 @@ public record ChangeReferenceResolveInfo(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    TargetNode? Target,
     ResolveInfo OldResolveInfo,
     ResolveInfo NewResolveInfo,
     CommandId CommandId,
@@ -367,7 +364,6 @@ public record AddReferenceTarget(
     TargetNode Parent,
     MetaPointer Reference,
     Index Index,
-    ResolveInfo ResolveInfo,
     TargetNode NewTarget,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
@@ -378,7 +374,6 @@ public record DeleteReferenceTarget(
     MetaPointer Reference,
     Index Index,
     TargetNode DeletedTarget,
-    ResolveInfo ResolveInfo,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages
 ) : DeltaCommandBase(CommandId, ProtocolMessages), IReferenceCommand;
@@ -388,7 +383,6 @@ public record ChangeReferenceTarget(
     MetaPointer Reference,
     Index Index,
     TargetNode OldTarget,
-    ResolveInfo? ResolveInfo,
     TargetNode NewTarget,
     CommandId CommandId,
     ProtocolMessage[]? ProtocolMessages

@@ -121,9 +121,6 @@ public abstract class JsonTestsBase
 
     #region Partitions
 
-    protected static CommandResponse CreateCommandResponse() =>
-        new(CommandId(), ProtocolMessages());
-
     protected static AddPartition CreateAddPartition() =>
         new(Chunk(), CommandId(), ProtocolMessages());
 
@@ -262,27 +259,27 @@ public abstract class JsonTestsBase
             ResolveInfo(), Index(), TargetNode(), ResolveInfo(), CommandId(), ProtocolMessages());
 
     protected static AddReferenceResolveInfo CreateAddReferenceResolveInfo() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
+        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(),
             CommandId(), ProtocolMessages());
 
     protected static DeleteReferenceResolveInfo CreateDeleteReferenceResolveInfo() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
+        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(),
             CommandId(), ProtocolMessages());
 
     protected static ChangeReferenceResolveInfo CreateChangeReferenceResolveInfo() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
+        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(),
             ResolveInfo(), CommandId(), ProtocolMessages());
 
     protected static AddReferenceTarget CreateAddReferenceTarget() =>
-        new(TargetNode(), MetaPointer(), Index(), ResolveInfo(), TargetNode(),
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
             CommandId(), ProtocolMessages());
 
     protected static DeleteReferenceTarget CreateDeleteReferenceTarget() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
             CommandId(), ProtocolMessages());
 
     protected static ChangeReferenceTarget CreateChangeReferenceTarget() =>
-        new(TargetNode(), MetaPointer(), Index(), TargetNode(), ResolveInfo(),
+        new(TargetNode(), MetaPointer(), Index(), TargetNode(),
             TargetNode(), CommandId(), ProtocolMessages());
 
     #endregion
@@ -298,7 +295,6 @@ public abstract class JsonTestsBase
 
     protected static IEnumerable<object[]> CollectCommandMessages() =>
     [
-        [CreateCommandResponse()],
         [CreateAddPartition()],
         [CreateDeletePartition()],
         [CreateChangeClassifier()],
