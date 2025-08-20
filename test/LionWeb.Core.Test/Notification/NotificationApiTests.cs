@@ -99,15 +99,6 @@ public class NotificationApiTests
 
     #endregion
 
-    #region compose several notifications into one composite notification
-
-    [TestMethod]
-    public void CompositeNotification()
-    {
-    }
-
-    #endregion
-
     #region replicate changes
 
     [TestMethod]
