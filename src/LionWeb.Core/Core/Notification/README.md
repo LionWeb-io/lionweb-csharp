@@ -69,7 +69,7 @@ INotificationHandler.Connect(compositor, counter);
 // Create a new composite notification
 var composite = compositor.Push(); 
 
-// The following three notifications will be added to the created composite notifications.
+// The following three notifications will be added to the created composite notification.
 partition.Documentation = new Documentation("documentation");
 partition.Documentation.Text = "hello";
 partition.AddShapes([new Circle("c")]);
@@ -77,7 +77,7 @@ partition.AddShapes([new Circle("c")]);
 Assert.AreEqual(3, composite.Parts.Count); // composite consists of 3 notifications
 Assert.AreEqual(0, counter.Count); // count is 0; nothing is sent from compositor to counter yet 
 
-compositor.Pop(true); // pops and sends the composite on top the the stack
+compositor.Pop(true); // pops and sends the composite on top the stack
 Assert.AreEqual(1, counter.Count); // counter receives 1 composite notificaion
 ```
 
@@ -90,3 +90,49 @@ internal class PartitionEventCounter() : NotificationHandlerBase(null), IReceivi
 }
 ```
 ### How to replicate changes
+
+Partition replicator:
+
+```csharp
+var circle = new Circle("c");
+var node = new Geometry("partition") { Shapes = [circle] };
+
+var clone = Clone(node);
+
+var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
+INotificationHandler.Connect(node.GetNotificationHandler(), cloneHandler);
+
+var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), node.GetId());
+INotificationHandler.Connect(cloneHandler, replicator);
+
+circle.Name = "Hello";
+
+AssertEquals([node], [clone]);
+```
+
+Forest replicator:
+
+```csharp
+var moved = new Documentation("moved");
+var originPartition = new Geometry("originPartition") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+
+var node = new Geometry("a") { };
+
+var originalForest = new Forest();
+var cloneForest = new Forest();
+
+var cloneHandler = new NodeCloneNotificationHandler("forestCloner");
+INotificationHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);
+
+var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
+INotificationHandler.Connect(cloneHandler, replicator);
+
+var receiver = new TestLocalForestChangeNotificationHandler(originalForest, cloneHandler);
+INotificationHandler.Connect(originalForest.GetNotificationHandler(), receiver);
+
+originalForest.AddPartitions([node, originPartition]);
+
+node.Documentation = moved;
+
+AssertEquals([node, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
+```
