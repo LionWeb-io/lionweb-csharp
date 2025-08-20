@@ -261,10 +261,10 @@ public class NotificationTests_MultiPartition
 
     #endregion
 
-    private static INotificationHandler<IPartitionNotification> CreateReplicator(Geometry clone, Geometry node)
+    private static INotificationHandler CreateReplicator(Geometry clone, Geometry node)
     {
-        var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");
-        var cloneHandler = new NodeCloneNotificationHandler<IPartitionNotification>(node.GetId());
+        var replicator = PartitionReplicator.Create(clone, new(), "cloneReplicator");
+        var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
         INotificationHandler.Connect((IPartitionNotificationHandler)node.GetNotificationHandler(), cloneHandler);
         INotificationHandler.Connect(cloneHandler, replicator);
         

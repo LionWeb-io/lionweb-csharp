@@ -131,22 +131,22 @@ public class NotificationTests_Infrastructure
         Assert.AreEqual(0, ReplicatorNotificationIds(cloneReplicator).Count);
     }
 
-    private static HashSet<INotificationId> ReplicatorNotificationIds(INotificationHandler<IPartitionNotification> replicator)
+    private static HashSet<INotificationId> ReplicatorNotificationIds(INotificationHandler replicator)
     {
-        var fieldInfoFilter = typeof(CompositeNotificationHandler<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_lastHandler");
-        var filter = (IdFilteringNotificationHandler<IPartitionNotification>) fieldInfoFilter.GetValue(replicator);
+        var fieldInfoFilter = typeof(CompositeNotificationHandler).GetRuntimeFields().First(f => f.Name == "_lastHandler");
+        var filter = (IdFilteringNotificationHandler) fieldInfoFilter.GetValue(replicator);
      
-        var fieldInfoNotificationIds = typeof(IdFilteringNotificationHandler<IPartitionNotification>).GetRuntimeFields().First(f => f.Name == "_notificationIds");
+        var fieldInfoNotificationIds = typeof(IdFilteringNotificationHandler).GetRuntimeFields().First(f => f.Name == "_notificationIds");
         var notificationIds = fieldInfoNotificationIds.GetValue(filter);
         
         return (HashSet<INotificationId>)notificationIds!;
     }
 
-    private Tuple<INotificationHandler<IPartitionNotification>, INotificationHandler<IPartitionNotification>>
+    private Tuple<IConnectingNotificationHandler, IConnectingNotificationHandler>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
-        var replicator = PartitionNotificationReplicator.Create(clone, new(), "cloneReplicator");
-        var cloneReplicator = PartitionNotificationReplicator.Create(node, new(), "nodeReplicator");
+        var replicator = PartitionReplicator.Create(clone, new(), "cloneReplicator");
+        var cloneReplicator = PartitionReplicator.Create(node, new(), "nodeReplicator");
         
         INotificationHandler.Connect(cloneReplicator, replicator);
         INotificationHandler.Connect(replicator, cloneReplicator);

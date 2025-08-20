@@ -17,29 +17,28 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
-/// Composes two or more <see cref="INotificationHandler{TNotification}"/>s.
+/// Composes two or more <see cref="INotificationHandler"/>s.
 ///
 /// Every message this notification handler <see cref="Receive">receives</see>
 /// is forwarded to the first <see cref="_notificationHandlers">component</see>.
 /// Each component is connected to the next component.
-/// The last component <see cref="INotificationHandler{TNotification}.Send">sends</see> to
+/// The last component <see cref="ISendingNotificationHandler.Send">sends</see> to
 /// this notification handler's <i>following</i> notification handlers.
-public class CompositeNotificationHandler<TNotification> : INotificationHandler<TNotification>
-    where TNotification : class, INotification
+public class CompositeNotificationHandler : IConnectingNotificationHandler
 {
-    private readonly INotificationHandler<TNotification> _firstHandler;
-    private readonly INotificationHandler<TNotification> _lastHandler;
-    private readonly IEnumerable<INotificationHandler<TNotification>> _notificationHandlers;
+    private readonly IConnectingNotificationHandler _firstHandler;
+    private readonly IConnectingNotificationHandler _lastHandler;
+    private readonly IEnumerable<IConnectingNotificationHandler> _notificationHandlers;
     private readonly object? _sender;
 
-    public CompositeNotificationHandler(List<INotificationHandler<TNotification>> notificationHandlers,
+    public CompositeNotificationHandler(List<IConnectingNotificationHandler> notificationHandlers,
         object? sender)
     {
         _notificationHandlers = notificationHandlers;
         _sender = sender;
         if (notificationHandlers.Count < 2)
             throw new ArgumentException(
-                $"{nameof(CompositeNotificationHandler<TNotification>)} must get at least 2 notification handlers");
+                $"{nameof(CompositeNotificationHandler)} must get at least 2 notification handlers");
 
         _firstHandler = notificationHandlers[0];
         _lastHandler = notificationHandlers[^1];
@@ -60,45 +59,26 @@ public class CompositeNotificationHandler<TNotification> : INotificationHandler<
     public void Dispose()
     {
         GC.SuppressFinalize(this);
-        foreach (INotificationHandler<TNotification> handler in _notificationHandlers.Reverse())
+        foreach (var handler in _notificationHandlers.Reverse())
         {
             handler.Dispose();
         }
     }
 
     /// <inheritdoc />
-    public string NotificationHandlerId =>
-        _sender?.ToString() ?? GetType().Name;
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
+        _firstHandler.Receive(correspondingHandler, notification);
 
     /// <inheritdoc />
-    public void Receive(TNotification message) =>
-        _firstHandler.Receive(message);
+    public bool Handles(params Type[] notificationTypes) =>
+        _firstHandler.Handles(notificationTypes);
 
-    /// <inheritdoc />
-    public bool CanReceive(params Type[] messageTypes) =>
-        _firstHandler.CanReceive(messageTypes);
-
-    void INotificationHandler<TNotification>.Send(TNotification message) =>
+    void ISendingNotificationHandler.Send(INotification notification) =>
         throw new ArgumentException("Should never be called");
 
-    void INotificationHandler<TNotification>.Subscribe<TSubscribedNotification>(
-        INotificationHandler<TSubscribedNotification> receiver) =>
+    void ISendingNotificationHandler.Subscribe(IReceivingNotificationHandler receiver) =>
         _lastHandler.Subscribe(receiver);
 
-    void INotificationHandler.Unsubscribe<T>(INotificationHandler receiver) =>
-        _lastHandler.Unsubscribe<T>(receiver);
-
-    /// <inheritdoc />
-    public void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "")
-    {
-        Console.WriteLine($"{indent}{this.GetType().Name}({_sender})");
-        if (INotificationHandler.RecursionDetected(this, alreadyPrinted, indent))
-            return;
-
-        Console.WriteLine($"{indent}Members:");
-        foreach (var handler in this._notificationHandlers)
-        {
-            handler.PrintAllReceivers(alreadyPrinted, indent + "  ");
-        }
-    }
+    void ISendingNotificationHandler.Unsubscribe(IReceivingNotificationHandler receiver) =>
+        _lastHandler.Unsubscribe(receiver);
 }

@@ -20,56 +20,39 @@ namespace LionWeb.Core.Notification.Handler;
 using System.Diagnostics;
 
 /// Forwards <see cref="Receive">received</see> notifications if the notification passes <see cref="Filter"/>.
-public abstract class FilteringNotificationHandler<TNotification>(object? sender)
-    : /*IDisposable,*/ NotificationHandlerBase<TNotification>(sender)
-    where TNotification : class, INotification
+public abstract class FilteringNotificationHandler(object? sender)
+    : NotificationHandlerBase(sender), IConnectingNotificationHandler
 {
-
-    /// Unsubscribes all registered <see cref="Subscribe{TSubscribedEvent}">subscribers</see>.
-    // public virtual void Dispose()
-    // {
-    //     if (_localPublisher == null)
-    //         return;
-    //
-    //     foreach (var handler in _forwardingHandlers.Values)
-    //     {
-    //         _localPublisher.Unsubscribe(handler);
-    //     }
-    //     
-    //     GC.SuppressFinalize(this);
-    // }
-
     /// <inheritdoc />
-    public override void Receive(TNotification message)
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
     {
-        var filtered = Filter(message);
-        Debug.WriteLine($"Forwarding notification id {message.NotificationId}: {filtered?.NotificationId}");
+        var filtered = Filter(notification);
+        Debug.WriteLine($"Forwarding notification id {notification.NotificationId}: {filtered?.NotificationId}");
         if (filtered is not null)
             Send(filtered);
     }
 
-
-    /// Determines whether <paramref name="notification"/> will be <see cref="IHandler{TReceive,TSend}.Send">sent</see> to <i>following</i> notification handlers.
+    /// Determines whether <paramref name="notification"/> will be <see cref="ISendingNotificationHandler.Send">sent</see> to <i>following</i> notification handlers.
     /// <param name="notification">Notification to check.</param>
     /// <returns>the notification to send, or <c>null</c>.</returns>
-    protected abstract TNotification? Filter(TNotification notification);
+    protected abstract INotification? Filter(INotification notification);
 }
 
 /// Suppresses all notifications with <see cref="RegisterNotificationId">registered notification ids</see>.
-public class IdFilteringNotificationHandler<TNotification>(object? sender) : FilteringNotificationHandler<TNotification>(sender) where TNotification : class, INotification
+public class IdFilteringNotificationHandler(object? sender) : FilteringNotificationHandler(sender)
 {
     private readonly HashSet<INotificationId> _notificationIds = [];
 
-    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="IHandler{TReceive,TSend}.Send">sending</see>.
+    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="ISendingNotificationHandler.Send">sending</see>.
     public void RegisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Add(notificationId);
 
-    /// <see cref="IHandler{TReceive,TSend}.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
+    /// <see cref="ISendingNotificationHandler.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
     public void UnregisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Remove(notificationId);
 
     /// <inheritdoc />
-    protected override TNotification? Filter(TNotification notification)
+    protected override INotification? Filter(INotification notification)
     {
         var result = !_notificationIds.Contains(notification.NotificationId);
         return result ? notification : null;

@@ -32,7 +32,7 @@ public class CompositorTests
     {
         var partition = new Geometry("partition");
 
-        var compositor = new PartitionNotificationCompositor("compositor", null);
+        var compositor = new NotificationCompositor("compositor");
         INotificationHandler.Connect(partition.GetNotificationHandler(), compositor);
 
         var counter = new PartitionEventCounter();
@@ -50,7 +50,7 @@ public class CompositorTests
     {
         var partition = new Geometry("partition");
 
-        var compositor = new PartitionNotificationCompositor("compositor", null);
+        var compositor = new NotificationCompositor("compositor");
         INotificationHandler.Connect(partition.GetNotificationHandler(), compositor);
 
         var counter = new PartitionEventCounter();
@@ -74,7 +74,7 @@ public class CompositorTests
     {
         var partition = new Geometry("partition");
 
-        var compositor = new PartitionNotificationCompositor("compositor", null);
+        var compositor = new NotificationCompositor("compositor");
         INotificationHandler.Connect(partition.GetNotificationHandler(), compositor);
 
         var counter = new PartitionEventCounter();
@@ -98,7 +98,7 @@ public class CompositorTests
     {
         var partition = new Geometry("partition");
 
-        var compositor = new PartitionNotificationCompositor("compositor", null);
+        var compositor = new NotificationCompositor("compositor");
         INotificationHandler.Connect(partition.GetNotificationHandler(), compositor);
 
         var counter = new PartitionEventCounter();
@@ -130,7 +130,7 @@ public class CompositorTests
         var forest = new Forest();
         var partition = new Geometry("partition");
 
-        var compositor = new ForestNotificationCompositor("compositor");
+        var compositor = new NotificationCompositor("compositor");
         INotificationHandler.Connect(forest.GetNotificationHandler(), compositor);
         
         forest.AddPartitions([partition]);
@@ -157,7 +157,7 @@ public class CompositorTests
         var forest = new Forest();
         var partition = new Geometry("partition");
 
-        var compositor = new ForestNotificationCompositor("compositor");
+        var compositor = new NotificationCompositor("compositor");
         INotificationHandler.Connect(forest.GetNotificationHandler(), compositor);
         
         forest.AddPartitions([partition]);
@@ -187,7 +187,7 @@ public class CompositorTests
     {
         var forest = new Forest();
 
-        var compositor = new ForestNotificationCompositor("compositor");
+        var compositor = new NotificationCompositor("compositor");
         INotificationHandler.Connect(forest.GetNotificationHandler(), compositor);
         
         var partitionA = new Geometry("partitionA");
@@ -219,7 +219,7 @@ public class CompositorTests
     {
         var forest = new Forest();
 
-        var compositor = new ForestNotificationCompositor("compositor");
+        var compositor = new NotificationCompositor("compositor");
         INotificationHandler.Connect(forest.GetNotificationHandler(), compositor);
         
         var counter = new ForestEventCounter();
@@ -271,18 +271,16 @@ public class CompositorTests
     }
 }
 
-internal class ForestEventCounter() : NotificationCompositorBase<IForestNotification>(null)
+internal class ForestEventCounter() : NotificationHandlerBase(null), IReceivingNotificationHandler
 {
     public int Count { get; private set; }
-    
-    public override void Receive(IForestNotification message) =>
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
         Count++;
 }
 
-internal class PartitionEventCounter() : NotificationCompositorBase<IPartitionNotification>(null)
+internal class PartitionEventCounter() : NotificationHandlerBase(null), IReceivingNotificationHandler
 {
     public int Count { get; private set; }
-    
-    public override void Receive(IPartitionNotification message) =>
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
         Count++;
 }

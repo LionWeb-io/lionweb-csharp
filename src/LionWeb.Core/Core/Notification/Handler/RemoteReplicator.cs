@@ -15,76 +15,51 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Partition;
+namespace LionWeb.Core.Notification.Handler;
 
-using Handler;
+using Forest;
+using M1;
 using M3;
+using Partition;
 using System.Collections;
 using System.Diagnostics;
 
-/// Replicates notifications for a <i>local</i> <see cref="IPartitionInstance">partition</see>.
-/// <inheritdoc cref="RemoteNotificationReplicatorBase{TNotification}"/>
-public static class PartitionNotificationReplicator
+/// Replicates <see cref="Receive">received</see> notifications on a <i>local</i> equivalent.
+/// 
+/// <para>
+/// Example: We receive a <see cref="PropertyAddedNotification" /> for a node that we know <i>locally</i>.
+/// This class adds the same property value to the <i>locally</i> known node.
+/// </para>
+public class RemoteReplicator : NotificationHandlerBase, IConnectingNotificationHandler
 {
-    public static INotificationHandler<IPartitionNotification> Create(IPartitionInstance localPartition,
-        SharedNodeMap sharedNodeMap, object? sender)
-    {
-        var internalSender = sender ?? localPartition.GetId();
-        var filter = new IdFilteringNotificationHandler<IPartitionNotification>(internalSender);
-        var remoteReplicator =
-            new RemotePartitionNotificationReplicator(localPartition, sharedNodeMap, filter, internalSender);
-        var localReplicator = new LocalPartitionNotificationReplicator(sharedNodeMap, internalSender);
+    private readonly IForest? _localForest;
 
-        var result = new CompositeNotificationHandler<IPartitionNotification>([remoteReplicator, filter],
-            sender ?? $"Composite of {nameof(PartitionNotificationReplicator)} {localPartition.GetId()}");
+    private readonly SharedNodeMap _sharedNodeMap;
+    protected readonly IdFilteringNotificationHandler Filter;
 
-        var partitionHandler = localPartition.GetNotificationHandler();
-        if (partitionHandler != null)
-        {
-            INotificationHandler.Connect(partitionHandler, localReplicator);
-            INotificationHandler.Connect(localReplicator, filter);
-        }
-
-        return result;
-    }
-}
-
-public class RemotePartitionNotificationReplicator : RemoteNotificationReplicatorBase<IPartitionNotification>
-{
-    private readonly IPartitionInstance _localPartition;
-
-    protected internal RemotePartitionNotificationReplicator(IPartitionInstance localPartition,
+    public RemoteReplicator(
+        IForest? localForest,
         SharedNodeMap sharedNodeMap,
-        IdFilteringNotificationHandler<IPartitionNotification> filter, object? sender) : base(
-        sharedNodeMap, filter, sender)
+        IdFilteringNotificationHandler filter,
+        object? sender) : base(sender)
     {
-        _localPartition = localPartition;
-        SharedNodeMap.RegisterNode(_localPartition);
+        _localForest = localForest;
+        _sharedNodeMap = sharedNodeMap;
+        Filter = filter;
     }
-
-    /// <see cref="SharedNodeMap.UnregisterNode">Unregisters</see> all nodes of the <i>local</i> partition,
-    /// and <see cref="IPublisher{TEvent}.Unsubscribe{TSubscribedEvent}">unsubscribes</see> from it.
-    // public override void Dispose()
-    // {
-    //     base.Dispose();
-    //
-    //     SharedNodeMap.UnregisterNode(_localPartition);
-    //
-    //     var localPublisher = _localPartition.GetPublisher();
-    //     if (localPublisher == null)
-    //         return;
-    //
-    //     localPublisher.Unsubscribe<IPartitionEvent>(LocalHandler);
-    //
-    //     GC.SuppressFinalize(this);
-    // }
 
     /// <inheritdoc />
-    protected override void ProcessNotification(IPartitionNotification? partitionNotification)
+    public void Receive(ISendingNotificationHandler notificationHandler, INotification notification)
     {
-        Debug.WriteLine($"processing notification {partitionNotification}");
-        switch (partitionNotification)
+        Debug.WriteLine($"processing notification {notification.NotificationId}");
+        switch (notification)
         {
+            case PartitionAddedNotification a:
+                OnRemoteNewPartition(notificationHandler, a);
+                break;
+            case PartitionDeletedNotification a:
+                OnRemotePartitionDeleted(notificationHandler, a);
+                break;
             case PropertyAddedNotification e:
                 OnRemotePropertyAdded(e);
                 break;
@@ -140,9 +115,32 @@ public class RemotePartitionNotificationReplicator : RemoteNotificationReplicato
                 OnRemoteReferenceChanged(e);
                 break;
             default:
-                throw new ArgumentException($"Can not process notification due to unknown {partitionNotification}!");
+                throw new ArgumentException($"Can not process notification due to unknown {notification}!");
         }
     }
+
+    #region Partitions
+
+    private void OnRemoteNewPartition(ISendingNotificationHandler notificationHandler,
+        PartitionAddedNotification partitionAdded) =>
+        SuppressNotificationForwarding(partitionAdded, () =>
+        {
+            var newPartition = partitionAdded.NewPartition;
+            _localForest?.AddPartitions([newPartition], partitionAdded.NotificationId);
+            INotificationHandler.Connect(notificationHandler, this);
+        });
+
+    private void OnRemotePartitionDeleted(ISendingNotificationHandler notificationHandler,
+        PartitionDeletedNotification partitionDeleted) =>
+        SuppressNotificationForwarding(partitionDeleted, () =>
+        {
+            notificationHandler.Unsubscribe(this);
+            var localPartition = (IPartitionInstance?)LookupOpt(partitionDeleted.DeletedPartition.GetId());
+            if (localPartition != null)
+                _localForest?.RemovePartitions([localPartition], partitionDeleted.NotificationId);
+        });
+
+    #endregion
 
     #region Properties
 
@@ -394,7 +392,7 @@ public class RemotePartitionNotificationReplicator : RemoteNotificationReplicato
         {
             var localParent = Lookup(referenceDeleted.Parent.GetId());
 
-            object newValue = null;
+            object? newValue = null;
             if (referenceDeleted.Reference.Multiple)
             {
                 var existingTargets = localParent.Get(referenceDeleted.Reference);
@@ -454,42 +452,25 @@ public class RemotePartitionNotificationReplicator : RemoteNotificationReplicato
     }
 
     #endregion
-}
 
-public class LocalPartitionNotificationReplicator(SharedNodeMap sharedNodeMap, object? sender)
-    : NotificationHandlerBase<IPartitionNotification>(sender)
-{
-    /// <inheritdoc />
-    public override void Receive(IPartitionNotification message)
+    private INode Lookup(NodeId nodeId) =>
+        (INode)_sharedNodeMap[nodeId];
+
+    private INode? LookupOpt(NodeId nodeId) =>
+        _sharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
+
+    /// Uses <see cref="IdFilteringNotificationHandler"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
+    protected virtual void SuppressNotificationForwarding(INotification notification, Action action)
     {
-        switch (message)
+        var notificationId = notification.NotificationId;
+        Filter.RegisterNotificationId(notificationId);
+
+        try
         {
-            case ChildAddedNotification e:
-                OnLocalChildAdded(e);
-                break;
-            case ChildDeletedNotification e:
-                OnLocalChildDeleted(e);
-                break;
-            case AnnotationAddedNotification e:
-                OnLocalAnnotationAdded(e);
-                break;
-            case AnnotationDeletedNotification e:
-                OnLocalAnnotationDeleted(e);
-                break;
+            action();
+        } finally
+        {
+            Filter.UnregisterNotificationId(notificationId);
         }
-
-        Send(message);
     }
-
-    private void OnLocalChildAdded(ChildAddedNotification childAdded) =>
-        sharedNodeMap.RegisterNode(childAdded.NewChild);
-
-    private void OnLocalChildDeleted(ChildDeletedNotification childDeleted) =>
-        sharedNodeMap.UnregisterNode(childDeleted.DeletedChild);
-
-    private void OnLocalAnnotationAdded(AnnotationAddedNotification annotationAdded) =>
-        sharedNodeMap.RegisterNode(annotationAdded.NewAnnotation);
-
-    private void OnLocalAnnotationDeleted(AnnotationDeletedNotification annotationDeleted) =>
-        sharedNodeMap.UnregisterNode(annotationDeleted.DeletedAnnotation);
 }

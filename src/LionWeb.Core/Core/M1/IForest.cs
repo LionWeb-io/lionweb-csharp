@@ -63,7 +63,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _notificationHandler.Receive(new PartitionAddedNotification(partition,
+                _notificationHandler.InitiateNotification(new PartitionAddedNotification(partition,
                     notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }
@@ -74,7 +74,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _notificationHandler.Receive(new PartitionDeletedNotification(partition,
+                _notificationHandler.InitiateNotification(new PartitionDeletedNotification(partition,
                     notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }

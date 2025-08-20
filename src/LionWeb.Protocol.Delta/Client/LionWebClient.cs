@@ -20,6 +20,7 @@ namespace LionWeb.Protocol.Delta.Client;
 using Core;
 using Core.M1;
 using Core.M3;
+using Core.Notification.Handler;
 using Core.Utilities;
 using Message;
 using Message.Command;
@@ -61,13 +62,11 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
         _eventReceiver = new DeltaProtocolEventReceiver(
             SharedNodeMap,
-            SharedPartitionReplicatorMap,
             sharedKeyedMap,
-            deserializerBuilder,
-            _replicator
+            deserializerBuilder
         );
 
-        _eventReceiver.Init();
+        INotificationHandler.Connect(_eventReceiver, _replicator);
     }
 
     /// <inheritdoc />
@@ -98,7 +97,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
                     Log($"received response: {response})");
                     if (_queryResponses.TryRemove(response.QueryId, out var tcs))
                     {
-                        var x = tcs.TrySetResult(response);
+                        tcs.TrySetResult(response);
                     }
 
                     break;
@@ -217,8 +216,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
 public class CommandIdProvider : ICommandIdProvider
 {
-    private int nextId = 0;
+    private int _nextId = 0;
 
     /// <inheritdoc />
-    public string Create() => (++nextId).ToString();
+    public string Create() => (++_nextId).ToString();
 }

@@ -87,12 +87,6 @@ public class DeltaCommandToDeltaEventMapper
         return parent.GetAnnotations().ToList().IndexOf(annotation);
     }
 
-
-    private long _nextSequence = 0;
-
-    private long NextSequence() =>
-        _nextSequence++;
-
     private CommandSource[] OriginCommands(IDeltaCommand a) =>
         [new CommandSource(_participationId, a.CommandId)];
 }

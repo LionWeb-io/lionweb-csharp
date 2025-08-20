@@ -18,12 +18,12 @@
 namespace LionWeb.Protocol.Delta.Test.Handler;
 
 using Client;
-using Client.Partition;
 using Core;
 using Core.M1;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
+using Core.Notification.Handler;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Notification;
@@ -47,25 +47,23 @@ public class NotificationsTestSerialized : NotificationTestsBase
                 .WithLanguages(languages)
             ;
 
-        var sharedPartitionReplicatorMap = new SharedPartitionReplicatorMap();
-
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
         
-        var replicator = ForestNotificationReplicator.Create(cloneForest, sharedPartitionReplicatorMap, sharedNodeMap, "cloneReplicator");
+        var replicator = ForestReplicator.Create(cloneForest, sharedNodeMap, "cloneReplicator");
 
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
-            sharedPartitionReplicatorMap,
             sharedKeyedMap,
-            deserializerBuilder,
-            replicator
+            deserializerBuilder
         );
+        
+        INotificationHandler.Connect(eventReceiver, replicator);
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
         node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
-            var deltaCommand = new PartitionNotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
+            var deltaCommand = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
         });
 

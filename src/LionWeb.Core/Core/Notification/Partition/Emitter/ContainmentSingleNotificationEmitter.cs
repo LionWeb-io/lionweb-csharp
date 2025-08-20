@@ -70,37 +70,37 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                 break;
 
             case (not null, null, _):
-                PartitionHandler.Receive(new ChildDeletedNotification(_oldValue, DestinationParent, Containment, 0,
+                InitiateNotification(new ChildDeletedNotification(_oldValue, DestinationParent, Containment, 0,
                     GetNotificationId()));
                 break;
 
             case (null, not null, null):
-                PartitionHandler.Receive(new ChildAddedNotification(DestinationParent, _newValue, Containment, 0,
+                InitiateNotification(new ChildAddedNotification(DestinationParent, _newValue, Containment, 0,
                     GetNotificationId()));
                 break;
 
             case (not null, not null, null):
-                PartitionHandler.Receive(new ChildReplacedNotification(_newValue, _oldValue, DestinationParent, Containment, 0,
+                InitiateNotification(new ChildReplacedNotification(_newValue, _oldValue, DestinationParent, Containment, 0,
                     GetNotificationId()));
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                PartitionHandler.Receive(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, 0, _newValue,
+                InitiateNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, 0, _newValue,
                     DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index,
                     GetNotificationId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                PartitionHandler.Receive(new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(Containment, 0,
+                InitiateNotification(new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(Containment, 0,
                     _newValue, DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, _oldValue,
                     GetNotificationId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent != DestinationParent:
-                PartitionHandler.Receive(new ChildMovedAndReplacedFromOtherContainmentNotification(DestinationParent,
+                InitiateNotification(new ChildMovedAndReplacedFromOtherContainmentNotification(DestinationParent,
                     Containment, 0, _newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index, _oldValue,
                     GetNotificationId()));
@@ -112,7 +112,7 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                 var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, 0, _newValue,
                     _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, notificationId);
                 RaiseOriginMoveNotification(_oldContainmentInfo, notification);
-                PartitionHandler.Receive(notification);
+                InitiateNotification(notification);
                 break;
 
             default:
@@ -121,10 +121,9 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     [MemberNotNullWhen(true, nameof(_oldContainmentInfo))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        Handles(
             typeof(ChildAddedNotification),
             typeof(ChildDeletedNotification),
             typeof(ChildReplacedNotification),

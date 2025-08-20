@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 
 public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotificationEmitterBase<T> where T : IReadableNode
 {
@@ -50,15 +49,14 @@ public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotif
         foreach (var node in SafeNodes)
         {
             IReferenceTarget newTarget = new ReferenceTarget(null, node);
-            PartitionHandler.Receive(new ReferenceAddedNotification(DestinationParent, Reference, index++, newTarget,
+            InitiateNotification(new ReferenceAddedNotification(DestinationParent, Reference, index++, newTarget,
                 GetNotificationId()));
         }
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        Handles(
             typeof(ReferenceAddedNotification)
         );
 }

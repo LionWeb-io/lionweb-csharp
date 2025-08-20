@@ -20,6 +20,7 @@ namespace LionWeb.Protocol.Delta.Repository;
 using Core;
 using Core.M1;
 using Core.M3;
+using Core.Notification.Handler;
 using Message;
 using Message.Command;
 using Message.Event;
@@ -47,13 +48,11 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 
         _commandReceiver = new DeltaProtocolCommandReceiver(
             SharedNodeMap,
-            SharedPartitionReplicatorMap,
             sharedKeyedMap,
-            deserializerBuilder,
-            _replicator
+            deserializerBuilder
         );
 
-        _commandReceiver.Init();
+        INotificationHandler.Connect(_commandReceiver, _replicator);
     }
 
     /// <inheritdoc />
@@ -75,7 +74,6 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             content.InternalParticipationId = messageContext.ClientInfo.ParticipationId;
             Log(
                 $"received {content.GetType().Name} for {messageContext.ClientInfo.ParticipationId}", true);
-            Log(content.ToString());
 
             switch (content)
             {

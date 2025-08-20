@@ -21,7 +21,7 @@ using Handler;
 
 /// Provides notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 /// Raises notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-public interface IPartitionNotificationHandler : INotificationHandler<IPartitionNotification>
+public interface IPartitionNotificationHandler : IInboundNotificationHandler
 {
     public INotificationId CreateNotificationId();
 
@@ -40,7 +40,7 @@ public interface IPartitionNotificationHandler : INotificationHandler<IPartition
         where TSubscribedNotification : class, IPartitionNotification;
 }
 
-/// Forwards all <see cref="ModelNotificationHandlerBase{TNotification}.Receive">received</see> notifications
+/// Forwards all <see cref="IInboundNotificationHandler.InitiateNotification">initiated</see> notifications
 /// unchanged to <i>following</i> notification handlers,
 /// and to EventHandlers <see cref="ModelNotificationHandlerBase{TNotification}.Subscribe{TSubscribedNotification}">subscribed</see>
 /// to specific notifications.

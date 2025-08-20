@@ -17,21 +17,22 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
-internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotification> handler)
-    : IReceivingNotificationHandler where TNotification : INotification
+using Utilities;
+
+/// <inheritdoc />
+/// Maintains the same node id for cloned nodes.
+public class SameIdCloner : Cloner
 {
-    public void Dispose()
+    /// <inheritdoc />
+    public SameIdCloner(IEnumerable<INode> inputNodes) : base(inputNodes)
     {
     }
 
-    /// <inheritdoc />
-    public bool Handles(params Type[] notificationTypes) =>
-        throw new NotImplementedException();
+    /// <inheritdoc cref="Cloner.Clone()"/>
+    public static new T Clone<T>(T node) where T : class, INode =>
+        (T)new SameIdCloner([node]).Clone()[node];
 
     /// <inheritdoc />
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) 
-    {
-        if (notification is TNotification n)
-            handler.Invoke(correspondingHandler, n);
-    }
+    protected override NodeId GetNewId(INode remoteNode) =>
+        remoteNode.GetId();
 }

@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 using Utilities.ListComparer;
 
 /// Encapsulates notification-related logic and data for <see cref="IWritableNode.Set">reflective</see> change of <see cref="Reference"/>s.
@@ -58,18 +57,18 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
             {
                 case ListAdded<T> added:
                     IReferenceTarget newTarget = new ReferenceTarget(null, added.Element);
-                    PartitionHandler.Receive(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, newTarget,
+                    InitiateNotification(new ReferenceAddedNotification(DestinationParent, Reference, added.RightIndex, newTarget,
                         GetNotificationId()));
                     break;
                 case ListMoved<T> moved:
                     IReferenceTarget target = new ReferenceTarget(null, moved.LeftElement);
-                    PartitionHandler.Receive(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
+                    InitiateNotification(new EntryMovedInSameReferenceNotification(DestinationParent, Reference, moved.RightIndex,
                         moved.LeftIndex, target,
                         GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
                     IReferenceTarget deletedTarget = new ReferenceTarget(null, deleted.Element);
-                    PartitionHandler.Receive(new ReferenceDeletedNotification(DestinationParent, Reference, deleted.LeftIndex,
+                    InitiateNotification(new ReferenceDeletedNotification(DestinationParent, Reference, deleted.LeftIndex,
                         deletedTarget, GetNotificationId()));
                     break;
             }
@@ -77,9 +76,8 @@ public class ReferenceSetNotificationEmitter<T> : ReferenceMultipleNotificationE
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        Handles(
             typeof(ReferenceAddedNotification),
             typeof(EntryMovedInSameReferenceNotification),
             typeof(ReferenceDeletedNotification)

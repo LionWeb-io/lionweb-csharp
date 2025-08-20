@@ -17,76 +17,81 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
-/// A member in a directed graph that sends messages.
-/// Each member is <see cref="Connect{TSubscribedNotification}">connected</see>
+/// A member in a directed graph that sends notifications.
+/// Each member is <see cref="Connect">connected</see>
 /// <i>from</i> one or more <i>preceding</i> notification handlers, and
 /// <i>to</i> one or more <i>following</i> notification handlers.
 ///
 /// <para>
 /// <i>Inbound</i> notification handlers have no <i>preceding</i> part.
-/// They receive their messages from outside the notification handler graph via <see cref="INotificationHandler{TNotification}.Receive"/>. 
+/// They receive their notifications from outside the notification handler graph via <see cref="IInboundNotificationHandler.InitiateNotification"/>. 
 /// </para>
 ///
 /// <para>
-/// Upon <see cref="INotificationHandler{TNotification}.Receive">receiving</see> a message,
-/// a notification handler can choose to <see cref="INotificationHandler{TNotification}.Send"/> the unmodified, modified, or a new message
+/// Upon <see cref="IReceivingNotificationHandler.Receive">receiving</see> a notifications,
+/// a notification handler can choose to <see cref="ISendingNotificationHandler.Send"/> the unmodified, modified, or a new notifications
 /// to its <i>following</i> notification handlers.
-/// A notification handler can also suppress an incoming message, i.e. not send the message to its <i>following</i> notification handlers. 
+/// A notification handler can also suppress an incoming notifications, i.e. not send the notifications to its <i>following</i> notification handlers. 
 /// </para>
-public interface INotificationHandler
+public interface INotificationHandler : IDisposable
 {
-    protected string NotificationHandlerId { get; }
-
-    /// All messages <see cref="INotificationHandler{TNotification}.Send">sent</see> by <paramref name="from"/>
-    /// will be <see cref="INotificationHandler{TNotification}.Receive">received</see> by <paramref name="to"/>. 
-    public static void Connect<TSubscribedNotification>(
-        INotificationHandler<TSubscribedNotification> from,
-        INotificationHandler<TSubscribedNotification> to)
-        where TSubscribedNotification : INotification =>
+    /// All notifications <see cref="ISendingNotificationHandler.Send">sent</see> by <paramref name="from"/>
+    /// will be <see cref="IReceivingNotificationHandler.Receive">received</see> by <paramref name="to"/>. 
+    public static void Connect(
+        ISendingNotificationHandler from,
+        IReceivingNotificationHandler to) =>
         from.Subscribe(to);
+}
+
+/// A <see cref="INotificationHandler">notification handler</see> that can <see cref="Send"/> notifications
+/// to <i>following</i> handlers.
+public interface ISendingNotificationHandler : INotificationHandler
+{
+    /// This notification handler wants to send <paramref name="notification"/>.
+    /// Only this notification handler should use this method.
+    protected void Send(INotification notification);
+
+    /// Subscribes <paramref name="receiver"/> to this, <paramref name="receiver"/>
+    /// <see cref="IReceivingNotificationHandler.Receive">receives</see> all messages
+    /// <see cref="ISendingNotificationHandler.Send">sent</see> by this notification handler.
+    /// For internal use only, use <see cref="IReceivingNotificationHandler"/>.
+    internal void Subscribe(IReceivingNotificationHandler receiver);
 
     /// Unsubscribes <paramref name="receiver"/> from this.
     /// For internal use only -- each notification handler should unsubscribe itself from all <i>preceding</i> notification handlers on disposal.
-    protected internal void Unsubscribe<T>(INotificationHandler receiver);
-
-    protected internal void PrintAllReceivers(List<INotificationHandler> alreadyPrinted, string indent = "");
-
-    protected static bool RecursionDetected(INotificationHandler self, List<INotificationHandler> alreadyPrinted, string indent)
-    {
-        try
-        {
-            if (!alreadyPrinted.Contains(self))
-                return false;
-
-            Console.WriteLine($"{indent}Recursion ^^");
-            return true;
-        } finally
-        {
-            alreadyPrinted.Add(self);
-        }
-    }
+    protected internal void Unsubscribe(IReceivingNotificationHandler receiver);
 }
 
-/// <see cref="INotificationHandler">Notification handler</see> that receives and sends <typeparamref name="TNotification"/>s.
-public interface INotificationHandler<in TNotification> : INotificationHandler, IDisposable where TNotification : INotification
+/// A <see cref="INotificationHandler">notification handler</see> that can determine whether it
+/// <see cref="Handles">can handle</see> specific notification types.
+public interface IFilterReceivingNotificationHandler : INotificationHandler
 {
-    /// Whether anybody would receive any of the <paramref name="messageTypes"/> notifications.
+    /// Whether anybody would receive any of the <paramref name="notificationTypes"/> notifications.
     /// Useful for returning eagerly from complex logic to calculate the notification contents.
     /// <value>
-    ///     <c>true</c> if someone would receive any of the <paramref name="messageTypes"/> notifications; <c>false</c> otherwise.
+    ///     <c>true</c> if someone would receive any of the <paramref name="notificationTypes"/> notifications; <c>false</c> otherwise.
     /// </value>
-    public bool CanReceive(params Type[] messageTypes);
-
-    /// This notification handler receives <paramref name="message"/>.
-    /// Call this on <i>inbound</i> notification handlers (i.e. notification handlers that get messages from outside the notification handler chain).
-    public void Receive(TNotification message);
-
-    /// This notification handler wants to send <paramref name="message"/>.
-    /// Only this notification handler should use this method.
-    protected void Send(TNotification message);
-
-    /// Subscribes <paramref name="receiver"/> to this, <paramref name="receiver"/>
-    /// <see cref="Receive">receives</see> all messages <see cref="Send">sent</see> by this notification handler.
-    /// For internal use only, use <see cref="INotificiationHandler.Connect{TSubscribedNotification}"/>.
-    internal void Subscribe<TSubscribedNotification>(INotificationHandler<TSubscribedNotification> receiver) where TSubscribedNotification : INotification;
+    bool Handles(params Type[] notificationTypes);
 }
+
+/// An <i>Inbound</i> <see cref="INotificationHandler">notification handler</see> has no <i>preceding</i> part.
+/// It <see cref="InitiateNotification">initiates</see> notifications from outside the notification handler graph,
+/// and <see cref="ISendingNotificationHandler.Send">sends</see> them to <i>following</i> handlers. 
+public interface IInboundNotificationHandler : IFilterReceivingNotificationHandler, ISendingNotificationHandler
+{
+    /// Receiving a notification from outside the notification handler graph.
+    public void InitiateNotification(INotification notification);
+}
+
+/// A <see cref="INotificationHandler">notification handler</see> that can <see cref="Receive"/> notfications
+/// from <i>preceding</i> handlers. 
+public interface IReceivingNotificationHandler : IFilterReceivingNotificationHandler
+{
+    /// This notification handler receives <paramref name="notification"/>.
+    void Receive(ISendingNotificationHandler correspondingHandler, INotification notification);
+}
+
+/// A <see cref="INotificationHandler">notification handler</see> that can both
+/// <see cref="IReceivingNotificationHandler.Receive"/> notifications from <i>preceding</i> handlers and
+/// <see cref="ISendingNotificationHandler.Send"/> notifications to <i>following</i> handlers.
+public interface IConnectingNotificationHandler : IReceivingNotificationHandler, ISendingNotificationHandler;

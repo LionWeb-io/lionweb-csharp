@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 
 public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBase<INode>
 {
@@ -48,17 +47,17 @@ public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBa
         {
             case (null, { } v):
                 IReferenceTarget newTarget = new ReferenceTarget(null, v);
-                PartitionHandler.Receive(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
+                InitiateNotification(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
                     GetNotificationId()));
                 break;
             case ({ } o, null):
                 IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
-                PartitionHandler.Receive(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
+                InitiateNotification(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
                     GetNotificationId()));
                 break;
             case ({ } o, { } n):
                 IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
-                PartitionHandler.Receive(new ReferenceChangedNotification(DestinationParent, Reference, 0,
+                InitiateNotification(new ReferenceChangedNotification(DestinationParent, Reference, 0,
                     new ReferenceTarget(null, n), replacedTarget,
                     GetNotificationId()));
                 break;
@@ -66,9 +65,8 @@ public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBa
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        Handles(
             typeof(ReferenceAddedNotification),
             typeof(ReferenceDeletedNotification),
             typeof(ReferenceChangedNotification)

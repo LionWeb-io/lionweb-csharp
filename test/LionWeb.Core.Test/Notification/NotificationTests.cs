@@ -476,7 +476,6 @@ public abstract class NotificationTestsBase
 
         var clone = CreateReplicator(node);
 
-        ((INotificationHandler)node.GetNotificationHandler()).PrintAllReceivers([]);
         // return;
 
         var added = new BillOfMaterials("added");
@@ -786,8 +785,8 @@ public class NotificationsTest : NotificationTestsBase
     {
         var clone = Clone(node);
 
-        var replicator = PartitionNotificationReplicator.Create(clone, new(), node.GetId());
-        var cloneHandler = new NodeCloneNotificationHandler<IPartitionNotification>(node.GetId());
+        var replicator = PartitionReplicator.Create(clone, new(), node.GetId());
+        var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
         INotificationHandler.Connect((IPartitionNotificationHandler)node.GetNotificationHandler(), cloneHandler);
         INotificationHandler.Connect(cloneHandler, replicator);
 

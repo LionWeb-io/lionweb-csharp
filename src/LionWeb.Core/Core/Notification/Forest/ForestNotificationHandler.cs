@@ -18,20 +18,12 @@
 namespace LionWeb.Core.Notification.Forest;
 
 using Handler;
-using Partition;
 
 /// Provides notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
 /// Raises notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-public interface IForestNotificationHandler : INotificationHandler<IForestNotification>
-{
-    /// <inheritdoc cref="INotificationHandler{TNotification}.Receive"/>
-    /// If used (instead of <see cref="INotificationHandler{TNotification}.Receive"/>), <paramref name="correspondingHandler"/>
-    /// is the <i>preceding</i> handler for <paramref name="message"/>.<see cref="IForestNotification.Partition"/>.
-    public void Receive(IPartitionNotificationHandler correspondingHandler, IForestNotification message) =>
-        Receive(message);
-}
+public interface IForestNotificationHandler : IInboundNotificationHandler;
 
-/// Forwards all <see cref="ModelNotificationHandlerBase{TNotification}.Receive">received</see> notifications
+/// Forwards all <see cref="IInboundNotificationHandler.InitiateNotification">initiated</see> notifications
 /// unchanged to <i>following</i> notification handler,
 /// and to EventHandlers <see cref="ModelNotificationHandlerBase{TNotification}.Subscribe{TSubscribedNotification}">subscribed</see>
 /// to specific notifications.
@@ -39,10 +31,15 @@ public class ForestNotificationHandler(object? sender)
     : ModelNotificationHandlerBase<IForestNotification>(sender), IForestNotificationHandler
 {
     /// <inheritdoc />
-    public void Receive(IPartitionNotificationHandler correspondingHandler, IForestNotification message) => 
-        Receive(message);
-
-    /// <inheritdoc />
-    protected override void Send(IForestNotification message) =>
-        SendWithSender(message.Partition.GetNotificationHandler(), message);
+    protected override void Send(INotification notification)
+    {
+        switch (notification)
+        {
+            case IForestNotification f:
+                SendWithSender(f.Partition.GetNotificationHandler(), notification);
+                return;
+            default:
+                throw new NotImplementedException();
+        }
+    }
 }

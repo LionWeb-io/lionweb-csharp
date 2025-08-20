@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Notification.Partition.Emitter;
 
 using M3;
-using System.Diagnostics.CodeAnalysis;
 
 /// Encapsulates notification-related logic and data for <i>adding</i> or <i>changing</i> or <i>deleting</i> of <see cref="Property"/>s.
 public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INode>
@@ -51,24 +50,23 @@ public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INod
         switch (_oldValue, _newValue)
         {
             case (null, { } v):
-                PartitionHandler.Receive(new PropertyAddedNotification(DestinationParent, _property, v,
+                InitiateNotification(new PropertyAddedNotification(DestinationParent, _property, v,
                     GetNotificationId()));
                 break;
             case ({ } o, null):
-                PartitionHandler.Receive(new PropertyDeletedNotification(DestinationParent, _property, o,
+                InitiateNotification(new PropertyDeletedNotification(DestinationParent, _property, o,
                     GetNotificationId()));
                 break;
             case ({ } o, { } n):
-                PartitionHandler.Receive(new PropertyChangedNotification(DestinationParent, _property, n, o,
+                InitiateNotification(new PropertyChangedNotification(DestinationParent, _property, n, o,
                     GetNotificationId()));
                 break;
         }
     }
 
     /// <inheritdoc />
-    [MemberNotNullWhen(true, nameof(PartitionHandler))]
     protected override bool IsActive() =>
-        PartitionHandler != null && PartitionHandler.CanReceive(
+        Handles(
             typeof(PropertyAddedNotification),
             typeof(PropertyDeletedNotification),
             typeof(PropertyChangedNotification)

@@ -131,7 +131,7 @@ public class DynamicNode : NodeBase
             _settings.Remove(property);
             if (oldValue != null)
             {
-                partitionHandler?.Receive(new PropertyDeletedNotification(this, property, oldValue, partitionHandler.CreateNotificationId()));
+                partitionHandler?.InitiateNotification(new PropertyDeletedNotification(this, property, oldValue, partitionHandler.CreateNotificationId()));
             }
 
             return true;
@@ -140,10 +140,10 @@ public class DynamicNode : NodeBase
         var newValue = VersionSpecifics.PrepareSetProperty(property, value);
         if (oldValue != null)
         {
-            partitionHandler?.Receive(new PropertyChangedNotification(this, property, newValue, oldValue, partitionHandler.CreateNotificationId()));
+            partitionHandler?.InitiateNotification(new PropertyChangedNotification(this, property, newValue, oldValue, partitionHandler.CreateNotificationId()));
         } else
         {
-            partitionHandler?.Receive(new PropertyAddedNotification(this, property, newValue, partitionHandler.CreateNotificationId()));
+            partitionHandler?.InitiateNotification(new PropertyAddedNotification(this, property, newValue, partitionHandler.CreateNotificationId()));
         }
 
         _settings[property] = newValue;

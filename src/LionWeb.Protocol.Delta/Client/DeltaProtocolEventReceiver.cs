@@ -19,36 +19,21 @@ namespace LionWeb.Protocol.Delta.Client;
 
 using Core.M1;
 using Core.Notification;
-using Core.Notification.Forest;
-using Core.Notification.Handler;
-using Core.Notification.Partition;
-using Forest;
 using Message.Event;
-using Partition;
 
-public class DeltaProtocolEventReceiver
-    : DeltaProtocolReceiverBase<IDeltaEvent, IPartitionDeltaEvent, IForestDeltaEvent>
+public class DeltaProtocolEventReceiver : DeltaProtocolReceiverBase<IDeltaEvent>
 {
-    private readonly DeltaEventToForestNotificationMapper _forestMapper;
-    private readonly DeltaEventToPartitionNotificationMapper _partitionMapper;
+    private readonly DeltaEventToNotificationMapper _mapper;
 
     public DeltaProtocolEventReceiver(
         PartitionSharedNodeMap sharedNodeMap,
-        SharedPartitionReplicatorMap sharedPartitionReplicatorMap,
         SharedKeyedMap sharedKeyedMap,
-        DeserializerBuilder deserializerBuilder,
-        INotificationHandler<IForestNotification> forestNotificationReplicator)
-        : base(sharedNodeMap, sharedPartitionReplicatorMap, forestNotificationReplicator)
+        DeserializerBuilder deserializerBuilder)
     {
-        _forestMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
-        _partitionMapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
+        _mapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
 
     /// <inheritdoc />
-    protected override IPartitionNotification MapPartition(IPartitionDeltaEvent partitionContent) =>
-        _partitionMapper.Map(partitionContent);
-
-    /// <inheritdoc />
-    protected override IForestNotification MapForest(IForestDeltaEvent forestContent) =>
-        _forestMapper.Map(forestContent);
+    protected override INotification Map(IDeltaEvent content) => 
+        _mapper.Map(content);
 }

@@ -18,8 +18,6 @@
 namespace LionWeb.Protocol.Delta.Test;
 
 using Client;
-using Client.Forest;
-using Client.Partition;
 using Core;
 using Core.M1;
 using Core.M3;
@@ -205,11 +203,7 @@ internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 
     public DeltaRepositoryConnector(LionWebVersions lionWebVersion)
     {
-        var commandIdProvider = new CommandIdProvider();
-        _mapper = new NotificationToDeltaCommandMapper(
-            new PartitionNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion),
-            new ForestNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion)
-        );
+        _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
     }
 
     public Action<IDeltaContent> Sender { get; set; }
@@ -239,11 +233,7 @@ internal class DeltaClientConnector : IDeltaClientConnector
     public DeltaClientConnector(LionWebVersions lionWebVersion, Action<IDeltaContent> sender)
     {
         _sender = sender;
-        var commandIdProvider = new CommandIdProvider();
-        _mapper = new NotificationToDeltaCommandMapper(
-            new PartitionNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion),
-            new ForestNotificationToDeltaCommandMapper(commandIdProvider, lionWebVersion)
-        );
+        _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
     }
 
     public Task SendToRepository(IDeltaContent content)

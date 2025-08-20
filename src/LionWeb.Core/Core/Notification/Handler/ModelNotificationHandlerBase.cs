@@ -17,15 +17,15 @@
 
 namespace LionWeb.Core.Notification.Handler;
 
-/// Forwards all <see cref="Receive">received</see> notifications unchanged to <i>following</i> notification handlers,
+/// Forwards all <see cref="InitiateNotification">initiated</see> notifications unchanged to <i>following</i> notification handlers,
 /// and to EventHandlers <see cref="Subscribe{TSubscribedNotification}">subscribed</see> to specific notifications.
 public abstract class ModelNotificationHandlerBase<TNotification>(object? sender)
-    : NotificationHandlerBase<TNotification>(sender)
+    : NotificationHandlerBase(sender), IInboundNotificationHandler
     where TNotification : INotification
 {
     /// <inheritdoc />
-    public override void Receive(TNotification message) =>
-        Send(message);
+    public void InitiateNotification(INotification notification) =>
+        Send(notification);
 
     /// Registers <paramref name="handler"/> to be notified of notifications compatible with <typeparamref name="TSubscribedNotification"/>.
     /// <typeparam name="TSubscribedNotification">
@@ -35,11 +35,7 @@ public abstract class ModelNotificationHandlerBase<TNotification>(object? sender
     /// </typeparam> 
     public void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
         where TSubscribedNotification : class, TNotification =>
-        INotificationHandler.Connect<TSubscribedNotification>(this,
-            new NativeEventNotificationHandler<TSubscribedNotification>(handler)
-            {
-                NotificationHandlerId = Sender.ToString() ?? GetType().Name
-            });
+        INotificationHandler.Connect(this, new NativeEventNotificationHandler<TSubscribedNotification>(handler));
 
     /// Unregisters <paramref name="handler"/> from notification of notifications.
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
