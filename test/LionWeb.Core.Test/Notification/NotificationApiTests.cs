@@ -18,13 +18,15 @@
 namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
+using Core.Notification.Forest;
 using Core.Notification.Handler;
 using Core.Notification.Partition;
+using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class NotificationApiTests
+public class NotificationApiTests: NotificationTestsBase
 {
     #region get informed about changes
 
@@ -104,9 +106,59 @@ public class NotificationApiTests
     [TestMethod]
     public void ReplicateChanges_Partition()
     {
+        var circle = new Circle("c");
+        var node = new Geometry("partition") { Shapes = [circle] };
+
+        var clone = Clone(node);
+
+        var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
+        INotificationHandler.Connect(node.GetNotificationHandler(), cloneHandler);
+        
+        var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), node.GetId());
+        INotificationHandler.Connect(cloneHandler, replicator);
+        
+        circle.Name = "Hello";
+
+        AssertEquals([node], [clone]);
     }
 
+    
+    [TestMethod]
+    public void ReplicateChanges_Forest()
+    {
+        var moved = new Documentation("moved");
+        var originPartition = new Geometry("originPartition") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+
+        var node = new Geometry("a") { };
+
+        var originalForest = new Forest();
+        var cloneForest = new Forest();
+
+        var cloneHandler = new NodeCloneNotificationHandler("forestCloner");
+        INotificationHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);
+        
+        var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
+        INotificationHandler.Connect(cloneHandler, replicator);
+        
+        var receiver = new TestLocalForestChangeNotificationHandler(originalForest, cloneHandler);
+        INotificationHandler.Connect(originalForest.GetNotificationHandler(), receiver);
+        
+        originalForest.AddPartitions([node, originPartition]);
+
+        node.Documentation = moved;
+
+        AssertEquals([node, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
+    }
+    
+    private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
+    {
+        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
+        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+    }
+    
     #endregion
+
+    protected override Geometry CreateReplicator(Geometry node) => throw new NotImplementedException();
 }
 
 internal class Observer : IReceivingNotificationHandler
