@@ -16,7 +16,10 @@ var node = new Geometry("partition");
         
 var sender = node.GetNotificationHandler();
 var receiver = new Observer();
-INotificationHandler.Connect(from: sender, to: receiver);
+if (sender != null)
+{
+    INotificationHandler.Connect(from: sender, to: receiver);
+}
 
 // This is a change to the model
 node.Documentation = new Documentation("added");
@@ -66,7 +69,10 @@ var sender = partition.GetNotificationHandler();
 // NotificationCompositor implements composite notification logic. 
 // It can receive and send notifications. 
 var compositor = new NotificationCompositor("compositor");
-INotificationHandler.Connect(from: sender, to: compositor);
+if (sender != null)
+{
+    INotificationHandler.Connect(from: sender, to: compositor);
+}
 
 // PartitionEventCounter (see the class definition below)
 // is a receiving notification handler and counts received notifications.
