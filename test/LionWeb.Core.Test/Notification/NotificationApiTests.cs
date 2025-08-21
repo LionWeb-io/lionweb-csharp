@@ -101,6 +101,35 @@ public class NotificationApiTests: NotificationTestsBase
 
     #endregion
 
+    #region collect several changes into one change set 
+
+    [TestMethod]
+    public void ComposeNotifications_into_a_composite_notification()
+    {
+        var partition = new Geometry("partition");
+
+        var sender = partition.GetNotificationHandler();
+        var compositor = new NotificationCompositor("compositor");
+        INotificationHandler.Connect(from: sender, to: compositor);
+        
+        var counter = new PartitionEventCounter();
+        INotificationHandler.Connect(from: compositor, to: counter);
+        
+        var composite = compositor.Push();
+
+        partition.Documentation = new Documentation("documentation");
+        partition.Documentation.Text = "hello";
+        partition.AddShapes([new Circle("c")]);
+
+        Assert.AreEqual(3, composite.Parts.Count);
+        Assert.AreEqual(0, counter.Count);
+        
+        compositor.Pop(true);
+        Assert.AreEqual(1, counter.Count);
+    }
+
+    #endregion
+    
     #region replicate changes
 
     [TestMethod]
