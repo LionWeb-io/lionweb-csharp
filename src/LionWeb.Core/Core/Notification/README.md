@@ -1,14 +1,16 @@
 # LionWeb notification system API
 
-This document explains LionWeb notification system API through some use cases. 
+This document explains the LionWeb notification system API through some use cases. 
 
 ## Use cases
 ### How to get informed about changes
-Node API exposes `GetNotificationHandler()`. It provides and raises notifications about nodes and their features.
-`INotificationHandler.Connect` specifies/connects a receiver to receive notifications sent by a sender. 
-Receiver filters notifications via its `Handles` member method and takes necessary actions for the received notification type.     
+Every partition node of a model, which support notification API, exposes `GetNotificationHandler()`. 
+A notification handler initiates and raises notifications about nodes and their features when there is a change to the model.
+Each change to the model raises a notification.  
+`INotificationHandler.Connect` specifies a receiver of notifications sent by a sender. In the example below,  `Observer` is a receiver which counts and 
+prints out the received notifications in its `Receive` member method.  Receiver can filter notifications via its `Handles` member method.     
 
-Code below gives an example of API usage demonstrating how to get informed changes from a partition.
+Code below gives an example of API usage demonstrating how to get informed about changes from a partition.
 ```csharp
 var node = new Geometry("partition");
         
@@ -16,9 +18,10 @@ var sender = node.GetNotificationHandler();
 var receiver = new Observer();
 INotificationHandler.Connect(from: sender, to: receiver);
 
+// This is a change to the model
 node.Documentation = new Documentation("added");
 ```
-Code below gives an example of API usage demonstrating how to get informed changes from a forest.
+Code below gives an example of API usage demonstrating how to get informed about changes from a forest.
 ```csharp
 var node = new Geometry("partition");
 var forest = new Forest();
@@ -27,6 +30,7 @@ var sender = forest.GetNotificationHandler();
 var receiver = new Observer();
 INotificationHandler.Connect(from: sender, to: receiver);
 
+// This is a change to the forest
 forest.AddPartitions([node]); 
 ```
 
@@ -49,7 +53,7 @@ public class Observer: IReceivingNotificationHandler
 }
 ```
 
-### How to compose several notifications into one composite notification
+### How to collect several changes into one change set 
 A composite notification composes other forest and/or partition notifications into one
 composite notification. Follow the comments below in the code block for further explanation.
 
