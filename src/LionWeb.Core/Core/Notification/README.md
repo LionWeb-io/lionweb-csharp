@@ -105,48 +105,108 @@ internal class PartitionEventCounter() : NotificationHandlerBase(null), IReceivi
 ```
 ### How to replicate changes
 
-Partition replicator:
+Partition replicator replicates received notifications on a local equivalent partitions.
 
 ```csharp
 var circle = new Circle("c");
 var node = new Geometry("partition") { Shapes = [circle] };
 
+var sender = node.GetNotificationHandler();
+
+// This handler creates a corresponding notifications for the node clone and raises the notifications
+// (see TestNodeCloneNotificationHandler below)
+var cloneHandler = new TestNodeCloneNotificationHandler(node.GetId());
+if (sender != null)
+{
+    INotificationHandler.Connect(from: sender, to: cloneHandler);
+}
+
 var clone = Clone(node);
+// Replicates notifications for the cloned partition. We receive a PropertyAddedNotification for the cloned node and 
+// this class adds the same property value to the cloned node.
+var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), sender: node.GetId());
+INotificationHandler.Connect(from: cloneHandler, to: replicator);
 
-var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
-INotificationHandler.Connect(node.GetNotificationHandler(), cloneHandler);
-
-var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), node.GetId());
-INotificationHandler.Connect(cloneHandler, replicator);
-
+// This change triggers PropertyAddedNotification notification
 circle.Name = "Hello";
-
-AssertEquals([node], [clone]);
 ```
 
-Forest replicator:
+In the class below; for the sake of keeping the code short, `Receive` handles only three type of notifications. 
+```csharp
+internal class TestNodeCloneNotificationHandler(object? sender) : NotificationHandlerBase(sender),
+IConnectingNotificationHandler
+{
+    private readonly Dictionary<IReadableNode, IReadableNode> _memoization = [];
+    private readonly Dictionary<ISendingNotificationHandler, ISendingNotificationHandler> _handlerMemoization = [];
+
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+    {
+        INotification result = notification switch
+        {
+            PartitionAddedNotification e => e with { NewPartition = Clone(e.NewPartition) },
+            PropertyAddedNotification e => e with { Node = Clone(e.Node), },
+            ChildMovedFromOtherContainmentNotification e => e with
+            {
+                MovedChild = Clone(e.MovedChild), NewParent = Clone(e.NewParent), OldParent = Clone(e.OldParent)
+            },
+        };
+
+        if (result is IForestNotification f)
+        {
+            _handlerMemoization[correspondingHandler] = f.Partition.GetNotificationHandler();
+            SendWithSender(f.Partition.GetNotificationHandler(), f);
+        } else
+            SendWithSender(_handlerMemoization.GetValueOrDefault(correspondingHandler, correspondingHandler), result);
+    }
+    
+    private T Clone<T>(T node) where T : class?, IReadableNode? =>
+        (T)(_memoization.TryGetValue(node, out var result)
+            ? result
+            : _memoization[node] = SameIdCloner.Clone((INode)node));
+}
+```
+
+Forest replicator replicates notifications for a local forest and all its partitions.
 
 ```csharp
 var moved = new Documentation("moved");
 var originPartition = new Geometry("originPartition") { Shapes = [new Line("l") { ShapeDocs = moved }] };
 
-var node = new Geometry("a") { };
+var node = new Geometry("a");
 
 var originalForest = new Forest();
 var cloneForest = new Forest();
 
-var cloneHandler = new NodeCloneNotificationHandler("forestCloner");
-INotificationHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);
+var sender = originalForest.GetNotificationHandler();
+var cloneHandler = new TestNodeCloneNotificationHandler("forestCloner");
+INotificationHandler.Connect(from: sender, to: cloneHandler);
 
-var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
-INotificationHandler.Connect(cloneHandler, replicator);
+var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), sender: null);
+INotificationHandler.Connect(from: cloneHandler, to: replicator);
 
-var receiver = new TestLocalForestChangeNotificationHandler(originalForest, cloneHandler);
-INotificationHandler.Connect(originalForest.GetNotificationHandler(), receiver);
+var receiver = new TestForestChangeNotificationHandler(originalForest, cloneHandler);
+INotificationHandler.Connect(from: sender, to: receiver);
 
+// Changes trigger PartitionAddedNotification and ChildMovedFromOtherContainmentNotification notifications 
 originalForest.AddPartitions([node, originPartition]);
-
 node.Documentation = moved;
+```
 
-AssertEquals([node, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
+```csharp
+internal class TestForestChangeNotificationHandler(object? sender, TestNodeCloneNotificationHandler cloneHandler)
+    : NotificationHandlerBase(sender), IReceivingNotificationHandler
+{
+    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+    {
+        switch (notification)
+        {
+            case PartitionAddedNotification partitionAddedNotification:
+                OnLocalPartitionAdded(partitionAddedNotification);
+                break;
+        }
+    }
+
+    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification) => 
+        INotificationHandler.Connect(from: partitionAddedNotification.NewPartition.GetNotificationHandler(), to: cloneHandler);
+}
 ```
