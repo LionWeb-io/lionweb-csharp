@@ -37,7 +37,7 @@ public class NotificationApiTests: NotificationTestsBase
 
         int notificationCount = 0;
         var sender = node.GetNotificationHandler();
-        sender?.Subscribe<IPartitionNotification>((sender, notification) =>
+        sender?.Subscribe<IPartitionNotification>((_, notification) =>
         {
             notificationCount++;
             Console.WriteLine(notification);
@@ -55,7 +55,10 @@ public class NotificationApiTests: NotificationTestsBase
 
         var sender = node.GetNotificationHandler();
         var receiver = new Observer();
-        INotificationHandler.Connect(from: sender, to: receiver);
+        if (sender != null)
+        {
+            INotificationHandler.Connect(from: sender, to: receiver);
+        }
 
         node.Documentation = new Documentation("added");
 
@@ -90,8 +93,11 @@ public class NotificationApiTests: NotificationTestsBase
         var partitionReceiver = new Observer();
         
         INotificationHandler.Connect(from: forestHandler, to: forestReceiver);
-        INotificationHandler.Connect(from: partitionHandler, to: partitionReceiver);
-        
+        if (partitionHandler != null)
+        {
+            INotificationHandler.Connect(from: partitionHandler, to: partitionReceiver);
+        }
+
         forest.AddPartitions([node]); 
         node.Documentation = new Documentation("added");
 
@@ -110,7 +116,11 @@ public class NotificationApiTests: NotificationTestsBase
 
         var sender = partition.GetNotificationHandler();
         var compositor = new NotificationCompositor("compositor");
-        INotificationHandler.Connect(from: sender, to: compositor);
+        
+        if (sender != null)
+        {
+            INotificationHandler.Connect(from: sender, to: compositor);    
+        }
         
         var counter = new PartitionEventCounter();
         INotificationHandler.Connect(from: compositor, to: counter);
