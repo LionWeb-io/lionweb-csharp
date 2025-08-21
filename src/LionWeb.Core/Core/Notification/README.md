@@ -10,7 +10,7 @@ Each change to the model raises a notification.
 `INotificationHandler.Connect` specifies a receiver of notifications sent by a sender. In the example below,  `Observer` is a receiver which counts and 
 prints out the received notifications in its `Receive` member method.  Receiver can filter notifications via its `Handles` member method.     
 
-Code below gives an example of API usage demonstrating how to get informed about changes from a partition.
+Code below gives an example of API usage demonstrating how to get informed about changes to a partition.
 ```csharp
 var node = new Geometry("partition");
         
@@ -21,7 +21,7 @@ INotificationHandler.Connect(from: sender, to: receiver);
 // This is a change to the model
 node.Documentation = new Documentation("added");
 ```
-Code below gives an example of API usage demonstrating how to get informed about changes from a forest.
+Code below gives an example of API usage demonstrating how to get informed about changes to a forest.
 ```csharp
 var node = new Geometry("partition");
 var forest = new Forest();
@@ -53,36 +53,40 @@ public class Observer: IReceivingNotificationHandler
 }
 ```
 
-### How to collect several changes into one change set 
+### How to collect multiple changes into one change set 
+Notifications raised by multiple changes to a model can be collected into one change set. 
 A composite notification composes other forest and/or partition notifications into one
 composite notification. Follow the comments below in the code block for further explanation.
 
 ```csharp
 var partition = new Geometry("partition");
 
-// NotificationCompositor is a type of handler that implements compositor logic.
-// It can receive and send notifications.
+var sender = partition.GetNotificationHandler();
+
+// NotificationCompositor implements composite notification logic. 
+// It can receive and send notifications. 
 var compositor = new NotificationCompositor("compositor");
-INotificationHandler.Connect(partition.GetNotificationHandler(), compositor);
+INotificationHandler.Connect(from: sender, to: compositor);
 
 // PartitionEventCounter (see the class definition below)
 // is a receiving notification handler and counts received notifications.
-var counter = new PartitionEventCounter(); 
-INotificationHandler.Connect(compositor, counter);
+var counter = new PartitionEventCounter();
+INotificationHandler.Connect(from: compositor, to: counter);
 
-// Create a new composite notification
+// Creates a new composite notification to collect incoming notifications
 var composite = compositor.Push(); 
 
-// The following three notifications will be added to the created composite notification.
+// The notifications raised by three changes below will be added to the created composite notification.
 partition.Documentation = new Documentation("documentation");
 partition.Documentation.Text = "hello";
 partition.AddShapes([new Circle("c")]);
 
-Assert.AreEqual(3, composite.Parts.Count); // composite consists of 3 notifications
-Assert.AreEqual(0, counter.Count); // count is 0; nothing is sent from compositor to counter yet 
+Console.WriteLine($"Size of composite: {composite.Parts.Count}");  // Size of composite: 3 (composite consists of 3 notifications)
+Console.WriteLine($"Counter: {counter.Count}"); // Counter: 0 (nothing is sent from compositor to counter yet)
 
-compositor.Pop(true); // pops and sends the composite on top the stack
-Assert.AreEqual(1, counter.Count); // counter receives 1 composite notificaion
+compositor.Pop(true); // pops and sends the composite notification on top the stack
+
+Console.WriteLine($"Counter: {counter.Count}"); // Counter: 1 (counter receives 1 composite notification)
 ```
 
 ```csharp
