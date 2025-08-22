@@ -147,18 +147,15 @@ public class NotificationApiTests: NotificationTestsBase
     {
         var circle = new Circle("c");
         var partition = new Geometry("geo") { Shapes = [circle] };
-
+        var clone = Clone(partition);
+        
         var sender = partition.GetNotificationHandler();
-        var cloneHandler = new TestNodeCloneNotificationHandler(partition.GetId());
+        var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), sender: partition.GetId());
         if (sender != null)
         {
-            INotificationHandler.Connect(from: sender, to: cloneHandler);
+            INotificationHandler.Connect(from: sender, to: replicator);
         }
 
-        var clone = Clone(partition);
-        var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), sender: partition.GetId());
-        INotificationHandler.Connect(from: cloneHandler, to: replicator);
-        
         circle.Name = "Hello";
 
         AssertEquals([partition], [clone]);
@@ -168,26 +165,19 @@ public class NotificationApiTests: NotificationTestsBase
     [TestMethod]
     public void ReplicateChanges_Forest()
     {
-        var moved = new Documentation("moved");
-        var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
-
-        var partition = new Geometry("geo");
-
         var originalForest = new Forest();
         var cloneForest = new Forest();
 
         var sender = originalForest.GetNotificationHandler();
-        var cloneHandler = new TestNodeCloneNotificationHandler("forestCloner");
-        INotificationHandler.Connect(from: sender, to: cloneHandler);
-        
         var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
-        INotificationHandler.Connect(from: cloneHandler, to: replicator);
+        INotificationHandler.Connect(from: sender, to: replicator);
         
-        var receiver = new TestForestChangeNotificationHandler(originalForest, cloneHandler);
-        INotificationHandler.Connect(from: sender, to: receiver);
+        var moved = new Documentation("moved");
+        var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+
+        var partition = new Geometry("geo");
         
         originalForest.AddPartitions([partition, originPartition]);
-
         partition.Documentation = moved;
 
         AssertEquals([partition, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
@@ -202,56 +192,6 @@ public class NotificationApiTests: NotificationTestsBase
     #endregion
 
     protected override Geometry CreateReplicator(Geometry node) => throw new NotImplementedException();
-}
-
-
-internal class TestNodeCloneNotificationHandler(object? sender) : NotificationHandlerBase(sender), 
-    IConnectingNotificationHandler
-{
-    private readonly Dictionary<IReadableNode, IReadableNode> _memoization = [];
-    private readonly Dictionary<ISendingNotificationHandler, ISendingNotificationHandler> _handlerMemoization = [];
-    
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
-    {
-        INotification result = notification switch
-        {
-            PartitionAddedNotification e => e with { NewPartition = Clone(e.NewPartition) },
-            PropertyAddedNotification e => e with { Node = Clone(e.Node), },
-            ChildMovedFromOtherContainmentNotification e => e with
-            {
-                MovedChild = Clone(e.MovedChild), NewParent = Clone(e.NewParent), OldParent = Clone(e.OldParent)
-            },
-        };
-
-        if (result is IForestNotification f)
-        {
-            _handlerMemoization[correspondingHandler] = f.Partition.GetNotificationHandler();
-            SendWithSender(f.Partition.GetNotificationHandler(), f);
-        } else
-            SendWithSender(_handlerMemoization.GetValueOrDefault(correspondingHandler, correspondingHandler), result);
-    }
-    
-    private T Clone<T>(T node) where T : class?, IReadableNode? =>
-        (T)(_memoization.TryGetValue(node, out var result)
-            ? result
-            : _memoization[node] = SameIdCloner.Clone((INode)node));
-} 
-
-internal class TestForestChangeNotificationHandler(object? sender, TestNodeCloneNotificationHandler cloneHandler)
-    : NotificationHandlerBase(sender), IReceivingNotificationHandler
-{
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
-    {
-        switch (notification)
-        {
-            case PartitionAddedNotification partitionAddedNotification:
-                OnLocalPartitionAdded(partitionAddedNotification);
-                break;
-        }
-    }
-
-    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification) => 
-        INotificationHandler.Connect(from: partitionAddedNotification.NewPartition.GetNotificationHandler(), to: cloneHandler);
 }
 
 internal class Observer : IReceivingNotificationHandler
