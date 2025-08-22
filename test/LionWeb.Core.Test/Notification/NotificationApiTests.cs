@@ -33,17 +33,17 @@ public class NotificationApiTests: NotificationTestsBase
     [TestMethod]
     public void ReceiveNotifications_from_partition_via_subscribe()
     {
-        var node = new Geometry("partition");
+        var partition = new Geometry("geo");
 
         int notificationCount = 0;
-        var sender = node.GetNotificationHandler();
+        var sender = partition.GetNotificationHandler();
         sender?.Subscribe<IPartitionNotification>((_, notification) =>
         {
             notificationCount++;
             Console.WriteLine(notification);
         });
 
-        node.Documentation = new Documentation("added");
+        partition.Documentation = new Documentation("added");
 
         Assert.AreEqual(1, notificationCount);
     }
@@ -51,16 +51,16 @@ public class NotificationApiTests: NotificationTestsBase
     [TestMethod]
     public void ReceiveNotifications_from_partition_via_connected_handlers()
     {
-        var node = new Geometry("partition");
+        var partition = new Geometry("geo");
 
-        var sender = node.GetNotificationHandler();
+        var sender = partition.GetNotificationHandler();
         var receiver = new Observer();
         if (sender != null)
         {
             INotificationHandler.Connect(from: sender, to: receiver);
         }
 
-        node.Documentation = new Documentation("added");
+        partition.Documentation = new Documentation("added");
 
         Assert.AreEqual(1, receiver.NotificationCount);
     }
@@ -68,14 +68,14 @@ public class NotificationApiTests: NotificationTestsBase
     [TestMethod]
     public void ReceiveNotifications_from_forest()
     {
-        var node = new Geometry("partition");
         var forest = new Forest();
 
         var sender = forest.GetNotificationHandler();
         var receiver = new Observer();
         INotificationHandler.Connect(from: sender, to: receiver);
-        
-        forest.AddPartitions([node]); 
+
+        var partition = new Geometry("geo");
+        forest.AddPartitions([partition]); 
 
         Assert.AreEqual(1, receiver.NotificationCount);
     }
@@ -83,11 +83,11 @@ public class NotificationApiTests: NotificationTestsBase
     [TestMethod]
     public void ReceiveNotifications_from_forest_and_partition()
     {
-        var node = new Geometry("partition");
+        var partition = new Geometry("geo");
         var forest = new Forest();
 
         var forestHandler = forest.GetNotificationHandler();
-        var partitionHandler = node.GetNotificationHandler();
+        var partitionHandler = partition.GetNotificationHandler();
         
         var forestReceiver = new Observer();
         var partitionReceiver = new Observer();
@@ -98,8 +98,8 @@ public class NotificationApiTests: NotificationTestsBase
             INotificationHandler.Connect(from: partitionHandler, to: partitionReceiver);
         }
 
-        forest.AddPartitions([node]); 
-        node.Documentation = new Documentation("added");
+        forest.AddPartitions([partition]); 
+        partition.Documentation = new Documentation("added");
 
         Assert.AreEqual(1, forestReceiver.NotificationCount);
         Assert.AreEqual(1, partitionReceiver.NotificationCount);
@@ -112,7 +112,7 @@ public class NotificationApiTests: NotificationTestsBase
     [TestMethod]
     public void ComposeNotifications_into_a_composite_notification()
     {
-        var partition = new Geometry("partition");
+        var partition = new Geometry("geo");
 
         var sender = partition.GetNotificationHandler();
         var compositor = new NotificationCompositor("compositor");
@@ -146,22 +146,22 @@ public class NotificationApiTests: NotificationTestsBase
     public void ReplicateChanges_Partition()
     {
         var circle = new Circle("c");
-        var node = new Geometry("partition") { Shapes = [circle] };
+        var partition = new Geometry("geo") { Shapes = [circle] };
 
-        var sender = node.GetNotificationHandler();
-        var cloneHandler = new TestNodeCloneNotificationHandler(node.GetId());
+        var sender = partition.GetNotificationHandler();
+        var cloneHandler = new TestNodeCloneNotificationHandler(partition.GetId());
         if (sender != null)
         {
             INotificationHandler.Connect(from: sender, to: cloneHandler);
         }
 
-        var clone = Clone(node);
-        var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), sender: node.GetId());
+        var clone = Clone(partition);
+        var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), sender: partition.GetId());
         INotificationHandler.Connect(from: cloneHandler, to: replicator);
         
         circle.Name = "Hello";
 
-        AssertEquals([node], [clone]);
+        AssertEquals([partition], [clone]);
     }
 
     
@@ -169,9 +169,9 @@ public class NotificationApiTests: NotificationTestsBase
     public void ReplicateChanges_Forest()
     {
         var moved = new Documentation("moved");
-        var originPartition = new Geometry("originPartition") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+        var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
 
-        var node = new Geometry("a");
+        var partition = new Geometry("geo");
 
         var originalForest = new Forest();
         var cloneForest = new Forest();
@@ -186,11 +186,11 @@ public class NotificationApiTests: NotificationTestsBase
         var receiver = new TestForestChangeNotificationHandler(originalForest, cloneHandler);
         INotificationHandler.Connect(from: sender, to: receiver);
         
-        originalForest.AddPartitions([node, originPartition]);
+        originalForest.AddPartitions([partition, originPartition]);
 
-        node.Documentation = moved;
+        partition.Documentation = moved;
 
-        AssertEquals([node, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
+        AssertEquals([partition, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
     }
     
     private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
