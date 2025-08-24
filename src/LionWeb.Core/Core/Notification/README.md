@@ -14,8 +14,10 @@ Code below gives an example of API usage demonstrating how to get informed about
 var partition = new Geometry("geo");
         
 var sender = partition.GetNotificationHandler();
-var receiver = new Observer(); // see Observer class definition below
-if (sender != null) // if model does not support notifications, sender might be null.   
+var receiver = new Observer();
+
+// When notifications are not supported, sender can be null. 
+if (sender != null) 
 {
     INotificationHandler.Connect(from: sender, to: receiver);
 }
@@ -69,6 +71,8 @@ var sender = partition.GetNotificationHandler();
 // NotificationCompositor implements composite notification logic. 
 // It can receive and send notifications. 
 var compositor = new NotificationCompositor("compositor");
+
+// When notifications are not supported, sender can be null. 
 if (sender != null)
 {
     INotificationHandler.Connect(from: sender, to: compositor);
@@ -112,11 +116,13 @@ var circle = new Circle("c");
 var partition = new Geometry("geo") { Shapes = [circle] };
 var clone = Clone(partition);
 
+var sender = partition.GetNotificationHandler();
 // Replicates notifications for the cloned partition. In this example, 
 // PropertyAddedNotification is received for the partition and 
 // replicator adds the same property value to the cloned partition node.
-var sender = partition.GetNotificationHandler();
 var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), sender: partition.GetId());
+
+// When notifications are not supported, sender can be null. 
 if (sender != null)
 {
     INotificationHandler.Connect(from: sender, to: replicator);
@@ -133,12 +139,14 @@ var originalForest = new Forest();
 var cloneForest = new Forest();
 
 var sender = originalForest.GetNotificationHandler();
+// Replicates notifications for the cloned forest. In this example, 
+// PropertyAddedNotification and ChildMovedFromOtherContainmentNotification are received.
+// Replicator adds the same partitions to the cloned forest and property value to the partition in the cloned forest.
 var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
 INotificationHandler.Connect(from: sender, to: replicator);
 
 var moved = new Documentation("moved");
 var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
-
 var partition = new Geometry("geo");
 
 // Changes trigger PartitionAddedNotification and ChildMovedFromOtherContainmentNotification notifications
