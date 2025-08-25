@@ -21,7 +21,10 @@ using Handler;
 
 /// Provides notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
 /// Raises notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-public interface IForestNotificationHandler : IInboundNotificationHandler;
+public interface IForestNotificationHandler : IInboundNotificationHandler
+{
+    public void ConnectTo(IReceivingNotificationHandler receiver) => Connect(this, receiver);
+};
 
 /// Forwards all <see cref="IInboundNotificationHandler.InitiateNotification">initiated</see> notifications
 /// unchanged to <i>following</i> notification handler,
