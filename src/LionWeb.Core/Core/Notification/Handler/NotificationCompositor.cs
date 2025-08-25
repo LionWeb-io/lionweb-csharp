@@ -92,4 +92,6 @@ public class NotificationCompositor : NotificationHandlerBase, IConnectingNotifi
 
     private void UnregisterPartition(ISendingNotificationHandler correspondingHandler) =>
         correspondingHandler.Unsubscribe(this);
+    
+    public void ConnectTo(IReceivingNotificationHandler receiver) => INotificationHandler.Connect(this, receiver);
 }

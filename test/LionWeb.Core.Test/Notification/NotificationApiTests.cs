@@ -28,6 +28,128 @@ using M1;
 [TestClass]
 public class NotificationApiTests: NotificationTestsBase
 {
+    #region notificaiton api revisited
+
+    #region get informed about changes
+    
+    [TestMethod]
+    public void ReceiveNotifications_from_partition_via_connected_handlers_revisited()
+    {
+        var partition = new Geometry("geo");
+        var receiver = new Observer();
+        
+        partition.GetNotificationHandler()?.ConnectTo(receiver);
+        
+        partition.Documentation = new Documentation("added");
+        
+        Assert.AreEqual(1, receiver.NotificationCount);
+    }
+    
+    [TestMethod]
+    public void ReceiveNotifications_from_forest_revisited()
+    {
+        var forest = new Forest();
+        var receiver = new Observer();
+        
+        forest.GetNotificationHandler().ConnectTo(receiver);
+
+        var partition = new Geometry("geo");
+        forest.AddPartitions([partition]); 
+
+        Assert.AreEqual(1, receiver.NotificationCount);
+    }
+    
+    [TestMethod]
+    public void ReceiveNotifications_from_forest_and_partition_revisited()
+    {
+        var partition = new Geometry("geo");
+        var forest = new Forest();
+        
+        var forestReceiver = new Observer();
+        var partitionReceiver = new Observer();
+        
+        forest.GetNotificationHandler().ConnectTo(forestReceiver);
+        partition.GetNotificationHandler()?.ConnectTo(partitionReceiver);
+        
+        forest.AddPartitions([partition]); 
+        partition.Documentation = new Documentation("added");
+
+        Assert.AreEqual(1, forestReceiver.NotificationCount);
+        Assert.AreEqual(1, partitionReceiver.NotificationCount);
+    }
+    
+    #endregion
+    
+    #region collect several changes into one change set 
+
+    [TestMethod]
+    public void ComposeNotifications_into_a_composite_notification_revisited()
+    {
+        var partition = new Geometry("geo");
+        
+        var compositor = new NotificationCompositor("compositor");
+        var counter = new PartitionEventCounter();
+        
+        partition.GetNotificationHandler()?.ConnectTo(compositor);
+        compositor.ConnectTo(counter);
+        
+        var composite = compositor.Push();
+
+        partition.Documentation = new Documentation("documentation");
+        partition.Documentation.Text = "hello";
+        partition.AddShapes([new Circle("c")]);
+
+        Assert.AreEqual(3, composite.Parts.Count);
+        Assert.AreEqual(0, counter.Count);
+        
+        compositor.Pop(true);
+        Assert.AreEqual(1, counter.Count);
+    }
+
+    #endregion
+    
+    #region replicate changes
+
+    [TestMethod]
+    public void ReplicateChanges_Partition_revisited()
+    {
+        var circle = new Circle("c");
+        var partition = new Geometry("geo") { Shapes = [circle] };
+        var clone = Clone(partition);
+        
+        var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), sender: partition.GetId());
+        partition.GetNotificationHandler()?.ConnectTo(replicator);
+
+        circle.Name = "Hello";
+
+        AssertEquals([partition], [clone]);
+    }
+
+    
+    [TestMethod]
+    public void ReplicateChanges_Forest_revisited()
+    {
+        var originalForest = new Forest();
+        var cloneForest = new Forest();
+        
+        var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
+        originalForest.GetNotificationHandler().ConnectTo(replicator);
+        
+        var moved = new Documentation("moved");
+        var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
+
+        var partition = new Geometry("geo");
+        
+        originalForest.AddPartitions([partition, originPartition]);
+        partition.Documentation = moved;
+
+        AssertEquals([partition, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
+    }
+    
+    #endregion
+    
+    #endregion
+    
     #region get informed about changes
 
     [TestMethod]
@@ -183,14 +305,14 @@ public class NotificationApiTests: NotificationTestsBase
         AssertEquals([partition, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
     }
     
+    #endregion
+    
     private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
     {
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
     
-    #endregion
-
     protected override Geometry CreateReplicator(Geometry node) => throw new NotImplementedException();
 }
 
