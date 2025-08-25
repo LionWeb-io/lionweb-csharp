@@ -4,7 +4,7 @@ This document explains the LionWeb notification system API through some use case
 
 ## Use cases
 ### How to get informed about changes
-Every partition node of a model, which supports notification API, exposes `GetNotificationHandler()`. 
+Every partition node (aka root node) of a model, which supports notification API, exposes `GetNotificationHandler()`. 
 A notification is triggered when there is a change to the model.
 `INotificationHandler.Connect` connects a receiver to a sender. In the example below, `Observer` is a receiver which counts and 
 prints out the received notifications in its `Receive` member method.  Receiver can filter notifications via its `Handles` member method.     
@@ -26,6 +26,7 @@ if (sender != null)
 partition.Documentation = new Documentation("added");
 ```
 Code below gives an example of API usage demonstrating how to get informed about changes to a forest.
+A forest is a collection of model trees, represented by each trees' partition.
 ```csharp
 var forest = new Forest();
 
