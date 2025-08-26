@@ -23,7 +23,10 @@ using Handler;
 /// <inheritdoc cref="RemoteReplicator"/>
 public static class PartitionReplicator
 {
-    public static IConnectingNotificationHandler Create(IPartitionInstance localPartition,
+    public static IConnectingNotificationHandler Create(IPartitionInstance localPartition, object? sender = null) => 
+        CreateInternal(localPartition, new SharedNodeMap(), sender);
+
+    private static IConnectingNotificationHandler CreateInternal(IPartitionInstance localPartition,
         SharedNodeMap sharedNodeMap, object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();

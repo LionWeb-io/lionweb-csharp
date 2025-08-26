@@ -751,7 +751,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var clone = Clone(node);
 
-        var replicator = PartitionReplicator.Create(clone, new(), node.GetId());
+        var replicator = PartitionReplicator.Create(clone,node.GetId());
         var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
         node.GetNotificationHandler()?.ConnectTo(cloneHandler);
         cloneHandler.ConnectTo(replicator);

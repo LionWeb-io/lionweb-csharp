@@ -145,8 +145,8 @@ public class NotificationTests_Infrastructure
     private Tuple<IConnectingNotificationHandler, IConnectingNotificationHandler>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
-        var replicator = PartitionReplicator.Create(clone, new(), "cloneReplicator");
-        var cloneReplicator = PartitionReplicator.Create(node, new(), "nodeReplicator");
+        var replicator = PartitionReplicator.Create(clone,"cloneReplicator");
+        var cloneReplicator = PartitionReplicator.Create(node, "nodeReplicator");
         
         cloneReplicator.ConnectTo(replicator);
         replicator.ConnectTo(cloneReplicator);
