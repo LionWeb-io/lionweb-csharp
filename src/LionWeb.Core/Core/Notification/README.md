@@ -4,24 +4,18 @@ This document explains the LionWeb notification system API through some use case
 
 ## Use cases
 ### How to get informed about changes
-Every partition node (aka root node) of a model, which supports notification API, exposes `GetNotificationHandler()`. 
-A notification is triggered when there is a change to the model.
-`INotificationHandler.Connect` connects a receiver to a sender. In the example below, `Observer` is a receiver which counts and 
-prints out the received notifications in its `Receive` member method.  Receiver can filter notifications via its `Handles` member method.     
+Every partition node (aka root node) of a model, which supports notification API, triggers a notification when there is a change to the model. In the example below, `ConnectTo` method connects a receiver to a sender, 
+in this case, partition to `Observer`. `Observer` is a receiver which prints out the received notifications to the console in its `Receive` member method. 
+Receiver can filter notifications via its `Handles` member method.     
 
 Code below gives an example of API usage demonstrating how to get informed about changes to a partition.
 ```csharp
 var partition = new Geometry("geo");
-        
-var sender = partition.GetNotificationHandler();
 var receiver = new Observer();
 
-// When notifications are not supported, sender can be null. 
-if (sender != null) 
-{
-    INotificationHandler.Connect(from: sender, to: receiver);
-}
-
+// When notifications are not supported, partition.GetNotificationHandler() returns null.
+partition.GetNotificationHandler()?.ConnectTo(receiver);
+        
 // This is a change to the model
 partition.Documentation = new Documentation("added");
 ```
@@ -29,10 +23,9 @@ Code below gives an example of API usage demonstrating how to get informed about
 A forest is a collection of model trees, represented by each trees' partition.
 ```csharp
 var forest = new Forest();
-
-var sender = forest.GetNotificationHandler();
 var receiver = new Observer();
-INotificationHandler.Connect(from: sender, to: receiver);
+
+forest.GetNotificationHandler().ConnectTo(receiver);
 
 var partition = new Geometry("geo");
 
@@ -43,8 +36,6 @@ forest.AddPartitions([partition]);
 ```csharp
 public class Observer: IReceivingNotificationHandler
 {
-    public int NotificationCount { get; private set; }
-    
     public void Dispose() => throw new NotImplementedException();
 
     // Handles all type of notifications
@@ -53,7 +44,6 @@ public class Observer: IReceivingNotificationHandler
     public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
     {
         // Take necessary action for the received notification 
-        NotificationCount++;
         Console.WriteLine(notification);
     }
 }
@@ -67,22 +57,17 @@ composite notification. Follow the comments below in the code block for further 
 ```csharp
 var partition = new Geometry("geo");
 
-var sender = partition.GetNotificationHandler();
-
 // NotificationCompositor implements composite notification logic. 
 // It can receive and send notifications. 
 var compositor = new NotificationCompositor("compositor");
 
-// When notifications are not supported, sender can be null. 
-if (sender != null)
-{
-    INotificationHandler.Connect(from: sender, to: compositor);
-}
-
 // PartitionEventCounter (see the class definition below)
 // is a receiving notification handler and counts received notifications.
 var counter = new PartitionEventCounter();
-INotificationHandler.Connect(from: compositor, to: counter);
+
+// When notifications are not supported, partition.GetNotificationHandler() returns null.
+partition.GetNotificationHandler()?.ConnectTo(compositor);
+compositor.ConnectTo(counter);
 
 // Creates a new composite notification to collect incoming notifications
 var composite = compositor.Push(); 
@@ -117,20 +102,17 @@ var circle = new Circle("c");
 var partition = new Geometry("geo") { Shapes = [circle] };
 var clone = Clone(partition);
 
-var sender = partition.GetNotificationHandler();
 // Replicates notifications for the cloned partition. In this example, 
 // PropertyAddedNotification is received for the partition and 
 // replicator adds the same property value to the cloned partition node.
-var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), sender: partition.GetId());
+var replicator = PartitionReplicator.Create(clone, partition.GetId());
 
-// When notifications are not supported, sender can be null. 
-if (sender != null)
-{
-    INotificationHandler.Connect(from: sender, to: replicator);
-}
+// When notifications are not supported, partition.GetNotificationHandler() returns null.
+partition.GetNotificationHandler()?.ConnectTo(replicator);
 
 // This change triggers PropertyAddedNotification notification
 circle.Name = "Hello";
+
 ```
 
 Forest replicator replicates notifications for a local forest and all its partitions.
@@ -139,12 +121,11 @@ Forest replicator replicates notifications for a local forest and all its partit
 var originalForest = new Forest();
 var cloneForest = new Forest();
 
-var sender = originalForest.GetNotificationHandler();
 // Replicates notifications for the cloned forest. In this example, 
 // PropertyAddedNotification and ChildMovedFromOtherContainmentNotification are received.
 // Replicator adds the same partitions to the cloned forest and property value to the partition in the cloned forest.
-var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
-INotificationHandler.Connect(from: sender, to: replicator);
+var replicator = ForestReplicator.Create(cloneForest);
+originalForest.GetNotificationHandler().ConnectTo(replicator);
 
 var moved = new Documentation("moved");
 var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
