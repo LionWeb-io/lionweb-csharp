@@ -149,7 +149,7 @@ public class NotificationApiTests: NotificationTestsBase
         var originalForest = new Forest();
         var cloneForest = new Forest();
         
-        var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
+        var replicator = ForestReplicator.Create(cloneForest);
         originalForest.GetNotificationHandler().ConnectTo(replicator);
         
         var moved = new Documentation("moved");

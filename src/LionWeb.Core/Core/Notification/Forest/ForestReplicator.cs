@@ -83,6 +83,10 @@ public static class ForestReplicator
         return result;
     }
 
+    /// <inheritdoc cref="Create(LionWeb.Core.M1.IForest,LionWeb.Core.Notification.SharedNodeMap,object?)"/>
+    public static IConnectingNotificationHandler Create(IForest localForest, object? sender = null) => 
+        Create(localForest, new SharedNodeMap(), sender);
+    
     public static List<IConnectingNotificationHandler> CreateInternal(
         IForest localForest,
         SharedNodeMap sharedNodeMap,
