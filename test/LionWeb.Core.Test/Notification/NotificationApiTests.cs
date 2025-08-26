@@ -134,7 +134,7 @@ public class NotificationApiTests: NotificationTestsBase
         var partition = new Geometry("geo") { Shapes = [circle] };
         var clone = Clone(partition);
         
-        var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), sender: partition.GetId());
+        var replicator = PartitionReplicator.Create(clone, partition.GetId());
         partition.GetNotificationHandler()?.ConnectTo(replicator);
 
         circle.Name = "Hello";

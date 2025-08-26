@@ -263,7 +263,7 @@ public class NotificationTests_MultiPartition
 
     private static INotificationHandler CreateReplicator(Geometry clone, Geometry node)
     {
-        var replicator = PartitionReplicator.Create(clone, new(), "cloneReplicator");
+        var replicator = PartitionReplicator.Create(clone, "cloneReplicator");
         var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
         node.GetNotificationHandler()?.ConnectTo(cloneHandler);
         cloneHandler.ConnectTo(replicator);
