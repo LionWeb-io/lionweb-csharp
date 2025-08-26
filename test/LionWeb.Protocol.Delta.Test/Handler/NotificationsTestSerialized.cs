@@ -23,7 +23,6 @@ using Core.M1;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
-using Core.Notification.Handler;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Notification;
@@ -58,10 +57,10 @@ public class NotificationsTestSerialized : NotificationTestsBase
             deserializerBuilder
         );
         
-        INotificationHandler.Connect(eventReceiver, replicator);
+        eventReceiver.ConnectTo(replicator);
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetNotificationHandler().Subscribe<IPartitionNotification>((sender, partitionNotification) =>
+        node.GetNotificationHandler()?.Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
             var deltaCommand = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));

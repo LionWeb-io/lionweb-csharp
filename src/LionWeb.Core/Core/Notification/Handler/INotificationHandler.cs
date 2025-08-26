@@ -18,7 +18,7 @@
 namespace LionWeb.Core.Notification.Handler;
 
 /// A member in a directed graph that sends notifications.
-/// Each member is <see cref="Connect">connected</see>
+/// Each member is <see cref="INotificationHandlerConnector.Connect">connected</see>
 /// <i>from</i> one or more <i>preceding</i> notification handlers, and
 /// <i>to</i> one or more <i>following</i> notification handlers.
 ///
@@ -33,19 +33,20 @@ namespace LionWeb.Core.Notification.Handler;
 /// to its <i>following</i> notification handlers.
 /// A notification handler can also suppress an incoming notifications, i.e. not send the notifications to its <i>following</i> notification handlers. 
 /// </para>
-public interface INotificationHandler : IDisposable
+public interface INotificationHandler : IDisposable;
+
+public interface INotificationHandlerConnector
 {
     /// All notifications <see cref="ISendingNotificationHandler.Send">sent</see> by <paramref name="from"/>
     /// will be <see cref="IReceivingNotificationHandler.Receive">received</see> by <paramref name="to"/>. 
     public static void Connect(
         ISendingNotificationHandler from,
-        IReceivingNotificationHandler to) =>
-        from.Subscribe(to);
+        IReceivingNotificationHandler to) => from.Subscribe(to);
 }
 
 /// A <see cref="INotificationHandler">notification handler</see> that can <see cref="Send"/> notifications
 /// to <i>following</i> handlers.
-public interface ISendingNotificationHandler : INotificationHandler
+public interface ISendingNotificationHandler : INotificationHandler, INotificationHandlerConnector
 {
     /// This notification handler wants to send <paramref name="notification"/>.
     /// Only this notification handler should use this method.
@@ -60,6 +61,11 @@ public interface ISendingNotificationHandler : INotificationHandler
     /// Unsubscribes <paramref name="receiver"/> from this.
     /// For internal use only -- each notification handler should unsubscribe itself from all <i>preceding</i> notification handlers on disposal.
     protected internal void Unsubscribe(IReceivingNotificationHandler receiver);
+
+    /// All notifications <see cref="ISendingNotificationHandler.Send">sent</see> by <paramref name="this"/>
+    /// will be <see cref="IReceivingNotificationHandler.Receive">received</see> by <paramref name="to"/>. 
+    /// <seealso cref="INotificationHandlerConnector.Connect"/>
+    public void ConnectTo(IReceivingNotificationHandler to) => Connect(this, to);
 }
 
 /// A <see cref="INotificationHandler">notification handler</see> that can determine whether it

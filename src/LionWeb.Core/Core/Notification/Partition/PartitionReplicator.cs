@@ -40,8 +40,8 @@ public static class PartitionReplicator
         if (partitionHandler == null)
             return result;
 
-        INotificationHandler.Connect(partitionHandler, localReplicator);
-        INotificationHandler.Connect(localReplicator, filter);
+        partitionHandler.ConnectTo(localReplicator);
+        localReplicator.ConnectTo(filter);
 
         return result;
     }

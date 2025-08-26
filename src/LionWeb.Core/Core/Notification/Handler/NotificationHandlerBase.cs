@@ -35,6 +35,8 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
         Sender = sender ?? this;
     }
 
+    public void ConnectTo(IReceivingNotificationHandler to) => INotificationHandlerConnector.Connect(this, to);
+    
     /// <inheritdoc />
     public virtual void Dispose()
     {

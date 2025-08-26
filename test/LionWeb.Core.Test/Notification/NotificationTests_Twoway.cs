@@ -836,17 +836,18 @@ public class NotificationTests_Twoway
     {
         var replicator = CreateReplicator(node, "nodeReplicator");
         var cloneReplicator = CreateReplicator(clone, "cloneReplicator");
-        
+
         var cloneHandlerA = new NodeCloneNotificationHandler(node.GetId());
-        INotificationHandler.Connect(replicator, cloneHandlerA);
-        INotificationHandler.Connect(cloneHandlerA, cloneReplicator);
-     
+        replicator.ConnectTo(cloneHandlerA);
+        cloneHandlerA.ConnectTo(cloneReplicator);
+
         var cloneHandlerB = new NodeCloneNotificationHandler(clone.GetId());
-        INotificationHandler.Connect(cloneReplicator, cloneHandlerB);
-        INotificationHandler.Connect(cloneHandlerB, replicator);
-     
+        cloneReplicator.ConnectTo(cloneHandlerB);
+        cloneHandlerB.ConnectTo(replicator);
+
         return Tuple.Create(replicator, cloneReplicator);
     }
+
     private static IConnectingNotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
         PartitionReplicator.Create(clone, new(), sender);
 

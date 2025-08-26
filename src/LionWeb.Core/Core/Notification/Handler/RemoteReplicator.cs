@@ -127,7 +127,7 @@ public class RemoteReplicator : NotificationHandlerBase, IConnectingNotification
         {
             var newPartition = partitionAdded.NewPartition;
             _localForest?.AddPartitions([newPartition], partitionAdded.NotificationId);
-            INotificationHandler.Connect(notificationHandler, this);
+            notificationHandler.ConnectTo(this);
         });
 
     private void OnRemotePartitionDeleted(ISendingNotificationHandler notificationHandler,

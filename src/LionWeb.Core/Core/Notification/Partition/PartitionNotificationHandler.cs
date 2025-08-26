@@ -38,8 +38,6 @@ public interface IPartitionNotificationHandler : IInboundNotificationHandler
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
     public void Unsubscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
         where TSubscribedNotification : class, IPartitionNotification;
-
-    public void ConnectTo(IReceivingNotificationHandler receiver) => Connect(this, receiver);
 }
 
 /// Forwards all <see cref="IInboundNotificationHandler.InitiateNotification">initiated</see> notifications

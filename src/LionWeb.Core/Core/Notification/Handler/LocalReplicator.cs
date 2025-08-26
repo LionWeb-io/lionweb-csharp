@@ -82,7 +82,7 @@ public class LocalReplicator : NotificationHandlerBase, IConnectingNotificationH
         IPartitionInstance partition)
     {
         _sharedNodeMap.RegisterNode(partition);
-        INotificationHandler.Connect(correspondingHandler, this);
+        correspondingHandler.ConnectTo(this);
     }
 
     private void UnregisterPartition(ISendingNotificationHandler correspondingHandler,
