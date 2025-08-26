@@ -101,8 +101,8 @@ public static class ForestReplicator
         if (forestHandler == null)
             return result;
 
-        INotificationHandler.Connect(forestHandler, localReplicator);
-        INotificationHandler.Connect(localReplicator, filter);
+        forestHandler.ConnectTo(localReplicator);
+        localReplicator.ConnectTo(filter);
 
         return result;
     }

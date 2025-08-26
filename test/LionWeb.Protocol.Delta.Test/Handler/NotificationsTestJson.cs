@@ -23,7 +23,6 @@ using Core.M1;
 using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
-using Core.Notification.Handler;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Notification;
@@ -59,7 +58,7 @@ public class NotificationsTestJson : NotificationTestsBase
             deserializerBuilder
         );
         
-        INotificationHandler.Connect(eventReceiver, replicator);
+        eventReceiver.ConnectTo(replicator);
 
         var deltaSerializer = new DeltaSerializer();
 

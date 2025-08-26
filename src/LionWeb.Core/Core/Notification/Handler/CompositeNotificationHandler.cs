@@ -49,7 +49,7 @@ public class CompositeNotificationHandler : IConnectingNotificationHandler
         while (enumerator.MoveNext())
         {
             var current = enumerator.Current;
-            INotificationHandler.Connect(previous, current);
+            previous.ConnectTo(current);
 
             previous = current;
         }

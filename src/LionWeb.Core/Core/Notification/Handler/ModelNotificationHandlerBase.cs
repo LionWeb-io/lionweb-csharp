@@ -35,7 +35,7 @@ public abstract class ModelNotificationHandlerBase<TNotification>(object? sender
     /// </typeparam> 
     public void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
         where TSubscribedNotification : class, TNotification =>
-        INotificationHandler.Connect(this, new NativeEventNotificationHandler<TSubscribedNotification>(handler));
+        ConnectTo(new NativeEventNotificationHandler<TSubscribedNotification>(handler));
 
     /// Unregisters <paramref name="handler"/> from notification of notifications.
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 

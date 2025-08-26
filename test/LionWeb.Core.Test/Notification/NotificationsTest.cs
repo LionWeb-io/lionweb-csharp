@@ -1,6 +1,5 @@
 ﻿namespace LionWeb.Core.Test.Notification;
 
-using Core.Notification.Handler;
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
@@ -754,9 +753,8 @@ public class NotificationsTest : NotificationTestsBase
 
         var replicator = PartitionReplicator.Create(clone, new(), node.GetId());
         var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
-        INotificationHandler.Connect((IPartitionNotificationHandler)node.GetNotificationHandler(), cloneHandler);
-        INotificationHandler.Connect(cloneHandler, replicator);
-
+        node.GetNotificationHandler()?.ConnectTo(cloneHandler);
+        cloneHandler.ConnectTo(replicator);
         return clone;
     }
 }

@@ -20,7 +20,6 @@ namespace LionWeb.Protocol.Delta.Repository;
 using Core;
 using Core.M1;
 using Core.M3;
-using Core.Notification.Handler;
 using Message;
 using Message.Command;
 using Message.Event;
@@ -52,7 +51,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             deserializerBuilder
         );
 
-        INotificationHandler.Connect(_commandReceiver, _replicator);
+        _commandReceiver.ConnectTo(_replicator);
     }
 
     /// <inheritdoc />
