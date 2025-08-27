@@ -81,4 +81,7 @@ public class CompositeNotificationHandler : IConnectingNotificationHandler
 
     void ISendingNotificationHandler.Unsubscribe(IReceivingNotificationHandler receiver) =>
         _lastHandler.Unsubscribe(receiver);
+    
+    /// <inheritdoc cref="INotificationHandlerConnector.ConnectTo"/>
+    public void ConnectTo(IReceivingNotificationHandler to) => ((INotificationHandlerConnector)this).Connect(this, to);
 }
