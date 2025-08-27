@@ -24,7 +24,7 @@ using SemanticPropertyValue = object;
 /// All LionWeb notifications relating to a partition.
 public interface IPartitionNotification : INotification
 {
-    public NodeId ContextNodeId { get; }
+    NodeId ContextNodeId { get; }
 }
 
 public abstract record APartitionNotification(INotificationId NotificationId) : IPartitionNotification

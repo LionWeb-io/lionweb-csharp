@@ -39,11 +39,11 @@ public interface INotificationHandlerConnector
 {
     /// All notifications <see cref="ISendingNotificationHandler.Send">sent</see> by <paramref name="from"/>
     /// will be <see cref="IReceivingNotificationHandler.Receive">received</see> by <paramref name="to"/>. 
-    public void Connect(
+    protected internal void Connect(
         ISendingNotificationHandler from,
         IReceivingNotificationHandler to) => from.Subscribe(to);
     
-    public void ConnectTo(IReceivingNotificationHandler to);
+    void ConnectTo(IReceivingNotificationHandler to);
 }
 
 /// A <see cref="INotificationHandler">notification handler</see> that can <see cref="Send"/> notifications
@@ -83,7 +83,7 @@ public interface IFilterReceivingNotificationHandler : INotificationHandler
 public interface IInboundNotificationHandler : IFilterReceivingNotificationHandler, ISendingNotificationHandler
 {
     /// Receiving a notification from outside the notification handler graph.
-    public void InitiateNotification(INotification notification);
+    void InitiateNotification(INotification notification);
 }
 
 /// A <see cref="INotificationHandler">notification handler</see> that can <see cref="Receive"/> notfications
