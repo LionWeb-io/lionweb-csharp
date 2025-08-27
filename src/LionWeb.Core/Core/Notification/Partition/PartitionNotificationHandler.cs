@@ -23,7 +23,7 @@ using Handler;
 /// Raises notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
 public interface IPartitionNotificationHandler : IInboundNotificationHandler
 {
-    public INotificationId CreateNotificationId();
+    INotificationId CreateNotificationId();
 
     /// Registers <paramref name="handler"/> to be notified of notifications compatible with <typeparamref name="TSubscribedNotification"/>.
     /// <typeparam name="TSubscribedNotification">
@@ -31,12 +31,12 @@ public interface IPartitionNotificationHandler : IInboundNotificationHandler
     /// notifications raised by this publisher that are <i>not</i> compatible with <typeparamref name="TSubscribedNotification"/>
     /// will <i>not</i> reach <paramref name="handler"/>.
     /// </typeparam> 
-    public void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
+    void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
         where TSubscribedNotification : class, IPartitionNotification;
 
     /// Unregisters <paramref name="handler"/> from notification of notifications.
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
-    public void Unsubscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
+    void Unsubscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
         where TSubscribedNotification : class, IPartitionNotification;
 }
 
