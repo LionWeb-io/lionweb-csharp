@@ -39,7 +39,7 @@ public interface INotificationHandlerConnector
 {
     /// All notifications <see cref="ISendingNotificationHandler.Send">sent</see> by <paramref name="from"/>
     /// will be <see cref="IReceivingNotificationHandler.Receive">received</see> by <paramref name="to"/>. 
-    protected internal void Connect(
+    protected internal static void Connect(
         ISendingNotificationHandler from,
         IReceivingNotificationHandler to) => from.Subscribe(to);
     
