@@ -88,11 +88,6 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     {
         public void Receive(INotificationSender correspondingSender, INotification notification) =>
             client.SendNotificationToRepository(sender, notification);
-
-        public void Dispose() { }
-
-        public bool Handles(params Type[] notificationTypes) => 
-            true;
     }
 
     #endregion

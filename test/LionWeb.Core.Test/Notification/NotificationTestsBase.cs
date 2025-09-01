@@ -46,8 +46,6 @@ public static class NotificationExtensions
 
 internal class FilteredReceiver<T>(Action<object?, T> handler) : INotificationReceiver
 {
-    public void Dispose() { }
-
     public bool Handles(params Type[] notificationTypes) =>
         notificationTypes.Any(t => typeof(T).IsAssignableFrom(t));
 

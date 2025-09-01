@@ -90,6 +90,10 @@ public interface INotificationProducer : INotificationPipe, INotificationFilter,
 /// from <i>preceding</i> notification pipe members.
 public interface INotificationReceiver : INotificationPipe, INotificationFilter
 {
+    void IDisposable.Dispose() { }
+
+    bool INotificationFilter.Handles(params Type[] notificationTypes) => true;
+
     /// This notification pipe member receives <paramref name="notification"/>.
     void Receive(INotificationSender correspondingSender, INotification notification);
 }

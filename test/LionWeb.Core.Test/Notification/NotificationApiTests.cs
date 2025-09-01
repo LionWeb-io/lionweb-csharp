@@ -315,10 +315,6 @@ public class NotificationApiTests : NotificationTestsBase
 internal class Observer : INotificationReceiver
 {
     public int NotificationCount { get; private set; }
-    public void Dispose() => throw new NotImplementedException();
-
-    public bool Handles(params Type[] notificationTypes) => true;
-
     public void Receive(INotificationSender correspondingSender, INotification notification)
     {
         NotificationCount++;

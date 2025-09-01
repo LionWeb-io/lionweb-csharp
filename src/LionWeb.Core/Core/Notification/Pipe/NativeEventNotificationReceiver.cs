@@ -20,14 +20,6 @@ namespace LionWeb.Core.Notification.Pipe;
 internal class NativeEventNotificationReceiver<TNotification>(EventHandler<TNotification> handler)
     : INotificationReceiver where TNotification : INotification
 {
-    public void Dispose()
-    {
-    }
-
-    /// <inheritdoc />
-    public bool Handles(params Type[] notificationTypes) =>
-        throw new NotImplementedException();
-
     /// <inheritdoc />
     public void Receive(INotificationSender correspondingSender, INotification notification) 
     {
