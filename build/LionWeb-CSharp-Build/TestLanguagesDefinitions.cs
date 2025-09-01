@@ -34,7 +34,7 @@ public class TestLanguagesDefinitions
     public Language? KeywordLang { get; private set; }
     public Language MultiInheritLang { get; private set; }
     public Language NamedLang { get; private set; }
-
+    public Language GeneralNodeLang { get; private set; }
     public List<Language> MixedLangs { get; private set; } = [];
 
     public TestLanguagesDefinitions(LionWebVersions lionWebVersion)
@@ -45,6 +45,8 @@ public class TestLanguagesDefinitions
         CreateTinyRefLang();
         CreateMultiInheritLang();
         CreateNamedLang();
+        CreateGeneralNodeLang();
+
         if (lionWebVersion.LionCore is ILionCoreLanguageWithStructuredDataType)
         {
             CreateSdtLang();
@@ -414,5 +416,28 @@ public class TestLanguagesDefinitions
             .Implementing(_lionWebVersion.BuiltIns.INamed);
 
         NamedLang = namedLang;
+    }
+
+    private void CreateGeneralNodeLang()
+    {
+        var generalNodeLang = new DynamicLanguage("id-GeneralNodeLang", _lionWebVersion)
+        {
+            Name = "GeneralNodeLang", Key = "key-GeneralNodeLang", Version = "1"
+        };
+
+        var concept = generalNodeLang.Concept("id-GeneralNodeConcept", "key-GeneralNodeConcept", "GeneralNodeConcept");
+        concept.Reference("id-singleRef", "key-singleRef", "singleRef").OfType(_lionWebVersion.BuiltIns.Node);
+        concept.Reference("id-multipleRef", "key-multipleRef", "multipleRef").OfType(_lionWebVersion.BuiltIns.Node).IsMultiple();
+        
+        concept.Reference("id-singleOptionalRef", "key-singleOptionalRef", "singleOptionalRef").OfType(_lionWebVersion.BuiltIns.Node).IsOptional();
+        concept.Reference("id-multipleOptionalRef", "key-multipleOptionalRef", "multipleOptionalRef").OfType(_lionWebVersion.BuiltIns.Node).IsMultiple().IsOptional();
+        
+        concept.Containment("id-singleContainment", "key-singleContainment", "singleContainment").OfType(_lionWebVersion.BuiltIns.Node);
+        concept.Containment("id-multipleContainment", "key-multipleContainment", "multipleContainment").OfType(_lionWebVersion.BuiltIns.Node).IsMultiple();
+
+        concept.Containment("id-singleOptionalContainment", "key-singleOptionalContainment", "singleOptionalContainment").OfType(_lionWebVersion.BuiltIns.Node).IsOptional();
+        concept.Containment("id-multipleOptionalContainment", "key-multipleOptionalContainment", "multipleOptionalContainment").OfType(_lionWebVersion.BuiltIns.Node).IsMultiple().IsOptional();
+        
+        GeneralNodeLang = generalNodeLang;
     }
 }

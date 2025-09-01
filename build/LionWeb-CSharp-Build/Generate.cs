@@ -65,6 +65,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var namedLang = testLanguagesDefinitions.NamedLang;
     var namedLangReadInterfaces = new DynamicLanguageCloner(lionWebVersion).Clone(namedLang);
     namedLangReadInterfaces.Name = "NamedReadInterfaces";
+    var generalNodeLang = testLanguagesDefinitions.GeneralNodeLang;
 
     var lionWebVersionNamespace = "V" + lionWebVersion.VersionString.Replace('.', '_');
     string prefix = $"LionWeb.Core.Test.Languages.Generated.{lionWebVersionNamespace}";
@@ -82,6 +83,7 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
         new(multiInheritLang, $"{prefix}.MultiInheritLang"),
         new(namedLang, $"{prefix}.NamedLang"),
         new(namedLangReadInterfaces, $"{prefix}.NamedLangReadInterfaces"),
+        new(generalNodeLang, $"{prefix}.GeneralNodeLang"),
         new(testLanguage, $"{prefix}.TestLanguage"),
         // We don't really want these file in tests project, but update the version in Generator.
         // However, it's not worth writing a separate code path for this one language (as we want to externalize it anyways).
