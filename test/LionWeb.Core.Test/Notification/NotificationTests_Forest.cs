@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
 using Core.Notification.Forest;
-using Core.Notification.Handler;
+using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
@@ -124,16 +124,16 @@ public class NotificationTests_Forest
 
     #endregion
 
-    private static INotificationHandler CreateReplicator(Forest cloneForest,
+    private static INotificationPipe CreateReplicator(Forest cloneForest,
         Forest originalForest)
     {
-        var replicator = ForestReplicator.Create(cloneForest);
+        var replicator = ForestReplicator.Create(cloneForest, new(), null);
         var cloneHandler = new NodeCloneNotificationHandler("forestCloner");
-        originalForest.GetNotificationHandler().ConnectTo(cloneHandler);
+        originalForest.GetNotificationSender().ConnectTo(cloneHandler);
         cloneHandler.ConnectTo(replicator);
 
-        var receiver = new TestLocalForestChangeNotificationHandler(originalForest, cloneHandler);
-        originalForest.GetNotificationHandler().ConnectTo(receiver);
+        var receiver = new TestLocalForestChangeNotificationReceiver(originalForest, cloneHandler);
+        originalForest.GetNotificationSender().ConnectTo(receiver);
         return replicator;
     }
 
@@ -144,10 +144,10 @@ public class NotificationTests_Forest
     }
 }
 
-internal class TestLocalForestChangeNotificationHandler(object? sender, NodeCloneNotificationHandler cloneHandler)
-    : NotificationHandlerBase(sender), IReceivingNotificationHandler
+internal class TestLocalForestChangeNotificationReceiver(object? sender, NodeCloneNotificationHandler cloneHandler)
+    : NotificationPipeBase(sender), INotificationReceiver
 {
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+    public void Receive(INotificationSender correspondingSender, INotification notification)
     {
         switch (notification)
         {
@@ -161,7 +161,7 @@ internal class TestLocalForestChangeNotificationHandler(object? sender, NodeClon
     }
 
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification) => 
-        partitionAddedNotification.NewPartition.GetNotificationHandler()?.ConnectTo(cloneHandler);
+        partitionAddedNotification.NewPartition.GetNotificationSender()?.ConnectTo(cloneHandler);
 
     private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
     {

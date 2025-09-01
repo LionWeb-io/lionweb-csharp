@@ -15,42 +15,43 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
 using Forest;
 using Partition;
 using System.Reflection;
 
-/// Base for all <see cref="INotificationHandler">notification handlers</see> that process <see cref="INotification">notifications</see>.
-public abstract class NotificationHandlerBase : IFilterReceivingNotificationHandler, ISendingNotificationHandler
+/// Base for all <see cref="INotificationPipe">notification pipes</see> that process <see cref="INotification">notifications</see>.
+public abstract class NotificationPipeBase : INotificationFilter, INotificationSender
 {
     protected readonly object Sender;
     private readonly Dictionary<Type, int> _subscribedNotifications = [];
-    private readonly Dictionary<IReceivingNotificationHandler, EventHandler<INotification>> _handlers = [];
+    private readonly Dictionary<INotificationReceiver, EventHandler<INotification>> _handlers = [];
 
-    /// <inheritdoc cref="NotificationHandlerBase"/>
+    /// <inheritdoc cref="NotificationPipeBase"/>
     /// <param name="sender">Optional sender of the notifications.</param>
-    protected NotificationHandlerBase(object? sender)
+    protected NotificationPipeBase(object? sender)
     {
         Sender = sender ?? this;
     }
 
-    /// <inheritdoc cref="INotificationHandlerConnector.ConnectTo"/>
-    public void ConnectTo(IReceivingNotificationHandler to) => INotificationHandlerConnector.Connect(this, to);
+    /// <inheritdoc />
+    public void ConnectTo(INotificationReceiver to) =>
+        ((INotificationSender)this).Subscribe(to);
     
     /// <inheritdoc />
     public virtual void Dispose()
     {
         GC.SuppressFinalize(this);
-        foreach (var (notificationHandler, eventHandler) in _handlers)
+        foreach (var (receiver, eventHandler) in _handlers)
         {
-            UnsubscribeHandler(notificationHandler, eventHandler);
+            UnsubscribeHandler(receiver, eventHandler);
         }
 
         return;
 
-        void UnsubscribeHandler<T>(IReceivingNotificationHandler notificationHandler, EventHandler<T> _) =>
-            Unsubscribe(notificationHandler);
+        void UnsubscribeHandler<T>(INotificationReceiver receiver, EventHandler<T> _) =>
+            Unsubscribe(receiver);
     }
 
     private event EventHandler<INotification>? InternalEvent;
@@ -64,24 +65,24 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
 
 
     /// <inheritdoc />
-    void ISendingNotificationHandler.Send(INotification notification) =>
+    void INotificationSender.Send(INotification notification) =>
         Send(notification);
 
-    /// <inheritdoc cref="ISendingNotificationHandler.Send"/>
+    /// <inheritdoc cref="INotificationSender.Send"/>
     protected virtual void Send(INotification notification) =>
         SendWithSender(this, notification);
 
-    /// This notification handler wants to send <paramref name="message"/> with <paramref name="sender"/>.
-    /// Only this notification handler should use this method.
+    /// This notification pipe wants to send <paramref name="message"/> with <paramref name="sender"/>.
+    /// Only this notification pipe should use this method.
     protected void SendWithSender(object? sender, INotification message) =>
         InternalEvent?.Invoke(sender, message);
 
     /// <inheritdoc />
-    void ISendingNotificationHandler.Subscribe(IReceivingNotificationHandler receiver) =>
+    void INotificationSender.Subscribe(INotificationReceiver receiver) =>
         Subscribe<INotification>(receiver);
 
-    /// <inheritdoc cref="ISendingNotificationHandler.Subscribe"/>
-    private void Subscribe<TSubscribedNotification>(IReceivingNotificationHandler receiver)
+    /// <inheritdoc cref="INotificationSender.Subscribe"/>
+    private void Subscribe<TSubscribedNotification>(INotificationReceiver receiver)
         where TSubscribedNotification : INotification
     {
         RegisterSubscribedNotifications<TSubscribedNotification>();
@@ -93,13 +94,13 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
     }
 
     private EventHandler<INotification> CreateHandler<TSubscribedNotification>(
-        IReceivingNotificationHandler receiver) where TSubscribedNotification : INotification =>
+        INotificationReceiver receiver) where TSubscribedNotification : INotification =>
         (sender, notification) =>
         {
             if (notification is not TSubscribedNotification r)
                 return;
 
-            if (sender is ISendingNotificationHandler handler)
+            if (sender is INotificationSender handler)
             {
                 receiver.Receive(handler, r);
                 return;
@@ -135,7 +136,7 @@ public abstract class NotificationHandlerBase : IFilterReceivingNotificationHand
     }
 
     /// <inheritdoc />
-    public void Unsubscribe(IReceivingNotificationHandler receiver)
+    public void Unsubscribe(INotificationReceiver receiver)
     {
         if (!_handlers.Remove(receiver, out var handler))
             return;

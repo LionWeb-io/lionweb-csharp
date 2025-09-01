@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
 using Forest;
 
@@ -23,15 +23,15 @@ using Forest;
 ///
 /// We keep a stack of composites.
 /// Every time a new composite is <see cref="Push">pushed</see>, that composite is added to the previous one (if any).
-public class NotificationCompositor : NotificationHandlerBase, IConnectingNotificationHandler
+public class NotificationCompositor : NotificationPipeBase, INotificationHandler
 {
     private readonly INotificationIdProvider _idProvider;
     private readonly Stack<CompositeNotification> _composites = [];
 
     /// <inheritdoc cref="NotificationCompositor"/>
-    public NotificationCompositor(object? notificationHandlerId) : base(notificationHandlerId)
+    public NotificationCompositor(object? sender) : base(sender)
     {
-        _idProvider = new NotificationIdProvider(notificationHandlerId);
+        _idProvider = new NotificationIdProvider(sender);
     }
 
     /// Pushes a new composite, and adds it to the previous one (if any).
@@ -50,7 +50,7 @@ public class NotificationCompositor : NotificationHandlerBase, IConnectingNotifi
     }
 
     /// Pops the previous composite.
-    /// <param name="send">If <c>true</c>, sends the popped composite to <i>following</i> handlers.</param>
+    /// <param name="send">If <c>true</c>, sends the popped composite to <i>following</i> pipes.</param>
     /// <returns>The previous composite</returns>
     /// <exception cref="InvalidOperationException">If there's no previous composite.</exception>
     public CompositeNotification Pop(bool send)
@@ -62,15 +62,15 @@ public class NotificationCompositor : NotificationHandlerBase, IConnectingNotifi
     }
 
     /// <inheritdoc />
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+    public void Receive(INotificationSender correspondingSender, INotification notification)
     {
         switch (notification)
         {
             case PartitionAddedNotification:
-                RegisterPartition(correspondingHandler);
+                RegisterPartition(correspondingSender);
                 break;
             case PartitionDeletedNotification:
-                UnregisterPartition(correspondingHandler);
+                UnregisterPartition(correspondingSender);
                 break;
         }
 
@@ -87,8 +87,8 @@ public class NotificationCompositor : NotificationHandlerBase, IConnectingNotifi
         return true;
     }
 
-    private void RegisterPartition(ISendingNotificationHandler correspondingHandler) =>
-        correspondingHandler.ConnectTo(this);
-    private void UnregisterPartition(ISendingNotificationHandler correspondingHandler) =>
-        correspondingHandler.Unsubscribe(this);
+    private void RegisterPartition(INotificationSender correspondingSender) =>
+        correspondingSender.ConnectTo(this);
+    private void UnregisterPartition(INotificationSender correspondingSender) =>
+        correspondingSender.Unsubscribe(this);
 }

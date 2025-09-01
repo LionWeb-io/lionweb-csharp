@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Test.Handler;
+namespace LionWeb.Protocol.Delta.Test.Pipe;
 
 using Client;
 using Core;
@@ -26,9 +26,10 @@ using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Notification;
+using Message.Command;
 
 [TestClass]
-public class NotificationsTestSerialized : NotificationTestsBase
+public class NotificationsTestJson : NotificationTestsBase
 {
     protected override Geometry CreateReplicator(Geometry node)
     {
@@ -59,11 +60,15 @@ public class NotificationsTestSerialized : NotificationTestsBase
         
         eventReceiver.ConnectTo(replicator);
 
+        var deltaSerializer = new DeltaSerializer();
+
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
-        node.GetNotificationHandler()?.Subscribe<IPartitionNotification>((sender, partitionNotification) =>
+        node.GetNotificationSender().Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
-            var deltaCommand = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
-            eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
+            var command = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
+            var json = deltaSerializer.Serialize(command);
+            var deserialized = deltaSerializer.Deserialize<IDeltaCommand>(json);
+            eventReceiver.Receive(commandToEventMapper.Map(deserialized));
         });
 
         return clone;

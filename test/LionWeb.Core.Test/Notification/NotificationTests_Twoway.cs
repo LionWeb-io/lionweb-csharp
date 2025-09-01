@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification;
 
-using Core.Notification.Handler;
+using Core.Notification.Pipe;
 using Core.Notification.Partition;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
@@ -831,7 +831,7 @@ public class NotificationTests_Twoway
     #endregion
 
 
-    private Tuple<IConnectingNotificationHandler, IConnectingNotificationHandler>
+    private Tuple<INotificationHandler, INotificationHandler>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = CreateReplicator(node, "nodeReplicator");
@@ -848,8 +848,8 @@ public class NotificationTests_Twoway
         return Tuple.Create(replicator, cloneReplicator);
     }
 
-    private static IConnectingNotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
-        PartitionReplicator.Create(clone, sender);
+    private static INotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
+        PartitionReplicator.Create(clone, new(), sender);
 
     private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {

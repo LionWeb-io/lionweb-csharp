@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Notification;
 
-using Core.Notification.Handler;
+using Core.Notification.Pipe;
 using Core.Notification.Partition;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
@@ -43,9 +43,9 @@ public class NotificationTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> deletions = [];
-        node.GetNotificationHandler().Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
+        node.GetNotificationSender().Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
         List<(NotificationId, IReadableNode)> moves = [];
-        node.GetNotificationHandler()
+        node.GetNotificationSender()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
         node.AddShapes([moved]);
@@ -69,10 +69,10 @@ public class NotificationTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationHandler()
+        originPartition.GetNotificationSender()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
         List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationHandler()
+        node.GetNotificationSender()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
         node.AddShapes([moved]);
@@ -97,10 +97,10 @@ public class NotificationTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationHandler()
+        originPartition.GetNotificationSender()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
         List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationHandler()
+        node.GetNotificationSender()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
         node.InsertShapes(0, [moved]);
@@ -122,9 +122,9 @@ public class NotificationTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> deletions = [];
-        node.GetNotificationHandler().Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
+        node.GetNotificationSender().Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
         List<(NotificationId, IReadableNode)> moves = [];
-        node.GetNotificationHandler()
+        node.GetNotificationSender()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
         node.Documentation = moved;
@@ -147,10 +147,10 @@ public class NotificationTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationHandler()
+        originPartition.GetNotificationSender()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
         List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationHandler()
+        node.GetNotificationSender()
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
         node.Documentation = moved;
@@ -184,10 +184,10 @@ public class NotificationTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> deletions = [];
-        node.GetNotificationHandler()
+        node.GetNotificationSender()
             .Subscribe<AnnotationDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedAnnotation)));
         List<(NotificationId, IReadableNode)> moves = [];
-        node.GetNotificationHandler()
+        node.GetNotificationSender()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) => moves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
 
         node.AddAnnotations([moved]);
@@ -212,10 +212,10 @@ public class NotificationTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationHandler()
+        originPartition.GetNotificationSender()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
         List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationHandler()
+        node.GetNotificationSender()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) =>
                 destinationMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
 
@@ -242,10 +242,10 @@ public class NotificationTests_MultiPartition
         var replicator = CreateReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
-        originPartition.GetNotificationHandler()
+        originPartition.GetNotificationSender()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) => originMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
         List<(NotificationId, IReadableNode)> destinationMoves = [];
-        node.GetNotificationHandler()
+        node.GetNotificationSender()
             .Subscribe<AnnotationMovedFromOtherParentNotification>((o, e) =>
                 destinationMoves.Add((e.NotificationId.ToString(), e.MovedAnnotation)));
 
@@ -261,11 +261,11 @@ public class NotificationTests_MultiPartition
 
     #endregion
 
-    private static INotificationHandler CreateReplicator(Geometry clone, Geometry node)
+    private static INotificationPipe CreateReplicator(Geometry clone, Geometry node)
     {
-        var replicator = PartitionReplicator.Create(clone, "cloneReplicator");
+        var replicator = PartitionReplicator.Create(clone, new(), "cloneReplicator");
         var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
-        node.GetNotificationHandler()?.ConnectTo(cloneHandler);
+        node.GetNotificationSender()?.ConnectTo(cloneHandler);
         cloneHandler.ConnectTo(replicator);
         
         return replicator;

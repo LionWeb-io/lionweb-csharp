@@ -17,14 +17,14 @@
 
 namespace LionWeb.Core.Notification.Forest;
 
-using Handler;
 using M1;
+using Pipe;
 
 /// Replicates notifications for a <i>local</i> <see cref="IForest"/> and all its <see cref="IPartitionInstance">partitions</see>.
 /// <inheritdoc cref="RemoteReplicator"/>
 public static class ForestReplicator
 {
-    /// Builds up the ForestReplicator Composite part:
+    /// Builds up the ForestReplicator MultipartNotificationHandler:
     /// <code>
     ///
     /// +-------------------------------------------------+
@@ -32,39 +32,39 @@ public static class ForestReplicator
     /// +--╫----------------------------------------------+
     ///    ║ 7,8
     ///    ║ +--------------------------------------------------------------------------+
-    ///    ║ | ForestReplicator Composite                                               |
+    ///    ║ | ForestReplicator MultipartNotificationHandler                            |
     ///    ║ +--------------------+------------------+----------------------------------+
-    ///    ╚═╪═» <see cref="RemoteReplicator"/> | <see cref="LocalReplicator"/> ═╪═» <see cref="IdFilteringNotificationHandler"/> |
+    ///    ╚═╪═» <see cref="RemoteReplicator"/> | <see cref="LocalReplicator"/> ═╪═» <see cref="IdFilteringNotificationFilter"/> |
     ///      |                    |          ^       |                               ║  |
     ///      +-------------╫------+----------╫-------+-------------------------------╫--+
     ///        9           ║             3,4 ║ 11      5   12                        ║
-    /// +---------------+  ║  +-----------+--╫-------------------------+   +---------╫------------------+
-    /// | Local changes ╪══╩══╪═» <see cref="IForest"/> | <see cref="IForestNotificationHandler"/> |   |         v                  |
-    /// +---------------+     +-----------+----------------------------+   | Remote sender, e.g.        |
-    ///   1                                 2   10                         | LionWebClientBase.         |
-    ///                                                                    |   LocalNotificationHandler |
-    ///                                                                    +----------------------------+
+    /// +---------------+  ║  +-----------+--╫-------------------------+   +---------╫-------------------+
+    /// | Local changes ╪══╩══╪═» <see cref="IForest"/> | <see cref="IForestNotificationProducer"/> |   |         v                   |
+    /// +---------------+     +-----------+----------------------------+   | Remote sender, e.g.         |
+    ///   1                                 2   10                         | LionWebClientBase.          |
+    ///                                                                    |   LocalNotificationReceiver |
+    ///                                                                    +-----------------------------+
     ///                                                                      6
     /// </code>
     /// <list type="number">
     /// <item>On side A, we change a <see cref="IForest"/> locally.</item>
-    /// <item>On side A, the <see cref="IForestNotificationHandler"/> picks up the change.</item>
+    /// <item>On side A, the <see cref="IForestNotificationProducer"/> picks up the change.</item>
     /// <item>On side A, the <see cref="LocalReplicator"/> receives the notification.</item>
     /// <item>On side A, the <see cref="LocalReplicator"/> updates <see cref="SharedNodeMap">internal look-up structures</see>, and forwards the notification.</item>
-    /// <item>On side A, the <see cref="IdFilteringNotificationHandler"/> doesn't suppress the notification, and forwards it.</item>
+    /// <item>On side A, the <see cref="IdFilteringNotificationFilter"/> doesn't suppress the notification, and forwards it.</item>
     /// <item>On side A, the remote sender transmits the notification.</item>
     /// <item>On side B, the remote receiver receives the notification.</item>
     /// <item>On side B, the remote receiver maps the incoming notification to a local one, with locally known nodes.</item>
     /// <item>
     ///   On side B, the <see cref="RemoteReplicator"/> interprets the notification,
-    ///   instructs the <see cref="IdFilteringNotificationHandler"/> to ignore the upcoming notification,
+    ///   instructs the <see cref="IdFilteringNotificationFilter"/> to ignore the upcoming notification,
     ///   and changes the <see cref="IForest"/> locally.
     /// </item>
-    /// <item>On side B, the <see cref="IForestNotificationHandler"/> picks up the change.</item>
+    /// <item>On side B, the <see cref="IForestNotificationProducer"/> picks up the change.</item>
     /// <item>On side B, the <see cref="LocalReplicator"/> updates <see cref="SharedNodeMap">internal look-up structures</see>, and forwards the notification.</item>
-    /// <item>On side B, the <see cref="IdFilteringNotificationHandler"/> suppresses the notification.</item>
+    /// <item>On side B, the <see cref="IdFilteringNotificationFilter"/> suppresses the notification.</item>
     /// </list>
-    public static IConnectingNotificationHandler Create(
+    public static INotificationHandler Create(
         IForest localForest,
         SharedNodeMap sharedNodeMap,
         object? sender
@@ -77,35 +77,31 @@ public static class ForestReplicator
             (filter, s) => new RemoteReplicator(localForest, sharedNodeMap, filter, s)
         );
 
-        var result = new CompositeNotificationHandler(parts,
-            sender ?? $"Composite of {nameof(ForestReplicator)} {localForest}");
+        var result = new MultipartNotificationHandler(parts,
+            sender ?? $"Multipart of {nameof(ForestReplicator)} {localForest}");
 
         return result;
     }
 
-    /// <inheritdoc cref="Create(LionWeb.Core.M1.IForest,LionWeb.Core.Notification.SharedNodeMap,object?)"/>
-    public static IConnectingNotificationHandler Create(IForest localForest, object? sender = null) => 
-        Create(localForest, new SharedNodeMap(), sender);
-    
-    public static List<IConnectingNotificationHandler> CreateInternal(
+    public static List<INotificationHandler> CreateInternal(
         IForest localForest,
         SharedNodeMap sharedNodeMap,
         object? sender,
-        Func<IdFilteringNotificationHandler, object, RemoteReplicator> remoteNotificationReplicator
+        Func<IdFilteringNotificationFilter, object, RemoteReplicator> remoteNotificationReplicator
     )
     {
         var internalSender = sender ?? localForest;
-        var filter = new IdFilteringNotificationHandler(internalSender);
+        var filter = new IdFilteringNotificationFilter(internalSender);
         var remoteReplicator = remoteNotificationReplicator(filter, internalSender);
         var localReplicator = new LocalReplicator(localForest, sharedNodeMap, internalSender);
 
-        var result = new List<IConnectingNotificationHandler> { remoteReplicator, filter };
+        var result = new List<INotificationHandler> { remoteReplicator, filter };
 
-        var forestHandler = localForest.GetNotificationHandler();
-        if (forestHandler == null)
+        var forestSender = localForest.GetNotificationSender();
+        if (forestSender == null)
             return result;
 
-        forestHandler.ConnectTo(localReplicator);
+        forestSender.ConnectTo(localReplicator);
         localReplicator.ConnectTo(filter);
 
         return result;

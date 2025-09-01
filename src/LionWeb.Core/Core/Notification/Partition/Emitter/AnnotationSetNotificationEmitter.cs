@@ -56,7 +56,7 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            InitiateNotification(new AnnotationAddedNotification(DestinationParent, added.Element,
+                            ProduceNotification(new AnnotationAddedNotification(DestinationParent, added.Element,
                                 added.RightIndex, GetNotificationId()));
                             break;
 
@@ -64,8 +64,8 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
                             var notificationId = GetNotificationId();
                             var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, added.RightIndex,
                                 added.Element, old.Parent, old.Index, notificationId);
-                            RaiseOriginMoveNotification(old, notification);
-                            InitiateNotification(notification);
+                            ProduceOriginMoveNotification(old, notification);
+                            ProduceNotification(notification);
                             break;
 
 
@@ -76,12 +76,12 @@ public class AnnotationSetNotificationEmitter : AnnotationNotificationEmitterBas
                     break;
 
                 case ListMoved<INode> moved:
-                    InitiateNotification(new AnnotationMovedInSameParentNotification(moved.RightIndex, moved.LeftElement,
+                    ProduceNotification(new AnnotationMovedInSameParentNotification(moved.RightIndex, moved.LeftElement,
                         DestinationParent, moved.LeftIndex, GetNotificationId()));
                     break;
 
                 case ListDeleted<INode> deleted:
-                    InitiateNotification(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,
+                    ProduceNotification(new AnnotationDeletedNotification(deleted.Element, DestinationParent, deleted.LeftIndex,
                         GetNotificationId()));
                     break;
             }

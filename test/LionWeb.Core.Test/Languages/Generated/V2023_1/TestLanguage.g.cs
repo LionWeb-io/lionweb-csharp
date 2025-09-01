@@ -5,6 +5,8 @@
 #pragma warning disable 1591
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.TestLanguage;
+
+using Core.Notification.Pipe;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
@@ -407,13 +409,13 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 
 	public DataTypeTestConcept(string id) : base(id)
 	{
-		_notificationHandler = new PartitionNotificationHandler(this);
+		_notificationHandler = new PartitionNotificationProducer(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.DataTypeTestConcept;
-	private readonly IPartitionNotificationHandler _notificationHandler;
-	public IPartitionNotificationHandler? GetNotificationHandler() => _notificationHandler;
+	private readonly IPartitionNotificationProducer _notificationHandler;
+	public INotificationSender? GetNotificationSender() => _notificationHandler;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -937,13 +939,13 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 	public LinkTestConcept(string id) : base(id)
 	{
-		_notificationHandler = new PartitionNotificationHandler(this);
+		_notificationHandler = new PartitionNotificationProducer(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.LinkTestConcept;
-	private readonly IPartitionNotificationHandler _notificationHandler;
-	public IPartitionNotificationHandler? GetNotificationHandler() => _notificationHandler;
+	private readonly IPartitionNotificationProducer _notificationHandler;
+	public INotificationSender? GetNotificationSender() => _notificationHandler;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{

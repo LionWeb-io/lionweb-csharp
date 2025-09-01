@@ -17,9 +17,11 @@
 
 namespace LionWeb.Core.Test.Notification;
 
-using Core.Notification.Handler;
+using Core.Notification;
+using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
+using System.Reflection;
 using Comparer = Core.Utilities.Comparer;
 
 public abstract class NotificationTestsBase
@@ -35,3 +37,23 @@ public abstract class NotificationTestsBase
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
 }
+
+public static class NotificationExtensions
+{
+    public static void Subscribe<T>(this INotificationSender sender, Action<object?, T> handler) => 
+        sender.ConnectTo(new FilteredReceiver<T>(handler));
+}
+
+internal class FilteredReceiver<T>(Action<object?, T> handler) : INotificationReceiver
+{
+    public void Dispose() { }
+
+    public bool Handles(params Type[] notificationTypes) =>
+        notificationTypes.Any(t => typeof(T).IsAssignableFrom(t));
+
+    public void Receive(INotificationSender correspondingSender, INotification notification)
+    {
+        if (notification is T t)
+            handler.Invoke(correspondingSender, t);
+    }
+} 

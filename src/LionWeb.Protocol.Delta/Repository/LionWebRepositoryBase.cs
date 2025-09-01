@@ -21,7 +21,7 @@ using Core;
 using Core.M1;
 using Core.M3;
 using Core.Notification;
-using Core.Notification.Handler;
+using Core.Notification.Pipe;
 
 public abstract class LionWebRepositoryBase<T> : IDisposable
 {
@@ -29,7 +29,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
     protected readonly IRepositoryConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
 
-    protected readonly IConnectingNotificationHandler _replicator;
+    protected readonly INotificationHandler _replicator;
 
     private long _nextFreeNodeId = 0;
 
@@ -47,7 +47,7 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
         SharedNodeMap = new();
         _replicator = RewriteForestReplicator.Create(forest, SharedNodeMap, _name);
 
-        _replicator.ConnectTo(new LocalNotificationHandler(name, this));
+        _replicator.ConnectTo(new LocalNotificationReceiver(name, this));
 
         _connector.ReceiveFromClient += OnReceiveFromClient;
     }
@@ -68,10 +68,10 @@ public abstract class LionWebRepositoryBase<T> : IDisposable
 
     #region Local
 
-    private class LocalNotificationHandler(object? sender, LionWebRepositoryBase<T> repository)
-        : IReceivingNotificationHandler
+    private class LocalNotificationReceiver(object? sender, LionWebRepositoryBase<T> repository)
+        : INotificationReceiver
     {
-        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) =>
+        public void Receive(INotificationSender correspondingSender, INotification notification) =>
             repository.SendNotificationToAllClients(sender, notification);
 
         public void Dispose() { }

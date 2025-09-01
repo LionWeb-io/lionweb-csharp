@@ -15,10 +15,10 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
-internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotification> handler)
-    : IReceivingNotificationHandler where TNotification : INotification
+internal class NativeEventNotificationReceiver<TNotification>(EventHandler<TNotification> handler)
+    : INotificationReceiver where TNotification : INotification
 {
     public void Dispose()
     {
@@ -29,9 +29,9 @@ internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotif
         throw new NotImplementedException();
 
     /// <inheritdoc />
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) 
+    public void Receive(INotificationSender correspondingSender, INotification notification) 
     {
         if (notification is TNotification n)
-            handler.Invoke(correspondingHandler, n);
+            handler.Invoke(correspondingSender, n);
     }
 }

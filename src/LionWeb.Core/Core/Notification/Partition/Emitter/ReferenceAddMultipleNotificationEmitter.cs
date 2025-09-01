@@ -49,7 +49,7 @@ public class ReferenceAddMultipleNotificationEmitter<T> : ReferenceMultipleNotif
         foreach (var node in SafeNodes)
         {
             IReferenceTarget newTarget = new ReferenceTarget(null, node);
-            InitiateNotification(new ReferenceAddedNotification(DestinationParent, Reference, index++, newTarget,
+            ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, index++, newTarget,
                 GetNotificationId()));
         }
     }

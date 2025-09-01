@@ -17,18 +17,15 @@
 
 namespace LionWeb.Core.Notification.Forest;
 
-using Handler;
+using Pipe;
 
-/// Provides notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-/// Raises notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-public interface IForestNotificationHandler : IInboundNotificationHandler;
+/// Produces notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
+public interface IForestNotificationProducer : INotificationProducer;
 
-/// Forwards all <see cref="IInboundNotificationHandler.InitiateNotification">initiated</see> notifications
-/// unchanged to <i>following</i> notification handler,
-/// and to EventHandlers <see cref="ModelNotificationHandlerBase{TNotification}.Subscribe{TSubscribedNotification}">subscribed</see>
-/// to specific notifications.
-public class ForestNotificationHandler(object? sender)
-    : ModelNotificationHandlerBase<IForestNotification>(sender), IForestNotificationHandler
+/// Forwards all <see cref="INotificationProducer.ProduceNotification">produced</see> notifications
+/// unchanged to <i>following</i> notification pipe.
+public class ForestNotificationProducer(object? sender)
+    : ModelNotificationProducerBase<IForestNotification>(sender), IForestNotificationProducer
 {
     /// <inheritdoc />
     protected override void Send(INotification notification)
@@ -36,7 +33,7 @@ public class ForestNotificationHandler(object? sender)
         switch (notification)
         {
             case IForestNotification f:
-                SendWithSender(f.Partition.GetNotificationHandler(), notification);
+                SendWithSender(f.Partition.GetNotificationSender(), notification);
                 return;
             default:
                 throw new NotImplementedException();

@@ -18,10 +18,10 @@
 namespace LionWeb.Protocol.Delta;
 
 using Core.Notification;
-using Core.Notification.Handler;
+using Core.Notification.Pipe;
 using Message;
 
-public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationHandlerBase(null), IInboundNotificationHandler
+public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationPipeBase(null), INotificationProducer
     where TContent : IDeltaContent
 {
     /// <inheritdoc />
@@ -35,7 +35,7 @@ public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationHandle
     public void Receive(TContent deltaContent)
     {
         var notification = Map(deltaContent);
-        InitiateNotification(notification);
+        ProduceNotification(notification);
     }
 
     protected abstract INotification Map(TContent content);
@@ -43,6 +43,6 @@ public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationHandle
     #endregion
 
     /// <inheritdoc />
-    public void InitiateNotification(INotification notification) =>
+    public void ProduceNotification(INotification notification) =>
         Send(notification);
 }

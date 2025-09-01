@@ -15,16 +15,15 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
-/// Forwards all <see cref="InitiateNotification">initiated</see> notifications unchanged to <i>following</i> notification handlers,
-/// and to EventHandlers <see cref="Subscribe{TSubscribedNotification}">subscribed</see> to specific notifications.
-public abstract class ModelNotificationHandlerBase<TNotification>(object? sender)
-    : NotificationHandlerBase(sender), IInboundNotificationHandler
+/// Forwards all <see cref="ProduceNotification">produced</see> notifications unchanged to <i>following</i> notification pipes.
+public abstract class ModelNotificationProducerBase<TNotification>(object? sender)
+    : NotificationPipeBase(sender), INotificationProducer
     where TNotification : INotification
 {
     /// <inheritdoc />
-    public void InitiateNotification(INotification notification) =>
+    public void ProduceNotification(INotification notification) =>
         Send(notification);
 
     /// Registers <paramref name="handler"/> to be notified of notifications compatible with <typeparamref name="TSubscribedNotification"/>.
@@ -35,7 +34,7 @@ public abstract class ModelNotificationHandlerBase<TNotification>(object? sender
     /// </typeparam> 
     public void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
         where TSubscribedNotification : class, TNotification =>
-        ConnectTo(new NativeEventNotificationHandler<TSubscribedNotification>(handler));
+        ConnectTo(new NativeEventNotificationReceiver<TSubscribedNotification>(handler));
 
     /// Unregisters <paramref name="handler"/> from notification of notifications.
     /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 

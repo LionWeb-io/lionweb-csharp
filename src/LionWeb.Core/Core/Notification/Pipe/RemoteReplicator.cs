@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
 using Forest;
 using M1;
@@ -30,17 +30,17 @@ using System.Diagnostics;
 /// Example: We receive a <see cref="PropertyAddedNotification" /> for a node that we know <i>locally</i>.
 /// This class adds the same property value to the <i>locally</i> known node.
 /// </para>
-public class RemoteReplicator : NotificationHandlerBase, IConnectingNotificationHandler
+public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 {
     private readonly IForest? _localForest;
 
     private readonly SharedNodeMap _sharedNodeMap;
-    protected readonly IdFilteringNotificationHandler Filter;
+    protected readonly IdFilteringNotificationFilter Filter;
 
     public RemoteReplicator(
         IForest? localForest,
         SharedNodeMap sharedNodeMap,
-        IdFilteringNotificationHandler filter,
+        IdFilteringNotificationFilter filter,
         object? sender) : base(sender)
     {
         _localForest = localForest;
@@ -49,16 +49,16 @@ public class RemoteReplicator : NotificationHandlerBase, IConnectingNotification
     }
 
     /// <inheritdoc />
-    public void Receive(ISendingNotificationHandler notificationHandler, INotification notification)
+    public void Receive(INotificationSender correspondingSender, INotification notification)
     {
         Debug.WriteLine($"processing notification {notification.NotificationId}");
         switch (notification)
         {
             case PartitionAddedNotification a:
-                OnRemoteNewPartition(notificationHandler, a);
+                OnRemoteNewPartition(correspondingSender, a);
                 break;
             case PartitionDeletedNotification a:
-                OnRemotePartitionDeleted(notificationHandler, a);
+                OnRemotePartitionDeleted(correspondingSender, a);
                 break;
             case PropertyAddedNotification e:
                 OnRemotePropertyAdded(e);
@@ -121,20 +121,18 @@ public class RemoteReplicator : NotificationHandlerBase, IConnectingNotification
 
     #region Partitions
 
-    private void OnRemoteNewPartition(ISendingNotificationHandler notificationHandler,
-        PartitionAddedNotification partitionAdded) =>
+    private void OnRemoteNewPartition(INotificationSender correspondingSender, PartitionAddedNotification partitionAdded) =>
         SuppressNotificationForwarding(partitionAdded, () =>
         {
             var newPartition = partitionAdded.NewPartition;
             _localForest?.AddPartitions([newPartition], partitionAdded.NotificationId);
-            notificationHandler.ConnectTo(this);
+            correspondingSender.ConnectTo(this);
         });
 
-    private void OnRemotePartitionDeleted(ISendingNotificationHandler notificationHandler,
-        PartitionDeletedNotification partitionDeleted) =>
+    private void OnRemotePartitionDeleted(INotificationSender correspondingSender, PartitionDeletedNotification partitionDeleted) =>
         SuppressNotificationForwarding(partitionDeleted, () =>
         {
-            notificationHandler.Unsubscribe(this);
+            correspondingSender.Unsubscribe(this);
             var localPartition = (IPartitionInstance?)LookupOpt(partitionDeleted.DeletedPartition.GetId());
             if (localPartition != null)
                 _localForest?.RemovePartitions([localPartition], partitionDeleted.NotificationId);
@@ -459,7 +457,7 @@ public class RemoteReplicator : NotificationHandlerBase, IConnectingNotification
     private INode? LookupOpt(NodeId nodeId) =>
         _sharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
 
-    /// Uses <see cref="IdFilteringNotificationHandler"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
+    /// Uses <see cref="IdFilteringNotificationFilter"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
     protected virtual void SuppressNotificationForwarding(INotification notification, Action action)
     {
         var notificationId = notification.NotificationId;

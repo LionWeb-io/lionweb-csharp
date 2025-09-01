@@ -17,11 +17,10 @@
 
 namespace LionWeb.Core.Notification.Partition;
 
-using Handler;
+using Pipe;
 
-/// Provides notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-/// Raises notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
-public interface IPartitionNotificationHandler : IInboundNotificationHandler
+/// Produces notifications about <see cref="INode">nodes</see> and their <see cref="Feature">features</see>.
+public interface IPartitionNotificationProducer : INotificationProducer
 {
     INotificationId CreateNotificationId();
 
@@ -40,12 +39,10 @@ public interface IPartitionNotificationHandler : IInboundNotificationHandler
         where TSubscribedNotification : class, IPartitionNotification;
 }
 
-/// Forwards all <see cref="IInboundNotificationHandler.InitiateNotification">initiated</see> notifications
-/// unchanged to <i>following</i> notification handlers,
-/// and to EventHandlers <see cref="ModelNotificationHandlerBase{TNotification}.Subscribe{TSubscribedNotification}">subscribed</see>
-/// to specific notifications.
-public class PartitionNotificationHandler(object? sender)
-    : ModelNotificationHandlerBase<IPartitionNotification>(sender), IPartitionNotificationHandler
+/// Forwards all <see cref="INotificationProducer.ProduceNotification">initiated</see> notifications
+/// unchanged to <i>following</i> notification pipes.
+public class PartitionNotificationProducer(object? sender)
+    : ModelNotificationProducerBase<IPartitionNotification>(sender), IPartitionNotificationProducer
 {
     private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(sender);
 

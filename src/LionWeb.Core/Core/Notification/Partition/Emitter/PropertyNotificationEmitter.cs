@@ -50,15 +50,15 @@ public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INod
         switch (_oldValue, _newValue)
         {
             case (null, { } v):
-                InitiateNotification(new PropertyAddedNotification(DestinationParent, _property, v,
+                ProduceNotification(new PropertyAddedNotification(DestinationParent, _property, v,
                     GetNotificationId()));
                 break;
             case ({ } o, null):
-                InitiateNotification(new PropertyDeletedNotification(DestinationParent, _property, o,
+                ProduceNotification(new PropertyDeletedNotification(DestinationParent, _property, o,
                     GetNotificationId()));
                 break;
             case ({ } o, { } n):
-                InitiateNotification(new PropertyChangedNotification(DestinationParent, _property, n, o,
+                ProduceNotification(new PropertyChangedNotification(DestinationParent, _property, n, o,
                     GetNotificationId()));
                 break;
         }

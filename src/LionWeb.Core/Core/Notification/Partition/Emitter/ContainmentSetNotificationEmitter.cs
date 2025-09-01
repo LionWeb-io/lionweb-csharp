@@ -57,7 +57,7 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                     switch (NewValues[added.Element])
                     {
                         case null:
-                            InitiateNotification(new ChildAddedNotification(DestinationParent, added.Element, Containment,
+                            ProduceNotification(new ChildAddedNotification(DestinationParent, added.Element, Containment,
                                 added.RightIndex, GetNotificationId()));
                             break;
 
@@ -65,13 +65,13 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                             var notificationId = GetNotificationId();
                             var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment,
                                 added.RightIndex, added.Element, old.Parent, old.Containment, old.Index, notificationId);
-                            RaiseOriginMoveNotification(old, notification);
-                            InitiateNotification(notification);
+                            ProduceOriginMoveNotification(old, notification);
+                            ProduceNotification(notification);
                             break;
 
 
                         case { } old when old.Parent == DestinationParent && old.Containment != Containment:
-                            InitiateNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment,
+                            ProduceNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment,
                                 added.RightIndex, added.Element, DestinationParent, old.Containment, old.Index,
                                 GetNotificationId()));
                             break;
@@ -83,11 +83,11 @@ public class ContainmentSetNotificationEmitter<T> : ContainmentMultipleNotificat
                     break;
 
                 case ListMoved<T> moved:
-                    InitiateNotification(new ChildMovedInSameContainmentNotification(moved.RightIndex, moved.LeftElement,
+                    ProduceNotification(new ChildMovedInSameContainmentNotification(moved.RightIndex, moved.LeftElement,
                         DestinationParent, Containment, moved.LeftIndex, GetNotificationId()));
                     break;
                 case ListDeleted<T> deleted:
-                    InitiateNotification(new ChildDeletedNotification(deleted.Element, DestinationParent, Containment,
+                    ProduceNotification(new ChildDeletedNotification(deleted.Element, DestinationParent, Containment,
                         deleted.LeftIndex, GetNotificationId()));
                     break;
             }

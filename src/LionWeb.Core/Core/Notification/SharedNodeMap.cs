@@ -21,7 +21,7 @@ using M1;
 using System.Diagnostics.CodeAnalysis;
 
 /// <see cref="NodeId">NodeId</see> -&gt; <see cref="IReadableNode"/> mapping,
-/// shared between all notification handlers in one client or repository.  
+/// shared between all notification pipes in one client or repository.  
 public class SharedNodeMap : IDisposable
 {
     private readonly Dictionary<NodeId, IReadableNode> _map = [];

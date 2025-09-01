@@ -19,7 +19,7 @@ namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
 using Core.Notification.Forest;
-using Core.Notification.Handler;
+using Core.Notification.Pipe;
 using Core.Notification.Partition;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
@@ -36,7 +36,7 @@ public class NotificationApiTests : NotificationTestsBase
         var partition = new Geometry("geo");
 
         int notificationCount = 0;
-        var sender = partition.GetNotificationHandler();
+        var sender = partition.GetNotificationSender();
         sender?.Subscribe<IPartitionNotification>((_, notification) =>
         {
             notificationCount++;
@@ -50,12 +50,12 @@ public class NotificationApiTests : NotificationTestsBase
 
 
     [TestMethod]
-    public void ReceiveNotifications_from_partition_via_connected_handlers()
+    public void ReceiveNotifications_from_partition_via_connected_pipes()
     {
         var partition = new Geometry("geo");
         var receiver = new Observer();
 
-        partition.GetNotificationHandler()?.ConnectTo(receiver);
+        partition.GetNotificationSender()?.ConnectTo(receiver);
 
         partition.Documentation = new Documentation("added");
 
@@ -68,7 +68,7 @@ public class NotificationApiTests : NotificationTestsBase
         var forest = new Forest();
         var receiver = new Observer();
 
-        forest.GetNotificationHandler().ConnectTo(receiver);
+        forest.GetNotificationSender().ConnectTo(receiver);
 
         var partition = new Geometry("geo");
         forest.AddPartitions([partition]);
@@ -85,8 +85,8 @@ public class NotificationApiTests : NotificationTestsBase
         var forestReceiver = new Observer();
         var partitionReceiver = new Observer();
 
-        forest.GetNotificationHandler().ConnectTo(forestReceiver);
-        partition.GetNotificationHandler()?.ConnectTo(partitionReceiver);
+        forest.GetNotificationSender().ConnectTo(forestReceiver);
+        partition.GetNotificationSender()?.ConnectTo(partitionReceiver);
 
         forest.AddPartitions([partition]);
         partition.Documentation = new Documentation("added");
@@ -107,7 +107,7 @@ public class NotificationApiTests : NotificationTestsBase
         var compositor = new NotificationCompositor("compositor");
         var counter = new PartitionEventCounter();
 
-        partition.GetNotificationHandler()?.ConnectTo(compositor);
+        partition.GetNotificationSender()?.ConnectTo(compositor);
         compositor.ConnectTo(counter);
 
         var composite = compositor.Push();
@@ -124,7 +124,7 @@ public class NotificationApiTests : NotificationTestsBase
     }
 
     [TestMethod]
-    public void CountNotificationTypes_pipeline_handlers()
+    public void CountNotificationTypes_pipeline_pipes()
     {
         var partition = new Geometry("geo");
 
@@ -134,30 +134,31 @@ public class NotificationApiTests : NotificationTestsBase
         var allNotificationCounter = new NotificationCounter();
 
         // partition -> compositor -> raw -> composite -> all
-        partition.GetNotificationHandler()?.ConnectTo(compositor);
+        partition.GetNotificationSender()?.ConnectTo(compositor);
         compositor.ConnectTo(rawNotificationCounter);
         rawNotificationCounter.ConnectTo(compositeNotificationCounter);
         compositeNotificationCounter.ConnectTo(allNotificationCounter);
-        
+
         partition.AddShapes([new Line("l")]);
-        
+
         _ = compositor.Push();
 
         partition.Documentation = new Documentation("documentation") { Text = "hello" };
         partition.AddShapes([new Circle("c1")]);
-        
+
         compositor.Pop(true);
 
         partition.AddShapes([new Circle("c2")]);
-        
-        Assert.AreEqual(allNotificationCounter.Count, rawNotificationCounter.Count + compositeNotificationCounter.Count);
+
+        Assert.AreEqual(allNotificationCounter.Count,
+            rawNotificationCounter.Count + compositeNotificationCounter.Count);
         Assert.AreEqual(3, allNotificationCounter.Count);
         Assert.AreEqual(2, rawNotificationCounter.Count);
         Assert.AreEqual(1, compositeNotificationCounter.Count);
     }
-    
+
     [TestMethod]
-    public void CountNotificationTypes_fanout_handlers()
+    public void CountNotificationTypes_fanout_pipes()
     {
         var partition = new Geometry("geo");
 
@@ -165,63 +166,64 @@ public class NotificationApiTests : NotificationTestsBase
         var compositeNotificationCounter = new CompositeNotificationCounter();
         var rawNotificationCounter = new RawNotificationCounter();
         var allNotificationCounter = new NotificationCounter();
-        
+
         // partition -> compositor -> raw | composite | all
-        partition.GetNotificationHandler()?.ConnectTo(compositor);
+        partition.GetNotificationSender()?.ConnectTo(compositor);
         compositor.ConnectTo(rawNotificationCounter);
         compositor.ConnectTo(compositeNotificationCounter);
         compositor.ConnectTo(allNotificationCounter);
-        
+
         partition.AddShapes([new Line("l")]);
-        
+
         _ = compositor.Push();
 
         partition.Documentation = new Documentation("documentation") { Text = "hello" };
         partition.AddShapes([new Circle("c1")]);
-        
+
         compositor.Pop(true);
 
         partition.AddShapes([new Circle("c2")]);
-        
-        Assert.AreEqual(allNotificationCounter.Count, rawNotificationCounter.Count + compositeNotificationCounter.Count);
+
+        Assert.AreEqual(allNotificationCounter.Count,
+            rawNotificationCounter.Count + compositeNotificationCounter.Count);
         Assert.AreEqual(3, allNotificationCounter.Count);
         Assert.AreEqual(2, rawNotificationCounter.Count);
         Assert.AreEqual(1, compositeNotificationCounter.Count);
     }
-    
+
     [TestMethod]
     [Ignore("introduces cycle")]
-    public void CountNotificationTypes_cycle_handlers()
+    public void CountNotificationTypes_cycle_pipes()
     {
         var partition = new Geometry("geo");
 
         var compositor = new NotificationCompositor("compositor");
         var compositeNotificationCounter = new CompositeNotificationCounter();
-        
+
         // partition -> composite -> compositor -> composite 
-        partition.GetNotificationHandler()?.ConnectTo(compositeNotificationCounter);
+        partition.GetNotificationSender()?.ConnectTo(compositeNotificationCounter);
         compositeNotificationCounter.ConnectTo(compositor);
         compositor.ConnectTo(compositeNotificationCounter);
-        
+
         partition.AddShapes([new Line("l")]);
-        
+
         _ = compositor.Push();
 
         partition.Documentation = new Documentation("documentation") { Text = "hello" };
         partition.AddShapes([new Circle("c1")]);
-        
+
         compositor.Pop(true);
 
         partition.AddShapes([new Circle("c2")]);
-        
+
         Assert.AreEqual(1, compositeNotificationCounter.Count);
     }
 
-    private class CompositeNotificationCounter() : NotificationHandlerBase(null), IConnectingNotificationHandler
+    private class CompositeNotificationCounter() : NotificationPipeBase(null), INotificationHandler
     {
         public int Count { get; private set; }
 
-        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+        public void Receive(INotificationSender correspondingSender, INotification notification)
         {
             if (notification is CompositeNotification)
             {
@@ -232,11 +234,11 @@ public class NotificationApiTests : NotificationTestsBase
         }
     }
 
-    private class RawNotificationCounter() : NotificationHandlerBase(null), IConnectingNotificationHandler
+    private class RawNotificationCounter() : NotificationPipeBase(null), INotificationHandler
     {
         public int Count { get; private set; }
 
-        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+        public void Receive(INotificationSender correspondingSender, INotification notification)
         {
             if (notification is not CompositeNotification)
             {
@@ -248,11 +250,11 @@ public class NotificationApiTests : NotificationTestsBase
     }
 
 
-    private class NotificationCounter() : NotificationHandlerBase(null), IConnectingNotificationHandler
+    private class NotificationCounter() : NotificationPipeBase(null), INotificationHandler
     {
         public int Count { get; private set; }
 
-        public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+        public void Receive(INotificationSender correspondingSender, INotification notification)
         {
             Count++;
             Send(notification);
@@ -270,8 +272,8 @@ public class NotificationApiTests : NotificationTestsBase
         var partition = new Geometry("geo") { Shapes = [circle] };
         var clone = Clone(partition);
 
-        var replicator = PartitionReplicator.Create(clone, partition.GetId());
-        partition.GetNotificationHandler()?.ConnectTo(replicator);
+        var replicator = PartitionReplicator.Create(clone, new(), partition.GetId());
+        partition.GetNotificationSender()?.ConnectTo(replicator);
 
         circle.Name = "Hello";
 
@@ -285,8 +287,8 @@ public class NotificationApiTests : NotificationTestsBase
         var originalForest = new Forest();
         var cloneForest = new Forest();
 
-        var replicator = ForestReplicator.Create(cloneForest);
-        originalForest.GetNotificationHandler().ConnectTo(replicator);
+        var replicator = ForestReplicator.Create(cloneForest, new(), null);
+        originalForest.GetNotificationSender().ConnectTo(replicator);
 
         var moved = new Documentation("moved");
         var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
@@ -310,14 +312,14 @@ public class NotificationApiTests : NotificationTestsBase
     protected override Geometry CreateReplicator(Geometry node) => throw new NotImplementedException();
 }
 
-internal class Observer : IReceivingNotificationHandler
+internal class Observer : INotificationReceiver
 {
     public int NotificationCount { get; private set; }
     public void Dispose() => throw new NotImplementedException();
 
     public bool Handles(params Type[] notificationTypes) => true;
 
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+    public void Receive(INotificationSender correspondingSender, INotification notification)
     {
         NotificationCount++;
         Console.WriteLine(notification);
