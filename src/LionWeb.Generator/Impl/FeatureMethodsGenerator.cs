@@ -237,7 +237,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private LocalDeclarationStatementSyntax SetContainmentEmitterVariable(Containment containment) =>
         Variable(
             "emitter",
-            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType())),
+            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType(), writeable:true)),
             NewCall([
                 MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("notificationId")
             ])
@@ -252,12 +252,17 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             ])
         );
 
-    private BinaryPatternSyntax NullOrTypePattern(Feature feature) =>
-        BinaryPattern(
+    private BinaryPatternSyntax NullOrTypePattern(Feature feature)
+    {
+        var type = feature is Containment ? AsType(feature.GetFeatureType(), true, writeable: true): AsType(feature.GetFeatureType(), true);
+        var binaryPatternSyntax = BinaryPattern(
             SyntaxKind.OrPattern,
             ConstantPattern(Null()),
-            TypePattern(AsType(feature.GetFeatureType(), true))
+            TypePattern(type)
         );
+
+        return binaryPatternSyntax;
+    }
 
     private DeclarationPatternSyntax AsTypePattern(Feature feature) =>
         DeclarationPattern(
@@ -306,16 +311,25 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear")))
         );
 
-    private CastExpressionSyntax CastValueType(Feature feature) =>
-        CastExpression(NullableType(AsType(feature.GetFeatureType(), true)), IdentifierName("value"));
+    private CastExpressionSyntax CastValueType(Feature feature)
+    {
+        var type = feature is Containment ? AsType(feature.GetFeatureType(), true, writeable: true): AsType(feature.GetFeatureType(), true);
+        var castExpressionSyntax = CastExpression(NullableType(type), IdentifierName("value"));
+        return castExpressionSyntax;
+    }
 
-    private InvocationExpressionSyntax AsNodesCall(Link link) =>
-        InvocationExpression(
+    private InvocationExpressionSyntax AsNodesCall(Link link)
+    {
+        var type = link is Containment ? AsType(link.Type, true, writeable: true) : AsType(link.Type, true);
+        var invocationExpressionSyntax = InvocationExpression(
             MemberAccess(MetaProperty(link),
-                Generic("AsNodes", AsType(link.Type, true))
+                Generic("AsNodes", type)
             ),
             AsArguments([IdentifierName("value")])
         );
+
+        return invocationExpressionSyntax;
+    }
 
     #endregion
 
