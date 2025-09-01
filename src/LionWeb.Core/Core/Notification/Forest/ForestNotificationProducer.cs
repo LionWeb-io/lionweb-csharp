@@ -25,7 +25,7 @@ public interface IForestNotificationProducer : INotificationProducer;
 /// Forwards all <see cref="INotificationProducer.ProduceNotification">produced</see> notifications
 /// unchanged to <i>following</i> notification pipe.
 public class ForestNotificationProducer(object? sender)
-    : ModelNotificationProducerBase<IForestNotification>(sender), IForestNotificationProducer
+    : ModelNotificationProducerBase(sender), IForestNotificationProducer
 {
     /// <inheritdoc />
     protected override void Send(INotification notification)

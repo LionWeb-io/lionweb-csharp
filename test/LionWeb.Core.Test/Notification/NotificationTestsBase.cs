@@ -40,6 +40,7 @@ public abstract class NotificationTestsBase
 
 public static class NotificationExtensions
 {
+    // TODO: Replace by proper ConnectTo() calls
     public static void Subscribe<T>(this INotificationSender sender, Action<object?, T> handler) => 
         sender.ConnectTo(new FilteredReceiver<T>(handler));
 }

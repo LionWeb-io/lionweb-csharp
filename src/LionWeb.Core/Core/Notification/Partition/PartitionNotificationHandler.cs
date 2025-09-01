@@ -23,26 +23,12 @@ using Pipe;
 public interface IPartitionNotificationProducer : INotificationProducer
 {
     INotificationId CreateNotificationId();
-
-    /// Registers <paramref name="handler"/> to be notified of notifications compatible with <typeparamref name="TSubscribedNotification"/>.
-    /// <typeparam name="TSubscribedNotification">
-    /// Type of notifications <paramref name="handler"/> is interested in.
-    /// notifications raised by this publisher that are <i>not</i> compatible with <typeparamref name="TSubscribedNotification"/>
-    /// will <i>not</i> reach <paramref name="handler"/>.
-    /// </typeparam> 
-    void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
-        where TSubscribedNotification : class, IPartitionNotification;
-
-    /// Unregisters <paramref name="handler"/> from notification of notifications.
-    /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
-    void Unsubscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
-        where TSubscribedNotification : class, IPartitionNotification;
 }
 
 /// Forwards all <see cref="INotificationProducer.ProduceNotification">initiated</see> notifications
 /// unchanged to <i>following</i> notification pipes.
 public class PartitionNotificationProducer(object? sender)
-    : ModelNotificationProducerBase<IPartitionNotification>(sender), IPartitionNotificationProducer
+    : ModelNotificationProducerBase(sender), IPartitionNotificationProducer
 {
     private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(sender);
 

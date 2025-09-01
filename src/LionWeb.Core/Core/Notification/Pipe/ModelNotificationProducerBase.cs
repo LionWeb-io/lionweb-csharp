@@ -18,26 +18,10 @@
 namespace LionWeb.Core.Notification.Pipe;
 
 /// Forwards all <see cref="ProduceNotification">produced</see> notifications unchanged to <i>following</i> notification pipes.
-public abstract class ModelNotificationProducerBase<TNotification>(object? sender)
+public abstract class ModelNotificationProducerBase(object? sender)
     : NotificationPipeBase(sender), INotificationProducer
-    where TNotification : INotification
 {
     /// <inheritdoc />
     public void ProduceNotification(INotification notification) =>
         Send(notification);
-
-    /// Registers <paramref name="handler"/> to be notified of notifications compatible with <typeparamref name="TSubscribedNotification"/>.
-    /// <typeparam name="TSubscribedNotification">
-    /// Type of notifications <paramref name="handler"/> is interested in.
-    /// Notifications raised by this publisher that are <i>not</i> compatible with <typeparamref name="TSubscribedNotification"/>
-    /// will <i>not</i> reach <paramref name="handler"/>.
-    /// </typeparam> 
-    public void Subscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
-        where TSubscribedNotification : class, TNotification =>
-        ConnectTo(new NativeEventNotificationReceiver<TSubscribedNotification>(handler));
-
-    /// Unregisters <paramref name="handler"/> from notification of notifications.
-    /// Silently ignores calls for unsubscribed <paramref name="handler"/>. 
-    public void Unsubscribe<TSubscribedNotification>(EventHandler<TSubscribedNotification> handler)
-        where TSubscribedNotification : class, TNotification => throw new NotImplementedException();
 }

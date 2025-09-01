@@ -55,7 +55,7 @@ public interface INotificationSender : INotificationPipe
     /// </para>
     /// <paramref name="receiver"/> <see cref="INotificationReceiver.Receive">receives</see> all messages
     /// <see cref="INotificationSender.Send">sent</see> by this notification pipe.
-    internal void Subscribe(INotificationReceiver receiver);
+    protected internal void Subscribe(INotificationReceiver receiver);
 
     /// Unsubscribes <paramref name="receiver"/> from this.
     /// <para>
