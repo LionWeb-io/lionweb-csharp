@@ -216,7 +216,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
-        new List<MemberDeclarationSyntax> { SingleFeatureField(true), SingleOptionalFeatureProperty(true), TryGet(true) }
+        new List<MemberDeclarationSyntax>
+            {
+                SingleFeatureField(true), SingleOptionalFeatureProperty(true), TryGet(true)
+            }
             .Concat(
                 OptionalFeatureSetter([
                     SingleContainmentEmitterVariable(),
@@ -437,7 +440,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalMultiReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleLinkField(reference), MultipleLinkProperty(reference, AsReadOnlyCall(reference)), TryGetMultiple()
+            MultipleLinkField(reference),
+            MultipleLinkProperty(reference, AsReadOnlyCall(reference)), 
+            TryGetMultiple()
         }.Concat(
             LinkAdder(reference, [
                 SafeNodesVariable(),
