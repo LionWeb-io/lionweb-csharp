@@ -9,7 +9,6 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - tbd
 
 ### Added
-* Bug fix: generator is refactored to support correct type generation of language features with generic Node type 
 * Introduced `INotifiableNode`. Represents nodes that support notifications.
 * Introduced `INotification` to make a clear distinction between delta protocol-specific events and LionWeb internal event system.
 * Introduced `INotificationId`. Represents globally unique id of a notification.
@@ -46,6 +45,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added external languages to `DynamicLanguageCloner`.
 * Added convenience method `DynamicLanguageClonerExtensions.Clone(Language)`.
 ### Fixed
+* Bug fix: generator now generates correct type for features of builtin Node type
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
 * Use `[NotNullWhen]` instead of `[MaybeNullWhen]` attributes for _TryGet_-like out parameters.
