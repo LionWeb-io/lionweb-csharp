@@ -418,6 +418,9 @@ public class TestLanguagesDefinitions
         NamedLang = namedLang;
     }
 
+    /// <summary>
+    /// Features of this language are type of generic builtin Node type. 
+    /// </summary>
     private void CreateGeneralNodeLang()
     {
         var generalNodeLang = new DynamicLanguage("id-GeneralNodeLang", _lionWebVersion)
