@@ -71,11 +71,11 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             Link { Multiple: true } l =>
             [
                 AbstractMultipleLinkProperty(l),
-                AbstractLinkAdder(l)
+                AbstractLinkAdder(l, writeable: feature is Containment)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                AbstractLinkInserter(l)
+                AbstractLinkInserter(l, writeable: feature is Containment)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                AbstractLinkRemover(l)
+                AbstractLinkRemover(l, writeable: feature is Containment)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ],
             { Optional: false } =>
@@ -270,8 +270,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> RequiredMultiContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleLinkField(containment),
-            MultipleLinkProperty(containment, AsNonEmptyReadOnlyCall(containment))
+            MultipleLinkField(containment, writeable: true),
+            MultipleLinkProperty(containment, AsNonEmptyReadOnlyCall(containment), writeable:true)
                 .Xdoc(XdocRequiredMultipleLink(containment)),
             TryGetMultiple()
         }.Concat(
@@ -283,7 +283,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     RequiredAddRangeCall(containment),
                     EmitterNotifyCall(),
                     ReturnStatement(This())
-                ])
+                ], writeable: true)
                 .Select(a => XdocRequiredAdder(a, containment))
         ).Concat(
             LinkInserter(containment, [
@@ -296,7 +296,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     InsertRangeCall(containment),
                     EmitterNotifyCall(),
                     ReturnStatement(This())
-                ])
+                ], writeable: true)
                 .Select(i => XdocRequiredInserter(i, containment))
         ).Concat(
             LinkRemover(containment, [
@@ -305,7 +305,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     AssureNotClearingCall(containment),
                     RequiredRemoveSelfParentCall(containment),
                     ReturnStatement(This())
-                ])
+                ], writeable: true)
                 .Select(r => XdocRequiredRemover(r, containment))
         );
 
@@ -334,8 +334,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalMultiContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleLinkField(containment),
-            MultipleLinkProperty(containment, AsReadOnlyCall(containment)),
+            MultipleLinkField(containment, writeable: true),
+            MultipleLinkProperty(containment, AsReadOnlyCall(containment), writeable: true),
             TryGetMultiple()
         }.Concat(
             LinkAdder(containment, [
@@ -347,7 +347,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 OptionalAddRangeCall(containment),
                 EmitterNotifyCall(),
                 ReturnStatement(This())
-            ])
+            ], writeable: true)
         ).Concat(
             LinkInserter(containment, [
                 AssureInRangeCall(containment),
@@ -360,12 +360,12 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 InsertRangeCall(containment),
                 EmitterNotifyCall(),
                 ReturnStatement(This())
-            ])
+            ], writeable: true)
         ).Concat(
             LinkRemover(containment, [
                 OptionalRemoveSelfParentCall(containment),
                 ReturnStatement(This())
-            ])
+            ], writeable: true)
         );
 
     private LocalDeclarationStatementSyntax AddMultipleContainmentEmitterVariable(ExpressionSyntax index) =>
@@ -588,16 +588,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    private FieldDeclarationSyntax MultipleLinkField(Link link)
-    {
-        var type = link is Containment ? AsType(link.Type, writeable: true) : AsType(link.Type);
-        var fieldDeclarationSyntax = Field(FeatureField(link).ToString(), AsType(typeof(List<>), type),
-                Collection([])
-            )
+    private FieldDeclarationSyntax MultipleLinkField(Link link, bool writeable = false) =>
+        Field(FeatureField(link).ToString(), AsType(typeof(List<>), AsType(link.Type, writeable: writeable)),
+                Collection([]))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
-
-        return fieldDeclarationSyntax;
-    }
 
     private PropertyDeclarationSyntax SingleRequiredFeatureProperty(bool writeable = false) =>
         Property(FeatureProperty(feature).ToString(), AsType(feature.GetFeatureType(), writeable: writeable),
@@ -689,10 +683,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(feature));
 
-    private PropertyDeclarationSyntax MultipleLinkProperty(Link link, InvocationExpressionSyntax getter)
-    {
-        var type = link is Containment ? AsType(link.Type, writeable: true) : AsType(link.Type);
-        var propertyDeclarationSyntax = PropertyDeclaration(AsType(typeof(IReadOnlyList<>), type),
+    private PropertyDeclarationSyntax MultipleLinkProperty(Link link, InvocationExpressionSyntax getter, bool writeable = false) =>
+        PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(link.Type, writeable: writeable)),
                 Identifier(FeatureProperty(link).ToString()))
             .WithAccessorList(AccessorList(List([
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
@@ -711,9 +703,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(link));
-
-        return propertyDeclarationSyntax;
-    }
 
     private PropertyDeclarationSyntax AbstractMultipleLinkProperty(Link link) =>
         PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(link.Type)),
@@ -840,17 +829,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(feature));
 
-    private IEnumerable<MethodDeclarationSyntax> LinkRemover(Link link, List<StatementSyntax> body)
+    private IEnumerable<MethodDeclarationSyntax> LinkRemover(Link link, List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractLinkRemover(link)
+            AbstractLinkRemover(link, writeable: writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkRemover(link),
+                InterfaceDelegator(AbstractLinkRemover(link, writeable: writeable),
                     Call(LinkRemove(link).ToString(), IdentifierName("nodes"))
                 )
             );
@@ -858,12 +847,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         return result;
     }
 
-    private MethodDeclarationSyntax AbstractLinkRemover(Link link)
-    {
-        var type = link is Containment ? AsType(link.Type, writeable: true) :AsType(link.Type);
-        var methodDeclarationSyntax = Method(LinkRemove(link).ToString(), AsType(classifier),
+    private MethodDeclarationSyntax AbstractLinkRemover(Link link, bool writeable = false) =>
+        Method(LinkRemove(link).ToString(), AsType(classifier),
                 [
-                    Param("nodes", AsType(typeof(IEnumerable<>), type)),
+                    Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
                     ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
                 ]
             )
@@ -871,20 +858,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(link));
 
-        return methodDeclarationSyntax;
-    }
-
-    private IEnumerable<MethodDeclarationSyntax> LinkInserter(Link link, List<StatementSyntax> body)
+    private IEnumerable<MethodDeclarationSyntax> LinkInserter(Link link, List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractLinkInserter(link)
+            AbstractLinkInserter(link, writeable: writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkInserter(link),
+                InterfaceDelegator(AbstractLinkInserter(link, writeable: writeable),
                     Call(LinkInsert(link).ToString(), IdentifierName("index"), IdentifierName("nodes"))
                 )
             );
@@ -892,53 +876,43 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         return result;
     }
 
-    private MethodDeclarationSyntax AbstractLinkInserter(Link link)
-    {
-        var type = link is Containment ? AsType(link.Type, writeable: true) : AsType(link.Type);
-        var methodDeclarationSyntax = Method(LinkInsert(link).ToString(), AsType(classifier), [
+    private MethodDeclarationSyntax AbstractLinkInserter(Link link, bool writeable = false) =>
+        Method(LinkInsert(link).ToString(), AsType(classifier), [
                 Param("index", AsType(typeof(int))),
-                Param("nodes", AsType(typeof(IEnumerable<>), type)),
+                Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
                 ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(link));
 
-        return methodDeclarationSyntax;
-    }
-
-    private IEnumerable<MethodDeclarationSyntax> LinkAdder(Link link, List<StatementSyntax> body)
+    private IEnumerable<MethodDeclarationSyntax> LinkAdder(Link link, List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractLinkAdder(link)
+            AbstractLinkAdder(link, writeable: writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkAdder(link),
+                InterfaceDelegator(AbstractLinkAdder(link,  writeable: writeable),
                     Call(LinkAdd(link).ToString(), IdentifierName("nodes")))
             );
 
         return result;
     }
 
-    private MethodDeclarationSyntax AbstractLinkAdder(Link link)
-    {
-        var type = link is Containment ? AsType(link.Type, writeable: true) : AsType(link.Type);
-        var methodDeclarationSyntax = Method(LinkAdd(link).ToString(), AsType(classifier),
+    private MethodDeclarationSyntax AbstractLinkAdder(Link link, bool writeable = false) =>
+        Method(LinkAdd(link).ToString(), AsType(classifier),
                 [
-                    Param("nodes", AsType(typeof(IEnumerable<>), type)),
+                    Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
                     ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
                 ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(link));
-
-        return methodDeclarationSyntax;
-    }
 
 
     private ExpressionSyntax LinkInsert(Link link) =>

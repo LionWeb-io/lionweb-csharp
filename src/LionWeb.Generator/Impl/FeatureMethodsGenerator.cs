@@ -168,11 +168,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private List<StatementSyntax> GenSetInternalSingleOptionalLink(Link link) =>
     [
         IfStatement(
-            IsPatternExpression(IdentifierName("value"), NullOrTypePattern(link)),
+            IsPatternExpression(IdentifierName("value"), NullOrTypePattern(link, writeable: link is Containment)),
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link), IdentifierName("notificationId")]))),
+                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link, writeable: link is Containment), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
@@ -252,17 +252,12 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             ])
         );
 
-    private BinaryPatternSyntax NullOrTypePattern(Feature feature)
-    {
-        var type = feature is Containment ? AsType(feature.GetFeatureType(), true, writeable: true): AsType(feature.GetFeatureType(), true);
-        var binaryPatternSyntax = BinaryPattern(
+    private BinaryPatternSyntax NullOrTypePattern(Feature feature, bool writeable = false) =>
+        BinaryPattern(
             SyntaxKind.OrPattern,
             ConstantPattern(Null()),
-            TypePattern(type)
+            TypePattern(AsType(feature.GetFeatureType(), true, writeable: writeable))
         );
-
-        return binaryPatternSyntax;
-    }
 
     private DeclarationPatternSyntax AsTypePattern(Feature feature) =>
         DeclarationPattern(
@@ -279,16 +274,16 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         );
 
     private LocalDeclarationStatementSyntax EnumerableVar(Link link) =>
-        Variable("enumerable", Var(), AsNodesCall(link));
+        Variable("enumerable", Var(), AsNodesCall(link, writeable: link is Containment));
 
     private LocalDeclarationStatementSyntax EnumerableToListVar(Link link) =>
         Variable("enumerable", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link), IdentifierName("ToList")))
+            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: link is Containment), IdentifierName("ToList")))
         );
 
     private LocalDeclarationStatementSyntax SafeNodesVar(Link link) =>
         Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link), IdentifierName("ToList")))
+            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: link is Containment), IdentifierName("ToList")))
         );
 
     private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
@@ -311,19 +306,14 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear")))
         );
 
-    private CastExpressionSyntax CastValueType(Feature feature)
-    {
-        var type = feature is Containment ? AsType(feature.GetFeatureType(), true, writeable: true): AsType(feature.GetFeatureType(), true);
-        var castExpressionSyntax = CastExpression(NullableType(type), IdentifierName("value"));
-        return castExpressionSyntax;
-    }
+    private CastExpressionSyntax CastValueType(Feature feature, bool writeable = false) => 
+        CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)), IdentifierName("value"));
 
-    private InvocationExpressionSyntax AsNodesCall(Link link)
+    private InvocationExpressionSyntax AsNodesCall(Link link, bool writeable = false)
     {
-        var type = link is Containment ? AsType(link.Type, true, writeable: true) : AsType(link.Type, true);
         var invocationExpressionSyntax = InvocationExpression(
             MemberAccess(MetaProperty(link),
-                Generic("AsNodes", type)
+                Generic("AsNodes",  AsType(link.Type, true, writeable: writeable) )
             ),
             AsArguments([IdentifierName("value")])
         );
