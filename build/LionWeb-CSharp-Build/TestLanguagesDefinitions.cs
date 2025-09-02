@@ -19,6 +19,7 @@
 
 using Io.Lionweb.Mps.Specific;
 using LionWeb.Core;
+using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 
 // ReSharper disable SuggestVarOrType_SimpleTypes
@@ -419,7 +420,7 @@ public class TestLanguagesDefinitions
     }
 
     /// <summary>
-    /// Features of this language are type of generic builtin Node type. 
+    /// This language is used to test the generation of a language concept features of builtin <see cref="IBuiltInsLanguage.Node"/> type.
     /// </summary>
     private void CreateGeneralNodeLang()
     {
