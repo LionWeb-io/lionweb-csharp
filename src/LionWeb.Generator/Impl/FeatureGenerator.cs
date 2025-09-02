@@ -68,19 +68,15 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     public IEnumerable<MemberDeclarationSyntax> AbstractMembers() =>
         feature switch
         {
-            Link { Multiple: true } l =>
-            [
-                AbstractMultipleLinkProperty(l),
-                AbstractLinkAdder(l, writeable: feature is Containment)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                AbstractLinkInserter(l, writeable: feature is Containment)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                AbstractLinkRemover(l, writeable: feature is Containment)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-            ],
+            Containment { Multiple: true } c =>
+                AbstractLinkMembers(c, writeable: true),
+
+            Reference { Multiple: true } r =>
+                AbstractLinkMembers(r),
+ 
             { Optional: false } =>
             [
-                AbstractSingleRequiredFeatureProperty(),
+                AbstractSingleRequiredFeatureProperty(feature is Containment),
                 AbstractRequiredFeatureSetter(feature is Containment)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ],
@@ -92,6 +88,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ],
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
         };
+
+    private IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(Link link, bool writeable = false) =>
+    [
+        AbstractMultipleLinkProperty(link),
+        AbstractLinkAdder(link, writeable: writeable)
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+        AbstractLinkInserter(link, writeable: writeable)
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+        AbstractLinkRemover(link, writeable: writeable)
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+    ];
 
     private IEnumerable<MemberDeclarationSyntax> RequiredProperty(Property property)
     {
@@ -632,10 +639,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ("Multiple", (feature is Link { Multiple: true }).AsLiteral())
         ]);
 
-    private PropertyDeclarationSyntax AbstractSingleRequiredFeatureProperty()
-    {
-        var writable = feature is Containment;
-        return PropertyDeclaration(AsType(feature.GetFeatureType(), writeable: writable),
+    private PropertyDeclarationSyntax AbstractSingleRequiredFeatureProperty(bool writeable = false) =>
+        PropertyDeclaration(AsType(feature.GetFeatureType(), writeable: writeable),
                 Identifier(FeatureProperty(feature).ToString()))
             .WithAccessorList(AccessorList(List([
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
@@ -650,7 +655,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(feature));
-    }
 
     private PropertyDeclarationSyntax SingleOptionalFeatureProperty(bool writeable = false) =>
         Property(FeatureProperty(feature).ToString(),
