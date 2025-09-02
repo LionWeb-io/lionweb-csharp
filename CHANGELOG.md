@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - tbd
 
 ### Added
+* Bug fix: generator is refactored to support correct type generation of language features with generic Node type 
 * Introduced `INotifiableNode`. Represents nodes that support notifications.
 * Introduced `INotification` to make a clear distinction between delta protocol-specific events and LionWeb internal event system.
 * Introduced `INotificationId`. Represents globally unique id of a notification.
