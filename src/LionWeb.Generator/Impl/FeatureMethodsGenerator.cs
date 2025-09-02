@@ -237,7 +237,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private LocalDeclarationStatementSyntax SetContainmentEmitterVariable(Containment containment) =>
         Variable(
             "emitter",
-            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType(), writeable:true)),
+            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType(), writeable: true)),
             NewCall([
                 MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("notificationId")
             ])
@@ -306,14 +306,14 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear")))
         );
 
-    private CastExpressionSyntax CastValueType(Feature feature, bool writeable = false) => 
+    private CastExpressionSyntax CastValueType(Feature feature, bool writeable = false) =>
         CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)), IdentifierName("value"));
 
     private InvocationExpressionSyntax AsNodesCall(Link link, bool writeable = false)
     {
         var invocationExpressionSyntax = InvocationExpression(
             MemberAccess(MetaProperty(link),
-                Generic("AsNodes",  AsType(link.Type, true, writeable: writeable) )
+                Generic("AsNodes", AsType(link.Type, true, writeable: writeable))
             ),
             AsArguments([IdentifierName("value")])
         );
@@ -346,8 +346,8 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                         .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword))
                 ))),
             ExpressionStatement(InvocationExpression(
-            MemberAccess(IdentifierName("result"), IdentifierName("Add")),
-            AsArguments([MetaProperty(feature)])
+                MemberAccess(IdentifierName("result"), IdentifierName("Add")),
+                AsArguments([MetaProperty(feature)])
             ))
         );
 

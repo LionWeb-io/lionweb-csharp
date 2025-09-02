@@ -73,7 +73,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
             Reference { Multiple: true } r =>
                 AbstractLinkMembers(r),
- 
+
             { Optional: false } =>
             [
                 AbstractSingleRequiredFeatureProperty(feature is Containment),
@@ -129,7 +129,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             AsType(typeof(PropertyNotificationEmitter)),
             NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
-    
+
     private MethodDeclarationSyntax TryGet(bool writeable = false) =>
         Method(FeatureTryGet(feature), AsType(typeof(bool)),
                 [
@@ -179,7 +179,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     )
             ]));
 
-    
+
     private IEnumerable<MemberDeclarationSyntax> OptionalProperty(Property property) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }
             .Concat(
@@ -216,20 +216,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         XdocThrows("If set to null", AsType(typeof(InvalidValueException)));
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleContainment(Containment containment) =>
-        new List<MemberDeclarationSyntax>
-            {
-                SingleFeatureField(true), SingleOptionalFeatureProperty(true), TryGet(true)
-            }
+        new List<MemberDeclarationSyntax> { SingleFeatureField(true), SingleOptionalFeatureProperty(true), TryGet(true) }
             .Concat(
-            OptionalFeatureSetter([
-                SingleContainmentEmitterVariable(),
-                EmitterCollectOldDataCall(),
-                SetParentNullCall(containment),
-                AttachChildCall(),
-                AssignFeatureField(),
-                EmitterNotifyCall(),
-                ReturnStatement(This())
-            ], true));
+                OptionalFeatureSetter([
+                    SingleContainmentEmitterVariable(),
+                    EmitterCollectOldDataCall(),
+                    SetParentNullCall(containment),
+                    AttachChildCall(),
+                    AssignFeatureField(),
+                    EmitterNotifyCall(),
+                    ReturnStatement(This())
+                ], true));
 
     private LocalDeclarationStatementSyntax SingleContainmentEmitterVariable() =>
         Variable(
@@ -278,7 +275,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         new List<MemberDeclarationSyntax>
         {
             MultipleLinkField(containment, writeable: true),
-            MultipleLinkProperty(containment, AsNonEmptyReadOnlyCall(containment), writeable:true)
+            MultipleLinkProperty(containment, AsNonEmptyReadOnlyCall(containment), writeable: true)
                 .Xdoc(XdocRequiredMultipleLink(containment)),
             TryGetMultiple()
         }.Concat(
@@ -440,9 +437,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalMultiReference(Reference reference) =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleLinkField(reference),
-            MultipleLinkProperty(reference, AsReadOnlyCall(reference)),
-            TryGetMultiple()
+            MultipleLinkField(reference), MultipleLinkProperty(reference, AsReadOnlyCall(reference)), TryGetMultiple()
         }.Concat(
             LinkAdder(reference, [
                 SafeNodesVariable(),
@@ -749,7 +744,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private MethodDeclarationSyntax AbstractRequiredFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier),
                 [
-                    Param("value", AsType(feature.GetFeatureType(), writeable: writeable)), 
+                    Param("value", AsType(feature.GetFeatureType(), writeable: writeable)),
                     ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
                 ]
             )
@@ -773,7 +768,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
         return result;
     }
-    
+
     private IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
         XdocKeyed(ffeature)
             .Concat(XdocRemarks(ffeature));
@@ -900,7 +895,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkAdder(link,  writeable: writeable),
+                InterfaceDelegator(AbstractLinkAdder(link, writeable: writeable),
                     Call(LinkAdd(link).ToString(), IdentifierName("nodes")))
             );
 
