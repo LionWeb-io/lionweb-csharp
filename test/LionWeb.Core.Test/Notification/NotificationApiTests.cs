@@ -19,8 +19,8 @@ namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
 using Core.Notification.Forest;
-using Core.Notification.Pipe;
 using Core.Notification.Partition;
+using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
@@ -68,7 +68,7 @@ public class NotificationApiTests : NotificationTestsBase
         var forest = new Forest();
         var receiver = new Observer();
 
-        forest.GetNotificationSender().ConnectTo(receiver);
+        forest.GetNotificationSender()?.ConnectTo(receiver);
 
         var partition = new Geometry("geo");
         forest.AddPartitions([partition]);
@@ -85,7 +85,7 @@ public class NotificationApiTests : NotificationTestsBase
         var forestReceiver = new Observer();
         var partitionReceiver = new Observer();
 
-        forest.GetNotificationSender().ConnectTo(forestReceiver);
+        forest.GetNotificationSender()?.ConnectTo(forestReceiver);
         partition.GetNotificationSender()?.ConnectTo(partitionReceiver);
 
         forest.AddPartitions([partition]);
@@ -288,7 +288,7 @@ public class NotificationApiTests : NotificationTestsBase
         var cloneForest = new Forest();
 
         var replicator = ForestReplicator.Create(cloneForest, new(), null);
-        originalForest.GetNotificationSender().ConnectTo(replicator);
+        originalForest.GetNotificationSender()?.ConnectTo(replicator);
 
         var moved = new Documentation("moved");
         var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
