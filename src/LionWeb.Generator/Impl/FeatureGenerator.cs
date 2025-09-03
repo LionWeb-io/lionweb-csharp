@@ -65,8 +65,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         };
 
     /// <inheritdoc cref="FeatureGenerator"/>
-    public IEnumerable<MemberDeclarationSyntax> AbstractMembers() =>
-        feature switch
+    public IEnumerable<MemberDeclarationSyntax> AbstractMembers()
+    {
+        var writeable = feature is Containment;
+        return feature switch
         {
             Containment { Multiple: true } c =>
                 AbstractLinkMembers(c, writeable: true),
@@ -76,18 +78,19 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
             { Optional: false } =>
             [
-                AbstractSingleRequiredFeatureProperty(feature is Containment),
-                AbstractRequiredFeatureSetter(feature is Containment)
+                AbstractSingleRequiredFeatureProperty(writeable: writeable),
+                AbstractRequiredFeatureSetter(writeable: writeable)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ],
             { Optional: true } =>
             [
                 AbstractSingleOptionalFeatureProperty(),
-                AbstractOptionalFeatureSetter(feature is Containment)
+                AbstractOptionalFeatureSetter(writeable: writeable)
                     .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
             ],
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
         };
+    }
 
     private IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(Link link, bool writeable = false) =>
     [
