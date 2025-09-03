@@ -5,14 +5,13 @@
 #pragma warning disable 1591
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2023_1.TestLanguage;
-
-using Core.Notification.Pipe;
 using LionWeb.Core;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
 using LionWeb.Core.Notification;
 using LionWeb.Core.Notification.Partition;
 using LionWeb.Core.Notification.Partition.Emitter;
+using LionWeb.Core.Notification.Pipe;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
@@ -409,13 +408,13 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 
 	public DataTypeTestConcept(string id) : base(id)
 	{
-		_notificationHandler = new PartitionNotificationProducer(this);
+		_notificationSender = new PartitionNotificationProducer(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.DataTypeTestConcept;
-	private readonly IPartitionNotificationProducer _notificationHandler;
-	public INotificationSender? GetNotificationSender() => _notificationHandler;
+	private readonly INotificationSender? _notificationSender;
+	public INotificationSender? GetNotificationSender() => _notificationSender;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -939,13 +938,13 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 
 	public LinkTestConcept(string id) : base(id)
 	{
-		_notificationHandler = new PartitionNotificationProducer(this);
+		_notificationSender = new PartitionNotificationProducer(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.LinkTestConcept;
-	private readonly IPartitionNotificationProducer _notificationHandler;
-	public INotificationSender? GetNotificationSender() => _notificationHandler;
+	private readonly INotificationSender? _notificationSender;
+	public INotificationSender? GetNotificationSender() => _notificationSender;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
