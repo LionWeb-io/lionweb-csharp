@@ -80,7 +80,7 @@ public interface INotificationFilter : INotificationPipe
 /// i.e. a "starting member" in a pipe.
 /// It <see cref="ProduceNotification">produces</see> notifications from outside the notification pipe system,
 /// and <see cref="INotificationSender.Send">sends</see> them to <i>following</i> pipes. 
-public interface INotificationProducer : INotificationPipe, INotificationFilter, INotificationSender
+public interface INotificationProducer : INotificationFilter, INotificationSender
 {
     /// Receiving a notification from outside the notification pipe system.
     void ProduceNotification(INotification notification);
@@ -88,7 +88,7 @@ public interface INotificationProducer : INotificationPipe, INotificationFilter,
 
 /// A <see cref="INotificationPipe">notification pipe member</see> that can <see cref="Receive"/> notfications
 /// from <i>preceding</i> notification pipe members.
-public interface INotificationReceiver : INotificationPipe, INotificationFilter
+public interface INotificationReceiver : INotificationFilter
 {
     void IDisposable.Dispose() { }
 
