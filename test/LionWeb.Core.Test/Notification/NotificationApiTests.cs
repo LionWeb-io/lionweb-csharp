@@ -94,6 +94,17 @@ public class NotificationApiTests : NotificationTestsBase
         Assert.AreEqual(1, forestReceiver.NotificationCount);
         Assert.AreEqual(1, partitionReceiver.NotificationCount);
     }
+    
+    private class Observer : INotificationReceiver
+    {
+        public int NotificationCount { get; private set; }
+
+        public void Receive(INotificationSender correspondingSender, INotification notification)
+        {
+            NotificationCount++;
+            Console.WriteLine(notification);
+        }
+    }
 
     #endregion
 
@@ -312,12 +323,3 @@ public class NotificationApiTests : NotificationTestsBase
     protected override Geometry CreateReplicator(Geometry node) => throw new NotImplementedException();
 }
 
-internal class Observer : INotificationReceiver
-{
-    public int NotificationCount { get; private set; }
-    public void Receive(INotificationSender correspondingSender, INotification notification)
-    {
-        NotificationCount++;
-        Console.WriteLine(notification);
-    }
-}
