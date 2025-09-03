@@ -21,6 +21,7 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Notification.Partition;
+using Core.Notification.Pipe;
 using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -94,13 +95,13 @@ public class ClassifierGenerator(
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
 
             additionalMembers.AddRange([
-                Field("_notificationHandler", AsType(typeof(IPartitionNotificationProducer)))
+                Field("_notificationSender", NullableType(AsType(typeof(INotificationSender))))
                     .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
-                Method("GetNotificationHandler", NullableType(AsType(typeof(IPartitionNotificationProducer))), exprBody: IdentifierName("_notificationHandler"))
+                Method("GetNotificationSender", NullableType(AsType(typeof(INotificationSender))), exprBody: IdentifierName("_notificationSender"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             ]);
             
-            additionalConstructorStatements.Add(Assignment("_notificationHandler", NewCall([This()], AsType(typeof(PartitionNotificationProducer)))));
+            additionalConstructorStatements.Add(Assignment("_notificationSender", NewCall([This()], AsType(typeof(PartitionNotificationProducer)))));
         }
 
         return ClassifierClass(bases, additionalMembers, additionalConstructorStatements);
