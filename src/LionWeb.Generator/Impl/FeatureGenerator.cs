@@ -67,29 +67,29 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     /// <inheritdoc cref="FeatureGenerator"/>
     public IEnumerable<MemberDeclarationSyntax> AbstractMembers()
     {
-        var writeable = feature is Containment;
-        return feature switch
+        switch (feature)
         {
-            Containment { Multiple: true } c =>
-                AbstractLinkMembers(c, writeable: true),
-
-            Reference { Multiple: true } r =>
-                AbstractLinkMembers(r),
-
-            { Optional: false } =>
-            [
-                AbstractSingleRequiredFeatureProperty(writeable: writeable),
-                AbstractRequiredFeatureSetter(writeable: writeable)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-            ],
-            { Optional: true } =>
-            [
-                AbstractSingleOptionalFeatureProperty(),
-                AbstractOptionalFeatureSetter(writeable: writeable)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-            ],
-            _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
-        };
+            case Containment { Multiple: true } c:
+                return AbstractLinkMembers(c, writeable: true);
+            case Reference { Multiple: true } r:
+                return AbstractLinkMembers(r);
+            case { Optional: false }:
+                var writeable = feature is Containment;
+                return
+                [
+                    AbstractSingleRequiredFeatureProperty(writeable: writeable),
+                    AbstractRequiredFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                ];
+            case { Optional: true }:
+                writeable = feature is Containment;
+                return
+                [
+                    AbstractSingleOptionalFeatureProperty(),
+                    AbstractOptionalFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+                ];
+            default:
+                throw new ArgumentException($"unsupported feature: {feature}", nameof(feature));
+        }
     }
 
     private IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(Link link, bool writeable = false) =>
