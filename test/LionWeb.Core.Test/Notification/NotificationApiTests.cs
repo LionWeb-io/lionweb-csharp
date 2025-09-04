@@ -53,27 +53,27 @@ public class NotificationApiTests : NotificationTestsBase
     public void ReceiveNotifications_from_partition_via_connected_pipes()
     {
         var partition = new Geometry("geo");
-        var receiver = new Observer();
+        var receiver = new NotificationCounter();
 
         partition.GetNotificationSender()!.ConnectTo(receiver);
 
         partition.Documentation = new Documentation("added");
 
-        Assert.AreEqual(1, receiver.NotificationCount);
+        Assert.AreEqual(1, receiver.Count);
     }
 
     [TestMethod]
     public void ReceiveNotifications_from_forest()
     {
         var forest = new Forest();
-        var receiver = new Observer();
+        var receiver = new NotificationCounter();
 
         forest.GetNotificationSender()!.ConnectTo(receiver);
 
         var partition = new Geometry("geo");
         forest.AddPartitions([partition]);
 
-        Assert.AreEqual(1, receiver.NotificationCount);
+        Assert.AreEqual(1, receiver.Count);
     }
 
     [TestMethod]
@@ -82,8 +82,8 @@ public class NotificationApiTests : NotificationTestsBase
         var partition = new Geometry("geo");
         var forest = new Forest();
 
-        var forestReceiver = new Observer();
-        var partitionReceiver = new Observer();
+        var forestReceiver = new NotificationCounter();
+        var partitionReceiver = new NotificationCounter();
 
         forest.GetNotificationSender()!.ConnectTo(forestReceiver);
         partition.GetNotificationSender()!.ConnectTo(partitionReceiver);
@@ -91,21 +91,11 @@ public class NotificationApiTests : NotificationTestsBase
         forest.AddPartitions([partition]);
         partition.Documentation = new Documentation("added");
 
-        Assert.AreEqual(1, forestReceiver.NotificationCount);
-        Assert.AreEqual(1, partitionReceiver.NotificationCount);
+        Assert.AreEqual(1, forestReceiver.Count);
+        Assert.AreEqual(1, partitionReceiver.Count);
     }
     
-    private class Observer : INotificationReceiver
-    {
-        public int NotificationCount { get; private set; }
-
-        public void Receive(INotificationSender correspondingSender, INotification notification)
-        {
-            NotificationCount++;
-            Console.WriteLine(notification);
-        }
-    }
-
+    
     #endregion
 
     #region collect several changes into one change set
@@ -259,7 +249,6 @@ public class NotificationApiTests : NotificationTestsBase
             Send(notification);
         }
     }
-
 
     private class NotificationCounter() : NotificationPipeBase(null), INotificationHandler
     {
