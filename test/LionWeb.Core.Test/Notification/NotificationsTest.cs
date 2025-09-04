@@ -5,7 +5,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class NotificationsTest : NotificationTestsBase
+public class NotificationsTest : NotificationTestsBase, IReplicatorCreator
 {
     #region Properties
 
@@ -747,7 +747,7 @@ public class NotificationsTest : NotificationTestsBase
 
     #endregion
 
-    protected override Geometry CreateReplicator(Geometry node)
+    public Geometry CreateReplicator(Geometry node)
     {
         var clone = Clone(node);
 

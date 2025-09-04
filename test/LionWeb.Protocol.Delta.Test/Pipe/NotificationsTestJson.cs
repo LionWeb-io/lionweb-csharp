@@ -29,9 +29,9 @@ using Core.Test.Notification;
 using Message.Command;
 
 [TestClass]
-public class NotificationsTestJson : NotificationTestsBase
+public class NotificationsTestJson : NotificationTestsBase, IReplicatorCreator
 {
-    protected override Geometry CreateReplicator(Geometry node)
+    public Geometry CreateReplicator(Geometry node)
     {
         var clone = Clone(node);
 

@@ -20,13 +20,11 @@ namespace LionWeb.Core.Test.Notification;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Pipe;
-using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class NotificationTests_Forest
+public class NotificationTests_Forest: NotificationTestsBase
 {
     #region Children
 
@@ -135,12 +133,6 @@ public class NotificationTests_Forest
         var receiver = new TestLocalForestChangeNotificationReceiver(originalForest, cloneHandler);
         originalForest.GetNotificationSender()!.ConnectTo(receiver);
         return replicator;
-    }
-
-    private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
-    {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
 }
 

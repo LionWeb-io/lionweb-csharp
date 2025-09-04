@@ -21,12 +21,11 @@ using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
-using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class NotificationApiTests : NotificationTestsBase
+public class NotificationApiTests : NotificationTestsBase, IReplicatorCreator
 {
     #region get informed about changes
 
@@ -303,12 +302,6 @@ public class NotificationApiTests : NotificationTestsBase
 
     #endregion
 
-    private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
-    {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
-    }
-
-    protected override Geometry CreateReplicator(Geometry node) => throw new NotImplementedException();
+    public Geometry CreateReplicator(Geometry node) => throw new NotImplementedException();
 }
 

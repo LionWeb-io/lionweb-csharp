@@ -21,13 +21,10 @@ using Core.Notification;
 using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using System.Reflection;
 using Comparer = Core.Utilities.Comparer;
 
 public abstract class NotificationTestsBase
 {
-    protected abstract Geometry CreateReplicator(Geometry node);
-
     protected Geometry Clone(Geometry node) =>
         (Geometry)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
 
@@ -36,6 +33,17 @@ public abstract class NotificationTestsBase
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
+    
+    protected void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
+    {
+        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
+        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+    }
+}
+
+public interface IReplicatorCreator
+{
+   Geometry CreateReplicator(Geometry node);
 }
 
 public static class NotificationExtensions

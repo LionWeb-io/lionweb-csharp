@@ -28,9 +28,9 @@ using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Notification;
 
 [TestClass]
-public class NotificationsTestSerialized : NotificationTestsBase
+public class NotificationsTestSerialized : NotificationTestsBase, IReplicatorCreator
 {
-    protected override Geometry CreateReplicator(Geometry node)
+    public Geometry CreateReplicator(Geometry node)
     {
         var clone = Clone(node);
 
