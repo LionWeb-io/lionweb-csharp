@@ -106,12 +106,12 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         {
             Property { Optional: false } reqProp => GenSetInternalRequiredProperty(reqProp),
             Property { Optional: true } reqProp => GenSetInternalOptionalProperty(reqProp),
-            Link { Optional: false, Multiple: false } singleReqLink => GenSetInternalSingleRequiredLink(singleReqLink),
-            Link { Optional: true, Multiple: false } singleOptLink => GenSetInternalSingleOptionalLink(singleOptLink),
-            Containment { Optional: true, Multiple: true } multiCont => GenSetInternalMultiOptionalContainment(
-                multiCont),
-            Containment { Optional: false, Multiple: true } multiCont => GenSetInternalMultiRequiredContainment(
-                multiCont),
+            Containment { Optional: false, Multiple: false } singleReqContainment => GenSetInternalSingleRequiredLink(singleReqContainment, writeable: true),
+            Containment { Optional: true, Multiple: false } singleOptContainment => GenSetInternalSingleOptionalLink(singleOptContainment, writeable: true),
+            Reference { Optional: false, Multiple: false } singleReqReference => GenSetInternalSingleRequiredLink(singleReqReference),
+            Reference { Optional: true, Multiple: false } singleOptReference => GenSetInternalSingleOptionalLink(singleOptReference),
+            Containment { Optional: true, Multiple: true } multiCont => GenSetInternalMultiOptionalContainment(multiCont, writeable: true),
+            Containment { Optional: false, Multiple: true } multiCont => GenSetInternalMultiRequiredContainment(multiCont, writeable: true),
             Reference { Optional: true, Multiple: true } multiRef => GenSetInternalMultiOptionalReference(multiRef),
             Reference { Optional: false, Multiple: true } multiRef => GenSetInternalMultiRequiredReference(multiRef),
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
@@ -151,10 +151,10 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         GenThrowInvalidValueException()
     ];
 
-    private List<StatementSyntax> GenSetInternalSingleRequiredLink(Link link) =>
+    private List<StatementSyntax> GenSetInternalSingleRequiredLink(Link link, bool writeable = false) =>
     [
         IfStatement(
-            IsPatternExpression(IdentifierName("value"), AsTypePattern(link)),
+            IsPatternExpression(IdentifierName("value"), AsTypePattern(link, writeable: writeable)),
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
@@ -165,23 +165,23 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         GenThrowInvalidValueException()
     ];
 
-    private List<StatementSyntax> GenSetInternalSingleOptionalLink(Link link) =>
+    private List<StatementSyntax> GenSetInternalSingleOptionalLink(Link link, bool writeable = false) =>
     [
         IfStatement(
-            IsPatternExpression(IdentifierName("value"), NullOrTypePattern(link)),
+            IsPatternExpression(IdentifierName("value"), NullOrTypePattern(link, writeable: writeable)),
             AsStatements([
                 ExpressionStatement(
                     InvocationExpression(
-                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link), IdentifierName("notificationId")]))),
+                        IdentifierName(FeatureSet(link)), AsArguments([CastValueType(link, writeable: writeable), IdentifierName("notificationId")]))),
                 ReturnTrue()
             ])
         ),
         GenThrowInvalidValueException()
     ];
 
-    private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment) =>
+    private List<StatementSyntax> GenSetInternalMultiOptionalContainment(Containment containment, bool writeable = false) =>
     [
-        SafeNodesVar(containment),
+        SafeNodesVar(containment, writeable: writeable),
         SetContainmentEmitterVariable(containment),
         EmitterCollectOldDataCall(),
         RemoveSelfParentCall(containment),
@@ -190,9 +190,9 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         ReturnTrue()
     ];
 
-    private List<StatementSyntax> GenSetInternalMultiRequiredContainment(Containment containment) =>
+    private List<StatementSyntax> GenSetInternalMultiRequiredContainment(Containment containment, bool writeable = false) =>
     [
-        SafeNodesVar(containment),
+        SafeNodesVar(containment, writeable: writeable),
         AssureNonEmptyCall(containment),
         SetContainmentEmitterVariable(containment),
         EmitterCollectOldDataCall(),
@@ -237,7 +237,7 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
     private LocalDeclarationStatementSyntax SetContainmentEmitterVariable(Containment containment) =>
         Variable(
             "emitter",
-            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType())),
+            AsType(typeof(ContainmentSetNotificationEmitter<>), AsType(containment.GetFeatureType(), writeable: true)),
             NewCall([
                 MetaProperty(containment), This(), IdentifierName("safeNodes"), FeatureField(containment), IdentifierName("notificationId")
             ])
@@ -252,16 +252,16 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             ])
         );
 
-    private BinaryPatternSyntax NullOrTypePattern(Feature feature) =>
+    private BinaryPatternSyntax NullOrTypePattern(Feature feature, bool writeable = false) =>
         BinaryPattern(
             SyntaxKind.OrPattern,
             ConstantPattern(Null()),
-            TypePattern(AsType(feature.GetFeatureType(), true))
+            TypePattern(AsType(feature.GetFeatureType(), true, writeable: writeable))
         );
 
-    private DeclarationPatternSyntax AsTypePattern(Feature feature) =>
+    private DeclarationPatternSyntax AsTypePattern(Feature feature, bool writeable = false) =>
         DeclarationPattern(
-            AsType(feature.GetFeatureType(), true, feature is Containment),
+            AsType(feature.GetFeatureType(), true, writeable: writeable),
             SingleVariableDesignation(Identifier("v"))
         );
 
@@ -273,17 +273,17 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             NewCall([IdentifierName("feature"), IdentifierName("value")], AsType(typeof(InvalidValueException)))
         );
 
-    private LocalDeclarationStatementSyntax EnumerableVar(Link link) =>
-        Variable("enumerable", Var(), AsNodesCall(link));
+    private LocalDeclarationStatementSyntax EnumerableVar(Link link, bool writeable = false) =>
+        Variable("enumerable", Var(), AsNodesCall(link, writeable: writeable));
 
-    private LocalDeclarationStatementSyntax EnumerableToListVar(Link link) =>
+    private LocalDeclarationStatementSyntax EnumerableToListVar(Link link, bool writeable = false) =>
         Variable("enumerable", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link), IdentifierName("ToList")))
+            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: writeable), IdentifierName("ToList")))
         );
 
-    private LocalDeclarationStatementSyntax SafeNodesVar(Link link) =>
+    private LocalDeclarationStatementSyntax SafeNodesVar(Link link, bool writeable = false) =>
         Variable("safeNodes", Var(),
-            InvocationExpression(MemberAccess(AsNodesCall(link), IdentifierName("ToList")))
+            InvocationExpression(MemberAccess(AsNodesCall(link, writeable: writeable), IdentifierName("ToList")))
         );
 
     private ExpressionStatementSyntax AssureNonEmptyCall(Link link) =>
@@ -306,16 +306,20 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             InvocationExpression(MemberAccess(FeatureField(reference), IdentifierName("Clear")))
         );
 
-    private CastExpressionSyntax CastValueType(Feature feature) =>
-        CastExpression(NullableType(AsType(feature.GetFeatureType(), true)), IdentifierName("value"));
+    private CastExpressionSyntax CastValueType(Feature feature, bool writeable = false) =>
+        CastExpression(NullableType(AsType(feature.GetFeatureType(), true, writeable: writeable)), IdentifierName("value"));
 
-    private InvocationExpressionSyntax AsNodesCall(Link link) =>
-        InvocationExpression(
+    private InvocationExpressionSyntax AsNodesCall(Link link, bool writeable = false)
+    {
+        var invocationExpressionSyntax = InvocationExpression(
             MemberAccess(MetaProperty(link),
-                Generic("AsNodes", AsType(link.Type, true))
+                Generic("AsNodes", AsType(link.Type, true, writeable: writeable))
             ),
             AsArguments([IdentifierName("value")])
         );
+
+        return invocationExpressionSyntax;
+    }
 
     #endregion
 
@@ -342,8 +346,8 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
                         .WithRefOrOutKeyword(Token(SyntaxKind.OutKeyword))
                 ))),
             ExpressionStatement(InvocationExpression(
-            MemberAccess(IdentifierName("result"), IdentifierName("Add")),
-            AsArguments([MetaProperty(feature)])
+                MemberAccess(IdentifierName("result"), IdentifierName("Add")),
+                AsArguments([MetaProperty(feature)])
             ))
         );
 

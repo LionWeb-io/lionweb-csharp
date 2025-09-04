@@ -45,6 +45,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added external languages to `DynamicLanguageCloner`.
 * Added convenience method `DynamicLanguageClonerExtensions.Clone(Language)`.
 ### Fixed
+* Bug fix: generator now generates correct type for features of builtin Node type
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
 * Use `[NotNullWhen]` instead of `[MaybeNullWhen]` attributes for _TryGet_-like out parameters.
