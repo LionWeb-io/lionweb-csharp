@@ -99,6 +99,56 @@ public class NotificationApiTests : NotificationTestsBase, IReplicatorCreator
 
     #region collect several changes into one change set
 
+    #region use case example
+    
+    private delegate void PartitionUpdater(Geometry partition);
+    
+    private void UpdateDocumentation(Geometry partition)
+    {
+        partition.Documentation = new Documentation("documentation");
+        partition.Documentation.Text = "hello";
+    }
+    
+    private CompositeNotification ComposeNotifications(Geometry partition, PartitionUpdater updater)
+    {
+        var compositor = new NotificationCompositor("compositor");
+        
+        partition.GetNotificationSender()!.ConnectTo(compositor);
+        
+        compositor.Push();
+        updater.Invoke(partition);
+        return compositor.Pop(true);
+        
+    }
+    
+    [TestMethod]
+    public void CountCompositeNotificationParts()
+    {
+        var partition = new Geometry("geo");
+        var changes = ComposeNotifications(partition, UpdateDocumentation);
+        
+        Assert.AreEqual(2, changes.Parts.Count);
+    }
+
+    [TestMethod]
+    public void CountCompositeNotificationParts_simple()
+    {
+        var partition = new Geometry("geo");
+        var compositor = new NotificationCompositor("compositor");
+        
+        partition.GetNotificationSender()!.ConnectTo(compositor);
+        
+        compositor.Push();
+        UpdateDocumentation(partition);
+        var composite = compositor.Pop(true);
+        
+        Assert.AreEqual(2, composite.Parts.Count);
+    }
+
+    
+    #endregion
+    
+
     [TestMethod]
     public void ComposeNotifications_into_a_composite_notification()
     {
