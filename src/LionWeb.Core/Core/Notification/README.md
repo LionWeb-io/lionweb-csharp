@@ -6,12 +6,12 @@ This document explains the LionWeb notification system API through some use case
 ### How to get informed about changes
 Every partition node (aka root node) of a model, which supports notification API, triggers a notification when there is a change to the model. 
 In the example below, a partition is connected to a receiver. Receiver will be informed about all the changes to the partition via notifications. 
-In this case, receiver (see `Observer` class definition below) prints out the received notifications to the console in its `Receive` method. 
+In this case, receiver (see `NotificationCounter` class definition below) counts the received notifications in its `Receive` method. 
 
 Code below gives an example of API usage demonstrating how to get informed about changes to a partition.
 ```csharp
 var partition = new Geometry("geo");
-var receiver = new Observer();
+var receiver = new NotificationCounter();
 
 // When notifications are not supported, partition.GetNotificationSender() returns null.
 partition.GetNotificationSender()?.ConnectTo(receiver);
@@ -20,10 +20,10 @@ partition.GetNotificationSender()?.ConnectTo(receiver);
 partition.Documentation = new Documentation("added");
 ```
 Code below gives an example of API usage demonstrating how to get informed about changes to a forest.
-A forest is a collection of model trees, represented by each trees' partition.
+A forest is a collection of model trees, represented by each tree's partition.
 ```csharp
 var forest = new Forest();
-var receiver = new Observer();
+var receiver = new NotificationCounter();
 
 // When notifications are not supported, forest.GetNotificationSender() returns null.
 forest.GetNotificationSender()?.ConnectTo(receiver);
@@ -35,59 +35,53 @@ forest.AddPartitions([partition]);
 ```
 
 ```csharp
-class Observer : INotificationReceiver
-{
-    // Take necessary action for the received notifications 
-    public void Receive(INotificationSender correspondingSender, INotification notification)
+class NotificationCounter() : NotificationPipeBase(null), INotificationHandler
     {
-        Console.WriteLine(notification);
+        public int Count { get; private set; }
+
+        public void Receive(INotificationSender correspondingSender, INotification notification)
+        {
+            Count++;
+            Send(notification);
+        }
     }
-}
 ```
 
 ### How to collect multiple changes into one change set 
 Notifications raised by multiple changes to a model can be collected into one change set. 
 A composite notification composes other forest and/or partition notifications into one
-composite notification. Follow the comments below in the code block for further explanation.
+composite notification. Follow the comments below in the code blocks for further explanation.
+
 
 ```csharp
 var partition = new Geometry("geo");
 
 // NotificationCompositor implements composite notification logic. 
-// It can receive and send notifications. 
 var compositor = new NotificationCompositor("compositor");
 
-// PartitionEventCounter (see the class definition below) counts the received notifications.
-var counter = new PartitionEventCounter();
-
+// Connects partition notification sender to compositor.
 // When notifications are not supported, partition.GetNotificationSender() returns null.
 partition.GetNotificationSender()?.ConnectTo(compositor);
-compositor.ConnectTo(counter);
 
 // Creates a new composite notification to collect incoming notifications
-var composite = compositor.Push(); 
-
-// The notifications raised by three changes below will be added to the created composite notification.
-partition.Documentation = new Documentation("documentation");
-partition.Documentation.Text = "hello";
-partition.AddShapes([new Circle("c")]);
-
-Console.WriteLine($"Size of composite: {composite.Parts.Count}");  // Size of composite: 3 (composite consists of 3 notifications)
-Console.WriteLine($"Counter: {counter.Count}"); // Counter: 0 (nothing is sent from compositor to counter yet)
-
-compositor.Pop(true); // pops and sends the composite notification on top the stack
-
-Console.WriteLine($"Counter: {counter.Count}"); // Counter: 1 (counter receives 1 composite notification)
+compositor.Push();
+// Updates take place
+UpdateDocumentation(partition);
+// Pop returns the composite notification
+var composite = compositor.Pop(true);
+    
+Console.WriteLine($"Number of collected notifications : {composite.Parts.Count}"); // prints 2
 ```
 
+`UpdateDocumentation` is the method that applies changes to the partition.
 ```csharp
-class PartitionEventCounter() : NotificationPipeBase(null), INotificationReceiver
+public void UpdateDocumentation(Geometry partition)
 {
-    public int Count { get; private set; }
-    public void Receive(INotificationSender correspondingSender, INotification notification) => 
-        Count++;
+    partition.Documentation = new Documentation("documentation");
+    partition.Documentation.Text = "hello";
 }
 ```
+
 ### How to replicate changes
 
 Partition replicator replicates received notifications on a local equivalent partitions.
