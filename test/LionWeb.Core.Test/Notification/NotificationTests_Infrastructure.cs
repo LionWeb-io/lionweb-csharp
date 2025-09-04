@@ -40,9 +40,9 @@ public class NotificationTests_Infrastructure: NotificationTestsBase
         var circle = new Circle("c");
         var node = new Geometry("a") { Shapes = [circle] };
 
-        node.GetNotificationSender().Subscribe<PropertyAddedNotification>((sender, args) => { } );
-        node.GetNotificationSender().Subscribe<PropertyChangedNotification>((sender, args) => { });
-        node.GetNotificationSender().Subscribe<IPartitionNotification>((sender, args) => { });
+        node.GetNotificationSender()!.Subscribe<PropertyAddedNotification>((sender, args) => { } );
+        node.GetNotificationSender()!.Subscribe<PropertyChangedNotification>((sender, args) => { });
+        node.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => { });
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -57,9 +57,8 @@ public class NotificationTests_Infrastructure: NotificationTestsBase
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetNotificationSender().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
-        
-        node.GetNotificationSender().Subscribe<PropertyChangedNotification>((sender, args) => {});
+        node.GetNotificationSender()!.Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
+        node.GetNotificationSender()!.Subscribe<PropertyChangedNotification>((sender, args) => {});
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -75,13 +74,13 @@ public class NotificationTests_Infrastructure: NotificationTestsBase
         var node = new Geometry("a") { Shapes = [circle] };
 
         int addedCount = 0;
-        node.GetNotificationSender().Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
+        node.GetNotificationSender()!.Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
         
         int changedCount = 0;
-        node.GetNotificationSender().Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
+        node.GetNotificationSender()!.Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
 
         int allCount = 0;
-        node.GetNotificationSender().Subscribe<IPartitionNotification>((sender, args) => allCount++);
+        node.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => allCount++);
 
         circle.Name = "Hello";
         circle.Name = "World";
@@ -104,10 +103,10 @@ public class NotificationTests_Infrastructure: NotificationTestsBase
         var (replicator, cloneReplicator) = CreateReplicators(node, clone);
 
         int nodeCount = 0;
-        node.GetNotificationSender().Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
+        node.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
         
         int cloneCount = 0;
-        clone.GetNotificationSender().Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
+        clone.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
         
         circle.Name = "Hello";
         cloneCircle.Name = "World";
