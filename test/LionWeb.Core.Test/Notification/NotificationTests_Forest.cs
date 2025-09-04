@@ -44,7 +44,7 @@ public class NotificationTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = CreateReplicator(cloneForest, forest);
+        _ = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node]);
 
@@ -68,7 +68,7 @@ public class NotificationTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = CreateReplicator(cloneForest, forest);
+        _ = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node]);
 
@@ -91,7 +91,7 @@ public class NotificationTests_Forest
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
 
-        var replicator = CreateReplicator(cloneForest, forest);
+        _ = CreateReplicator(cloneForest, forest);
 
         node.Documentation = moved;
 
@@ -111,7 +111,7 @@ public class NotificationTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = CreateReplicator(cloneForest, forest);
+        _ = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node, originPartition]);
 
