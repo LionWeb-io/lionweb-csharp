@@ -13,7 +13,7 @@ Code below gives an example of API usage demonstrating how to get informed about
 var partition = new Geometry("geo");
 var receiver = new NotificationCounter();
 
-// When notifications are not supported, partition.GetNotificationSender() returns null.
+// If notifications are not supported, partition.GetNotificationSender() returns null.
 partition.GetNotificationSender()?.ConnectTo(receiver);
         
 // This is a change to the model
@@ -25,7 +25,7 @@ A forest is a collection of model trees, represented by each tree's partition.
 var forest = new Forest();
 var receiver = new NotificationCounter();
 
-// When notifications are not supported, forest.GetNotificationSender() returns null.
+// If notifications are not supported, forest.GetNotificationSender() returns null.
 forest.GetNotificationSender()?.ConnectTo(receiver);
 
 var partition = new Geometry("geo");
@@ -36,15 +36,15 @@ forest.AddPartitions([partition]);
 
 ```csharp
 class NotificationCounter() : NotificationPipeBase(null), INotificationHandler
-    {
-        public int Count { get; private set; }
+{
+    public int Count { get; private set; }
 
-        public void Receive(INotificationSender correspondingSender, INotification notification)
-        {
-            Count++;
-            Send(notification);
-        }
+    public void Receive(INotificationSender correspondingSender, INotification notification)
+    {
+        Count++;
+        Send(notification);
     }
+}
 ```
 
 ### How to collect multiple changes into one change set 
@@ -60,23 +60,30 @@ var partition = new Geometry("geo");
 var compositor = new NotificationCompositor("compositor");
 
 // Connects partition notification sender to compositor.
-// When notifications are not supported, partition.GetNotificationSender() returns null.
+// If notifications are not supported, partition.GetNotificationSender() returns null.
 partition.GetNotificationSender()?.ConnectTo(compositor);
 
-// Creates a new composite notification to collect incoming notifications
+// Push creates a new composite notification to collect incoming notifications
 compositor.Push();
 // Updates take place
 UpdateDocumentation(partition);
-// Pop returns the composite notification
-var composite = compositor.Pop(true);
+// Pop returns the composite notification 
+var changes = compositor.Pop(true);
     
-Console.WriteLine($"Number of collected notifications : {composite.Parts.Count}"); // prints 2
+Console.WriteLine($"Number of collected notifications : {changes.Parts.Count}"); // prints 2
+
+// Access the notifications (changes)  
+foreach (INotification notification in changes.Parts)
+{
+    Console.WriteLine(notification.ToString());
+}
 ```
 
 `UpdateDocumentation` is the method that applies changes to the partition.
 ```csharp
 public void UpdateDocumentation(Geometry partition)
 {
+    // changes to the partition
     partition.Documentation = new Documentation("documentation");
     partition.Documentation.Text = "hello";
 }
@@ -96,7 +103,7 @@ var clone = Clone(partition);
 // replicator adds the same property value to the cloned partition node.
 var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), partition.GetId());
 
-// When notifications are not supported, partition.GetNotificationSender() returns null.
+// If notifications are not supported, partition.GetNotificationSender() returns null.
 partition.GetNotificationSender()?.ConnectTo(replicator);
 
 // This change triggers PropertyAddedNotification notification
@@ -115,7 +122,7 @@ var cloneForest = new Forest();
 // Replicator adds the same partitions to the cloned forest and property value to the partition in the cloned forest.
 var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
 
-// When notifications are not supported, forest.GetNotificationSender() returns null.
+// If notifications are not supported, forest.GetNotificationSender() returns null.
 originalForest.GetNotificationSender()?.ConnectTo(replicator);
 
 var moved = new Documentation("moved");
