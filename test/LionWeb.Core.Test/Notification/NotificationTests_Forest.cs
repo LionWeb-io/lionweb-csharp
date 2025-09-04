@@ -129,11 +129,11 @@ public class NotificationTests_Forest
     {
         var replicator = ForestReplicator.Create(cloneForest, new(), null);
         var cloneHandler = new NodeCloneNotificationHandler("forestCloner");
-        originalForest.GetNotificationSender()?.ConnectTo(cloneHandler);
+        originalForest.GetNotificationSender()!.ConnectTo(cloneHandler);
         cloneHandler.ConnectTo(replicator);
 
         var receiver = new TestLocalForestChangeNotificationReceiver(originalForest, cloneHandler);
-        originalForest.GetNotificationSender()?.ConnectTo(receiver);
+        originalForest.GetNotificationSender()!.ConnectTo(receiver);
         return replicator;
     }
 
@@ -161,7 +161,7 @@ internal class TestLocalForestChangeNotificationReceiver(object? sender, NodeClo
     }
 
     private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification) => 
-        partitionAddedNotification.NewPartition.GetNotificationSender()?.ConnectTo(cloneHandler);
+        partitionAddedNotification.NewPartition.GetNotificationSender()!.ConnectTo(cloneHandler);
 
     private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
     {

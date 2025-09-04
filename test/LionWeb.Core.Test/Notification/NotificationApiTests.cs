@@ -37,7 +37,7 @@ public class NotificationApiTests : NotificationTestsBase
 
         int notificationCount = 0;
         var sender = partition.GetNotificationSender();
-        sender?.Subscribe<IPartitionNotification>((_, notification) =>
+        sender!.Subscribe<IPartitionNotification>((_, notification) =>
         {
             notificationCount++;
             Console.WriteLine(notification);
@@ -55,7 +55,7 @@ public class NotificationApiTests : NotificationTestsBase
         var partition = new Geometry("geo");
         var receiver = new Observer();
 
-        partition.GetNotificationSender()?.ConnectTo(receiver);
+        partition.GetNotificationSender()!.ConnectTo(receiver);
 
         partition.Documentation = new Documentation("added");
 
@@ -68,7 +68,7 @@ public class NotificationApiTests : NotificationTestsBase
         var forest = new Forest();
         var receiver = new Observer();
 
-        forest.GetNotificationSender()?.ConnectTo(receiver);
+        forest.GetNotificationSender()!.ConnectTo(receiver);
 
         var partition = new Geometry("geo");
         forest.AddPartitions([partition]);
@@ -85,8 +85,8 @@ public class NotificationApiTests : NotificationTestsBase
         var forestReceiver = new Observer();
         var partitionReceiver = new Observer();
 
-        forest.GetNotificationSender()?.ConnectTo(forestReceiver);
-        partition.GetNotificationSender()?.ConnectTo(partitionReceiver);
+        forest.GetNotificationSender()!.ConnectTo(forestReceiver);
+        partition.GetNotificationSender()!.ConnectTo(partitionReceiver);
 
         forest.AddPartitions([partition]);
         partition.Documentation = new Documentation("added");
@@ -118,7 +118,7 @@ public class NotificationApiTests : NotificationTestsBase
         var compositor = new NotificationCompositor("compositor");
         var counter = new PartitionEventCounter();
 
-        partition.GetNotificationSender()?.ConnectTo(compositor);
+        partition.GetNotificationSender()!.ConnectTo(compositor);
         compositor.ConnectTo(counter);
 
         var composite = compositor.Push();
@@ -145,7 +145,7 @@ public class NotificationApiTests : NotificationTestsBase
         var allNotificationCounter = new NotificationCounter();
 
         // partition -> compositor -> raw -> composite -> all
-        partition.GetNotificationSender()?.ConnectTo(compositor);
+        partition.GetNotificationSender()!.ConnectTo(compositor);
         compositor.ConnectTo(rawNotificationCounter);
         rawNotificationCounter.ConnectTo(compositeNotificationCounter);
         compositeNotificationCounter.ConnectTo(allNotificationCounter);
@@ -179,7 +179,7 @@ public class NotificationApiTests : NotificationTestsBase
         var allNotificationCounter = new NotificationCounter();
 
         // partition -> compositor -> raw | composite | all
-        partition.GetNotificationSender()?.ConnectTo(compositor);
+        partition.GetNotificationSender()!.ConnectTo(compositor);
         compositor.ConnectTo(rawNotificationCounter);
         compositor.ConnectTo(compositeNotificationCounter);
         compositor.ConnectTo(allNotificationCounter);
@@ -212,7 +212,7 @@ public class NotificationApiTests : NotificationTestsBase
         var compositeNotificationCounter = new CompositeNotificationCounter();
 
         // partition -> composite -> compositor -> composite 
-        partition.GetNotificationSender()?.ConnectTo(compositeNotificationCounter);
+        partition.GetNotificationSender()!.ConnectTo(compositeNotificationCounter);
         compositeNotificationCounter.ConnectTo(compositor);
         compositor.ConnectTo(compositeNotificationCounter);
 
@@ -284,7 +284,7 @@ public class NotificationApiTests : NotificationTestsBase
         var clone = Clone(partition);
 
         var replicator = PartitionReplicator.Create(clone, new(), partition.GetId());
-        partition.GetNotificationSender()?.ConnectTo(replicator);
+        partition.GetNotificationSender()!.ConnectTo(replicator);
 
         circle.Name = "Hello";
 
@@ -299,7 +299,7 @@ public class NotificationApiTests : NotificationTestsBase
         var cloneForest = new Forest();
 
         var replicator = ForestReplicator.Create(cloneForest, new(), null);
-        originalForest.GetNotificationSender()?.ConnectTo(replicator);
+        originalForest.GetNotificationSender()!.ConnectTo(replicator);
 
         var moved = new Documentation("moved");
         var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
