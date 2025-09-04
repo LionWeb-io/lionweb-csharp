@@ -101,7 +101,15 @@ public class ClassifierGenerator(
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             ]);
             
+            additionalMembers.AddRange([
+                Field("_notificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))))
+                    .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
+                Method("GetNotificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))), exprBody: IdentifierName("_notificationProducer"))
+                    .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword))
+            ]);
+            
             additionalConstructorStatements.Add(Assignment("_notificationSender", NewCall([This()], AsType(typeof(PartitionNotificationProducer)))));
+            additionalConstructorStatements.Add(Assignment("_notificationProducer", CastExpression(NullableType(AsType(typeof(IPartitionNotificationProducer))), IdentifierName("_notificationSender"))));
         }
 
         return ClassifierClass(bases, additionalMembers, additionalConstructorStatements);
