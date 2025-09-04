@@ -18,8 +18,8 @@
 namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
-using Core.Notification.Pipe;
 using Core.Notification.Partition;
+using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using System.Reflection;
@@ -28,6 +28,14 @@ using Comparer = Core.Utilities.Comparer;
 [TestClass]
 public class NotificationTests_Infrastructure
 {
+    [TestMethod]
+    public void NotificationProducer()
+    {
+        var node = new Geometry("a");
+        
+        Assert.AreSame(node.GetNotificationSender(), node.GetNotificationProducer());
+    }  
+    
     [TestMethod]
     public void MultiListeners_NoRead()
     {
