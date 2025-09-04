@@ -409,12 +409,15 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	public DataTypeTestConcept(string id) : base(id)
 	{
 		_notificationSender = new PartitionNotificationProducer(this);
+		_notificationProducer = (IPartitionNotificationProducer?)_notificationSender;
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.DataTypeTestConcept;
 	private readonly INotificationSender? _notificationSender;
 	public INotificationSender? GetNotificationSender() => _notificationSender;
+	private readonly IPartitionNotificationProducer? _notificationProducer;
+	protected internal IPartitionNotificationProducer? GetNotificationProducer() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -939,12 +942,15 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	public LinkTestConcept(string id) : base(id)
 	{
 		_notificationSender = new PartitionNotificationProducer(this);
+		_notificationProducer = (IPartitionNotificationProducer?)_notificationSender;
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.LinkTestConcept;
 	private readonly INotificationSender? _notificationSender;
 	public INotificationSender? GetNotificationSender() => _notificationSender;
+	private readonly IPartitionNotificationProducer? _notificationProducer;
+	protected internal IPartitionNotificationProducer? GetNotificationProducer() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
