@@ -65,34 +65,19 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         };
 
     /// <inheritdoc cref="FeatureGenerator"/>
-    public IEnumerable<MemberDeclarationSyntax> AbstractMembers()
-    {
-        switch (feature)
+    public IEnumerable<MemberDeclarationSyntax> AbstractMembers() =>
+        feature switch
         {
-            case Containment { Multiple: true } c:
-                return AbstractLinkMembers(c, writeable: true);
-            case Reference { Multiple: true } r:
-                return AbstractLinkMembers(r);
-            case { Optional: false }:
-                var writeable = feature is Containment;
-                return
-                [
-                    AbstractSingleRequiredFeatureProperty(writeable: writeable),
-                    AbstractRequiredFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-                ];
-            case { Optional: true }:
-                writeable = feature is Containment;
-                return
-                [
-                    AbstractSingleOptionalFeatureProperty(),
-                    AbstractOptionalFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-                ];
-            default:
-                throw new ArgumentException($"unsupported feature: {feature}", nameof(feature));
-        }
-    }
+            Containment { Multiple: true } c => AbstractLinkMembers(c, writeable: true),
+            Reference { Multiple: true } r => AbstractLinkMembers(r, writeable: false),
+            Containment { Optional: false } => AbstractSingleRequiredMembers(true),
+            Reference { Optional: false } or Property { Optional: false } => AbstractSingleRequiredMembers(false),
+            Containment { Optional: true } => AbstractSingleOptionalMembers(writeable: true),
+            Reference { Optional: true } or Property { Optional: true } => AbstractSingleOptionalMembers(false),
+            _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
+        };
 
-    private IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(Link link, bool writeable = false) =>
+    private IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(Link link, bool writeable) =>
     [
         AbstractMultipleLinkProperty(link),
         AbstractLinkAdder(link, writeable: writeable)
@@ -101,6 +86,18 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
         AbstractLinkRemover(link, writeable: writeable)
             .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+    ];
+
+    private IEnumerable<MemberDeclarationSyntax> AbstractSingleRequiredMembers(bool writeable) =>
+    [
+        AbstractSingleRequiredFeatureProperty(writeable: writeable),
+        AbstractRequiredFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+    ];
+
+    private IEnumerable<MemberDeclarationSyntax> AbstractSingleOptionalMembers(bool writeable) =>
+    [
+        AbstractSingleOptionalFeatureProperty(),
+        AbstractOptionalFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
     ];
 
     private IEnumerable<MemberDeclarationSyntax> RequiredProperty(Property property)
