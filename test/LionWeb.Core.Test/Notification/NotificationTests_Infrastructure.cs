@@ -20,13 +20,11 @@ namespace LionWeb.Core.Test.Notification;
 using Core.Notification;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
-using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using System.Reflection;
-using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class NotificationTests_Infrastructure
+public class NotificationTests_Infrastructure: NotificationTestsBase
 {
     [TestMethod]
     public void NotificationProducer()
@@ -160,10 +158,5 @@ public class NotificationTests_Infrastructure
         replicator.ConnectTo(cloneReplicator);
         
         return Tuple.Create(replicator, cloneReplicator);
-    }
-    private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
-    {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
 }

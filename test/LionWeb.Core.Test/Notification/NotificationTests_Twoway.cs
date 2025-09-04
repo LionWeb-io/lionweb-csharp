@@ -17,14 +17,12 @@
 
 namespace LionWeb.Core.Test.Notification;
 
-using Core.Notification.Pipe;
 using Core.Notification.Partition;
-using Core.Utilities;
+using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
-using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class NotificationTests_Twoway
+public class NotificationTests_Twoway: NotificationTestsBase 
 {
     #region Properties
 
@@ -851,9 +849,4 @@ public class NotificationTests_Twoway
     private static INotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
         PartitionReplicator.Create(clone, new(), sender);
 
-    private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
-    {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
-    }
 }
