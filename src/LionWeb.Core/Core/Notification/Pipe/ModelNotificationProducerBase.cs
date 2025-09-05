@@ -15,23 +15,13 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
-internal class NativeEventNotificationHandler<TNotification>(EventHandler<TNotification> handler)
-    : IReceivingNotificationHandler where TNotification : INotification
+/// Forwards all <see cref="ProduceNotification">produced</see> notifications unchanged to <i>following</i> notification pipes.
+public abstract class ModelNotificationProducerBase(object? sender)
+    : NotificationPipeBase(sender), INotificationProducer
 {
-    public void Dispose()
-    {
-    }
-
     /// <inheritdoc />
-    public bool Handles(params Type[] notificationTypes) =>
-        throw new NotImplementedException();
-
-    /// <inheritdoc />
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) 
-    {
-        if (notification is TNotification n)
-            handler.Invoke(correspondingHandler, n);
-    }
+    public void ProduceNotification(INotification notification) =>
+        Send(notification);
 }

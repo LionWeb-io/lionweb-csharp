@@ -54,7 +54,7 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
             switch (old)
             {
                 case null:
-                    InitiateNotification(new ChildAddedNotification(DestinationParent, added, Containment, _newIndex,
+                    ProduceNotification(new ChildAddedNotification(DestinationParent, added, Containment, _newIndex,
                         GetNotificationId()));
                     break;
 
@@ -62,8 +62,8 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
                     var notificationId = GetNotificationId();
                     var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, _newIndex, added,
                         old.Parent, old.Containment, old.Index, notificationId);
-                    RaiseOriginMoveNotification(old, notification);
-                    InitiateNotification(notification);
+                    ProduceOriginMoveNotification(old, notification);
+                    ProduceNotification(notification);
                     break;
 
                 case not null when old.Parent == DestinationParent && old.Containment == Containment && old.Index == _newIndex:
@@ -75,14 +75,14 @@ public class ContainmentAddMultipleNotificationEmitter<T> : ContainmentMultipleN
                         _newIndex--;
                     if (old.Index != _newIndex)
                     {
-                        InitiateNotification(new ChildMovedInSameContainmentNotification(_newIndex, added, DestinationParent,
+                        ProduceNotification(new ChildMovedInSameContainmentNotification(_newIndex, added, DestinationParent,
                             old.Containment, old.Index, GetNotificationId()));
                     }
 
                     break;
 
                 case not null when old.Parent == DestinationParent && old.Containment != Containment:
-                    InitiateNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, _newIndex,
+                    ProduceNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, _newIndex,
                         added, DestinationParent, old.Containment, old.Index, GetNotificationId()));
                     break;
 

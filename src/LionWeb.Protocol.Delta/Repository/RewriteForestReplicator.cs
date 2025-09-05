@@ -20,24 +20,24 @@ namespace LionWeb.Protocol.Delta.Repository;
 using Core.M1;
 using Core.Notification;
 using Core.Notification.Forest;
-using Core.Notification.Handler;
+using Core.Notification.Pipe;
 
 // TODO: Add docs once functionality (and usage) is clear.
 internal static class RewriteForestReplicator
 {
-    public static IConnectingNotificationHandler Create(
+    public static INotificationHandler Create(
         IForest localForest,
         SharedNodeMap sharedNodeMap,
         object? sender
     )
     {
-        IdReplacingNotificationHandler replacingFilter = null!;
+        IdReplacingNotificationFilter replacingFilter = null!;
         var parts = ForestReplicator.CreateInternal(localForest,
             sharedNodeMap,
             sender,
             (filter, s) =>
             {
-                replacingFilter = new IdReplacingNotificationHandler(s);
+                replacingFilter = new IdReplacingNotificationFilter(s);
                 return new RewriteRemoteReplicator(
                     localForest,
                     sharedNodeMap,
@@ -47,7 +47,7 @@ internal static class RewriteForestReplicator
                 );
             });
 
-        var result = new CompositeNotificationHandler(
+        var result = new MultipartNotificationHandler(
             parts.Prepend(replacingFilter).ToList(),
             sender ?? $"Composite of {nameof(RewriteForestReplicator)} {localForest}");
 
@@ -58,8 +58,8 @@ internal static class RewriteForestReplicator
 internal class RewriteRemoteReplicator(
     IForest? localForest,
     SharedNodeMap sharedNodeMap,
-    IdFilteringNotificationHandler filter,
-    IdReplacingNotificationHandler replacingFilter,
+    IdFilteringNotificationFilter filter,
+    IdReplacingNotificationFilter replacingFilter,
     object? sender
 ) : RemoteReplicator(localForest, sharedNodeMap, filter, sender)
 {

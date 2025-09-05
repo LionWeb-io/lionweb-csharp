@@ -15,16 +15,15 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
 using System.Diagnostics;
 
 /// Forwards <see cref="Receive">received</see> notifications if the notification passes <see cref="Filter"/>.
-public abstract class FilteringNotificationHandler(object? sender)
-    : NotificationHandlerBase(sender), IConnectingNotificationHandler
+public abstract class NotificationFilterBase(object? sender) : NotificationPipeBase(sender), INotificationHandler
 {
     /// <inheritdoc />
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+    public void Receive(INotificationSender correspondingSender, INotification notification)
     {
         var filtered = Filter(notification);
         Debug.WriteLine($"Forwarding notification id {notification.NotificationId}: {filtered?.NotificationId}");
@@ -32,22 +31,23 @@ public abstract class FilteringNotificationHandler(object? sender)
             Send(filtered);
     }
 
-    /// Determines whether <paramref name="notification"/> will be <see cref="ISendingNotificationHandler.Send">sent</see> to <i>following</i> notification handlers.
+    /// Determines whether <paramref name="notification"/> will be <see cref="INotificationSender.Send">sent</see>
+    /// to <i>following</i> notification pipes.
     /// <param name="notification">Notification to check.</param>
     /// <returns>the notification to send, or <c>null</c>.</returns>
     protected abstract INotification? Filter(INotification notification);
 }
 
 /// Suppresses all notifications with <see cref="RegisterNotificationId">registered notification ids</see>.
-public class IdFilteringNotificationHandler(object? sender) : FilteringNotificationHandler(sender)
+public class IdFilteringNotificationFilter(object? sender) : NotificationFilterBase(sender)
 {
     private readonly HashSet<INotificationId> _notificationIds = [];
 
-    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="ISendingNotificationHandler.Send">sending</see>.
+    /// Suppresses future notifications with <paramref name="notificationId"/> from <see cref="INotificationSender.Send">sending</see>.
     public void RegisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Add(notificationId);
 
-    /// <see cref="ISendingNotificationHandler.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
+    /// <see cref="INotificationSender.Send">Sends</see> future notifications with <paramref name="notificationId"/>.
     public void UnregisterNotificationId(INotificationId notificationId) =>
         _notificationIds.Remove(notificationId);
 

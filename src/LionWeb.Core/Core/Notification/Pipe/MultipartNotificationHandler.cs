@@ -15,30 +15,29 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
 /// Composes two or more <see cref="INotificationHandler"/>s.
 ///
 /// Every message this notification handler <see cref="Receive">receives</see>
-/// is forwarded to the first <see cref="_notificationHandlers">component</see>.
-/// Each component is connected to the next component.
-/// The last component <see cref="ISendingNotificationHandler.Send">sends</see> to
-/// this notification handler's <i>following</i> notification handlers.
-public class CompositeNotificationHandler : IConnectingNotificationHandler
+/// is forwarded to the first <see cref="_notificationHandlers">part</see>.
+/// Each part is connected to the next part.
+/// The last part <see cref="INotificationSender.Send">sends</see> to
+/// this notification handler's <i>following</i> notification pipes.
+public class MultipartNotificationHandler : INotificationHandler
 {
-    private readonly IConnectingNotificationHandler _firstHandler;
-    private readonly IConnectingNotificationHandler _lastHandler;
-    private readonly IEnumerable<IConnectingNotificationHandler> _notificationHandlers;
+    private readonly INotificationHandler _firstHandler;
+    private readonly INotificationHandler _lastHandler;
+    private readonly IEnumerable<INotificationHandler> _notificationHandlers;
     private readonly object? _sender;
 
-    public CompositeNotificationHandler(List<IConnectingNotificationHandler> notificationHandlers,
-        object? sender)
+    public MultipartNotificationHandler(List<INotificationHandler> notificationHandlers, object? sender)
     {
         _notificationHandlers = notificationHandlers;
         _sender = sender;
         if (notificationHandlers.Count < 2)
             throw new ArgumentException(
-                $"{nameof(CompositeNotificationHandler)} must get at least 2 notification handlers");
+                $"{nameof(MultipartNotificationHandler)} must get at least 2 notification handlers");
 
         _firstHandler = notificationHandlers[0];
         _lastHandler = notificationHandlers[^1];
@@ -49,7 +48,7 @@ public class CompositeNotificationHandler : IConnectingNotificationHandler
         while (enumerator.MoveNext())
         {
             var current = enumerator.Current;
-            INotificationHandler.Connect(previous, current);
+            previous.ConnectTo(current);
 
             previous = current;
         }
@@ -66,19 +65,23 @@ public class CompositeNotificationHandler : IConnectingNotificationHandler
     }
 
     /// <inheritdoc />
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
-        _firstHandler.Receive(correspondingHandler, notification);
+    public void Receive(INotificationSender correspondingSender, INotification notification) =>
+        _firstHandler.Receive(correspondingSender, notification);
 
     /// <inheritdoc />
     public bool Handles(params Type[] notificationTypes) =>
         _firstHandler.Handles(notificationTypes);
 
-    void ISendingNotificationHandler.Send(INotification notification) =>
+    void INotificationSender.Send(INotification notification) =>
         throw new ArgumentException("Should never be called");
 
-    void ISendingNotificationHandler.Subscribe(IReceivingNotificationHandler receiver) =>
+    void INotificationSender.Subscribe(INotificationReceiver receiver) =>
         _lastHandler.Subscribe(receiver);
 
-    void ISendingNotificationHandler.Unsubscribe(IReceivingNotificationHandler receiver) =>
+    void INotificationSender.Unsubscribe(INotificationReceiver receiver) =>
         _lastHandler.Unsubscribe(receiver);
+
+    /// <inheritdoc />
+    public void ConnectTo(INotificationReceiver to) =>
+        ((INotificationSender)this).Subscribe(to);
 }

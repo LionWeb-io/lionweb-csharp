@@ -70,37 +70,37 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                 break;
 
             case (not null, null, _):
-                InitiateNotification(new ChildDeletedNotification(_oldValue, DestinationParent, Containment, 0,
+                ProduceNotification(new ChildDeletedNotification(_oldValue, DestinationParent, Containment, 0,
                     GetNotificationId()));
                 break;
 
             case (null, not null, null):
-                InitiateNotification(new ChildAddedNotification(DestinationParent, _newValue, Containment, 0,
+                ProduceNotification(new ChildAddedNotification(DestinationParent, _newValue, Containment, 0,
                     GetNotificationId()));
                 break;
 
             case (not null, not null, null):
-                InitiateNotification(new ChildReplacedNotification(_newValue, _oldValue, DestinationParent, Containment, 0,
+                ProduceNotification(new ChildReplacedNotification(_newValue, _oldValue, DestinationParent, Containment, 0,
                     GetNotificationId()));
                 break;
 
             case (null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                InitiateNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, 0, _newValue,
+                ProduceNotification(new ChildMovedFromOtherContainmentInSameParentNotification(Containment, 0, _newValue,
                     DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index,
                     GetNotificationId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent == DestinationParent && _oldContainmentInfo.Containment != Containment:
-                InitiateNotification(new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(Containment, 0,
+                ProduceNotification(new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(Containment, 0,
                     _newValue, DestinationParent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, _oldValue,
                     GetNotificationId()));
                 break;
 
             case (not null, not null, not null)
                 when _oldContainmentInfo.Parent != DestinationParent:
-                InitiateNotification(new ChildMovedAndReplacedFromOtherContainmentNotification(DestinationParent,
+                ProduceNotification(new ChildMovedAndReplacedFromOtherContainmentNotification(DestinationParent,
                     Containment, 0, _newValue, _oldContainmentInfo.Parent, _oldContainmentInfo.Containment,
                     _oldContainmentInfo.Index, _oldValue,
                     GetNotificationId()));
@@ -111,8 +111,8 @@ public class ContainmentSingleNotificationEmitter<T> : ContainmentNotificationEm
                 var notificationId = GetNotificationId();
                 var notification = new ChildMovedFromOtherContainmentNotification(DestinationParent, Containment, 0, _newValue,
                     _oldContainmentInfo.Parent, _oldContainmentInfo.Containment, _oldContainmentInfo.Index, notificationId);
-                RaiseOriginMoveNotification(_oldContainmentInfo, notification);
-                InitiateNotification(notification);
+                ProduceOriginMoveNotification(_oldContainmentInfo, notification);
+                ProduceNotification(notification);
                 break;
 
             default:

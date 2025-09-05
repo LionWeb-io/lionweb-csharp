@@ -19,6 +19,7 @@ namespace LionWeb.Core.M1;
 
 using Notification;
 using Notification.Forest;
+using Notification.Pipe;
 using Utilities;
 
 /// A collection of model trees, represented by each trees' <see cref="IPartitionInstance">partition</see> (aka root node).
@@ -27,30 +28,33 @@ public interface IForest
     /// Contains all known partitions.
     /// <seealso cref="AddPartitions"/>
     /// <seealso cref="RemovePartitions"/>
-    public IReadOnlySet<IPartitionInstance> Partitions { get; }
+    IReadOnlySet<IPartitionInstance> Partitions { get; }
 
     /// Adds <paramref name="partitions"/> to <c>this</c> forest.
-    public void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
+    void AddPartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
     /// Removes <paramref name="partitions"/> from <c>this</c> forest.
-    public void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
+    void RemovePartitions(IEnumerable<IPartitionInstance> partitions, INotificationId? notificationId = null);
 
-    /// <c>this</c> forest's notification handler, if any.
-    IForestNotificationHandler? GetNotificationHandler();
+    /// <c>this</c> forest's notification sender, if any.
+    INotificationSender? GetNotificationSender();
+
+    /// <c>this</c> forest's notification producer, if any.
+    protected IForestNotificationProducer? GetNotificationProducer();
 }
 
 /// <inheritdoc />
 public class Forest : IForest
 {
     private readonly HashSet<IPartitionInstance> _partitions;
-    private readonly IForestNotificationHandler _notificationHandler;
+    private readonly IForestNotificationProducer _notificationProducer;
     private readonly INotificationIdProvider _notificationIdProvider;
 
     /// <inheritdoc cref="IForest"/>
     public Forest()
     {
         _partitions = new HashSet<IPartitionInstance>(new NodeIdComparer<IPartitionInstance>());
-        _notificationHandler = new ForestNotificationHandler(this);
+        _notificationProducer = new ForestNotificationProducer(this);
         _notificationIdProvider = new NotificationIdProvider(this);
     }
 
@@ -63,7 +67,7 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Add(partition))
-                _notificationHandler.InitiateNotification(new PartitionAddedNotification(partition,
+                GetNotificationProducer()?.ProduceNotification(new PartitionAddedNotification(partition,
                     notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }
@@ -74,14 +78,20 @@ public class Forest : IForest
         foreach (var partition in partitions)
         {
             if (_partitions.Remove(partition))
-                _notificationHandler.InitiateNotification(new PartitionDeletedNotification(partition,
+                GetNotificationProducer()?.ProduceNotification(new PartitionDeletedNotification(partition,
                     notificationId ?? _notificationIdProvider.CreateNotificationId()));
         }
     }
 
     /// <inheritdoc />
-    public IForestNotificationHandler GetNotificationHandler() => _notificationHandler;
+    public INotificationSender? GetNotificationSender() =>
+        GetNotificationProducer();
 
     /// <inheritdoc />
-    public override string ToString() => $"{nameof(Forest)}@{GetHashCode()}";
+    public IForestNotificationProducer? GetNotificationProducer() =>
+        _notificationProducer;
+
+    /// <inheritdoc />
+    public override string ToString() =>
+        $"{nameof(Forest)}@{GetHashCode()}";
 }

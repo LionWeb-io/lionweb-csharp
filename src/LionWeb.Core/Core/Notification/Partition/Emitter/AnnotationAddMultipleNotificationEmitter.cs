@@ -49,7 +49,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
             switch (old)
             {
                 case null:
-                    InitiateNotification(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
+                    ProduceNotification(new AnnotationAddedNotification(DestinationParent, added, _newIndex,
                         GetNotificationId()));
                     break;
 
@@ -57,8 +57,8 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
                     var notificationId = GetNotificationId();
                     var notification = new AnnotationMovedFromOtherParentNotification(DestinationParent, _newIndex, added, old.Parent,
                         old.Index, notificationId);
-                    RaiseOriginMoveNotification(old, notification);
-                    InitiateNotification(notification);
+                    ProduceOriginMoveNotification(old, notification);
+                    ProduceNotification(notification);
                     break;
 
 
@@ -67,7 +67,7 @@ public class AnnotationAddMultipleNotificationEmitter : AnnotationNotificationEm
                     break;
 
                 case not null when old.Parent == DestinationParent:
-                    InitiateNotification(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
+                    ProduceNotification(new AnnotationMovedInSameParentNotification(_newIndex, added, DestinationParent,
                         old.Index, GetNotificationId()));
                     break;
 

@@ -18,9 +18,7 @@
 namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
-using Core.Notification.Forest;
-using Core.Notification.Handler;
-using Core.Notification.Partition;
+using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
@@ -33,10 +31,10 @@ public class CompositorTests
         var partition = new Geometry("partition");
 
         var compositor = new NotificationCompositor("compositor");
-        INotificationHandler.Connect(partition.GetNotificationHandler(), compositor);
+        partition.GetNotificationSender()!.ConnectTo(compositor);
 
         var counter = new PartitionEventCounter();
-        INotificationHandler.Connect(compositor, counter);
+        compositor.ConnectTo(counter);
         
         partition.Documentation = new Documentation("documentation");
         partition.Documentation.Text = "hello";
@@ -51,10 +49,10 @@ public class CompositorTests
         var partition = new Geometry("partition");
 
         var compositor = new NotificationCompositor("compositor");
-        INotificationHandler.Connect(partition.GetNotificationHandler(), compositor);
+        partition.GetNotificationSender()!.ConnectTo(compositor);
 
         var counter = new PartitionEventCounter();
-        INotificationHandler.Connect(compositor, counter);
+        compositor.ConnectTo(counter);
 
         var composite = compositor.Push();
         
@@ -75,10 +73,10 @@ public class CompositorTests
         var partition = new Geometry("partition");
 
         var compositor = new NotificationCompositor("compositor");
-        INotificationHandler.Connect(partition.GetNotificationHandler(), compositor);
+        partition.GetNotificationSender()!.ConnectTo(compositor);
 
         var counter = new PartitionEventCounter();
-        INotificationHandler.Connect(compositor, counter);
+        compositor.ConnectTo(counter);
 
         var composite = compositor.Push();
         
@@ -99,10 +97,10 @@ public class CompositorTests
         var partition = new Geometry("partition");
 
         var compositor = new NotificationCompositor("compositor");
-        INotificationHandler.Connect(partition.GetNotificationHandler(), compositor);
+        partition.GetNotificationSender()!.ConnectTo(compositor);
 
         var counter = new PartitionEventCounter();
-        INotificationHandler.Connect(compositor, counter);
+        compositor.ConnectTo(counter);
 
         var compositeA = compositor.Push();
         
@@ -131,12 +129,12 @@ public class CompositorTests
         var partition = new Geometry("partition");
 
         var compositor = new NotificationCompositor("compositor");
-        INotificationHandler.Connect(forest.GetNotificationHandler(), compositor);
+        forest.GetNotificationSender()!.ConnectTo(compositor);
         
         forest.AddPartitions([partition]);
 
         var counter = new ForestEventCounter();
-        INotificationHandler.Connect(compositor, counter);
+        compositor.ConnectTo(counter);
 
         var composite = compositor.Push();
         
@@ -158,12 +156,12 @@ public class CompositorTests
         var partition = new Geometry("partition");
 
         var compositor = new NotificationCompositor("compositor");
-        INotificationHandler.Connect(forest.GetNotificationHandler(), compositor);
+        forest.GetNotificationSender()!.ConnectTo(compositor);
         
         forest.AddPartitions([partition]);
 
         var counter = new ForestEventCounter();
-        INotificationHandler.Connect(compositor, counter);
+        compositor.ConnectTo(counter);
 
         var composite = compositor.Push();
         
@@ -188,14 +186,14 @@ public class CompositorTests
         var forest = new Forest();
 
         var compositor = new NotificationCompositor("compositor");
-        INotificationHandler.Connect(forest.GetNotificationHandler(), compositor);
+        forest.GetNotificationSender()!.ConnectTo(compositor);
         
         var partitionA = new Geometry("partitionA");
         // outside counter
         forest.AddPartitions([partitionA]);
 
         var counter = new ForestEventCounter();
-        INotificationHandler.Connect(compositor, counter);
+        compositor.ConnectTo(counter);
         
         var partitionB = new Geometry("partitionB");
         // inside counter, outside composite
@@ -220,10 +218,10 @@ public class CompositorTests
         var forest = new Forest();
 
         var compositor = new NotificationCompositor("compositor");
-        INotificationHandler.Connect(forest.GetNotificationHandler(), compositor);
+        forest.GetNotificationSender()!.ConnectTo(compositor);
         
         var counter = new ForestEventCounter();
-        INotificationHandler.Connect(compositor, counter);
+        compositor.ConnectTo(counter);
         
         var compositeA = compositor.Push();
         
@@ -271,16 +269,16 @@ public class CompositorTests
     }
 }
 
-internal class ForestEventCounter() : NotificationHandlerBase(null), IReceivingNotificationHandler
+internal class ForestEventCounter() : NotificationPipeBase(null), INotificationReceiver
 {
     public int Count { get; private set; }
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
+    public void Receive(INotificationSender correspondingSender, INotification notification) => 
         Count++;
 }
 
-internal class PartitionEventCounter() : NotificationHandlerBase(null), IReceivingNotificationHandler
+internal class PartitionEventCounter() : NotificationPipeBase(null), INotificationReceiver
 {
     public int Count { get; private set; }
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification) => 
+    public void Receive(INotificationSender correspondingSender, INotification notification) => 
         Count++;
 }

@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Notification;
 
 [TestClass]
 public class ContainmentTests_Annotation_Listener
@@ -33,7 +34,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -54,7 +55,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -77,7 +78,7 @@ public class ContainmentTests_Annotation_Listener
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -102,7 +103,7 @@ public class ContainmentTests_Annotation_Listener
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -126,7 +127,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom, new Documentation("doc")]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreEqual(0, args.OldIndex);
@@ -150,7 +151,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom, doc]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreEqual(0, args.OldIndex);
@@ -173,7 +174,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([new Documentation("doc"), bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
 
         line.AddAnnotations([bom]);
 
@@ -190,7 +191,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc, bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
 
         line.Set(null, new List<INode> { doc, bom });
 
@@ -207,7 +208,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -230,7 +231,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -253,7 +254,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -276,7 +277,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -299,7 +300,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -323,7 +324,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -347,7 +348,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -371,7 +372,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -395,7 +396,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -419,7 +420,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -443,7 +444,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -469,7 +470,7 @@ public class ContainmentTests_Annotation_Listener
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -497,7 +498,7 @@ public class ContainmentTests_Annotation_Listener
         oldParent.AddAnnotations([new Documentation("doc"), bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationMovedFromOtherParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(oldParent, args.OldParent);
@@ -523,7 +524,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreEqual(1, args.OldIndex);
@@ -548,7 +549,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, args) =>
         {
             notifications++;
             Assert.AreEqual(1, args.OldIndex);
@@ -573,7 +574,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
 
         line.InsertAnnotations(1, [bom]);
 
@@ -591,7 +592,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationMovedInSameParentNotification>((_, _) => notifications++);
 
         line.Set(null, new List<INode> { docA, bom, docB });
 
@@ -610,7 +611,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations([bom]);
 
@@ -627,7 +628,7 @@ public class ContainmentTests_Annotation_Listener
         var bom = new BillOfMaterials("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations([bom]);
 
@@ -643,7 +644,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -665,7 +666,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -688,7 +689,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom, doc]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -711,7 +712,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([bom, doc]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -734,7 +735,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc, bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -757,7 +758,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([doc, bom]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -781,7 +782,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -805,7 +806,7 @@ public class ContainmentTests_Annotation_Listener
         line.AddAnnotations([docA, bom, docB]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -832,7 +833,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
 
         line.AddAnnotations(values);
 
@@ -847,7 +848,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
 
         line.Set(null, values);
 
@@ -862,7 +863,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, _) => notifications++);
 
         line.InsertAnnotations(0, values);
 
@@ -877,7 +878,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[0];
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations(values);
 
@@ -895,7 +896,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new List<BillOfMaterials>();
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(line, args.Parent);
@@ -922,7 +923,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(notifications, args.Index);
@@ -945,7 +946,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(notifications, args.Index);
@@ -970,7 +971,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(notifications, args.Index);
@@ -993,7 +994,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(notifications, args.Index);
@@ -1019,7 +1020,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1 + notifications, args.Index);
@@ -1045,7 +1046,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationAddedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1 + notifications, args.Index);
@@ -1073,7 +1074,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new List<INode>() { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1097,7 +1098,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new List<INode>() { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1120,7 +1121,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations(values);
 
@@ -1140,7 +1141,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, _) => notifications++);
 
         line.RemoveAnnotations(values);
 
@@ -1159,7 +1160,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, docA };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1184,7 +1185,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, docA };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1208,7 +1209,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1232,7 +1233,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(0, args.Index);
@@ -1257,7 +1258,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
@@ -1282,7 +1283,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
@@ -1308,7 +1309,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
@@ -1334,7 +1335,7 @@ public class ContainmentTests_Annotation_Listener
         var values = new INode[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(1, args.Index);
@@ -1361,7 +1362,7 @@ public class ContainmentTests_Annotation_Listener
 
         int notifications = 0;
         int[] indices = [0, 1];
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(indices[notifications], args.Index);
@@ -1388,7 +1389,7 @@ public class ContainmentTests_Annotation_Listener
 
         int notifications = 0;
         int[] indices = [0, 1];
-        parent.GetNotificationHandler().Subscribe<AnnotationDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<AnnotationDeletedNotification>((_, args) =>
         {
             Assert.AreSame(line, args.Parent);
             Assert.AreEqual(indices[notifications], args.Index);

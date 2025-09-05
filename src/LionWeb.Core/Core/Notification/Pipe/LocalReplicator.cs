@@ -15,7 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Core.Notification.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
 using Forest;
 using M1;
@@ -25,7 +25,7 @@ using Partition;
 /// Keeps track of <i>locally</i> <see cref="OnLocalPartitionAdded">added</see> and <see cref="OnLocalPartitionDeleted">deleted</see>
 /// partitions, and updates the <see cref="SharedNodeMap"/> with <i>locally</i> <see cref="SharedNodeMap.RegisterNode">added</see>
 /// and <see cref="SharedNodeMap.UnregisterNode">removed</see> nodes. 
-public class LocalReplicator : NotificationHandlerBase, IConnectingNotificationHandler
+public class LocalReplicator : NotificationPipeBase, INotificationHandler
 {
     private readonly SharedNodeMap _sharedNodeMap;
 
@@ -42,22 +42,22 @@ public class LocalReplicator : NotificationHandlerBase, IConnectingNotificationH
 
         foreach (var partition in localForest.Partitions)
         {
-            var handler = partition.GetNotificationHandler();
-            if (handler != null)
-                RegisterPartition(handler, partition);
+            var notificationSender = partition.GetNotificationSender();
+            if (notificationSender != null)
+                RegisterPartition(notificationSender, partition);
         }
     }
 
     /// <inheritdoc />
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+    public void Receive(INotificationSender correspondingSender, INotification notification)
     {
         switch (notification)
         {
             case PartitionAddedNotification partitionAdded:
-                OnLocalPartitionAdded(correspondingHandler, partitionAdded);
+                OnLocalPartitionAdded(correspondingSender, partitionAdded);
                 break;
             case PartitionDeletedNotification partitionDeleted:
-                OnLocalPartitionDeleted(correspondingHandler, partitionDeleted);
+                OnLocalPartitionDeleted(correspondingSender, partitionDeleted);
                 break;
             case ChildAddedNotification e:
                 OnLocalChildAdded(e);
@@ -73,32 +73,28 @@ public class LocalReplicator : NotificationHandlerBase, IConnectingNotificationH
                 break;
         }
 
-        SendWithSender(correspondingHandler, notification);
+        SendWithSender(correspondingSender, notification);
     }
 
     #region Forest
 
-    private void RegisterPartition(ISendingNotificationHandler correspondingHandler,
-        IPartitionInstance partition)
+    private void RegisterPartition(INotificationSender correspondingSender, IPartitionInstance partition)
     {
         _sharedNodeMap.RegisterNode(partition);
-        INotificationHandler.Connect(correspondingHandler, this);
+        correspondingSender.ConnectTo(this);
     }
 
-    private void UnregisterPartition(ISendingNotificationHandler correspondingHandler,
-        IPartitionInstance partition)
+    private void UnregisterPartition(INotificationSender correspondingSender, IPartitionInstance partition)
     {
-        correspondingHandler.Unsubscribe(this);
+        correspondingSender.Unsubscribe(this);
         _sharedNodeMap.UnregisterNode(partition);
     }
 
-    private void OnLocalPartitionAdded(ISendingNotificationHandler correspondingHandler,
-        PartitionAddedNotification partitionAdded) =>
-        RegisterPartition(correspondingHandler, partitionAdded.NewPartition);
+    private void OnLocalPartitionAdded(INotificationSender correspondingSender, PartitionAddedNotification partitionAdded) =>
+        RegisterPartition(correspondingSender, partitionAdded.NewPartition);
 
-    private void OnLocalPartitionDeleted(ISendingNotificationHandler correspondingHandler,
-        PartitionDeletedNotification partitionDeleted) =>
-        UnregisterPartition(correspondingHandler, partitionDeleted.DeletedPartition);
+    private void OnLocalPartitionDeleted(INotificationSender correspondingSender, PartitionDeletedNotification partitionDeleted) =>
+        UnregisterPartition(correspondingSender, partitionDeleted.DeletedPartition);
 
     #endregion
 

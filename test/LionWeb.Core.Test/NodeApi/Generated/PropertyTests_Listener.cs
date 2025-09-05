@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Notification;
 
 [TestClass]
 public class PropertyTests_Listener
@@ -31,7 +32,7 @@ public class PropertyTests_Listener
         parent.Documentation = doc;
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<PropertyAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(doc, args.Node);
@@ -53,7 +54,7 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<PropertyDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(doc, args.Node);
@@ -75,7 +76,7 @@ public class PropertyTests_Listener
         doc.Text = "hello";
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyChangedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<PropertyChangedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(doc, args.Node);
@@ -85,8 +86,8 @@ public class PropertyTests_Listener
         });
 
         int badNotifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
-        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationSender().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationSender().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
 
         doc.Text = "bye";
 
@@ -102,7 +103,7 @@ public class PropertyTests_Listener
         parent.AddShapes([circle]);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<PropertyAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(circle, args.Node);
@@ -124,7 +125,7 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<PropertyDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(circle, args.Node);
@@ -145,7 +146,7 @@ public class PropertyTests_Listener
         circle.Uuid = "hello";
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyChangedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<PropertyChangedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(circle, args.Node);
@@ -155,8 +156,8 @@ public class PropertyTests_Listener
         });
 
         int badNotifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
-        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationSender().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationSender().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
 
         circle.Uuid = "bye";
 
