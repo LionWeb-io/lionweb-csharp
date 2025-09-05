@@ -93,23 +93,17 @@ public class ClassifierGenerator(
         if (concept.Partition)
         {
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
-
-            additionalMembers.AddRange([
-                Field("_notificationSender", NullableType(AsType(typeof(INotificationSender))))
-                    .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
-                Method("GetNotificationSender", NullableType(AsType(typeof(INotificationSender))), exprBody: IdentifierName("_notificationSender"))
-                    .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
-            ]);
             
             additionalMembers.AddRange([
                 Field("_notificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))))
                     .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
                 Method("GetNotificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))), exprBody: IdentifierName("_notificationProducer"))
-                    .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword))
+                    .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword)),
+                Method("GetNotificationSender", NullableType(AsType(typeof(INotificationSender))), exprBody: IdentifierName("_notificationProducer"))
+                    .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             ]);
             
-            additionalConstructorStatements.Add(Assignment("_notificationSender", NewCall([This()], AsType(typeof(PartitionNotificationProducer)))));
-            additionalConstructorStatements.Add(Assignment("_notificationProducer", CastExpression(NullableType(AsType(typeof(IPartitionNotificationProducer))), IdentifierName("_notificationSender"))));
+            additionalConstructorStatements.Add(Assignment("_notificationProducer", NewCall([This()], AsType(typeof(PartitionNotificationProducer)))));
         }
 
         return ClassifierClass(bases, additionalMembers, additionalConstructorStatements);
