@@ -1430,16 +1430,14 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 	public Geometry(string id) : base(id)
 	{
-		_notificationSender = new PartitionNotificationProducer(this);
-		_notificationProducer = (IPartitionNotificationProducer?)_notificationSender;
+		_notificationProducer = new PartitionNotificationProducer(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
-	private readonly INotificationSender? _notificationSender;
-	public INotificationSender? GetNotificationSender() => _notificationSender;
 	private readonly IPartitionNotificationProducer? _notificationProducer;
 	protected internal IPartitionNotificationProducer? GetNotificationProducer() => _notificationProducer;
+	public INotificationSender? GetNotificationSender() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -2297,16 +2295,14 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 
 	public ReferenceGeometry(string id) : base(id)
 	{
-		_notificationSender = new PartitionNotificationProducer(this);
-		_notificationProducer = (IPartitionNotificationProducer?)_notificationSender;
+		_notificationProducer = new PartitionNotificationProducer(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
-	private readonly INotificationSender? _notificationSender;
-	public INotificationSender? GetNotificationSender() => _notificationSender;
 	private readonly IPartitionNotificationProducer? _notificationProducer;
 	protected internal IPartitionNotificationProducer? GetNotificationProducer() => _notificationProducer;
+	public INotificationSender? GetNotificationSender() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
