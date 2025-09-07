@@ -20,6 +20,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Google.Protobuf" />
       <PackageReference Include="Utf8JsonAsyncStreamReader" />
     </ItemGroup>
 

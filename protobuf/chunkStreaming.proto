@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package io.lionweb.protobuf.streaming;
+
+option java_multiple_files = true;
+option java_package = "io.lionweb.protobuf.streaming";
+option java_outer_classname = "ChunkProtos";
+
+message PsMessage {
+  oneof message {
+      PsSerializationFormatVersion serializationFormatVersion = 1;
+      PsStringValue stringValue = 2;
+      PsMetaPointer metaPointer = 3;
+      PsLanguage language = 4;
+      PsNode node = 5;
+      PsUnboundNodeId unboundId = 6;
+  }
+}
+
+message PsSerializationFormatVersion {
+  string version = 1;
+}
+
+message PsChunk {
+  PsSerializationFormatVersion serializationFormatVersion = 1;
+  // We use this mechanism both to save space and to represent nulls (identified by -1)
+  repeated PsStringValue stringValues = 2;
+  repeated PsMetaPointer metaPointers= 3;
+  repeated PsLanguage languages = 4;
+  repeated PsNode nodes = 5;
+  repeated PsUnboundNodeId unboundIds = 6;
+}
+
+message PsStringValue {
+  uint64 idx = 1;
+  string value = 2;
+}
+
+message PsLanguage {
+  uint64 idx = 1;
+  uint64 key = 2;
+  uint64 version = 3;
+}
+
+message PsUnboundNodeId {
+  uint64 idx = 1;
+  uint64 id = 2;
+}
+
+message PsNode {
+  uint64 idx = 1;
+  uint64 id = 2;
+  uint64 classifier = 3;
+  repeated PsProperty properties = 4;
+  repeated PsContainment containments = 5;
+  repeated PsReference references = 6;
+  /* This is a list of indexes representing the string values corresponding to the IDs of the annotations */
+  repeated uint64 annotations = 7;
+  optional uint64 parent = 8;
+}
+
+message PsMetaPointer {
+  uint64 idx = 1;
+  uint64 language = 2;
+  uint64 version = 3;
+  uint64 key = 4;
+}
+
+message PsProperty {
+  uint64 metaPointerIndex = 1;
+  optional uint64 value = 2;
+}
+
+message PsContainment {
+  uint64 metaPointerIndex = 1;
+  repeated uint64 children = 2;
+}
+
+message PsReference {
+  uint64 metaPointerIndex = 1;
+  repeated PsReferenceValue values = 2;
+}
+
+message PsReferenceValue {
+  optional uint64 resolveInfo = 1;
+  optional uint64 referred = 2;
+}

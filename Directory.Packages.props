@@ -12,6 +12,7 @@ SPDX-License-Identifier: Apache-2.0
     <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotMemory" Version="0.15.2" />
     <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.2" />
     <PackageVersion Include="BenchmarkDotNet.TestAdapter" Version="0.15.2" />
+    <PackageVersion Include="Google.Protobuf" Version="3.32.0" />
     <PackageVersion Include="JsonSchema.Net" Version="7.3.4" />
     <PackageVersion Include="MinVer" Version="4.3.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
