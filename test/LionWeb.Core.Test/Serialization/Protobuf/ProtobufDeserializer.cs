@@ -23,11 +23,11 @@ using M1;
 using M2;
 using M3;
 
-class ProtobufDeserializer
+public class ProtobufDeserializer
 {
     private readonly PBChunk _chunk;
 
-    private LionWebVersions _lionWebVersion = LionWebVersions.v2023_1;
+    private LionWebVersions _lionWebVersion = LionWebVersions.v2024_1_Compatible;
 
     private readonly Dictionary<int, Language> _languages = new();
     private readonly Dictionary<int, IKeyed> _entities = new();

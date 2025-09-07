@@ -37,7 +37,7 @@ public abstract class ProtobufDeserializerBase
 {
     private readonly PBChunk _chunk;
 
-    private LionWebVersions _lionWebVersion = LionWebVersions.v2023_1;
+    private LionWebVersions _lionWebVersion = LionWebVersions.v2024_1_Compatible;
 
     private readonly List<Language> _registeredLanguages;
     private readonly LanguageLookup _languages;

@@ -49,7 +49,7 @@ public class ProtobufStreamingDeserializer : ProtobufDeserializerBase
         while (_stream.Position < _stream.Length)
         {
             var msg = PsMessage.Parser.ParseDelimitedFrom(_stream);
-            Console.WriteLine($"Reading {msg}");
+            // Console.WriteLine($"Reading {msg}");
             if (msg == null)
                 break;
             Process(msg);

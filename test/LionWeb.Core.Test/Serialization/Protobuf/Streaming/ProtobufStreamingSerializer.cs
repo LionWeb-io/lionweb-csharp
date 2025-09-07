@@ -51,7 +51,7 @@ public class ProtobufStreamingSerializer : ProtobufSerializerBase
 
     private void Write(PsMessage msg)
     {
-        Console.WriteLine($"Writing {msg}");
+        // Console.WriteLine($"Writing {msg}");
         msg.WriteDelimitedTo(_stream);
     }
 

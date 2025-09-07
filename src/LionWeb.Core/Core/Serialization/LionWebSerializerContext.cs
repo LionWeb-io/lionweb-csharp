@@ -37,7 +37,7 @@ public class InternedStringConverter : JsonConverter<string>
 
     public override void Write(Utf8JsonWriter writer, string value, JsonSerializerOptions options)
     {
-7        if (value != null)
+        if (value != null)
             writer.WriteStringValue(value.AsSpan());
         else
             writer.WriteNullValue();

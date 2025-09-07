@@ -18,11 +18,15 @@
 namespace LionWeb.Core.Benchmark;
 
 using BenchmarkDotNet.Attributes;
+using Io.Lionweb.Protobuf;
+using Io.Lionweb.Protobuf.Streaming;
 using M1;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Serialization;
 using System.Text.Json;
 using System.Text.Json.Stream;
+using Test.Serialization.Protobuf;
+using Test.Serialization.Protobuf.Streaming;
 using Utf8JsonStreamReader;
 
 [MemoryDiagnoser]
@@ -189,6 +193,52 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
+    // [Benchmark]
+    [TestMethod]
+    public void Deserialize_Protobuf()
+    {
+        using Stream stream = File.OpenRead(_protobufFile);
+
+        var pbChunk = PBChunk.Parser.ParseFrom(stream);
+
+        var deserializer = new ProtobufDeserializer(pbChunk);
+        var nodes = deserializer.Deserialize([_language]).ToList();
+
+        var actual = nodes.SelectMany(n => n.Descendants(true, true)).Count();
+        if (_maxSize != actual)
+            throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
+    }
+    
+    // [Benchmark]
+    [TestMethod]
+    public void Deserialize_Protobuf_Block()
+    {
+        using Stream stream = File.OpenRead(_protobufBlockFile);
+
+        var psChunk = PsChunk.Parser.ParseFrom(stream);
+
+        var deserializer = new ProtobufBlockDeserializer([_language]);
+        var nodes = deserializer.Deserialize(psChunk).ToList();
+
+        var actual = nodes.SelectMany(n => n.Descendants(true, true)).Count();
+        if (_maxSize != actual)
+            throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
+    }
+    
+    [Benchmark]
+    [TestMethod]
+    public void Deserialize_Protobuf_Streaming()
+    {
+        using Stream stream = File.OpenRead(_protobufStreamingFile);
+
+        var deserializer = new ProtobufStreamingDeserializer(stream, [_language]);
+        var nodes = deserializer.Deserialize().ToList();
+
+        var actual = nodes.SelectMany(n => n.Descendants(true, true)).Count();
+        if (_maxSize != actual)
+            throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
+    }
+    
     private static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream utf8JsonStream,
         IDeserializer deserializer, JsonSerializerOptions jsonSerializerOptions, Action<string>? lionWebVersionChecker = null)
     {

@@ -41,7 +41,7 @@ public abstract class ProtobufSerializerBase
 
     public ProtobufSerializerBase()
     {
-        _lionWebVersion = LionWebVersions.v2023_1;
+        _lionWebVersion = LionWebVersions.v2024_1_Compatible;
         _serializerSpecifics = ISerializerVersionSpecifics.Create(_lionWebVersion);
 
         _languages = new(_lionWebVersion,

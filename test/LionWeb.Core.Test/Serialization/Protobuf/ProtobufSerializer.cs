@@ -24,8 +24,9 @@ using M2;
 using M3;
 using System.Collections;
 using VersionSpecific.V2023_1;
+using VersionSpecific.V2024_1_Compatible;
 
-class ProtobufSerializer
+public class ProtobufSerializer
 {
     private readonly IEnumerable<IReadableNode> _nodes;
 
@@ -41,7 +42,7 @@ class ProtobufSerializer
     {
         _nodes = nodes;
 
-        _serializerSpecifics = new SerializerVersionSpecifics_2023_1();
+        _serializerSpecifics = new SerializerVersionSpecifics_2024_1_Compatible();
     }
 
     public PBChunk Serialize()

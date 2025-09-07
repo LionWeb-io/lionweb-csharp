@@ -18,11 +18,14 @@
 namespace LionWeb.Core.Benchmark;
 
 using BenchmarkDotNet.Attributes;
+using Google.Protobuf;
 using M1;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Serialization;
 using System.Text.Json;
 using Test.Languages.Generated.V2024_1.Shapes.M2;
+using Test.Serialization.Protobuf;
+using Test.Serialization.Protobuf.Streaming;
 using Test.Utilities;
 
 [MemoryDiagnoser]
@@ -33,6 +36,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     private IEnumerable<INode> _nodes;
 
     [IterationSetup]
+    [TestInitialize]
     public void CreateNodes()
     {
         _nodes = CreateNodes(_maxSize);
@@ -124,6 +128,41 @@ public class SerializerBenchmark : SerializerBenchmarkBase
             .SerializeToChunk(_nodes), _aotOptions);
 
         File.WriteAllText(_stringFile, output);
+    }
+
+    [Benchmark]
+    [TestMethod]
+    public void Serialize_Protobuf()
+    {
+        IEnumerable<IReadableNode> nodes = _nodes;
+        var serializer = new ProtobufSerializer(nodes);
+        var pbChunk = serializer.Serialize();
+        
+        using Stream stream = File.Create(_protobufFile);
+        pbChunk.WriteTo(stream);
+    }
+
+    [Benchmark]
+    [TestMethod]
+    public void Serialize_Protobuf_Block()
+    {
+        IEnumerable<IReadableNode> nodes = _nodes;
+        var serializer = new ProtobufBlockSerializer();
+        var psChunk = serializer.Serialize(nodes);
+        
+        using Stream stream = File.Create(_protobufBlockFile);
+        psChunk.WriteTo(stream);
+    }
+
+    [Benchmark]
+    [TestMethod]
+    public void Serialize_Protobuf_Streaming()
+    {
+        using Stream stream = File.Create(_protobufStreamingFile);
+        
+        IEnumerable<IReadableNode> nodes = _nodes;
+        var serializer = new ProtobufStreamingSerializer(stream);
+        serializer.Serialize(nodes);
     }
 
     private static IEnumerable<INode> CreateNodes(long count)

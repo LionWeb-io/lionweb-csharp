@@ -36,6 +36,9 @@ public class SerializerBenchmarkBase
     protected const long _maxSize = 100_500L;
     protected const string _streamFile = "/tmp/output_stream.json";
     protected const string _stringFile = "/tmp/output_string.json";
+    protected const string _protobufFile = "/tmp/output.protobuf";
+    protected const string _protobufBlockFile = "/tmp/outputBlock.protobuf";
+    protected const string _protobufStreamingFile = "/tmp/outputStreaming.protobuf";
 
     protected static readonly JsonSerializerOptions _aotOptions;
     protected static readonly JsonSerializerOptions _simpleOptions;
