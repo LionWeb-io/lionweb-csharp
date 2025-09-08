@@ -1,0 +1,235 @@
+= LionWeb Notification System API
+
+This document explains the LionWeb notification system API through some use cases.
+
+== Use cases
+
+=== How to get informed about changes
+
+Every partition node (aka root node) of a model, which supports notification API, triggers a notification when there is a change to the model.
+In the example below, a partition is connected to a receiver. Receiver will be informed about all the changes to the partition via notifications.
+In this case, receiver (see `NotificationCounter` class definition below) counts the received notifications in its `Receive` method.
+
+Code below gives an example of API usage demonstrating how to get informed about changes to a partition.
+
+[,csharp]
+----
+var partition = new Geometry("geo");
+var receiver = new NotificationCounter();
+
+partition.GetNotificationSender()?.ConnectTo(receiver); <1>
+
+partition.Documentation = new Documentation("added"); <2>
+----
+<1> If notifications are not supported, partition.GetNotificationSender() returns null.
+<2> This is a change to the model.
+
+
+Code below gives an example of API usage demonstrating how to get informed about changes to a forest.
+A forest is a collection of model trees, represented by each tree's partition.
+
+[,csharp]
+----
+var forest = new Forest();
+var receiver = new NotificationCounter();
+
+forest.GetNotificationSender()?.ConnectTo(receiver); <1>
+
+var partition = new Geometry("geo");
+
+forest.AddPartitions([partition]); <2>
+----
+<1> If notifications are not supported, partition.GetNotificationSender() returns null.
+<2> This is a change to the forest. A partition is added to the forest.
+
+[,csharp]
+----
+class NotificationCounter() : NotificationPipeBase(null), INotificationHandler
+{
+    public int Count { get; private set; }
+
+    public void Receive(INotificationSender correspondingSender, INotification notification)
+    {
+        Count++;
+        Send(notification);
+    }
+}
+----
+
+=== How to collect multiple changes into one change set
+
+Notifications raised by multiple changes to a model can be collected into one change set.
+A composite notification composes other forest and/or partition notifications into one
+composite notification. Follow the comments below in the code blocks for further explanation.
+
+[,csharp]
+----
+var partition = new Geometry("geo");
+
+var compositor = new NotificationCompositor("compositor"); <1>
+
+var sender = partition.GetNotificationSender(); <2>
+
+sender?.ConnectTo(compositor); <3>
+
+compositor.Push(); <4>
+UpdateDocumentation(partition); <5>
+var changes = compositor.Pop(); <6>
+
+foreach (INotification notification in changes.Parts) <7>
+{
+    Console.WriteLine(notification.ToString());
+}
+----
+<1> NotificationCompositor implements composite notification logic.
+<2> If notifications are not supported, partition.GetNotificationSender() returns null.
+<3> Connects partition notification sender to compositor.
+<4> Push creates a new composite notification to collect incoming notifications.
+<5> Updates take place.
+<6> Pop returns the composite notification.
+<7> Access the notifications (changes).
+
+`UpdateDocumentation` is the method that applies changes to the partition.
+
+[,csharp]
+----
+public void UpdateDocumentation(Geometry partition)
+{
+    
+    partition.Documentation = new Documentation("documentation"); <1>
+    partition.Documentation.Text = "hello"; <2>
+}
+----
+<1> First change to the partition.
+<2> Second change to the partition.
+
+=== How to replicate changes
+
+==== Partition replicator
+
+Partition replicator replicates received changes (via notifications) on a local equivalent partitions. +
+Follow the comments below in the code blocks for further explanation.
+
+[,csharp]
+----
+var localPartition = new Geometry("geo"); <1>
+
+IEnumerable<INotification> changes = GetChangesOn(localPartition); <2>
+
+ReplicateChangesOn(localPartition, changes); <3>
+----
+<1> Changes will be applied to this local partition.
+<2> Gets changes on this local partition.
+<3> Replicates received changes on local partition.
+
+`GetChangesOn` emulates the source of notifications by manually creating two notifications.
+Any other source would also work.
+
+[,csharp]
+----
+public IEnumerable<INotification> GetChangesOn(Geometry localPartition)
+{
+    var documentation = new Documentation("documentation");
+
+    return
+    [
+        new ChildAddedNotification(localPartition, documentation,
+            ShapesLanguage.Instance.Geometry_documentation, 0, new NumericNotificationId("ChildAddedNotification", 0)),
+
+        new PropertyAddedNotification(documentation, ShapesLanguage.Instance.Documentation_text,
+            "hello", new NumericNotificationId("PropertyAddedNotification", 0))
+    ];
+}
+----
+
+`ReplicateChangesOn` replicates the changes on local partition.
+
+[,csharp]
+----
+public void ReplicateChangesOn(Geometry localPartition, IEnumerable<INotification> changes)
+{
+    var replicator = PartitionReplicator.Create(localPartition, new SharedNodeMap(), "partition replicator"); <1>
+
+    var creator = new Creator(); <2>
+
+    creator.ConnectTo(replicator); <3>
+
+    foreach (var notification in changes) 
+    {
+        creator.ProduceNotification(notification); <4>
+    }
+}
+----
+<1> Creates a partition replicator.
+<2> Creator acts as a remote notification producer.
+<3> Replicator will receive changes form the creator.
+<4> Creator forwards the changes to the replicator.
+
+[,csharp]
+----
+public class Creator() : NotificationPipeBase(null), INotificationProducer
+{
+    public void ProduceNotification(INotification notification) => Send(notification);
+}
+----
+
+==== Forest replicator
+
+Forest replicator replicates notifications for a local forest and all its partitions.
+
+[,csharp]
+----
+var localForest = new Forest(); <1>
+
+IEnumerable<INotification> changes = GetChanges(); <2>
+
+ReplicateChangesOn(localForest, changes); <3>
+----
+<1> Changes will be applied to this local forest.
+<2> Gets changes.
+<3> Replicates changes on local forest.
+
+`GetChanges` adds a new partition to the forest. Then it adds a new child to the partition and sets its property.
+
+[,csharp]
+----
+public IEnumerable<INotification> GetChanges()
+{
+    var partition = new Geometry("geo");
+    var documentation = new Documentation("documentation");
+
+    return
+    [
+        new PartitionAddedNotification(partition, new NumericNotificationId("PartitionAddedNotification", 0)),
+
+        new ChildAddedNotification(partition, documentation,
+            ShapesLanguage.Instance.Geometry_documentation, 0, new NumericNotificationId("ChildAddedNotification", 0)),
+
+        new PropertyAddedNotification(documentation, ShapesLanguage.Instance.Documentation_text,
+            "hello", new NumericNotificationId("PropertyAddedNotification", 0))
+    ];
+}
+----
+
+`ReplicateChangesOn` replicates the changes on local forest.
+
+[,csharp]
+----
+public void ReplicateChangesOn(Forest localForest, IEnumerable<INotification> changes)
+{
+    var replicator = ForestReplicator.Create(localForest, new SharedNodeMap(), "forest replicator"); <1>
+
+    var creator = new Creator(); <2>
+    creator.ConnectTo(replicator); <3>
+
+    foreach (var notification in changes)
+    {
+        creator.ProduceNotification(notification); <4>
+    }
+}
+----
+<1> Creates a forest replicator.
+<2> Creator acts as a remote notification producer.
+<3> Replicator will receive changes form the creator.
+<4> Creator forwards the changes to the replicator.
+
