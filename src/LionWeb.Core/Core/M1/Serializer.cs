@@ -319,7 +319,7 @@ public class Serializer : ISerializer
         prefix + target switch
         {
             Feature f => f.GetFeatureClassifier().Name,
-            _ => ""
+            _ => SerializationConstants.Empty
         } + ((IKeyed)target).Name;
 
     private IEnumerable<SerializedReference> CollectUnsetReferences(ISet<Feature> allFeatures,

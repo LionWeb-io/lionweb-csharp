@@ -166,7 +166,7 @@ public class UnsupportedStructuredDataTypeException : LionWebExceptionBase
     /// <param name="message">Optional additional message.</param>
     public UnsupportedStructuredDataTypeException(StructuredDataType structuredDataType, string? message = null) : base(
         $"StructuredDataType {structuredDataType.Name} not supported" +
-        (message != null ? $": {message}" : "")
+        (message != null ? $": {message}" : string.Empty)
     )
     {
     }
@@ -179,7 +179,7 @@ public class UnsupportedStructuredDataTypeException : LionWebExceptionBase
     /// <param name="message">Optional additional message.</param>
     public UnsupportedStructuredDataTypeException(Type structuredDataType, string? message = null) : base(
         $"StructuredDataType {structuredDataType.Name} not supported" +
-        (message != null ? $": {message}" : "")
+        (message != null ? $": {message}" : string.Empty)
     )
     {
     }
@@ -227,4 +227,4 @@ public class UnsupportedVersionException : LionWebExceptionBase
 /// <param name="message">Optional additional message.</param>
 public class VersionMismatchException(LionWebVersions versionA, LionWebVersions versionB, string? message = null)
     : LionWebExceptionBase($"Mismatched LionWeb versions: {versionA} vs. {versionB}" +
-                           (message != null ? $": {message}" : ""));
+                           (message != null ? $": {message}" : string.Empty));

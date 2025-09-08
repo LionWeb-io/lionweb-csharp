@@ -98,7 +98,11 @@ internal abstract class SerializerVersionSpecificsBase : ISerializerVersionSpeci
     protected PropertyValue? ConvertPrimitiveType(object value) => value switch
     {
         null => null,
-        bool boolean => boolean ? "true" : "false",
+        true => SerializationConstants.True,
+        false => SerializationConstants.False,
+        0 => SerializationConstants.Zero,
+        1 => SerializationConstants.One,
+        "" => SerializationConstants.Empty,
         string @string => @string,
         _ => value.ToString()
     };
