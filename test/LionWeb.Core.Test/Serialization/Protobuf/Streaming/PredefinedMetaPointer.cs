@@ -19,7 +19,6 @@ namespace LionWeb.Core.Test.Serialization.Protobuf.Streaming;
 
 using Core.Serialization;
 using M3;
-using MetaPointerIndex = ulong;
 
 public enum PredefinedMetaPointer : MetaPointerIndex
 {
@@ -107,8 +106,8 @@ class MetaPointerIndexer(LionWebVersions lionWebVersion, Action<MetaPointer, Met
         PredefinedMetaPointerExtensions.TryGet(candidate, lionWebVersion, out result);
 }
 
-class MetaPointerLookup(LionWebVersions lionWebVersion) : IndexLookupBase<IKeyed>
+class MetaPointerLookup(LionWebVersions lionWebVersion) : IndexLookupBase<IKeyed>(PredefinedMetaPointerExtensions.Max + 1)
 {
-    protected override bool TryGet(ulong idx, out IKeyed? candidate) => 
+    protected override bool TryGet(MetaPointerIndex idx, out IKeyed? candidate) => 
         ((PredefinedMetaPointer)idx).TryGet(lionWebVersion, out candidate);
 }

@@ -38,12 +38,12 @@ public class ProtobufStreamingSerializer : ProtobufSerializerBase
         _stream = stream;
     }
 
-    public void Serialize(IEnumerable<IReadableNode> nodes)
+    public void Serialize(IEnumerable<IReadableNode> allNodes)
     {
         var version = new PsSerializationFormatVersion { Version = _lionWebVersion.VersionString };
         Write(new PsMessage { SerializationFormatVersion = version });
         
-        foreach (var node in nodes)
+        foreach (var node in allNodes)
         {
             Write(new PsMessage {Node = CreateNode(node)});
         }

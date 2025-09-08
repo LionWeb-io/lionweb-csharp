@@ -19,14 +19,23 @@ namespace LionWeb.Core.Test.Serialization.Protobuf;
 
 using Google.Protobuf;
 using Io.Lionweb.Protobuf;
-using LionWeb.Core.Test.Languages.Generated.V2023_1.Shapes.M2;
+using LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using LionWeb.Core.Utilities;
 using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
 public class Protobuf
 {
-    private readonly Geometry geo = new Geometry("g") { Documentation = new Documentation("d") { Text = "hello" } };
+    private readonly Geometry geo = new Geometry("g")
+    {
+        Documentation = new Documentation("d") { Text = "hello", Technical = true},
+        Shapes = [new Line("l")
+        {
+            Start = new Coord("s") {X = 23},
+            End = new Coord("e") {Y = 42},
+            Name = "the line"
+        }]
+    };
 
     [TestMethod]
     public void Write()

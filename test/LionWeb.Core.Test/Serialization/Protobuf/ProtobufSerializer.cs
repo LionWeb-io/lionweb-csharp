@@ -23,12 +23,11 @@ using M1;
 using M2;
 using M3;
 using System.Collections;
-using VersionSpecific.V2023_1;
 using VersionSpecific.V2024_1_Compatible;
 
 public class ProtobufSerializer
 {
-    private readonly IEnumerable<IReadableNode> _nodes;
+    private readonly IEnumerable<IReadableNode> _rootNodes;
 
     private readonly ISerializerVersionSpecifics _serializerSpecifics;
 
@@ -38,16 +37,16 @@ public class ProtobufSerializer
     private readonly Dictionary<IReadableNode, int> _nodeIndices = new();
     private readonly List<PBNode> _pbNodes = new();
 
-    public ProtobufSerializer(IEnumerable<IReadableNode> nodes)
+    public ProtobufSerializer(IEnumerable<IReadableNode> rootNodes)
     {
-        _nodes = nodes;
+        _rootNodes = rootNodes;
 
         _serializerSpecifics = new SerializerVersionSpecifics_2024_1_Compatible();
     }
 
     public PBChunk Serialize()
     {
-        foreach (var node in _nodes)
+        foreach (var node in _rootNodes)
         {
             CreateNode(node);
         }
@@ -108,10 +107,13 @@ public class ProtobufSerializer
 
     private PBNode CreateNode(IReadableNode node)
     {
+        if (_nodeIndices.TryGetValue(node, out var existing))
+            return _pbNodes[existing];
+        
         var result = new PBNode { Id = AsString(node.GetId()), Classifier = AsMetaPointer(node.GetClassifier()), };
         var ownIndex = _nodeIndices.Count;
-        _nodeIndices[node] = ownIndex;
         _pbNodes.Add(result);
+        _nodeIndices.Add(node, ownIndex);
 
         foreach (var feature in node.CollectAllSetFeatures())
         {
@@ -159,7 +161,7 @@ public class ProtobufSerializer
     private PBProperty CreateProperty(Property prop, IReadableNode node) =>
         new()
         {
-            MetaPointerIndex = AsMetaPointer(prop.ToMetaPointer()),
+            MetaPointerIndex = AsMetaPointer(prop),
             Value = AsString(_serializerSpecifics.ConvertDatatype(node, prop, node.Get(prop)))
         };
 
@@ -177,10 +179,16 @@ public class ProtobufSerializer
         return result;
     }
 
-    private int AsMetaPointer(LanguageEntity entity)
+    private int AsMetaPointer(IKeyed entity)
     {
         RegisterLanguage(entity.GetLanguage());
-        return AsMetaPointer(entity.ToMetaPointer());
+        var metaPointer = entity switch
+        {
+            LanguageEntity e => e.ToMetaPointer(),
+            Feature f => f.ToMetaPointer(),
+            _ => throw new InvalidOperationException()
+        };
+        return AsMetaPointer(metaPointer);
     }
 
     private int AsMetaPointer(MetaPointer metaPointer)

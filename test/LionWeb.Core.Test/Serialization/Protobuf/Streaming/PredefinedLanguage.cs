@@ -19,7 +19,6 @@ namespace LionWeb.Core.Test.Serialization.Protobuf.Streaming;
 
 using Core.Utilities;
 using M3;
-using LanguageIndex = ulong;
 
 public enum PredefinedLanguage : LanguageIndex
 {
@@ -71,8 +70,8 @@ class LanguageIndexer(LionWebVersions lionWebVersion, Action<Language, LanguageI
         PredefinedLanguageExtensions.TryGet(candidate, lionWebVersion, out result);
 }
 
-class LanguageLookup(LionWebVersions lionWebVersion) : IndexLookupBase<Language>
+class LanguageLookup(LionWebVersions lionWebVersion) : IndexLookupBase<Language>(PredefinedLanguageExtensions.Max + 1)
 {
-    protected override bool TryGet(ulong idx, out Language? candidate) => 
+    protected override bool TryGet(LanguageIndex idx, out Language? candidate) => 
         ((PredefinedLanguage)idx).TryGet(lionWebVersion, out candidate);
 }

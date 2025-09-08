@@ -17,3 +17,8 @@
 
 global using Microsoft.VisualStudio.TestTools.UnitTesting;
 global using NodeId = string;
+
+global using StringIndex = uint;
+global using LanguageIndex = uint;
+global using MetaPointerIndex = uint;
+global using NodeIndex = uint;

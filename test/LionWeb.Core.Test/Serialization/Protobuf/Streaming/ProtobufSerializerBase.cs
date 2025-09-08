@@ -23,10 +23,6 @@ using M1;
 using M2;
 using M3;
 using System.Collections;
-using StringIndex = ulong;
-using LanguageIndex = ulong;
-using MetaPointerIndex = ulong;
-using NodeIndex = ulong;
 
 public abstract class ProtobufSerializerBase
 {
@@ -47,80 +43,38 @@ public abstract class ProtobufSerializerBase
         _languages = new(_lionWebVersion,
             (language, idx) => AddUsedLanguage(new PsLanguage
             {
-                Idx = idx, Key = AsString(language.Key), Version = AsString(language.Version)
+                // LangIdx = idx, 
+                KeyStrIdx = AsString(language.Key), VersionStrIdx = AsString(language.Version)
             }));
         _metaPointers = new(_lionWebVersion,
             (metaPointer, idx) => AddMetaPointer(new PsMetaPointer
             {
-                Idx = idx,
-                Language = AsString(metaPointer.Language),
-                Version = AsString(metaPointer.Version),
-                Key = AsString(metaPointer.Key)
+                // MetaPointerIdx = idx,
+                LanguageStrIdx = AsString(metaPointer.Language),
+                VersionStrIdx = AsString(metaPointer.Version),
+                KeyStrIdx = AsString(metaPointer.Key)
             }));
-        _strings = new((str, idx) => AddString(new PsStringValue { Idx = idx, Value = str }));
+        _strings = new((str, idx) => AddString(new PsStringValue
+        {
+            // StrIdx = idx, 
+            Value = str
+        }));
         _nodes = new();
     }
 
     public abstract PsNode Process(IReadableNode node);
-
-    // public IEnumerable<PsMessage> Finish()
-    // {
-    //     foreach (var node in _nodes)
-    //     {
-    //         CreateNode(node);
-    //     }
-    //
-    //     foreach (var pair in _nodeIndices)
-    //     {
-    //         var pbNode = _pbNodes[pair.Value];
-    //         foreach (var reference in pair.Key.CollectAllSetFeatures().OfType<Reference>())
-    //         {
-    //             var pbRef = new PsReference { MetaPointerIndex = AsMetaPointer(reference.Type) };
-    //             if (reference.Multiple)
-    //             {
-    //                 var targets = (IEnumerable)pair.Key.Get(reference);
-    //                 foreach (var target in targets.Cast<IReadableNode>())
-    //                 {
-    //                     CreateTarget(target, pbRef);
-    //                 }
-    //             } else
-    //             {
-    //                 var target = (IReadableNode)pair.Key.Get(reference);
-    //                 CreateTarget(target, pbRef);
-    //             }
-    //
-    //             pbNode.References.Add(pbRef);
-    //         }
-    //     }
-    //
-    //     var result = new PsChunk { SerializationFormatVersion = _serializerSpecifics.Version.VersionString };
-    //     result.Languages.AddRange(_usedLanguages.Select(l => new PsLanguage
-    //     {
-    //         Key = AsString(l.Key), Version = AsString(l.Version)
-    //     }));
-    //     result.MetaPointers.AddRange(_metaPointers.Keys.Select(metaPointer => new PsMetaPointer
-    //     {
-    //         Language = AsString(metaPointer.Language),
-    //         Version = AsString(metaPointer.Version),
-    //         Key = AsString(metaPointer.Key)
-    //     }));
-    //     result.StringValues.AddRange(_stringValues.Keys);
-    //     result.Nodes.AddRange(_pbNodes);
-    //
-    //     return result;
-    // }
 
     protected PsNode CreateNode(IReadableNode node)
     {
         var ownIndex = RegisterNode(node.GetId());
         var result = new PsNode
         {
-            Idx = ownIndex, Id = AsString(node.GetId()), Classifier = AsMetaPointer(node.GetClassifier()),
+            NodeIdx = ownIndex, IdStrIdx = AsString(node.GetId()), ClassifierMetaPointerIdx = AsMetaPointer(node.GetClassifier()),
         };
 
         if (node.GetParent() is { } parent)
         {
-            result.Parent = RegisterNode(parent.GetId());
+            result.ParentNodeIdx = RegisterNode(parent.GetId());
         }
 
         foreach (var feature in node.CollectAllSetFeatures())
@@ -133,27 +87,27 @@ public abstract class ProtobufSerializerBase
 
                 case Containment c:
                     var containmentIndex = AsMetaPointer(c.ToMetaPointer());
-                    var pbContainment = new PsContainment { MetaPointerIndex = containmentIndex };
+                    var pbContainment = new PsContainment { TypeMetaPointerIdx = containmentIndex };
                     if (c.Multiple)
                     {
                         var children = (IEnumerable)node.Get(c);
                         foreach (var ch in children.Cast<IReadableNode>())
                         {
                             var childIndex = RegisterNode(ch.GetId());
-                            pbContainment.Children.Add(childIndex);
+                            pbContainment.ChildrenNodeIdx.Add(childIndex);
                         }
                     } else
                     {
                         var child = (IReadableNode)node.Get(c);
                         var childIndex = RegisterNode(child.GetId());
-                        pbContainment.Children.Add(childIndex);
+                        pbContainment.ChildrenNodeIdx.Add(childIndex);
                     }
 
                     result.Containments.Add(pbContainment);
                     break;
 
                 case Reference reference:
-                    var pbRef = new PsReference { MetaPointerIndex = AsMetaPointer(reference.ToMetaPointer()) };
+                    var pbRef = new PsReference { TypeMetaPointerIdx = AsMetaPointer(reference.ToMetaPointer()) };
                     if (reference.Multiple)
                     {
                         var targets = (IEnumerable)node.Get(reference);
@@ -172,7 +126,7 @@ public abstract class ProtobufSerializerBase
             }
         }
 
-        result.Annotations.AddRange(
+        result.AnnotationsNodeIdx.AddRange(
             node
                 .GetAnnotations()
                 .Select(ann => ann.GetId())
@@ -185,8 +139,8 @@ public abstract class ProtobufSerializerBase
     private PsProperty CreateProperty(Property prop, IReadableNode node) =>
         new()
         {
-            MetaPointerIndex = AsMetaPointer(prop.ToMetaPointer()),
-            Value = AsString(_serializerSpecifics.ConvertDatatype(node, prop, node.Get(prop)))
+            TypeMetaPointerIdx = AsMetaPointer(prop.ToMetaPointer()),
+            ValueStrIdx = AsString(_serializerSpecifics.ConvertDatatype(node, prop, node.Get(prop)))
         };
 
     private void CreateTarget(IReadableNode? target, PsReference pbRef)
@@ -194,9 +148,9 @@ public abstract class ProtobufSerializerBase
         var pbTarget = new PsReferenceValue();
         if (target != null)
         {
-            pbTarget.Referred = RegisterNode(target.GetId());
+            pbTarget.ReferredNodeIdx = RegisterNode(target.GetId());
             if (target is INamed n && n.TryGetName(out var name))
-                pbTarget.ResolveInfo = AsString(name);
+                pbTarget.ResolveInfoStrIdx = AsString(name);
         }
 
         pbRef.Values.Add(pbTarget);

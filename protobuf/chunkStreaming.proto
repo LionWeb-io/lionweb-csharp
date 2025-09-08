@@ -23,7 +23,6 @@ message PsSerializationFormatVersion {
 
 message PsChunk {
   PsSerializationFormatVersion serializationFormatVersion = 1;
-  // We use this mechanism both to save space and to represent nulls (identified by -1)
   repeated PsStringValue stringValues = 2;
   repeated PsMetaPointer metaPointers= 3;
   repeated PsLanguage languages = 4;
@@ -32,56 +31,55 @@ message PsChunk {
 }
 
 message PsStringValue {
-  uint64 idx = 1;
+//  uint32 strIdx = 1;
   string value = 2;
 }
 
 message PsLanguage {
-  uint64 idx = 1;
-  uint64 key = 2;
-  uint64 version = 3;
+//  uint32 langIdx = 1;
+  uint32 key_StrIdx = 2;
+  uint32 version_StrIdx = 3;
 }
 
 message PsUnboundNodeId {
-  uint64 idx = 1;
-  uint64 id = 2;
+  uint32 nodeIdx = 1;
+  uint32 id_StrIdx = 2;
 }
 
 message PsNode {
-  uint64 idx = 1;
-  uint64 id = 2;
-  uint64 classifier = 3;
+  uint32 nodeIdx = 1;
+  uint32 id_StrIdx = 2;
+  uint32 classifier_metaPointerIdx = 3;
   repeated PsProperty properties = 4;
   repeated PsContainment containments = 5;
   repeated PsReference references = 6;
-  /* This is a list of indexes representing the string values corresponding to the IDs of the annotations */
-  repeated uint64 annotations = 7;
-  optional uint64 parent = 8;
+  repeated uint32 annotations_nodeIdx = 7;
+  optional uint32 parent_nodeIdx = 8;
 }
 
 message PsMetaPointer {
-  uint64 idx = 1;
-  uint64 language = 2;
-  uint64 version = 3;
-  uint64 key = 4;
+//  uint32 metaPointerIdx = 1;
+  uint32 language_strIdx = 2;
+  uint32 version_strIdx = 3;
+  uint32 key_strIdx = 4;
 }
 
 message PsProperty {
-  uint64 metaPointerIndex = 1;
-  optional uint64 value = 2;
+  uint32 type_metaPointerIdx = 1;
+  optional uint32 value_strIdx = 2;
 }
 
 message PsContainment {
-  uint64 metaPointerIndex = 1;
-  repeated uint64 children = 2;
+  uint32 type_metaPointerIdx = 1;
+  repeated uint32 children_nodeIdx = 2;
 }
 
 message PsReference {
-  uint64 metaPointerIndex = 1;
+  uint32 type_metaPointerIdx = 1;
   repeated PsReferenceValue values = 2;
 }
 
 message PsReferenceValue {
-  optional uint64 resolveInfo = 1;
-  optional uint64 referred = 2;
+  optional uint32 resolveInfo_strIdx = 1;
+  optional uint32 referred_nodeIdx = 2;
 }

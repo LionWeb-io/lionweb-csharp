@@ -17,7 +17,7 @@
 
 namespace LionWeb.Core.Test.Serialization.Protobuf.Streaming;
 
-using StringIndex = ulong;
+using Counter = uint;
 
 public enum PredefinedString : StringIndex
 {
@@ -96,8 +96,8 @@ class StringIndexer(Action<string, StringIndex> adder) : IndexCounterBase<string
         PredefinedStringExtensions.TryGet(candidate, out result);
 }
 
-class StringLookup : IndexLookupBase<string>
+class StringLookup() : IndexLookupBase<string>(PredefinedStringExtensions.Max + 1)
 {
-    protected override bool TryGet(ulong idx, out string? candidate) =>
+    protected override bool TryGet(StringIndex idx, out string? candidate) =>
         ((PredefinedString)idx).TryGet(out candidate);
 }

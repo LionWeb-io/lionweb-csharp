@@ -38,10 +38,9 @@ public class ProtobufBlockSerializer : ProtobufSerializerBase
         _chunk = new PsChunk { SerializationFormatVersion = x };
     }
 
-    public PsChunk Serialize(IEnumerable<IReadableNode> nodes)
+    public PsChunk Serialize(IEnumerable<IReadableNode> allNodes)
     {
-        nodes
-            .SelectMany(n => M1Extensions.Descendants(n, true, true))
+        allNodes
             .Select(Process)
             .ToList();
 

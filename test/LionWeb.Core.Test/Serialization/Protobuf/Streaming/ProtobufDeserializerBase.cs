@@ -25,13 +25,8 @@ using M1;
 using M2;
 using M3;
 using System.Diagnostics;
-using StringIndex = ulong;
-using LanguageIndex = ulong;
-using MetaPointerIndex = ulong;
-using NodeIndex = ulong;
-using ResolveInfo = string;
-using CompressedContainment = (ulong, List<ulong>);
-using CompressedReference = (ulong, List<(ulong?, ulong?)>);
+using CompressedContainment = (NodeIndex, List<NodeIndex>);
+using CompressedReference = (NodeIndex, List<(NodeIndex?, StringIndex?)>);
 
 public abstract class ProtobufDeserializerBase
 {
@@ -152,40 +147,46 @@ public abstract class ProtobufDeserializerBase
 
     protected void Process(PsLanguage l)
     {
-        var version = AsString(l.Version);
-        var key = AsString(l.Key);
+        var version = AsString(l.VersionStrIdx);
+        var key = AsString(l.KeyStrIdx);
         _languages.Register(
-            _registeredLanguages.FirstOrDefault(lang => key == lang.Key && version == lang.Version), l.Idx);
+            _registeredLanguages.FirstOrDefault(lang => key == lang.Key && version == lang.Version)
+            // , l.LangIdx
+            );
     }
 
     protected void Process(PsMetaPointer m)
     {
-        var language = AsString(m.Language);
-        var version = AsString(m.Version);
-        var key = AsString(m.Key);
+        var language = AsString(m.LanguageStrIdx);
+        var version = AsString(m.VersionStrIdx);
+        var key = AsString(m.KeyStrIdx);
         _entities.Register(_registeredLanguages
             .Where(l => l.Key == language && l.Version == version)
             .SelectMany(l => M1Extensions.Descendants((IReadableNode)l, true, false))
             .OfType<IKeyed>()
-            .FirstOrDefault(e => e.Key == key), m.Idx);
+            .FirstOrDefault(e => e.Key == key)
+            // , m.MetaPointerIdx
+            );
     }
 
-    protected void Process(PsStringValue s) => _strings.Register(s.Value, s.Idx);
+    protected void Process(PsStringValue s) => _strings.Register(s.Value
+        // , s.StrIdx
+        );
 
-    protected void Process(PsUnboundNodeId u) => _unboundNodeIds[u.Idx] = AsString(u.Id);
+    protected void Process(PsUnboundNodeId u) => _unboundNodeIds[u.NodeIdx] = AsString(u.IdStrIdx);
 
     protected void Process(PsNode n) => Convert(n);
 
     private INode Convert(PsNode psNode)
     {
-        var classifier = AsClassifier(psNode.Classifier);
-        var result = classifier.GetLanguage().GetFactory().CreateNode(AsString(psNode.Id), classifier);
-        _nodes[psNode.Idx] = result;
+        var classifier = AsClassifier(psNode.ClassifierMetaPointerIdx);
+        var result = classifier.GetLanguage().GetFactory().CreateNode(AsString(psNode.IdStrIdx), classifier);
+        _nodes[psNode.NodeIdx] = result;
 
         foreach (var psProperty in psNode.Properties)
         {
-            var prop = (Property)_entities.Get(psProperty.MetaPointerIndex);
-            var rawValue = AsString(psProperty.Value);
+            var prop = (Property)_entities.Get(psProperty.TypeMetaPointerIdx);
+            var rawValue = AsString(psProperty.ValueStrIdx);
             object value = rawValue;
             if (prop.Type.EqualsIdentity(_lionWebVersion.BuiltIns.Boolean))
             {
@@ -203,11 +204,11 @@ public abstract class ProtobufDeserializerBase
 
         foreach (var psContainment in psNode.Containments)
         {
-            var cont = (Containment)_entities.Get(psContainment.MetaPointerIndex);
+            var cont = (Containment)_entities.Get(psContainment.TypeMetaPointerIdx);
 
             List<IReadableNode> children = [];
             bool allResolved = true;
-            foreach (var psChildIdx in psContainment.Children)
+            foreach (var psChildIdx in psContainment.ChildrenNodeIdx)
             {
                 if (!TryGetNode(psChildIdx, out var child))
                 {
@@ -235,20 +236,20 @@ public abstract class ProtobufDeserializerBase
 
         if (deferredContainments.Count != 0)
         {
-            _containmentsByOwnerId[psNode.Idx] = deferredContainments;
+            _containmentsByOwnerId[psNode.NodeIdx] = deferredContainments;
         }
 
         List<CompressedReference> deferredReferences = [];
         
         foreach (var psReference in psNode.References)
         {
-            var reference = (Reference)_entities.Get(psReference.MetaPointerIndex);
+            var reference = (Reference)_entities.Get(psReference.TypeMetaPointerIdx);
 
             List<IReadableNode> targets = [];
             bool allResolved = true;
             foreach (var psReferenceValue in psReference.Values)
             {
-                if (!TryGetNode(psReferenceValue.Referred, out var target))
+                if (!TryGetNode(psReferenceValue.ReferredNodeIdx, out var target))
                 {
                     allResolved = false;
                     break;
@@ -274,13 +275,13 @@ public abstract class ProtobufDeserializerBase
 
         if (deferredReferences.Count != 0)
         {
-            _referencesByOwnerId[psNode.Idx] = deferredReferences;
+            _referencesByOwnerId[psNode.NodeIdx] = deferredReferences;
         }
 
         {
             List<IReadableNode> annotations = [];
             bool allResolved = true;
-            foreach (var psAnnIdx in psNode.Annotations)
+            foreach (var psAnnIdx in psNode.AnnotationsNodeIdx)
             {
                 if (!TryGetNode(psAnnIdx, out var ann))
                 {
@@ -296,7 +297,7 @@ public abstract class ProtobufDeserializerBase
                 result.AddAnnotations(annotations.Cast<INode>());
             } else
             {
-                _annotationsByOwnerId[psNode.Idx] = psNode.Annotations.ToList();
+                _annotationsByOwnerId[psNode.NodeIdx] = psNode.AnnotationsNodeIdx.ToList();
             }
         }
 
@@ -342,18 +343,18 @@ public abstract class ProtobufDeserializerBase
 
     private CompressedContainment Compress(PsContainment c) =>
     (
-        c.MetaPointerIndex,
+        c.TypeMetaPointerIdx,
         c
-            .Children
+            .ChildrenNodeIdx
             .ToList()
     );
 
     private CompressedReference Compress(PsReference r) =>
     (
-        r.MetaPointerIndex,
+        r.TypeMetaPointerIdx,
         r
             .Values
-            .Select(t => ((NodeIndex?)t.Referred, (StringIndex?) t.ResolveInfo))
+            .Select(t => ((NodeIndex?)t.ReferredNodeIdx, (StringIndex?) t.ResolveInfoStrIdx))
             .ToList()
     );
     private CompressedIdConfig CompressedIdConfig

@@ -17,23 +17,25 @@
 
 namespace LionWeb.Core.Test.Serialization.Protobuf.Streaming;
 
+using Counter = uint;
+
 abstract class IndexCounterBase<T> where T : notnull
 {
-    private readonly Dictionary<T, ulong> _entries;
-    private readonly Action<T, ulong> _adder;
+    private readonly Dictionary<T, Counter> _entries;
+    private readonly Action<T, Counter> _adder;
 
-    private ulong _nextIndex;
+    private Counter _nextIndex;
 
-    public IndexCounterBase(ulong nextIndex, Action<T, ulong> adder, IEqualityComparer<T>? comparer = null)
+    public IndexCounterBase(Counter nextIndex, Action<T, Counter> adder, IEqualityComparer<T>? comparer = null)
     {
         _nextIndex = nextIndex;
         _adder = adder;
-        _entries = new Dictionary<T, ulong>(comparer ?? EqualityComparer<T>.Default);
+        _entries = new Dictionary<T, Counter>(comparer ?? EqualityComparer<T>.Default);
     }
 
-    public ulong GetOrCreate(T? candidate)
+    public Counter GetOrCreate(T? candidate)
     {
-        ulong result;
+        Counter result;
 
         if (TryGet(candidate, out result))
             return result;
@@ -48,27 +50,33 @@ abstract class IndexCounterBase<T> where T : notnull
         return result;
     }
 
-    protected abstract bool TryGet(T? candidate, out ulong result);
+    protected abstract bool TryGet(T? candidate, out Counter result);
 }
 
 abstract class IndexLookupBase<T>
 {
-    private readonly Dictionary<ulong, T> _entries;
+    private readonly Dictionary<Counter, T> _entries;
+    private Counter _nextIndex;
 
-    public IndexLookupBase()
+    public IndexLookupBase(Counter nextIndex)
     {
         _entries = [];
+        _nextIndex = nextIndex;
     }
 
-    public T Get(ulong idx)
+    public T Get(Counter idx)
     {
         if (TryGet(idx, out var candidate))
             return candidate;
 
         return _entries[idx];
     }
+
+    public T Register(T element) =>
+        Register(element, _nextIndex++);
+        
     
-    public T Register(T element, ulong idx)
+    public T Register(T element, Counter idx)
     {
         if (TryGet(idx, out var candidate) && Equals(element, candidate))
             return candidate;
@@ -77,5 +85,5 @@ abstract class IndexLookupBase<T>
         return element;
     }
 
-    protected abstract bool TryGet(ulong idx, out T? candidate);
+    protected abstract bool TryGet(Counter idx, out T? candidate);
 }

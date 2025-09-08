@@ -45,43 +45,45 @@ namespace Io.Lionweb.Protobuf.Streaming {
             "BCADKAsyKS5pby5saW9ud2ViLnByb3RvYnVmLnN0cmVhbWluZy5Qc0xhbmd1",
             "YWdlEjQKBW5vZGVzGAUgAygLMiUuaW8ubGlvbndlYi5wcm90b2J1Zi5zdHJl",
             "YW1pbmcuUHNOb2RlEkIKCnVuYm91bmRJZHMYBiADKAsyLi5pby5saW9ud2Vi",
-            "LnByb3RvYnVmLnN0cmVhbWluZy5Qc1VuYm91bmROb2RlSWQiKwoNUHNTdHJp",
-            "bmdWYWx1ZRILCgNpZHgYASABKAQSDQoFdmFsdWUYAiABKAkiNwoKUHNMYW5n",
-            "dWFnZRILCgNpZHgYASABKAQSCwoDa2V5GAIgASgEEg8KB3ZlcnNpb24YAyAB",
-            "KAQiKgoPUHNVbmJvdW5kTm9kZUlkEgsKA2lkeBgBIAEoBBIKCgJpZBgCIAEo",
-            "BCKtAgoGUHNOb2RlEgsKA2lkeBgBIAEoBBIKCgJpZBgCIAEoBBISCgpjbGFz",
-            "c2lmaWVyGAMgASgEEj0KCnByb3BlcnRpZXMYBCADKAsyKS5pby5saW9ud2Vi",
-            "LnByb3RvYnVmLnN0cmVhbWluZy5Qc1Byb3BlcnR5EkIKDGNvbnRhaW5tZW50",
-            "cxgFIAMoCzIsLmlvLmxpb253ZWIucHJvdG9idWYuc3RyZWFtaW5nLlBzQ29u",
-            "dGFpbm1lbnQSPgoKcmVmZXJlbmNlcxgGIAMoCzIqLmlvLmxpb253ZWIucHJv",
-            "dG9idWYuc3RyZWFtaW5nLlBzUmVmZXJlbmNlEhMKC2Fubm90YXRpb25zGAcg",
-            "AygEEhMKBnBhcmVudBgIIAEoBEgAiAEBQgkKB19wYXJlbnQiTAoNUHNNZXRh",
-            "UG9pbnRlchILCgNpZHgYASABKAQSEAoIbGFuZ3VhZ2UYAiABKAQSDwoHdmVy",
-            "c2lvbhgDIAEoBBILCgNrZXkYBCABKAQiRAoKUHNQcm9wZXJ0eRIYChBtZXRh",
-            "UG9pbnRlckluZGV4GAEgASgEEhIKBXZhbHVlGAIgASgESACIAQFCCAoGX3Zh",
-            "bHVlIjsKDVBzQ29udGFpbm1lbnQSGAoQbWV0YVBvaW50ZXJJbmRleBgBIAEo",
-            "BBIQCghjaGlsZHJlbhgCIAMoBCJoCgtQc1JlZmVyZW5jZRIYChBtZXRhUG9p",
-            "bnRlckluZGV4GAEgASgEEj8KBnZhbHVlcxgCIAMoCzIvLmlvLmxpb253ZWIu",
-            "cHJvdG9idWYuc3RyZWFtaW5nLlBzUmVmZXJlbmNlVmFsdWUiYAoQUHNSZWZl",
-            "cmVuY2VWYWx1ZRIYCgtyZXNvbHZlSW5mbxgBIAEoBEgAiAEBEhUKCHJlZmVy",
-            "cmVkGAIgASgESAGIAQFCDgoMX3Jlc29sdmVJbmZvQgsKCV9yZWZlcnJlZEIu",
-            "Ch1pby5saW9ud2ViLnByb3RvYnVmLnN0cmVhbWluZ0ILQ2h1bmtQcm90b3NQ",
-            "AWIGcHJvdG8z"));
+            "LnByb3RvYnVmLnN0cmVhbWluZy5Qc1VuYm91bmROb2RlSWQiHgoNUHNTdHJp",
+            "bmdWYWx1ZRINCgV2YWx1ZRgCIAEoCSI4CgpQc0xhbmd1YWdlEhIKCmtleV9T",
+            "dHJJZHgYAiABKA0SFgoOdmVyc2lvbl9TdHJJZHgYAyABKA0iNQoPUHNVbmJv",
+            "dW5kTm9kZUlkEg8KB25vZGVJZHgYASABKA0SEQoJaWRfU3RySWR4GAIgASgN",
+            "It8CCgZQc05vZGUSDwoHbm9kZUlkeBgBIAEoDRIRCglpZF9TdHJJZHgYAiAB",
+            "KA0SIQoZY2xhc3NpZmllcl9tZXRhUG9pbnRlcklkeBgDIAEoDRI9Cgpwcm9w",
+            "ZXJ0aWVzGAQgAygLMikuaW8ubGlvbndlYi5wcm90b2J1Zi5zdHJlYW1pbmcu",
+            "UHNQcm9wZXJ0eRJCCgxjb250YWlubWVudHMYBSADKAsyLC5pby5saW9ud2Vi",
+            "LnByb3RvYnVmLnN0cmVhbWluZy5Qc0NvbnRhaW5tZW50Ej4KCnJlZmVyZW5j",
+            "ZXMYBiADKAsyKi5pby5saW9ud2ViLnByb3RvYnVmLnN0cmVhbWluZy5Qc1Jl",
+            "ZmVyZW5jZRIbChNhbm5vdGF0aW9uc19ub2RlSWR4GAcgAygNEhsKDnBhcmVu",
+            "dF9ub2RlSWR4GAggASgNSACIAQFCEQoPX3BhcmVudF9ub2RlSWR4IlQKDVBz",
+            "TWV0YVBvaW50ZXISFwoPbGFuZ3VhZ2Vfc3RySWR4GAIgASgNEhYKDnZlcnNp",
+            "b25fc3RySWR4GAMgASgNEhIKCmtleV9zdHJJZHgYBCABKA0iVQoKUHNQcm9w",
+            "ZXJ0eRIbChN0eXBlX21ldGFQb2ludGVySWR4GAEgASgNEhkKDHZhbHVlX3N0",
+            "cklkeBgCIAEoDUgAiAEBQg8KDV92YWx1ZV9zdHJJZHgiRgoNUHNDb250YWlu",
+            "bWVudBIbChN0eXBlX21ldGFQb2ludGVySWR4GAEgASgNEhgKEGNoaWxkcmVu",
+            "X25vZGVJZHgYAiADKA0iawoLUHNSZWZlcmVuY2USGwoTdHlwZV9tZXRhUG9p",
+            "bnRlcklkeBgBIAEoDRI/CgZ2YWx1ZXMYAiADKAsyLy5pby5saW9ud2ViLnBy",
+            "b3RvYnVmLnN0cmVhbWluZy5Qc1JlZmVyZW5jZVZhbHVlIn4KEFBzUmVmZXJl",
+            "bmNlVmFsdWUSHwoScmVzb2x2ZUluZm9fc3RySWR4GAEgASgNSACIAQESHQoQ",
+            "cmVmZXJyZWRfbm9kZUlkeBgCIAEoDUgBiAEBQhUKE19yZXNvbHZlSW5mb19z",
+            "dHJJZHhCEwoRX3JlZmVycmVkX25vZGVJZHhCLgodaW8ubGlvbndlYi5wcm90",
+            "b2J1Zi5zdHJlYW1pbmdCC0NodW5rUHJvdG9zUAFiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
             new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsMessage), global::Io.Lionweb.Protobuf.Streaming.PsMessage.Parser, new[]{ "SerializationFormatVersion", "StringValue", "MetaPointer", "Language", "Node", "UnboundId" }, new[]{ "Message" }, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsSerializationFormatVersion), global::Io.Lionweb.Protobuf.Streaming.PsSerializationFormatVersion.Parser, new[]{ "Version" }, null, null, null, null),
             new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsChunk), global::Io.Lionweb.Protobuf.Streaming.PsChunk.Parser, new[]{ "SerializationFormatVersion", "StringValues", "MetaPointers", "Languages", "Nodes", "UnboundIds" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsStringValue), global::Io.Lionweb.Protobuf.Streaming.PsStringValue.Parser, new[]{ "Idx", "Value" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsLanguage), global::Io.Lionweb.Protobuf.Streaming.PsLanguage.Parser, new[]{ "Idx", "Key", "Version" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsUnboundNodeId), global::Io.Lionweb.Protobuf.Streaming.PsUnboundNodeId.Parser, new[]{ "Idx", "Id" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsNode), global::Io.Lionweb.Protobuf.Streaming.PsNode.Parser, new[]{ "Idx", "Id", "Classifier", "Properties", "Containments", "References", "Annotations", "Parent" }, new[]{ "Parent" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsMetaPointer), global::Io.Lionweb.Protobuf.Streaming.PsMetaPointer.Parser, new[]{ "Idx", "Language", "Version", "Key" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsProperty), global::Io.Lionweb.Protobuf.Streaming.PsProperty.Parser, new[]{ "MetaPointerIndex", "Value" }, new[]{ "Value" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsContainment), global::Io.Lionweb.Protobuf.Streaming.PsContainment.Parser, new[]{ "MetaPointerIndex", "Children" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsReference), global::Io.Lionweb.Protobuf.Streaming.PsReference.Parser, new[]{ "MetaPointerIndex", "Values" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsReferenceValue), global::Io.Lionweb.Protobuf.Streaming.PsReferenceValue.Parser, new[]{ "ResolveInfo", "Referred" }, new[]{ "ResolveInfo", "Referred" }, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsStringValue), global::Io.Lionweb.Protobuf.Streaming.PsStringValue.Parser, new[]{ "Value" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsLanguage), global::Io.Lionweb.Protobuf.Streaming.PsLanguage.Parser, new[]{ "KeyStrIdx", "VersionStrIdx" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsUnboundNodeId), global::Io.Lionweb.Protobuf.Streaming.PsUnboundNodeId.Parser, new[]{ "NodeIdx", "IdStrIdx" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsNode), global::Io.Lionweb.Protobuf.Streaming.PsNode.Parser, new[]{ "NodeIdx", "IdStrIdx", "ClassifierMetaPointerIdx", "Properties", "Containments", "References", "AnnotationsNodeIdx", "ParentNodeIdx" }, new[]{ "ParentNodeIdx" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsMetaPointer), global::Io.Lionweb.Protobuf.Streaming.PsMetaPointer.Parser, new[]{ "LanguageStrIdx", "VersionStrIdx", "KeyStrIdx" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsProperty), global::Io.Lionweb.Protobuf.Streaming.PsProperty.Parser, new[]{ "TypeMetaPointerIdx", "ValueStrIdx" }, new[]{ "ValueStrIdx" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsContainment), global::Io.Lionweb.Protobuf.Streaming.PsContainment.Parser, new[]{ "TypeMetaPointerIdx", "ChildrenNodeIdx" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsReference), global::Io.Lionweb.Protobuf.Streaming.PsReference.Parser, new[]{ "TypeMetaPointerIdx", "Values" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Io.Lionweb.Protobuf.Streaming.PsReferenceValue), global::Io.Lionweb.Protobuf.Streaming.PsReferenceValue.Parser, new[]{ "ResolveInfoStrIdx", "ReferredNodeIdx" }, new[]{ "ResolveInfoStrIdx", "ReferredNodeIdx" }, null, null, null)
           }));
     }
     #endregion
@@ -859,9 +861,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
     private static readonly pb::FieldCodec<global::Io.Lionweb.Protobuf.Streaming.PsStringValue> _repeated_stringValues_codec
         = pb::FieldCodec.ForMessage(18, global::Io.Lionweb.Protobuf.Streaming.PsStringValue.Parser);
     private readonly pbc::RepeatedField<global::Io.Lionweb.Protobuf.Streaming.PsStringValue> stringValues_ = new pbc::RepeatedField<global::Io.Lionweb.Protobuf.Streaming.PsStringValue>();
-    /// <summary>
-    /// We use this mechanism both to save space and to represent nulls (identified by -1)
-    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public pbc::RepeatedField<global::Io.Lionweb.Protobuf.Streaming.PsStringValue> StringValues {
@@ -1167,7 +1166,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PsStringValue(PsStringValue other) : this() {
-      idx_ = other.idx_;
       value_ = other.value_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -1178,21 +1176,12 @@ namespace Io.Lionweb.Protobuf.Streaming {
       return new PsStringValue(this);
     }
 
-    /// <summary>Field number for the "idx" field.</summary>
-    public const int IdxFieldNumber = 1;
-    private ulong idx_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Idx {
-      get { return idx_; }
-      set {
-        idx_ = value;
-      }
-    }
-
     /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 2;
     private string value_ = "";
+    /// <summary>
+    ///  uint32 strIdx = 1;
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Value {
@@ -1217,7 +1206,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Idx != other.Idx) return false;
       if (Value != other.Value) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -1226,7 +1214,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Idx != 0UL) hash ^= Idx.GetHashCode();
       if (Value.Length != 0) hash ^= Value.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -1246,10 +1233,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Idx != 0UL) {
-        output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
-      }
       if (Value.Length != 0) {
         output.WriteRawTag(18);
         output.WriteString(Value);
@@ -1264,10 +1247,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Idx != 0UL) {
-        output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
-      }
       if (Value.Length != 0) {
         output.WriteRawTag(18);
         output.WriteString(Value);
@@ -1282,9 +1261,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Idx != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Idx);
-      }
       if (Value.Length != 0) {
         size += 1 + pb::CodedOutputStream.ComputeStringSize(Value);
       }
@@ -1299,9 +1275,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
     public void MergeFrom(PsStringValue other) {
       if (other == null) {
         return;
-      }
-      if (other.Idx != 0UL) {
-        Idx = other.Idx;
       }
       if (other.Value.Length != 0) {
         Value = other.Value;
@@ -1325,10 +1298,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            Idx = input.ReadUInt64();
-            break;
-          }
           case 18: {
             Value = input.ReadString();
             break;
@@ -1352,10 +1321,6 @@ namespace Io.Lionweb.Protobuf.Streaming {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 8: {
-            Idx = input.ReadUInt64();
-            break;
-          }
           case 18: {
             Value = input.ReadString();
             break;
@@ -1402,9 +1367,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PsLanguage(PsLanguage other) : this() {
-      idx_ = other.idx_;
-      key_ = other.key_;
-      version_ = other.version_;
+      keyStrIdx_ = other.keyStrIdx_;
+      versionStrIdx_ = other.versionStrIdx_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1414,39 +1378,30 @@ namespace Io.Lionweb.Protobuf.Streaming {
       return new PsLanguage(this);
     }
 
-    /// <summary>Field number for the "idx" field.</summary>
-    public const int IdxFieldNumber = 1;
-    private ulong idx_;
+    /// <summary>Field number for the "key_StrIdx" field.</summary>
+    public const int KeyStrIdxFieldNumber = 2;
+    private uint keyStrIdx_;
+    /// <summary>
+    ///  uint32 langIdx = 1;
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Idx {
-      get { return idx_; }
+    public uint KeyStrIdx {
+      get { return keyStrIdx_; }
       set {
-        idx_ = value;
+        keyStrIdx_ = value;
       }
     }
 
-    /// <summary>Field number for the "key" field.</summary>
-    public const int KeyFieldNumber = 2;
-    private ulong key_;
+    /// <summary>Field number for the "version_StrIdx" field.</summary>
+    public const int VersionStrIdxFieldNumber = 3;
+    private uint versionStrIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Key {
-      get { return key_; }
+    public uint VersionStrIdx {
+      get { return versionStrIdx_; }
       set {
-        key_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "version" field.</summary>
-    public const int VersionFieldNumber = 3;
-    private ulong version_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Version {
-      get { return version_; }
-      set {
-        version_ = value;
+        versionStrIdx_ = value;
       }
     }
 
@@ -1465,9 +1420,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Idx != other.Idx) return false;
-      if (Key != other.Key) return false;
-      if (Version != other.Version) return false;
+      if (KeyStrIdx != other.KeyStrIdx) return false;
+      if (VersionStrIdx != other.VersionStrIdx) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1475,9 +1429,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Idx != 0UL) hash ^= Idx.GetHashCode();
-      if (Key != 0UL) hash ^= Key.GetHashCode();
-      if (Version != 0UL) hash ^= Version.GetHashCode();
+      if (KeyStrIdx != 0) hash ^= KeyStrIdx.GetHashCode();
+      if (VersionStrIdx != 0) hash ^= VersionStrIdx.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1496,17 +1449,13 @@ namespace Io.Lionweb.Protobuf.Streaming {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Idx != 0UL) {
-        output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
-      }
-      if (Key != 0UL) {
+      if (KeyStrIdx != 0) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Key);
+        output.WriteUInt32(KeyStrIdx);
       }
-      if (Version != 0UL) {
+      if (VersionStrIdx != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt64(Version);
+        output.WriteUInt32(VersionStrIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -1518,17 +1467,13 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Idx != 0UL) {
-        output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
-      }
-      if (Key != 0UL) {
+      if (KeyStrIdx != 0) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Key);
+        output.WriteUInt32(KeyStrIdx);
       }
-      if (Version != 0UL) {
+      if (VersionStrIdx != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt64(Version);
+        output.WriteUInt32(VersionStrIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -1540,14 +1485,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Idx != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Idx);
+      if (KeyStrIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(KeyStrIdx);
       }
-      if (Key != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Key);
-      }
-      if (Version != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Version);
+      if (VersionStrIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(VersionStrIdx);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1561,14 +1503,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (other == null) {
         return;
       }
-      if (other.Idx != 0UL) {
-        Idx = other.Idx;
+      if (other.KeyStrIdx != 0) {
+        KeyStrIdx = other.KeyStrIdx;
       }
-      if (other.Key != 0UL) {
-        Key = other.Key;
-      }
-      if (other.Version != 0UL) {
-        Version = other.Version;
+      if (other.VersionStrIdx != 0) {
+        VersionStrIdx = other.VersionStrIdx;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1589,16 +1528,12 @@ namespace Io.Lionweb.Protobuf.Streaming {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            Idx = input.ReadUInt64();
-            break;
-          }
           case 16: {
-            Key = input.ReadUInt64();
+            KeyStrIdx = input.ReadUInt32();
             break;
           }
           case 24: {
-            Version = input.ReadUInt64();
+            VersionStrIdx = input.ReadUInt32();
             break;
           }
         }
@@ -1620,16 +1555,12 @@ namespace Io.Lionweb.Protobuf.Streaming {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 8: {
-            Idx = input.ReadUInt64();
-            break;
-          }
           case 16: {
-            Key = input.ReadUInt64();
+            KeyStrIdx = input.ReadUInt32();
             break;
           }
           case 24: {
-            Version = input.ReadUInt64();
+            VersionStrIdx = input.ReadUInt32();
             break;
           }
         }
@@ -1674,8 +1605,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PsUnboundNodeId(PsUnboundNodeId other) : this() {
-      idx_ = other.idx_;
-      id_ = other.id_;
+      nodeIdx_ = other.nodeIdx_;
+      idStrIdx_ = other.idStrIdx_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1685,27 +1616,27 @@ namespace Io.Lionweb.Protobuf.Streaming {
       return new PsUnboundNodeId(this);
     }
 
-    /// <summary>Field number for the "idx" field.</summary>
-    public const int IdxFieldNumber = 1;
-    private ulong idx_;
+    /// <summary>Field number for the "nodeIdx" field.</summary>
+    public const int NodeIdxFieldNumber = 1;
+    private uint nodeIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Idx {
-      get { return idx_; }
+    public uint NodeIdx {
+      get { return nodeIdx_; }
       set {
-        idx_ = value;
+        nodeIdx_ = value;
       }
     }
 
-    /// <summary>Field number for the "id" field.</summary>
-    public const int IdFieldNumber = 2;
-    private ulong id_;
+    /// <summary>Field number for the "id_StrIdx" field.</summary>
+    public const int IdStrIdxFieldNumber = 2;
+    private uint idStrIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Id {
-      get { return id_; }
+    public uint IdStrIdx {
+      get { return idStrIdx_; }
       set {
-        id_ = value;
+        idStrIdx_ = value;
       }
     }
 
@@ -1724,8 +1655,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Idx != other.Idx) return false;
-      if (Id != other.Id) return false;
+      if (NodeIdx != other.NodeIdx) return false;
+      if (IdStrIdx != other.IdStrIdx) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -1733,8 +1664,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Idx != 0UL) hash ^= Idx.GetHashCode();
-      if (Id != 0UL) hash ^= Id.GetHashCode();
+      if (NodeIdx != 0) hash ^= NodeIdx.GetHashCode();
+      if (IdStrIdx != 0) hash ^= IdStrIdx.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -1753,13 +1684,13 @@ namespace Io.Lionweb.Protobuf.Streaming {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Idx != 0UL) {
+      if (NodeIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
+        output.WriteUInt32(NodeIdx);
       }
-      if (Id != 0UL) {
+      if (IdStrIdx != 0) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Id);
+        output.WriteUInt32(IdStrIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -1771,13 +1702,13 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Idx != 0UL) {
+      if (NodeIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
+        output.WriteUInt32(NodeIdx);
       }
-      if (Id != 0UL) {
+      if (IdStrIdx != 0) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Id);
+        output.WriteUInt32(IdStrIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -1789,11 +1720,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Idx != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Idx);
+      if (NodeIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(NodeIdx);
       }
-      if (Id != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Id);
+      if (IdStrIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(IdStrIdx);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -1807,11 +1738,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (other == null) {
         return;
       }
-      if (other.Idx != 0UL) {
-        Idx = other.Idx;
+      if (other.NodeIdx != 0) {
+        NodeIdx = other.NodeIdx;
       }
-      if (other.Id != 0UL) {
-        Id = other.Id;
+      if (other.IdStrIdx != 0) {
+        IdStrIdx = other.IdStrIdx;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -1833,11 +1764,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Idx = input.ReadUInt64();
+            NodeIdx = input.ReadUInt32();
             break;
           }
           case 16: {
-            Id = input.ReadUInt64();
+            IdStrIdx = input.ReadUInt32();
             break;
           }
         }
@@ -1860,11 +1791,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Idx = input.ReadUInt64();
+            NodeIdx = input.ReadUInt32();
             break;
           }
           case 16: {
-            Id = input.ReadUInt64();
+            IdStrIdx = input.ReadUInt32();
             break;
           }
         }
@@ -1911,14 +1842,14 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PsNode(PsNode other) : this() {
       _hasBits0 = other._hasBits0;
-      idx_ = other.idx_;
-      id_ = other.id_;
-      classifier_ = other.classifier_;
+      nodeIdx_ = other.nodeIdx_;
+      idStrIdx_ = other.idStrIdx_;
+      classifierMetaPointerIdx_ = other.classifierMetaPointerIdx_;
       properties_ = other.properties_.Clone();
       containments_ = other.containments_.Clone();
       references_ = other.references_.Clone();
-      annotations_ = other.annotations_.Clone();
-      parent_ = other.parent_;
+      annotationsNodeIdx_ = other.annotationsNodeIdx_.Clone();
+      parentNodeIdx_ = other.parentNodeIdx_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -1928,39 +1859,39 @@ namespace Io.Lionweb.Protobuf.Streaming {
       return new PsNode(this);
     }
 
-    /// <summary>Field number for the "idx" field.</summary>
-    public const int IdxFieldNumber = 1;
-    private ulong idx_;
+    /// <summary>Field number for the "nodeIdx" field.</summary>
+    public const int NodeIdxFieldNumber = 1;
+    private uint nodeIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Idx {
-      get { return idx_; }
+    public uint NodeIdx {
+      get { return nodeIdx_; }
       set {
-        idx_ = value;
+        nodeIdx_ = value;
       }
     }
 
-    /// <summary>Field number for the "id" field.</summary>
-    public const int IdFieldNumber = 2;
-    private ulong id_;
+    /// <summary>Field number for the "id_StrIdx" field.</summary>
+    public const int IdStrIdxFieldNumber = 2;
+    private uint idStrIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Id {
-      get { return id_; }
+    public uint IdStrIdx {
+      get { return idStrIdx_; }
       set {
-        id_ = value;
+        idStrIdx_ = value;
       }
     }
 
-    /// <summary>Field number for the "classifier" field.</summary>
-    public const int ClassifierFieldNumber = 3;
-    private ulong classifier_;
+    /// <summary>Field number for the "classifier_metaPointerIdx" field.</summary>
+    public const int ClassifierMetaPointerIdxFieldNumber = 3;
+    private uint classifierMetaPointerIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Classifier {
-      get { return classifier_; }
+    public uint ClassifierMetaPointerIdx {
+      get { return classifierMetaPointerIdx_; }
       set {
-        classifier_ = value;
+        classifierMetaPointerIdx_ = value;
       }
     }
 
@@ -1997,44 +1928,41 @@ namespace Io.Lionweb.Protobuf.Streaming {
       get { return references_; }
     }
 
-    /// <summary>Field number for the "annotations" field.</summary>
-    public const int AnnotationsFieldNumber = 7;
-    private static readonly pb::FieldCodec<ulong> _repeated_annotations_codec
-        = pb::FieldCodec.ForUInt64(58);
-    private readonly pbc::RepeatedField<ulong> annotations_ = new pbc::RepeatedField<ulong>();
-    /// <summary>
-    /// This is a list of indexes representing the string values corresponding to the IDs of the annotations 
-    /// </summary>
+    /// <summary>Field number for the "annotations_nodeIdx" field.</summary>
+    public const int AnnotationsNodeIdxFieldNumber = 7;
+    private static readonly pb::FieldCodec<uint> _repeated_annotationsNodeIdx_codec
+        = pb::FieldCodec.ForUInt32(58);
+    private readonly pbc::RepeatedField<uint> annotationsNodeIdx_ = new pbc::RepeatedField<uint>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<ulong> Annotations {
-      get { return annotations_; }
+    public pbc::RepeatedField<uint> AnnotationsNodeIdx {
+      get { return annotationsNodeIdx_; }
     }
 
-    /// <summary>Field number for the "parent" field.</summary>
-    public const int ParentFieldNumber = 8;
-    private readonly static ulong ParentDefaultValue = 0UL;
+    /// <summary>Field number for the "parent_nodeIdx" field.</summary>
+    public const int ParentNodeIdxFieldNumber = 8;
+    private readonly static uint ParentNodeIdxDefaultValue = 0;
 
-    private ulong parent_;
+    private uint parentNodeIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Parent {
-      get { if ((_hasBits0 & 1) != 0) { return parent_; } else { return ParentDefaultValue; } }
+    public uint ParentNodeIdx {
+      get { if ((_hasBits0 & 1) != 0) { return parentNodeIdx_; } else { return ParentNodeIdxDefaultValue; } }
       set {
         _hasBits0 |= 1;
-        parent_ = value;
+        parentNodeIdx_ = value;
       }
     }
-    /// <summary>Gets whether the "parent" field is set</summary>
+    /// <summary>Gets whether the "parent_nodeIdx" field is set</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool HasParent {
+    public bool HasParentNodeIdx {
       get { return (_hasBits0 & 1) != 0; }
     }
-    /// <summary>Clears the value of the "parent" field</summary>
+    /// <summary>Clears the value of the "parent_nodeIdx" field</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearParent() {
+    public void ClearParentNodeIdx() {
       _hasBits0 &= ~1;
     }
 
@@ -2053,14 +1981,14 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Idx != other.Idx) return false;
-      if (Id != other.Id) return false;
-      if (Classifier != other.Classifier) return false;
+      if (NodeIdx != other.NodeIdx) return false;
+      if (IdStrIdx != other.IdStrIdx) return false;
+      if (ClassifierMetaPointerIdx != other.ClassifierMetaPointerIdx) return false;
       if(!properties_.Equals(other.properties_)) return false;
       if(!containments_.Equals(other.containments_)) return false;
       if(!references_.Equals(other.references_)) return false;
-      if(!annotations_.Equals(other.annotations_)) return false;
-      if (Parent != other.Parent) return false;
+      if(!annotationsNodeIdx_.Equals(other.annotationsNodeIdx_)) return false;
+      if (ParentNodeIdx != other.ParentNodeIdx) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2068,14 +1996,14 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Idx != 0UL) hash ^= Idx.GetHashCode();
-      if (Id != 0UL) hash ^= Id.GetHashCode();
-      if (Classifier != 0UL) hash ^= Classifier.GetHashCode();
+      if (NodeIdx != 0) hash ^= NodeIdx.GetHashCode();
+      if (IdStrIdx != 0) hash ^= IdStrIdx.GetHashCode();
+      if (ClassifierMetaPointerIdx != 0) hash ^= ClassifierMetaPointerIdx.GetHashCode();
       hash ^= properties_.GetHashCode();
       hash ^= containments_.GetHashCode();
       hash ^= references_.GetHashCode();
-      hash ^= annotations_.GetHashCode();
-      if (HasParent) hash ^= Parent.GetHashCode();
+      hash ^= annotationsNodeIdx_.GetHashCode();
+      if (HasParentNodeIdx) hash ^= ParentNodeIdx.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2094,25 +2022,25 @@ namespace Io.Lionweb.Protobuf.Streaming {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Idx != 0UL) {
+      if (NodeIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
+        output.WriteUInt32(NodeIdx);
       }
-      if (Id != 0UL) {
+      if (IdStrIdx != 0) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Id);
+        output.WriteUInt32(IdStrIdx);
       }
-      if (Classifier != 0UL) {
+      if (ClassifierMetaPointerIdx != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt64(Classifier);
+        output.WriteUInt32(ClassifierMetaPointerIdx);
       }
       properties_.WriteTo(output, _repeated_properties_codec);
       containments_.WriteTo(output, _repeated_containments_codec);
       references_.WriteTo(output, _repeated_references_codec);
-      annotations_.WriteTo(output, _repeated_annotations_codec);
-      if (HasParent) {
+      annotationsNodeIdx_.WriteTo(output, _repeated_annotationsNodeIdx_codec);
+      if (HasParentNodeIdx) {
         output.WriteRawTag(64);
-        output.WriteUInt64(Parent);
+        output.WriteUInt32(ParentNodeIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -2124,25 +2052,25 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Idx != 0UL) {
+      if (NodeIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
+        output.WriteUInt32(NodeIdx);
       }
-      if (Id != 0UL) {
+      if (IdStrIdx != 0) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Id);
+        output.WriteUInt32(IdStrIdx);
       }
-      if (Classifier != 0UL) {
+      if (ClassifierMetaPointerIdx != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt64(Classifier);
+        output.WriteUInt32(ClassifierMetaPointerIdx);
       }
       properties_.WriteTo(ref output, _repeated_properties_codec);
       containments_.WriteTo(ref output, _repeated_containments_codec);
       references_.WriteTo(ref output, _repeated_references_codec);
-      annotations_.WriteTo(ref output, _repeated_annotations_codec);
-      if (HasParent) {
+      annotationsNodeIdx_.WriteTo(ref output, _repeated_annotationsNodeIdx_codec);
+      if (HasParentNodeIdx) {
         output.WriteRawTag(64);
-        output.WriteUInt64(Parent);
+        output.WriteUInt32(ParentNodeIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -2154,21 +2082,21 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Idx != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Idx);
+      if (NodeIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(NodeIdx);
       }
-      if (Id != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Id);
+      if (IdStrIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(IdStrIdx);
       }
-      if (Classifier != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Classifier);
+      if (ClassifierMetaPointerIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(ClassifierMetaPointerIdx);
       }
       size += properties_.CalculateSize(_repeated_properties_codec);
       size += containments_.CalculateSize(_repeated_containments_codec);
       size += references_.CalculateSize(_repeated_references_codec);
-      size += annotations_.CalculateSize(_repeated_annotations_codec);
-      if (HasParent) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Parent);
+      size += annotationsNodeIdx_.CalculateSize(_repeated_annotationsNodeIdx_codec);
+      if (HasParentNodeIdx) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(ParentNodeIdx);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2182,21 +2110,21 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (other == null) {
         return;
       }
-      if (other.Idx != 0UL) {
-        Idx = other.Idx;
+      if (other.NodeIdx != 0) {
+        NodeIdx = other.NodeIdx;
       }
-      if (other.Id != 0UL) {
-        Id = other.Id;
+      if (other.IdStrIdx != 0) {
+        IdStrIdx = other.IdStrIdx;
       }
-      if (other.Classifier != 0UL) {
-        Classifier = other.Classifier;
+      if (other.ClassifierMetaPointerIdx != 0) {
+        ClassifierMetaPointerIdx = other.ClassifierMetaPointerIdx;
       }
       properties_.Add(other.properties_);
       containments_.Add(other.containments_);
       references_.Add(other.references_);
-      annotations_.Add(other.annotations_);
-      if (other.HasParent) {
-        Parent = other.Parent;
+      annotationsNodeIdx_.Add(other.annotationsNodeIdx_);
+      if (other.HasParentNodeIdx) {
+        ParentNodeIdx = other.ParentNodeIdx;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2218,15 +2146,15 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Idx = input.ReadUInt64();
+            NodeIdx = input.ReadUInt32();
             break;
           }
           case 16: {
-            Id = input.ReadUInt64();
+            IdStrIdx = input.ReadUInt32();
             break;
           }
           case 24: {
-            Classifier = input.ReadUInt64();
+            ClassifierMetaPointerIdx = input.ReadUInt32();
             break;
           }
           case 34: {
@@ -2243,11 +2171,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
           }
           case 58:
           case 56: {
-            annotations_.AddEntriesFrom(input, _repeated_annotations_codec);
+            annotationsNodeIdx_.AddEntriesFrom(input, _repeated_annotationsNodeIdx_codec);
             break;
           }
           case 64: {
-            Parent = input.ReadUInt64();
+            ParentNodeIdx = input.ReadUInt32();
             break;
           }
         }
@@ -2270,15 +2198,15 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Idx = input.ReadUInt64();
+            NodeIdx = input.ReadUInt32();
             break;
           }
           case 16: {
-            Id = input.ReadUInt64();
+            IdStrIdx = input.ReadUInt32();
             break;
           }
           case 24: {
-            Classifier = input.ReadUInt64();
+            ClassifierMetaPointerIdx = input.ReadUInt32();
             break;
           }
           case 34: {
@@ -2295,11 +2223,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
           }
           case 58:
           case 56: {
-            annotations_.AddEntriesFrom(ref input, _repeated_annotations_codec);
+            annotationsNodeIdx_.AddEntriesFrom(ref input, _repeated_annotationsNodeIdx_codec);
             break;
           }
           case 64: {
-            Parent = input.ReadUInt64();
+            ParentNodeIdx = input.ReadUInt32();
             break;
           }
         }
@@ -2344,10 +2272,9 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PsMetaPointer(PsMetaPointer other) : this() {
-      idx_ = other.idx_;
-      language_ = other.language_;
-      version_ = other.version_;
-      key_ = other.key_;
+      languageStrIdx_ = other.languageStrIdx_;
+      versionStrIdx_ = other.versionStrIdx_;
+      keyStrIdx_ = other.keyStrIdx_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2357,51 +2284,42 @@ namespace Io.Lionweb.Protobuf.Streaming {
       return new PsMetaPointer(this);
     }
 
-    /// <summary>Field number for the "idx" field.</summary>
-    public const int IdxFieldNumber = 1;
-    private ulong idx_;
+    /// <summary>Field number for the "language_strIdx" field.</summary>
+    public const int LanguageStrIdxFieldNumber = 2;
+    private uint languageStrIdx_;
+    /// <summary>
+    ///  uint32 metaPointerIdx = 1;
+    /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Idx {
-      get { return idx_; }
+    public uint LanguageStrIdx {
+      get { return languageStrIdx_; }
       set {
-        idx_ = value;
+        languageStrIdx_ = value;
       }
     }
 
-    /// <summary>Field number for the "language" field.</summary>
-    public const int LanguageFieldNumber = 2;
-    private ulong language_;
+    /// <summary>Field number for the "version_strIdx" field.</summary>
+    public const int VersionStrIdxFieldNumber = 3;
+    private uint versionStrIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Language {
-      get { return language_; }
+    public uint VersionStrIdx {
+      get { return versionStrIdx_; }
       set {
-        language_ = value;
+        versionStrIdx_ = value;
       }
     }
 
-    /// <summary>Field number for the "version" field.</summary>
-    public const int VersionFieldNumber = 3;
-    private ulong version_;
+    /// <summary>Field number for the "key_strIdx" field.</summary>
+    public const int KeyStrIdxFieldNumber = 4;
+    private uint keyStrIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Version {
-      get { return version_; }
+    public uint KeyStrIdx {
+      get { return keyStrIdx_; }
       set {
-        version_ = value;
-      }
-    }
-
-    /// <summary>Field number for the "key" field.</summary>
-    public const int KeyFieldNumber = 4;
-    private ulong key_;
-    [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
-    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Key {
-      get { return key_; }
-      set {
-        key_ = value;
+        keyStrIdx_ = value;
       }
     }
 
@@ -2420,10 +2338,9 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (Idx != other.Idx) return false;
-      if (Language != other.Language) return false;
-      if (Version != other.Version) return false;
-      if (Key != other.Key) return false;
+      if (LanguageStrIdx != other.LanguageStrIdx) return false;
+      if (VersionStrIdx != other.VersionStrIdx) return false;
+      if (KeyStrIdx != other.KeyStrIdx) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2431,10 +2348,9 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Idx != 0UL) hash ^= Idx.GetHashCode();
-      if (Language != 0UL) hash ^= Language.GetHashCode();
-      if (Version != 0UL) hash ^= Version.GetHashCode();
-      if (Key != 0UL) hash ^= Key.GetHashCode();
+      if (LanguageStrIdx != 0) hash ^= LanguageStrIdx.GetHashCode();
+      if (VersionStrIdx != 0) hash ^= VersionStrIdx.GetHashCode();
+      if (KeyStrIdx != 0) hash ^= KeyStrIdx.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2453,21 +2369,17 @@ namespace Io.Lionweb.Protobuf.Streaming {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Idx != 0UL) {
-        output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
-      }
-      if (Language != 0UL) {
+      if (LanguageStrIdx != 0) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Language);
+        output.WriteUInt32(LanguageStrIdx);
       }
-      if (Version != 0UL) {
+      if (VersionStrIdx != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt64(Version);
+        output.WriteUInt32(VersionStrIdx);
       }
-      if (Key != 0UL) {
+      if (KeyStrIdx != 0) {
         output.WriteRawTag(32);
-        output.WriteUInt64(Key);
+        output.WriteUInt32(KeyStrIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -2479,21 +2391,17 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Idx != 0UL) {
-        output.WriteRawTag(8);
-        output.WriteUInt64(Idx);
-      }
-      if (Language != 0UL) {
+      if (LanguageStrIdx != 0) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Language);
+        output.WriteUInt32(LanguageStrIdx);
       }
-      if (Version != 0UL) {
+      if (VersionStrIdx != 0) {
         output.WriteRawTag(24);
-        output.WriteUInt64(Version);
+        output.WriteUInt32(VersionStrIdx);
       }
-      if (Key != 0UL) {
+      if (KeyStrIdx != 0) {
         output.WriteRawTag(32);
-        output.WriteUInt64(Key);
+        output.WriteUInt32(KeyStrIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -2505,17 +2413,14 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Idx != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Idx);
+      if (LanguageStrIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(LanguageStrIdx);
       }
-      if (Language != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Language);
+      if (VersionStrIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(VersionStrIdx);
       }
-      if (Version != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Version);
-      }
-      if (Key != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Key);
+      if (KeyStrIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(KeyStrIdx);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2529,17 +2434,14 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (other == null) {
         return;
       }
-      if (other.Idx != 0UL) {
-        Idx = other.Idx;
+      if (other.LanguageStrIdx != 0) {
+        LanguageStrIdx = other.LanguageStrIdx;
       }
-      if (other.Language != 0UL) {
-        Language = other.Language;
+      if (other.VersionStrIdx != 0) {
+        VersionStrIdx = other.VersionStrIdx;
       }
-      if (other.Version != 0UL) {
-        Version = other.Version;
-      }
-      if (other.Key != 0UL) {
-        Key = other.Key;
+      if (other.KeyStrIdx != 0) {
+        KeyStrIdx = other.KeyStrIdx;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2560,20 +2462,16 @@ namespace Io.Lionweb.Protobuf.Streaming {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 8: {
-            Idx = input.ReadUInt64();
-            break;
-          }
           case 16: {
-            Language = input.ReadUInt64();
+            LanguageStrIdx = input.ReadUInt32();
             break;
           }
           case 24: {
-            Version = input.ReadUInt64();
+            VersionStrIdx = input.ReadUInt32();
             break;
           }
           case 32: {
-            Key = input.ReadUInt64();
+            KeyStrIdx = input.ReadUInt32();
             break;
           }
         }
@@ -2595,20 +2493,16 @@ namespace Io.Lionweb.Protobuf.Streaming {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 8: {
-            Idx = input.ReadUInt64();
-            break;
-          }
           case 16: {
-            Language = input.ReadUInt64();
+            LanguageStrIdx = input.ReadUInt32();
             break;
           }
           case 24: {
-            Version = input.ReadUInt64();
+            VersionStrIdx = input.ReadUInt32();
             break;
           }
           case 32: {
-            Key = input.ReadUInt64();
+            KeyStrIdx = input.ReadUInt32();
             break;
           }
         }
@@ -2655,8 +2549,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PsProperty(PsProperty other) : this() {
       _hasBits0 = other._hasBits0;
-      metaPointerIndex_ = other.metaPointerIndex_;
-      value_ = other.value_;
+      typeMetaPointerIdx_ = other.typeMetaPointerIdx_;
+      valueStrIdx_ = other.valueStrIdx_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2666,42 +2560,42 @@ namespace Io.Lionweb.Protobuf.Streaming {
       return new PsProperty(this);
     }
 
-    /// <summary>Field number for the "metaPointerIndex" field.</summary>
-    public const int MetaPointerIndexFieldNumber = 1;
-    private ulong metaPointerIndex_;
+    /// <summary>Field number for the "type_metaPointerIdx" field.</summary>
+    public const int TypeMetaPointerIdxFieldNumber = 1;
+    private uint typeMetaPointerIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong MetaPointerIndex {
-      get { return metaPointerIndex_; }
+    public uint TypeMetaPointerIdx {
+      get { return typeMetaPointerIdx_; }
       set {
-        metaPointerIndex_ = value;
+        typeMetaPointerIdx_ = value;
       }
     }
 
-    /// <summary>Field number for the "value" field.</summary>
-    public const int ValueFieldNumber = 2;
-    private readonly static ulong ValueDefaultValue = 0UL;
+    /// <summary>Field number for the "value_strIdx" field.</summary>
+    public const int ValueStrIdxFieldNumber = 2;
+    private readonly static uint ValueStrIdxDefaultValue = 0;
 
-    private ulong value_;
+    private uint valueStrIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Value {
-      get { if ((_hasBits0 & 1) != 0) { return value_; } else { return ValueDefaultValue; } }
+    public uint ValueStrIdx {
+      get { if ((_hasBits0 & 1) != 0) { return valueStrIdx_; } else { return ValueStrIdxDefaultValue; } }
       set {
         _hasBits0 |= 1;
-        value_ = value;
+        valueStrIdx_ = value;
       }
     }
-    /// <summary>Gets whether the "value" field is set</summary>
+    /// <summary>Gets whether the "value_strIdx" field is set</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool HasValue {
+    public bool HasValueStrIdx {
       get { return (_hasBits0 & 1) != 0; }
     }
-    /// <summary>Clears the value of the "value" field</summary>
+    /// <summary>Clears the value of the "value_strIdx" field</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearValue() {
+    public void ClearValueStrIdx() {
       _hasBits0 &= ~1;
     }
 
@@ -2720,8 +2614,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (MetaPointerIndex != other.MetaPointerIndex) return false;
-      if (Value != other.Value) return false;
+      if (TypeMetaPointerIdx != other.TypeMetaPointerIdx) return false;
+      if (ValueStrIdx != other.ValueStrIdx) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2729,8 +2623,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (MetaPointerIndex != 0UL) hash ^= MetaPointerIndex.GetHashCode();
-      if (HasValue) hash ^= Value.GetHashCode();
+      if (TypeMetaPointerIdx != 0) hash ^= TypeMetaPointerIdx.GetHashCode();
+      if (HasValueStrIdx) hash ^= ValueStrIdx.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2749,13 +2643,13 @@ namespace Io.Lionweb.Protobuf.Streaming {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (MetaPointerIndex != 0UL) {
+      if (TypeMetaPointerIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(MetaPointerIndex);
+        output.WriteUInt32(TypeMetaPointerIdx);
       }
-      if (HasValue) {
+      if (HasValueStrIdx) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Value);
+        output.WriteUInt32(ValueStrIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -2767,13 +2661,13 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (MetaPointerIndex != 0UL) {
+      if (TypeMetaPointerIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(MetaPointerIndex);
+        output.WriteUInt32(TypeMetaPointerIdx);
       }
-      if (HasValue) {
+      if (HasValueStrIdx) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Value);
+        output.WriteUInt32(ValueStrIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -2785,11 +2679,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (MetaPointerIndex != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(MetaPointerIndex);
+      if (TypeMetaPointerIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(TypeMetaPointerIdx);
       }
-      if (HasValue) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Value);
+      if (HasValueStrIdx) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(ValueStrIdx);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -2803,11 +2697,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (other == null) {
         return;
       }
-      if (other.MetaPointerIndex != 0UL) {
-        MetaPointerIndex = other.MetaPointerIndex;
+      if (other.TypeMetaPointerIdx != 0) {
+        TypeMetaPointerIdx = other.TypeMetaPointerIdx;
       }
-      if (other.HasValue) {
-        Value = other.Value;
+      if (other.HasValueStrIdx) {
+        ValueStrIdx = other.ValueStrIdx;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -2829,11 +2723,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            MetaPointerIndex = input.ReadUInt64();
+            TypeMetaPointerIdx = input.ReadUInt32();
             break;
           }
           case 16: {
-            Value = input.ReadUInt64();
+            ValueStrIdx = input.ReadUInt32();
             break;
           }
         }
@@ -2856,11 +2750,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            MetaPointerIndex = input.ReadUInt64();
+            TypeMetaPointerIdx = input.ReadUInt32();
             break;
           }
           case 16: {
-            Value = input.ReadUInt64();
+            ValueStrIdx = input.ReadUInt32();
             break;
           }
         }
@@ -2905,8 +2799,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PsContainment(PsContainment other) : this() {
-      metaPointerIndex_ = other.metaPointerIndex_;
-      children_ = other.children_.Clone();
+      typeMetaPointerIdx_ = other.typeMetaPointerIdx_;
+      childrenNodeIdx_ = other.childrenNodeIdx_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -2916,27 +2810,27 @@ namespace Io.Lionweb.Protobuf.Streaming {
       return new PsContainment(this);
     }
 
-    /// <summary>Field number for the "metaPointerIndex" field.</summary>
-    public const int MetaPointerIndexFieldNumber = 1;
-    private ulong metaPointerIndex_;
+    /// <summary>Field number for the "type_metaPointerIdx" field.</summary>
+    public const int TypeMetaPointerIdxFieldNumber = 1;
+    private uint typeMetaPointerIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong MetaPointerIndex {
-      get { return metaPointerIndex_; }
+    public uint TypeMetaPointerIdx {
+      get { return typeMetaPointerIdx_; }
       set {
-        metaPointerIndex_ = value;
+        typeMetaPointerIdx_ = value;
       }
     }
 
-    /// <summary>Field number for the "children" field.</summary>
-    public const int ChildrenFieldNumber = 2;
-    private static readonly pb::FieldCodec<ulong> _repeated_children_codec
-        = pb::FieldCodec.ForUInt64(18);
-    private readonly pbc::RepeatedField<ulong> children_ = new pbc::RepeatedField<ulong>();
+    /// <summary>Field number for the "children_nodeIdx" field.</summary>
+    public const int ChildrenNodeIdxFieldNumber = 2;
+    private static readonly pb::FieldCodec<uint> _repeated_childrenNodeIdx_codec
+        = pb::FieldCodec.ForUInt32(18);
+    private readonly pbc::RepeatedField<uint> childrenNodeIdx_ = new pbc::RepeatedField<uint>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<ulong> Children {
-      get { return children_; }
+    public pbc::RepeatedField<uint> ChildrenNodeIdx {
+      get { return childrenNodeIdx_; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2954,8 +2848,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (MetaPointerIndex != other.MetaPointerIndex) return false;
-      if(!children_.Equals(other.children_)) return false;
+      if (TypeMetaPointerIdx != other.TypeMetaPointerIdx) return false;
+      if(!childrenNodeIdx_.Equals(other.childrenNodeIdx_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -2963,8 +2857,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (MetaPointerIndex != 0UL) hash ^= MetaPointerIndex.GetHashCode();
-      hash ^= children_.GetHashCode();
+      if (TypeMetaPointerIdx != 0) hash ^= TypeMetaPointerIdx.GetHashCode();
+      hash ^= childrenNodeIdx_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -2983,11 +2877,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (MetaPointerIndex != 0UL) {
+      if (TypeMetaPointerIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(MetaPointerIndex);
+        output.WriteUInt32(TypeMetaPointerIdx);
       }
-      children_.WriteTo(output, _repeated_children_codec);
+      childrenNodeIdx_.WriteTo(output, _repeated_childrenNodeIdx_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
       }
@@ -2998,11 +2892,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (MetaPointerIndex != 0UL) {
+      if (TypeMetaPointerIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(MetaPointerIndex);
+        output.WriteUInt32(TypeMetaPointerIdx);
       }
-      children_.WriteTo(ref output, _repeated_children_codec);
+      childrenNodeIdx_.WriteTo(ref output, _repeated_childrenNodeIdx_codec);
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
       }
@@ -3013,10 +2907,10 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (MetaPointerIndex != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(MetaPointerIndex);
+      if (TypeMetaPointerIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(TypeMetaPointerIdx);
       }
-      size += children_.CalculateSize(_repeated_children_codec);
+      size += childrenNodeIdx_.CalculateSize(_repeated_childrenNodeIdx_codec);
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
       }
@@ -3029,10 +2923,10 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (other == null) {
         return;
       }
-      if (other.MetaPointerIndex != 0UL) {
-        MetaPointerIndex = other.MetaPointerIndex;
+      if (other.TypeMetaPointerIdx != 0) {
+        TypeMetaPointerIdx = other.TypeMetaPointerIdx;
       }
-      children_.Add(other.children_);
+      childrenNodeIdx_.Add(other.childrenNodeIdx_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
 
@@ -3053,12 +2947,12 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            MetaPointerIndex = input.ReadUInt64();
+            TypeMetaPointerIdx = input.ReadUInt32();
             break;
           }
           case 18:
           case 16: {
-            children_.AddEntriesFrom(input, _repeated_children_codec);
+            childrenNodeIdx_.AddEntriesFrom(input, _repeated_childrenNodeIdx_codec);
             break;
           }
         }
@@ -3081,12 +2975,12 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            MetaPointerIndex = input.ReadUInt64();
+            TypeMetaPointerIdx = input.ReadUInt32();
             break;
           }
           case 18:
           case 16: {
-            children_.AddEntriesFrom(ref input, _repeated_children_codec);
+            childrenNodeIdx_.AddEntriesFrom(ref input, _repeated_childrenNodeIdx_codec);
             break;
           }
         }
@@ -3131,7 +3025,7 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PsReference(PsReference other) : this() {
-      metaPointerIndex_ = other.metaPointerIndex_;
+      typeMetaPointerIdx_ = other.typeMetaPointerIdx_;
       values_ = other.values_.Clone();
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
@@ -3142,15 +3036,15 @@ namespace Io.Lionweb.Protobuf.Streaming {
       return new PsReference(this);
     }
 
-    /// <summary>Field number for the "metaPointerIndex" field.</summary>
-    public const int MetaPointerIndexFieldNumber = 1;
-    private ulong metaPointerIndex_;
+    /// <summary>Field number for the "type_metaPointerIdx" field.</summary>
+    public const int TypeMetaPointerIdxFieldNumber = 1;
+    private uint typeMetaPointerIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong MetaPointerIndex {
-      get { return metaPointerIndex_; }
+    public uint TypeMetaPointerIdx {
+      get { return typeMetaPointerIdx_; }
       set {
-        metaPointerIndex_ = value;
+        typeMetaPointerIdx_ = value;
       }
     }
 
@@ -3180,7 +3074,7 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (MetaPointerIndex != other.MetaPointerIndex) return false;
+      if (TypeMetaPointerIdx != other.TypeMetaPointerIdx) return false;
       if(!values_.Equals(other.values_)) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
@@ -3189,7 +3083,7 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (MetaPointerIndex != 0UL) hash ^= MetaPointerIndex.GetHashCode();
+      if (TypeMetaPointerIdx != 0) hash ^= TypeMetaPointerIdx.GetHashCode();
       hash ^= values_.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
@@ -3209,9 +3103,9 @@ namespace Io.Lionweb.Protobuf.Streaming {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (MetaPointerIndex != 0UL) {
+      if (TypeMetaPointerIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(MetaPointerIndex);
+        output.WriteUInt32(TypeMetaPointerIdx);
       }
       values_.WriteTo(output, _repeated_values_codec);
       if (_unknownFields != null) {
@@ -3224,9 +3118,9 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (MetaPointerIndex != 0UL) {
+      if (TypeMetaPointerIdx != 0) {
         output.WriteRawTag(8);
-        output.WriteUInt64(MetaPointerIndex);
+        output.WriteUInt32(TypeMetaPointerIdx);
       }
       values_.WriteTo(ref output, _repeated_values_codec);
       if (_unknownFields != null) {
@@ -3239,8 +3133,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (MetaPointerIndex != 0UL) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(MetaPointerIndex);
+      if (TypeMetaPointerIdx != 0) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(TypeMetaPointerIdx);
       }
       size += values_.CalculateSize(_repeated_values_codec);
       if (_unknownFields != null) {
@@ -3255,8 +3149,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (other == null) {
         return;
       }
-      if (other.MetaPointerIndex != 0UL) {
-        MetaPointerIndex = other.MetaPointerIndex;
+      if (other.TypeMetaPointerIdx != 0) {
+        TypeMetaPointerIdx = other.TypeMetaPointerIdx;
       }
       values_.Add(other.values_);
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
@@ -3279,7 +3173,7 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            MetaPointerIndex = input.ReadUInt64();
+            TypeMetaPointerIdx = input.ReadUInt32();
             break;
           }
           case 18: {
@@ -3306,7 +3200,7 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            MetaPointerIndex = input.ReadUInt64();
+            TypeMetaPointerIdx = input.ReadUInt32();
             break;
           }
           case 18: {
@@ -3357,8 +3251,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public PsReferenceValue(PsReferenceValue other) : this() {
       _hasBits0 = other._hasBits0;
-      resolveInfo_ = other.resolveInfo_;
-      referred_ = other.referred_;
+      resolveInfoStrIdx_ = other.resolveInfoStrIdx_;
+      referredNodeIdx_ = other.referredNodeIdx_;
       _unknownFields = pb::UnknownFieldSet.Clone(other._unknownFields);
     }
 
@@ -3368,57 +3262,57 @@ namespace Io.Lionweb.Protobuf.Streaming {
       return new PsReferenceValue(this);
     }
 
-    /// <summary>Field number for the "resolveInfo" field.</summary>
-    public const int ResolveInfoFieldNumber = 1;
-    private readonly static ulong ResolveInfoDefaultValue = 0UL;
+    /// <summary>Field number for the "resolveInfo_strIdx" field.</summary>
+    public const int ResolveInfoStrIdxFieldNumber = 1;
+    private readonly static uint ResolveInfoStrIdxDefaultValue = 0;
 
-    private ulong resolveInfo_;
+    private uint resolveInfoStrIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong ResolveInfo {
-      get { if ((_hasBits0 & 1) != 0) { return resolveInfo_; } else { return ResolveInfoDefaultValue; } }
+    public uint ResolveInfoStrIdx {
+      get { if ((_hasBits0 & 1) != 0) { return resolveInfoStrIdx_; } else { return ResolveInfoStrIdxDefaultValue; } }
       set {
         _hasBits0 |= 1;
-        resolveInfo_ = value;
+        resolveInfoStrIdx_ = value;
       }
     }
-    /// <summary>Gets whether the "resolveInfo" field is set</summary>
+    /// <summary>Gets whether the "resolveInfo_strIdx" field is set</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool HasResolveInfo {
+    public bool HasResolveInfoStrIdx {
       get { return (_hasBits0 & 1) != 0; }
     }
-    /// <summary>Clears the value of the "resolveInfo" field</summary>
+    /// <summary>Clears the value of the "resolveInfo_strIdx" field</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearResolveInfo() {
+    public void ClearResolveInfoStrIdx() {
       _hasBits0 &= ~1;
     }
 
-    /// <summary>Field number for the "referred" field.</summary>
-    public const int ReferredFieldNumber = 2;
-    private readonly static ulong ReferredDefaultValue = 0UL;
+    /// <summary>Field number for the "referred_nodeIdx" field.</summary>
+    public const int ReferredNodeIdxFieldNumber = 2;
+    private readonly static uint ReferredNodeIdxDefaultValue = 0;
 
-    private ulong referred_;
+    private uint referredNodeIdx_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public ulong Referred {
-      get { if ((_hasBits0 & 2) != 0) { return referred_; } else { return ReferredDefaultValue; } }
+    public uint ReferredNodeIdx {
+      get { if ((_hasBits0 & 2) != 0) { return referredNodeIdx_; } else { return ReferredNodeIdxDefaultValue; } }
       set {
         _hasBits0 |= 2;
-        referred_ = value;
+        referredNodeIdx_ = value;
       }
     }
-    /// <summary>Gets whether the "referred" field is set</summary>
+    /// <summary>Gets whether the "referred_nodeIdx" field is set</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public bool HasReferred {
+    public bool HasReferredNodeIdx {
       get { return (_hasBits0 & 2) != 0; }
     }
-    /// <summary>Clears the value of the "referred" field</summary>
+    /// <summary>Clears the value of the "referred_nodeIdx" field</summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public void ClearReferred() {
+    public void ClearReferredNodeIdx() {
       _hasBits0 &= ~2;
     }
 
@@ -3437,8 +3331,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (ReferenceEquals(other, this)) {
         return true;
       }
-      if (ResolveInfo != other.ResolveInfo) return false;
-      if (Referred != other.Referred) return false;
+      if (ResolveInfoStrIdx != other.ResolveInfoStrIdx) return false;
+      if (ReferredNodeIdx != other.ReferredNodeIdx) return false;
       return Equals(_unknownFields, other._unknownFields);
     }
 
@@ -3446,8 +3340,8 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (HasResolveInfo) hash ^= ResolveInfo.GetHashCode();
-      if (HasReferred) hash ^= Referred.GetHashCode();
+      if (HasResolveInfoStrIdx) hash ^= ResolveInfoStrIdx.GetHashCode();
+      if (HasReferredNodeIdx) hash ^= ReferredNodeIdx.GetHashCode();
       if (_unknownFields != null) {
         hash ^= _unknownFields.GetHashCode();
       }
@@ -3466,13 +3360,13 @@ namespace Io.Lionweb.Protobuf.Streaming {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (HasResolveInfo) {
+      if (HasResolveInfoStrIdx) {
         output.WriteRawTag(8);
-        output.WriteUInt64(ResolveInfo);
+        output.WriteUInt32(ResolveInfoStrIdx);
       }
-      if (HasReferred) {
+      if (HasReferredNodeIdx) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Referred);
+        output.WriteUInt32(ReferredNodeIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(output);
@@ -3484,13 +3378,13 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (HasResolveInfo) {
+      if (HasResolveInfoStrIdx) {
         output.WriteRawTag(8);
-        output.WriteUInt64(ResolveInfo);
+        output.WriteUInt32(ResolveInfoStrIdx);
       }
-      if (HasReferred) {
+      if (HasReferredNodeIdx) {
         output.WriteRawTag(16);
-        output.WriteUInt64(Referred);
+        output.WriteUInt32(ReferredNodeIdx);
       }
       if (_unknownFields != null) {
         _unknownFields.WriteTo(ref output);
@@ -3502,11 +3396,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (HasResolveInfo) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(ResolveInfo);
+      if (HasResolveInfoStrIdx) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(ResolveInfoStrIdx);
       }
-      if (HasReferred) {
-        size += 1 + pb::CodedOutputStream.ComputeUInt64Size(Referred);
+      if (HasReferredNodeIdx) {
+        size += 1 + pb::CodedOutputStream.ComputeUInt32Size(ReferredNodeIdx);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -3520,11 +3414,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
       if (other == null) {
         return;
       }
-      if (other.HasResolveInfo) {
-        ResolveInfo = other.ResolveInfo;
+      if (other.HasResolveInfoStrIdx) {
+        ResolveInfoStrIdx = other.ResolveInfoStrIdx;
       }
-      if (other.HasReferred) {
-        Referred = other.Referred;
+      if (other.HasReferredNodeIdx) {
+        ReferredNodeIdx = other.ReferredNodeIdx;
       }
       _unknownFields = pb::UnknownFieldSet.MergeFrom(_unknownFields, other._unknownFields);
     }
@@ -3546,11 +3440,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            ResolveInfo = input.ReadUInt64();
+            ResolveInfoStrIdx = input.ReadUInt32();
             break;
           }
           case 16: {
-            Referred = input.ReadUInt64();
+            ReferredNodeIdx = input.ReadUInt32();
             break;
           }
         }
@@ -3573,11 +3467,11 @@ namespace Io.Lionweb.Protobuf.Streaming {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            ResolveInfo = input.ReadUInt64();
+            ResolveInfoStrIdx = input.ReadUInt32();
             break;
           }
           case 16: {
-            Referred = input.ReadUInt64();
+            ReferredNodeIdx = input.ReadUInt32();
             break;
           }
         }

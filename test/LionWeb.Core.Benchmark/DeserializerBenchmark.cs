@@ -34,7 +34,7 @@ using Utf8JsonStreamReader;
 [TestClass]
 public class DeserializerBenchmark : SerializerBenchmarkBase
 {
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public async Task Deserialize_Stream_Async()
     {
@@ -49,7 +49,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public async Task Deserialize_Stream_Async_Aot()
     {
@@ -64,7 +64,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public void Deserialize_Stream()
     {
@@ -79,7 +79,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public void Deserialize_Stream_Aot()
     {
@@ -94,7 +94,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public void Deserialize_StreamX_Aot()
     {
@@ -167,7 +167,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public void Deserialize_String()
     {
@@ -180,7 +180,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public void Deserialize_String_Aot()
     {
@@ -193,7 +193,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    // [Benchmark]
+    [Benchmark]
     [TestMethod]
     public void Deserialize_Protobuf()
     {
@@ -209,7 +209,7 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
     
-    // [Benchmark]
+    [Benchmark]
     [TestMethod]
     public void Deserialize_Protobuf_Block()
     {

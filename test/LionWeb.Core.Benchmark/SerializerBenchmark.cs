@@ -42,7 +42,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         _nodes = CreateNodes(_maxSize);
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public async Task Serialize_Stream_Async()
     {
@@ -58,7 +58,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         await JsonSerializer.SerializeAsync(stream, data, _simpleOptions);
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public void Serialize_Stream()
     {
@@ -74,7 +74,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         JsonSerializer.Serialize(stream, data, _simpleOptions);
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public async Task Serialize_Stream_Async_Aot()
     {
@@ -90,7 +90,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         await JsonSerializer.SerializeAsync(stream, data, _aotOptions);
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public void Serialize_Stream_Aot()
     {
@@ -106,7 +106,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         JsonSerializer.Serialize(stream, data, _aotOptions);
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public void Serialize_String()
     {
@@ -118,7 +118,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
         File.WriteAllText(_stringFile, output);
     }
 
-    [Benchmark]
+    // [Benchmark]
     [TestMethod]
     public void Serialize_String_Aot()
     {
@@ -135,7 +135,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     public void Serialize_Protobuf()
     {
         IEnumerable<IReadableNode> nodes = _nodes;
-        var serializer = new ProtobufSerializer(nodes);
+        var serializer = new ProtobufSerializer(nodes.Where(n => n.GetParent() == null));
         var pbChunk = serializer.Serialize();
         
         using Stream stream = File.Create(_protobufFile);
@@ -160,7 +160,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     {
         using Stream stream = File.Create(_protobufStreamingFile);
         
-        IEnumerable<IReadableNode> nodes = _nodes;
+        IEnumerable<IReadableNode> nodes = _nodes.Reverse();
         var serializer = new ProtobufStreamingSerializer(stream);
         serializer.Serialize(nodes);
     }
