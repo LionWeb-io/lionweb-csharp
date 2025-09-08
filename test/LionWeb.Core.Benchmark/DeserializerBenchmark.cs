@@ -26,6 +26,7 @@ using System.Text.Json.Stream;
 [MemoryDiagnoser]
 // [NativeMemoryProfiler]
 [TestClass]
+[Ignore("must run after SerializerBenchmark")]
 public class DeserializerBenchmark : SerializerBenchmarkBase
 {
     [Benchmark]
