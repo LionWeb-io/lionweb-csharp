@@ -145,7 +145,7 @@ public static class JsonUtils
 
 /// Variant of <see cref="SerializationChunk"/> that moves <see cref="Languages"/> as last entry,
 /// so we can fill it _after_ we've processed all <see cref="Nodes"/>.
-internal class LazySerializationChunk
+public class LazySerializationChunk
 {
     /// <inheritdoc cref="SerializationChunk.SerializationFormatVersion"/>
     [JsonPropertyOrder(0)]

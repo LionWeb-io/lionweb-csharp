@@ -116,7 +116,7 @@ public class StreamingTests
     public TestContext TestContext { get; set; }
 }
 
-internal static class StringRandomizer
+public static class StringRandomizer
 {
     // Constant seed for reproducible tests
     private static readonly Random _defaultRandom = new Random(0x1EE7);
