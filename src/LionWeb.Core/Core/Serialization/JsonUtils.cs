@@ -53,6 +53,7 @@ public static class JsonUtils
     /// <i>Only</i> includes these nodes, no descendants etc.</param>
     /// <param name="serializer">Serializer to use.</param>
     /// <param name="nodes">Nodes to serialize.</param>
+    /// <seealso cref="WriteNodesToStreamAsync"/>
     public static void WriteNodesToStream(Stream utf8JsonStream, ISerializer serializer,
         IEnumerable<IReadableNode> nodes)
     {
@@ -72,6 +73,7 @@ public static class JsonUtils
     /// <i>Only</i> includes these nodes, no descendants etc.</param>
     /// <param name="serializer">Serializer to use.</param>
     /// <param name="nodes">Nodes to serialize.</param>
+    /// <seealso cref="WriteNodesToStream"/>
     public static async Task WriteNodesToStreamAsync(Stream utf8JsonStream, ISerializer serializer,
         IEnumerable<IReadableNode> nodes)
     {
@@ -93,46 +95,11 @@ public static class JsonUtils
     /// should throw <see cref="VersionMismatchException"/> if the check fails.
     /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
+    /// <seealso cref="ReadNodesFromStream"/>
     public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream utf8JsonStream,
         IDeserializer deserializer,
         Action<string>? lionWebVersionChecker = null) =>
         await ReadNodesFromStreamAsync(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
-
-    private abstract class StreamReaderBase
-    {
-        protected readonly IDeserializer Deserializer;
-        protected bool InsideNodes = false;
-
-        protected StreamReaderBase(IDeserializer deserializer)
-        {
-            Deserializer = deserializer;
-        }
-
-        public Action<string>? LionWebVersionChecker { get; init; }
-
-        public JsonSerializerOptions JsonSerializerOptions { get; init; } = _readOptions;
-
-        protected bool IsInsideNodes(string? stringFromReader) => stringFromReader == "nodes";
-
-        protected bool IsSerializationFormatVersion(string? stringFromReader) => stringFromReader == "serializationFormatVersion";
-
-        protected void Process(SerializedNode? serializedNode)
-        {
-            if (serializedNode != null)
-                Deserializer.Process(serializedNode);
-        }
-
-        protected void CheckSerializationFormatVersion(string? stringFromReader)
-        {
-            if (stringFromReader == null)
-                return;
-
-            if (LionWebVersionChecker == null)
-                Deserializer.LionWebVersion.AssureCompatible(stringFromReader);
-            else
-                LionWebVersionChecker(stringFromReader);
-        }
-    }
 
     internal static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream utf8JsonStream,
         IDeserializer deserializer,
@@ -141,48 +108,6 @@ public static class JsonUtils
         {
             JsonSerializerOptions = jsonSerializerOptions, LionWebVersionChecker = lionWebVersionChecker
         }.ReadNodes();
-
-    private sealed class StreamReaderAsync : StreamReaderBase
-    {
-        private readonly Utf8JsonAsyncStreamReader _streamReader;
-        public StreamReaderAsync(Stream utf8JsonStream, IDeserializer deserializer) : base(deserializer)
-        {
-            _streamReader = new Utf8JsonAsyncStreamReader(utf8JsonStream, leaveOpen: true);
-        }
-
-        public async Task<List<IReadableNode>> ReadNodes()
-        {
-            while (await Advance())
-            {
-                switch (_streamReader.TokenType)
-                {
-                    case JsonTokenType.PropertyName when IsSerializationFormatVersion(_streamReader.GetString()):
-                        await Advance();
-                        CheckSerializationFormatVersion(_streamReader.GetString());
-
-                        break;
-
-                    case JsonTokenType.PropertyName when IsInsideNodes(_streamReader.GetString()):
-                        InsideNodes = true;
-                        break;
-
-                    case JsonTokenType.PropertyName when !IsInsideNodes(_streamReader.GetString()):
-                        InsideNodes = false;
-                        break;
-
-                    case JsonTokenType.StartObject when InsideNodes:
-                        var serializedNode = await _streamReader.DeserializeAsync<SerializedNode>(JsonSerializerOptions);
-                        Process(serializedNode);
-
-                        break;
-                }
-            }
-
-            return Deserializer.Finish().ToList();
-        }
-
-        private async Task<bool> Advance() => await _streamReader.ReadAsync();
-    }
 
     /// <summary>
     /// Uses <paramref name="deserializer"/> to read nodes from <paramref name="utf8JsonStream"/>.  
@@ -193,6 +118,7 @@ public static class JsonUtils
     /// should throw <see cref="VersionMismatchException"/> if the check fails.
     /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
+    /// <seealso cref="ReadNodesFromStreamAsync"/>
     public static List<IReadableNode> ReadNodesFromStream(Stream utf8JsonStream, IDeserializer deserializer,
         Action<string>? lionWebVersionChecker = null) =>
         ReadNodesFromStream(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
@@ -203,52 +129,6 @@ public static class JsonUtils
         {
             JsonSerializerOptions = jsonSerializerOptions, LionWebVersionChecker = lionWebVersionChecker
         }.ReadNodes();
-
-    private sealed class StreamReaderSync : StreamReaderBase
-    {
-        private readonly Stream _utf8JsonStream;
-        private const int _bufferSize = 1024 * 8;
-
-
-        public StreamReaderSync(Stream utf8JsonStream, IDeserializer deserializer) : base(deserializer)
-        {
-            _utf8JsonStream = utf8JsonStream;
-        }
-
-        public List<IReadableNode> ReadNodes()
-        {
-            using var jsonStreamReader = new Utf8JsonStreamReader(_utf8JsonStream, _bufferSize);
-
-            var insideNodes = false;
-            while (jsonStreamReader.Read())
-            {
-                switch (jsonStreamReader.TokenType)
-                {
-                    case JsonTokenType.PropertyName when IsSerializationFormatVersion(jsonStreamReader.GetString()):
-                        jsonStreamReader.Read();
-                        CheckSerializationFormatVersion(jsonStreamReader.GetString());
-                        break;
-
-                    case JsonTokenType.PropertyName when IsInsideNodes(jsonStreamReader.GetString()):
-                        insideNodes = true;
-                        break;
-
-                    case JsonTokenType.PropertyName when !IsInsideNodes(jsonStreamReader.GetString()):
-                        insideNodes = false;
-                        break;
-
-                    case JsonTokenType.StartObject when insideNodes:
-                        var serializedNode = jsonStreamReader.Deserialize<SerializedNode>(JsonSerializerOptions);
-                        if (serializedNode != null)
-                            Deserializer.Process(serializedNode);
-
-                        break;
-                }
-            }
-
-            return Deserializer.Finish().ToList();
-        }
-    }
 }
 
 /// Variant of <see cref="SerializationChunk"/> that moves <see cref="Languages"/> as last entry,
