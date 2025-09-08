@@ -93,6 +93,8 @@ public void UpdateDocumentation(Geometry partition)
 
 ### How to replicate changes
 
+#### Partition replicator
+
 Partition replicator replicates received changes (via notifications) on a local equivalent partitions.  
 Follow the comments below in the code blocks for further explanation.
 
@@ -100,10 +102,10 @@ Follow the comments below in the code blocks for further explanation.
 // Changes will be applied to this local partition
 var localPartition = new Geometry("geo");
 
-// GetChangesOn method manually creates notifications and returns them
+// Gets changes on this local partition
 IEnumerable<INotification> changes = GetChangesOn(localPartition);
 
-// ReplicateChangesOn replicates received changes on local partition 
+// Replicates received changes on local partition 
 ReplicateChangesOn(localPartition, changes);
 ```
 
@@ -130,7 +132,7 @@ public IEnumerable<INotification> GetChangesOn(Geometry localPartition)
 public void ReplicateChangesOn(Geometry localPartition, IEnumerable<INotification> changes)
 {
     // Creates a partition replicator
-    var replicator = PartitionReplicator.Create(localPartition, new(), "replicator");
+    var replicator = PartitionReplicator.Create(localPartition, new SharedNodeMap(), "partition replicator");
 
     // Creater acts as a remote notificaiton producer
     var creator = new Creator();
@@ -153,26 +155,58 @@ public class Creator() : NotificationPipeBase(null), INotificationProducer
 }
 ```
 
+#### Forest replicator
+
 Forest replicator replicates notifications for a local forest and all its partitions.
 
 ```csharp
-var originalForest = new Forest();
-var cloneForest = new Forest();
+// Changes will be applied to this local forest
+var localForest = new Forest();
 
-// Replicates notifications for the cloned forest. In this example, 
-// PropertyAddedNotification and ChildMovedFromOtherContainmentNotification are received.
-// Replicator adds the same partitions to the cloned forest and property value to the partition in the cloned forest.
-var replicator = ForestReplicator.Create(cloneForest, new SharedNodeMap(), null);
+// Gets changes
+IEnumerable<INotification> changes = GetChanges();
 
-// If notifications are not supported, forest.GetNotificationSender() returns null.
-originalForest.GetNotificationSender()?.ConnectTo(replicator);
-
-var moved = new Documentation("moved");
-var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
-var partition = new Geometry("geo");
-
-// Changes trigger PartitionAddedNotification and ChildMovedFromOtherContainmentNotification notifications
-originalForest.AddPartitions([partition, originPartition]);
-partition.Documentation = moved;
+// Replicates changes on local forest
+ReplicateChangesOn(localForest, changes);
 ```
- 
+
+`GetChanges` adds a new partition to the forest. Then it adds a new child to the partition and sets its property. 
+```csharp
+public IEnumerable<INotification> GetChanges()
+{
+    var partition = new Geometry("geo");
+    var documentation = new Documentation("documentation");
+    
+    return
+    [
+        new PartitionAddedNotification(partition, new NumericNotificationId("PartitionAddedNotification", 0)),
+        
+        new ChildAddedNotification(partition, documentation,
+            ShapesLanguage.Instance.Geometry_documentation, 0, new NumericNotificationId("ChildAddedNotification", 0)),
+        
+        new PropertyAddedNotification(documentation, ShapesLanguage.Instance.Documentation_text, 
+            "hello", new NumericNotificationId("PropertyAddedNotification", 0))
+    ];
+}
+```
+
+`ReplicateChangesOn` replicates the changes on local forest.
+```csharp
+public void ReplicateChangesOn(Forest localForest, IEnumerable<INotification> changes)
+{
+    // Creates a forest replicator
+    var replicator = ForestReplicator.Create(localForest, new SharedNodeMap(), "forest replicator");
+
+    // Creater acts as a remote notificaiton producer
+    var creator = new Creator();
+
+    // Replicator will receive changes form the creator 
+    creator.ConnectTo(replicator);
+
+    // Creater forwards the changes to the replicator
+    foreach (var notification in changes)
+    {
+        creator.ProduceNotification(notification);
+    }
+}
+```
