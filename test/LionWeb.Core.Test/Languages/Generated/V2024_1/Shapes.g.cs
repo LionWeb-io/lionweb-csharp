@@ -1436,8 +1436,9 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
 	private readonly IPartitionNotificationProducer? _notificationProducer;
-	protected internal IPartitionNotificationProducer? GetNotificationProducer() => _notificationProducer;
-	public INotificationSender? GetNotificationSender() => _notificationProducer;
+	IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => _notificationProducer;
+	/// <inheritdoc/>
+        public INotificationSender? GetNotificationSender() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -2301,8 +2302,9 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
 	private readonly IPartitionNotificationProducer? _notificationProducer;
-	protected internal IPartitionNotificationProducer? GetNotificationProducer() => _notificationProducer;
-	public INotificationSender? GetNotificationSender() => _notificationProducer;
+	IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => _notificationProducer;
+	/// <inheritdoc/>
+        public INotificationSender? GetNotificationSender() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{

@@ -414,8 +414,9 @@ public partial class DataTypeTestConcept : ConceptInstanceBase, IPartitionInstan
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.DataTypeTestConcept;
 	private readonly IPartitionNotificationProducer? _notificationProducer;
-	protected internal IPartitionNotificationProducer? GetNotificationProducer() => _notificationProducer;
-	public INotificationSender? GetNotificationSender() => _notificationProducer;
+	IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => _notificationProducer;
+	/// <inheritdoc/>
+        public INotificationSender? GetNotificationSender() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -945,8 +946,9 @@ public partial class LinkTestConcept : ConceptInstanceBase, INamedWritable, IPar
 	/// <inheritdoc/>
         public override Concept GetConcept() => TestLanguageLanguage.Instance.LinkTestConcept;
 	private readonly IPartitionNotificationProducer? _notificationProducer;
-	protected internal IPartitionNotificationProducer? GetNotificationProducer() => _notificationProducer;
-	public INotificationSender? GetNotificationSender() => _notificationProducer;
+	IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => _notificationProducer;
+	/// <inheritdoc/>
+        public INotificationSender? GetNotificationSender() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{

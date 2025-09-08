@@ -380,5 +380,8 @@ public class LenientPartition : LenientNode, IPartitionInstance
     public INotificationSender? GetNotificationSender() => _notificationProducer;
 
     /// <inheritdoc />
+    IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => _notificationProducer;
+
+    /// <inheritdoc />
     public Concept GetConcept() => (Concept)GetClassifier();
 }

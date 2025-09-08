@@ -283,4 +283,8 @@ public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstan
     /// <inheritdoc />
     public INotificationSender? GetNotificationSender() => 
         _notificationProducer;
+
+    /// <inheritdoc />
+    IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => 
+        _notificationProducer;
 }

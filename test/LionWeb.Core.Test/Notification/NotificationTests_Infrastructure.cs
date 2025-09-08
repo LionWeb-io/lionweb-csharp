@@ -31,7 +31,9 @@ public class NotificationTests_Infrastructure: NotificationTestsBase
     {
         var node = new Geometry("a");
         
-        Assert.AreSame(node.GetNotificationSender(), node.GetNotificationProducer());
+        Assert.IsNotNull(node.GetNotificationSender());
+        Assert.AreSame(node.GetNotificationSender(), ((IPartitionInstance)node).GetNotificationProducer());
+        Assert.AreSame(node.GetNotificationSender(), ((IPartitionInstance)node).GetNotificationSender());
     }  
     
     [TestMethod]

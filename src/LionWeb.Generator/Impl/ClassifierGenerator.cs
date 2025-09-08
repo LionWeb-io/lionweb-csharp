@@ -98,9 +98,10 @@ public class ClassifierGenerator(
                 Field("_notificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))))
                     .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
                 Method("GetNotificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))), exprBody: IdentifierName("_notificationProducer"))
-                    .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.InternalKeyword)),
+                    .WithExplicitInterfaceSpecifier(ExplicitInterfaceSpecifier(IdentifierName(AsType(typeof(IPartitionInstance)).ToString()))),
                 Method("GetNotificationSender", NullableType(AsType(typeof(INotificationSender))), exprBody: IdentifierName("_notificationProducer"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+                    .Xdoc(XdocInheritDoc())
             ]);
             
             additionalConstructorStatements.Add(Assignment("_notificationProducer", NewCall([This()], AsType(typeof(PartitionNotificationProducer)))));
