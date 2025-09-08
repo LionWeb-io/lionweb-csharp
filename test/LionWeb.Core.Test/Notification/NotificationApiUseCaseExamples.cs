@@ -72,7 +72,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         forest.GetNotificationSender()?.ConnectTo(receiver); // <1>
 
         var partition = new Geometry("geo");
-        forest.AddPartitions([partition]);  // <2>
+        forest.AddPartitions([partition]); // <2>
         // end::forest_changes[]
         Assert.AreEqual(1, receiver.Count);
     }
@@ -141,7 +141,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         var compositor = new NotificationCompositor("compositor");
 
         var sender = partition.GetNotificationSender(); // <1>
-        sender?.ConnectTo(compositor);  // <2>
+        sender?.ConnectTo(compositor); // <2>
 
         compositor.Push(); // <3>
         UpdateDocumentation(partition); // <4>
@@ -332,14 +332,15 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     //tag::replicate_changes_on[]
     private void ReplicateChangesOn(Geometry localPartition, IEnumerable<INotification> changes)
     {
-        var replicator = PartitionReplicator.Create(localPartition, new SharedNodeMap(), "partition replicator");  // <1>
+        var sharedNodeMap = new SharedNodeMap(); // <1>
+        var replicator = PartitionReplicator.Create(localPartition, sharedNodeMap, "partition replicator"); // <2>
 
-        var creator = new Creator();  // <2>
-        creator.ConnectTo(replicator);  // <3>
+        var creator = new Creator(); // <3>
+        creator.ConnectTo(replicator); // <4>
 
         foreach (var notification in changes)
         {
-            creator.ProduceNotification(notification);  // <4>
+            creator.ProduceNotification(notification); // <5>
         }
     }
     //end::replicate_changes_on[]
