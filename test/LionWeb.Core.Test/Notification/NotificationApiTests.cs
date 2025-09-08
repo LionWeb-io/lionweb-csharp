@@ -311,7 +311,7 @@ public class NotificationApiTests : NotificationTestsBase
 
     #region replicate changes
 
-    #region use case example
+    #region partition replicator use case example
 
     private class Creator() : NotificationPipeBase(null), INotificationProducer
     {
@@ -320,7 +320,7 @@ public class NotificationApiTests : NotificationTestsBase
     
     private void ReplicateChangesOn(Geometry localPartition, IEnumerable<INotification> changes)
     {
-        var replicator = PartitionReplicator.Create(localPartition, new(), "replicator");
+        var replicator = PartitionReplicator.Create(localPartition, new(), "partition replicator");
 
         var creator = new Creator();
         creator.ConnectTo(replicator);
@@ -359,6 +359,53 @@ public class NotificationApiTests : NotificationTestsBase
 
     #endregion
 
+    #region forest replicator use case example
+    
+    private void ReplicateChangesOn(Forest localForest, IEnumerable<INotification> changes)
+    {
+        var replicator = ForestReplicator.Create(localForest, new(), "forest replicator");
+
+        var creator = new Creator();
+        creator.ConnectTo(replicator);
+
+        foreach (var notification in changes)
+        {
+            creator.ProduceNotification(notification);
+        }
+    }
+    
+    private IEnumerable<INotification> GetChanges()
+    {
+        var partition = new Geometry("geo");
+        var documentation = new Documentation("documentation");
+        
+        return
+        [
+            new PartitionAddedNotification(partition, new NumericNotificationId("PartitionAddedNotification", 0)),
+            
+            new ChildAddedNotification(partition, documentation,
+                ShapesLanguage.Instance.Geometry_documentation, 0, new NumericNotificationId("ChildAddedNotification", 0)),
+            
+            new PropertyAddedNotification(documentation, ShapesLanguage.Instance.Documentation_text, 
+                "hello", new NumericNotificationId("PropertyAddedNotification", 0))
+        ];
+    }
+    
+    [TestMethod]
+    public void ForestReplicator_use_case()
+    {
+        var localForest = new Forest();
+        
+        IEnumerable<INotification> changes = GetChanges();
+
+        ReplicateChangesOn(localForest, changes);
+
+        Assert.AreEqual(1, localForest.Partitions.Count);
+        AssertEquals([new Geometry("geo") { Documentation = new Documentation("documentation") {Text = "hello"} }], [localForest.Partitions.First()]);
+    }
+    
+    #endregion
+    
     [TestMethod]
     public void ReplicateChanges_Partition()
     {
