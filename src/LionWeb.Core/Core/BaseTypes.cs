@@ -21,9 +21,9 @@ using M1;
 using M2;
 using M3;
 using Notification;
-using Notification.Pipe;
 using Notification.Partition;
 using Notification.Partition.Emitter;
+using Notification.Pipe;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
@@ -134,7 +134,6 @@ public interface IPartitionInstance : IConceptInstance
 
     /// Optional hook to raise partition notifications.
     /// Not supported by every implementation.
-    /// TODO FIXME Implement both these methods explicitly (also in generator).
     protected internal IPartitionNotificationProducer? GetNotificationProducer() =>
         (IPartitionNotificationProducer?)GetNotificationSender();
 }
@@ -876,4 +875,6 @@ public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionIns
 {
     /// <inheritdoc />
     protected PartitionInstanceBase(NodeId id) : base(id) { }
+
+    public abstract IPartitionNotificationProducer? GetNotificationProducer();
 }
