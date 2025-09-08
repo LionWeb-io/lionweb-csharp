@@ -59,16 +59,18 @@ var partition = new Geometry("geo");
 // NotificationCompositor implements composite notification logic. 
 var compositor = new NotificationCompositor("compositor");
 
-// Connects partition notification sender to compositor.
 // If notifications are not supported, partition.GetNotificationSender() returns null.
-partition.GetNotificationSender()?.ConnectTo(compositor);
+var sender = partition.GetNotificationSender();
+
+// Connects partition notification sender to compositor.
+sender?.ConnectTo(compositor);
 
 // Push creates a new composite notification to collect incoming notifications
 compositor.Push();
 // Updates take place
 UpdateDocumentation(partition);
 // Pop returns the composite notification 
-var changes = compositor.Pop(true);
+var changes = compositor.Pop();
     
 Console.WriteLine($"Number of collected notifications : {changes.Parts.Count}"); // prints 2
 
@@ -91,24 +93,64 @@ public void UpdateDocumentation(Geometry partition)
 
 ### How to replicate changes
 
-Partition replicator replicates received notifications on a local equivalent partitions.
+Partition replicator replicates received changes (via notifications) on a local equivalent partitions.  
+Follow the comments below in the code blocks for further explanation.
 
 ```csharp
-var circle = new Circle("c");
-var partition = new Geometry("geo") { Shapes = [circle] };
-var clone = Clone(partition);
+// Changes will be applied to this local partition
+var localPartition = new Geometry("geo");
 
-// Replicates notifications for the cloned partition. In this example, 
-// PropertyAddedNotification is received for the partition and 
-// replicator adds the same property value to the cloned partition node.
-var replicator = PartitionReplicator.Create(clone, new SharedNodeMap(), partition.GetId());
+// GetChangesOn method manually creates notifications and returns them
+IEnumerable<INotification> changes = GetChangesOn(localPartition);
 
-// If notifications are not supported, partition.GetNotificationSender() returns null.
-partition.GetNotificationSender()?.ConnectTo(replicator);
+// ReplicateChangesOn replicates received changes on local partition 
+ReplicateChangesOn(localPartition, changes);
+```
 
-// This change triggers PropertyAddedNotification notification
-circle.Name = "Hello";
+`GetChangesOn` emulates the source of notifications by manually creating two notifications. 
+Any other source would also work. 
+```csharp
+public IEnumerable<INotification> GetChangesOn(Geometry localPartition)
+{
+    var documentation = new Documentation("documentation");
+    
+    return
+    [
+        new ChildAddedNotification(localPartition, documentation,
+            ShapesLanguage.Instance.Geometry_documentation, 0, new NumericNotificationId("ChildAddedNotification", 0)),
+        
+        new PropertyAddedNotification(documentation, ShapesLanguage.Instance.Documentation_text, 
+            "hello", new NumericNotificationId("PropertyAddedNotification", 0))
+    ];
+}
+```
 
+`ReplicateChangesOn` replicates the changes on local partition.
+```csharp
+public void ReplicateChangesOn(Geometry localPartition, IEnumerable<INotification> changes)
+{
+    // Creates a partition replicator
+    var replicator = PartitionReplicator.Create(localPartition, new(), "replicator");
+
+    // Creater acts as a remote notificaiton producer
+    var creator = new Creator();
+    
+    // Replicator will receive changes form the creator 
+    creator.ConnectTo(replicator);
+
+    // Creater forwards the changes to the replicator
+    foreach (var notification in changes)
+    {
+        creator.ProduceNotification(notification);
+    }
+}
+```
+
+```csharp
+public class Creator() : NotificationPipeBase(null), INotificationProducer
+{
+    public void ProduceNotification(INotification notification) => Send(notification);
+}
 ```
 
 Forest replicator replicates notifications for a local forest and all its partitions.
