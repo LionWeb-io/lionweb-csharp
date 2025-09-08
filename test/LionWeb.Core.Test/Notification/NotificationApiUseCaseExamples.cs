@@ -25,7 +25,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class NotificationApiTests : NotificationTestsBase
+public class NotificationApiUseCaseExamples : NotificationTestsBase
 {
     #region get informed about changes
 
@@ -51,27 +51,29 @@ public class NotificationApiTests : NotificationTestsBase
     [TestMethod]
     public void ReceiveNotifications_from_partition_via_connected_pipes()
     {
+        // tag::partition_changes[]
         var partition = new Geometry("geo");
         var receiver = new NotificationCounter();
+        
+        partition.GetNotificationSender()?.ConnectTo(receiver); // <1>
 
-        partition.GetNotificationSender()!.ConnectTo(receiver);
-
-        partition.Documentation = new Documentation("added");
-
+        partition.Documentation = new Documentation("added"); // <2>
+        // end::partition_changes[]
         Assert.AreEqual(1, receiver.Count);
     }
 
     [TestMethod]
     public void ReceiveNotifications_from_forest()
     {
+        // tag::forest_changes[]
         var forest = new Forest();
         var receiver = new NotificationCounter();
 
-        forest.GetNotificationSender()!.ConnectTo(receiver);
+        forest.GetNotificationSender()?.ConnectTo(receiver); // <1>
 
         var partition = new Geometry("geo");
-        forest.AddPartitions([partition]);
-
+        forest.AddPartitions([partition]);  // <2>
+        // end::forest_changes[]
         Assert.AreEqual(1, receiver.Count);
     }
 
@@ -102,11 +104,14 @@ public class NotificationApiTests : NotificationTestsBase
 
     private delegate void PartitionUpdater(Geometry partition);
 
+
+    // tag::update_documentation[]
     private void UpdateDocumentation(Geometry partition)
     {
-        partition.Documentation = new Documentation("documentation");
-        partition.Documentation.Text = "hello";
+        partition.Documentation = new Documentation("documentation"); // <1>
+        partition.Documentation.Text = "hello"; // <2>
     }
+    // end::update_documentation[]
 
     private CompositeNotification ComposeNotifications(Geometry partition, PartitionUpdater updater)
     {
@@ -131,15 +136,22 @@ public class NotificationApiTests : NotificationTestsBase
     [TestMethod]
     public void CountCompositeNotificationParts_simple()
     {
+        // tag::composite_notification[]
         var partition = new Geometry("geo");
         var compositor = new NotificationCompositor("compositor");
 
-        partition.GetNotificationSender()!.ConnectTo(compositor);
+        var sender = partition.GetNotificationSender(); // <1>
+        sender?.ConnectTo(compositor);  // <2>
 
-        compositor.Push();
-        UpdateDocumentation(partition);
-        var changes = compositor.Pop();
-
+        compositor.Push(); // <3>
+        UpdateDocumentation(partition); // <4>
+        var changes = compositor.Pop(); // <5>
+        
+        foreach (INotification notification in changes.Parts) // <6>
+        {
+            Console.WriteLine(notification.ToString());
+        }
+        // end::composite_notification[]
         Assert.AreEqual(2, changes.Parts.Count);
     }
 
@@ -295,17 +307,14 @@ public class NotificationApiTests : NotificationTestsBase
             Send(notification);
         }
     }
-
-    private class NotificationCounter() : NotificationPipeBase(null), INotificationHandler
+    // tag::notification_counter[]
+    private class NotificationCounter: INotificationReceiver
     {
         public int Count { get; private set; }
 
-        public void Receive(INotificationSender correspondingSender, INotification notification)
-        {
-            Count++;
-            Send(notification);
-        }
+        public void Receive(INotificationSender correspondingSender, INotification notification) => Count++;
     }
+    // end::notification_counter[]
 
     #endregion
 
@@ -313,23 +322,27 @@ public class NotificationApiTests : NotificationTestsBase
 
     #region partition replicator use case example
 
+    //tag::creator[]
     private class Creator() : NotificationPipeBase(null), INotificationProducer
     {
         public void ProduceNotification(INotification notification) => Send(notification);
     }
+    //end::creator[]
     
+    //tag::replicate_changes_on[]
     private void ReplicateChangesOn(Geometry localPartition, IEnumerable<INotification> changes)
     {
-        var replicator = PartitionReplicator.Create(localPartition, new(), "partition replicator");
+        var replicator = PartitionReplicator.Create(localPartition, new SharedNodeMap(), "partition replicator");  // <1>
 
-        var creator = new Creator();
-        creator.ConnectTo(replicator);
+        var creator = new Creator();  // <2>
+        creator.ConnectTo(replicator);  // <3>
 
         foreach (var notification in changes)
         {
-            creator.ProduceNotification(notification);
+            creator.ProduceNotification(notification);  // <4>
         }
     }
+    //end::replicate_changes_on[]
 
     private IEnumerable<INotification> GetChangesOn(Geometry localPartition)
     {
@@ -348,11 +361,14 @@ public class NotificationApiTests : NotificationTestsBase
     [TestMethod]
     public void PartitionReplicator_use_case()
     {
-        var localPartition = new Geometry("geo");
-        
+        //tag::partition_replicator_1[]
+        var localPartition = new Geometry("geo"); // <1>
+        //end::partition_replicator_1[]
         IEnumerable<INotification> changes = GetChangesOn(localPartition);
 
-        ReplicateChangesOn(localPartition, changes);
+        //tag::partition_replicator_2[]
+        ReplicateChangesOn(localPartition, changes); // <2>
+        //end::partition_replicator_2[]
 
         AssertEquals([new Geometry("geo") { Documentation = new Documentation("documentation") {Text = "hello"} }], [localPartition]);
     }
@@ -361,9 +377,10 @@ public class NotificationApiTests : NotificationTestsBase
 
     #region forest replicator use case example
     
+
     private void ReplicateChangesOn(Forest localForest, IEnumerable<INotification> changes)
     {
-        var replicator = ForestReplicator.Create(localForest, new(), "forest replicator");
+        var replicator = ForestReplicator.Create(localForest, new SharedNodeMap(), "forest replicator");
 
         var creator = new Creator();
         creator.ConnectTo(replicator);
@@ -373,6 +390,7 @@ public class NotificationApiTests : NotificationTestsBase
             creator.ProduceNotification(notification);
         }
     }
+
     
     private IEnumerable<INotification> GetChanges()
     {
