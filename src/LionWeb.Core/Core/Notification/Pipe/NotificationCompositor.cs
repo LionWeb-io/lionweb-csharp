@@ -53,7 +53,7 @@ public class NotificationCompositor : NotificationPipeBase, INotificationHandler
     /// <param name="send">If <c>true</c>, sends the popped composite to <i>following</i> pipes.</param>
     /// <returns>The previous composite</returns>
     /// <exception cref="InvalidOperationException">If there's no previous composite.</exception>
-    public CompositeNotification Pop(bool send)
+    public CompositeNotification Pop(bool send = false)
     {
         var result = _composites.Pop();
         if (send)
