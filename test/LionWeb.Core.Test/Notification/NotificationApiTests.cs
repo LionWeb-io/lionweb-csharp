@@ -25,7 +25,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class NotificationApiTests : NotificationTestsBase, IReplicatorCreator
+public class NotificationApiTests : NotificationTestsBase
 {
     #region get informed about changes
 
@@ -116,7 +116,7 @@ public class NotificationApiTests : NotificationTestsBase, IReplicatorCreator
 
         compositor.Push();
         updater.Invoke(partition);
-        return compositor.Pop(true);
+        return compositor.Pop();
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class NotificationApiTests : NotificationTestsBase, IReplicatorCreator
     {
         var partition = new Geometry("geo");
         var changes = ComposeNotifications(partition, UpdateDocumentation);
-        
+
         Assert.AreEqual(2, changes.Parts.Count);
     }
 
@@ -138,7 +138,7 @@ public class NotificationApiTests : NotificationTestsBase, IReplicatorCreator
 
         compositor.Push();
         UpdateDocumentation(partition);
-        var changes = compositor.Pop(true);
+        var changes = compositor.Pop();
 
         Assert.AreEqual(2, changes.Parts.Count);
     }
@@ -311,6 +311,54 @@ public class NotificationApiTests : NotificationTestsBase, IReplicatorCreator
 
     #region replicate changes
 
+    #region use case example
+
+    private class Creator() : NotificationPipeBase(null), INotificationProducer
+    {
+        public void ProduceNotification(INotification notification) => Send(notification);
+    }
+    
+    private void ReplicateChangesOn(Geometry localPartition, IEnumerable<INotification> changes)
+    {
+        var replicator = PartitionReplicator.Create(localPartition, new(), "replicator");
+
+        var creator = new Creator();
+        creator.ConnectTo(replicator);
+
+        foreach (var notification in changes)
+        {
+            creator.ProduceNotification(notification);
+        }
+    }
+
+    private IEnumerable<INotification> GetChangesOn(Geometry localPartition)
+    {
+        var documentation = new Documentation("documentation");
+        
+        return
+        [
+            new ChildAddedNotification(localPartition, documentation,
+                ShapesLanguage.Instance.Geometry_documentation, 0, new NumericNotificationId("ChildAddedNotification", 0)),
+            
+            new PropertyAddedNotification(documentation, ShapesLanguage.Instance.Documentation_text, 
+                "hello", new NumericNotificationId("PropertyAddedNotification", 0))
+        ];
+    }
+
+    [TestMethod]
+    public void PartitionReplicator_use_case()
+    {
+        var localPartition = new Geometry("geo");
+        
+        IEnumerable<INotification> changes = GetChangesOn(localPartition);
+
+        ReplicateChangesOn(localPartition, changes);
+
+        AssertEquals([new Geometry("geo") { Documentation = new Documentation("documentation") {Text = "hello"} }], [localPartition]);
+    }
+
+    #endregion
+
     [TestMethod]
     public void ReplicateChanges_Partition()
     {
@@ -348,6 +396,4 @@ public class NotificationApiTests : NotificationTestsBase, IReplicatorCreator
     }
 
     #endregion
-
-    public Geometry CreateReplicator(Geometry node) => throw new NotImplementedException();
 }
