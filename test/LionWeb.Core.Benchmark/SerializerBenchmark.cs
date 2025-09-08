@@ -32,6 +32,7 @@ public class SerializerBenchmark : SerializerBenchmarkBase
     private IEnumerable<INode> _nodes;
 
     [IterationSetup]
+    [TestInitialize]
     public void CreateNodes()
     {
         _nodes = CreateNodes(_maxSize);
