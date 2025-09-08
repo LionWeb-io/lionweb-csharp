@@ -27,10 +27,7 @@ using System.Text.Json.Stream;
 /// </summary>
 public static class JsonUtils
 {
-    private static readonly JsonSerializerOptions _readOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
+    private static readonly JsonSerializerOptions _readOptions = LionWebJsonSerializerContext.Default.Options;
 
     /// Parses <paramref name="json"/> as JSON.
     public static T ReadJsonFromString<T>(string json) =>
