@@ -245,14 +245,14 @@ public class SerializationTests
             .WithLanguage(ShapesLanguage.Instance)
             .Build();
 
-        var readableNodes = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).Result;
+        var readableNodes = JsonUtils.ReadNodesFromStream(stream, deserializer);
 
         Assert.AreEqual(text,
             readableNodes.OfType<INode>().SelectMany(n => n.Descendants(true)).OfType<Circle>().First().Name);
     }
 
     [TestMethod]
-    public async Task SerializedLionWebVersion()
+    public async Task SerializedLionWebVersion_Async()
     {
         const string text = "\ud83d\ude0a Hällö 😊";
         var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") { Name = text } };
@@ -269,6 +269,31 @@ public class SerializationTests
 
         string serializedLionWebVersion = null;
         var readableNodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, s =>
+        {
+            serializedLionWebVersion = s;
+        });
+
+        Assert.AreEqual(_lionWebVersion.VersionString, serializedLionWebVersion);
+    }
+
+    [TestMethod]
+    public void SerializedLionWebVersion_Sync()
+    {
+        const string text = "\ud83d\ude0a Hällö 😊";
+        var materialGroup = new MaterialGroup("a") { DefaultShape = new Circle("b") { Name = text } };
+
+        var serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
+        var stream = new MemoryStream();
+        JsonUtils.WriteNodesToStream(stream, serializer, materialGroup.Descendants(true));
+
+        stream.Seek(0, SeekOrigin.Begin);
+
+        var deserializer = new DeserializerBuilder()
+            .WithLanguage(ShapesLanguage.Instance)
+            .Build();
+
+        string serializedLionWebVersion = null;
+        var readableNodes = JsonUtils.ReadNodesFromStream(stream, deserializer, s =>
         {
             serializedLionWebVersion = s;
         });

@@ -91,7 +91,7 @@ public class StreamingTests
 
 
     [TestMethod]
-    public void MassDeserialization()
+    public async Task MassDeserialization_Async()
     {
         using Stream stream =
             File.OpenRead("output.json");
@@ -104,7 +104,26 @@ public class StreamingTests
         deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);
         deserializer.RegisterInstantiatedLanguage(_language);
 
-        List<IReadableNode> nodes = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).GetAwaiter().GetResult();
+        List<IReadableNode> nodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer);
+
+        Assert.AreEqual(_maxSize, nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count());
+    }
+
+    [TestMethod]
+    public void MassDeserialization_Sync()
+    {
+        using Stream stream =
+            File.OpenRead("output.json");
+
+        var deserializer = new DeserializerBuilder()
+            .WithLionWebVersion(LionWebVersions.v2024_1)
+            .WithCompressedIds(new(KeepOriginal: true))
+            .Build();
+
+        deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);
+        deserializer.RegisterInstantiatedLanguage(_language);
+
+        List<IReadableNode> nodes = JsonUtils.ReadNodesFromStream(stream, deserializer);
 
         Assert.AreEqual(_maxSize, nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count());
     }
