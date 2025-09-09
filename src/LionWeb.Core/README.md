@@ -30,7 +30,7 @@ Various aspects of LionWeb are represented as directories at the top-level of th
     * `M3/`: [implementation of the LionCore M3](Core/M3/Types.cs) to define languages with, computed properties and extension methods defined on top of those, and (de-)serialization of language definitions
 	* `Serialization/`: implementation of (de-)serialization for the `Node` type, and definition of the serialization chunk format (after it's been unmarshalled from JSON)
     * `Utilities/`: utilities like `Cloner`, `Comparer`, or `ReferenceUtils`
-    * `Notification/`: [LionWeb notification system API](https://github.com/LionWeb-io/lionweb-csharp/tree/main/docs/LionWeb-notification-api.pdf)
+    * `Notification/`: [LionWeb notification system API](../../docs/LionWeb-notification-api.pdf)
 * `docs/`: documentation, mainly in the form of diagrams of that as well
 
 
