@@ -20,8 +20,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj" />
-      <ProjectReference Include="..\LionWeb.Core.Test\LionWeb.Core.Test.csproj" />
+      <ProjectReference Include="..\..\src\LionWeb.Core\LionWeb.Core.csproj">
+          <PrivateAssets>None</PrivateAssets>
+      </ProjectReference>
+      <ProjectReference Include="..\LionWeb.Core.Test\LionWeb.Core.Test.csproj">
+          <PrivateAssets>None</PrivateAssets>
+      </ProjectReference>
     </ItemGroup>
 
 </Project>

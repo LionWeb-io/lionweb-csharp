@@ -44,4 +44,10 @@ SPDX-License-Identifier: Apache-2.0
   <ItemGroup>
     <SourceRoot Include="$(SolutionDir)" RepositoryUrl="$(RepositoryUrl)" />
   </ItemGroup>
+
+  <ItemDefinitionGroup>
+    <ProjectReference>
+      <PrivateAssets>all</PrivateAssets>
+    </ProjectReference>
+  </ItemDefinitionGroup>
 </Project>
