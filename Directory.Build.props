@@ -49,5 +49,5 @@ SPDX-License-Identifier: Apache-2.0
     <ProjectReference>
       <PrivateAssets>all</PrivateAssets>
     </ProjectReference>
-  </ItemDefinitionGroup>   
+  </ItemDefinitionGroup>    
 </Project>
