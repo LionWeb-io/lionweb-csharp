@@ -17,14 +17,12 @@
 
 namespace LionWeb.Core.Test.Notification;
 
-using Core.Notification.Handler;
 using Core.Notification.Partition;
-using Core.Utilities;
+using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
-using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class NotificationTests_Twoway
+public class NotificationTests_Twoway: NotificationTestsBase 
 {
     #region Properties
 
@@ -831,28 +829,24 @@ public class NotificationTests_Twoway
     #endregion
 
 
-    private Tuple<IConnectingNotificationHandler, IConnectingNotificationHandler>
+    private Tuple<INotificationHandler, INotificationHandler>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
         var replicator = CreateReplicator(node, "nodeReplicator");
         var cloneReplicator = CreateReplicator(clone, "cloneReplicator");
-        
+
         var cloneHandlerA = new NodeCloneNotificationHandler(node.GetId());
-        INotificationHandler.Connect(replicator, cloneHandlerA);
-        INotificationHandler.Connect(cloneHandlerA, cloneReplicator);
-     
+        replicator.ConnectTo(cloneHandlerA);
+        cloneHandlerA.ConnectTo(cloneReplicator);
+
         var cloneHandlerB = new NodeCloneNotificationHandler(clone.GetId());
-        INotificationHandler.Connect(cloneReplicator, cloneHandlerB);
-        INotificationHandler.Connect(cloneHandlerB, replicator);
-     
+        cloneReplicator.ConnectTo(cloneHandlerB);
+        cloneHandlerB.ConnectTo(replicator);
+
         return Tuple.Create(replicator, cloneReplicator);
     }
-    private static IConnectingNotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
+
+    private static INotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
         PartitionReplicator.Create(clone, new(), sender);
 
-    private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
-    {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
-    }
 }

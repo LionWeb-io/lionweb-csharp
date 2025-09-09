@@ -20,6 +20,7 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using Notification;
+using Notification.Pipe;
 using Notification.Partition;
 using System.Collections;
 using Utilities;
@@ -124,14 +125,14 @@ public class DynamicNode : NodeBase
 
     private bool SetProperty(Property property, object? value)
     {
-        var partitionHandler = GetPartitionNotificationHandler();
+        var partitionProducer = GetPartitionNotificationProducer();
         _settings.TryGetValue(property, out var oldValue);
         if (value == null && property.Optional)
         {
             _settings.Remove(property);
             if (oldValue != null)
             {
-                partitionHandler?.InitiateNotification(new PropertyDeletedNotification(this, property, oldValue, partitionHandler.CreateNotificationId()));
+                partitionProducer?.ProduceNotification(new PropertyDeletedNotification(this, property, oldValue, partitionProducer.CreateNotificationId()));
             }
 
             return true;
@@ -140,10 +141,10 @@ public class DynamicNode : NodeBase
         var newValue = VersionSpecifics.PrepareSetProperty(property, value);
         if (oldValue != null)
         {
-            partitionHandler?.InitiateNotification(new PropertyChangedNotification(this, property, newValue, oldValue, partitionHandler.CreateNotificationId()));
+            partitionProducer?.ProduceNotification(new PropertyChangedNotification(this, property, newValue, oldValue, partitionProducer.CreateNotificationId()));
         } else
         {
-            partitionHandler?.InitiateNotification(new PropertyAddedNotification(this, property, newValue, partitionHandler.CreateNotificationId()));
+            partitionProducer?.ProduceNotification(new PropertyAddedNotification(this, property, newValue, partitionProducer.CreateNotificationId()));
         }
 
         _settings[property] = newValue;
@@ -271,15 +272,19 @@ public class DynamicConceptInstance : DynamicNode, IConceptInstance<INode>
 /// that essentially wraps a (hash-)map <see cref="Feature"/> --> value of setting of that feature.
 public class DynamicPartitionInstance : DynamicConceptInstance, IPartitionInstance<INode>
 {
-    private readonly IPartitionNotificationHandler _notificationHandler;
+    private readonly IPartitionNotificationProducer _notificationProducer;
 
     /// <inheritdoc />
     public DynamicPartitionInstance(NodeId id, Concept concept) : base(id, concept)
     {
-        _notificationHandler = new PartitionNotificationHandler(this);
+        _notificationProducer = new PartitionNotificationProducer(this);
     }
 
     /// <inheritdoc />
-    public IPartitionNotificationHandler? GetNotificationHandler() => 
-        _notificationHandler;
+    public INotificationSender? GetNotificationSender() => 
+        _notificationProducer;
+
+    /// <inheritdoc />
+    IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => 
+        _notificationProducer;
 }

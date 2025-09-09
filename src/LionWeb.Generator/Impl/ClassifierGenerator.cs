@@ -21,6 +21,7 @@ using Core;
 using Core.M2;
 using Core.M3;
 using Core.Notification.Partition;
+using Core.Notification.Pipe;
 using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -92,15 +93,18 @@ public class ClassifierGenerator(
         if (concept.Partition)
         {
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
-
+            
             additionalMembers.AddRange([
-                Field("_notificationHandler", AsType(typeof(IPartitionNotificationHandler)))
+                Field("_notificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))))
                     .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
-                Method("GetNotificationHandler", NullableType(AsType(typeof(IPartitionNotificationHandler))), exprBody: IdentifierName("_notificationHandler"))
+                Method("GetNotificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))), exprBody: IdentifierName("_notificationProducer"))
+                    .WithExplicitInterfaceSpecifier(ExplicitInterfaceSpecifier(IdentifierName(AsType(typeof(IPartitionInstance)).ToString()))),
+                Method("GetNotificationSender", NullableType(AsType(typeof(INotificationSender))), exprBody: IdentifierName("_notificationProducer"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+                    .Xdoc(XdocInheritDoc())
             ]);
             
-            additionalConstructorStatements.Add(Assignment("_notificationHandler", NewCall([This()], AsType(typeof(PartitionNotificationHandler)))));
+            additionalConstructorStatements.Add(Assignment("_notificationProducer", NewCall([This()], AsType(typeof(PartitionNotificationProducer)))));
         }
 
         return ClassifierClass(bases, additionalMembers, additionalConstructorStatements);

@@ -1,36 +1,12 @@
-﻿// Copyright 2025 TRUMPF Laser SE and other contributors
-// 
-// Licensed under the Apache License, Version 2.0 (the "License")
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-// 
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// 
-// SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
-// SPDX-License-Identifier: Apache-2.0
+﻿namespace LionWeb.Core.Test.Notification;
 
-namespace LionWeb.Core.Test.Notification;
-
-using Core.Notification.Handler;
 using Core.Notification.Partition;
-using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using Comparer = Core.Utilities.Comparer;
 
-public abstract class NotificationTestsBase
+[TestClass]
+public class NotificationsTest : NotificationTestsBase, IReplicatorCreator
 {
-    protected abstract Geometry CreateReplicator(Geometry node);
-
-    protected Geometry Clone(Geometry node) =>
-        (Geometry)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
-
     #region Properties
 
     [TestMethod]
@@ -771,25 +747,14 @@ public abstract class NotificationTestsBase
 
     #endregion
 
-    private void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
-    {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
-    }
-}
-
-[TestClass]
-public class NotificationsTest : NotificationTestsBase
-{
-    protected override Geometry CreateReplicator(Geometry node)
+    public Geometry CreateReplicator(Geometry node)
     {
         var clone = Clone(node);
 
         var replicator = PartitionReplicator.Create(clone, new(), node.GetId());
         var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
-        INotificationHandler.Connect((IPartitionNotificationHandler)node.GetNotificationHandler(), cloneHandler);
-        INotificationHandler.Connect(cloneHandler, replicator);
-
+        node.GetNotificationSender()?.ConnectTo(cloneHandler);
+        cloneHandler.ConnectTo(replicator);
         return clone;
     }
 }

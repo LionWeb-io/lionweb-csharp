@@ -19,17 +19,17 @@ namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
 using Core.Notification.Forest;
-using Core.Notification.Handler;
+using Core.Notification.Pipe;
 using Core.Notification.Partition;
 
 internal class NodeCloneNotificationHandler(object? sender)
-    : NotificationHandlerBase(sender), IConnectingNotificationHandler
+    : NotificationPipeBase(sender), INotificationHandler
 {
     private readonly Dictionary<IReadableNode, IReadableNode> _memoization = [];
 
-    private readonly Dictionary<ISendingNotificationHandler, ISendingNotificationHandler> _handlerMemoization = [];
+    private readonly Dictionary<INotificationSender, INotificationSender> _senderMemoization = [];
 
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+    public void Receive(INotificationSender correspondingSender, INotification notification)
     {
         INotification result = notification switch
         {
@@ -178,10 +178,10 @@ internal class NodeCloneNotificationHandler(object? sender)
 
         if (result is IForestNotification f)
         {
-            _handlerMemoization[correspondingHandler] = f.Partition.GetNotificationHandler();
-            SendWithSender(f.Partition.GetNotificationHandler(), f);
+            _senderMemoization[correspondingSender] = f.Partition.GetNotificationSender();
+            SendWithSender(f.Partition.GetNotificationSender(), f);
         } else
-            SendWithSender(_handlerMemoization.GetValueOrDefault(correspondingHandler, correspondingHandler), result);
+            SendWithSender(_senderMemoization.GetValueOrDefault(correspondingSender, correspondingSender), result);
     }
 
 

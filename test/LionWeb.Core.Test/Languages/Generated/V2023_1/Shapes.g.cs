@@ -11,6 +11,7 @@ using LionWeb.Core.M3;
 using LionWeb.Core.Notification;
 using LionWeb.Core.Notification.Partition;
 using LionWeb.Core.Notification.Partition.Emitter;
+using LionWeb.Core.Notification.Pipe;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2023_1;
 using System;
@@ -1429,13 +1430,15 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 	public Geometry(string id) : base(id)
 	{
-		_notificationHandler = new PartitionNotificationHandler(this);
+		_notificationProducer = new PartitionNotificationProducer(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.Geometry;
-	private readonly IPartitionNotificationHandler _notificationHandler;
-	public IPartitionNotificationHandler? GetNotificationHandler() => _notificationHandler;
+	private readonly IPartitionNotificationProducer? _notificationProducer;
+	IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => _notificationProducer;
+	/// <inheritdoc/>
+        public INotificationSender? GetNotificationSender() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{
@@ -2293,13 +2296,15 @@ public partial class ReferenceGeometry : ConceptInstanceBase, IPartitionInstance
 
 	public ReferenceGeometry(string id) : base(id)
 	{
-		_notificationHandler = new PartitionNotificationHandler(this);
+		_notificationProducer = new PartitionNotificationProducer(this);
 	}
 
 	/// <inheritdoc/>
         public override Concept GetConcept() => ShapesLanguage.Instance.ReferenceGeometry;
-	private readonly IPartitionNotificationHandler _notificationHandler;
-	public IPartitionNotificationHandler? GetNotificationHandler() => _notificationHandler;
+	private readonly IPartitionNotificationProducer? _notificationProducer;
+	IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => _notificationProducer;
+	/// <inheritdoc/>
+        public INotificationSender? GetNotificationSender() => _notificationProducer;
 	/// <inheritdoc/>
         protected override bool GetInternal(Feature? feature, out object? result)
 	{

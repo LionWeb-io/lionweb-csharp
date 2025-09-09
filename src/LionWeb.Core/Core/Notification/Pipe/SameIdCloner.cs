@@ -1,4 +1,4 @@
-// Copyright 2025 TRUMPF Laser SE and other contributors
+﻿// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -15,12 +15,24 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Test.Handler;
+namespace LionWeb.Core.Notification.Pipe;
 
-using Client;
+using Utilities;
 
-public class CommandIdProvider : ICommandIdProvider
+/// <inheritdoc />
+/// Maintains the same node id for cloned nodes.
+public class SameIdCloner : Cloner
 {
-    private int nextId = 0;
-    public string Create() => (++nextId).ToString();
+    /// <inheritdoc />
+    public SameIdCloner(IEnumerable<INode> inputNodes) : base(inputNodes)
+    {
+    }
+
+    /// <inheritdoc cref="Cloner.Clone()"/>
+    public static new T Clone<T>(T node) where T : class, INode =>
+        (T)new SameIdCloner([node]).Clone()[node];
+
+    /// <inheritdoc />
+    protected override NodeId GetNewId(INode remoteNode) =>
+        remoteNode.GetId();
 }

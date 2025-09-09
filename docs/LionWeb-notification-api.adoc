@@ -1,0 +1,102 @@
+= LionWeb Notification System API
+:source-highlighter: rouge
+:source-language: csharp
+:source-indent: 0
+:icons: font
+
+This document explains the LionWeb notification system API through some use cases.
+
+== Use cases
+
+=== How to get informed about changes
+
+Every partition node (aka root node) of a model, which supports notification API, triggers a notification when there is a change to the model.
+In the example below, a partition is connected to a receiver.
+Receiver will be informed about all the changes to the partition via notifications.
+In this case, receiver (see `NotificationCounter` class definition below) counts the received notifications in its `Receive` method.
+
+Code below demonstrates how to use the API to get informed about changes to a partition.
+
+.Example how to get informed about partition changes
+----
+include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.cs[tag=partition_changes]
+----
+<1> If notifications are not supported, `partition.GetNotificationSender()` returns null.
+<2> This is a change to the model.
+
+Code below gives an example of API usage demonstrating how to get informed about changes to a forest.
+A forest is a collection of model trees, represented by each tree's partition.
+
+.Example how to get informed about forest changes
+----
+include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.cs[tag=forest_changes]
+----
+<1> If notifications are not supported, `partition.GetNotificationSender()` returns null.
+<2> This is a change to the forest.
+A partition is added to the forest.
+
+.NotificationCounter class
+----
+include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.cs[tag=notification_counter]
+----
+
+=== How to collect multiple changes into one change set
+
+Notifications raised by multiple changes to a model can be collected into one change set.
+A `NotificationCompositor` composes other forest and/or partition notifications into one `CompositeNotification`.
+Follow the comments below further explanation.
+
+.Example how to capture changes
+----
+include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.cs[tag=composite_notification]
+----
+<1> If notifications are not supported, `partition.GetNotificationSender()`  returns null.
+<2> Connects partition notification sender to compositor.
+<3> `Push()` creates a new `CompositeNotification` to collect incoming notifications.
+<4> Updates take place.
+<5> `Pop()` returns the `CompositeNotification`.
+<6> Access the notifications (changes).
+
+`UpdateDocumentation()` method changes the partition.
+
+.UpdateDocumentation method
+----
+include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.cs[tag=update_documentation]
+----
+<1> First change to the partition.
+<2> Second change to the partition.
+
+=== How to replicate changes
+
+==== Partition replicator
+
+`PartitionReplicator` replicates received changes (via notifications) on a local equivalent partition. +
+Follow the comments below for further explanation.
+
+.Example set-up
+----
+include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.cs[tags=partition_replicator_1;partition_replicator_2]
+----
+<1> Changes will be applied to this local partition.
+<2> `ReplicateChangesOn()` replicates the received changes on local partition. 
+
+.Example how to replicate changes
+----
+include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.cs[tag=replicate_changes_on]
+----
+<1> The `SharedNodeMap` maps all locally known node ids to node instances.
+It is shared between all notification pipes in one client or repository.
+<2> Creates a `PartitionReplicator`.
+<3> `Creator` simulates a notification producer.
+<4> `replicator` will receive changes from `creator`.
+<5> `creator` sends changes to `replicator`.
+
+.Creator class
+----
+include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.cs[tag=creator]
+----
+
+==== Forest replicator
+`ForestReplicator` replicates notifications for a local forest and all its partitions.
+It works exactly the same way as for one partition.
+Instead of `PartitionReplicator.Create()`, we use `ForestReplicator.Create()` helper method.   

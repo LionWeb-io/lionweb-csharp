@@ -20,7 +20,6 @@ namespace LionWeb.Protocol.Delta.Client;
 using Core;
 using Core.M1;
 using Core.M3;
-using Core.Notification.Handler;
 using Core.Utilities;
 using Message;
 using Message.Command;
@@ -66,7 +65,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             deserializerBuilder
         );
 
-        INotificationHandler.Connect(_eventReceiver, _replicator);
+        _eventReceiver.ConnectTo(_replicator);
     }
 
     /// <inheritdoc />

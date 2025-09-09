@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Test.NodeApi.Dynamic;
 
 using Core.Notification.Partition;
+using Notification;
 
 [TestClass]
 public class PropertyTests_Listener : DynamicNodeTestsBase
@@ -30,7 +31,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         parent.Set(Geometry_documentation, doc);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<PropertyAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(doc, args.Node);
@@ -52,7 +53,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         doc.Set(Documentation_text, "hello");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<PropertyDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(doc, args.Node);
@@ -74,7 +75,7 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         doc.Set(Documentation_text, "hello");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyChangedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<PropertyChangedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(doc, args.Node);
@@ -84,8 +85,8 @@ public class PropertyTests_Listener : DynamicNodeTestsBase
         });
 
         int badNotifications = 0;
-        parent.GetNotificationHandler().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
-        parent.GetNotificationHandler().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationSender().Subscribe<PropertyAddedNotification>((_, _) => badNotifications++);
+        parent.GetNotificationSender().Subscribe<PropertyDeletedNotification>((_, _) => badNotifications++);
 
         doc.Set(Documentation_text, "bye");
 

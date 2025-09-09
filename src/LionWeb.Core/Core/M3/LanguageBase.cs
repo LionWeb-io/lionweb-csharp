@@ -20,6 +20,8 @@
 namespace LionWeb.Core.M3;
 
 using M2;
+using Notification.Partition;
+using Notification.Pipe;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
 
@@ -151,6 +153,12 @@ public abstract class LanguageBase<TNodeFactory>(NodeId id, LionWebVersions lion
 
     /// <inheritdoc />
     public virtual void SetFactory(TNodeFactory factory) => _factory = factory;
+
+    /// <inheritdoc />
+    public INotificationSender? GetNotificationSender() => null;
+
+    /// <inheritdoc />
+    IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => null;
 }
 
 /// <inheritdoc cref="IKeyed"/>

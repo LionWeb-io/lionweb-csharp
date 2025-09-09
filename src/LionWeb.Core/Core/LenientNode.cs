@@ -20,6 +20,7 @@ namespace LionWeb.Core;
 using M2;
 using M3;
 using Notification;
+using Notification.Pipe;
 using Notification.Partition;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
@@ -368,15 +369,18 @@ public class LenientNode : NodeBase, INode
 
 public class LenientPartition : LenientNode, IPartitionInstance
 {
-    private readonly IPartitionNotificationHandler _notificationHandler;
+    private readonly IPartitionNotificationProducer _notificationProducer;
 
     public LenientPartition(NodeId id, Classifier? classifier) : base(id, classifier)
     {
-        _notificationHandler = new PartitionNotificationHandler(this);
+        _notificationProducer = new PartitionNotificationProducer(this);
     }
 
     /// <inheritdoc />
-    public IPartitionNotificationHandler? GetNotificationHandler() => _notificationHandler;
+    public INotificationSender? GetNotificationSender() => _notificationProducer;
+
+    /// <inheritdoc />
+    IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => _notificationProducer;
 
     /// <inheritdoc />
     public Concept GetConcept() => (Concept)GetClassifier();

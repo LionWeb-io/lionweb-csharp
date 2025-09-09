@@ -19,6 +19,7 @@ namespace LionWeb.Core.Test.NodeApi.Generated;
 
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Notification;
 
 [TestClass]
 public class ReferenceTests_Multiple_Optional_Listener
@@ -32,7 +33,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -53,7 +54,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -77,7 +78,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -99,7 +100,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -121,7 +122,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -143,7 +144,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -166,7 +167,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -189,7 +190,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -212,7 +213,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -235,7 +236,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -258,7 +259,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -281,7 +282,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -306,7 +307,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.RemoveShapes([line]);
 
@@ -320,7 +321,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
 
@@ -335,7 +336,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.RemoveShapes([line]);
 
@@ -349,7 +350,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [line] };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -370,7 +371,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [line] };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -392,7 +393,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [line, circle] };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -414,7 +415,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [line, circle] };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -436,7 +437,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circle, line] };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -458,7 +459,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circle, line] };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -481,7 +482,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, line, circleB] };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -504,7 +505,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, line, circleB] };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             notifications++;
             Assert.AreSame(parent, args.Parent);
@@ -531,7 +532,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
         parent.AddShapes(values);
 
@@ -545,8 +546,8 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
 
@@ -560,7 +561,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
         parent.InsertShapes(0, values);
 
@@ -574,7 +575,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[0];
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.RemoveShapes(values);
 
@@ -590,7 +591,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new List<IShape>();
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -617,7 +618,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -640,7 +641,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -665,7 +666,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new List<IShape> { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -690,7 +691,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceAddedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -718,7 +719,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         parent.AddShapes(values);
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -743,7 +744,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.RemoveShapes(values);
 
@@ -760,7 +761,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, circleA };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -783,7 +784,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -807,7 +808,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -832,7 +833,7 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new IShape[] { valueA, valueB };
 
         int notifications = 0;
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
@@ -858,7 +859,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         int notifications = 0;
         int[] indexes = { 0, 1 };
-        parent.GetNotificationHandler().Subscribe<ReferenceDeletedNotification>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);

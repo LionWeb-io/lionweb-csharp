@@ -29,8 +29,8 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
 {
     protected readonly IPartitionInstance? DestinationPartition;
 
-    /// <see cref="IPartitionNotificationHandler"/> to use for our notifications, if any.
-    private readonly IPartitionNotificationHandler? _partitionHandler;
+    /// <see cref="IPartitionNotificationProducer"/> to use for our notifications, if any.
+    private readonly IPartitionNotificationProducer? _partitionProducer;
 
     /// Owner of the represented <see cref="Feature"/>.
     protected readonly INotifiableNode DestinationParent;
@@ -46,7 +46,7 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
         DestinationParent = destinationParent;
         _notificationId = notificationId;
         DestinationPartition = destinationParent.GetPartition();
-        _partitionHandler = DestinationPartition?.GetNotificationHandler();
+        _partitionProducer = DestinationPartition?.GetNotificationProducer();
     }
 
     /// Logic to execute <i>before</i> any changes to the underlying nodes.
@@ -58,18 +58,18 @@ public abstract class PartitionNotificationEmitterBase<T> where T : IReadableNod
     /// <summary>
     /// Whether this emitter should execute at all.
     /// </summary>
-    [MemberNotNullWhen(true, nameof(_partitionHandler))]
+    [MemberNotNullWhen(true, nameof(_partitionProducer))]
     protected abstract bool IsActive();
 
     /// <summary>
     /// Retrieves the notification ID associated with the notification emitter.
     /// If no notification ID is set, it creates a new notification ID.
     /// </summary>
-    protected INotificationId GetNotificationId() => _notificationId ?? _partitionHandler.CreateNotificationId();
+    protected INotificationId GetNotificationId() => _notificationId ?? _partitionProducer.CreateNotificationId();
     
-    protected void InitiateNotification(INotification notification) =>
-        _partitionHandler?.InitiateNotification(notification);
+    protected void ProduceNotification(INotification notification) =>
+        _partitionProducer?.ProduceNotification(notification);
     
     protected bool Handles(params Type[] notificationTypes) =>
-        _partitionHandler?.Handles(notificationTypes) ?? false;
+        _partitionProducer?.Handles(notificationTypes) ?? false;
 }

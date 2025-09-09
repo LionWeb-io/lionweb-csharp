@@ -23,6 +23,7 @@ using M3;
 using Notification;
 using Notification.Partition;
 using Notification.Partition.Emitter;
+using Notification.Pipe;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
@@ -127,10 +128,13 @@ public interface IConceptInstance<out T> : IReadableNode<T>, IConceptInstance wh
 /// <inheritdoc />
 public interface IPartitionInstance : IConceptInstance
 {
-    /// Optional hook to raise partition notifications.
     /// Optional hook to listen to partition notifications.
     /// Not supported by every implementation. 
-    IPartitionNotificationHandler? GetNotificationHandler() => null;
+    INotificationSender? GetNotificationSender() => GetNotificationProducer();
+
+    /// Optional hook to raise partition notifications.
+    /// Not supported by every implementation.
+    protected internal IPartitionNotificationProducer? GetNotificationProducer();
 }
 
 /// <inheritdoc cref="IPartitionInstance" />
@@ -203,7 +207,7 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="AddAnnotations"/>
     /// <seealso cref="InsertAnnotations"/>
     public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations);
-    
+
     /// <summary>
     /// Sets the given <paramref name="feature"/> on <c>this</c> node to the given <paramref name="value"/>.
     /// </summary>
@@ -395,25 +399,28 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             _parent = null;
         }
     }
-    
+
     /// <inheritdoc />
     public virtual void AddAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null)
     {
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations, startIndex: null, notificationId: notificationId);
+        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
+            startIndex: null, notificationId: notificationId);
         notification.CollectOldData();
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
         notification.Notify();
     }
 
     /// <inheritdoc />
-    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations, INotificationId? notificationId = null)
+    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations,
+        INotificationId? notificationId = null)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations, startIndex: index, notificationId: notificationId);
+        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
+            startIndex: index, notificationId: notificationId);
         notification.CollectOldData();
         _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
         notification.Notify();
@@ -485,11 +492,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <summary>
-    /// Tries to retrieve the <see cref="IPartitionInstance.GetNotificationHandler"/> from this node's <see cref="Concept.Partition"/>.
+    /// Tries to retrieve the <see cref="IPartitionInstance.GetNotificationProducer"/> from this node's <see cref="Concept.Partition"/>.
     /// </summary>
-    /// <returns>This node's <see cref="IPartitionNotificationHandler"/>, if available.</returns>
-    protected virtual IPartitionNotificationHandler? GetPartitionNotificationHandler() =>
-        this.GetPartition()?.GetNotificationHandler();
+    /// <returns>This node's <see cref="IPartitionNotificationProducer"/>, if available.</returns>
+    protected virtual IPartitionNotificationProducer? GetPartitionNotificationProducer() =>
+        this.GetPartition()?.GetNotificationProducer();
 
     #region Helpers
 
@@ -758,19 +765,21 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
     /// <param name="remover">
     ///     Optional Action to call for each removed element of <paramref name="list"/>.
-    ///     Only called if <see cref="GetPartitionNotificationHandler"/> is available.
+    ///     Only called if <see cref="GetPartitionNotificationProducer"/> is available.
     /// </param>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link, Action<IPartitionNotificationHandler, Index, T, INotificationId?>? remover = null, INotificationId? notificationId = null)
+    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link,
+        Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover = null,
+        INotificationId? notificationId = null)
         where T : IReadableNode
     {
         AssureNotNull(list, link);
         AssureNotNullMembers(list, link);
 
-        var partitionHandler = GetPartitionNotificationHandler();
+        var partitionProducer = GetPartitionNotificationProducer();
 
         bool result = false;
         foreach (T node in list)
@@ -783,8 +792,8 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
             result = true;
             if (node is INode iNode)
                 SetParentInternal(iNode, null);
-            if (partitionHandler != null && remover != null)
-                remover(partitionHandler, index, node, notificationId ?? partitionHandler.CreateNotificationId());
+            if (partitionProducer != null && remover != null)
+                remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
         }
 
         return result;
@@ -798,14 +807,16 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="storage">Storage of nodes.</param>
     /// <param name="remover">
     ///     Optional Action to call for each removed element of <paramref name="safeNodes"/>.
-    ///     Only called if <see cref="GetPartitionNotificationHandler"/> is available.
+    ///     Only called if <see cref="GetPartitionNotificationProducer"/> is available.
     /// </param>
     /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
-    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionNotificationHandler, Index, T, INotificationId?>? remover, INotificationId? notificationId = null)
+    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage,
+        Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
+        INotificationId? notificationId = null)
         where T : IReadableNode
     {
-        var partitionHandler = GetPartitionNotificationHandler();
+        var partitionProducer = GetPartitionNotificationProducer();
 
         foreach (var node in safeNodes)
         {
@@ -814,27 +825,33 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 continue;
 
             storage.RemoveAt(index);
-            if (partitionHandler != null && remover != null)
-                remover(partitionHandler, index, node, notificationId ?? partitionHandler.CreateNotificationId());
+            if (partitionProducer != null && remover != null)
+                remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
         }
     }
 
     /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
-    protected Action<IPartitionNotificationHandler, Index, T, INotificationId?> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
-        (handler, index, node, notificationId) =>
+    protected Action<IPartitionNotificationProducer, Index, T, INotificationId?>
+        ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
+        (producer, index, node, notificationId) =>
         {
             IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
-            handler.InitiateNotification(new ReferenceDeletedNotification(this, reference, index, deletedTarget, notificationId ?? handler.CreateNotificationId()));
+            producer.ProduceNotification(new ReferenceDeletedNotification(this, reference, index, deletedTarget,
+                notificationId ?? producer.CreateNotificationId()));
         };
 
     /// Raises <see cref="ChildDeletedNotification"/> for <paramref name="containment"/>.
-    protected Action<IPartitionNotificationHandler, Index, T, INotificationId?> ContainmentRemover<T>(Containment containment) where T : INode =>
-        (handler, index, node, notificationId) =>
-            handler.InitiateNotification(new ChildDeletedNotification(node, this, containment, index, notificationId ?? handler.CreateNotificationId()));
+    protected Action<IPartitionNotificationProducer, Index, T, INotificationId?>
+        ContainmentRemover<T>(Containment containment) where T : INode =>
+        (producer, index, node, notificationId) =>
+            producer.ProduceNotification(new ChildDeletedNotification(node, this, containment, index,
+                notificationId ?? producer.CreateNotificationId()));
 
     /// Raises <see cref="AnnotationDeletedNotification"/>.
-    private void AnnotationRemover(IPartitionNotificationHandler handler, Index index, INode node, INotificationId? notificationId = null) =>
-        handler.InitiateNotification(new AnnotationDeletedNotification(node, this, index, notificationId ?? handler.CreateNotificationId()));
+    private void AnnotationRemover(IPartitionNotificationProducer producer, Index index, INode node,
+        INotificationId? notificationId = null) =>
+        producer.ProduceNotification(new AnnotationDeletedNotification(node, this, index,
+            notificationId ?? producer.CreateNotificationId()));
 
     #endregion
 }
@@ -870,4 +887,13 @@ public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionIns
 {
     /// <inheritdoc />
     protected PartitionInstanceBase(NodeId id) : base(id) { }
+
+    /// <inheritdoc />
+    public INotificationSender? GetNotificationSender() => GetNotificationProducer();
+
+    /// <inheritdoc />
+    IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => GetNotificationProducer();
+
+    /// <inheritdoc cref="IPartitionInstance.GetNotificationProducer"/>
+    protected internal abstract IPartitionNotificationProducer? GetNotificationProducer();
 }

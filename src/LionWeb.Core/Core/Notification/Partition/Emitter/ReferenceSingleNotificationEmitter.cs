@@ -47,17 +47,17 @@ public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBa
         {
             case (null, { } v):
                 IReferenceTarget newTarget = new ReferenceTarget(null, v);
-                InitiateNotification(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
+                ProduceNotification(new ReferenceAddedNotification(DestinationParent, Reference, 0, newTarget,
                     GetNotificationId()));
                 break;
             case ({ } o, null):
                 IReferenceTarget deletedTarget = new ReferenceTarget(null, o);
-                InitiateNotification(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
+                ProduceNotification(new ReferenceDeletedNotification(DestinationParent, Reference, 0, deletedTarget,
                     GetNotificationId()));
                 break;
             case ({ } o, { } n):
                 IReferenceTarget replacedTarget = new ReferenceTarget(null, o);
-                InitiateNotification(new ReferenceChangedNotification(DestinationParent, Reference, 0,
+                ProduceNotification(new ReferenceChangedNotification(DestinationParent, Reference, 0,
                     new ReferenceTarget(null, n), replacedTarget,
                     GetNotificationId()));
                 break;

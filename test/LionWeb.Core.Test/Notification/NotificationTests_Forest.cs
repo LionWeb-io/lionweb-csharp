@@ -19,14 +19,12 @@ namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
 using Core.Notification.Forest;
-using Core.Notification.Handler;
-using Core.Utilities;
+using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using Comparer = Core.Utilities.Comparer;
 
 [TestClass]
-public class NotificationTests_Forest
+public class NotificationTests_Forest: NotificationTestsBase
 {
     #region Children
 
@@ -44,7 +42,7 @@ public class NotificationTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = CreateReplicator(cloneForest, forest);
+        _ = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node]);
 
@@ -68,7 +66,7 @@ public class NotificationTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = CreateReplicator(cloneForest, forest);
+        _ = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node]);
 
@@ -91,7 +89,7 @@ public class NotificationTests_Forest
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
 
-        var replicator = CreateReplicator(cloneForest, forest);
+        _ = CreateReplicator(cloneForest, forest);
 
         node.Documentation = moved;
 
@@ -111,7 +109,7 @@ public class NotificationTests_Forest
 
         var cloneForest = new Forest();
 
-        var replicator = CreateReplicator(cloneForest, forest);
+        _ = CreateReplicator(cloneForest, forest);
 
         forest.AddPartitions([node, originPartition]);
 
@@ -124,30 +122,24 @@ public class NotificationTests_Forest
 
     #endregion
 
-    private static INotificationHandler CreateReplicator(Forest cloneForest,
+    private static INotificationPipe CreateReplicator(Forest cloneForest,
         Forest originalForest)
     {
         var replicator = ForestReplicator.Create(cloneForest, new(), null);
         var cloneHandler = new NodeCloneNotificationHandler("forestCloner");
-        INotificationHandler.Connect(originalForest.GetNotificationHandler(), cloneHandler);
-        INotificationHandler.Connect(cloneHandler, replicator);
+        originalForest.GetNotificationSender()!.ConnectTo(cloneHandler);
+        cloneHandler.ConnectTo(replicator);
 
-        var receiver = new TestLocalForestChangeNotificationHandler(originalForest, cloneHandler);
-        INotificationHandler.Connect(originalForest.GetNotificationHandler(), receiver);
+        var receiver = new TestLocalForestChangeNotificationReceiver(originalForest, cloneHandler);
+        originalForest.GetNotificationSender()!.ConnectTo(receiver);
         return replicator;
-    }
-
-    private void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
-    {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
 }
 
-internal class TestLocalForestChangeNotificationHandler(object? sender, NodeCloneNotificationHandler cloneHandler)
-    : NotificationHandlerBase(sender), IReceivingNotificationHandler
+internal class TestLocalForestChangeNotificationReceiver(object? sender, NodeCloneNotificationHandler cloneHandler)
+    : NotificationPipeBase(sender), INotificationReceiver
 {
-    public void Receive(ISendingNotificationHandler correspondingHandler, INotification notification)
+    public void Receive(INotificationSender correspondingSender, INotification notification)
     {
         switch (notification)
         {
@@ -160,10 +152,8 @@ internal class TestLocalForestChangeNotificationHandler(object? sender, NodeClon
         }
     }
 
-    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification)
-    {
-        INotificationHandler.Connect(partitionAddedNotification.NewPartition.GetNotificationHandler(), cloneHandler);
-    }
+    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification) => 
+        partitionAddedNotification.NewPartition.GetNotificationSender()!.ConnectTo(cloneHandler);
 
     private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
     {

@@ -17,31 +17,31 @@
 
 namespace LionWeb.Core.Notification.Partition;
 
-using Handler;
+using Pipe;
 
 /// Replicates notifications for a <i>local</i> <see cref="IPartitionInstance">partition</see>.
 /// <inheritdoc cref="RemoteReplicator"/>
 public static class PartitionReplicator
 {
-    public static IConnectingNotificationHandler Create(IPartitionInstance localPartition,
-        SharedNodeMap sharedNodeMap, object? sender)
+    public static INotificationHandler Create(IPartitionInstance localPartition, SharedNodeMap sharedNodeMap,
+        object? sender)
     {
         var internalSender = sender ?? localPartition.GetId();
-        var filter = new IdFilteringNotificationHandler(internalSender);
+        var filter = new IdFilteringNotificationFilter(internalSender);
         var remoteReplicator = new RemoteReplicator(null, sharedNodeMap, filter, internalSender);
         var localReplicator = new LocalReplicator(null, sharedNodeMap, internalSender);
 
-        var result = new CompositeNotificationHandler([remoteReplicator, filter],
+        var result = new MultipartNotificationHandler([remoteReplicator, filter],
             sender ?? $"Composite of {nameof(PartitionReplicator)} {localPartition.GetId()}");
 
         sharedNodeMap.RegisterNode(localPartition);
 
-        var partitionHandler = localPartition.GetNotificationHandler();
-        if (partitionHandler == null)
+        var partitionSender = localPartition.GetNotificationSender();
+        if (partitionSender == null)
             return result;
 
-        INotificationHandler.Connect(partitionHandler, localReplicator);
-        INotificationHandler.Connect(localReplicator, filter);
+        partitionSender.ConnectTo(localReplicator);
+        localReplicator.ConnectTo(filter);
 
         return result;
     }

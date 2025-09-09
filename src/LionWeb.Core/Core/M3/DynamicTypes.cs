@@ -19,6 +19,8 @@ namespace LionWeb.Core.M3;
 
 using M2;
 using Notification;
+using Notification.Partition;
+using Notification.Pipe;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -1287,4 +1289,10 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
     /// <inheritdoc />
     public void SetFactory(INodeFactory factory) => NodeFactory = factory;
+    
+    /// <inheritdoc />
+    public INotificationSender? GetNotificationSender() => null;
+    
+    /// <inheritdoc />
+    IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => null;
 }
