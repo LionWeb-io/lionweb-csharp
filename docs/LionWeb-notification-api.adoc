@@ -35,7 +35,7 @@ include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.c
 <2> This is a change to the forest.
 A partition is added to the forest.
 
-.NotificationCenter class
+.NotificationCounter class
 ----
 include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.cs[tag=notification_counter]
 ----
