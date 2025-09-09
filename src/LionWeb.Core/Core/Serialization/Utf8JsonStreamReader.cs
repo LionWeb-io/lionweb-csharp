@@ -33,7 +33,7 @@ using System.Text.Json;
 // Taken from https://stackoverflow.com/questions/54983533/parsing-a-json-file-with-net-core-3-0-system-text-json
 // and fixed a few bugs with that
 
-/// <inheritdoc cref="Utf8JsonReader"/>
+/// Wraps <see cref="Utf8JsonReader"/> to read from minimal subsequences of a UTF-8 encoded JSON stream. 
 public ref struct Utf8JsonStreamReader
 {
     private readonly Stream _utf8JsonStream;

@@ -96,14 +96,18 @@ public static class JsonUtils
     /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
     /// <seealso cref="ReadNodesFromStream"/>
-    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream utf8JsonStream,
+    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(
+        Stream utf8JsonStream,
         IDeserializer deserializer,
-        Action<string>? lionWebVersionChecker = null) =>
-        await ReadNodesFromStreamAsync(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
+        Action<string>? lionWebVersionChecker = null
+    ) => await ReadNodesFromStreamAsync(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
 
-    internal static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream utf8JsonStream,
+    internal static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(
+        Stream utf8JsonStream,
         IDeserializer deserializer,
-        Action<string>? lionWebVersionChecker, JsonSerializerOptions jsonSerializerOptions) =>
+        Action<string>? lionWebVersionChecker,
+        JsonSerializerOptions jsonSerializerOptions
+    ) =>
         await new StreamReaderAsync(utf8JsonStream, deserializer)
         {
             JsonSerializerOptions = jsonSerializerOptions, LionWebVersionChecker = lionWebVersionChecker
@@ -119,12 +123,18 @@ public static class JsonUtils
     /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
     /// <seealso cref="ReadNodesFromStreamAsync"/>
-    public static List<IReadableNode> ReadNodesFromStream(Stream utf8JsonStream, IDeserializer deserializer,
-        Action<string>? lionWebVersionChecker = null) =>
-        ReadNodesFromStream(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
+    public static List<IReadableNode> ReadNodesFromStream(
+        Stream utf8JsonStream,
+        IDeserializer deserializer,
+        Action<string>? lionWebVersionChecker = null
+    ) => ReadNodesFromStream(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
 
-    internal static List<IReadableNode> ReadNodesFromStream(Stream utf8JsonStream, IDeserializer deserializer,
-        Action<string>? lionWebVersionChecker, JsonSerializerOptions jsonSerializerOptions) =>
+    internal static List<IReadableNode> ReadNodesFromStream(
+        Stream utf8JsonStream,
+        IDeserializer deserializer,
+        Action<string>? lionWebVersionChecker,
+        JsonSerializerOptions jsonSerializerOptions
+    ) =>
         new StreamReaderSync(utf8JsonStream, deserializer)
         {
             JsonSerializerOptions = jsonSerializerOptions, LionWebVersionChecker = lionWebVersionChecker

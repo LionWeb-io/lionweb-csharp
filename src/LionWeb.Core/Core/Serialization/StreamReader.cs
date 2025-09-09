@@ -21,6 +21,8 @@ using M1;
 using System.Text.Json;
 using System.Text.Json.Stream;
 
+/// Partially successful attempt to share logic for synchronous and <c>async</c>chronous deserialization.
+/// Not supposed to be used directly, but through <see cref="JsonUtils.ReadNodesFromStream"/> or <see cref="JsonUtils.ReadNodesFromStreamAsync"/>. 
 internal abstract class StreamReaderBase(IDeserializer deserializer)
 {
     protected readonly IDeserializer Deserializer = deserializer;
@@ -67,7 +69,6 @@ internal sealed class StreamReaderAsync(Stream utf8JsonStream, IDeserializer des
                 case JsonTokenType.PropertyName when IsSerializationFormatVersion(_streamReader.GetString()):
                     await Advance();
                     CheckSerializationFormatVersion(_streamReader.GetString());
-
                     break;
 
                 case JsonTokenType.PropertyName when IsInsideNodes(_streamReader.GetString()):
@@ -81,7 +82,6 @@ internal sealed class StreamReaderAsync(Stream utf8JsonStream, IDeserializer des
                 case JsonTokenType.StartObject when insideNodes:
                     var serializedNode = await _streamReader.DeserializeAsync<SerializedNode>(JsonSerializerOptions);
                     Process(serializedNode);
-
                     break;
             }
         }
@@ -123,7 +123,6 @@ internal sealed class StreamReaderSync(Stream utf8JsonStream, IDeserializer dese
                     var serializedNode = jsonStreamReader.Deserialize<SerializedNode>(JsonSerializerOptions);
                     if (serializedNode != null)
                         Deserializer.Process(serializedNode);
-
                     break;
             }
         }
