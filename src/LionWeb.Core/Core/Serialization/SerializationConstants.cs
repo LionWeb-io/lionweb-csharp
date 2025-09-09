@@ -25,14 +25,14 @@ public static class SerializationConstants
     public static readonly string Empty = string.Empty;
 
     /// <c>0</c> as string
-    public static readonly string Zero = string.Intern("0");
+    public static readonly string Zero = "0";
 
     /// <c>1</c> as string
-    public static readonly string One = string.Intern("1");
+    public static readonly string One = "1";
 
     /// <c>true</c> as string
-    public static readonly string True = string.Intern("true");
+    public static readonly string True = "true";
 
     /// <c>false</c> as string
-    public static readonly string False = string.Intern("false");
+    public static readonly string False = "false";
 }

@@ -18,6 +18,7 @@
 namespace LionWeb.Core.Benchmark;
 
 using M3;
+using Serialization;
 using System.Text.Json;
 using Test.Languages.Generated.V2024_1.Shapes.M2;
 
@@ -36,11 +37,16 @@ public class SerializerBenchmarkBase
     protected const string _streamFile = "/tmp/output_stream.json";
     protected const string _stringFile = "/tmp/output_string.json";
 
+    protected static readonly JsonSerializerOptions _aotOptions;
     protected static readonly JsonSerializerOptions _simpleOptions;
 
     static SerializerBenchmarkBase()
     {
-        _simpleOptions = new() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+        _aotOptions = LionWebJsonSerializerContext.Default.Options;
+        _simpleOptions = new()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        };
     }
 
     static string AsFraction(long value) =>
