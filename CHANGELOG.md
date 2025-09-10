@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - tbd
 
 ### Added
+* Added `JsonUtils.ReadNodesFromStream()` to load nodes from strings synchronously.
 * Added benchmarking project.
 * Introduced `INotifiableNode`. Represents nodes that support notifications.
 * Introduced `INotification` to make a clear distinction between delta protocol-specific events and LionWeb internal event system.

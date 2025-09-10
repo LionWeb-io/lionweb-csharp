@@ -21,7 +21,6 @@ using BenchmarkDotNet.Attributes;
 using M1;
 using Serialization;
 using System.Text.Json;
-using System.Text.Json.Stream;
 
 [MemoryDiagnoser]
 // [NativeMemoryProfiler]
@@ -37,7 +36,23 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
 
         IDeserializer deserializer = Deserializer();
 
-        List<IReadableNode> nodes = await ReadNodesFromStreamAsync(stream, deserializer, _simpleOptions);
+        List<IReadableNode> nodes =
+            await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, null, _simpleOptions);
+
+        var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
+        if (_maxSize != actual)
+            throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
+    }
+
+    [Benchmark]
+    [TestMethod]
+    public void Deserialize_Stream()
+    {
+        using Stream stream = File.OpenRead(_streamFile);
+
+        IDeserializer deserializer = Deserializer();
+
+        var nodes = JsonUtils.ReadNodesFromStream(stream, deserializer, null, _simpleOptions);
 
         var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
         if (_maxSize != actual)
@@ -57,54 +72,6 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
             throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
     }
 
-    private static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream utf8JsonStream,
-        IDeserializer deserializer, JsonSerializerOptions jsonSerializerOptions, Action<string>? lionWebVersionChecker = null)
-    {
-        var streamReader = new Utf8JsonAsyncStreamReader(utf8JsonStream, leaveOpen: true);
-
-        bool insideNodes = false;
-        while (await Advance())
-        {
-            switch (streamReader.TokenType)
-            {
-                case JsonTokenType.PropertyName when streamReader.GetString() == "serializationFormatVersion":
-                    await Advance();
-                    string? version = streamReader.GetString();
-                    if (version != null)
-                    {
-                        if (lionWebVersionChecker == null)
-                        {
-                            deserializer.LionWebVersion.AssureCompatible(version);
-                        } else
-                        {
-                            lionWebVersionChecker(version);
-                        }
-                    }
-
-                    break;
-
-                case JsonTokenType.PropertyName when streamReader.GetString() == "nodes":
-                    insideNodes = true;
-                    break;
-
-                case JsonTokenType.PropertyName when streamReader.GetString() != "nodes":
-                    insideNodes = false;
-                    break;
-
-                case JsonTokenType.StartObject when insideNodes:
-                    var serializedNode = await streamReader.DeserializeAsync<SerializedNode>(jsonSerializerOptions);
-                    if (serializedNode != null)
-                        deserializer.Process(serializedNode);
-
-                    break;
-            }
-        }
-
-        return deserializer.Finish().ToList();
-
-        async Task<bool> Advance() => await streamReader.ReadAsync();
-    }
-    
     private IDeserializer Deserializer()
     {
         var deserializer = new DeserializerBuilder()
