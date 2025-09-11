@@ -29,10 +29,6 @@ using Comparer = Core.Utilities.Comparer;
 
 public abstract class NotificationTestsBase
 {
-    protected Geometry Clone(Geometry node) =>
-        (Geometry)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
-
-    //TODO: use generic PartitionCloner
     protected T PartitionCloner<T>(T node) where T : IPartitionInstance =>
         (T)new SameIdCloner([(INode)node]) { IncludingReferences = true }.Clone()[(INode)node];
 
