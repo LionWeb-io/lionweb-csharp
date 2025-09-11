@@ -222,7 +222,7 @@ public partial class Names : INames
     public string Use(Type type)
     {
         _usedTypes.Add(type);
-        return AfterIncludingBacktick().Replace(type.Name, "").PrefixKeyword();
+        return AfterIncludingBacktick().Replace(type.Name, string.Empty).PrefixKeyword();
     }
 
     /// <inheritdoc />

@@ -36,8 +36,22 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
 
         IDeserializer deserializer = Deserializer();
 
-        List<IReadableNode> nodes =
-            await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, null, _simpleOptions);
+        List<IReadableNode> nodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, null, _simpleOptions);
+
+        var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
+        if (_maxSize != actual)
+            throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
+    }
+
+    [Benchmark]
+    [TestMethod]
+    public async Task Deserialize_Stream_Async_Aot()
+    {
+        await using Stream stream = File.OpenRead(_streamFile);
+
+        IDeserializer deserializer = Deserializer();
+
+        List<IReadableNode> nodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer, null, _aotOptions);
 
         var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
         if (_maxSize != actual)
@@ -61,9 +75,37 @@ public class DeserializerBenchmark : SerializerBenchmarkBase
 
     [Benchmark]
     [TestMethod]
+    public void Deserialize_Stream_Aot()
+    {
+        using Stream stream = File.OpenRead(_streamFile);
+
+        IDeserializer deserializer = Deserializer();
+
+        var nodes = JsonUtils.ReadNodesFromStream(stream, deserializer, null,  _aotOptions);
+
+        var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
+        if (_maxSize != actual)
+            throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
+    }
+
+    [Benchmark]
+    [TestMethod]
     public void Deserialize_String()
     {
         var input = JsonSerializer.Deserialize<SerializationChunk>(File.ReadAllText(_stringFile), _simpleOptions)!;
+        var deserializer = Deserializer();
+        var nodes = deserializer.Deserialize(input);
+
+        var actual = nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count();
+        if (_maxSize != actual)
+            throw new Exception($"Assertion failed: {actual} should be {_maxSize}");
+    }
+
+    [Benchmark]
+    [TestMethod]
+    public void Deserialize_String_Aot()
+    {
+        var input = JsonSerializer.Deserialize<SerializationChunk>(File.ReadAllText(_stringFile), _aotOptions)!;
         var deserializer = Deserializer();
         var nodes = deserializer.Deserialize(input);
 

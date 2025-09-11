@@ -72,12 +72,56 @@ public class SerializerBenchmark : SerializerBenchmarkBase
 
     [Benchmark]
     [TestMethod]
+    public async Task Serialize_Stream_Async_Aot()
+    {
+        await using Stream stream = File.Create(_streamFile);
+        ISerializer serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
+        IEnumerable<IReadableNode> nodes = _nodes;
+        object data = new LazySerializationChunk
+        {
+            SerializationFormatVersion = serializer.LionWebVersion.VersionString,
+            Nodes = serializer.Serialize(nodes),
+            Languages = serializer.UsedLanguages
+        };
+        await JsonSerializer.SerializeAsync(stream, data, _aotOptions);
+    }
+
+    [Benchmark]
+    [TestMethod]
+    public void Serialize_Stream_Aot()
+    {
+        using Stream stream = File.Create(_streamFile);
+        ISerializer serializer = new SerializerBuilder().WithLionWebVersion(_lionWebVersion).Build();
+        IEnumerable<IReadableNode> nodes = _nodes;
+        object data = new LazySerializationChunk
+        {
+            SerializationFormatVersion = serializer.LionWebVersion.VersionString,
+            Nodes = serializer.Serialize(nodes),
+            Languages = serializer.UsedLanguages
+        };
+        JsonSerializer.Serialize(stream, data, _aotOptions);
+    }
+
+    [Benchmark]
+    [TestMethod]
     public void Serialize_String()
     {
         var output = JsonSerializer.Serialize((object)new SerializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
             .Build()
             .SerializeToChunk(_nodes), _simpleOptions);
+
+        File.WriteAllText(_stringFile, output);
+    }
+
+    [Benchmark]
+    [TestMethod]
+    public void Serialize_String_Aot()
+    {
+        var output = JsonSerializer.Serialize((object)new SerializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .Build()
+            .SerializeToChunk(_nodes), _aotOptions);
 
         File.WriteAllText(_stringFile, output);
     }
