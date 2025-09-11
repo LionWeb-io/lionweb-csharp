@@ -21,7 +21,6 @@ using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
-using Core.Serialization;
 using M1;
 using M3;
 
@@ -75,7 +74,7 @@ public class NotificationToNotificationMapper(
 
     private PropertyAddedNotification OnPropertyAdded(PropertyAddedNotification notification) =>
         new(
-            Clone(notification.Node),
+            NodeCloner(notification.Node),
             notification.Property,
             notification.NewValue,
             notification.NotificationId
@@ -83,7 +82,7 @@ public class NotificationToNotificationMapper(
 
     private PropertyDeletedNotification OnPropertyDeleted(PropertyDeletedNotification notification) =>
         new(
-            Clone(notification.Node),
+            NodeCloner(notification.Node),
             notification.Property,
             notification.OldValue,
             notification.NotificationId
@@ -91,7 +90,7 @@ public class NotificationToNotificationMapper(
 
     private PropertyChangedNotification OnPropertyChanged(PropertyChangedNotification notification) =>
         new(
-            Clone(notification.Node),
+            NodeCloner(notification.Node),
             notification.Property,
             notification.NewValue,
             notification.OldValue,
@@ -105,8 +104,8 @@ public class NotificationToNotificationMapper(
 
     private ChildAddedNotification OnChildAdded(ChildAddedNotification notification) =>
         new(
-            Clone(notification.Parent),
-            Clone(notification.NewChild),
+            NodeCloner(notification.Parent),
+            NodeCloner(notification.NewChild),
             notification.Containment,
             notification.Index,
             notification.NotificationId
@@ -115,7 +114,7 @@ public class NotificationToNotificationMapper(
     private ChildDeletedNotification OnChildDeleted(ChildDeletedNotification notification) =>
         new(
             notification.DeletedChild,
-            Clone(notification.Parent),
+            NodeCloner(notification.Parent),
             notification.Containment,
             notification.Index,
             notification.NotificationId
@@ -123,8 +122,8 @@ public class NotificationToNotificationMapper(
 
     private ChildReplacedNotification OnChildReplaced(ChildReplacedNotification notification) =>
         new(
-            Clone(notification.NewChild),
-            Clone(notification.ReplacedChild),
+            NodeCloner(notification.NewChild),
+            NodeCloner(notification.ReplacedChild),
             notification.Parent,
             notification.Containment,
             notification.Index,
@@ -134,8 +133,8 @@ public class NotificationToNotificationMapper(
     private ChildMovedFromOtherContainmentNotification OnChildMovedFromOtherContainment(
         ChildMovedFromOtherContainmentNotification notification)
     {
-        var movedChild = Clone(notification.MovedChild);
-        var oldParent = Clone(notification.OldParent);
+        var movedChild = NodeCloner(notification.MovedChild);
+        var oldParent = NodeCloner(notification.OldParent);
         var newParent = notification.NewParent;
 
         return new ChildMovedFromOtherContainmentNotification(
@@ -153,9 +152,9 @@ public class NotificationToNotificationMapper(
     private ChildMovedAndReplacedFromOtherContainmentNotification OnChildMovedAndReplacedFromOtherContainment(
         ChildMovedAndReplacedFromOtherContainmentNotification notification)
     {
-        var movedChild = Clone(notification.MovedChild);
-        var newParent = notification.NewParent; //Clone(notification.NewParent); //TODO: test: moved child is child of partition or subtree
-        var replacedChild = Clone(notification.ReplacedChild);
+        var movedChild = NodeCloner(notification.MovedChild);
+        var newParent = notification.NewParent; //NodeCloner(notification.NewParent); //TODO: test: moved child is child of partition or subtree
+        var replacedChild = NodeCloner(notification.ReplacedChild);
 
         return new ChildMovedAndReplacedFromOtherContainmentNotification(
             newParent,
@@ -174,9 +173,9 @@ public class NotificationToNotificationMapper(
         OnChildMovedAndReplacedFromOtherContainmentInSameParent(
             ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification)
     {
-        var parent = Clone(notification.Parent);
-        var movedChild = Clone(notification.MovedChild);
-        var replacedChild = Clone(notification.ReplacedChild);
+        var parent = NodeCloner(notification.Parent);
+        var movedChild = NodeCloner(notification.MovedChild);
+        var replacedChild = NodeCloner(notification.ReplacedChild);
 
         return new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
             notification.NewContainment,
@@ -193,8 +192,8 @@ public class NotificationToNotificationMapper(
     private ChildMovedFromOtherContainmentInSameParentNotification OnChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParentNotification notification)
     {
-        var parent = Clone(notification.Parent);
-        var movedChild = Clone(notification.MovedChild);
+        var parent = NodeCloner(notification.Parent);
+        var movedChild = NodeCloner(notification.MovedChild);
         return new ChildMovedFromOtherContainmentInSameParentNotification(
             notification.NewContainment,
             notification.NewIndex,
@@ -209,8 +208,8 @@ public class NotificationToNotificationMapper(
     private ChildMovedInSameContainmentNotification OnChildMovedInSameContainment(
         ChildMovedInSameContainmentNotification notification)
     {
-        var parent = Clone(notification.Parent);
-        var movedChild = Clone(notification.MovedChild);
+        var parent = NodeCloner(notification.Parent);
+        var movedChild = NodeCloner(notification.MovedChild);
         return new ChildMovedInSameContainmentNotification(
             notification.NewIndex,
             movedChild,
@@ -223,21 +222,21 @@ public class NotificationToNotificationMapper(
 
     #endregion
 
-    
+
     #region Annotations
 
     private AnnotationAddedNotification OnAnnotationAdded(AnnotationAddedNotification notification) =>
         new(
-            Clone(notification.Parent),
-            Clone(notification.NewAnnotation),
+            NodeCloner(notification.Parent),
+            NodeCloner(notification.NewAnnotation),
             notification.Index,
             notification.NotificationId
         );
 
     private AnnotationDeletedNotification OnAnnotationDeleted(AnnotationDeletedNotification notification) =>
         new(
-            Clone(notification.DeletedAnnotation),
-            Clone(notification.Parent),
+            NodeCloner(notification.DeletedAnnotation),
+            NodeCloner(notification.Parent),
             notification.Index,
             notification.NotificationId
         );
@@ -246,10 +245,10 @@ public class NotificationToNotificationMapper(
         AnnotationMovedFromOtherParentNotification notification)
     {
         //TODO: check similar cases: moved node is not a child of partition
-        var oldParent = notification.OldParent; 
-        
-        var newParent = Clone(notification.NewParent);
-        var movedAnnotation = Clone(notification.MovedAnnotation);
+        var oldParent = notification.OldParent;
+
+        var newParent = NodeCloner(notification.NewParent);
+        var movedAnnotation = NodeCloner(notification.MovedAnnotation);
         return new AnnotationMovedFromOtherParentNotification(
             newParent,
             notification.NewIndex,
@@ -263,8 +262,8 @@ public class NotificationToNotificationMapper(
     private AnnotationMovedInSameParentNotification OnAnnotationMovedInSameParent(
         AnnotationMovedInSameParentNotification notification)
     {
-        var parent = Clone(notification.Parent);
-        var movedAnnotation = Clone(notification.MovedAnnotation);
+        var parent = NodeCloner(notification.Parent);
+        var movedAnnotation = NodeCloner(notification.MovedAnnotation);
         return new AnnotationMovedInSameParentNotification(
             notification.NewIndex,
             movedAnnotation,
@@ -280,7 +279,7 @@ public class NotificationToNotificationMapper(
 
     private ReferenceAddedNotification OnReferenceAdded(ReferenceAddedNotification notification) =>
         new(
-            Clone(notification.Parent),
+            NodeCloner(notification.Parent),
             notification.Reference,
             notification.Index,
             notification.NewTarget,
@@ -289,7 +288,7 @@ public class NotificationToNotificationMapper(
 
     private ReferenceDeletedNotification OnReferenceDeleted(ReferenceDeletedNotification notification) =>
         new(
-            Clone(notification.Parent),
+            NodeCloner(notification.Parent),
             notification.Reference,
             notification.Index,
             notification.DeletedTarget,
@@ -298,48 +297,25 @@ public class NotificationToNotificationMapper(
 
     private ReferenceChangedNotification OnReferenceChanged(ReferenceChangedNotification notification) =>
         new(
-            Clone(notification.Parent),
+            NodeCloner(notification.Parent),
             notification.Reference,
             notification.Index,
             notification.NewTarget,
             notification.OldTarget,
             notification.NotificationId
         );
-    
+
     #endregion
 
-    private IWritableNode Clone(IWritableNode node)
-    {
-        var nodeId = node.GetId();
-
-        if (sharedNodeMap.TryGetValue(nodeId, out var result) && result is IWritableNode w)
-            return w;
-
-        var clone = SameIdCloner.Clone((INode)node);
-        sharedNodeMap.RegisterNode(clone);
-        return clone;
-    }
-
-    private T Clone<T>(T node) where T : class?, IReadableNode?
+    private T NodeCloner<T>(T node) where T : IWritableNode
     {
         var nodeId = node.GetId();
 
         if (sharedNodeMap.TryGetValue(nodeId, out var result) && result is T w)
             return w;
-        
+
         var clone = (T)SameIdCloner.Clone((INode)node);
         sharedNodeMap.RegisterNode(clone);
         return clone;
     }
-
-    private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature
-    {
-        if (sharedKeyedMap.TryGetValue(Compress(deltaReference), out var e) && e is T c)
-            return c;
-
-        throw new UnknownFeatureException(node.GetClassifier(), deltaReference);
-    }
-
-    private CompressedMetaPointer Compress(MetaPointer metaPointer) =>
-        CompressedMetaPointer.Create(metaPointer, true);
 }
