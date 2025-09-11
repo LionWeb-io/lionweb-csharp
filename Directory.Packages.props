@@ -16,8 +16,8 @@ SPDX-License-Identifier: Apache-2.0
     <PackageVersion Include="JsonSchema.Net" Version="7.3.4" />
     <PackageVersion Include="MinVer" Version="4.3.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
-    <PackageVersion Include="MSTest.TestAdapter" Version="3.1.1" />
-    <PackageVersion Include="MSTest.TestFramework" Version="3.1.1" />
+    <PackageVersion Include="MSTest.TestAdapter" Version="3.10.4" />
+    <PackageVersion Include="MSTest.TestFramework" Version="3.10.4" />
     <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="1.5.0" />
     <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.8.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.0">

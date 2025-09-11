@@ -6,6 +6,11 @@ option java_multiple_files = true;
 option java_package = "io.lionweb.protobuf.streaming";
 option java_outer_classname = "ChunkProtos";
 
+message PsTest {
+  optional uint32 opt = 1;
+  uint32 req = 2;
+}
+
 message PsMessage {
   oneof message {
       PsSerializationFormatVersion serializationFormatVersion = 1;
