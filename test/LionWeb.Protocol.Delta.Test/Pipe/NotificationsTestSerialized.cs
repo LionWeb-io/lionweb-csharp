@@ -32,7 +32,7 @@ public class NotificationsTestSerialized : NotificationTestsBase, IReplicatorCre
 {
     public Geometry CreateReplicator(Geometry node)
     {
-        var clone = Clone(node);
+        var clone = ClonePartition(node);
 
         var lionWebVersion = LionWebVersions.v2024_1;
         List<Language> languages = [ShapesLanguage.Instance, lionWebVersion.BuiltIns, lionWebVersion.LionCore];
