@@ -198,12 +198,19 @@ public class NotificationsTest : NotificationTestsBase
     [TestMethod]
     public void ChildReplaced_Single()
     {
-        var originalPartition = new Geometry("a") { Documentation = new Documentation("replaced") { Text = "a" } };
+        var originalPartition = new Geometry("a")
+        {
+            Documentation = new Documentation("replaced") { Text = "a" }
+        };
         var clonePartition = PartitionCloner(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
-        var added = new Documentation("added") { Text = "added" };
+        var added = new Documentation("added")
+        {
+            Text = "added"
+        };
+        
         originalPartition.Documentation = added;
 
         AssertEquals([originalPartition], [clonePartition]);
@@ -213,7 +220,10 @@ public class NotificationsTest : NotificationTestsBase
     public void ChildReplaced_Deep()
     {
         var originalPartition = new Geometry("a");
-        var bof = new BillOfMaterials("bof") { DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid } };
+        var bof = new BillOfMaterials("bof")
+        {
+            DefaultGroup = new MaterialGroup("mg") { MatterState = MatterState.liquid }
+        };
         originalPartition.AddAnnotations([bof]);
 
         var clonePartition = PartitionCloner(originalPartition);
@@ -232,7 +242,10 @@ public class NotificationsTest : NotificationTestsBase
     [TestMethod]
     public void ChildReplaced_Multiple_First()
     {
-        var originalPartition = new Geometry("a") { Shapes = [new Circle("replaced"), new Circle("child")] };
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [new Circle("replaced"), new Circle("child")]
+        };
         var clonePartition = PartitionCloner(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
@@ -250,7 +263,10 @@ public class NotificationsTest : NotificationTestsBase
     [TestMethod]
     public void ChildReplaced_Multiple_Last()
     {
-        var originalPartition = new Geometry("a") { Shapes = [new Circle("child"), new Circle("replaced")] };
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [new Circle("child"), new Circle("replaced")]
+        };
         var clonePartition = PartitionCloner(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);

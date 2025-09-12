@@ -17,7 +17,6 @@
 
 namespace LionWeb.Core.Test.Notification;
 
-using Core.Notification.Forest;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 

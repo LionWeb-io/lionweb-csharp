@@ -24,7 +24,6 @@ using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using M3;
 using Comparer = Core.Utilities.Comparer;
 
 public abstract class NotificationTestsBase
@@ -44,7 +43,7 @@ public abstract class NotificationTestsBase
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
     
-    protected void CreateForestReplicator(Forest cloneForest, Forest originalForest)
+    protected void CreateForestReplicator(IForest cloneForest, IForest originalForest)
     {
         var notificationMapper = new NotificationMapper();
         originalForest.GetNotificationSender()!.ConnectTo(notificationMapper);
@@ -70,8 +69,7 @@ public interface IReplicatorCreator
 
 internal class NotificationMapper() : NotificationPipeBase(null), INotificationHandler
 {
-    private readonly NotificationToNotificationMapper _notificationMapper =
-        new(new SharedNodeMap(), new Dictionary<CompressedMetaPointer, IKeyed>());
+    private readonly NotificationToNotificationMapper _notificationMapper = new(new SharedNodeMap());
 
     private void ProduceNotification(INotification notification) => Send(notification);
 

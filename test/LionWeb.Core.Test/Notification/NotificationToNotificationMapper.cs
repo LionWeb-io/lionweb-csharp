@@ -21,12 +21,8 @@ using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
-using M1;
-using M3;
 
-public class NotificationToNotificationMapper(
-    SharedNodeMap sharedNodeMap,
-    Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap)
+public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 {
     public INotification Map(INotification notification) =>
         notification switch
@@ -72,70 +68,98 @@ public class NotificationToNotificationMapper(
 
     #region Properties
 
-    private PropertyAddedNotification OnPropertyAdded(PropertyAddedNotification notification) =>
-        new(
-            NodeCloner(notification.Node),
+    private PropertyAddedNotification OnPropertyAdded(PropertyAddedNotification notification)
+    {
+        var node = NodeCloner(notification.Node);
+
+        return new(
+            node,
             notification.Property,
             notification.NewValue,
             notification.NotificationId
         );
+    }
 
-    private PropertyDeletedNotification OnPropertyDeleted(PropertyDeletedNotification notification) =>
-        new(
-            NodeCloner(notification.Node),
+    private PropertyDeletedNotification OnPropertyDeleted(PropertyDeletedNotification notification)
+    {
+        var node = NodeCloner(notification.Node);
+
+        return new(
+            node,
             notification.Property,
             notification.OldValue,
             notification.NotificationId
         );
+    }
 
-    private PropertyChangedNotification OnPropertyChanged(PropertyChangedNotification notification) =>
-        new(
-            NodeCloner(notification.Node),
+    private PropertyChangedNotification OnPropertyChanged(PropertyChangedNotification notification)
+    {
+        var node = NodeCloner(notification.Node);
+
+        return new(
+            node,
             notification.Property,
             notification.NewValue,
             notification.OldValue,
             notification.NotificationId
         );
+    }
 
     #endregion
 
 
     #region Children
 
-    private ChildAddedNotification OnChildAdded(ChildAddedNotification notification) =>
-        new(
-            NodeCloner(notification.Parent),
-            NodeCloner(notification.NewChild),
-            notification.Containment,
-            notification.Index,
-            notification.NotificationId
-        );
+    private ChildAddedNotification OnChildAdded(ChildAddedNotification notification)
+    {
+        var parent = NodeCloner(notification.Parent);
+        var newChild = NodeCloner(notification.NewChild);
 
-    private ChildDeletedNotification OnChildDeleted(ChildDeletedNotification notification) =>
-        new(
-            notification.DeletedChild,
-            NodeCloner(notification.Parent),
+        return new(
+            parent,
+            newChild,
             notification.Containment,
             notification.Index,
             notification.NotificationId
         );
+    }
 
-    private ChildReplacedNotification OnChildReplaced(ChildReplacedNotification notification) =>
-        new(
-            NodeCloner(notification.NewChild),
-            NodeCloner(notification.ReplacedChild),
-            notification.Parent,
+    private ChildDeletedNotification OnChildDeleted(ChildDeletedNotification notification)
+    {
+        var deletedChild = NodeCloner(notification.DeletedChild);
+        var parent = NodeCloner(notification.Parent);
+
+        return new(
+            deletedChild,
+            parent,
             notification.Containment,
             notification.Index,
             notification.NotificationId
         );
+    }
+
+    private ChildReplacedNotification OnChildReplaced(ChildReplacedNotification notification)
+    {
+        var parent = NodeCloner(notification.Parent);
+        var newChild = NodeCloner(notification.NewChild);
+        var replacedChild = NodeCloner(notification.ReplacedChild);
+
+        return new(
+            newChild,
+            replacedChild,
+            parent,
+            notification.Containment,
+            notification.Index,
+            notification.NotificationId
+        );
+    }
 
     private ChildMovedFromOtherContainmentNotification OnChildMovedFromOtherContainment(
         ChildMovedFromOtherContainmentNotification notification)
     {
-        var movedChild = NodeCloner(notification.MovedChild);
+        var newParent = NodeCloner(notification.NewParent);
         var oldParent = NodeCloner(notification.OldParent);
-        var newParent = notification.NewParent;
+        var movedChild = NodeCloner(notification.MovedChild);
 
         return new ChildMovedFromOtherContainmentNotification(
             newParent,
@@ -152,8 +176,8 @@ public class NotificationToNotificationMapper(
     private ChildMovedAndReplacedFromOtherContainmentNotification OnChildMovedAndReplacedFromOtherContainment(
         ChildMovedAndReplacedFromOtherContainmentNotification notification)
     {
+        var newParent = NodeCloner(notification.NewParent);
         var movedChild = NodeCloner(notification.MovedChild);
-        var newParent = notification.NewParent; //NodeCloner(notification.NewParent); //TODO: test: moved child is child of partition or subtree
         var replacedChild = NodeCloner(notification.ReplacedChild);
 
         return new ChildMovedAndReplacedFromOtherContainmentNotification(
@@ -194,6 +218,7 @@ public class NotificationToNotificationMapper(
     {
         var parent = NodeCloner(notification.Parent);
         var movedChild = NodeCloner(notification.MovedChild);
+
         return new ChildMovedFromOtherContainmentInSameParentNotification(
             notification.NewContainment,
             notification.NewIndex,
@@ -210,6 +235,7 @@ public class NotificationToNotificationMapper(
     {
         var parent = NodeCloner(notification.Parent);
         var movedChild = NodeCloner(notification.MovedChild);
+
         return new ChildMovedInSameContainmentNotification(
             notification.NewIndex,
             movedChild,
@@ -225,35 +251,43 @@ public class NotificationToNotificationMapper(
 
     #region Annotations
 
-    private AnnotationAddedNotification OnAnnotationAdded(AnnotationAddedNotification notification) =>
-        new(
-            NodeCloner(notification.Parent),
-            NodeCloner(notification.NewAnnotation),
-            notification.Index,
-            notification.NotificationId
-        );
+    private AnnotationAddedNotification OnAnnotationAdded(AnnotationAddedNotification notification)
+    {
+        var parent = NodeCloner(notification.Parent);
+        var newAnnotation = NodeCloner(notification.NewAnnotation);
 
-    private AnnotationDeletedNotification OnAnnotationDeleted(AnnotationDeletedNotification notification) =>
-        new(
-            NodeCloner(notification.DeletedAnnotation),
-            NodeCloner(notification.Parent),
+        return new(
+            parent,
+            newAnnotation,
             notification.Index,
             notification.NotificationId
         );
+    }
+
+    private AnnotationDeletedNotification OnAnnotationDeleted(AnnotationDeletedNotification notification)
+    {
+        var deletedAnnotation = NodeCloner(notification.DeletedAnnotation);
+        var parent = NodeCloner(notification.Parent);
+
+        return new(
+            deletedAnnotation,
+            parent,
+            notification.Index,
+            notification.NotificationId
+        );
+    }
 
     private AnnotationMovedFromOtherParentNotification OnAnnotationMovedFromOtherParent(
         AnnotationMovedFromOtherParentNotification notification)
     {
-        //TODO: check similar cases: moved node is not a child of partition
-        var oldParent = notification.OldParent;
-
         var newParent = NodeCloner(notification.NewParent);
         var movedAnnotation = NodeCloner(notification.MovedAnnotation);
+
         return new AnnotationMovedFromOtherParentNotification(
             newParent,
             notification.NewIndex,
             movedAnnotation,
-            oldParent,
+            notification.OldParent,
             notification.OldIndex,
             notification.NotificationId
         );
@@ -264,6 +298,7 @@ public class NotificationToNotificationMapper(
     {
         var parent = NodeCloner(notification.Parent);
         var movedAnnotation = NodeCloner(notification.MovedAnnotation);
+
         return new AnnotationMovedInSameParentNotification(
             notification.NewIndex,
             movedAnnotation,
@@ -277,40 +312,51 @@ public class NotificationToNotificationMapper(
 
     #region References
 
-    private ReferenceAddedNotification OnReferenceAdded(ReferenceAddedNotification notification) =>
-        new(
-            NodeCloner(notification.Parent),
+    private ReferenceAddedNotification OnReferenceAdded(ReferenceAddedNotification notification)
+    {
+        var parent = NodeCloner(notification.Parent);
+
+        return new(
+            parent,
             notification.Reference,
             notification.Index,
             notification.NewTarget,
             notification.NotificationId
         );
+    }
 
-    private ReferenceDeletedNotification OnReferenceDeleted(ReferenceDeletedNotification notification) =>
-        new(
-            NodeCloner(notification.Parent),
+    private ReferenceDeletedNotification OnReferenceDeleted(ReferenceDeletedNotification notification)
+    {
+        var parent = NodeCloner(notification.Parent);
+
+        return new(
+            parent,
             notification.Reference,
             notification.Index,
             notification.DeletedTarget,
             notification.NotificationId
         );
+    }
 
-    private ReferenceChangedNotification OnReferenceChanged(ReferenceChangedNotification notification) =>
-        new(
-            NodeCloner(notification.Parent),
+    private ReferenceChangedNotification OnReferenceChanged(ReferenceChangedNotification notification)
+    {
+        var parent = NodeCloner(notification.Parent);
+
+        return new(
+            parent,
             notification.Reference,
             notification.Index,
             notification.NewTarget,
             notification.OldTarget,
             notification.NotificationId
         );
+    }
 
     #endregion
 
     private T NodeCloner<T>(T node) where T : IWritableNode
     {
         var nodeId = node.GetId();
-
         if (sharedNodeMap.TryGetValue(nodeId, out var result) && result is T w)
             return w;
 
