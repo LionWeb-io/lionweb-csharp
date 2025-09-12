@@ -60,7 +60,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private PartitionDeletedNotification OnPartitionDeleted(PartitionDeletedNotification notification) =>
         new(
-            notification.DeletedPartition,
+            UpdateNodeMap(notification.DeletedPartition),
             notification.NotificationId
         );
 
@@ -70,7 +70,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private PropertyAddedNotification OnPropertyAdded(PropertyAddedNotification notification)
     {
-        var node = NodeCloner(notification.Node);
+        var node = UpdateNodeMap(notification.Node);
 
         return new(
             node,
@@ -82,7 +82,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private PropertyDeletedNotification OnPropertyDeleted(PropertyDeletedNotification notification)
     {
-        var node = NodeCloner(notification.Node);
+        var node = UpdateNodeMap(notification.Node);
 
         return new(
             node,
@@ -94,7 +94,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private PropertyChangedNotification OnPropertyChanged(PropertyChangedNotification notification)
     {
-        var node = NodeCloner(notification.Node);
+        var node = UpdateNodeMap(notification.Node);
 
         return new(
             node,
@@ -112,8 +112,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private ChildAddedNotification OnChildAdded(ChildAddedNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
-        var newChild = NodeCloner(notification.NewChild);
+        var parent = UpdateNodeMap(notification.Parent);
+        var newChild = UpdateNodeMap(notification.NewChild);
 
         return new(
             parent,
@@ -126,8 +126,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private ChildDeletedNotification OnChildDeleted(ChildDeletedNotification notification)
     {
-        var deletedChild = NodeCloner(notification.DeletedChild);
-        var parent = NodeCloner(notification.Parent);
+        var deletedChild = UpdateNodeMap(notification.DeletedChild);
+        var parent = UpdateNodeMap(notification.Parent);
 
         return new(
             deletedChild,
@@ -140,9 +140,9 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private ChildReplacedNotification OnChildReplaced(ChildReplacedNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
-        var newChild = NodeCloner(notification.NewChild);
-        var replacedChild = NodeCloner(notification.ReplacedChild);
+        var parent = UpdateNodeMap(notification.Parent);
+        var newChild = UpdateNodeMap(notification.NewChild);
+        var replacedChild = UpdateNodeMap(notification.ReplacedChild);
 
         return new(
             newChild,
@@ -157,9 +157,9 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private ChildMovedFromOtherContainmentNotification OnChildMovedFromOtherContainment(
         ChildMovedFromOtherContainmentNotification notification)
     {
-        var newParent = NodeCloner(notification.NewParent);
-        var oldParent = NodeCloner(notification.OldParent);
-        var movedChild = NodeCloner(notification.MovedChild);
+        var newParent = UpdateNodeMap(notification.NewParent);
+        var oldParent = UpdateNodeMap(notification.OldParent);
+        var movedChild = UpdateNodeMap(notification.MovedChild);
 
         return new ChildMovedFromOtherContainmentNotification(
             newParent,
@@ -176,9 +176,9 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private ChildMovedAndReplacedFromOtherContainmentNotification OnChildMovedAndReplacedFromOtherContainment(
         ChildMovedAndReplacedFromOtherContainmentNotification notification)
     {
-        var newParent = NodeCloner(notification.NewParent);
-        var movedChild = NodeCloner(notification.MovedChild);
-        var replacedChild = NodeCloner(notification.ReplacedChild);
+        var newParent = UpdateNodeMap(notification.NewParent);
+        var movedChild = UpdateNodeMap(notification.MovedChild);
+        var replacedChild = UpdateNodeMap(notification.ReplacedChild);
 
         return new ChildMovedAndReplacedFromOtherContainmentNotification(
             newParent,
@@ -197,9 +197,9 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         OnChildMovedAndReplacedFromOtherContainmentInSameParent(
             ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
-        var movedChild = NodeCloner(notification.MovedChild);
-        var replacedChild = NodeCloner(notification.ReplacedChild);
+        var parent = UpdateNodeMap(notification.Parent);
+        var movedChild = UpdateNodeMap(notification.MovedChild);
+        var replacedChild = UpdateNodeMap(notification.ReplacedChild);
 
         return new ChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
             notification.NewContainment,
@@ -216,8 +216,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private ChildMovedFromOtherContainmentInSameParentNotification OnChildMovedFromOtherContainmentInSameParent(
         ChildMovedFromOtherContainmentInSameParentNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
-        var movedChild = NodeCloner(notification.MovedChild);
+        var parent = UpdateNodeMap(notification.Parent);
+        var movedChild = UpdateNodeMap(notification.MovedChild);
 
         return new ChildMovedFromOtherContainmentInSameParentNotification(
             notification.NewContainment,
@@ -233,8 +233,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private ChildMovedInSameContainmentNotification OnChildMovedInSameContainment(
         ChildMovedInSameContainmentNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
-        var movedChild = NodeCloner(notification.MovedChild);
+        var parent = UpdateNodeMap(notification.Parent);
+        var movedChild = UpdateNodeMap(notification.MovedChild);
 
         return new ChildMovedInSameContainmentNotification(
             notification.NewIndex,
@@ -253,8 +253,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private AnnotationAddedNotification OnAnnotationAdded(AnnotationAddedNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
-        var newAnnotation = NodeCloner(notification.NewAnnotation);
+        var parent = UpdateNodeMap(notification.Parent);
+        var newAnnotation = UpdateNodeMap(notification.NewAnnotation);
 
         return new(
             parent,
@@ -266,8 +266,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private AnnotationDeletedNotification OnAnnotationDeleted(AnnotationDeletedNotification notification)
     {
-        var deletedAnnotation = NodeCloner(notification.DeletedAnnotation);
-        var parent = NodeCloner(notification.Parent);
+        var deletedAnnotation = UpdateNodeMap(notification.DeletedAnnotation);
+        var parent = UpdateNodeMap(notification.Parent);
 
         return new(
             deletedAnnotation,
@@ -280,8 +280,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private AnnotationMovedFromOtherParentNotification OnAnnotationMovedFromOtherParent(
         AnnotationMovedFromOtherParentNotification notification)
     {
-        var newParent = NodeCloner(notification.NewParent);
-        var movedAnnotation = NodeCloner(notification.MovedAnnotation);
+        var newParent = UpdateNodeMap(notification.NewParent);
+        var movedAnnotation = UpdateNodeMap(notification.MovedAnnotation);
 
         return new AnnotationMovedFromOtherParentNotification(
             newParent,
@@ -296,8 +296,8 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private AnnotationMovedInSameParentNotification OnAnnotationMovedInSameParent(
         AnnotationMovedInSameParentNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
-        var movedAnnotation = NodeCloner(notification.MovedAnnotation);
+        var parent = UpdateNodeMap(notification.Parent);
+        var movedAnnotation = UpdateNodeMap(notification.MovedAnnotation);
 
         return new AnnotationMovedInSameParentNotification(
             notification.NewIndex,
@@ -314,7 +314,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private ReferenceAddedNotification OnReferenceAdded(ReferenceAddedNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
+        var parent = UpdateNodeMap(notification.Parent);
 
         return new(
             parent,
@@ -327,7 +327,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private ReferenceDeletedNotification OnReferenceDeleted(ReferenceDeletedNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
+        var parent = UpdateNodeMap(notification.Parent);
 
         return new(
             parent,
@@ -340,7 +340,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     private ReferenceChangedNotification OnReferenceChanged(ReferenceChangedNotification notification)
     {
-        var parent = NodeCloner(notification.Parent);
+        var parent = UpdateNodeMap(notification.Parent);
 
         return new(
             parent,
@@ -354,7 +354,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     #endregion
 
-    private T NodeCloner<T>(T node) where T : IWritableNode
+    private T UpdateNodeMap<T>(T node) where T : IReadableNode
     {
         var nodeId = node.GetId();
         if (sharedNodeMap.TryGetValue(nodeId, out var result) && result is T w)

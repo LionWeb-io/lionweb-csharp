@@ -13,7 +13,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var circle = new Circle("c");
         var originalPartition = new Geometry("a") { Shapes = [circle] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -27,7 +27,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var circle = new Circle("c") { Name = "Hello" };
         var originalPartition = new Geometry("a") { Shapes = [circle] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -41,7 +41,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var docs = new Documentation("c") { Text = "Hello" };
         var originalPartition = new Geometry("a") { Documentation = docs };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -60,7 +60,7 @@ public class NotificationsTest : NotificationTestsBase
     public void ChildAdded_Multiple_Only()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -75,7 +75,7 @@ public class NotificationsTest : NotificationTestsBase
     public void ChildAdded_Multiple_First()
     {
         var originalPartition = new Geometry("a") { Shapes = [new Line("l")] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -90,7 +90,7 @@ public class NotificationsTest : NotificationTestsBase
     public void ChildAdded_Multiple_Last()
     {
         var originalPartition = new Geometry("a") { Shapes = [new Line("l")] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -105,7 +105,7 @@ public class NotificationsTest : NotificationTestsBase
     public void ChildAdded_Single()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -120,7 +120,7 @@ public class NotificationsTest : NotificationTestsBase
     public void ChildAdded_Deep()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -140,7 +140,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var deleted = new Circle("deleted");
         var originalPartition = new Geometry("a") { Shapes = [deleted] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -154,7 +154,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var deleted = new Circle("deleted");
         var originalPartition = new Geometry("a") { Shapes = [deleted, new Line("l")] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -168,7 +168,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var deleted = new Circle("deleted");
         var originalPartition = new Geometry("a") { Shapes = [new Line("l"), deleted] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -182,7 +182,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var deleted = new Documentation("deleted");
         var originalPartition = new Geometry("a") { Documentation = deleted };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -202,7 +202,7 @@ public class NotificationsTest : NotificationTestsBase
         {
             Documentation = new Documentation("replaced") { Text = "a" }
         };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -226,7 +226,7 @@ public class NotificationsTest : NotificationTestsBase
         };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -246,7 +246,7 @@ public class NotificationsTest : NotificationTestsBase
         {
             Shapes = [new Circle("replaced"), new Circle("child")]
         };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -267,7 +267,7 @@ public class NotificationsTest : NotificationTestsBase
         {
             Shapes = [new Circle("child"), new Circle("replaced")]
         };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -287,7 +287,7 @@ public class NotificationsTest : NotificationTestsBase
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originalPartition = new Geometry("a") { Shapes = [origin] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -304,7 +304,7 @@ public class NotificationsTest : NotificationTestsBase
         {
             Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -326,7 +326,7 @@ public class NotificationsTest : NotificationTestsBase
         {
             Documentation = replaced, Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -344,7 +344,7 @@ public class NotificationsTest : NotificationTestsBase
         {
             Documentation = replaced, Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -360,7 +360,7 @@ public class NotificationsTest : NotificationTestsBase
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var replaced = new Circle("replaced");
         var originalPartition = new Geometry("a") { Shapes = [origin, replaced] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -381,7 +381,7 @@ public class NotificationsTest : NotificationTestsBase
             Start = new Coord("moved"), End = new Coord("replaced")
         };
         var originalPartition = new Geometry("a") { Shapes = [line] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -398,7 +398,7 @@ public class NotificationsTest : NotificationTestsBase
             Start = new Coord("moved"), End = new Coord("replaced")
         };
         var originalPartition = new Geometry("a") { Shapes = [line] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -417,7 +417,7 @@ public class NotificationsTest : NotificationTestsBase
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originalPartition = new Geometry("a") { Shapes = [origin] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -432,7 +432,7 @@ public class NotificationsTest : NotificationTestsBase
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originalPartition = new Geometry("a") { Shapes = [origin] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -450,7 +450,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var moved = new Circle("moved");
         var originalPartition = new Geometry("a") { Shapes = [moved, new Line("l")] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -464,7 +464,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var moved = new Circle("moved");
         var originalPartition = new Geometry("a") { Shapes = [new Line("l"), moved] };
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -485,7 +485,7 @@ public class NotificationsTest : NotificationTestsBase
     public void AnnotationAdded_Multiple_Only()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -501,7 +501,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([new BillOfMaterials("bof")]);
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -517,7 +517,7 @@ public class NotificationsTest : NotificationTestsBase
     {
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([new BillOfMaterials("bof")]);
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -532,7 +532,7 @@ public class NotificationsTest : NotificationTestsBase
     public void AnnotationAdded_Deep()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
 
         CreatePartitionReplicator(clonePartition, originalPartition);
 
@@ -554,7 +554,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([deleted]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         originalPartition.RemoveAnnotations([deleted]);
@@ -569,7 +569,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([deleted, new BillOfMaterials("bof")]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         originalPartition.RemoveAnnotations([deleted]);
@@ -584,7 +584,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([new BillOfMaterials("bof"), deleted]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         originalPartition.RemoveAnnotations([deleted]);
@@ -604,7 +604,7 @@ public class NotificationsTest : NotificationTestsBase
         origin.AddAnnotations([moved]);
         var originalPartition = new Geometry("a") { Shapes = [origin] };
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         originalPartition.AddAnnotations([moved]);
@@ -623,7 +623,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([moved, new BillOfMaterials("bof")]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         originalPartition.AddAnnotations([moved]);
@@ -638,7 +638,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([new BillOfMaterials("bof"), moved]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         originalPartition.InsertAnnotations(0, [moved]);
@@ -662,7 +662,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         bof.AddMaterials([line]);
@@ -679,7 +679,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line, circle] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         bof.InsertMaterials(0, [line]);
@@ -696,7 +696,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line, circle] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         bof.InsertMaterials(1, [line]);
@@ -711,7 +711,7 @@ public class NotificationsTest : NotificationTestsBase
         var od = new OffsetDuplicate("od");
         var originalPartition = new Geometry("a") { Shapes = [od, circle] };
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         od.Source = circle;
@@ -731,7 +731,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         bof.RemoveMaterials([line]);
@@ -748,7 +748,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line, circle] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         bof.RemoveMaterials([line]);
@@ -765,7 +765,7 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line, circle] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         bof.RemoveMaterials([line]);
@@ -780,7 +780,7 @@ public class NotificationsTest : NotificationTestsBase
         var od = new OffsetDuplicate("od") { AltSource = circle };
         var originalPartition = new Geometry("a") { Shapes = [od, circle] };
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         od.AltSource = null;
@@ -800,7 +800,7 @@ public class NotificationsTest : NotificationTestsBase
         var od = new OffsetDuplicate("od") { AltSource = circle };
         var originalPartition = new Geometry("a") { Shapes = [od, circle, line] };
 
-        var clonePartition = PartitionCloner(originalPartition);
+        var clonePartition = ClonePartition(originalPartition);
         CreatePartitionReplicator(clonePartition, originalPartition);
 
         od.AltSource = line;

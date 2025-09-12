@@ -430,7 +430,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     {
         var circle = new Circle("c");
         var partition = new Geometry("geo") { Shapes = [circle] };
-        var clone = PartitionCloner(partition);
+        var clone = ClonePartition(partition);
 
         var replicator = PartitionReplicator.Create(clone, new(), partition.GetId());
         partition.GetNotificationSender()!.ConnectTo(replicator);

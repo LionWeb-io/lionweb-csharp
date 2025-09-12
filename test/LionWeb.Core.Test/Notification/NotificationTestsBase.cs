@@ -28,8 +28,8 @@ using Comparer = Core.Utilities.Comparer;
 
 public abstract class NotificationTestsBase
 {
-    protected T PartitionCloner<T>(T node) where T : IPartitionInstance =>
-        (T)new SameIdCloner([(INode)node]) { IncludingReferences = true }.Clone()[(INode)node];
+    protected T ClonePartition<T>(T node) where T : IPartitionInstance, INode =>
+        (T)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
 
     protected void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {
