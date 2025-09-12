@@ -43,21 +43,21 @@ public abstract class NotificationTestsBase
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
     
-    protected void CreateForestReplicator(IForest cloneForest, IForest originalForest)
+    protected void CreateForestReplicator(IForest clonedForest, IForest originalForest)
     {
         var notificationMapper = new NotificationMapper();
         originalForest.GetNotificationSender()!.ConnectTo(notificationMapper);
         
-        var replicator = ForestReplicator.Create(cloneForest, new(), null);
+        var replicator = ForestReplicator.Create(clonedForest, new(), null);
         notificationMapper.ConnectTo(replicator);
     }
     
-    protected void CreatePartitionReplicator(IPartitionInstance clonePartition, IPartitionInstance originalPartition)
+    protected void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition)
     {
         var notificationMapper = new NotificationMapper();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationMapper);
 
-        var replicator = PartitionReplicator.Create(clonePartition, new(), null);
+        var replicator = PartitionReplicator.Create(clonedPartition, new(), null);
         notificationMapper.ConnectTo(replicator);
     }
 }

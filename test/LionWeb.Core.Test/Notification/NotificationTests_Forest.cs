@@ -30,40 +30,39 @@ public class NotificationTests_Forest : NotificationTestsBase
     {
         var node = new Geometry("a");
         var originalForest = new Forest();
-        var cloneForest = new Forest();
-        
-        CreateForestReplicator(cloneForest, originalForest);
+        var clonedForest = new Forest();
+
+        CreateForestReplicator(clonedForest, originalForest);
 
         originalForest.AddPartitions([node]);
 
-        AssertEquals([node], cloneForest.Partitions);
+        AssertEquals([node], clonedForest.Partitions);
     }
-    
+
     [TestMethod]
     public void PartitionDeleted()
     {
         var node = new Geometry("a");
         var originalForest = new Forest();
         originalForest.AddPartitions([node]);
-        
-        var cloneForest = new Forest();
-        cloneForest.AddPartitions([node]);
-        
-        CreateForestReplicator(cloneForest, originalForest);
+
+        var clonedForest = new Forest();
+        clonedForest.AddPartitions([node]);
+
+        CreateForestReplicator(clonedForest, originalForest);
 
         originalForest.RemovePartitions([node]);
 
-        Assert.IsEmpty(cloneForest.Partitions);
+        Assert.IsEmpty(clonedForest.Partitions);
         Assert.IsEmpty(originalForest.Partitions);
-        
     }
 
     #endregion
-    
+
     #region Children
-    
+
     #region ChildMovedFromOtherContainment
-    
+
     [TestMethod]
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_Works()
     {
@@ -72,16 +71,16 @@ public class NotificationTests_Forest : NotificationTestsBase
         var node = new Geometry("a") { Shapes = [origin] };
 
         var originalForest = new Forest();
-        var cloneForest = new Forest();
-        
-        CreateForestReplicator(cloneForest, originalForest);
+        var clonedForest = new Forest();
+
+        CreateForestReplicator(clonedForest, originalForest);
 
         originalForest.AddPartitions([node]);
         node.AddShapes([moved]);
 
-        AssertEquals([node], cloneForest.Partitions);
+        AssertEquals([node], clonedForest.Partitions);
     }
-    
+
     [TestMethod]
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_Destination_Works()
     {
@@ -94,17 +93,16 @@ public class NotificationTests_Forest : NotificationTestsBase
         var originalForest = new Forest();
         originalForest.AddPartitions([originPartition]);
 
-        var cloneForest = new Forest();
-        
-        CreateForestReplicator(cloneForest, originalForest);
+        var clonedForest = new Forest();
+
+        CreateForestReplicator(clonedForest, originalForest);
 
         originalForest.AddPartitions([node]);
         node.AddShapes([moved]);
 
-        AssertEquals([node], cloneForest.Partitions);
+        AssertEquals([node], clonedForest.Partitions);
     }
-   
-   
+
     [TestMethod]
     public void ChildMovedFromOtherContainment_AddBeforeSubscribe_CloneExists_NotReplicated()
     {
@@ -116,11 +114,11 @@ public class NotificationTests_Forest : NotificationTestsBase
 
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
-        var cloneForest = new Forest();
-        cloneForest.AddPartitions([clone]);
-        
-        CreateForestReplicator(cloneForest, originalForest);
-        
+        var clonedForest = new Forest();
+        clonedForest.AddPartitions([clone]);
+
+        CreateForestReplicator(clonedForest, originalForest);
+
         node.Documentation = moved;
 
         Assert.AreEqual(node, moved.GetParent());
@@ -136,18 +134,17 @@ public class NotificationTests_Forest : NotificationTestsBase
         var node = new Geometry("a") { };
 
         var originalForest = new Forest();
-        var cloneForest = new Forest();
-        
-        CreateForestReplicator(cloneForest, originalForest);
+        var clonedForest = new Forest();
+
+        CreateForestReplicator(clonedForest, originalForest);
 
         originalForest.AddPartitions([node, originPartition]);
         node.Documentation = moved;
 
-        AssertEquals([node, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
+        AssertEquals([node, originPartition], clonedForest.Partitions.OrderBy(p => p.GetId()).ToList());
     }
 
     #endregion
 
     #endregion
-    
 }

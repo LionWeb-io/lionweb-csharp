@@ -13,13 +13,13 @@ public class NotificationsTest : NotificationTestsBase
     {
         var circle = new Circle("c");
         var originalPartition = new Geometry("a") { Shapes = [circle] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         circle.Name = "Hello";
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -27,13 +27,13 @@ public class NotificationsTest : NotificationTestsBase
     {
         var circle = new Circle("c") { Name = "Hello" };
         var originalPartition = new Geometry("a") { Shapes = [circle] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         circle.Name = "Bye";
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -41,13 +41,13 @@ public class NotificationsTest : NotificationTestsBase
     {
         var docs = new Documentation("c") { Text = "Hello" };
         var originalPartition = new Geometry("a") { Documentation = docs };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         docs.Text = null;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -60,75 +60,75 @@ public class NotificationsTest : NotificationTestsBase
     public void ChildAdded_Multiple_Only()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new Circle("added");
         originalPartition.AddShapes([added]);
 
-        AssertEquals([originalPartition], [clonePartition]);
-        Assert.AreNotSame(added, clonePartition.Shapes[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
     }
 
     [TestMethod]
     public void ChildAdded_Multiple_First()
     {
         var originalPartition = new Geometry("a") { Shapes = [new Line("l")] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new Circle("added");
         originalPartition.InsertShapes(0, [added]);
 
-        AssertEquals([originalPartition], [clonePartition]);
-        Assert.AreNotSame(added, clonePartition.Shapes[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
     }
 
     [TestMethod]
     public void ChildAdded_Multiple_Last()
     {
         var originalPartition = new Geometry("a") { Shapes = [new Line("l")] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new Circle("added");
         originalPartition.InsertShapes(1, [added]);
 
-        AssertEquals([originalPartition], [clonePartition]);
-        Assert.AreNotSame(added, clonePartition.Shapes[1]);
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.Shapes[1]);
     }
 
     [TestMethod]
     public void ChildAdded_Single()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new Documentation("added");
         originalPartition.Documentation = added;
 
-        AssertEquals([originalPartition], [clonePartition]);
-        Assert.AreNotSame(added, clonePartition.Documentation);
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.Documentation);
     }
 
     [TestMethod]
     public void ChildAdded_Deep()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new Circle("added") { Center = new Coord("coord") { X = 1, Y = 2, Z = 3 } };
         originalPartition.AddShapes([added]);
 
-        AssertEquals([originalPartition], [clonePartition]);
-        Assert.AreNotSame(added, clonePartition.Shapes[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.Shapes[0]);
     }
 
     #endregion
@@ -140,13 +140,13 @@ public class NotificationsTest : NotificationTestsBase
     {
         var deleted = new Circle("deleted");
         var originalPartition = new Geometry("a") { Shapes = [deleted] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.RemoveShapes([deleted]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -154,13 +154,13 @@ public class NotificationsTest : NotificationTestsBase
     {
         var deleted = new Circle("deleted");
         var originalPartition = new Geometry("a") { Shapes = [deleted, new Line("l")] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.RemoveShapes([deleted]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -168,13 +168,13 @@ public class NotificationsTest : NotificationTestsBase
     {
         var deleted = new Circle("deleted");
         var originalPartition = new Geometry("a") { Shapes = [new Line("l"), deleted] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.RemoveShapes([deleted]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -182,13 +182,13 @@ public class NotificationsTest : NotificationTestsBase
     {
         var deleted = new Documentation("deleted");
         var originalPartition = new Geometry("a") { Documentation = deleted };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.Documentation = null;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -202,9 +202,9 @@ public class NotificationsTest : NotificationTestsBase
         {
             Documentation = new Documentation("replaced") { Text = "a" }
         };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new Documentation("added")
         {
@@ -213,7 +213,7 @@ public class NotificationsTest : NotificationTestsBase
         
         originalPartition.Documentation = added;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -226,13 +226,13 @@ public class NotificationsTest : NotificationTestsBase
         };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         bof.DefaultGroup = new MaterialGroup("replaced") { MatterState = MatterState.gas };
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     /// <summary>
@@ -246,14 +246,14 @@ public class NotificationsTest : NotificationTestsBase
         {
             Shapes = [new Circle("replaced"), new Circle("child")]
         };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var substituteNode = new Line("substituteNode");
         originalPartition.Shapes[0].ReplaceWith(substituteNode);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     /// <summary>
@@ -267,14 +267,14 @@ public class NotificationsTest : NotificationTestsBase
         {
             Shapes = [new Circle("child"), new Circle("replaced")]
         };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var substituteNode = new Line("substituteNode");
         originalPartition.Shapes[^1].ReplaceWith(substituteNode);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -287,13 +287,13 @@ public class NotificationsTest : NotificationTestsBase
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originalPartition = new Geometry("a") { Shapes = [origin] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.AddShapes([moved]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -304,13 +304,13 @@ public class NotificationsTest : NotificationTestsBase
         {
             Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.Documentation = moved;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -326,13 +326,13 @@ public class NotificationsTest : NotificationTestsBase
         {
             Documentation = replaced, Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
         
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.Documentation = moved;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -344,13 +344,13 @@ public class NotificationsTest : NotificationTestsBase
         {
             Documentation = replaced, Shapes = [new Line("l") { ShapeDocs = moved }]
         };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
         
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         replaced.ReplaceWith(moved);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -360,13 +360,13 @@ public class NotificationsTest : NotificationTestsBase
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var replaced = new Circle("replaced");
         var originalPartition = new Geometry("a") { Shapes = [origin, replaced] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         replaced.ReplaceWith(moved);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -381,13 +381,13 @@ public class NotificationsTest : NotificationTestsBase
             Start = new Coord("moved"), End = new Coord("replaced")
         };
         var originalPartition = new Geometry("a") { Shapes = [line] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
         
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         line.End = line.Start;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -398,13 +398,13 @@ public class NotificationsTest : NotificationTestsBase
             Start = new Coord("moved"), End = new Coord("replaced")
         };
         var originalPartition = new Geometry("a") { Shapes = [line] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         line.End.ReplaceWith(line.Start);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -417,13 +417,13 @@ public class NotificationsTest : NotificationTestsBase
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originalPartition = new Geometry("a") { Shapes = [origin] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         origin.AddDisabledParts([moved]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -432,13 +432,13 @@ public class NotificationsTest : NotificationTestsBase
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originalPartition = new Geometry("a") { Shapes = [origin] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         origin.EvilPart = moved;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -450,13 +450,13 @@ public class NotificationsTest : NotificationTestsBase
     {
         var moved = new Circle("moved");
         var originalPartition = new Geometry("a") { Shapes = [moved, new Line("l")] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.AddShapes([moved]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -464,13 +464,13 @@ public class NotificationsTest : NotificationTestsBase
     {
         var moved = new Circle("moved");
         var originalPartition = new Geometry("a") { Shapes = [new Line("l"), moved] };
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.InsertShapes(0, [moved]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -485,15 +485,15 @@ public class NotificationsTest : NotificationTestsBase
     public void AnnotationAdded_Multiple_Only()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new BillOfMaterials("added");
         originalPartition.AddAnnotations([added]);
 
-        AssertEquals([originalPartition], [clonePartition]);
-        Assert.AreNotSame(added, clonePartition.GetAnnotations()[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.GetAnnotations()[0]);
     }
 
     [TestMethod]
@@ -501,15 +501,15 @@ public class NotificationsTest : NotificationTestsBase
     {
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([new BillOfMaterials("bof")]);
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new BillOfMaterials("added");
         originalPartition.InsertAnnotations(0, [added]);
 
-        AssertEquals([originalPartition], [clonePartition]);
-        Assert.AreNotSame(added, clonePartition.GetAnnotations()[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.GetAnnotations()[0]);
     }
 
     [TestMethod]
@@ -517,30 +517,30 @@ public class NotificationsTest : NotificationTestsBase
     {
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([new BillOfMaterials("bof")]);
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new BillOfMaterials("added");
         originalPartition.InsertAnnotations(1, [added]);
 
-        AssertEquals([originalPartition], [clonePartition]);
-        Assert.AreNotSame(added, clonePartition.GetAnnotations()[1]);
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.GetAnnotations()[1]);
     }
 
     [TestMethod]
     public void AnnotationAdded_Deep()
     {
         var originalPartition = new Geometry("a");
-        var clonePartition = ClonePartition(originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
 
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         var added = new BillOfMaterials("added") { AltGroups = [new MaterialGroup("mg") { MatterState = MatterState.gas }] };
         originalPartition.AddAnnotations([added]);
 
-        AssertEquals([originalPartition], [clonePartition]);
-        Assert.AreNotSame(added, clonePartition.GetAnnotations()[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+        Assert.AreNotSame(added, clonedPartition.GetAnnotations()[0]);
     }
 
     #endregion
@@ -554,12 +554,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([deleted]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.RemoveAnnotations([deleted]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -569,12 +569,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([deleted, new BillOfMaterials("bof")]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.RemoveAnnotations([deleted]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -584,12 +584,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([new BillOfMaterials("bof"), deleted]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.RemoveAnnotations([deleted]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -604,12 +604,12 @@ public class NotificationsTest : NotificationTestsBase
         origin.AddAnnotations([moved]);
         var originalPartition = new Geometry("a") { Shapes = [origin] };
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.AddAnnotations([moved]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -623,12 +623,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([moved, new BillOfMaterials("bof")]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.AddAnnotations([moved]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -638,12 +638,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a");
         originalPartition.AddAnnotations([new BillOfMaterials("bof"), moved]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.InsertAnnotations(0, [moved]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -662,12 +662,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         bof.AddMaterials([line]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -679,12 +679,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line, circle] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         bof.InsertMaterials(0, [line]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -696,12 +696,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line, circle] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         bof.InsertMaterials(1, [line]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -711,12 +711,12 @@ public class NotificationsTest : NotificationTestsBase
         var od = new OffsetDuplicate("od");
         var originalPartition = new Geometry("a") { Shapes = [od, circle] };
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         od.Source = circle;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -731,12 +731,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         bof.RemoveMaterials([line]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -748,12 +748,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line, circle] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         bof.RemoveMaterials([line]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -765,12 +765,12 @@ public class NotificationsTest : NotificationTestsBase
         var originalPartition = new Geometry("a") { Shapes = [line, circle] };
         originalPartition.AddAnnotations([bof]);
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         bof.RemoveMaterials([line]);
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     [TestMethod]
@@ -780,12 +780,12 @@ public class NotificationsTest : NotificationTestsBase
         var od = new OffsetDuplicate("od") { AltSource = circle };
         var originalPartition = new Geometry("a") { Shapes = [od, circle] };
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         od.AltSource = null;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
@@ -800,12 +800,12 @@ public class NotificationsTest : NotificationTestsBase
         var od = new OffsetDuplicate("od") { AltSource = circle };
         var originalPartition = new Geometry("a") { Shapes = [od, circle, line] };
 
-        var clonePartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonePartition, originalPartition);
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
 
         od.AltSource = line;
 
-        AssertEquals([originalPartition], [clonePartition]);
+        AssertEquals([originalPartition], [clonedPartition]);
     }
 
     #endregion
