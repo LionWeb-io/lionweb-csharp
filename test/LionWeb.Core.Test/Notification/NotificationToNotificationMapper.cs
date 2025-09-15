@@ -22,6 +22,14 @@ using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
 
+/// <summary>
+/// This class provides a convenience notification to notification mapping layer between a local forest/partition and a forest/partition replicator.
+/// It maps locally produced forest and partition notifications to new notifications by 
+/// 1) Cloning newly introduced nodes, as they cannot be known in the local representation (i.e. they aren't present in the <paramref name="sharedNodeMap"/>).
+/// 2) Replacing the existing nodes by their local equivalent (i.e. the value of the same node id in <paramref name="sharedNodeMap"/>).
+/// </summary>
+/// <param name="sharedNodeMap">Shared node map between all notification pipes </param>)
+/// <seealso cref="SharedNodeMap"/>
 public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 {
     public INotification Map(INotification notification) =>
