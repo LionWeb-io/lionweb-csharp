@@ -45,19 +45,21 @@ public abstract class NotificationTestsBase
     
     protected void CreateForestReplicator(IForest clonedForest, IForest originalForest)
     {
-        var notificationMapper = new NotificationMapper();
+        var sharedNodeMap = new SharedNodeMap();
+        var notificationMapper = new NotificationMapper(sharedNodeMap);
         originalForest.GetNotificationSender()!.ConnectTo(notificationMapper);
         
-        var replicator = ForestReplicator.Create(clonedForest, new(), null);
+        var replicator = ForestReplicator.Create(clonedForest, sharedNodeMap, null);
         notificationMapper.ConnectTo(replicator);
     }
     
     protected void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition)
     {
-        var notificationMapper = new NotificationMapper();
+        var sharedNodeMap = new SharedNodeMap();
+        var notificationMapper = new NotificationMapper(sharedNodeMap);
         originalPartition.GetNotificationSender()!.ConnectTo(notificationMapper);
 
-        var replicator = PartitionReplicator.Create(clonedPartition, new(), null);
+        var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
         notificationMapper.ConnectTo(replicator);
     }
 }
@@ -67,9 +69,9 @@ public interface IReplicatorCreator
     Geometry CreateReplicator(Geometry node);
 }
 
-internal class NotificationMapper() : NotificationPipeBase(null), INotificationHandler
+internal class NotificationMapper(SharedNodeMap sharedNodeMap) : NotificationPipeBase(null), INotificationHandler
 {
-    private readonly NotificationToNotificationMapper _notificationMapper = new(new SharedNodeMap());
+    private readonly NotificationToNotificationMapper _notificationMapper = new(sharedNodeMap);
 
     private void ProduceNotification(INotification notification) => Send(notification);
 
