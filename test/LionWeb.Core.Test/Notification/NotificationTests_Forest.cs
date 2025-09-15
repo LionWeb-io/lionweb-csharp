@@ -56,6 +56,22 @@ public class NotificationTests_Forest : NotificationTestsBase
         Assert.IsEmpty(clonedForest.Partitions);
         Assert.IsEmpty(originalForest.Partitions);
     }
+    
+    [TestMethod]
+    public void PartitionAddedDeleted_AfterSubscribe()
+    {
+        var node = new Geometry("a");
+        var originalForest = new Forest();
+        var clonedForest = new Forest();
+
+        CreateForestReplicator(clonedForest, originalForest);
+
+        originalForest.AddPartitions([node]);
+        originalForest.RemovePartitions([node]);
+
+        Assert.IsEmpty(clonedForest.Partitions);
+        Assert.IsEmpty(originalForest.Partitions);
+    }
 
     #endregion
 
