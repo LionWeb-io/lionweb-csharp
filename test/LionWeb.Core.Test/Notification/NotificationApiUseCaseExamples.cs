@@ -57,7 +57,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         
         partition.GetNotificationSender()?.ConnectTo(receiver); // <1>
 
-        partition.Documentation = new Documentation("added"); // <2>
+        partition.Documentation = new Documentation("added");   // <2>
         // end::partition_changes[]
         Assert.AreEqual(1, receiver.Count);
     }
@@ -72,7 +72,8 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         forest.GetNotificationSender()?.ConnectTo(receiver); // <1>
 
         var partition = new Geometry("geo");
-        forest.AddPartitions([partition]); // <2>
+        forest.AddPartitions([partition]);                   // <2>
+        partition.Documentation = new Documentation("doc");  // <3>
         // end::forest_changes[]
         Assert.AreEqual(1, receiver.Count);
     }
@@ -92,7 +93,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         forest.AddPartitions([partition]);
         partition.Documentation = new Documentation("added");
 
-        Assert.AreEqual(1, forestReceiver.Count);
+        Assert.AreEqual(2, forestReceiver.Count);
         Assert.AreEqual(1, partitionReceiver.Count);
     }
 
@@ -109,7 +110,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     private void UpdateDocumentation(Geometry partition)
     {
         partition.Documentation = new Documentation("documentation"); // <1>
-        partition.Documentation.Text = "hello"; // <2>
+        partition.Documentation.Text = "hello";                       // <2>
     }
     // end::update_documentation[]
 
@@ -140,12 +141,12 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         var partition = new Geometry("geo");
         var compositor = new NotificationCompositor("compositor");
 
-        var sender = partition.GetNotificationSender(); // <1>
-        sender?.ConnectTo(compositor); // <2>
+        var sender = partition.GetNotificationSender();       // <1>
+        sender?.ConnectTo(compositor);                        // <2>
 
-        compositor.Push(); // <3>
-        UpdateDocumentation(partition); // <4>
-        var changes = compositor.Pop(); // <5>
+        compositor.Push();                                    // <3>
+        UpdateDocumentation(partition);                       // <4>
+        var changes = compositor.Pop();                       // <5>
         
         foreach (INotification notification in changes.Parts) // <6>
         {
@@ -164,7 +165,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         var partition = new Geometry("geo");
 
         var compositor = new NotificationCompositor("compositor");
-        var counter = new PartitionEventCounter();
+        var counter = new EventCounter();
 
         partition.GetNotificationSender()!.ConnectTo(compositor);
         compositor.ConnectTo(counter);
@@ -282,7 +283,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     {
         public int Count { get; private set; }
 
-        public void Receive(INotificationSender correspondingSender, INotification notification)
+        public void Receive(INotificationSender _, INotification notification)
         {
             if (notification is CompositeNotification)
             {
@@ -297,7 +298,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     {
         public int Count { get; private set; }
 
-        public void Receive(INotificationSender correspondingSender, INotification notification)
+        public void Receive(INotificationSender _, INotification notification)
         {
             if (notification is not CompositeNotification)
             {
@@ -312,7 +313,8 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     {
         public int Count { get; private set; }
 
-        public void Receive(INotificationSender correspondingSender, INotification notification) => Count++;
+        public void Receive(INotificationSender _, INotification notification) =>
+            Count++;
     }
     // end::notification_counter[]
 
@@ -332,15 +334,16 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     //tag::replicate_changes_on[]
     private void ReplicateChangesOn(Geometry localPartition, IEnumerable<INotification> changes)
     {
-        var sharedNodeMap = new SharedNodeMap(); // <1>
-        var replicator = PartitionReplicator.Create(localPartition, sharedNodeMap, "partition replicator"); // <2>
+        var sharedNodeMap = new SharedNodeMap();                                     // <1>
+        var replicator = 
+            PartitionReplicator.Create(localPartition, sharedNodeMap, "replicator"); // <2>
 
-        var creator = new Creator(); // <3>
-        creator.ConnectTo(replicator); // <4>
+        var creator = new Creator();                                                 // <3>
+        creator.ConnectTo(replicator);                                               // <4>
 
         foreach (var notification in changes)
         {
-            creator.ProduceNotification(notification); // <5>
+            creator.ProduceNotification(notification);                               // <5>
         }
     }
     //end::replicate_changes_on[]
@@ -363,7 +366,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     public void PartitionReplicator_use_case()
     {
         //tag::partition_replicator_1[]
-        var localPartition = new Geometry("geo"); // <1>
+        var localPartition = new Geometry("geo");    // <1>
         //end::partition_replicator_1[]
         IEnumerable<INotification> changes = GetChangesOn(localPartition);
 

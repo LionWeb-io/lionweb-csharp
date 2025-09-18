@@ -34,6 +34,8 @@ include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.c
 <1> If notifications are not supported, `partition.GetNotificationSender()` returns null.
 <2> This is a change to the forest.
 A partition is added to the forest.
+<3> This is a change to a partition in the forest.
+The forest also sends out notifications about all its partitions.
 
 .NotificationCounter class
 ----
@@ -54,8 +56,9 @@ include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.c
 <2> Connects partition notification sender to compositor.
 <3> `Push()` creates a new `CompositeNotification` to collect incoming notifications.
 <4> Updates take place.
+We don't know any details about the update.
 <5> `Pop()` returns the `CompositeNotification`.
-<6> Access the notifications (changes).
+<6> Access the notifications, aka changes that happened during `UpdateDocumentation()`.
 
 `UpdateDocumentation()` method changes the partition.
 
