@@ -75,7 +75,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         forest.AddPartitions([partition]);                   // <2>
         partition.Documentation = new Documentation("doc");  // <3>
         // end::forest_changes[]
-        Assert.AreEqual(1, receiver.Count);
+        Assert.AreEqual(2, receiver.Count);
     }
 
     [TestMethod]
