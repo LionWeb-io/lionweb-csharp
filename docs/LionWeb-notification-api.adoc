@@ -10,7 +10,7 @@ This document explains the LionWeb notification system API through some use case
 
 === How to get informed about changes
 
-Every partition node (aka root node) of a model, which supports notification API, triggers a notification when there is a change to the model.
+Every partition node (a.k.a. root node) of a model, which supports notification API, triggers a notification when there is a change to the model.
 In the example below, a partition is connected to a receiver.
 Receiver will be informed about all the changes to the partition via notifications.
 In this case, receiver (see `NotificationCounter` class definition below) counts the received notifications in its `Receive` method.
@@ -34,6 +34,8 @@ include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.c
 <1> If notifications are not supported, `partition.GetNotificationSender()` returns null.
 <2> This is a change to the forest.
 A partition is added to the forest.
+<3> This is a change to a partition in the forest.
+The forest also sends out notifications about all its partitions.
 
 .NotificationCounter class
 ----
@@ -54,8 +56,9 @@ include::../test/LionWeb.Core.Test/Notification/NotificationApiUseCaseExamples.c
 <2> Connects partition notification sender to compositor.
 <3> `Push()` creates a new `CompositeNotification` to collect incoming notifications.
 <4> Updates take place.
+We don't know any details about the update.
 <5> `Pop()` returns the `CompositeNotification`.
-<6> Access the notifications (changes).
+<6> Access the notifications, a.k.a. changes that happened during `UpdateDocumentation()`.
 
 `UpdateDocumentation()` method changes the partition.
 

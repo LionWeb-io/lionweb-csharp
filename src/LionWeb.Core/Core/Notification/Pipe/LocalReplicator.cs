@@ -42,9 +42,7 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
 
         foreach (var partition in localForest.Partitions)
         {
-            var notificationSender = partition.GetNotificationSender();
-            if (notificationSender != null)
-                RegisterPartition(notificationSender, partition);
+            RegisterPartition(partition);
         }
     }
 
@@ -54,10 +52,10 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
         switch (notification)
         {
             case PartitionAddedNotification partitionAdded:
-                OnLocalPartitionAdded(correspondingSender, partitionAdded);
+                OnLocalPartitionAdded(partitionAdded);
                 break;
             case PartitionDeletedNotification partitionDeleted:
-                OnLocalPartitionDeleted(correspondingSender, partitionDeleted);
+                OnLocalPartitionDeleted(partitionDeleted);
                 break;
             case ChildAddedNotification e:
                 OnLocalChildAdded(e);
@@ -78,23 +76,17 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
 
     #region Forest
 
-    private void RegisterPartition(INotificationSender correspondingSender, IPartitionInstance partition)
-    {
+    private void RegisterPartition(IPartitionInstance partition) =>
         _sharedNodeMap.RegisterNode(partition);
-        correspondingSender.ConnectTo(this);
-    }
 
-    private void UnregisterPartition(INotificationSender correspondingSender, IPartitionInstance partition)
-    {
-        correspondingSender.Unsubscribe(this);
+    private void UnregisterPartition(IPartitionInstance partition) =>
         _sharedNodeMap.UnregisterNode(partition);
-    }
 
-    private void OnLocalPartitionAdded(INotificationSender correspondingSender, PartitionAddedNotification partitionAdded) =>
-        RegisterPartition(correspondingSender, partitionAdded.NewPartition);
+    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAdded) =>
+        RegisterPartition(partitionAdded.NewPartition);
 
-    private void OnLocalPartitionDeleted(INotificationSender correspondingSender, PartitionDeletedNotification partitionDeleted) =>
-        UnregisterPartition(correspondingSender, partitionDeleted.DeletedPartition);
+    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeleted) =>
+        UnregisterPartition(partitionDeleted.DeletedPartition);
 
     #endregion
 

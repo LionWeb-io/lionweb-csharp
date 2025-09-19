@@ -64,6 +64,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * `Hasher` would not recognize internal references if it encounters the reference before the target node.
 * Deserializing languages with annotations that contain references works now.
 ### Changed
+* Pipe members following forests get all notifications of all partitions inside the forest.
 * Made `DynamicStructuredDataTypeInstance.GetHashCode()` more stable.
 * `DynamicLanguageCloner` doesn't change a language's factory anymore.
 * `ILanguageRegistry` works on both registered and current round's languages.

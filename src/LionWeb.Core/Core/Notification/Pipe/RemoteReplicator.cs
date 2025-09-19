@@ -55,10 +55,10 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         switch (notification)
         {
             case PartitionAddedNotification a:
-                OnRemoteNewPartition(correspondingSender, a);
+                OnRemoteNewPartition(a);
                 break;
             case PartitionDeletedNotification a:
-                OnRemotePartitionDeleted(correspondingSender, a);
+                OnRemotePartitionDeleted(a);
                 break;
             case PropertyAddedNotification e:
                 OnRemotePropertyAdded(e);
@@ -121,18 +121,16 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region Partitions
 
-    private void OnRemoteNewPartition(INotificationSender correspondingSender, PartitionAddedNotification partitionAdded) =>
+    private void OnRemoteNewPartition(PartitionAddedNotification partitionAdded) =>
         SuppressNotificationForwarding(partitionAdded, () =>
         {
             var newPartition = partitionAdded.NewPartition;
             _localForest?.AddPartitions([newPartition], partitionAdded.NotificationId);
-            correspondingSender.ConnectTo(this);
         });
 
-    private void OnRemotePartitionDeleted(INotificationSender correspondingSender, PartitionDeletedNotification partitionDeleted) =>
+    private void OnRemotePartitionDeleted(PartitionDeletedNotification partitionDeleted) =>
         SuppressNotificationForwarding(partitionDeleted, () =>
         {
-            correspondingSender.Unsubscribe(this);
             var localPartition = (IPartitionInstance?)LookupOpt(partitionDeleted.DeletedPartition.GetId());
             if (localPartition != null)
                 _localForest?.RemovePartitions([localPartition], partitionDeleted.NotificationId);
