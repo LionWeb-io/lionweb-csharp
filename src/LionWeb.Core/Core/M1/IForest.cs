@@ -71,12 +71,12 @@ public class Forest : IForest
             if (!_partitions.Add(partition))
                 continue;
 
-            ProducePartitionAdded(notificationId, partition);
+            ProducePartitionAddedNotification(notificationId, partition);
             ConnectToPartition(partition);
         }
     }
 
-    private void ProducePartitionAdded(INotificationId? notificationId, IPartitionInstance partition) =>
+    private void ProducePartitionAddedNotification(INotificationId? notificationId, IPartitionInstance partition) =>
         GetNotificationProducer()?.ProduceNotification(new PartitionAddedNotification(partition,
             notificationId ?? _notificationIdProvider.CreateNotificationId()));
 
@@ -96,12 +96,12 @@ public class Forest : IForest
             if (!_partitions.Remove(partition))
                 continue;
 
-            ProducePartitionRemoved(notificationId, partition);
+            ProducePartitionDeletedNotification(notificationId, partition);
             UnsubscribeFromPartition(partition);
         }
     }
 
-    private void ProducePartitionRemoved(INotificationId? notificationId, IPartitionInstance partition) =>
+    private void ProducePartitionDeletedNotification(INotificationId? notificationId, IPartitionInstance partition) =>
         GetNotificationProducer()?.ProduceNotification(new PartitionDeletedNotification(partition,
             notificationId ?? _notificationIdProvider.CreateNotificationId()));
 

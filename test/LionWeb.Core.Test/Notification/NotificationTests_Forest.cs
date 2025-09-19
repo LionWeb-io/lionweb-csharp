@@ -111,7 +111,7 @@ public class NotificationTests_Forest : NotificationTestsBase
 
         _ = CreateReplicator(cloneForest, forest);
 
-        var eventCounter = new EventCounter();
+        var eventCounter = new NotificationCounter();
 
         forest.GetNotificationSender()!.ConnectTo(eventCounter);
 
