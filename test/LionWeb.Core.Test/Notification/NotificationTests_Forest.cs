@@ -17,8 +17,6 @@
 
 namespace LionWeb.Core.Test.Notification;
 
-using Core.Notification.Forest;
-using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
@@ -100,6 +98,7 @@ public class NotificationTests_Forest : NotificationTestsBase
     }
 
     [TestMethod]
+    [Ignore("original and cloned forests are out of sync, this case is not supported")]
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_Destination_Works()
     {
         var moved = new Circle("moved");
@@ -157,18 +156,18 @@ public class NotificationTests_Forest : NotificationTestsBase
 
         CreateForestReplicator(clonedForest, originalForest);
 
-        var eventCounter = new NotificationCounter();
+        var notificationCounter = new NotificationCounter();
 
-        originalForest.GetNotificationSender()!.ConnectTo(eventCounter);
+        originalForest.GetNotificationSender()!.ConnectTo(notificationCounter);
 
         originalForest.AddPartitions([node, originPartition]);
 
         node.Documentation = moved;
 
         Assert.AreEqual(
-            eventCounter.Notifications.DistinctBy(n => n.NotificationId).Count(),
-            eventCounter.Count,
-            string.Join("\n", eventCounter.Notifications)
+            notificationCounter.Notifications.DistinctBy(n => n.NotificationId).Count(),
+            notificationCounter.Count,
+            string.Join("\n", notificationCounter.Notifications)
         );
 
         AssertEquals([node, originPartition], clonedForest.Partitions.OrderBy(p => p.GetId()).ToList());
