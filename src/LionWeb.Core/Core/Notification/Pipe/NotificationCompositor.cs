@@ -17,8 +17,6 @@
 
 namespace LionWeb.Core.Notification.Pipe;
 
-using Forest;
-
 /// Compose several <see cref="INotification">notifications</see> into one <see cref="CompositeNotification"/>.
 ///
 /// We keep a stack of composites.
@@ -64,16 +62,6 @@ public class NotificationCompositor : NotificationPipeBase, INotificationHandler
     /// <inheritdoc />
     public void Receive(INotificationSender correspondingSender, INotification notification)
     {
-        switch (notification)
-        {
-            case PartitionAddedNotification:
-                RegisterPartition(correspondingSender);
-                break;
-            case PartitionDeletedNotification:
-                UnregisterPartition(correspondingSender);
-                break;
-        }
-
         if (!TryAdd(notification))
             Send(notification);
     }
@@ -86,9 +74,4 @@ public class NotificationCompositor : NotificationPipeBase, INotificationHandler
         composite.AddPart(notification);
         return true;
     }
-
-    private void RegisterPartition(INotificationSender correspondingSender) =>
-        correspondingSender.ConnectTo(this);
-    private void UnregisterPartition(INotificationSender correspondingSender) =>
-        correspondingSender.Unsubscribe(this);
 }

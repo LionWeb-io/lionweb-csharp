@@ -17,14 +17,13 @@
 
 namespace LionWeb.Core.Test.Notification;
 
-using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class NotificationTests_Forest: NotificationTestsBase
+public class NotificationTests_Forest : NotificationTestsBase
 {
     #region Children
 
@@ -76,7 +75,7 @@ public class NotificationTests_Forest: NotificationTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_AddBeforeSubscribe_CloneExists_NotReplicated()
+    public void ChildMovedFromOtherContainment_AddBeforeSubscribe_CloneExists_Replicated()
     {
         var moved = new Documentation("moved");
         var node = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = moved }] };
@@ -93,8 +92,9 @@ public class NotificationTests_Forest: NotificationTestsBase
 
         node.Documentation = moved;
 
-        Assert.AreEqual(node, moved.GetParent());
-        Assert.IsNotNull(clone.Shapes.OfType<Shape>().First().ShapeDocs);
+        Assert.AreSame(node, moved.GetParent());
+        AssertEquals([node], [clone]);
+        AssertEquals(forest.Partitions, cloneForest.Partitions);
     }
 
     [TestMethod]
@@ -111,9 +111,19 @@ public class NotificationTests_Forest: NotificationTestsBase
 
         _ = CreateReplicator(cloneForest, forest);
 
+        var eventCounter = new NotificationCounter();
+
+        forest.GetNotificationSender()!.ConnectTo(eventCounter);
+
         forest.AddPartitions([node, originPartition]);
 
         node.Documentation = moved;
+
+        Assert.AreEqual(
+            eventCounter.Notifications.DistinctBy(n => n.NotificationId).Count(),
+            eventCounter.Count,
+            string.Join("\n", eventCounter.Notifications)
+        );
 
         AssertEquals([node, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
     }
@@ -130,33 +140,6 @@ public class NotificationTests_Forest: NotificationTestsBase
         originalForest.GetNotificationSender()!.ConnectTo(cloneHandler);
         cloneHandler.ConnectTo(replicator);
 
-        var receiver = new TestLocalForestChangeNotificationReceiver(originalForest, cloneHandler);
-        originalForest.GetNotificationSender()!.ConnectTo(receiver);
         return replicator;
-    }
-}
-
-internal class TestLocalForestChangeNotificationReceiver(object? sender, NodeCloneNotificationHandler cloneHandler)
-    : NotificationPipeBase(sender), INotificationReceiver
-{
-    public void Receive(INotificationSender correspondingSender, INotification notification)
-    {
-        switch (notification)
-        {
-            case PartitionAddedNotification partitionAddedNotification:
-                OnLocalPartitionAdded(partitionAddedNotification);
-                break;
-            case PartitionDeletedNotification partitionDeletedNotification:
-                OnLocalPartitionDeleted(partitionDeletedNotification);
-                break;
-        }
-    }
-
-    private void OnLocalPartitionAdded(PartitionAddedNotification partitionAddedNotification) => 
-        partitionAddedNotification.NewPartition.GetNotificationSender()!.ConnectTo(cloneHandler);
-
-    private void OnLocalPartitionDeleted(PartitionDeletedNotification partitionDeletedNotification)
-    {
-        throw new NotImplementedException();
     }
 }

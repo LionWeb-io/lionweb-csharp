@@ -20,23 +20,17 @@ namespace LionWeb.Core.Notification.Forest;
 using Pipe;
 
 /// Produces notifications for adding and deleting <see cref="IPartitionInstance">partitions</see>.
-public interface IForestNotificationProducer : INotificationProducer;
+public interface IForestNotificationProducer : INotificationProducer
+{
+    internal void ProduceNotification(INotificationSender correspondingSender, INotification notification);
+};
 
 /// Forwards all <see cref="INotificationProducer.ProduceNotification">produced</see> notifications
 /// unchanged to <i>following</i> notification pipe.
 public class ForestNotificationProducer(object? sender)
     : ModelNotificationProducerBase(sender), IForestNotificationProducer
 {
-    /// <inheritdoc />
-    protected override void Send(INotification notification)
-    {
-        switch (notification)
-        {
-            case IForestNotification f:
-                SendWithSender(f.Partition.GetNotificationSender(), notification);
-                return;
-            default:
-                throw new NotImplementedException();
-        }
-    }
+    void IForestNotificationProducer.ProduceNotification(INotificationSender correspondingSender,
+        INotification notification) =>
+        SendWithSender(correspondingSender, notification);
 }
