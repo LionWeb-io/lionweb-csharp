@@ -23,7 +23,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using NotificationId = string;
 
 [TestClass]
-public class NotificationTests_MultiPartition: NotificationTestsBase
+public class NotificationTests_MultiPartition : NotificationTestsBase
 {
     #region Children
 
@@ -38,7 +38,7 @@ public class NotificationTests_MultiPartition: NotificationTestsBase
 
         var clone = new Geometry("a") { Shapes = [new CompositeShape("origin") { Parts = [new Circle("moved")] }] };
 
-        _ = CreateReplicator(clone, node);
+        CreatePartitionReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> deletions = [];
         node.GetNotificationSender()!.Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
@@ -64,7 +64,7 @@ public class NotificationTests_MultiPartition: NotificationTestsBase
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        _ = CreateReplicator(clone, node);
+        CreatePartitionReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationSender()!
@@ -73,6 +73,8 @@ public class NotificationTests_MultiPartition: NotificationTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
+        // TODO: this change adds a new node to original partition, it should NOT be seen as ChildMovedFromOtherContainment. 
+        // This applies to the other failing tests in this file.
         node.AddShapes([moved]);
 
         AssertEquals([node], [clone]);
@@ -92,7 +94,7 @@ public class NotificationTests_MultiPartition: NotificationTestsBase
 
         var clone = new Geometry("a") { Shapes = [] };
 
-        _ = CreateReplicator(clone, node);
+        CreatePartitionReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationSender()!
@@ -117,7 +119,7 @@ public class NotificationTests_MultiPartition: NotificationTestsBase
 
         var clone = new Geometry("a") { Shapes = [new Line("l") { ShapeDocs = new Documentation("moved") }] };
 
-        _ = CreateReplicator(clone, node);
+        CreatePartitionReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> deletions = [];
         node.GetNotificationSender()!.Subscribe<ChildDeletedNotification>((o, e) => deletions.Add((e.NotificationId.ToString(), e.DeletedChild)));
@@ -142,7 +144,7 @@ public class NotificationTests_MultiPartition: NotificationTestsBase
 
         var clone = new Geometry("a") { };
 
-        _ = CreateReplicator(clone, node);
+        CreatePartitionReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationSender()!
@@ -179,7 +181,7 @@ public class NotificationTests_MultiPartition: NotificationTestsBase
         cloneOrigin.AddAnnotations([new BillOfMaterials("moved")]);
         var clone = new Geometry("a") { Shapes = [cloneOrigin] };
 
-        _ = CreateReplicator(clone, node);
+        CreatePartitionReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> deletions = [];
         node.GetNotificationSender()!
@@ -207,7 +209,7 @@ public class NotificationTests_MultiPartition: NotificationTestsBase
 
         var clone = new Geometry("a") { };
 
-        _ = CreateReplicator(clone, node);
+        CreatePartitionReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationSender()!
@@ -237,7 +239,7 @@ public class NotificationTests_MultiPartition: NotificationTestsBase
 
         var clone = new Geometry("a") { };
 
-        _ = CreateReplicator(clone, node);
+        CreatePartitionReplicator(clone, node);
 
         List<(NotificationId, IReadableNode)> originMoves = [];
         originPartition.GetNotificationSender()!
