@@ -63,6 +63,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * `Comparer` didn't recognize internal references to nodes that are children in single containments.
 * `Hasher` would not recognize internal references if it encounters the reference before the target node.
 * Deserializing languages with annotations that contain references works now.
+* Fixed generating &lt;seealso&gt; tags pointing to case-mangled names.
 ### Changed
 * Pipe members following forests get all notifications of all partitions inside the forest.
 * Made `DynamicStructuredDataTypeInstance.GetHashCode()` more stable.
