@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <AssemblyName>LionWeb-CSharp-Generator-Cli</AssemblyName>
+        <Title>LionWeb-CSharp-Generator-Cli</Title>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageTags>LionWeb</PackageTags>
+        <RootNamespace>LionWeb.Generator.Cli</RootNamespace>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.CodeAnalysis" />
+        <PackageReference Include="System.CommandLine" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="LICENSE">
+            <Pack>true</Pack>
+            <PackagePath>/</PackagePath>
+        </None>
+        <None Update="README.md">
+            <Pack>true</Pack>
+            <PackagePath>/</PackagePath>
+        </None>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\LionWeb.Core\LionWeb.Core.csproj" />
+      <ProjectReference Include="..\LionWeb.Generator\LionWeb.Generator.csproj" />
+    </ItemGroup>
+
+    <PropertyGroup>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+</Project>

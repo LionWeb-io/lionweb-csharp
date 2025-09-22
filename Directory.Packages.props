@@ -24,6 +24,7 @@ SPDX-License-Identifier: Apache-2.0
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
+    <PackageVersion Include="System.CommandLine" Version="2.0.0-rc.1.25451.107" />
     <PackageVersion Include="Utf8JsonAsyncStreamReader" Version="1.1.0" />
     <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.0" PrivateAssets="All" />
   </ItemGroup>
