@@ -98,9 +98,9 @@ public class NotificationTests_Forest : NotificationTestsBase
     }
 
     [TestMethod]
-    [Ignore("original and cloned forests are out of sync, this case is not supported")]
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_Destination_Works()
     {
+        // Original and cloned forests are out of sync: their initial state differ.
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originPartition = new Geometry("g") { Shapes = [origin] };
@@ -115,9 +115,7 @@ public class NotificationTests_Forest : NotificationTestsBase
         CreateForestReplicator(clonedForest, originalForest);
 
         originalForest.AddPartitions([node]);
-        node.AddShapes([moved]);
-
-        AssertEquals([node], clonedForest.Partitions);
+        Assert.ThrowsExactly<NotImplementedException>(() => node.AddShapes([moved]));
     }
 
     [TestMethod]
