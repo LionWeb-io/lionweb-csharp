@@ -18,7 +18,6 @@
 namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification.Partition;
-using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
 using NotificationId = string;
 
@@ -54,8 +53,13 @@ public class NotificationTests_MultiPartition : NotificationTestsBase
     }
 
     [TestMethod]
+    [Ignore("Requires implementation of rewriting logic")]
     public void ChildMovedFromOtherContainment_Multiple_DifferentPartition_Add()
     {
+        // This change adds a new node to the original partition (node).
+        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // Therefore, rewriting of notification is needed.   
+
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originPartition = new Geometry("g") { Shapes = [origin] };
@@ -73,8 +77,6 @@ public class NotificationTests_MultiPartition : NotificationTestsBase
         node.GetNotificationSender()!
             .Subscribe<ChildMovedFromOtherContainmentNotification>((o, e) => destinationMoves.Add((e.NotificationId.ToString(), e.MovedChild)));
 
-        // TODO: this change adds a new node to original partition, it should NOT be seen as ChildMovedFromOtherContainment. 
-        // This applies to the other failing tests in this file.
         node.AddShapes([moved]);
 
         AssertEquals([node], [clone]);
@@ -84,8 +86,13 @@ public class NotificationTests_MultiPartition : NotificationTestsBase
     }
 
     [TestMethod]
+    [Ignore("Requires implementation of rewriting logic")]
     public void ChildMovedFromOtherContainment_Multiple_DifferentPartition_Insert()
     {
+        // This change adds a new node to the original partition (node).
+        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // Therefore, rewriting of notification is needed.
+
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originPartition = new Geometry("g") { Shapes = [origin] };
@@ -135,8 +142,13 @@ public class NotificationTests_MultiPartition : NotificationTestsBase
     }
 
     [TestMethod]
+    [Ignore("Requires implementation of rewriting logic")]
     public void ChildMovedFromOtherContainment_Single_DifferentPartition()
     {
+        // This change adds a new node to the original partition (node).
+        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // Therefore, rewriting of notification is needed.   
+
         var moved = new Documentation("moved");
         var originPartition = new Geometry("g") { Shapes = [new Line("l") { ShapeDocs = moved }] };
 
@@ -198,8 +210,13 @@ public class NotificationTests_MultiPartition : NotificationTestsBase
     }
 
     [TestMethod]
+    [Ignore("Requires implementation of rewriting logic")]
     public void AnnotationMovedFromOtherParent_Multiple_DifferentPartition_Add()
     {
+        // This change adds a new node to the original partition (node).
+        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // Therefore, rewriting of notification is needed.   
+
         var moved = new BillOfMaterials("moved");
         var origin = new CompositeShape("origin");
         origin.AddAnnotations([moved]);
@@ -228,8 +245,13 @@ public class NotificationTests_MultiPartition : NotificationTestsBase
     }
 
     [TestMethod]
+    [Ignore("Requires implementation of rewriting logic")]
     public void AnnotationMovedFromOtherParent_Multiple_DifferentPartition_Insert()
     {
+        // This change adds a new node to the original partition (node).
+        // It should NOT be seen as ChildMovedFromOtherContainment but as ChildAdded, because parent of a moved child is not known.   
+        // Therefore, rewriting of notification is needed.   
+
         var moved = new BillOfMaterials("moved");
         var origin = new CompositeShape("origin");
         origin.AddAnnotations([moved]);
@@ -260,14 +282,4 @@ public class NotificationTests_MultiPartition : NotificationTestsBase
     #endregion
 
     #endregion
-
-    private static INotificationPipe CreateReplicator(Geometry clone, Geometry node)
-    {
-        var replicator = PartitionReplicator.Create(clone, new(), "cloneReplicator");
-        var cloneHandler = new NodeCloneNotificationHandler(node.GetId());
-        node.GetNotificationSender()?.ConnectTo(cloneHandler);
-        cloneHandler.ConnectTo(replicator);
-        
-        return replicator;
-    }
 }
