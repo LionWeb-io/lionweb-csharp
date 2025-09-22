@@ -66,6 +66,8 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     var namedLangReadInterfaces = new DynamicLanguageCloner(lionWebVersion).Clone(namedLang);
     namedLangReadInterfaces.Name = "NamedReadInterfaces";
     var generalNodeLang = testLanguagesDefinitions.GeneralNodeLang;
+    var lowerCaseLang = testLanguagesDefinitions.LowerCaseLang;
+    var upperCaseLang = testLanguagesDefinitions.UpperCaseLang;
 
     var lionWebVersionNamespace = "V" + lionWebVersion.VersionString.Replace('.', '_');
     string prefix = $"LionWeb.Core.Test.Languages.Generated.{lionWebVersionNamespace}";
@@ -99,6 +101,12 @@ foreach (LionWebVersions lionWebVersion in LionWebVersions.AllPureVersions)
     if (keywordLang != null)
         names.Add(new(keywordLang, $"@namespace.@int.@public.{lionWebVersionNamespace}"));
 
+    if (lowerCaseLang != null)
+        names.Add(new(lowerCaseLang, $"{prefix}.myLowerCaseLang"));
+    
+    if (upperCaseLang != null)
+        names.Add(new(upperCaseLang, $"{prefix}.MYUpperCaseLang"));
+    
     names.AddRange(testLanguagesDefinitions
         .MixedLangs
         .Select(l =>
