@@ -182,10 +182,8 @@ public partial class Names : INames
         Language l => AsType(l),
         Classifier c => ToName(AsType(c, disambiguate)),
         Datatype d => ToName(AsType(d, disambiguate)),
-        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)),
-            IdentifierName(f.Name.PrefixKeyword())),
-        Field f => QualifiedName(ToName(AsType(f.GetStructuredDataType(), disambiguate)),
-            IdentifierName(f.Name.PrefixKeyword())),
+        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)), FeatureProperty(f)),
+        Field f => QualifiedName(ToName(AsType(f.GetStructuredDataType(), disambiguate)), FieldProperty(f)),
         EnumerationLiteral f => QualifiedName(ToName(AsType(f.GetEnumeration(), disambiguate)),
             IdentifierName(f.Name.PrefixKeyword()))
     };

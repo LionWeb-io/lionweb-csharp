@@ -36,6 +36,8 @@ public class TestLanguagesDefinitions
     public Language MultiInheritLang { get; private set; }
     public Language NamedLang { get; private set; }
     public Language GeneralNodeLang { get; private set; }
+    public Language? LowerCaseLang { get; private set; }
+    public Language? UpperCaseLang { get; private set; }
     public List<Language> MixedLangs { get; private set; } = [];
 
     public TestLanguagesDefinitions(LionWebVersions lionWebVersion)
@@ -53,6 +55,8 @@ public class TestLanguagesDefinitions
             CreateSdtLang();
             CreateMixedLangs();
             CreateKeywordLang();
+            CreateLowerCaseLang();
+            CreateUpperCaseLang();
         }
     }
 
@@ -431,17 +435,88 @@ public class TestLanguagesDefinitions
 
         var concept = generalNodeLang.Concept("id-GeneralNodeConcept", "key-GeneralNodeConcept", "GeneralNodeConcept");
         concept.Reference("id-singleRef", "key-singleRef", "singleRef").OfType(_lionWebVersion.BuiltIns.Node);
-        concept.Reference("id-multipleRef", "key-multipleRef", "multipleRef").OfType(_lionWebVersion.BuiltIns.Node).IsMultiple();
-        
-        concept.Reference("id-singleOptionalRef", "key-singleOptionalRef", "singleOptionalRef").OfType(_lionWebVersion.BuiltIns.Node).IsOptional();
-        concept.Reference("id-multipleOptionalRef", "key-multipleOptionalRef", "multipleOptionalRef").OfType(_lionWebVersion.BuiltIns.Node).IsMultiple().IsOptional();
-        
-        concept.Containment("id-singleContainment", "key-singleContainment", "singleContainment").OfType(_lionWebVersion.BuiltIns.Node);
-        concept.Containment("id-multipleContainment", "key-multipleContainment", "multipleContainment").OfType(_lionWebVersion.BuiltIns.Node).IsMultiple();
+        concept.Reference("id-multipleRef", "key-multipleRef", "multipleRef").OfType(_lionWebVersion.BuiltIns.Node)
+            .IsMultiple();
 
-        concept.Containment("id-singleOptionalContainment", "key-singleOptionalContainment", "singleOptionalContainment").OfType(_lionWebVersion.BuiltIns.Node).IsOptional();
-        concept.Containment("id-multipleOptionalContainment", "key-multipleOptionalContainment", "multipleOptionalContainment").OfType(_lionWebVersion.BuiltIns.Node).IsMultiple().IsOptional();
-        
+        concept.Reference("id-singleOptionalRef", "key-singleOptionalRef", "singleOptionalRef")
+            .OfType(_lionWebVersion.BuiltIns.Node).IsOptional();
+        concept.Reference("id-multipleOptionalRef", "key-multipleOptionalRef", "multipleOptionalRef")
+            .OfType(_lionWebVersion.BuiltIns.Node).IsMultiple().IsOptional();
+
+        concept.Containment("id-singleContainment", "key-singleContainment", "singleContainment")
+            .OfType(_lionWebVersion.BuiltIns.Node);
+        concept.Containment("id-multipleContainment", "key-multipleContainment", "multipleContainment")
+            .OfType(_lionWebVersion.BuiltIns.Node).IsMultiple();
+
+        concept.Containment("id-singleOptionalContainment", "key-singleOptionalContainment",
+            "singleOptionalContainment").OfType(_lionWebVersion.BuiltIns.Node).IsOptional();
+        concept.Containment("id-multipleOptionalContainment", "key-multipleOptionalContainment",
+            "multipleOptionalContainment").OfType(_lionWebVersion.BuiltIns.Node).IsMultiple().IsOptional();
+
         GeneralNodeLang = generalNodeLang;
+    }
+
+    private void CreateLowerCaseLang()
+    {
+        var casingLang = new DynamicLanguage("id-lowerCase-lang", _lionWebVersion)
+        {
+            Name = "myLowerCaseLang", Key = "key-LowerCaseLang", Version = "1"
+        };
+
+        var concept = casingLang.Concept("id-concept", "key-concept", "myConcept");
+
+        var prop = concept.Property("id-property", "key-property", "myProperty")
+            .OfType(_lionWebVersion.BuiltIns.String);
+        var refer = concept.Reference("id-reference", "key-reference", "myReference")
+            .OfType(_lionWebVersion.BuiltIns.Node);
+        var cont = concept.Containment("id-containment", "key-containment", "myContainment")
+            .OfType(_lionWebVersion.BuiltIns.Node);
+
+        var enm = casingLang.Enumeration("id-enumeration", "key-enumeration", "myEnum");
+        var lit = enm.EnumerationLiteral("id-literal", "key-literal", "myLiteral");
+
+        var sdt = casingLang.StructuredDataType("id-sdt", "key-sdt", "mySdt");
+        var field = sdt.Field("id-field", "key-field", "myField").OfType(_lionWebVersion.BuiltIns.String);
+
+        var ann = casingLang.Annotation("id-annotation", "key-annotation", "myAnnotation");
+
+        ann.AddAnnotations([
+            CreateKeyedDescription("aaa-keyedDesc", null,
+                [casingLang, concept, prop, refer, cont, enm, lit, sdt, field, ann])
+        ]);
+
+        LowerCaseLang = casingLang;
+    }
+
+    private void CreateUpperCaseLang()
+    {
+        var casingLang = new DynamicLanguage("id-UpperCase-lang", _lionWebVersion)
+        {
+            Name = "MYUpperCaseLang", Key = "key-UpperCaseLang", Version = "1"
+        };
+
+        var concept = casingLang.Concept("id-concept", "key-concept", "MYConcept");
+
+        var prop = concept.Property("id-property", "key-property", "MYProperty")
+            .OfType(_lionWebVersion.BuiltIns.String);
+        var refer = concept.Reference("id-reference", "key-reference", "MYReference")
+            .OfType(_lionWebVersion.BuiltIns.Node);
+        var cont = concept.Containment("id-containment", "key-containment", "MYContainment")
+            .OfType(_lionWebVersion.BuiltIns.Node);
+
+        var enm = casingLang.Enumeration("id-enumeration", "key-enumeration", "MYEnum");
+        var lit = enm.EnumerationLiteral("id-literal", "key-literal", "MYLiteral");
+
+        var sdt = casingLang.StructuredDataType("id-sdt", "key-sdt", "MYSdt");
+        var field = sdt.Field("id-field", "key-field", "MYField").OfType(_lionWebVersion.BuiltIns.String);
+
+        var ann = casingLang.Annotation("id-annotation", "key-annotation", "MYAnnotation");
+
+        ann.AddAnnotations([
+            CreateKeyedDescription("aaa-keyedDesc", null,
+                [casingLang, concept, prop, refer, cont, enm, lit, sdt, field, ann])
+        ]);
+
+        UpperCaseLang = casingLang;
     }
 }
