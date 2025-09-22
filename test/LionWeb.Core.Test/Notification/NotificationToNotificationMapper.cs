@@ -323,12 +323,13 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private ReferenceAddedNotification OnReferenceAdded(ReferenceAddedNotification notification)
     {
         var parent = LookUpNode(notification.Parent);
+        var newTarget = LookUpNode(notification.NewTarget);
 
         return new(
             parent,
             notification.Reference,
             notification.Index,
-            notification.NewTarget,
+            newTarget,
             notification.NotificationId
         );
     }
@@ -336,12 +337,13 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private ReferenceDeletedNotification OnReferenceDeleted(ReferenceDeletedNotification notification)
     {
         var parent = LookUpNode(notification.Parent);
+        var deletedTarget = LookUpNode(notification.DeletedTarget);
 
         return new(
             parent,
             notification.Reference,
             notification.Index,
-            notification.DeletedTarget,
+            deletedTarget,
             notification.NotificationId
         );
     }
@@ -349,13 +351,15 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private ReferenceChangedNotification OnReferenceChanged(ReferenceChangedNotification notification)
     {
         var parent = LookUpNode(notification.Parent);
+        var newTarget = LookUpNode(notification.NewTarget);
+        var oldTarget = LookUpNode(notification.OldTarget);
 
         return new(
             parent,
             notification.Reference,
             notification.Index,
-            notification.NewTarget,
-            notification.OldTarget,
+            newTarget,
+            oldTarget,
             notification.NotificationId
         );
     }
@@ -368,8 +372,18 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         if (sharedNodeMap.TryGetValue(nodeId, out var result) && result is T w)
             return w;
 
-        // TODO change to correct exception 
-        throw new NotImplementedException(nodeId);
+        // TODO change to correct exception (UnknownNodeIdException ?)
+        throw new NotImplementedException($"Unknown node with id: {nodeId}");
+    }  
+    
+    private ReferenceTarget LookUpNode(IReferenceTarget target) 
+    {
+        var nodeId = target.Reference.GetId();
+        if (sharedNodeMap.TryGetValue(nodeId, out var result))
+            return new ReferenceTarget(null, result);
+
+        // TODO change to correct exception (UnknownNodeIdException ?)
+        throw new NotImplementedException($"Unknown target node with id: {nodeId}");
     }
 
     private T CloneNode<T>(T node) where T : IReadableNode => (T)SameIdCloner.Clone((INode)node);

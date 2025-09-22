@@ -1,5 +1,7 @@
 ﻿namespace LionWeb.Core.Test.Notification;
 
+using Core.Notification;
+using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
@@ -327,7 +329,7 @@ public class NotificationsTest : NotificationTestsBase
             Documentation = replaced, Shapes = [new Line("l") { ShapeDocs = moved }]
         };
         var clonedPartition = ClonePartition(originalPartition);
-        
+
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
         originalPartition.Documentation = moved;
@@ -345,7 +347,7 @@ public class NotificationsTest : NotificationTestsBase
             Documentation = replaced, Shapes = [new Line("l") { ShapeDocs = moved }]
         };
         var clonedPartition = ClonePartition(originalPartition);
-        
+
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
         replaced.ReplaceWith(moved);
@@ -382,7 +384,7 @@ public class NotificationsTest : NotificationTestsBase
         };
         var originalPartition = new Geometry("a") { Shapes = [line] };
         var clonedPartition = ClonePartition(originalPartition);
-        
+
         CreatePartitionReplicator(clonedPartition, originalPartition);
 
         line.End = line.Start;
@@ -717,6 +719,10 @@ public class NotificationsTest : NotificationTestsBase
         od.Source = circle;
 
         AssertEquals([originalPartition], [clonedPartition]);
+
+        var clonedOffsetDuplicate = (OffsetDuplicate)clonedPartition.Shapes[0];
+        var clonedCircle = (Circle)clonedPartition.Shapes[1];
+        Assert.AreSame(clonedCircle, clonedOffsetDuplicate.Source);
     }
 
     #endregion
@@ -806,6 +812,32 @@ public class NotificationsTest : NotificationTestsBase
         od.AltSource = line;
 
         AssertEquals([originalPartition], [clonedPartition]);
+    }
+
+    #endregion
+
+    #region ReferenceTarget
+
+    [TestMethod]
+    public void ReferenceTarget_refers_to_cloned_node()
+    {
+        var circle = new Circle("circle");
+        var od = new OffsetDuplicate("od");
+        var originalPartition = new Geometry("a") { Shapes = [od, circle] };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        var sharedNodeMap = new SharedNodeMap();
+        sharedNodeMap.RegisterNode(clonedPartition);
+        
+        var notificationMapper = new NotificationToNotificationMapper(sharedNodeMap);
+        
+        var referenceAddedNotification = new ReferenceAddedNotification(originalPartition, 
+            ShapesLanguage.Instance.OffsetDuplicate_source, 0,
+            new ReferenceTarget(null, circle), new NumericNotificationId("refAddedNotification", 0));
+        
+        var notification = notificationMapper.Map(referenceAddedNotification);
+        
+        Assert.AreNotSame(circle, ((ReferenceAddedNotification)notification).NewTarget.Reference);
     }
 
     #endregion
