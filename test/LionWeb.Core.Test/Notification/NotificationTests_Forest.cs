@@ -98,7 +98,7 @@ public class NotificationTests_Forest : NotificationTestsBase
     }
 
     [TestMethod]
-    public void ChildMovedFromOtherContainment_AddAfterSubscribe_Destination_Works()
+    public void ChildMovedFromOtherContainment_AddAfterSubscribe_Destination_Fails()
     {
         // Original and cloned forests are out of sync: their initial states differ.
         var moved = new Circle("moved");
@@ -115,6 +115,7 @@ public class NotificationTests_Forest : NotificationTestsBase
         CreateForestReplicator(clonedForest, originalForest);
 
         originalForest.AddPartitions([destinationPartition]);
+        // Node "moved" is unknown in the cloned forest
         Assert.ThrowsExactly<NotImplementedException>(() => destinationPartition.AddShapes([moved]));
     }
 
