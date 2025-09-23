@@ -105,7 +105,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOnResponse"/></returns>
-    public abstract Task SignOn();
+    public abstract Task SignOn(RepositoryId repositoryId);
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOffRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOffResponse"/></returns>
