@@ -130,46 +130,46 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region Partitions
 
-    private void OnRemoteNewPartition(PartitionAddedNotification partitionAdded) =>
-        SuppressNotificationForwarding(partitionAdded, () =>
+    private void OnRemoteNewPartition(PartitionAddedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var newPartition = partitionAdded.NewPartition;
-            _localForest?.AddPartitions([newPartition], partitionAdded.NotificationId);
+            var newPartition = notification.NewPartition;
+            _localForest?.AddPartitions([newPartition], notification.NotificationId);
         });
 
-    private void OnRemotePartitionDeleted(PartitionDeletedNotification partitionDeleted) =>
-        SuppressNotificationForwarding(partitionDeleted, () =>
+    private void OnRemotePartitionDeleted(PartitionDeletedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localPartition = (IPartitionInstance?)LookupOpt(partitionDeleted.DeletedPartition.GetId());
+            var localPartition = (IPartitionInstance?)LookupOpt(notification.DeletedPartition.GetId());
             if (localPartition != null)
-                _localForest?.RemovePartitions([localPartition], partitionDeleted.NotificationId);
+                _localForest?.RemovePartitions([localPartition], notification.NotificationId);
         });
 
     #endregion
 
     #region Properties
 
-    private void OnRemotePropertyAdded(PropertyAddedNotification propertyAdded) =>
-        SuppressNotificationForwarding(propertyAdded, () =>
+    private void OnRemotePropertyAdded(PropertyAddedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
             Debug.WriteLine(
-                $"Node {propertyAdded.Node.PrintIdentity()}: Setting {propertyAdded.Property} to {propertyAdded.NewValue}");
-            Lookup(propertyAdded.Node.GetId()).Set(propertyAdded.Property, propertyAdded.NewValue,
-                propertyAdded.NotificationId);
+                $"Node {notification.Node.PrintIdentity()}: Setting {notification.Property} to {notification.NewValue}");
+            Lookup(notification.Node.GetId()).Set(notification.Property, notification.NewValue,
+                notification.NotificationId);
         });
 
-    private void OnRemotePropertyDeleted(PropertyDeletedNotification propertyDeleted) =>
-        SuppressNotificationForwarding(propertyDeleted, () =>
+    private void OnRemotePropertyDeleted(PropertyDeletedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            Lookup(propertyDeleted.Node.GetId())
-                .Set(propertyDeleted.Property, null, propertyDeleted.NotificationId);
+            Lookup(notification.Node.GetId())
+                .Set(notification.Property, null, notification.NotificationId);
         });
 
-    private void OnRemotePropertyChanged(PropertyChangedNotification propertyChanged) =>
-        SuppressNotificationForwarding(propertyChanged, () =>
+    private void OnRemotePropertyChanged(PropertyChangedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            Lookup(propertyChanged.Node.GetId()).Set(propertyChanged.Property, propertyChanged.NewValue,
-                propertyChanged.NotificationId);
+            Lookup(notification.Node.GetId()).Set(notification.Property, notification.NewValue,
+                notification.NotificationId);
         });
 
     #endregion
@@ -405,56 +405,56 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region References
 
-    private void OnRemoteReferenceAdded(ReferenceAddedNotification referenceAdded) =>
-        SuppressNotificationForwarding(referenceAdded, () =>
+    private void OnRemoteReferenceAdded(ReferenceAddedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(referenceAdded.Parent.GetId());
-            INode target = Lookup(referenceAdded.NewTarget.Reference.GetId());
-            var newValue = InsertReference(localParent, referenceAdded.Reference, referenceAdded.Index,
+            var localParent = Lookup(notification.Parent.GetId());
+            INode target = Lookup(notification.NewTarget.Reference.GetId());
+            var newValue = InsertReference(localParent, notification.Reference, notification.Index,
                 target);
 
-            localParent.Set(referenceAdded.Reference, newValue, referenceAdded.NotificationId);
+            localParent.Set(notification.Reference, newValue, notification.NotificationId);
         });
 
-    private void OnRemoteReferenceDeleted(ReferenceDeletedNotification referenceDeleted) =>
-        SuppressNotificationForwarding(referenceDeleted, () =>
+    private void OnRemoteReferenceDeleted(ReferenceDeletedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(referenceDeleted.Parent.GetId());
+            var localParent = Lookup(notification.Parent.GetId());
 
             object? newValue = null;
-            if (referenceDeleted.Reference.Multiple)
+            if (notification.Reference.Multiple)
             {
-                var existingTargets = localParent.Get(referenceDeleted.Reference);
+                var existingTargets = localParent.Get(notification.Reference);
                 if (existingTargets is IList l)
                 {
                     var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.RemoveAt(referenceDeleted.Index);
+                    targets.RemoveAt(notification.Index);
                     newValue = targets;
                 }
             }
 
-            localParent.Set(referenceDeleted.Reference, newValue, referenceDeleted.NotificationId);
+            localParent.Set(notification.Reference, newValue, notification.NotificationId);
         });
 
-    private void OnRemoteReferenceChanged(ReferenceChangedNotification referenceChanged) =>
-        SuppressNotificationForwarding(referenceChanged, () =>
+    private void OnRemoteReferenceChanged(ReferenceChangedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(referenceChanged.Parent.GetId());
+            var localParent = Lookup(notification.Parent.GetId());
 
-            object newValue = Lookup(referenceChanged.NewTarget.Reference.GetId());
-            if (referenceChanged.Reference.Multiple)
+            object newValue = Lookup(notification.NewTarget.Reference.GetId());
+            if (notification.Reference.Multiple)
             {
-                var existingTargets = localParent.Get(referenceChanged.Reference);
+                var existingTargets = localParent.Get(notification.Reference);
                 if (existingTargets is IList l)
                 {
                     var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.Insert(referenceChanged.Index, (IReadableNode)newValue);
-                    targets.RemoveAt(referenceChanged.Index + 1);
+                    targets.Insert(notification.Index, (IReadableNode)newValue);
+                    targets.RemoveAt(notification.Index + 1);
                     newValue = targets;
                 }
             }
 
-            localParent.Set(referenceChanged.Reference, newValue, referenceChanged.NotificationId);
+            localParent.Set(notification.Reference, newValue, notification.NotificationId);
         });
 
     private static object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
