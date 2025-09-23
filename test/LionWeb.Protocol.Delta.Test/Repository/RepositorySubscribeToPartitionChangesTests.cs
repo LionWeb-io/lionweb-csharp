@@ -23,6 +23,7 @@ using Core.Test.Languages.Generated.V2023_1.TestLanguage;
 public class SubscribeToPartitionContentsTests : RepositoryTestsBase
 {
     [TestMethod]
+    [Timeout(6000)]
     public void NoSubscription()
     {
         var part = new LinkTestConcept("part");
@@ -32,6 +33,7 @@ public class SubscribeToPartitionContentsTests : RepositoryTestsBase
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public async Task WithSubscription()
     {
         var part = new LinkTestConcept("part");
@@ -46,6 +48,7 @@ public class SubscribeToPartitionContentsTests : RepositoryTestsBase
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public async Task Unsubscribe()
     {
         var aPart = new LinkTestConcept("part");
