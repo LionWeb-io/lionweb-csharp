@@ -31,19 +31,19 @@ public abstract class NotificationTestsBase
     protected T ClonePartition<T>(T node) where T : IPartitionInstance, INode =>
         (T)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
 
-    protected void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
+    protected static void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
 
-    protected void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
+    protected static void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
     {
         List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
     }
     
-    protected void CreateForestReplicator(IForest clonedForest, IForest originalForest)
+    protected static void CreateForestReplicator(IForest clonedForest, IForest originalForest)
     {
         var sharedNodeMap = new SharedNodeMap();
         var notificationMapper = new NotificationMapper(sharedNodeMap);
@@ -53,7 +53,7 @@ public abstract class NotificationTestsBase
         notificationMapper.ConnectTo(replicator);
     }
     
-    protected void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition)
+    protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition)
     {
         var sharedNodeMap = new SharedNodeMap();
         var notificationMapper = new NotificationMapper(sharedNodeMap);
@@ -62,6 +62,23 @@ public abstract class NotificationTestsBase
         var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
         notificationMapper.ConnectTo(replicator);
     }
+    
+    protected static void CreatePartitionReplicator(Geometry clonedPartition, INotification notification)
+    {
+        var sharedNodeMap = new SharedNodeMap();
+        var notificationMapper = new NotificationMapper(sharedNodeMap);
+        var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
+        var notificationProducer = new NotificationProducer();
+        
+        notificationProducer.ConnectTo(notificationMapper);
+        notificationMapper.ConnectTo(replicator);
+        notificationProducer.ProduceNotification(notification);
+    }
+}
+
+internal class NotificationProducer() : NotificationPipeBase(null), INotificationProducer
+{
+    public void ProduceNotification(INotification notification) => Send(notification);
 }
 
 public interface IReplicatorCreator

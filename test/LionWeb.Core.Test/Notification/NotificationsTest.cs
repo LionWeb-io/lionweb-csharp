@@ -2,7 +2,6 @@
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
@@ -666,7 +665,7 @@ public class NotificationsTest : NotificationTestsBase
         var annotationReplacedNotification = new AnnotationReplacedNotification(newAnnotation, replaced, originalPartition, 
             0, new NumericNotificationId("annotationReplaced", 0));
         
-        CreateReplicator(clonedPartition, annotationReplacedNotification);
+        CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
         Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
         Assert.AreEqual(newAnnotation.GetId(), clonedPartition.GetAnnotations()[0].GetId());
@@ -685,7 +684,7 @@ public class NotificationsTest : NotificationTestsBase
         var annotationReplacedNotification = new AnnotationReplacedNotification(newAnnotation, replaced, originalPartition, 
             0, new NumericNotificationId("annotationReplaced", 0));
         
-        CreateReplicator(clonedPartition, annotationReplacedNotification);
+        CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
         Assert.AreEqual(2, clonedPartition.GetAnnotations().Count);
         Assert.AreEqual(newAnnotation.GetId(), clonedPartition.GetAnnotations()[0].GetId());
@@ -705,7 +704,7 @@ public class NotificationsTest : NotificationTestsBase
         var annotationReplacedNotification = new AnnotationReplacedNotification(newAnnotation, replaced, originalPartition, 
             index, new NumericNotificationId("annotationReplaced", 0));
         
-        CreateReplicator(clonedPartition, annotationReplacedNotification);
+        CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
         Assert.AreEqual(2, clonedPartition.GetAnnotations().Count);
         Assert.AreEqual(newAnnotation.GetId(), clonedPartition.GetAnnotations()[index].GetId());
@@ -730,7 +729,7 @@ public class NotificationsTest : NotificationTestsBase
         var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition,oldIndex, 
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
         
-        CreateReplicator(clonedPartition, annotationReplacedNotification);
+        CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
         Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
         Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
@@ -752,7 +751,7 @@ public class NotificationsTest : NotificationTestsBase
         var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition,oldIndex, 
             replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
         
-        CreateReplicator(clonedPartition, annotationReplacedNotification);
+        CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
 
         Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
         Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
@@ -997,22 +996,4 @@ public class NotificationsTest : NotificationTestsBase
     #endregion
 
     #endregion
-    
-    private static void CreateReplicator(Geometry clonedPartition, INotification notification)
-    {
-        var sharedNodeMap = new SharedNodeMap();
-        var notificationMapper = new NotificationMapper(sharedNodeMap);
-        var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
-        var notificationProducer = new NotificationProducer();
-        
-        notificationProducer.ConnectTo(notificationMapper);
-        notificationMapper.ConnectTo(replicator);
-        notificationProducer.ProduceNotification(notification);
-    }
-
-    private class NotificationProducer() : NotificationPipeBase(null), INotificationProducer
-    {
-        public void ProduceNotification(INotification notification) => Send(notification);
-    }
-    
 }
