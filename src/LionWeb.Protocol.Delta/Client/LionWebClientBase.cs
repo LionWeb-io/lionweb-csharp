@@ -28,6 +28,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 {
     private readonly string _name;
     protected readonly LionWebVersions _lionWebVersion;
+    protected readonly List<Language> _languages;
     protected readonly IClientConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
     protected readonly INotificationHandler _replicator;
@@ -56,6 +57,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     )
     {
         _lionWebVersion = lionWebVersion;
+        _languages = languages;
         _name = name;
         _connector = connector;
 
@@ -103,6 +105,24 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     #region Send
 
+    #region Subscription
+    
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToChangingPartitionsRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToChangingPartitionsResponse"/></returns>
+    public abstract Task SubscribeToChangingPartitions(bool creation, bool deletion, bool partitions);
+
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToPartitionContentsRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToPartitionContentsResponse"/></returns>
+    public abstract Task SubscribeToPartitionContents(TargetNode partition);
+
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.UnsubscribeFromPartitionContentsRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.UnsubscribeFromPartitionContentsResponse"/></returns>
+    public abstract Task UnsubscribeFromPartitionContents(TargetNode partition);
+
+    #endregion
+    
+    #region Participation
+
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOnResponse"/></returns>
     public abstract Task SignOn(RepositoryId repositoryId);
@@ -111,10 +131,24 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOffResponse"/></returns>
     public abstract Task SignOff();
 
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.ReconnectRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.ReconnectResponse"/></returns>
+    public abstract Task Reconnect(ParticipationId participationId, EventSequenceNumber lastReceivedSequenceNumber);
+
+    #endregion
+    
+    #region Miscellaneous
+    
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsResponse"/></returns>
     public abstract Task GetAvailableIds(int count);
 
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.ListPartitionsRequest"/>
+    /// <returns>List{<see cref="IPartitionInstance"/>}</returns>
+    public abstract Task ListPartitions();
+
+    #endregion
+    
     protected abstract Task Send(T deltaContent);
 
     private void SendNotificationToRepository(object? sender, INotification? notification)

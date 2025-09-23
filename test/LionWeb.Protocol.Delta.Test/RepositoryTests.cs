@@ -21,14 +21,10 @@ using Client;
 using Core;
 using Core.M1;
 using Core.M3;
-using Core.Notification;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Test.Languages.Generated.V2023_1.TestLanguage;
 using Core.Utilities;
-using Message;
-using Message.Event;
 using Repository;
-using System.Text;
 
 [TestClass]
 public class RepositoryTests
@@ -143,6 +139,72 @@ public class RepositoryTests
         AssertEquals(_aForest.Partitions, _bForest.Partitions);
     }
 
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task ListPartitions_empty()
+    {
+        var partitions = await _aClient.ListPartitions();
+        Assert.AreEqual(0, partitions.Count);
+    }
+
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task ListPartitions_one()
+    {
+        await _aClient.SignOn("myRepo");
+        var part0 = new Geometry("partition");
+        _aForest.AddPartitions([part0]);
+        WaitForReceived(1);
+        var partitions = await _aClient.ListPartitions();
+        Assert.HasCount(1, partitions);
+        
+        AssertEquals(part0, partitions[0]);
+    }
+
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task ListPartitions_two()
+    {
+        var part0 = new Geometry("part0");
+        _aForest.AddPartitions([part0]);
+        WaitForReceived(1);
+
+        var part1 = new Geometry("part1");
+        _bForest.AddPartitions([part1]);
+        WaitForReceived(1);
+        
+        var partitions = await _aClient.ListPartitions();
+        Assert.HasCount(2, partitions);
+        
+        AssertEquals(part0, partitions[0]);
+        AssertEquals(part1, partitions[1]);
+    }
+
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task ListPartitions_noFeatures()
+    {
+        await _aClient.SignOn("myRepo");
+        var containment01 = new LinkTestConcept("cont");
+        var part0 = new LinkTestConcept("partition")
+        {
+            Name = "my partition", Containment_0_1 = containment01, Reference_0_1 = containment01
+        };
+        part0.AddAnnotations([new TestAnnotation("ann")]);
+        _aForest.AddPartitions([part0]);
+        WaitForReceived(1);
+        
+        var partitions = await _aClient.ListPartitions();
+        Assert.HasCount(1, partitions);
+        var actual = (LinkTestConcept)partitions[0];
+        
+        Assert.AreEqual(part0.GetId(), actual.GetId());
+        Assert.AreEqual(part0.GetConcept(), actual.GetConcept());
+        Assert.AreEqual(part0.Name, actual.Name);
+        Assert.IsNull(actual.Containment_0_1);
+        Assert.IsNull(actual.Reference_0_1);
+    }
+
     protected void AssertEquals(IReadableNode? a, IReadableNode? b) =>
         AssertEquals([a], [b]);
 
@@ -160,111 +222,5 @@ public class RepositoryTests
     {
         _aClient.WaitForReceived(numberOfMessages);
         _bClient.WaitForReceived(numberOfMessages);
-    }
-}
-
-class RepositoryConnector : IDeltaRepositoryConnector
-{
-    private readonly DeltaSerializer _deltaSerializer = new();
-    private readonly NotificationToDeltaEventMapper _mapper;
-    private readonly Dictionary<IClientInfo, ClientConnector> _clients = [];
-
-    public RepositoryConnector(LionWebVersions lionWebVersion)
-    {
-        _mapper = new(new ExceptionParticipationIdProvider(), lionWebVersion);
-    }
-
-    public void AddClient(IClientInfo clientInfo, ClientConnector clientConnector) =>
-        _clients[clientInfo] = clientConnector;
-
-    public async Task SendToClient(IClientInfo clientInfo, IDeltaContent content)
-    {
-        if (_clients.TryGetValue(clientInfo, out var clientConnector))
-        {
-            var encoded = Encode(clientInfo, content);
-            clientConnector.MessageFromRepository(encoded);
-        }
-    }
-
-    public async Task SendToAllClients(IDeltaContent content)
-    {
-        foreach ((var clientInfo, var clientConnector) in _clients)
-        {
-            var encoded = Encode(clientInfo, content);
-            clientConnector.MessageFromRepository(encoded);
-        }
-    }
-
-    private byte[] Encode(IClientInfo clientInfo, IDeltaContent content) =>
-        Encode(_deltaSerializer.Serialize(UpdateSequenceNumber(content, clientInfo)));
-
-    private static byte[] Encode(string msg) =>
-        Encoding.UTF8.GetBytes(msg);
-
-    private static IDeltaContent UpdateSequenceNumber(IDeltaContent content, IClientInfo clientInfo)
-    {
-        if (content is IDeltaEvent deltaEvent)
-        {
-            deltaEvent.SequenceNumber = clientInfo.IncrementAndGetSequenceNumber();
-        }
-
-        return content;
-    }
-
-    public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
-
-    public IDeltaContent Convert(INotification notification) =>
-        _mapper.Map(notification);
-
-    public void MessageFromClient(ClientInfo clientInfo, byte[] encoded)
-    {
-        var deltaContent = _deltaSerializer.Deserialize<IDeltaContent>(Encoding.UTF8.GetString(encoded));
-        ReceiveFromClient?.Invoke(this, new DeltaMessageContext(clientInfo, deltaContent));
-    }
-}
-
-class ClientConnector : IDeltaClientConnector
-{
-    private readonly DeltaSerializer _deltaSerializer = new();
-    private readonly NotificationToDeltaCommandMapper _mapper;
-    private RepositoryConnector _repositoryConnector;
-    private ClientInfo _clientInfo;
-
-
-    public ClientConnector(LionWebVersions lionWebVersion)
-    {
-        _mapper = new(new CommandIdProvider(), lionWebVersion);
-    }
-
-    public void Connect(ParticipationId participationId, RepositoryConnector repositoryConnector)
-    {
-        _clientInfo = new ClientInfo { ParticipationId = participationId };
-        repositoryConnector.AddClient(_clientInfo, this);
-        _repositoryConnector = repositoryConnector;
-    }
-
-    public Task SendToRepository(IDeltaContent content)
-    {
-        var encoded = Encode(content);
-        _repositoryConnector.MessageFromClient(_clientInfo, encoded);
-
-        return Task.CompletedTask;
-    }
-
-    private byte[] Encode(IDeltaContent content) =>
-        Encode(_deltaSerializer.Serialize(content));
-
-    private static byte[] Encode(string msg) =>
-        Encoding.UTF8.GetBytes(msg);
-
-    public event EventHandler<IDeltaContent>? ReceiveFromRepository;
-
-    public IDeltaContent Convert(INotification notification) =>
-        _mapper.Map(notification);
-
-    public void MessageFromRepository(byte[] encoded)
-    {
-        var deltaContent = _deltaSerializer.Deserialize<IDeltaContent>(Encoding.UTF8.GetString(encoded));
-        ReceiveFromRepository?.Invoke(this, deltaContent);
     }
 }

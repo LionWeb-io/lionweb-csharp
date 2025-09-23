@@ -161,6 +161,31 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
     #region Send
 
+    #region Subscription
+
+    /// <inheritdoc />
+    public override async Task<SubscribeToChangingPartitionsResponse> SubscribeToChangingPartitions(bool creation,
+        bool deletion, bool partitions) =>
+        await Query<SubscribeToChangingPartitionsResponse, SubscribeToChangingPartitionsRequest>(
+            new SubscribeToChangingPartitionsRequest(creation, deletion, partitions, QueryId(), null));
+
+
+    /// <inheritdoc />
+    public override async Task<SubscribeToPartitionContentsResponse>
+        SubscribeToPartitionContents(TargetNode partition) =>
+        await Query<SubscribeToPartitionContentsResponse, SubscribeToPartitionContentsRequest>(
+            new SubscribeToPartitionContentsRequest(partition, QueryId(), null));
+
+    /// <inheritdoc />
+    public override async Task<UnsubscribeFromPartitionContentsResponse> UnsubscribeFromPartitionContents(
+        TargetNode partition) =>
+        await Query<UnsubscribeFromPartitionContentsResponse, UnsubscribeFromPartitionContentsRequest>(
+            new UnsubscribeFromPartitionContentsRequest(partition, QueryId(), null));
+
+    #endregion
+
+    #region Participation
+
     /// <inheritdoc />
     public override async Task<SignOnResponse> SignOn(RepositoryId repositoryId)
     {
@@ -173,12 +198,37 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
     /// <inheritdoc />
     public override async Task<SignOffResponse> SignOff() =>
-        await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(IdUtils.NewId(), null));
+        await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(QueryId(), null));
+
+    /// <inheritdoc />
+    public override async Task<ReconnectResponse> Reconnect(ParticipationId participationId,
+        EventSequenceNumber lastReceivedSequenceNumber) =>
+        await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(participationId,
+            lastReceivedSequenceNumber, QueryId(), null));
+
+    #endregion
+
+    #region Miscellaneous
 
     /// <inheritdoc />
     public override async Task<GetAvailableIdsResponse> GetAvailableIds(int count) =>
         await Query<GetAvailableIdsResponse, GetAvailableIdsRequest>(
-            new GetAvailableIdsRequest(count, IdUtils.NewId(), null));
+            new GetAvailableIdsRequest(count, QueryId(), null));
+
+    /// <inheritdoc />
+    public override async Task<List<IPartitionInstance>> ListPartitions()
+    {
+        var response = await Query<ListPartitionsResponse, ListPartitionsRequest>(new ListPartitionsRequest(QueryId(), null));
+        Log($"ListPartitions response: {response}");
+        var deserializer = new DeserializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .WithLanguages(_languages)
+            .WithHandler(new NoFeaturesDeserializationHandler())
+            .Build();
+        return deserializer.Deserialize(response.Partitions.Nodes).Cast<IPartitionInstance>().ToList();
+    }
+    
+    #endregion
 
     private async Task<TResponse> Query<TResponse, TRequest>(TRequest request)
         where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest
@@ -211,6 +261,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     }
 
     #endregion
+
+    private NodeId QueryId() => IdUtils.NewId();
 }
 
 public class CommandIdProvider : ICommandIdProvider
@@ -219,4 +271,17 @@ public class CommandIdProvider : ICommandIdProvider
 
     /// <inheritdoc />
     public string Create() => (++_nextId).ToString();
+}
+
+internal class NoFeaturesDeserializationHandler : DeserializerExceptionHandler
+{
+    public override IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) =>
+        null;
+
+    public override IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, string? resolveInfo,
+        Feature reference, IReadableNode node) =>
+        null;
+
+    public override IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
+        null;
 }
