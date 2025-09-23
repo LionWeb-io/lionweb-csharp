@@ -50,6 +50,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
             AnnotationDeletedNotification a => OnAnnotationDeleted(a),
+            AnnotationReplacedNotification a => OnAnnotationReplaced(a),
             AnnotationMovedFromOtherParentNotification a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedInSameParentNotification a => OnAnnotationMovedInSameParent(a),
             ReferenceAddedNotification a => OnReferenceAdded(a),
@@ -114,7 +115,6 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     }
 
     #endregion
-
 
     #region Children
 
@@ -256,7 +256,6 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
     #endregion
 
-
     #region Annotations
 
     private AnnotationAddedNotification OnAnnotationAdded(AnnotationAddedNotification notification)
@@ -283,6 +282,19 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             notification.Index,
             notification.NotificationId
         );
+    }
+
+    private AnnotationReplacedNotification OnAnnotationReplaced(AnnotationReplacedNotification notification)
+    {
+        var newAnnotation = CloneNode(notification.NewAnnotation);
+        var parent = LookUpNode(notification.Parent);
+
+        return new AnnotationReplacedNotification(
+            newAnnotation,
+            notification.ReplacedAnnotation,
+            parent,
+            notification.Index,
+            notification.NotificationId);
     }
 
     private AnnotationMovedFromOtherParentNotification OnAnnotationMovedFromOtherParent(
@@ -374,9 +386,9 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
         // TODO change to correct exception (UnknownNodeIdException ?)
         throw new NotImplementedException($"Unknown node with id: {nodeId}");
-    }  
-    
-    private ReferenceTarget LookUpNode(IReferenceTarget target) 
+    }
+
+    private ReferenceTarget LookUpNode(IReferenceTarget target)
     {
         var nodeId = target.Reference.GetId();
         if (sharedNodeMap.TryGetValue(nodeId, out var result))

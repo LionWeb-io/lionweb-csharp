@@ -2,6 +2,7 @@
 
 using Core.Notification;
 using Core.Notification.Partition;
+using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
@@ -650,6 +651,65 @@ public class NotificationsTest : NotificationTestsBase
 
     #endregion
 
+    #region AnnotationReplaced
+    
+    [TestMethod]
+    public void AnnotationReplaced_Multiple_Only()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([replaced]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var newAnnotation = new BillOfMaterials("new");
+        var annotationReplacedNotification = new AnnotationReplacedNotification(newAnnotation, replaced, originalPartition, 
+            0, new NumericNotificationId("annotationReplaced", 0));
+        
+        CreateReplicator(clonedPartition, annotationReplacedNotification);
+
+        Assert.AreEqual(newAnnotation.GetId(), clonedPartition.GetAnnotations()[0].GetId());
+    }
+
+    [TestMethod]
+    public void AnnotationReplaced_Multiple_First()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([replaced, new BillOfMaterials("bof")]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var newAnnotation = new BillOfMaterials("new");
+        var annotationReplacedNotification = new AnnotationReplacedNotification(newAnnotation, replaced, originalPartition, 
+            0, new NumericNotificationId("annotationReplaced", 0));
+        
+        CreateReplicator(clonedPartition, annotationReplacedNotification);
+
+        Assert.AreEqual(newAnnotation.GetId(), clonedPartition.GetAnnotations()[0].GetId());
+    }
+
+    [TestMethod]
+    public void AnnotationReplaced_Multiple_Last()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([new BillOfMaterials("bof"), replaced]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var index = 1;
+        var newAnnotation = new BillOfMaterials("new");
+        var annotationReplacedNotification = new AnnotationReplacedNotification(newAnnotation, replaced, originalPartition, 
+            index, new NumericNotificationId("annotationReplaced", 0));
+        
+        CreateReplicator(clonedPartition, annotationReplacedNotification);
+
+        Assert.AreEqual(newAnnotation.GetId(), clonedPartition.GetAnnotations()[index].GetId());
+    }
+    
+    #endregion
+
     #endregion
 
     #region References
@@ -886,4 +946,22 @@ public class NotificationsTest : NotificationTestsBase
     #endregion
 
     #endregion
+    
+    private static void CreateReplicator(Geometry clonedPartition, INotification notification)
+    {
+        var sharedNodeMap = new SharedNodeMap();
+        var notificationMapper = new NotificationMapper(sharedNodeMap);
+        var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
+        var notificationProducer = new NotificationProducer();
+        
+        notificationProducer.ConnectTo(notificationMapper);
+        notificationMapper.ConnectTo(replicator);
+        notificationProducer.ProduceNotification(notification);
+    }
+
+    private class NotificationProducer() : NotificationPipeBase(null), INotificationProducer
+    {
+        public void ProduceNotification(INotification notification) => Send(notification);
+    }
+    
 }

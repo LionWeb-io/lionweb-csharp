@@ -99,6 +99,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             case AnnotationDeletedNotification e:
                 OnRemoteAnnotationDeleted(e);
                 break;
+            case AnnotationReplacedNotification e:
+                OnRemoteAnnotationReplaced(e);
+                break;
             case AnnotationMovedFromOtherParentNotification e:
                 OnRemoteAnnotationMovedFromOtherParent(e);
                 break;
@@ -335,37 +338,45 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region Annotations
 
-    private void OnRemoteAnnotationAdded(AnnotationAddedNotification annotationAdded) =>
-        SuppressNotificationForwarding(annotationAdded, () =>
+    private void OnRemoteAnnotationAdded(AnnotationAddedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(annotationAdded.Parent.GetId());
-            var annotation = (INode)annotationAdded.NewAnnotation;
-            localParent.InsertAnnotations(annotationAdded.Index, [annotation], annotationAdded.NotificationId);
+            var localParent = Lookup(notification.Parent.GetId());
+            var annotation = (INode)notification.NewAnnotation;
+            localParent.InsertAnnotations(notification.Index, [annotation], notification.NotificationId);
         });
 
-    private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification annotationDeleted) =>
-        SuppressNotificationForwarding(annotationDeleted, () =>
+    private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(annotationDeleted.Parent.GetId());
-            var localDeleted = Lookup(annotationDeleted.DeletedAnnotation.GetId());
-            localParent.RemoveAnnotations([localDeleted], annotationDeleted.NotificationId);
+            var localParent = Lookup(notification.Parent.GetId());
+            var localDeleted = Lookup(notification.DeletedAnnotation.GetId());
+            localParent.RemoveAnnotations([localDeleted], notification.NotificationId);
         });
 
-    private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification annotationMoved) =>
-        SuppressNotificationForwarding(annotationMoved, () =>
+    private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localNewParent = Lookup(annotationMoved.NewParent.GetId());
-            var moved = LookupOpt(annotationMoved.MovedAnnotation.GetId()) ??
-                        (INode)annotationMoved.MovedAnnotation;
-            localNewParent.InsertAnnotations(annotationMoved.NewIndex, [moved], annotationMoved.NotificationId);
+            var localParent = Lookup(notification.Parent.GetId());
+            var newAnnotation = (INode)notification.NewAnnotation;
+            localParent.InsertAnnotations(notification.Index, [newAnnotation], notification.NotificationId);
         });
 
-    private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification annotationMoved) =>
-        SuppressNotificationForwarding(annotationMoved, () =>
+    private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(annotationMoved.Parent.GetId());
-            INode nodeToInsert = Lookup(annotationMoved.MovedAnnotation.GetId());
-            localParent.InsertAnnotations(annotationMoved.NewIndex, [nodeToInsert], annotationMoved.NotificationId);
+            var localNewParent = Lookup(notification.NewParent.GetId());
+            var moved = LookupOpt(notification.MovedAnnotation.GetId()) ??
+                        (INode)notification.MovedAnnotation;
+            localNewParent.InsertAnnotations(notification.NewIndex, [moved], notification.NotificationId);
+        });
+
+    private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
+        {
+            var localParent = Lookup(notification.Parent.GetId());
+            INode nodeToInsert = Lookup(notification.MovedAnnotation.GetId());
+            localParent.InsertAnnotations(notification.NewIndex, [nodeToInsert], notification.NotificationId);
         });
 
     #endregion
