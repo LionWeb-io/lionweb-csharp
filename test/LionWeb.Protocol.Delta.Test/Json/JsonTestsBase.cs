@@ -341,8 +341,11 @@ public abstract class JsonTestsBase
 
     #region Partitions
 
-    protected static PartitionAdded CreatePartitionAdded() =>
-        new(Chunk(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+    protected static PartitionAdded CreatePartitionAdded()
+    {
+        var chunk = Chunk();
+        return new(chunk, chunk.Nodes.First().Id, Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };
+    }
 
     protected static PartitionDeleted CreatePartitionDeleted() =>
         new(TargetNode(), Descendants(), Origin(), ProtocolMessages()) { SequenceNumber = Sequence() };

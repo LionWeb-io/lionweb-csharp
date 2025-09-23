@@ -20,6 +20,7 @@ namespace LionWeb.Protocol.Delta.Repository;
 using Core;
 using Core.M1;
 using Core.M3;
+using Core.Notification.Forest;
 using Message;
 using Message.Command;
 using Message.Event;
@@ -28,6 +29,7 @@ using Message.Query;
 public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
     private readonly DeltaProtocolCommandReceiver _commandReceiver;
+    private readonly SerializerBuilder _serializerBuilder;
 
     public LionWebRepository(
         LionWebVersions lionWebVersion,
@@ -52,6 +54,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         );
 
         _commandReceiver.ConnectTo(_replicator);
+        _serializerBuilder = new SerializerBuilder()
+            .WithLionWebVersion(_lionWebVersion);
     }
 
     /// <inheritdoc />
@@ -78,7 +82,20 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             {
                 case IDeltaCommand command:
                     Log($"received command: {command.GetType()}({command.CommandId})");
-                    _commandReceiver.Receive(command);
+                    var notification = _commandReceiver.Map(command);
+                    if (notification is PartitionAddedNotification partitionAdded)
+                    {
+                        messageContext.ClientInfo.SubscribedPartitions.Add(partitionAdded.NewPartition.GetId());
+                    }
+
+                    _commandReceiver.ProduceNotification(notification);
+
+                    if (notification is PartitionDeletedNotification partitionDeleted)
+                    {
+                        messageContext.ClientInfo.SubscribedPartitions.Remove(partitionDeleted.DeletedPartition
+                            .GetId());
+                    }
+
                     break;
 
                 case IDeltaQueryRequest request:
@@ -122,7 +139,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 return SubscribeToChangingPartitions(subscribeToChangingPartitionsRequest);
 
             case SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest:
-                return SubscribeToPartitionContents(subscribeToPartitionContentsRequest);
+                return SubscribeToPartitionContents(subscribeToPartitionContentsRequest, clientInfo);
 
             case UnsubscribeFromPartitionContentsRequest unsubscribeFromPartitionContentsRequest:
                 return UnsubscribeFromPartitionContents(unsubscribeFromPartitionContentsRequest);
@@ -139,11 +156,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 
     private IDeltaQueryResponse ListPartitions(ListPartitionsRequest listPartitionsRequest)
     {
-        var serializer = new SerializerBuilder()
-            .WithLionWebVersion(_lionWebVersion)
-            .Build();
-
-        var chunk = new DeltaSerializationChunk(serializer.Serialize(_forest.Partitions).ToArray());
+        DeltaSerializationChunk chunk = Serialize(_forest.Partitions);
         return new ListPartitionsResponse(chunk, listPartitionsRequest.QueryId, null);
     }
 
@@ -161,9 +174,19 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         new SubscribeToChangingPartitionsResponse(subscribeToChangingPartitionsRequest.QueryId, null);
 
     private IDeltaQueryResponse SubscribeToPartitionContents(
-        SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest) =>
-        new SubscribeToPartitionContentsResponse(new DeltaSerializationChunk([]),
-            subscribeToPartitionContentsRequest.QueryId, null);
+        SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest, IClientInfo clientInfo)
+    {
+        if (clientInfo.SubscribedPartitions.Add(subscribeToPartitionContentsRequest.Partition) &&
+            SharedNodeMap.TryGetPartition(subscribeToPartitionContentsRequest.Partition, out var partition))
+        {
+            return new SubscribeToPartitionContentsResponse(
+                Serialize(M1Extensions.Descendants<IReadableNode>(partition, true, true)),
+                subscribeToPartitionContentsRequest.QueryId, null);
+        }
+
+        throw new NotImplementedException();
+    }
+
 
     private IDeltaQueryResponse UnsubscribeFromPartitionContents(
         UnsubscribeFromPartitionContentsRequest unsubscribeFromPartitionContentsRequest) =>
@@ -192,12 +215,21 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     {
         try
         {
+            HashSet<NodeId> affectedPartitions = [];
+            
             switch (deltaContent)
             {
                 case IDeltaEvent deltaEvent:
                     var commandSource = deltaEvent is { OriginCommands: { } cmds }
                         ? cmds.First()
                         : null;
+
+                    foreach (var affectedNode in deltaEvent.AffectedNodes)
+                    {
+                        if (SharedNodeMap.TryGetPartition(affectedNode, out var partition))
+                            affectedPartitions.Add(partition.GetId());
+                    }
+                    
                     Log(
                         $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})",
                         true);
@@ -207,8 +239,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                     Log($"sending: {deltaContent.GetType().Name}", true);
                     break;
             }
-
-            await _connector.SendToAllClients(deltaContent);
+            
+            await _connector.SendToAllClients(deltaContent, affectedPartitions);
         } catch (Exception e)
         {
             Log(e.ToString());
@@ -217,6 +249,13 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     }
 
     #endregion
+
+    private DeltaSerializationChunk Serialize(IEnumerable<IReadableNode> nodes)
+    {
+        var serializer = _serializerBuilder.Build();
+        var chunk = new DeltaSerializationChunk(serializer.Serialize(nodes).ToArray());
+        return chunk;
+    }
 }
 
 public class ExceptionParticipationIdProvider : IParticipationIdProvider

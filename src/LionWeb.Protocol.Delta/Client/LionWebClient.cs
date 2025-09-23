@@ -20,12 +20,14 @@ namespace LionWeb.Protocol.Delta.Client;
 using Core;
 using Core.M1;
 using Core.M3;
+using Core.Notification;
 using Core.Utilities;
 using Message;
 using Message.Command;
 using Message.Event;
 using Message.Query;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 
 public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
@@ -38,6 +40,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     #region EventSequenceNumber
 
     private EventSequenceNumber _nextEventSequenceNumber = 0;
+    private DeserializerBuilder _deserializerBuilder;
     private void IncrementEventSequenceNumber() => Interlocked.Increment(ref _nextEventSequenceNumber);
     private EventSequenceNumber EventSequenceNumber => Interlocked.Read(ref _nextEventSequenceNumber);
 
@@ -51,18 +54,17 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         IClientConnector<IDeltaContent> connector
     ) : base(lionWebVersion, languages, name, forest, connector)
     {
-        DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
-                .WithLionWebVersion(lionWebVersion)
-                .WithLanguages(languages)
-                .WithHandler(new ReceiverDeserializerHandler())
-            ;
+        _deserializerBuilder = new DeserializerBuilder()
+            .WithLionWebVersion(lionWebVersion)
+            .WithLanguages(languages)
+            .WithHandler(new ReceiverDeserializerHandler());
 
         SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
         _eventReceiver = new DeltaProtocolEventReceiver(
             SharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder
+            _deserializerBuilder
         );
 
         _eventReceiver.ConnectTo(_replicator);
@@ -171,10 +173,27 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
 
     /// <inheritdoc />
-    public override async Task<SubscribeToPartitionContentsResponse>
-        SubscribeToPartitionContents(TargetNode partition) =>
-        await Query<SubscribeToPartitionContentsResponse, SubscribeToPartitionContentsRequest>(
+    public override async Task<IPartitionInstance> SubscribeToPartitionContents(TargetNode partition)
+    {
+        var response = await Query<SubscribeToPartitionContentsResponse, SubscribeToPartitionContentsRequest>(
             new SubscribeToPartitionContentsRequest(partition, QueryId(), null));
+
+        var deserializer = _deserializerBuilder.Build();
+        deserializer.RegisterDependentNodes(_forest.Descendants(true));
+        var partitionInstances = deserializer
+            .Deserialize(response.Contents.Nodes)
+            .Cast<IPartitionInstance>()
+            .ToList();
+        
+        Debug.Assert(partitionInstances.Count == 1);
+        var result = partitionInstances.First();
+
+        var notificationId = new NotificationIdProvider(this).CreateNotificationId();
+        _ownNotifications[notificationId] = true;
+        
+        _forest.AddPartitions([result], notificationId);
+        return result;
+    }
 
     /// <inheritdoc />
     public override async Task<UnsubscribeFromPartitionContentsResponse> UnsubscribeFromPartitionContents(
@@ -218,7 +237,8 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     /// <inheritdoc />
     public override async Task<List<IPartitionInstance>> ListPartitions()
     {
-        var response = await Query<ListPartitionsResponse, ListPartitionsRequest>(new ListPartitionsRequest(QueryId(), null));
+        var response =
+            await Query<ListPartitionsResponse, ListPartitionsRequest>(new ListPartitionsRequest(QueryId(), null));
         Log($"ListPartitions response: {response}");
         var deserializer = new DeserializerBuilder()
             .WithLionWebVersion(_lionWebVersion)
@@ -227,7 +247,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             .Build();
         return deserializer.Deserialize(response.Partitions.Nodes).Cast<IPartitionInstance>().ToList();
     }
-    
+
     #endregion
 
     private async Task<TResponse> Query<TResponse, TRequest>(TRequest request)
@@ -263,25 +283,4 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     #endregion
 
     private NodeId QueryId() => IdUtils.NewId();
-}
-
-public class CommandIdProvider : ICommandIdProvider
-{
-    private int _nextId = 0;
-
-    /// <inheritdoc />
-    public string Create() => (++_nextId).ToString();
-}
-
-internal class NoFeaturesDeserializationHandler : DeserializerExceptionHandler
-{
-    public override IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) =>
-        null;
-
-    public override IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, string? resolveInfo,
-        Feature reference, IReadableNode node) =>
-        null;
-
-    public override IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
-        null;
 }

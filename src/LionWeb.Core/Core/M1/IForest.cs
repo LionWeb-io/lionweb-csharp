@@ -163,3 +163,11 @@ public class Forest : IForest
         }
     }
 }
+
+public static class ForestExtensions
+{
+    public static IEnumerable<IReadableNode> Descendants(this IForest forest, bool includeAnnotations = true) =>
+        forest
+            .Partitions
+            .SelectMany(p => M1Extensions.Descendants(p, true, includeAnnotations));
+}

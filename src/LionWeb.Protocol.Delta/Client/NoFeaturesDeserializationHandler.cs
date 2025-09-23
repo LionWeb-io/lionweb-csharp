@@ -15,34 +15,21 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta;
+namespace LionWeb.Protocol.Delta.Client;
 
-using Core.Notification;
-using Core.Notification.Pipe;
-using Message;
+using Core;
+using Core.M1;
+using Core.M3;
 
-public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationPipeBase(null), INotificationProducer
-    where TContent : IDeltaContent
+internal class NoFeaturesDeserializationHandler : DeserializerExceptionHandler
 {
-    /// <inheritdoc />
-    public override void Dispose()
-    {
-        GC.SuppressFinalize(this);
-    }
+    public override IWritableNode? UnresolvableChild(ICompressedId childId, Feature containment, IReadableNode node) =>
+        null;
 
-    #region Remote
+    public override IReadableNode? UnresolvableReferenceTarget(ICompressedId? targetId, string? resolveInfo,
+        Feature reference, IReadableNode node) =>
+        null;
 
-    public void Receive(TContent deltaContent)
-    {
-        var notification = Map(deltaContent);
-        ProduceNotification(notification);
-    }
-
-    public abstract INotification Map(TContent content);
-
-    #endregion
-
-    /// <inheritdoc />
-    public void ProduceNotification(INotification notification) =>
-        Send(notification);
+    public override IWritableNode? UnresolvableAnnotation(ICompressedId annotationId, IReadableNode node) =>
+        null;
 }

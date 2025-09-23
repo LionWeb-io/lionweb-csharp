@@ -40,7 +40,7 @@ internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
         return Task.CompletedTask;
     }
 
-    public Task SendToAllClients(IDeltaContent content)
+    public Task SendToAllClients(IDeltaContent content, HashSet<NodeId> affectedPartitions)
     {
         Sender?.Invoke(content);
         return Task.CompletedTask;
