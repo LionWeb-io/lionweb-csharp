@@ -43,4 +43,13 @@ public record ClientInfo : IClientInfo
 
     /// <inheritdoc />
     public HashSet<NodeId> SubscribedPartitions { get; } = [];
+
+    /// <inheritdoc />
+    public bool NotifyAboutParitionCreation { get; set; }
+
+    /// <inheritdoc />
+    public bool NotifyAboutParitionDeletion { get; set; }
+
+    /// <inheritdoc />
+    public bool SubscribeCreatedParitions { get; set; }
 }

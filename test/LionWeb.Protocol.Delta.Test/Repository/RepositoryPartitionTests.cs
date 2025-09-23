@@ -50,10 +50,11 @@ public class RepositoryPartitionTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task RemovePartition()
     {
+        await _bClient.SubscribeToChangingPartitions(true, true, true);
+        
         _aForest.AddPartitions([new Geometry("geo")]);
-        await _bClient.SubscribeToPartitionContents("geo");
         WaitForReceived(1);
-
+        
         var bLink = new LinkTestConcept("link");
         _bForest.AddPartitions([bLink]);
         await _aClient.SubscribeToPartitionContents("link");

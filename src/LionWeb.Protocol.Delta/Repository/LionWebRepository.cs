@@ -136,7 +136,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 return Reconnect(reconnectRequest);
 
             case SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest:
-                return SubscribeToChangingPartitions(subscribeToChangingPartitionsRequest);
+                return SubscribeToChangingPartitions(subscribeToChangingPartitionsRequest, clientInfo);
 
             case SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest:
                 return SubscribeToPartitionContents(subscribeToPartitionContentsRequest, clientInfo);
@@ -170,8 +170,14 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         new ReconnectResponse(-1, reconnectRequest.QueryId, null);
 
     private IDeltaQueryResponse SubscribeToChangingPartitions(
-        SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest) =>
-        new SubscribeToChangingPartitionsResponse(subscribeToChangingPartitionsRequest.QueryId, null);
+        SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest, IClientInfo clientInfo)
+    {
+        clientInfo.NotifyAboutParitionCreation = subscribeToChangingPartitionsRequest.Creation;
+        clientInfo.NotifyAboutParitionDeletion = subscribeToChangingPartitionsRequest.Deletion;
+        clientInfo.SubscribeCreatedParitions = subscribeToChangingPartitionsRequest.Partitions;
+
+        return new SubscribeToChangingPartitionsResponse(subscribeToChangingPartitionsRequest.QueryId, null);
+    }
 
     private IDeltaQueryResponse SubscribeToPartitionContents(
         SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest, IClientInfo clientInfo)
@@ -193,8 +199,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     {
         if (clientInfo.SubscribedPartitions.Remove(unsubscribeFromPartitionContentsRequest.Partition))
             return new UnsubscribeFromPartitionContentsResponse(unsubscribeFromPartitionContentsRequest.QueryId,
-            null);
-        
+                null);
+
         throw new NotImplementedException();
     }
 
@@ -221,7 +227,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         try
         {
             HashSet<NodeId> affectedPartitions = [];
-            
+
             switch (deltaContent)
             {
                 case IDeltaEvent deltaEvent:
@@ -234,7 +240,10 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                         if (SharedNodeMap.TryGetPartition(affectedNode, out var partition))
                             affectedPartitions.Add(partition.GetId());
                     }
-                    
+
+                    if (deltaEvent is PartitionDeleted d)
+                        affectedPartitions.Add(d.DeletedPartition);
+
                     Log(
                         $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})",
                         true);
@@ -244,7 +253,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                     Log($"sending: {deltaContent.GetType().Name}", true);
                     break;
             }
-            
+
             await _connector.SendToAllClients(deltaContent, affectedPartitions);
         } catch (Exception e)
         {

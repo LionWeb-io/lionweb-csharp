@@ -29,7 +29,9 @@ class RepositoryConnector : IDeltaRepositoryConnector
 {
     private readonly DeltaSerializer _deltaSerializer = new();
     private readonly NotificationToDeltaEventMapper _mapper;
-    private readonly Dictionary<IClientInfo, ClientConnector> _clients = new Dictionary<IClientInfo, ClientConnector>(new ClientInfoComparer());
+
+    private readonly Dictionary<IClientInfo, ClientConnector> _clients =
+        new Dictionary<IClientInfo, ClientConnector>(new ClientInfoComparer());
 
     private class ClientInfoComparer : IEqualityComparer<IClientInfo>
     {
@@ -59,7 +61,24 @@ class RepositoryConnector : IDeltaRepositoryConnector
     {
         foreach ((var clientInfo, var clientConnector) in _clients)
         {
-            if (affectedPartitions.Count == 0 || clientInfo.SubscribedPartitions.Overlaps(affectedPartitions))
+            var shouldSend = false;
+
+            if ((clientInfo.NotifyAboutParitionDeletion ||
+                      content.InternalParticipationId == clientInfo.ParticipationId) && content is PartitionDeleted)
+                shouldSend = true;
+            else if (clientInfo.NotifyAboutParitionCreation && content is PartitionAdded)
+                shouldSend = true;
+            
+            if (clientInfo.SubscribedPartitions.Overlaps(affectedPartitions))
+                shouldSend = true;
+
+            if (clientInfo.SubscribeCreatedParitions && content is PartitionAdded a)
+                clientInfo.SubscribedPartitions.Add(a.AffectedNode);
+            
+            if (content is PartitionDeleted d)
+                clientInfo.SubscribedPartitions.Remove(d.DeletedPartition);
+            
+            if (shouldSend)
             {
                 var encoded = Encode(clientInfo, content);
                 clientConnector.MessageFromRepository(encoded);
@@ -85,8 +104,13 @@ class RepositoryConnector : IDeltaRepositoryConnector
 
     public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
 
-    public IDeltaContent Convert(INotification notification) =>
-        _mapper.Map(notification);
+    public IDeltaContent Convert(INotification notification)
+    {
+        var result = _mapper.Map(notification);
+        if (notification.NotificationId is ParticipationNotificationId p && result.RequiresParticipationId)
+            result.InternalParticipationId = p.ParticipationId;
+        return result;
+    }
 
     public void MessageFromClient(ClientInfo clientInfo, byte[] encoded)
     {

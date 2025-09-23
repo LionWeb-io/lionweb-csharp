@@ -131,7 +131,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemotePartitionDeleted(PartitionDeletedNotification partitionDeleted) =>
         SuppressNotificationForwarding(partitionDeleted, () =>
         {
-            var localPartition = (IPartitionInstance?)LookupOpt(partitionDeleted.DeletedPartition.GetId());
+            var localPartition = (IPartitionInstance?)LookupOpt(partitionDeleted.DeletedPartition?.GetId());
             if (localPartition != null)
                 _localForest?.RemovePartitions([localPartition], partitionDeleted.NotificationId);
         });
@@ -452,8 +452,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private INode Lookup(NodeId nodeId) =>
         (INode)_sharedNodeMap[nodeId];
 
-    private INode? LookupOpt(NodeId nodeId) =>
-        _sharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
+    private INode? LookupOpt(NodeId? nodeId) =>
+        nodeId == null ? null : _sharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
 
     /// Uses <see cref="IdFilteringNotificationFilter"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
     protected virtual void SuppressNotificationForwarding(INotification notification, Action action)
