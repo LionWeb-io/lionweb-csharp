@@ -668,6 +668,7 @@ public class NotificationsTest : NotificationTestsBase
         
         CreateReplicator(clonedPartition, annotationReplacedNotification);
 
+        Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
         Assert.AreEqual(newAnnotation.GetId(), clonedPartition.GetAnnotations()[0].GetId());
     }
 
@@ -686,6 +687,7 @@ public class NotificationsTest : NotificationTestsBase
         
         CreateReplicator(clonedPartition, annotationReplacedNotification);
 
+        Assert.AreEqual(2, clonedPartition.GetAnnotations().Count);
         Assert.AreEqual(newAnnotation.GetId(), clonedPartition.GetAnnotations()[0].GetId());
     }
 
@@ -705,9 +707,58 @@ public class NotificationsTest : NotificationTestsBase
         
         CreateReplicator(clonedPartition, annotationReplacedNotification);
 
+        Assert.AreEqual(2, clonedPartition.GetAnnotations().Count);
         Assert.AreEqual(newAnnotation.GetId(), clonedPartition.GetAnnotations()[index].GetId());
     }
     
+    #endregion
+
+    #region AnnotationMovedAndReplacedInSameParent
+
+    [TestMethod]
+    public void AnnotationMovedAndReplacedInSameParent_Forward()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([moved, replaced]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var newIndex = 1;
+        var oldIndex = 0;
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition,oldIndex, 
+            replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
+        
+        CreateReplicator(clonedPartition, annotationReplacedNotification);
+
+        Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
+    }
+    
+    
+    [TestMethod]
+    public void AnnotationMovedAndReplacedInSameParent_Backward()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([replaced, moved]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var newIndex = 0;
+        var oldIndex = 1;
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition,oldIndex, 
+            replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
+        
+        CreateReplicator(clonedPartition, annotationReplacedNotification);
+
+        Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
+    }
+    
+
     #endregion
 
     #endregion
