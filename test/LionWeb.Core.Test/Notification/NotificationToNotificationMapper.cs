@@ -55,7 +55,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             ReferenceAddedNotification a => OnReferenceAdded(a),
             ReferenceDeletedNotification a => OnReferenceDeleted(a),
             ReferenceChangedNotification a => OnReferenceChanged(a),
-            _ => throw new NotImplementedException(notification.GetType().Name)
+            _ => throw new ArgumentException($"{notification.GetType().Name} is not implemented")
         };
 
     #region Partitions
