@@ -81,19 +81,10 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                     _commandReceiver.Receive(command);
                     break;
 
-                case GetAvailableIdsRequest idsRequest:
-                    Log(
-                        $"received {nameof(GetAvailableIdsRequest)} for {messageContext.ClientInfo}: {idsRequest})");
-                    await Send(messageContext.ClientInfo,
-                        new GetAvailableIdsResponse(GetFreeNodeIds(idsRequest.count).ToArray(), idsRequest.QueryId,
-                            null));
-                    break;
-
-                case SignOnRequest signOnRequest:
-                    Log(
-                        $"received {nameof(SignOnRequest)} for {messageContext.ClientInfo}: {signOnRequest})");
-                    await Send(messageContext.ClientInfo,
-                        new SignOnResponse(messageContext.ClientInfo.ParticipationId, signOnRequest.QueryId, null));
+                case IDeltaQueryRequest request:
+                    Log($"received query: {request.GetType()}({request.QueryId}) for for {messageContext.ClientInfo}");
+                    var response = HandleRequest(request, messageContext.ClientInfo);
+                    await Send(messageContext.ClientInfo, response);
                     break;
 
                 default:
@@ -107,6 +98,77 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             OnCommunicationError(e);
         }
     }
+
+    private IDeltaQueryResponse HandleRequest(IDeltaQueryRequest request, IClientInfo clientInfo)
+    {
+        switch (request)
+        {
+            case GetAvailableIdsRequest idsRequest:
+                return GetAvailableIds(idsRequest);
+
+            case ListPartitionsRequest listPartitionsRequest:
+                return ListPartitions(listPartitionsRequest);
+
+            case SignOnRequest signOnRequest:
+                return SignOn(clientInfo, signOnRequest);
+
+            case SignOffRequest signOffRequest:
+                return SignOff(signOffRequest);
+
+            case ReconnectRequest reconnectRequest:
+                return Reconnect(reconnectRequest);
+
+            case SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest:
+                return SubscribeToChangingPartitions(subscribeToChangingPartitionsRequest);
+
+            case SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest:
+                return SubscribeToPartitionContents(subscribeToPartitionContentsRequest);
+
+            case UnsubscribeFromPartitionContentsRequest unsubscribeFromPartitionContentsRequest:
+                return UnsubscribeFromPartitionContents(unsubscribeFromPartitionContentsRequest);
+
+            default:
+                Log(
+                    $"ignoring received query: {request.GetType()}({request.InternalParticipationId})");
+                return null;
+        }
+    }
+
+    private IDeltaQueryResponse GetAvailableIds(GetAvailableIdsRequest idsRequest) =>
+        new GetAvailableIdsResponse(GetFreeNodeIds(idsRequest.count).ToArray(), idsRequest.QueryId, null);
+
+    private IDeltaQueryResponse ListPartitions(ListPartitionsRequest listPartitionsRequest)
+    {
+        var serializer = new SerializerBuilder()
+            .WithLionWebVersion(_lionWebVersion)
+            .Build();
+
+        var chunk = new DeltaSerializationChunk(serializer.Serialize(_forest.Partitions).ToArray());
+        return new ListPartitionsResponse(chunk, listPartitionsRequest.QueryId, null);
+    }
+
+    private IDeltaQueryResponse SignOn(IClientInfo clientInfo, SignOnRequest signOnRequest) =>
+        new SignOnResponse(clientInfo.ParticipationId, signOnRequest.QueryId, null);
+
+    private IDeltaQueryResponse SignOff(SignOffRequest signOffRequest) =>
+        new SignOffResponse(signOffRequest.QueryId, null);
+
+    private IDeltaQueryResponse Reconnect(ReconnectRequest reconnectRequest) =>
+        new ReconnectResponse(-1, reconnectRequest.QueryId, null);
+
+    private IDeltaQueryResponse SubscribeToChangingPartitions(
+        SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest) =>
+        new SubscribeToChangingPartitionsResponse(subscribeToChangingPartitionsRequest.QueryId, null);
+
+    private IDeltaQueryResponse SubscribeToPartitionContents(
+        SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest) =>
+        new SubscribeToPartitionContentsResponse(new DeltaSerializationChunk([]),
+            subscribeToPartitionContentsRequest.QueryId, null);
+
+    private IDeltaQueryResponse UnsubscribeFromPartitionContents(
+        UnsubscribeFromPartitionContentsRequest unsubscribeFromPartitionContentsRequest) =>
+        new UnsubscribeFromPartitionContentsResponse(unsubscribeFromPartitionContentsRequest.QueryId,
+            null);
 
     #endregion
 
