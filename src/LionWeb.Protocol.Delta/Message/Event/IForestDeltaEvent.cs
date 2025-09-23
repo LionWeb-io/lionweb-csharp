@@ -29,6 +29,9 @@ public record PartitionAdded(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IForestDeltaEvent
 {
+    [JsonIgnore]
+    public TargetNode AffectedNode { get; init; } = AffectedNode;
+
     /// <inheritdoc />
     [JsonIgnore]
     public override HashSet<TargetNode> AffectedNodes => [AffectedNode];

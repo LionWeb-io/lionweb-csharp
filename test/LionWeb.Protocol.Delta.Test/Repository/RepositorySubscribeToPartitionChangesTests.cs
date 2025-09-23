@@ -27,10 +27,10 @@ public class SubscribeToPartitionContentsTests : RepositoryTestsBase
     {
         var part = new LinkTestConcept("part");
         _aForest.AddPartitions([part]);
-        
+
         Assert.HasCount(0, _bForest.Partitions);
     }
-    
+
     [TestMethod]
     public async Task WithSubscription()
     {
@@ -43,5 +43,21 @@ public class SubscribeToPartitionContentsTests : RepositoryTestsBase
         Assert.HasCount(1, _bForest.Partitions);
         AssertEquals(part, _bForest.Partitions.First());
         Assert.AreSame(actual, _bForest.Partitions.First());
+    }
+
+    [TestMethod]
+    public async Task Unsubscribe()
+    {
+        var aPart = new LinkTestConcept("part");
+        _aForest.AddPartitions([aPart]);
+
+        var actual = await _bClient.SubscribeToPartitionContents("part");
+        await _aClient.UnsubscribeFromPartitionContents("part");
+
+        Assert.HasCount(1, _bForest.Partitions);
+        var bPart = (LinkTestConcept)_bForest.Partitions.First();
+        bPart.Name = "my name";
+
+        Assert.IsFalse(aPart.TryGetName(out _));
     }
 }
