@@ -93,6 +93,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             case ChildMovedAndReplacedFromOtherContainmentInSameParentNotification e:
                 OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(e);
                 break;
+            case ChildMovedAndReplacedInSameContainmentNotification e:
+                OnRemoteChildMovedAndReplacedInSameContainment(e);
+                break;
             case AnnotationAddedNotification e:
                 OnRemoteAnnotationAdded(e);
                 break;
@@ -282,6 +285,12 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             localParent.Set(childMoved.Containment, newValue, childMoved.NotificationId);
         });
 
+    private void OnRemoteChildMovedAndReplacedInSameContainment(ChildMovedAndReplacedInSameContainmentNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
+        {
+            
+        });
+    
     private static object ReplaceContainment(INode localParent, Containment containment, Index index,
         INode substituteNode)
     {

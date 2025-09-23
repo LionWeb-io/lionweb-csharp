@@ -475,6 +475,46 @@ public class NotificationsTest : NotificationTestsBase
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
+    [TestMethod]
+    [Ignore("add support in remote replicator")]
+    public void ChildMovedAndReplacedInSameContainment_Forward()
+    {
+        var moved = new Circle("moved");
+        var replaced = new Line("replaced");
+        var originalPartition = new Geometry("a") { Shapes = [moved, replaced] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var newIndex = 1;
+        var oldIndex = 0;
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+
+        Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
+    }
+
+    [TestMethod]
+    [Ignore("add support in remote replicator")]
+    public void ChildMovedAndReplacedInSameContainment_Backward()
+    {
+        var moved = new Circle("moved");
+        var replaced = new Line("replaced");
+        var originalPartition = new Geometry("a") { Shapes = [replaced, moved] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var newIndex = 0;
+        var oldIndex = 1;
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+
+        Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
+    }
+
     #endregion
 
     #endregion
