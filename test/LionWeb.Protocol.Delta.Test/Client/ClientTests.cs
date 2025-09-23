@@ -15,20 +15,19 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Test;
+namespace LionWeb.Protocol.Delta.Test.Client;
 
-using Client;
 using Core;
 using Core.M1;
 using Core.M3;
-using Core.Notification;
 using Core.Notification.Pipe;
 using Core.Serialization;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Utilities;
+using Delta.Client;
+using Delta.Repository;
 using Message;
 using Message.Event;
-using Repository;
 
 [TestClass]
 public class ClientTests
@@ -197,55 +196,4 @@ public class ClientTests
         Assert.IsTrue(differences.Count == 0,
             differences.DescribeAll(new() { LeftDescription = "a", RightDescription = "b" }));
     }
-}
-
-internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
-{
-    private readonly NotificationToDeltaCommandMapper _mapper;
-
-    public DeltaRepositoryConnector(LionWebVersions lionWebVersion)
-    {
-        _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
-    }
-
-    public Action<IDeltaContent> Sender { get; set; }
-
-    public Task SendToClient(IClientInfo clientInfo, IDeltaContent content)
-    {
-        Sender?.Invoke(content);
-        return Task.CompletedTask;
-    }
-
-    public Task SendToAllClients(IDeltaContent content)
-    {
-        Sender?.Invoke(content);
-        return Task.CompletedTask;
-    }
-
-    public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
-    public void ReceiveMessageFromClient(IDeltaMessageContext context) => ReceiveFromClient?.Invoke(null, context);
-    public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
-}
-
-internal class DeltaClientConnector : IDeltaClientConnector
-{
-    private readonly Action<IDeltaContent> _sender;
-    private readonly NotificationToDeltaCommandMapper _mapper;
-
-    public DeltaClientConnector(LionWebVersions lionWebVersion, Action<IDeltaContent> sender)
-    {
-        _sender = sender;
-        _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
-    }
-
-    public Task SendToRepository(IDeltaContent content)
-    {
-        _sender(content);
-        return Task.CompletedTask;
-    }
-
-    public event EventHandler<IDeltaContent>? ReceiveFromRepository;
-
-    public void ReceiveMessageFromRepository(IDeltaContent context) => ReceiveFromRepository?.Invoke(null, context);
-    public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
 }

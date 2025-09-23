@@ -15,11 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta.Test;
+namespace LionWeb.Protocol.Delta.Test.Client;
 
-using Client;
 using Core;
 using Core.Notification;
+using Delta.Client;
+using Delta.Repository;
 using Message;
 using Repository;
 using System.Text;
