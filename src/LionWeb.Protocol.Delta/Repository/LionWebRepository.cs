@@ -142,7 +142,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 return SubscribeToPartitionContents(subscribeToPartitionContentsRequest, clientInfo);
 
             case UnsubscribeFromPartitionContentsRequest unsubscribeFromPartitionContentsRequest:
-                return UnsubscribeFromPartitionContents(unsubscribeFromPartitionContentsRequest);
+                return UnsubscribeFromPartitionContents(unsubscribeFromPartitionContentsRequest, clientInfo);
 
             default:
                 Log(
@@ -189,9 +189,14 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 
 
     private IDeltaQueryResponse UnsubscribeFromPartitionContents(
-        UnsubscribeFromPartitionContentsRequest unsubscribeFromPartitionContentsRequest) =>
-        new UnsubscribeFromPartitionContentsResponse(unsubscribeFromPartitionContentsRequest.QueryId,
+        UnsubscribeFromPartitionContentsRequest unsubscribeFromPartitionContentsRequest, IClientInfo clientInfo)
+    {
+        if (clientInfo.SubscribedPartitions.Remove(unsubscribeFromPartitionContentsRequest.Partition))
+            return new UnsubscribeFromPartitionContentsResponse(unsubscribeFromPartitionContentsRequest.QueryId,
             null);
+        
+        throw new NotImplementedException();
+    }
 
     #endregion
 
