@@ -78,7 +78,7 @@ public abstract class JsonTestsBase
         new(Chunk(), QueryId(), ProtocolMessages());
 
     protected static SignOnRequest CreateSignOnRequest() =>
-        new(LionWebVersions.v2025_1.VersionString, ClientId(), QueryId(), ProtocolMessages());
+        new(LionWebVersions.v2025_1.VersionString, ClientId(), QueryId(), RepositoryId(), ProtocolMessages());
 
     protected static SignOnResponse CreateSignOnResponse() =>
         new(ParticipationId(), QueryId(), ProtocolMessages());
@@ -678,6 +678,9 @@ public abstract class JsonTestsBase
         "iAmTheClient";
 
     protected static QueryId QueryId() =>
+        (++_nextQueryId).ToString();
+
+    protected static RepositoryId RepositoryId() =>
         (++_nextQueryId).ToString();
 
     private TestContext testContextInstance;

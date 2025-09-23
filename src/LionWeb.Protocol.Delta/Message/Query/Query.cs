@@ -144,6 +144,7 @@ public record SignOnRequest(
     string DeltaProtocolVersion,
     ClientId ClientId,
     QueryId QueryId,
+    RepositoryId RepositoryId,
     ProtocolMessage[]? ProtocolMessages
 ) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryRequest
 {

@@ -162,11 +162,11 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     #region Send
 
     /// <inheritdoc />
-    public override async Task<SignOnResponse> SignOn()
+    public override async Task<SignOnResponse> SignOn(RepositoryId repositoryId)
     {
         var signOnResponse =
             await Query<SignOnResponse, SignOnRequest>(new SignOnRequest(_lionWebVersion.VersionString, ClientId,
-                IdUtils.NewId(), null));
+                IdUtils.NewId(), repositoryId, null));
         ParticipationId = signOnResponse.ParticipationId;
         return signOnResponse;
     }

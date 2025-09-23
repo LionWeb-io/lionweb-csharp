@@ -28,6 +28,7 @@ global using ClientId = string;
 global using TargetNode = string;
 global using QueryId = string;
 global using FreeId = string;
+global using RepositoryId = string;
 global using MessageKind = string;
 global using MessageDataKey = string;
 global using EventSequenceNumber = long;

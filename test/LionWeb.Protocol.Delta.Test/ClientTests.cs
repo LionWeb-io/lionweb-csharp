@@ -33,6 +33,8 @@ using Repository;
 [TestClass]
 public class ClientTests
 {
+    private const RepositoryId _repositoryId = "myRepo";
+    
     private readonly DeltaRepositoryConnector _repositoryConnector;
     private readonly IForest _repositoryForest;
     private readonly Geometry _repositoryPartition;
@@ -84,7 +86,7 @@ public class ClientTests
     [Timeout(6000)]
     public async Task SignOn()
     {
-        var signOnResponse = await _client.SignOn();
+        var signOnResponse = await _client.SignOn(_repositoryId);
 
         Assert.AreEqual("clientParticipation", signOnResponse.ParticipationId);
     }
@@ -106,7 +108,7 @@ public class ClientTests
     [Timeout(6000)]
     public async Task GetAvailableIds_SomeAlreadyUsed()
     {
-        await _client.SignOn();
+        await _client.SignOn(_repositoryId);
 
         var usedNodeId = "repoProvidedId-6";
         _clientPartition.Documentation = new Documentation(usedNodeId);
