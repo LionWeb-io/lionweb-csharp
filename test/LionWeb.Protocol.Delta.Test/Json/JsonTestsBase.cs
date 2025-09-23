@@ -681,7 +681,7 @@ public abstract class JsonTestsBase
         (++_nextQueryId).ToString();
 
     protected static RepositoryId RepositoryId() =>
-        (++_nextQueryId).ToString();
+        "myRepo";
 
     private TestContext testContextInstance;
 
