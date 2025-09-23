@@ -35,10 +35,9 @@ public class RepositoryListPartitionsTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task ListPartitions_one()
     {
-        await _aClient.SignOn("myRepo");
         var part0 = new Geometry("partition");
         _aForest.AddPartitions([part0]);
-        WaitForReceived(1);
+        _aClient.WaitForReceived(1);
         var partitions = await _aClient.ListPartitions();
         Assert.HasCount(1, partitions);
 
@@ -51,10 +50,12 @@ public class RepositoryListPartitionsTests : RepositoryTestsBase
     {
         var part0 = new Geometry("part0");
         _aForest.AddPartitions([part0]);
+        await _bClient.SubscribeToPartitionContents(part0.GetId());
         WaitForReceived(1);
 
         var part1 = new Geometry("part1");
         _bForest.AddPartitions([part1]);
+        await _aClient.SubscribeToPartitionContents(part1.GetId());
         WaitForReceived(1);
 
         var partitions = await _aClient.ListPartitions();
@@ -68,7 +69,6 @@ public class RepositoryListPartitionsTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task ListPartitions_noFeatures()
     {
-        await _aClient.SignOn("myRepo");
         var containment01 = new LinkTestConcept("cont");
         var part0 = new LinkTestConcept("partition")
         {
@@ -76,7 +76,7 @@ public class RepositoryListPartitionsTests : RepositoryTestsBase
         };
         part0.AddAnnotations([new TestAnnotation("ann")]);
         _aForest.AddPartitions([part0]);
-        WaitForReceived(1);
+        _aClient.WaitForReceived(1);
 
         var partitions = await _aClient.ListPartitions();
         Assert.HasCount(1, partitions);

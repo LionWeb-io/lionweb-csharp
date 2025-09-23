@@ -15,34 +15,12 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
-namespace LionWeb.Protocol.Delta;
+namespace LionWeb.Protocol.Delta.Client;
 
-using Core.Notification;
-using Core.Notification.Pipe;
-using Message;
-
-public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationPipeBase(null), INotificationProducer
-    where TContent : IDeltaContent
+public class CommandIdProvider : ICommandIdProvider
 {
-    /// <inheritdoc />
-    public override void Dispose()
-    {
-        GC.SuppressFinalize(this);
-    }
-
-    #region Remote
-
-    public void Receive(TContent deltaContent)
-    {
-        var notification = Map(deltaContent);
-        ProduceNotification(notification);
-    }
-
-    public abstract INotification Map(TContent content);
-
-    #endregion
+    private int _nextId = 0;
 
     /// <inheritdoc />
-    public void ProduceNotification(INotification notification) =>
-        Send(notification);
+    public string Create() => (++_nextId).ToString();
 }

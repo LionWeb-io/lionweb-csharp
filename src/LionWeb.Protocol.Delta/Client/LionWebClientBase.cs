@@ -23,15 +23,18 @@ using Core.M3;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Pipe;
+using System.Collections.Concurrent;
 
 public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 {
     private readonly string _name;
+    protected readonly IForest _forest;
     protected readonly LionWebVersions _lionWebVersion;
     protected readonly List<Language> _languages;
     protected readonly IClientConnector<T> _connector;
     protected readonly PartitionSharedNodeMap SharedNodeMap;
     protected readonly INotificationHandler _replicator;
+    protected readonly ConcurrentDictionary<INotificationId, bool> _ownNotifications = [];
 
     private ParticipationId? _participationId;
     private readonly ClientId? _clientId;
@@ -59,6 +62,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         _lionWebVersion = lionWebVersion;
         _languages = languages;
         _name = name;
+        _forest = forest;
         _connector = connector;
 
         SharedNodeMap = new();
@@ -113,7 +117,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToPartitionContentsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SubscribeToPartitionContentsResponse"/></returns>
-    public abstract Task SubscribeToPartitionContents(TargetNode partition);
+    public abstract Task<IPartitionInstance> SubscribeToPartitionContents(TargetNode partition);
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.UnsubscribeFromPartitionContentsRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.UnsubscribeFromPartitionContentsResponse"/></returns>
@@ -153,7 +157,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     private void SendNotificationToRepository(object? sender, INotification? notification)
     {
-        if (notification == null)
+        if (notification == null || _ownNotifications.TryRemove(notification.NotificationId, out _))
             return;
 
         var converted = _connector.Convert(notification);

@@ -25,9 +25,10 @@ public class RepositoryPartitionTests : RepositoryTestsBase
 {
     [TestMethod]
     [Timeout(6000)]
-    public void NewPartition()
+    public async Task NewPartition()
     {
         _aForest.AddPartitions([new Geometry("partition")]);
+        await _bClient.SubscribeToPartitionContents("partition");
         WaitForReceived(1);
 
         AssertEquals(_aForest.Partitions, _bForest.Partitions);
@@ -35,9 +36,11 @@ public class RepositoryPartitionTests : RepositoryTestsBase
 
     [TestMethod]
     [Timeout(6000)]
-    public void NewPartitions()
+    public async Task NewPartitions()
     {
         _aForest.AddPartitions([new Geometry("partitionA"), new LinkTestConcept("partitionB")]);
+        await _bClient.SubscribeToPartitionContents("partitionA");
+        await _bClient.SubscribeToPartitionContents("partitionB");
         WaitForReceived(2);
 
         AssertEquals(_aForest.Partitions, _bForest.Partitions);
@@ -45,13 +48,15 @@ public class RepositoryPartitionTests : RepositoryTestsBase
 
     [TestMethod]
     [Timeout(6000)]
-    public void RemovePartition()
+    public async Task RemovePartition()
     {
         _aForest.AddPartitions([new Geometry("geo")]);
+        await _bClient.SubscribeToPartitionContents("geo");
         WaitForReceived(1);
 
         var bLink = new LinkTestConcept("link");
         _bForest.AddPartitions([bLink]);
+        await _aClient.SubscribeToPartitionContents("link");
         WaitForReceived(1);
 
         var aLink = (LinkTestConcept)_aForest.Partitions.Last();
@@ -70,10 +75,12 @@ public class RepositoryPartitionTests : RepositoryTestsBase
 
     [TestMethod]
     [Timeout(6000)]
-    public void PartitionAnnotation()
+    public async Task PartitionAnnotation()
     {
         _aForest.AddPartitions([new Geometry("partition")]);
-        WaitForReceived(1);
+        _aClient.WaitForReceived(1);
+        await _bClient.SubscribeToPartitionContents("partition");
+        _bClient.WaitForReceived(1);
 
         var bPartition = (Geometry)_bForest.Partitions.First();
         Assert.IsNotNull(bPartition);

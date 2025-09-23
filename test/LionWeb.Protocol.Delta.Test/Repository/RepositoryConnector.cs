@@ -55,12 +55,15 @@ class RepositoryConnector : IDeltaRepositoryConnector
         }
     }
 
-    public async Task SendToAllClients(IDeltaContent content)
+    public async Task SendToAllClients(IDeltaContent content, HashSet<NodeId> affectedPartitions)
     {
         foreach ((var clientInfo, var clientConnector) in _clients)
         {
-            var encoded = Encode(clientInfo, content);
-            clientConnector.MessageFromRepository(encoded);
+            if (affectedPartitions.Count == 0 || clientInfo.SubscribedPartitions.Overlaps(affectedPartitions))
+            {
+                var encoded = Encode(clientInfo, content);
+                clientConnector.MessageFromRepository(encoded);
+            }
         }
     }
 

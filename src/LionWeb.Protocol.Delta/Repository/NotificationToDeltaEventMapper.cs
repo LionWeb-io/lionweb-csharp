@@ -73,6 +73,7 @@ public class NotificationToDeltaEventMapper
     private PartitionAdded OnPartitionAdded(PartitionAddedNotification partitionAddedNotification) =>
         new(
             ToDeltaChunk(partitionAddedNotification.NewPartition),
+            partitionAddedNotification.NewPartition.GetId(),
             ToCommandSources(partitionAddedNotification),
             []
         );

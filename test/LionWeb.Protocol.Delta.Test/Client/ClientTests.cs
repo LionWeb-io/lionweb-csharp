@@ -127,9 +127,9 @@ public class ClientTests
     [Timeout(6000)]
     public void InOrderEvents()
     {
-        _repositoryConnector.SendToAllClients(ChildAdded(0));
-        _repositoryConnector.SendToAllClients(PropertyAdded(1));
-        _repositoryConnector.SendToAllClients(PropertyChanged(2));
+        _repositoryConnector.SendToAllClients(ChildAdded(0), []);
+        _repositoryConnector.SendToAllClients(PropertyAdded(1), []);
+        _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
 
         AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
             _clientPartition);
@@ -139,9 +139,9 @@ public class ClientTests
     [Timeout(6000)]
     public void OutOfOrderEvents()
     {
-        _repositoryConnector.SendToAllClients(PropertyAdded(1));
-        _repositoryConnector.SendToAllClients(PropertyChanged(2));
-        _repositoryConnector.SendToAllClients(ChildAdded(0));
+        _repositoryConnector.SendToAllClients(PropertyAdded(1), []);
+        _repositoryConnector.SendToAllClients(PropertyChanged(2), []);
+        _repositoryConnector.SendToAllClients(ChildAdded(0), []);
 
         AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
             _clientPartition);

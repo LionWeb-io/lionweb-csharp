@@ -34,6 +34,6 @@ public class DeltaProtocolEventReceiver : DeltaProtocolReceiverBase<IDeltaEvent>
     }
 
     /// <inheritdoc />
-    protected override INotification Map(IDeltaEvent content) => 
+    public override INotification Map(IDeltaEvent content) => 
         _mapper.Map(content);
 }
