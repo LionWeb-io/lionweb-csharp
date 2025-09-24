@@ -176,134 +176,150 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     #region Children
 
-    private void OnRemoteChildAdded(ChildAddedNotification childAdded) =>
-        SuppressNotificationForwarding(childAdded, () =>
+    private void OnRemoteChildAdded(ChildAddedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(childAdded.Parent.GetId());
-            var newChildNode = (INode)childAdded.NewChild;
+            var localParent = Lookup(notification.Parent.GetId());
+            var newChildNode = (INode)notification.NewChild;
 
             Debug.WriteLine(
-                $"Parent {localParent.PrintIdentity()}: Adding {newChildNode.PrintIdentity()} to {childAdded.Containment} at {childAdded.Index}");
-            var newValue = InsertContainment(localParent, childAdded.Containment, childAdded.Index,
+                $"Parent {localParent.PrintIdentity()}: Adding {newChildNode.PrintIdentity()} to {notification.Containment} at {notification.Index}");
+            var newValue = InsertContainment(localParent, notification.Containment, notification.Index,
                 newChildNode);
 
-            localParent.Set(childAdded.Containment, newValue, childAdded.NotificationId);
+            localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
 
-    private void OnRemoteChildDeleted(ChildDeletedNotification childDeleted) =>
-        SuppressNotificationForwarding(childDeleted, () =>
+    private void OnRemoteChildDeleted(ChildDeletedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(childDeleted.Parent.GetId());
+            var localParent = Lookup(notification.Parent.GetId());
 
             object? newValue = null;
-            if (childDeleted.Containment.Multiple)
+            if (notification.Containment.Multiple)
             {
-                var existingChildren = localParent.Get(childDeleted.Containment);
+                var existingChildren = localParent.Get(notification.Containment);
                 if (existingChildren is IList l)
                 {
                     var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.RemoveAt(childDeleted.Index);
+                    children.RemoveAt(notification.Index);
                     newValue = children;
                 }
             }
 
-            localParent.Set(childDeleted.Containment, newValue, childDeleted.NotificationId);
+            localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
 
-    private void OnRemoteChildReplaced(ChildReplacedNotification childReplaced) =>
-        SuppressNotificationForwarding(childReplaced, () =>
+    private void OnRemoteChildReplaced(ChildReplacedNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(childReplaced.Parent.GetId());
-            var substituteNode = (INode)childReplaced.NewChild;
-            var newValue = ReplaceContainment(localParent, childReplaced.Containment, childReplaced.Index,
-                substituteNode);
+            var localParent = Lookup(notification.Parent.GetId());
+            var substituteNode = (INode)notification.NewChild;
+            var newValue = ReplaceContainment(localParent, notification.Containment, notification.Index, substituteNode);
 
-            localParent.Set(childReplaced.Containment, newValue, childReplaced.NotificationId);
+            localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
 
-    private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification childMoved) =>
-        SuppressNotificationForwarding(childMoved, () =>
+    private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localNewParent = Lookup(childMoved.NewParent.GetId());
-            var nodeToInsert = LookupOpt(childMoved.MovedChild.GetId()) ?? (INode)childMoved.MovedChild;
-            var newValue = InsertContainment(localNewParent, childMoved.NewContainment, childMoved.NewIndex,
+            var localNewParent = Lookup(notification.NewParent.GetId());
+            var nodeToInsert = LookupOpt(notification.MovedChild.GetId()) ?? (INode)notification.MovedChild;
+            var newValue = InsertContainment(localNewParent, notification.NewContainment, notification.NewIndex,
                 nodeToInsert);
 
-            localNewParent.Set(childMoved.NewContainment, newValue, childMoved.NotificationId);
+            localNewParent.Set(notification.NewContainment, newValue, notification.NotificationId);
         });
 
     private void OnRemoteChildMovedAndReplacedFromOtherContainment(
-        ChildMovedAndReplacedFromOtherContainmentNotification childMovedAndReplaced) => SuppressNotificationForwarding(
-        childMovedAndReplaced, () =>
+        ChildMovedAndReplacedFromOtherContainmentNotification notification) => SuppressNotificationForwarding(
+        notification, () =>
         {
-            var localNewParent = Lookup(childMovedAndReplaced.NewParent.GetId());
-            var substituteNode = Lookup(childMovedAndReplaced.MovedChild.GetId());
-            var newValue = ReplaceContainment(localNewParent, childMovedAndReplaced.NewContainment,
-                childMovedAndReplaced.NewIndex,
+            var localNewParent = Lookup(notification.NewParent.GetId());
+            var substituteNode = Lookup(notification.MovedChild.GetId());
+            var newValue = ReplaceContainment(localNewParent, notification.NewContainment,
+                notification.NewIndex, 
                 substituteNode);
 
-            localNewParent.Set(childMovedAndReplaced.NewContainment, newValue, childMovedAndReplaced.NotificationId);
+            localNewParent.Set(notification.NewContainment, newValue, notification.NotificationId);
         });
 
     private void OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(
-        ChildMovedAndReplacedFromOtherContainmentInSameParentNotification childMovedAndReplaced)
+        ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification)
     {
-        var parent = Lookup(childMovedAndReplaced.Parent.GetId());
-        var substituteNode = Lookup(childMovedAndReplaced.MovedChild.GetId());
-        var newValue = ReplaceContainment(parent, childMovedAndReplaced.NewContainment,
-            childMovedAndReplaced.NewIndex, substituteNode);
+        var parent = Lookup(notification.Parent.GetId());
+        var substituteNode = Lookup(notification.MovedChild.GetId());
+        var newValue = ReplaceContainment(parent, notification.NewContainment,
+            notification.NewIndex, substituteNode);
 
-        parent.Set(childMovedAndReplaced.NewContainment, newValue);
+        parent.Set(notification.NewContainment, newValue);
     }
 
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(
-        ChildMovedFromOtherContainmentInSameParentNotification childMoved) =>
-        SuppressNotificationForwarding(childMoved, () =>
+        ChildMovedFromOtherContainmentInSameParentNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(childMoved.Parent.GetId());
-            var newValue = InsertContainment(localParent, childMoved.NewContainment, childMoved.NewIndex,
-                Lookup(childMoved.MovedChild.GetId()));
+            var localParent = Lookup(notification.Parent.GetId());
+            var newValue = InsertContainment(localParent, notification.NewContainment, notification.NewIndex,
+                Lookup(notification.MovedChild.GetId()));
 
-            localParent.Set(childMoved.NewContainment, newValue, childMoved.NotificationId);
+            localParent.Set(notification.NewContainment, newValue, notification.NotificationId);
         });
 
-    private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification childMoved) =>
-        SuppressNotificationForwarding(childMoved, () =>
+    private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(childMoved.Parent.GetId());
-            INode nodeToInsert = Lookup(childMoved.MovedChild.GetId());
+            var localParent = Lookup(notification.Parent.GetId());
+            INode nodeToInsert = Lookup(notification.MovedChild.GetId());
             object newValue = nodeToInsert;
-            var existingChildren = localParent.Get(childMoved.Containment);
+            var existingChildren = localParent.Get(notification.Containment);
             if (existingChildren is IList l)
             {
                 var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                children.RemoveAt(childMoved.OldIndex);
-                children.Insert(childMoved.NewIndex, nodeToInsert);
+                children.RemoveAt(notification.OldIndex);
+                children.Insert(notification.NewIndex, nodeToInsert);
                 newValue = children;
             }
 
-            localParent.Set(childMoved.Containment, newValue, childMoved.NotificationId);
+            localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
 
     private void OnRemoteChildMovedAndReplacedInSameContainment(ChildMovedAndReplacedInSameContainmentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
+            var localParent = Lookup(notification.Parent.GetId());
+            var substituteNode = Lookup(notification.MovedChild.GetId());
+            var newValue = ReplaceContainment(localParent, notification.Containment, notification.NewIndex, substituteNode, notification.OldIndex);
             
+            localParent.Set(notification.Containment, newValue);
         });
     
-    private static object ReplaceContainment(INode localParent, Containment containment, Index index,
-        INode substituteNode)
+    private static object ReplaceContainment(INode localParent, Containment containment, Index newIndex,INode substituteNode,  Index? oldIndex = null)
     {
         if (localParent.TryGet(containment, out var existingChildren))
         {
             switch (existingChildren)
             {
                 case IList l:
-                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.Insert(index, substituteNode);
-                    children.RemoveAt(index + 1);
-                    return children;
-                case IWritableNode _ when index == 0:
+                    {
+                        var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                        
+                        var substituteNodeParent = substituteNode.GetParent();
+                        var substituteNodeContainment = substituteNodeParent?.GetContainmentOf(substituteNode);
+                        if (substituteNodeContainment == containment)
+                        {
+                           children.Insert(newIndex, substituteNode);
+                           children.RemoveAt(newIndex + 1);
+                           children.RemoveAt(oldIndex > newIndex ? children.LastIndexOf(substituteNode) : children.IndexOf(substituteNode));
+                        }else
+                        {
+                            children.Insert(newIndex, substituteNode);
+                            children.RemoveAt(newIndex + 1);
+                        }
+
+                        return children;   
+                    }
+                case IWritableNode _ when newIndex == 0:
                     return substituteNode;
                 default:
                     // when containment data is corrupted or assigned to an invalid value after its creation
