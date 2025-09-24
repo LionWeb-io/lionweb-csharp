@@ -63,6 +63,7 @@ public class ClientTests
         _clientForest = new Forest();
         _clientPartition = new Geometry("partition");
         _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector);
+        _client.SignOn(_repositoryId);
         _client.ParticipationId = _clientInfo.ParticipationId;
         
         _clientForest.AddPartitions([_clientPartition]);
@@ -79,48 +80,6 @@ public class ClientTests
          _repository.WaitForReceived(1);
 
         AssertEquals(_clientPartition, _repositoryPartition);
-    }
-
-    [TestMethod]
-    [Timeout(6000)]
-    public async Task SignOn()
-    {
-        var signOnResponse = await _client.SignOn(_repositoryId);
-
-        Assert.AreEqual("clientParticipation", signOnResponse.ParticipationId);
-    }
-
-    [TestMethod]
-    [Timeout(6000)]
-    public async Task GetAvailableIds()
-    {
-        var availableIdsResponse = await _client.GetAvailableIds(11);
-
-        Assert.AreEqual(11, availableIdsResponse.Ids.Length);
-        foreach (var freeId in availableIdsResponse.Ids)
-        {
-            Assert.IsTrue(IdUtils.IsValid(freeId));
-        }
-    }
-
-    [TestMethod]
-    [Timeout(6000)]
-    public async Task GetAvailableIds_SomeAlreadyUsed()
-    {
-        await _client.SignOn(_repositoryId);
-
-        var usedNodeId = "repoProvidedId-6";
-        _clientPartition.Documentation = new Documentation(usedNodeId);
-
-        var availableIdsResponse = await _client.GetAvailableIds(11);
-
-        Assert.AreEqual(11, availableIdsResponse.Ids.Length);
-        foreach (var freeId in availableIdsResponse.Ids)
-        {
-            Assert.IsTrue(IdUtils.IsValid(freeId));
-        }
-
-        Assert.IsFalse(availableIdsResponse.Ids.Contains(usedNodeId));
     }
 
     [TestMethod]

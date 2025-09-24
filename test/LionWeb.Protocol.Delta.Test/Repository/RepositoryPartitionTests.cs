@@ -21,12 +21,15 @@ using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Test.Languages.Generated.V2023_1.TestLanguage;
 
 [TestClass]
-public class RepositoryPartitionTests : RepositoryTestsBase
+public class RepositoryPartitionTests : RepositoryTestNoExceptionsBase
 {
     [TestMethod]
     [Timeout(6000)]
     public async Task NewPartition()
     {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+        
         _aForest.AddPartitions([new Geometry("partition")]);
         await _bClient.SubscribeToPartitionContents("partition");
         WaitForReceived(1);
@@ -38,6 +41,9 @@ public class RepositoryPartitionTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task NewPartitions()
     {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+        
         _aForest.AddPartitions([new Geometry("partitionA"), new LinkTestConcept("partitionB")]);
         await _bClient.SubscribeToPartitionContents("partitionA");
         await _bClient.SubscribeToPartitionContents("partitionB");
@@ -50,6 +56,9 @@ public class RepositoryPartitionTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task RemovePartition()
     {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+        
         await _bClient.SubscribeToChangingPartitions(true, true, true);
         
         _aForest.AddPartitions([new Geometry("geo")]);
@@ -78,6 +87,9 @@ public class RepositoryPartitionTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task PartitionAnnotation()
     {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+        
         _aForest.AddPartitions([new Geometry("partition")]);
         _aClient.WaitForReceived(1);
         await _bClient.SubscribeToPartitionContents("partition");

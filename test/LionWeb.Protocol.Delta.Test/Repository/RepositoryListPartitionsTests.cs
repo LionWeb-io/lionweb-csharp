@@ -21,12 +21,14 @@ using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Test.Languages.Generated.V2023_1.TestLanguage;
 
 [TestClass]
-public class RepositoryListPartitionsTests : RepositoryTestsBase
+public class RepositoryListPartitionsTests : RepositoryTestNoExceptionsBase
 {
     [TestMethod]
     [Timeout(6000)]
     public async Task ListPartitions_empty()
     {
+        await _aClient.SignOn(RepoId);
+        
         var partitions = await _aClient.ListPartitions();
         Assert.AreEqual(0, partitions.Count);
     }
@@ -35,6 +37,8 @@ public class RepositoryListPartitionsTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task ListPartitions_one()
     {
+        await _aClient.SignOn(RepoId);
+        
         var part0 = new Geometry("partition");
         _aForest.AddPartitions([part0]);
         _aClient.WaitForReceived(1);
@@ -48,6 +52,9 @@ public class RepositoryListPartitionsTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task ListPartitions_two()
     {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+        
         var part0 = new Geometry("part0");
         _aForest.AddPartitions([part0]);
         await _bClient.SubscribeToPartitionContents(part0.GetId());
@@ -69,6 +76,8 @@ public class RepositoryListPartitionsTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task ListPartitions_noFeatures()
     {
+        await _aClient.SignOn(RepoId);
+        
         var containment01 = new LinkTestConcept("cont");
         var part0 = new LinkTestConcept("partition")
         {

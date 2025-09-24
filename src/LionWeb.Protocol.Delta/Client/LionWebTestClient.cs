@@ -27,6 +27,7 @@ public class LionWebTestClient : LionWebClient
     public const int _sleepInterval = 100;
 
     private long _messageCount;
+    private bool? _signedIn = null;
 
     public LionWebTestClient(
         LionWebVersions lionWebVersion,
@@ -39,7 +40,15 @@ public class LionWebTestClient : LionWebClient
         CommunicationError += (_, exception) => Exceptions.Add(exception);
     }
 
+    /// <inheritdoc />
+    protected override bool SignedIn => _signedIn ?? _participationId != null;
+
+    public void SetSignedIn(bool? signedIn) => _signedIn = signedIn;
+
+    public void SetEventSequenceNumber(EventSequenceNumber number) => _nextEventSequenceNumber = number;
+
     public long MessageCount => Interlocked.Read(ref _messageCount);
+
     private void IncrementMessageCount() => Interlocked.Increment(ref _messageCount);
 
     public long WaitCount { get; set; }

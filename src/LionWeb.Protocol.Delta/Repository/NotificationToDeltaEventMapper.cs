@@ -340,15 +340,10 @@ public class NotificationToDeltaEventMapper
             commandId = pei.CommandId;
         } else
         {
-            participationId = _participationIdProvider.ParticipationId;
+            participationId = _participationIdProvider.Create();
             commandId = notification.NotificationId.ToString();
         }
 
         return [new CommandSource(participationId, commandId)];
     }
-}
-
-public interface IParticipationIdProvider
-{
-    ParticipationId ParticipationId { get; }
 }

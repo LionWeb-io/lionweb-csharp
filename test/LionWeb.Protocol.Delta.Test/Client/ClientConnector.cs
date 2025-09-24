@@ -38,9 +38,12 @@ class ClientConnector : IDeltaClientConnector
         _mapper = new(new CommandIdProvider(), lionWebVersion);
     }
 
-    public void Connect(ParticipationId participationId, RepositoryConnector repositoryConnector)
+    public void Connect(ClientId clientId, RepositoryConnector repositoryConnector)
     {
-        _clientInfo = new ClientInfo { ParticipationId = participationId };
+        _clientInfo = new ClientInfo
+        {
+            ClientId = clientId
+        };
         repositoryConnector.AddClient(_clientInfo, this);
         _repositoryConnector = repositoryConnector;
     }
