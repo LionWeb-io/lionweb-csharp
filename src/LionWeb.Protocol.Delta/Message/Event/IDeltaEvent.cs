@@ -196,7 +196,7 @@ public record Error(
     ErrorCode ErrorCode,
     string Message,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent, IDeltaError
 {
     /// <inheritdoc />
     [JsonIgnore]

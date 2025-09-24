@@ -16,6 +16,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 // ReSharper disable CoVariantArrayConversion
+
 namespace LionWeb.Protocol.Delta.Message.Query;
 
 using Core.Serialization;
@@ -171,7 +172,12 @@ public record SignOffRequest(
 public record SignOffResponse(
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public bool RequiresParticipationId => false;
+}
 
 #endregion
 
@@ -182,13 +188,23 @@ public record ReconnectRequest(
     EventSequenceNumber LastReceivedSequenceNumber,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryRequest;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryRequest
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public bool RequiresParticipationId => false;
+}
 
 public record ReconnectResponse(
     EventSequenceNumber LastSentSequenceNumber,
     QueryId QueryId,
     ProtocolMessage[]? ProtocolMessages
-) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse;
+) : DeltaQueryBase(QueryId, ProtocolMessages), IParticipationDeltaQuery, IDeltaQueryResponse
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public bool RequiresParticipationId => false;
+}
 
 #endregion
 
@@ -271,3 +287,15 @@ public record ListPartitionsResponse(
 #endregion
 
 #endregion
+
+public record ErrorResponse(
+    ErrorCode ErrorCode,
+    string Message,
+    QueryId QueryId,
+    ProtocolMessage[]? ProtocolMessages
+) : DeltaContentBase(ProtocolMessages), IDeltaQueryResponse, IDeltaError
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override string Id => QueryId;
+}

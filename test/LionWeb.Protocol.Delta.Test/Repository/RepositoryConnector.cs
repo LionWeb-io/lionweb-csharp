@@ -31,14 +31,7 @@ class RepositoryConnector : IDeltaRepositoryConnector
     private readonly NotificationToDeltaEventMapper _mapper;
 
     private readonly Dictionary<IClientInfo, ClientConnector> _clients =
-        new Dictionary<IClientInfo, ClientConnector>(new ClientInfoComparer());
-
-    private class ClientInfoComparer : IEqualityComparer<IClientInfo>
-    {
-        public bool Equals(IClientInfo? x, IClientInfo? y) => x.ParticipationId.Equals(y.ParticipationId);
-
-        public int GetHashCode(IClientInfo obj) => obj.ParticipationId.GetHashCode();
-    }
+        new Dictionary<IClientInfo, ClientConnector>(IClientInfo.IdentityComparer);
 
     public RepositoryConnector(LionWebVersions lionWebVersion)
     {
@@ -50,7 +43,8 @@ class RepositoryConnector : IDeltaRepositoryConnector
 
     public async Task SendToClient(IClientInfo clientInfo, IDeltaContent content)
     {
-        if (_clients.TryGetValue(clientInfo, out var clientConnector))
+        if ((clientInfo.SignedOn || content is IDeltaError || !content.RequiresParticipationId) &&
+            _clients.TryGetValue(clientInfo, out var clientConnector))
         {
             var encoded = Encode(clientInfo, content);
             clientConnector.MessageFromRepository(encoded);
@@ -61,23 +55,26 @@ class RepositoryConnector : IDeltaRepositoryConnector
     {
         foreach ((var clientInfo, var clientConnector) in _clients)
         {
+            if (!clientInfo.SignedOn)
+                continue;
+
             var shouldSend = false;
 
             if ((clientInfo.NotifyAboutParitionDeletion ||
-                      content.InternalParticipationId == clientInfo.ParticipationId) && content is PartitionDeleted)
+                 content.InternalParticipationId == clientInfo.ParticipationId) && content is PartitionDeleted)
                 shouldSend = true;
             else if (clientInfo.NotifyAboutParitionCreation && content is PartitionAdded)
                 shouldSend = true;
-            
+
             if (clientInfo.SubscribedPartitions.Overlaps(affectedPartitions))
                 shouldSend = true;
 
             if (clientInfo.SubscribeCreatedParitions && content is PartitionAdded a)
                 clientInfo.SubscribedPartitions.Add(a.AffectedNode);
-            
+
             if (content is PartitionDeleted d)
                 clientInfo.SubscribedPartitions.Remove(d.DeletedPartition);
-            
+
             if (shouldSend)
             {
                 var encoded = Encode(clientInfo, content);

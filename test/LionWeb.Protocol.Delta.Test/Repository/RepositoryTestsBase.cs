@@ -30,8 +30,10 @@ using Delta.Repository;
 [TestClass]
 public abstract class RepositoryTestsBase
 {
+    protected const RepositoryId RepoId = "myRepo";
+    
     private readonly IForest _repositoryForest;
-    private readonly LionWebTestRepository _repository;
+    protected readonly LionWebTestRepository _repository;
     private readonly RepositoryConnector _repositoryConnector;
 
     protected readonly IForest _aForest;
@@ -58,24 +60,16 @@ public abstract class RepositoryTestsBase
         _bClient = CreateClient("B", out _bForest, out _bConnector);
     }
 
-    [TestCleanup]
-    public void AssertNoExceptions()
-    {
-        AssertNoExceptions(_repository.Exceptions);
-        AssertNoExceptions(_aClient.Exceptions);
-        AssertNoExceptions(_bClient.Exceptions);
-    }
-
     private LionWebTestClient CreateClient(string name, out IForest forest, out ClientConnector connector)
     {
-        var participation = $"{name}Participation";
+        var clientId = $"{name}ClientId";
         forest = new Forest();
         connector = new ClientConnector(_lionWebVersion);
         var client = new LionWebTestClient(_lionWebVersion, _languages, name, forest, connector)
         {
-            ParticipationId = participation
+            ClientId = clientId
         };
-        connector.Connect(participation, _repositoryConnector);
+        connector.Connect(clientId, _repositoryConnector);
         return client;
     }
 
@@ -97,5 +91,16 @@ public abstract class RepositoryTestsBase
     {
         _aClient.WaitForReceived(numberOfMessages);
         _bClient.WaitForReceived(numberOfMessages);
+    }
+}
+
+public abstract class RepositoryTestNoExceptionsBase : RepositoryTestsBase
+{
+    [TestCleanup]
+    public void AssertNoExceptions()
+    {
+        AssertNoExceptions(_repository.Exceptions);
+        AssertNoExceptions(_aClient.Exceptions);
+        AssertNoExceptions(_bClient.Exceptions);
     }
 }

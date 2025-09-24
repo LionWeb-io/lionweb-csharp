@@ -1,4 +1,4 @@
-// Copyright 2025 TRUMPF Laser SE and other contributors
+﻿// Copyright 2025 TRUMPF Laser SE and other contributors
 // 
 // Licensed under the Apache License, Version 2.0 (the "License")
 // you may not use this file except in compliance with the License.
@@ -17,10 +17,21 @@
 
 namespace LionWeb.Protocol.Delta.Repository;
 
-using Message;
+public interface IParticipationIdProvider
+{
+    ParticipationId Create();
+}
 
-public interface IDeltaRepositoryConnector : IRepositoryConnector<IDeltaContent>;
+public class ParticipationIdProvider : IParticipationIdProvider
+{
+    private int _nextParticipationId = 0;
 
-public interface IDeltaMessageContext : IMessageContext<IDeltaContent>;
+    /// <inheritdoc />
+    public ParticipationId Create() => $"participationId{++_nextParticipationId}";
+}
 
-public record DeltaMessageContext(IClientInfo ClientInfo, IDeltaContent Content) : IDeltaMessageContext;
+public class ExceptionParticipationIdProvider : IParticipationIdProvider
+{
+    /// <inheritdoc />
+    public ParticipationId Create() => throw new NotImplementedException();
+}

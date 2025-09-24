@@ -32,16 +32,3 @@ public interface IMessageContext<T>
     IClientInfo ClientInfo { get; }
     T Content { get; }
 }
-
-public interface IClientInfo
-{
-    ParticipationId ParticipationId { get; }
-
-    HashSet<NodeId> SubscribedPartitions { get; }
-
-    bool NotifyAboutParitionCreation { get; set; }
-    bool NotifyAboutParitionDeletion { get; set; }
-    bool SubscribeCreatedParitions { get; set; }
-
-    EventSequenceNumber IncrementAndGetSequenceNumber();
-}

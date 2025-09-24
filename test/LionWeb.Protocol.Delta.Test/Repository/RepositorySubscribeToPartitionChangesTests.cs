@@ -20,12 +20,15 @@ namespace LionWeb.Protocol.Delta.Test.Repository;
 using Core.Test.Languages.Generated.V2023_1.TestLanguage;
 
 [TestClass]
-public class SubscribeToPartitionContentsTests : RepositoryTestsBase
+public class SubscribeToPartitionContentsTests : RepositoryTestNoExceptionsBase
 {
     [TestMethod]
     [Timeout(6000)]
-    public void NoSubscription()
+    public async Task NoSubscription()
     {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+        
         var part = new LinkTestConcept("part");
         _aForest.AddPartitions([part]);
 
@@ -36,6 +39,9 @@ public class SubscribeToPartitionContentsTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task WithSubscription()
     {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+        
         var part = new LinkTestConcept("part");
 
         _aForest.AddPartitions([part]);
@@ -51,6 +57,9 @@ public class SubscribeToPartitionContentsTests : RepositoryTestsBase
     [Timeout(6000)]
     public async Task Unsubscribe()
     {
+        await _aClient.SignOn(RepoId);
+        await _bClient.SignOn(RepoId);
+        
         var aPart = new LinkTestConcept("part");
         _aForest.AddPartitions([aPart]);
 

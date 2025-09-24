@@ -32,6 +32,7 @@ using System.Diagnostics;
 public class LionWebClient : LionWebClientBase<IDeltaContent>
 {
     private readonly DeltaProtocolEventReceiver _eventReceiver;
+    private readonly DeserializerBuilder _deserializerBuilder;
 
     private readonly ConcurrentDictionary<EventSequenceNumber, IDeltaEvent> _unprocessedEvents = [];
     private readonly ConcurrentDictionary<CommandId, bool> _ownCommands = [];
@@ -39,8 +40,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
 
     #region EventSequenceNumber
 
-    private EventSequenceNumber _nextEventSequenceNumber = 0;
-    private DeserializerBuilder _deserializerBuilder;
+    protected EventSequenceNumber _nextEventSequenceNumber = 0;
     private void IncrementEventSequenceNumber() => Interlocked.Increment(ref _nextEventSequenceNumber);
     private EventSequenceNumber EventSequenceNumber => Interlocked.Read(ref _nextEventSequenceNumber);
 
@@ -91,23 +91,23 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             {
                 case IDeltaEvent deltaEvent:
                     ReceiveEvent(deltaEvent);
-
-                    break;
+                    return;
 
                 case IDeltaQueryResponse response:
                     Log($"received response: {response})");
                     if (_queryResponses.TryRemove(response.QueryId, out var tcs))
                     {
                         tcs.TrySetResult(response);
+                        return;
                     }
 
                     break;
-
-                default:
-                    Log(
-                        $"ignoring received: {content.GetType()}({content.InternalParticipationId})");
-                    break;
             }
+
+            if (content is IDeltaError e)
+                throw new DeltaException(e);
+
+            Log($"ignoring received: {content.GetType()}({content.InternalParticipationId})");
         } catch (Exception e)
         {
             Log(e.ToString());
@@ -141,6 +141,9 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     private void ProcessEvent(IDeltaEvent deltaEvent)
     {
         IncrementEventSequenceNumber();
+
+        if (deltaEvent is Error e)
+            throw new DeltaException(e);
 
         var originCommands = deltaEvent.OriginCommands ?? [];
         var commandSource = originCommands.FirstOrDefault();
@@ -184,13 +187,13 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
             .Deserialize(response.Contents.Nodes)
             .Cast<IPartitionInstance>()
             .ToList();
-        
+
         Debug.Assert(partitionInstances.Count == 1);
         var result = partitionInstances.First();
 
         var notificationId = new NotificationIdProvider(this).CreateNotificationId();
         _ownNotifications[notificationId] = true;
-        
+
         _forest.AddPartitions([result], notificationId);
         return result;
     }
@@ -216,14 +219,23 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     }
 
     /// <inheritdoc />
-    public override async Task<SignOffResponse> SignOff() =>
-        await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(QueryId(), null));
+    public override async Task<SignOffResponse> SignOff()
+    {
+        var response = await Query<SignOffResponse, SignOffRequest>(new SignOffRequest(QueryId(), null));
+        _participationId = null;
+        return response;
+    }
 
     /// <inheritdoc />
-    public override async Task<ReconnectResponse> Reconnect(ParticipationId participationId,
-        EventSequenceNumber lastReceivedSequenceNumber) =>
-        await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(participationId,
-            lastReceivedSequenceNumber, QueryId(), null));
+    public override async Task<ReconnectResponse> Reconnect(ParticipationId participationId)
+    {
+        if(SignedIn)
+            throw new DeltaException(new ErrorResponse("AlreadySignedIn", "Already signed in", null, null));
+
+        var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(participationId, EventSequenceNumber, QueryId(), null));
+        ParticipationId = participationId;
+        return response;
+    }
 
     #endregion
 
@@ -253,10 +265,16 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     private async Task<TResponse> Query<TResponse, TRequest>(TRequest request)
         where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest
     {
+        if (request.RequiresParticipationId && !SignedIn)
+            throw new DeltaException(new ErrorResponse("NotSignedIn", "Not signed in", request.QueryId, null));
+        
         var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
         _queryResponses[request.QueryId] = tcs;
         await Send(request);
         var response = await tcs.Task;
+        if (response is IDeltaError err)
+            throw new DeltaException(err);
+
         return response as TResponse ?? throw new ArgumentException(response.GetType().Name);
     }
 

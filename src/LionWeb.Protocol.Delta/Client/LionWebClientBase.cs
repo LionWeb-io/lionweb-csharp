@@ -36,7 +36,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
     protected readonly INotificationHandler _replicator;
     protected readonly ConcurrentDictionary<INotificationId, bool> _ownNotifications = [];
 
-    private ParticipationId? _participationId;
+    protected ParticipationId? _participationId;
     private readonly ClientId? _clientId;
 
     protected internal ParticipationId ParticipationId
@@ -44,6 +44,8 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
         get => _participationId ?? throw new InvalidOperationException($"{nameof(ParticipationId)} not set");
         set => _participationId = value;
     }
+
+    protected virtual bool SignedIn => _participationId != null;
 
     public ClientId ClientId
     {
@@ -137,7 +139,7 @@ public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.ReconnectRequest"/>
     /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.ReconnectResponse"/></returns>
-    public abstract Task Reconnect(ParticipationId participationId, EventSequenceNumber lastReceivedSequenceNumber);
+    public abstract Task Reconnect(ParticipationId participationId);
 
     #endregion
     

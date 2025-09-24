@@ -30,6 +30,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
     private readonly DeltaProtocolCommandReceiver _commandReceiver;
     private readonly SerializerBuilder _serializerBuilder;
+    private readonly IParticipationIdProvider _participationIdProvider;
 
     public LionWebRepository(
         LionWebVersions lionWebVersion,
@@ -54,8 +55,11 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         );
 
         _commandReceiver.ConnectTo(_replicator);
+
         _serializerBuilder = new SerializerBuilder()
             .WithLionWebVersion(_lionWebVersion);
+
+        _participationIdProvider = new ParticipationIdProvider();
     }
 
     /// <inheritdoc />
@@ -82,6 +86,13 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             {
                 case IDeltaCommand command:
                     Log($"received command: {command.GetType()}({command.CommandId})");
+                    
+                    if (!messageContext.ClientInfo.SignedOn)
+                    {
+                        await Send(messageContext.ClientInfo, new Error("NotSignedOn", "Not signed on", [new CommandSource(messageContext.ClientInfo.ParticipationId, command.CommandId)], null));
+                        return;
+                    }
+
                     var notification = _commandReceiver.Map(command);
                     if (notification is PartitionAddedNotification partitionAdded)
                     {
@@ -130,10 +141,10 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 return SignOn(clientInfo, signOnRequest);
 
             case SignOffRequest signOffRequest:
-                return SignOff(signOffRequest);
+                return SignOff(clientInfo, signOffRequest);
 
             case ReconnectRequest reconnectRequest:
-                return Reconnect(reconnectRequest);
+                return Reconnect(clientInfo, reconnectRequest);
 
             case SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest:
                 return SubscribeToChangingPartitions(subscribeToChangingPartitionsRequest, clientInfo);
@@ -160,14 +171,40 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         return new ListPartitionsResponse(chunk, listPartitionsRequest.QueryId, null);
     }
 
-    private IDeltaQueryResponse SignOn(IClientInfo clientInfo, SignOnRequest signOnRequest) =>
-        new SignOnResponse(clientInfo.ParticipationId, signOnRequest.QueryId, null);
+    private IDeltaQueryResponse SignOn(IClientInfo clientInfo, SignOnRequest signOnRequest)
+    {
+        if (clientInfo.SignedOn)
+            return new ErrorResponse("AlreadySignedOn", "Client not signed on", signOnRequest.QueryId, null);
 
-    private IDeltaQueryResponse SignOff(SignOffRequest signOffRequest) =>
-        new SignOffResponse(signOffRequest.QueryId, null);
+        clientInfo.SignedOn = true;
+        clientInfo.ClientId = signOnRequest.ClientId;
+        clientInfo.ParticipationId = _participationIdProvider.Create();
+        return new SignOnResponse(clientInfo.ParticipationId, signOnRequest.QueryId, null);
+    }
 
-    private IDeltaQueryResponse Reconnect(ReconnectRequest reconnectRequest) =>
-        new ReconnectResponse(-1, reconnectRequest.QueryId, null);
+    private IDeltaQueryResponse SignOff(IClientInfo clientInfo, SignOffRequest signOffRequest)
+    {
+        if (!clientInfo.SignedOn)
+            return new ErrorResponse("NotSignedOn", "Client not signed on", signOffRequest.QueryId, null);
+
+        clientInfo.SignedOn = false;
+        return new SignOffResponse(signOffRequest.QueryId, null);
+    }
+
+    private IDeltaQueryResponse Reconnect(IClientInfo clientInfo, ReconnectRequest reconnectRequest)
+    {
+        if (clientInfo.SignedOn)
+            return new ErrorResponse("AlreadySignedOn", "Already signed on", reconnectRequest.QueryId, null);
+
+        if (clientInfo.SequenceNumber != reconnectRequest.LastReceivedSequenceNumber)
+            return new ErrorResponse("NotCurrentSequenceNumber",
+                $"Last sent sequence number is {clientInfo.SequenceNumber} vs. last received {reconnectRequest.LastReceivedSequenceNumber}",
+                reconnectRequest.QueryId, null);
+
+        var response = new ReconnectResponse(clientInfo.SequenceNumber, reconnectRequest.QueryId, null);
+        clientInfo.SignedOn = true;
+        return response;
+    }
 
     private IDeltaQueryResponse SubscribeToChangingPartitions(
         SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest, IClientInfo clientInfo)
@@ -190,7 +227,9 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 subscribeToPartitionContentsRequest.QueryId, null);
         }
 
-        throw new NotImplementedException();
+        return new ErrorResponse("UnknownPartition",
+            $"Unknown partition '{subscribeToPartitionContentsRequest.Partition}'",
+            subscribeToPartitionContentsRequest.QueryId, null);
     }
 
 
@@ -201,7 +240,9 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             return new UnsubscribeFromPartitionContentsResponse(unsubscribeFromPartitionContentsRequest.QueryId,
                 null);
 
-        throw new NotImplementedException();
+        return new ErrorResponse("NotSubscribed",
+            $"NotSubscribed to partition '{unsubscribeFromPartitionContentsRequest.Partition}'",
+            unsubscribeFromPartitionContentsRequest.QueryId, null);
     }
 
     #endregion
@@ -270,14 +311,4 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         var chunk = new DeltaSerializationChunk(serializer.Serialize(nodes).ToArray());
         return chunk;
     }
-}
-
-public class ExceptionParticipationIdProvider : IParticipationIdProvider
-{
-    private int _nextParticipationId = 1000;
-
-    /// <inheritdoc />
-    public string ParticipationId =>
-        // $"participationId{++_nextParticipationId}";
-        throw new NotImplementedException();
 }
