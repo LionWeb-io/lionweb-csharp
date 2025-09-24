@@ -3,6 +3,7 @@
 using Core.Notification;
 using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2025_1.TestLanguage;
 using M1;
 
 [TestClass]
@@ -1191,5 +1192,33 @@ public class NotificationsTest : NotificationTestsBase
 
     #endregion
 
+    #region MoveEntryInSameReference
+
+    [TestMethod]
+    public void MoveEntryInSameReference_Backward()
+    {
+        var ref1 = new LinkTestConcept("ref1");
+        var ref2 = new LinkTestConcept("ref2");
+        var moved = new LinkTestConcept("moved");
+        
+        var originalPartition = new LinkTestConcept("concept")
+        {
+            Reference_0_n = [ref1, ref2, moved]
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var oldIndex = 2;
+        var newIndex = 0;
+        var notification = new EntryMovedInSameReferenceNotification(originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            oldIndex, newIndex, new ReferenceTarget {Reference = moved}, new NumericNotificationId("moveEntryInSameReference", 0));
+        
+        CreatePartitionReplicator(clonedPartition, notification);
+        
+        Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[0].GetId());
+    }
+
+    #endregion
+    
     #endregion
 }
