@@ -72,6 +72,7 @@ public abstract class NotificationTestsBase
         
         notificationForwarder.ConnectTo(notificationMapper);
         notificationMapper.ConnectTo(replicator);
+        
         notificationForwarder.ProduceNotification(notification);
     }
 }
@@ -94,6 +95,16 @@ internal class NotificationMapper(SharedNodeMap sharedNodeMap) : NotificationPip
 
     public void Receive(INotificationSender correspondingSender, INotification notification) =>
         ProduceNotification(_notificationMapper.Map(notification));
+}
+
+internal class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
+{
+    public int Count => Notifications.Count;
+
+    public List<INotification> Notifications { get; } = [];
+
+    public void Receive(INotificationSender correspondingSender, INotification notification) =>
+        Notifications.Add(notification);
 }
 
 [Obsolete("Will be removed after tests are refactored with proper ConnectTo() calls")]
