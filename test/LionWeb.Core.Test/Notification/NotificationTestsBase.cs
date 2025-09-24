@@ -63,9 +63,9 @@ public abstract class NotificationTestsBase
         notificationMapper.ConnectTo(replicator);
     }
     
-    protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, INotification notification)
+    protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, INotification notification, SharedNodeMap? sharedNodeMap = null)
     {
-        var sharedNodeMap = new SharedNodeMap();
+        sharedNodeMap ??= new SharedNodeMap();
         var notificationMapper = new NotificationMapper(sharedNodeMap);
         var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
         var notificationForwarder = new NotificationForwarder();

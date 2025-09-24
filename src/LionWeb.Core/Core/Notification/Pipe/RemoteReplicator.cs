@@ -123,6 +123,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             case ReferenceChangedNotification e:
                 OnRemoteReferenceChanged(e);
                 break;
+            case EntryMovedInSameReferenceNotification e:
+                OnEntryMovedInSameReference(e);
+                break;
             default:
                 throw new ArgumentException($"Can not process notification due to unknown {notification}!");
         }
@@ -472,6 +475,32 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
             localParent.Set(notification.Reference, newValue, notification.NotificationId);
         });
+    
+    private void OnEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
+    {
+        var localParent = Lookup(notification.Parent.GetId());
+        var target = Lookup(notification.Target.Reference.GetId());
+        
+        object newValue = target;
+        var reference = notification.Reference;
+        if (localParent.CollectAllSetFeatures().Contains(reference))
+        {
+            var existingTargets = localParent.Get(reference);
+            if (existingTargets is IList l)
+            {
+                var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
+                targets.RemoveAt(notification.OldIndex);
+                targets.Insert(notification.NewIndex, target);
+                newValue = targets;
+            }
+        } else
+        {
+            newValue = new List<IReadableNode>() { target };
+        }
+        
+        localParent.Set(reference, newValue);
+        
+    }
 
     private static object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
     {
