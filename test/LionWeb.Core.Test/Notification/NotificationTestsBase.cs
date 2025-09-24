@@ -68,15 +68,15 @@ public abstract class NotificationTestsBase
         var sharedNodeMap = new SharedNodeMap();
         var notificationMapper = new NotificationMapper(sharedNodeMap);
         var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
-        var notificationProducer = new NotificationProducer();
+        var notificationForwarder = new NotificationForwarder();
         
-        notificationProducer.ConnectTo(notificationMapper);
+        notificationForwarder.ConnectTo(notificationMapper);
         notificationMapper.ConnectTo(replicator);
-        notificationProducer.ProduceNotification(notification);
+        notificationForwarder.ProduceNotification(notification);
     }
 }
 
-internal class NotificationProducer() : NotificationPipeBase(null), INotificationProducer
+internal class NotificationForwarder() : NotificationPipeBase(null), INotificationProducer
 {
     public void ProduceNotification(INotification notification) => Send(notification);
 }
