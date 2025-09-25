@@ -23,6 +23,8 @@ using Languages.Generated.V2025_1.Shapes.M2;
 
 public class NotificationTests_Annotation: NotificationTestsBase
 {
+    //TODO: add tests for MoveAndReplaceAnnotationFromOtherParent
+    
     #region Annotations
 
     #region AnnotationAdded
@@ -140,60 +142,6 @@ public class NotificationTests_Annotation: NotificationTestsBase
 
     #endregion
 
-    #region AnnotationMovedFromOtherParent
-
-    [TestMethod]
-    public void AnnotationMovedFromOtherParent_Multiple()
-    {
-        var moved = new BillOfMaterials("moved");
-        var origin = new CompositeShape("origin");
-        origin.AddAnnotations([moved]);
-        var originalPartition = new Geometry("a") { Shapes = [origin] };
-
-        var clonedPartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonedPartition, originalPartition);
-
-        originalPartition.AddAnnotations([moved]);
-
-        AssertEquals([originalPartition], [clonedPartition]);
-    }
-
-    #endregion
-
-    #region AnnotationMovedInSameParent
-
-    [TestMethod]
-    public void AnnotationMovedInSameParent_Forward()
-    {
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([moved, new BillOfMaterials("bof")]);
-
-        var clonedPartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonedPartition, originalPartition);
-
-        originalPartition.AddAnnotations([moved]);
-
-        AssertEquals([originalPartition], [clonedPartition]);
-    }
-
-    [TestMethod]
-    public void AnnotationMovedInSameParent_Backward()
-    {
-        var moved = new BillOfMaterials("moved");
-        var originalPartition = new Geometry("a");
-        originalPartition.AddAnnotations([new BillOfMaterials("bof"), moved]);
-
-        var clonedPartition = ClonePartition(originalPartition);
-        CreatePartitionReplicator(clonedPartition, originalPartition);
-
-        originalPartition.InsertAnnotations(0, [moved]);
-
-        AssertEquals([originalPartition], [clonedPartition]);
-    }
-
-    #endregion
-
     #region AnnotationReplaced
     
     [TestMethod]
@@ -256,6 +204,60 @@ public class NotificationTests_Annotation: NotificationTestsBase
     
     #endregion
 
+    #region AnnotationMovedFromOtherParent
+
+    [TestMethod]
+    public void AnnotationMovedFromOtherParent_Multiple()
+    {
+        var moved = new BillOfMaterials("moved");
+        var origin = new CompositeShape("origin");
+        origin.AddAnnotations([moved]);
+        var originalPartition = new Geometry("a") { Shapes = [origin] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        originalPartition.AddAnnotations([moved]);
+
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+
+    #endregion
+
+    #region AnnotationMovedInSameParent
+
+    [TestMethod]
+    public void AnnotationMovedInSameParent_Forward()
+    {
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([moved, new BillOfMaterials("bof")]);
+
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        originalPartition.AddAnnotations([moved]);
+
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+
+    [TestMethod]
+    public void AnnotationMovedInSameParent_Backward()
+    {
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([new BillOfMaterials("bof"), moved]);
+
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        originalPartition.InsertAnnotations(0, [moved]);
+
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+
+    #endregion
+    
     #region AnnotationMovedAndReplacedInSameParent
 
     [TestMethod]
