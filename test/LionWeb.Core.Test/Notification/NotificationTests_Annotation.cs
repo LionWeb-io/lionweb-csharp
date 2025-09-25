@@ -304,6 +304,49 @@ public class NotificationTests_Annotation: NotificationTestsBase
         Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
     }
     
+    [TestMethod]
+    public void AnnotationMovedAndReplacedInSameParent_Backward_MoreThanThreeNodes()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([new BillOfMaterials("A"), replaced, new BillOfMaterials("B"), moved, new BillOfMaterials("C")]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var newIndex = 1;
+        var oldIndex = 3;
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition,oldIndex, 
+            replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
+        
+        CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
+
+        Assert.AreEqual(4, clonedPartition.GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[1].GetId());
+    }
+      
+    
+    [TestMethod]
+    public void AnnotationMovedAndReplacedInSameParent_Forward_MoreThanThreeNodes()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([new BillOfMaterials("A"), moved, new BillOfMaterials("B"), replaced, new BillOfMaterials("C")]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var newIndex = 3;
+        var oldIndex = 1;
+        var annotationReplacedNotification = new AnnotationMovedAndReplacedInSameParentNotification(newIndex, moved, originalPartition,oldIndex, 
+            replaced, new NumericNotificationId("annotationMovedAndReplaced", 0));
+        
+        CreatePartitionReplicator(clonedPartition, annotationReplacedNotification);
+
+        Assert.AreEqual(4, clonedPartition.GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[2].GetId());
+    }
+    
 
     #endregion
 
