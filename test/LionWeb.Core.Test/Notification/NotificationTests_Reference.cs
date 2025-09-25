@@ -189,7 +189,7 @@ public class NotificationTests_Reference : NotificationTestsBase
     }
     
     [TestMethod]
-    public void ReferenceChanged_NoOps_test()
+    public void ReferenceChanged_produces_NoOps()
     {
         var circle = new Circle("circle");
         var line = new Line("line");
@@ -205,7 +205,7 @@ public class NotificationTests_Reference : NotificationTestsBase
     }
     
     [TestMethod]
-    public void ReferenceChanged_NoOps_test_ReplaceWith()
+    public void ReferenceChanged_produces_NoOps_uses_ReplaceWith()
     {
         var circle = new Circle("circle");
         var line = new Line("line");
