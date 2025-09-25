@@ -286,6 +286,7 @@ public class NotificationTests_Reference : NotificationTestsBase
         
         CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
         
+        Assert.AreEqual(3, clonedPartition.Reference_0_n.Count);
         Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[0].GetId());
     }
 
@@ -315,7 +316,76 @@ public class NotificationTests_Reference : NotificationTestsBase
         
         CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
         
+        Assert.AreEqual(3, clonedPartition.Reference_0_n.Count);
         Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[^1].GetId());
+    }
+
+    [TestMethod]
+    public void MoveEntryInSameReference_Forward_MoreThanThreeNodes()
+    {
+        var ref1 = new LinkTestConcept("ref1");
+        var ref2 = new LinkTestConcept("ref2");
+        var ref3 = new LinkTestConcept("ref3");
+        var ref4 = new LinkTestConcept("ref4");
+        var moved = new LinkTestConcept("moved");
+        
+        var originalPartition = new LinkTestConcept("concept")
+        {
+            Reference_0_n = [ref1, moved, ref2, ref3, ref4]
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var oldIndex = 1;
+        var newIndex = 3;
+        var notification = new EntryMovedInSameReferenceNotification(originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            oldIndex, newIndex, new ReferenceTarget {Reference = moved}, new NumericNotificationId("moveEntryInSameReference", 0));
+        
+        var sharedNodeMap = new SharedNodeMap();
+        
+        foreach (var reference in originalPartition.Reference_0_n)
+        {
+            sharedNodeMap.RegisterNode(reference);
+        }
+        
+        CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+        
+        Assert.AreEqual(5, clonedPartition.Reference_0_n.Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[3].GetId());
+    }
+
+    [TestMethod]
+    public void MoveEntryInSameReference_Backward_MoreThanThreeNodes()
+    {
+        var ref1 = new LinkTestConcept("ref1");
+        var ref2 = new LinkTestConcept("ref2");
+        var ref3 = new LinkTestConcept("ref3");
+        var ref4 = new LinkTestConcept("ref4");
+        var moved = new LinkTestConcept("moved");
+        
+        var originalPartition = new LinkTestConcept("concept")
+        {
+            Reference_0_n = [ref1, ref2, ref3, moved, ref4]
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var oldIndex = 3;
+        var newIndex = 1;
+        var notification = new EntryMovedInSameReferenceNotification(originalPartition, TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n,
+            oldIndex, newIndex, new ReferenceTarget {Reference = moved}, new NumericNotificationId("moveEntryInSameReference", 0));
+        
+        var sharedNodeMap = new SharedNodeMap();
+        
+        foreach (var reference in originalPartition.Reference_0_n)
+        {
+            sharedNodeMap.RegisterNode(reference);
+        }
+        
+        CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+        
+        Assert.AreEqual(5, clonedPartition.Reference_0_n.Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[1].GetId());
     }
 
     #endregion
