@@ -24,7 +24,6 @@ using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using Comparer = Core.Utilities.Comparer;
 
 public abstract class NotificationTestsBase
 {
@@ -33,14 +32,14 @@ public abstract class NotificationTestsBase
 
     protected static void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+        List<IDifference> differences = new IdComparer(expected.ToList(), actual.ToList()).Compare().ToList();
+        Assert.HasCount(0, differences, differences.DescribeAll(new()));
     }
 
     protected static void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
     {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+        List<IDifference> differences = new IdComparer(expected.ToList(), actual.ToList()).Compare().ToList();
+        Assert.HasCount(0, differences, differences.DescribeAll(new()));
     }
     
     protected static void CreateForestReplicator(IForest clonedForest, IForest originalForest)
@@ -75,6 +74,9 @@ public abstract class NotificationTestsBase
         
         notificationForwarder.ProduceNotification(notification);
     }
+    
+    protected Circle NewCircle(string id) => new(id) { Name = id };
+    protected Line NewLine(string id) => new(id) { Name = id };
 }
 
 internal class NotificationForwarder() : NotificationPipeBase(null), INotificationProducer
