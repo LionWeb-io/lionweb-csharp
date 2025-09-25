@@ -22,6 +22,7 @@ using Core.Notification.Partition;
 using Languages.Generated.V2025_1.Shapes.M2;
 using Languages.Generated.V2025_1.TestLanguage;
 
+[TestClass]
 public class NotificationTests_Reference : NotificationTestsBase
 {
     #region References

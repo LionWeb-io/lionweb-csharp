@@ -21,6 +21,7 @@ using Core.Notification;
 using Core.Notification.Partition;
 using Languages.Generated.V2025_1.Shapes.M2;
 
+[TestClass]
 public class NotificationTests_Annotation: NotificationTestsBase
 {
     //TODO: add tests for MoveAndReplaceAnnotationFromOtherParent
