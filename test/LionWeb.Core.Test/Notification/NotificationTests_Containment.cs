@@ -545,8 +545,8 @@ public class NotificationTests_Containment: NotificationTestsBase
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
-    // Should emit ChildMovedAndReplacedFromOtherContainmentNotification TODO: requires fix!
     [TestMethod]
+    [Ignore("Should emit ChildMovedAndReplacedFromOtherContainmentNotification")]
     public void ChildMovedAndReplacedFromOtherContainment_Multiple()
     {
         var moved = new Circle("moved");
@@ -562,11 +562,31 @@ public class NotificationTests_Containment: NotificationTestsBase
         
         replaced.ReplaceWith(moved);
         
-        Assert.AreEqual(2, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildDeletedNotification>(notificationObserver.Notifications[0]);
-        Assert.IsInstanceOfType<ChildMovedFromOtherContainmentNotification>(notificationObserver.Notifications[1]);
-
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildMovedAndReplacedFromOtherContainmentNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
+    }
+
+    [TestMethod]
+    public void ChildMovedAndReplacedFromOtherContainment_Multiple_ProducesNotification()
+    {
+        var moved = new Circle("moved");
+        var origin = new CompositeShape("origin") { Parts = [moved] };
+        var replaced = new Circle("replaced");
+        var originalPartition = new Geometry("a") { Shapes = [origin, replaced] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var newIndex = 1;
+        var oldIndex = 0;
+        var notification = new ChildMovedAndReplacedFromOtherContainmentNotification(originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+            newIndex, moved, origin, ShapesLanguage.Instance.CompositeShape_parts, oldIndex, replaced, new NumericNotificationId("childMovedAndReplacedFromOtherContainment", 0));
+        
+        CreatePartitionReplicator(clonedPartition, notification);
+        
+        Assert.AreEqual(1, clonedPartition.Shapes.Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[^1].GetId());
     }
 
     #endregion
