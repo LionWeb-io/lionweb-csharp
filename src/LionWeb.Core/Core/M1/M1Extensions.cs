@@ -137,6 +137,9 @@ public static class M1Extensions
     /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent.</exception>
     public static T ReplaceWith<T>(this INode self, T replacement) where T : INode
     {
+        if (ReferenceEquals(self, replacement))
+            return replacement;
+        
         INode? parent = self.GetParent();
         if (parent == null)
             throw new TreeShapeException(self, "Cannot replace a node with no parent");
