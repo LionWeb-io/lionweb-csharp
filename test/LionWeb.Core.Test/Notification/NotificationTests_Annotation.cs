@@ -24,7 +24,8 @@ using Languages.Generated.V2025_1.Shapes.M2;
 [TestClass]
 public class NotificationTests_Annotation: NotificationTestsBase
 {
-    //TODO: add tests for MoveAndReplaceAnnotationFromOtherParent
+    //TODO: misses tests for MoveAndReplaceAnnotationFromOtherParent
+    // Requires implementation of emitter logic and support in replicator.
     
     #region Annotations
 
