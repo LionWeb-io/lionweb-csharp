@@ -74,9 +74,6 @@ public abstract class NotificationTestsBase
         
         notificationForwarder.ProduceNotification(notification);
     }
-    
-    protected Circle NewCircle(string id) => new(id) { Name = id };
-    protected Line NewLine(string id) => new(id) { Name = id };
 }
 
 internal class NotificationForwarder() : NotificationPipeBase(null), INotificationProducer
