@@ -142,7 +142,7 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot replace a node with no parent");
 
         if (replacement is null)
-            throw new ArgumentException("Null is not a valid node");
+            throw new UnsupportedNodeTypeException(replacement, nameof(replacement));
         
         Containment containment = parent.GetContainmentOf(self);
 
@@ -173,7 +173,8 @@ public static class M1Extensions
 
             var replacementParent = replacement.GetParent();
             var replacementContainment = replacementParent?.GetContainmentOf(replacement);
-            if (replacementContainment == containment)
+            
+            if (containment.Equals(replacementContainment))
             {
                 var replacementIndex = nodes.IndexOf(replacement);
                 nodes.Insert(index, replacement);
@@ -184,6 +185,7 @@ public static class M1Extensions
                 nodes.Insert(index, replacement);
                 nodes.Remove(self);
             }
+            
             parent.Set(containment, nodes);
         } else
         {
