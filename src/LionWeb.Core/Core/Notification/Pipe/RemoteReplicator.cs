@@ -241,8 +241,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             var localNewParent = Lookup(notification.NewParent.GetId());
             var substituteNode = Lookup(notification.MovedChild.GetId());
             var newValue = ReplaceContainment(localNewParent, notification.NewContainment,
-                notification.NewIndex, 
-                substituteNode);
+                notification.NewIndex, substituteNode);
 
             localNewParent.Set(notification.NewContainment, newValue, notification.NotificationId);
         });
@@ -292,12 +291,13 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             var localParent = Lookup(notification.Parent.GetId());
             var substituteNode = Lookup(notification.MovedChild.GetId());
-            var newValue = ReplaceContainment(localParent, notification.Containment, notification.NewIndex, substituteNode, notification.OldIndex);
+            var newValue = ReplaceContainment(localParent, notification.Containment, notification.NewIndex, 
+                substituteNode, notification.OldIndex);
             
             localParent.Set(notification.Containment, newValue);
         });
     
-    private static object ReplaceContainment(INode localParent, Containment containment, Index newIndex,INode substituteNode,  Index? oldIndex = null)
+    private static object ReplaceContainment(INode localParent, Containment containment, Index newIndex, INode substituteNode, Index? oldIndex = null)
     {
         if (localParent.TryGet(containment, out var existingChildren))
         {
@@ -309,11 +309,11 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                         
                         var substituteNodeParent = substituteNode.GetParent();
                         var substituteNodeContainment = substituteNodeParent?.GetContainmentOf(substituteNode);
-                        if (substituteNodeContainment == containment)
+                        if (containment.Equals(substituteNodeContainment))
                         {
                            children.Insert(newIndex, substituteNode);
                            children.RemoveAt(newIndex + 1);
-                           children.RemoveAt(oldIndex > newIndex ? children.LastIndexOf(substituteNode) : children.IndexOf(substituteNode));
+                           children.RemoveAt(newIndex < oldIndex ? children.LastIndexOf(substituteNode) : children.IndexOf(substituteNode));
                         }else
                         {
                             children.Insert(newIndex, substituteNode);
