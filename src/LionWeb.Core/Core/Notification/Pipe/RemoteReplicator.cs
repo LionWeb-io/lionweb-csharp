@@ -112,7 +112,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 OnRemoteAnnotationMovedInSameParent(e);
                 break;
             case AnnotationMovedAndReplacedInSameParentNotification e:
-                OnAnnotationMovedAndReplacedInSameParent(e);
+                OnRemoteAnnotationMovedAndReplacedInSameParent(e);
                 break;
             case ReferenceAddedNotification e:
                 OnRemoteReferenceAdded(e);
@@ -124,7 +124,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 OnRemoteReferenceChanged(e);
                 break;
             case EntryMovedInSameReferenceNotification e:
-                OnEntryMovedInSameReference(e);
+                OnRemoteEntryMovedInSameReference(e);
                 break;
             default:
                 throw new ArgumentException($"Can not process notification due to unknown {notification}!");
@@ -409,7 +409,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             localParent.InsertAnnotations(notification.NewIndex, [nodeToInsert], notification.NotificationId);
         });
 
-    private void OnAnnotationMovedAndReplacedInSameParent(AnnotationMovedAndReplacedInSameParentNotification notification) =>
+    private void OnRemoteAnnotationMovedAndReplacedInSameParent(AnnotationMovedAndReplacedInSameParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = Lookup(notification.Parent.GetId());
@@ -476,7 +476,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             localParent.Set(notification.Reference, newValue, notification.NotificationId);
         });
     
-    private void OnEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
+    private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
     {
         var localParent = Lookup(notification.Parent.GetId());
         var target = Lookup(notification.Target.Reference.GetId());
