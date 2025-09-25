@@ -45,10 +45,8 @@ public class ReplaceTests_Containment
             Shapes = [new Line("substituteNode")]
         };
         
-        List<IDifference> differences = new Comparer(new List<INode?> {expected}, new List<INode?> {actual}).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
-     
-    } 
+        AssertEquals([expected], [actual]);
+    }
     
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_WithTwoChildren()
@@ -68,8 +66,7 @@ public class ReplaceTests_Containment
             Shapes = [new Line("substituteNode")]
         };
         
-        List<IDifference> differences = new Comparer(new List<INode?> {expected}, new List<INode?> {actual}).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+        AssertEquals([expected], [actual]);
     } 
     
     [TestMethod]
@@ -90,9 +87,7 @@ public class ReplaceTests_Containment
             Shapes = [NewCircle("child"), new Line("substituteNode")]
         };
         
-        List<IDifference> differences = new Comparer(new List<INode?> {expected}, new List<INode?> {actual}).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
-     
+        AssertEquals([expected], [actual]);
     } 
     
     
@@ -114,9 +109,7 @@ public class ReplaceTests_Containment
             Shapes = [NewCircle("child"), new Line("substituteNode")]
         };
         
-        List<IDifference> differences = new Comparer(new List<INode?> {expected}, new List<INode?> {actual}).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
-     
+        AssertEquals([expected], [actual]);
     } 
     
     [TestMethod]
@@ -137,10 +130,9 @@ public class ReplaceTests_Containment
             Shapes = [new Line("substituteNode"), NewCircle("child")]
         };
         
-        List<IDifference> differences = new Comparer(new List<INode?> {expected}, new List<INode?> {actual}).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
-     
+        AssertEquals([expected], [actual]);
     }
+    
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_MoreThanThreeChildren()
     {
@@ -159,13 +151,17 @@ public class ReplaceTests_Containment
             Shapes = [NewCircle("A"), new Line("E"), NewCircle("C"), NewCircle("D"), NewCircle("F")]
         };
         
-        List<IDifference> differences = new Comparer(new List<INode?> {expected}, new List<INode?> {actual}).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
-     
+        AssertEquals([expected], [actual]);
     }
 
     private Circle NewCircle(string id) => new(id) { Name = id };
 
+    private static void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
+    {
+        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
+        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+    }
+    
     #endregion
 
     [TestMethod]
@@ -267,7 +263,7 @@ public class ReplaceTests_Containment
                 circle
             ]
         };
-        Assert.ThrowsExactly<ArgumentException>(() => circle.ReplaceWith((INode)null));
+        Assert.ThrowsExactly<UnsupportedNodeTypeException>(() => circle.ReplaceWith((INode)null));
     }
 }
 
@@ -336,6 +332,6 @@ public class ReplaceTests_Annotation
 
         var shape = new Line("geom");
         shape.AddAnnotations([doc]);
-        Assert.ThrowsExactly<ArgumentException>(() => doc.ReplaceWith((INode)null));
+        Assert.ThrowsExactly<UnsupportedNodeTypeException>(() => doc.ReplaceWith((INode)null));
     }
 }
