@@ -483,9 +483,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         
         object newValue = target;
         var reference = notification.Reference;
-        if (localParent.CollectAllSetFeatures().Contains(reference))
+        if (localParent.TryGet(reference, out object? existingTargets))
         {
-            var existingTargets = localParent.Get(reference);
             if (existingTargets is IList l)
             {
                 var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
