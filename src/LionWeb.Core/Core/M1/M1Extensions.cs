@@ -138,7 +138,7 @@ public static class M1Extensions
     public static T ReplaceWith<T>(this INode self, T replacement) where T : INode
     {
         if (ReferenceEquals(self, replacement))
-            return (T)self;
+            return replacement;
         
         INode? parent = self.GetParent();
         if (parent == null)
