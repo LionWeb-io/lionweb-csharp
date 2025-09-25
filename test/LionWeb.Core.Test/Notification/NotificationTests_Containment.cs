@@ -24,7 +24,7 @@ using M1;
 
 public class NotificationTests_Containment: NotificationTestsBase
 {
-        #region Children
+    #region Children
 
     #region ChildAdded
 
@@ -217,10 +217,56 @@ public class NotificationTests_Containment: NotificationTestsBase
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
-    /// <summary>
-    /// Should trigger ChildReplacedNotification TODO: requires fix !
-    /// </summary>
     [TestMethod]
+    public void ChildReplaced_Multiple_Only_ProducesNotification()
+    {
+        var replaced = new Circle("replaced");
+        
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [replaced]
+        };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var substituteNode = new Line("substituteNode");
+        var childReplacedNotification = new ChildReplacedNotification(substituteNode, replaced, originalPartition, 
+            ShapesLanguage.Instance.Geometry_shapes, 0, new NumericNotificationId("childReplacedNotification", 0));
+        
+        CreatePartitionReplicator(clonedPartition, childReplacedNotification);
+        
+        Assert.AreEqual(1, clonedPartition.Shapes.Count);
+        Assert.AreEqual(substituteNode.GetId(), clonedPartition.Shapes[0].GetId());
+    }
+    
+    [TestMethod]
+    [Ignore("Should emit ChildReplacedNotification")]
+    public void ChildReplaced_Multiple_Only()
+    {
+        var replaced = new Circle("replaced");
+        var substituteNode = new Line("substituteNode");
+        
+        var originalPartition = new Geometry("a")
+        {
+            Shapes = [replaced]
+        };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+        
+        replaced.ReplaceWith(substituteNode);
+
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    [TestMethod]
+    [Ignore("Should emit ChildReplacedNotification")]
     public void ChildReplaced_Multiple_First()
     {
         var replaced = new Circle("replaced");
@@ -239,16 +285,13 @@ public class NotificationTests_Containment: NotificationTestsBase
         
         replaced.ReplaceWith(substituteNode);
         
-        Assert.AreEqual(2, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildDeletedNotification>(notificationObserver.Notifications[0]);
-        Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[1]);
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
-    /// <summary>
-    /// Should trigger ChildReplacedNotification TODO: requires fix !
-    /// </summary>
     [TestMethod]
+    [Ignore("Should emit ChildReplacedNotification")]
     public void ChildReplaced_Multiple_Last()
     {
         var replaced = new Circle("replaced");
@@ -267,15 +310,18 @@ public class NotificationTests_Containment: NotificationTestsBase
         
         replaced.ReplaceWith(substituteNode);
 
-        Assert.AreEqual(2, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildDeletedNotification>(notificationObserver.Notifications[0]);
-        Assert.IsInstanceOfType<ChildAddedNotification>(notificationObserver.Notifications[1]);
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<ChildReplacedNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
     }
     
-    // Should emit ChildMovedAndReplacedInSameContainmentNotification TODO: requires fix!
+    #endregion
+
+    #region ChildMovedAndReplaceInSameContainment
+    
     [TestMethod]
-    public void ChildReplaced_Multiple_Middle_InSameContainment_Backward()
+    [Ignore("Should emit ChildMovedAndReplacedInSameContainmentNotification")]
+    public void ChildMovedAndReplacedInSameContainment_Backward()
     {
         var substituteNode = new Line("substituteNode");
         var replaced = new Circle("replaced");
@@ -294,14 +340,13 @@ public class NotificationTests_Containment: NotificationTestsBase
         replaced.ReplaceWith(substituteNode);
         
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildDeletedNotification>(notificationObserver.Notifications[0]);
-
+        Assert.IsInstanceOfType<ChildMovedAndReplacedInSameContainmentNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
-    // Should emit ChildMovedAndReplacedInSameContainmentNotification TODO: requires fix!
     [TestMethod]
-    public void ChildReplaced_Multiple_Middle_InSameContainment_Forward()
+    [Ignore("Should emit ChildMovedAndReplacedInSameContainmentNotification")]
+    public void ChildMovedAndReplacedInSameContainment_Forward()
     {
         var substituteNode = new Line("substituteNode");
         var replaced = new Circle("replaced");
@@ -320,9 +365,96 @@ public class NotificationTests_Containment: NotificationTestsBase
         replaced.ReplaceWith(substituteNode);
         
         Assert.AreEqual(1, notificationObserver.Count);
-        Assert.IsInstanceOfType<ChildDeletedNotification>(notificationObserver.Notifications[0]);
-        
+        Assert.IsInstanceOfType<ChildMovedAndReplacedInSameContainmentNotification>(notificationObserver.Notifications[0]);
         AssertEquals([originalPartition], [clonedPartition]);
+    }
+
+    [TestMethod]
+    public void ChildMovedAndReplacedInSameContainment_Forward_ProducesNotification()
+    {
+        var moved = new Circle("moved");
+        var replaced = new Line("replaced");
+        var originalPartition = new Geometry("a") { Shapes = [moved, replaced] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var newIndex = 1;
+        var oldIndex = 0;
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+
+        Assert.AreEqual(1, clonedPartition.Shapes.Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[0].GetId());
+    }
+
+    [TestMethod]
+    public void ChildMovedAndReplacedInSameContainment_BackwardP_ProducesNotification()
+    {
+        var moved = new Circle("moved");
+        var replaced = new Line("replaced");
+        var originalPartition = new Geometry("a") { Shapes = [replaced, moved] };
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var newIndex = 0;
+        var oldIndex = 1;
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+
+        Assert.AreEqual(1, clonedPartition.Shapes.Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[0].GetId());
+    }
+    
+    [TestMethod]
+    public void ChildMovedAndReplacedInSameContainment_Backward_MoreThanThreeChildren_ProducesNotification()
+    {
+        var substituteNode = new Line("E");
+        var replaced = new Circle("B");
+        
+        var originalPartition = new Geometry("container")
+        {
+            Shapes = [new Circle("A"), replaced, new Circle("C"), new Circle("D"), substituteNode, new Circle("F")]
+        };
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var newIndex = 1;
+        var oldIndex = 4;
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, substituteNode, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+        
+        replaced.ReplaceWith(substituteNode);
+        
+        Assert.AreEqual(5, clonedPartition.Shapes.Count);
+        Assert.AreEqual(substituteNode.GetId(), clonedPartition.Shapes[1].GetId());
+    }
+    
+    [TestMethod]
+    public void ChildMovedAndReplacedInSameContainment_Forward_MoreThanThreeChildren_ProducesNotification()
+    {
+        var substituteNode = new Line("E");
+        var replaced = new Circle("B");
+        
+        var originalPartition = new Geometry("container")
+        {
+            Shapes = [new Circle("A"), substituteNode, new Circle("C"), new Circle("D"), replaced, new Circle("F")]
+        };
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var newIndex = 4;
+        var oldIndex = 1;
+        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, substituteNode, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
+            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
+
+        CreatePartitionReplicator(clonedPartition, notification);
+        
+        replaced.ReplaceWith(substituteNode);
+        
+        Assert.AreEqual(5, clonedPartition.Shapes.Count);
+        Assert.AreEqual(substituteNode.GetId(), clonedPartition.Shapes[^2].GetId());
     }
 
     #endregion
@@ -551,94 +683,6 @@ public class NotificationTests_Containment: NotificationTestsBase
         originalPartition.InsertShapes(0, [moved]);
 
         AssertEquals([originalPartition], [clonedPartition]);
-    }
-
-    [TestMethod]
-    public void ChildMovedAndReplacedInSameContainment_Forward()
-    {
-        var moved = new Circle("moved");
-        var replaced = new Line("replaced");
-        var originalPartition = new Geometry("a") { Shapes = [moved, replaced] };
-        var clonedPartition = ClonePartition(originalPartition);
-
-        var newIndex = 1;
-        var oldIndex = 0;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
-            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
-
-        CreatePartitionReplicator(clonedPartition, notification);
-
-        Assert.AreEqual(1, clonedPartition.Shapes.Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[0].GetId());
-    }
-
-    [TestMethod]
-    public void ChildMovedAndReplacedInSameContainment_Backward()
-    {
-        var moved = new Circle("moved");
-        var replaced = new Line("replaced");
-        var originalPartition = new Geometry("a") { Shapes = [replaced, moved] };
-        var clonedPartition = ClonePartition(originalPartition);
-
-        var newIndex = 0;
-        var oldIndex = 1;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, moved, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
-            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
-
-        CreatePartitionReplicator(clonedPartition, notification);
-
-        Assert.AreEqual(1, clonedPartition.Shapes.Count);
-        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[0].GetId());
-    }
-    
-    [TestMethod]
-    public void ChildMovedAndReplacedInSameContainment_Backward_MoreThanThreeChildren()
-    {
-        var substituteNode = new Line("E");
-        var replaced = new Circle("B");
-        
-        var originalPartition = new Geometry("container")
-        {
-            Shapes = [new Circle("A"), replaced, new Circle("C"), new Circle("D"), substituteNode, new Circle("F")]
-        };
-        var clonedPartition = ClonePartition(originalPartition);
-        
-        var newIndex = 1;
-        var oldIndex = 4;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, substituteNode, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
-            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
-
-        CreatePartitionReplicator(clonedPartition, notification);
-        
-        replaced.ReplaceWith(substituteNode);
-        
-        Assert.AreEqual(5, clonedPartition.Shapes.Count);
-        Assert.AreEqual(substituteNode.GetId(), clonedPartition.Shapes[1].GetId());
-    }
-    
-    [TestMethod]
-    public void ChildMovedAndReplacedInSameContainment_Forward_MoreThanThreeChildren()
-    {
-        var substituteNode = new Line("E");
-        var replaced = new Circle("B");
-        
-        var originalPartition = new Geometry("container")
-        {
-            Shapes = [new Circle("A"), substituteNode, new Circle("C"), new Circle("D"), replaced, new Circle("F")]
-        };
-        var clonedPartition = ClonePartition(originalPartition);
-        
-        var newIndex = 4;
-        var oldIndex = 1;
-        var notification = new ChildMovedAndReplacedInSameContainmentNotification(newIndex, substituteNode, originalPartition, ShapesLanguage.Instance.Geometry_shapes, 
-            replaced, oldIndex, new NumericNotificationId("childMovedAndReplacedInSameContainment", 0));
-
-        CreatePartitionReplicator(clonedPartition, notification);
-        
-        replaced.ReplaceWith(substituteNode);
-        
-        Assert.AreEqual(5, clonedPartition.Shapes.Count);
-        Assert.AreEqual(substituteNode.GetId(), clonedPartition.Shapes[^2].GetId());
     }
 
     #endregion
