@@ -47,8 +47,8 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added external languages to `DynamicLanguageCloner`.
 * Added convenience method `DynamicLanguageClonerExtensions.Clone(Language)`.
 ### Fixed
-* Bug fix: `M1Extensions.ReplaceWith` method now handles node move and replacement operation in the same containment.
-* Bug fix: this bug fix prevents emitting `ReferenceChangedNotification` when old and new targets of a reference are the same nodes.
+* Bug fix: `M1Extensions.ReplaceWith` method now handles node move and replacement operation in the same containment correctly.
+* Bug fix: prevents emitting `ReferenceChangedNotification` when old and new targets of a reference are the same nodes.
 * Bug fix: generator now generates correct type for features of builtin Node type
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
