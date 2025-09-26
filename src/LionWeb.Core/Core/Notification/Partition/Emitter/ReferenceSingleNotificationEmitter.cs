@@ -43,6 +43,9 @@ public class ReferenceSingleNotificationEmitter : ReferenceNotificationEmitterBa
         if (!IsActive())
             return;
 
+        if (ReferenceEquals(_oldTarget, _newTarget))
+            return;
+        
         switch (_oldTarget, _newTarget)
         {
             case (null, { } v):

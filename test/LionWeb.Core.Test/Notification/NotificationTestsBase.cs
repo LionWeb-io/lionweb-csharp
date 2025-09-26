@@ -24,26 +24,25 @@ using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
-using Comparer = Core.Utilities.Comparer;
 
 public abstract class NotificationTestsBase
 {
     protected T ClonePartition<T>(T node) where T : IPartitionInstance, INode =>
         (T)new SameIdCloner([node]) { IncludingReferences = true }.Clone()[node];
 
-    protected void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
+    protected static void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
     {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+        List<IDifference> differences = new IdComparer(expected.ToList(), actual.ToList()).Compare().ToList();
+        Assert.HasCount(0, differences, differences.DescribeAll(new()));
     }
 
-    protected void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
+    protected static void AssertEquals(IEnumerable<IReadableNode?> expected, IEnumerable<IReadableNode?> actual)
     {
-        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
-        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+        List<IDifference> differences = new IdComparer(expected.ToList(), actual.ToList()).Compare().ToList();
+        Assert.HasCount(0, differences, differences.DescribeAll(new()));
     }
     
-    protected void CreateForestReplicator(IForest clonedForest, IForest originalForest)
+    protected static void CreateForestReplicator(IForest clonedForest, IForest originalForest)
     {
         var sharedNodeMap = new SharedNodeMap();
         var notificationMapper = new NotificationMapper(sharedNodeMap);
@@ -53,7 +52,7 @@ public abstract class NotificationTestsBase
         notificationMapper.ConnectTo(replicator);
     }
     
-    protected void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition)
+    protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition)
     {
         var sharedNodeMap = new SharedNodeMap();
         var notificationMapper = new NotificationMapper(sharedNodeMap);
@@ -62,6 +61,24 @@ public abstract class NotificationTestsBase
         var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
         notificationMapper.ConnectTo(replicator);
     }
+    
+    protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, INotification notification, SharedNodeMap? sharedNodeMap = null)
+    {
+        sharedNodeMap ??= new SharedNodeMap();
+        var notificationMapper = new NotificationMapper(sharedNodeMap);
+        var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
+        var notificationForwarder = new NotificationForwarder();
+        
+        notificationForwarder.ConnectTo(notificationMapper);
+        notificationMapper.ConnectTo(replicator);
+        
+        notificationForwarder.ProduceNotification(notification);
+    }
+}
+
+internal class NotificationForwarder() : NotificationPipeBase(null), INotificationProducer
+{
+    public void ProduceNotification(INotification notification) => Send(notification);
 }
 
 public interface IReplicatorCreator
@@ -77,6 +94,16 @@ internal class NotificationMapper(SharedNodeMap sharedNodeMap) : NotificationPip
 
     public void Receive(INotificationSender correspondingSender, INotification notification) =>
         ProduceNotification(_notificationMapper.Map(notification));
+}
+
+internal class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver
+{
+    public int Count => Notifications.Count;
+
+    public List<INotification> Notifications { get; } = [];
+
+    public void Receive(INotificationSender correspondingSender, INotification notification) =>
+        Notifications.Add(notification);
 }
 
 [Obsolete("Will be removed after tests are refactored with proper ConnectTo() calls")]

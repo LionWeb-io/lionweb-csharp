@@ -48,13 +48,17 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             ChildMovedInSameContainmentNotification a => OnChildMovedInSameContainment(a),
             ChildMovedAndReplacedFromOtherContainmentNotification a => OnChildMovedAndReplacedFromOtherContainment(a),
             ChildMovedAndReplacedFromOtherContainmentInSameParentNotification a => OnChildMovedAndReplacedFromOtherContainmentInSameParent(a),
+            ChildMovedAndReplacedInSameContainmentNotification a => OnChildMovedAndReplacedInSameContainment(a),
             AnnotationAddedNotification a => OnAnnotationAdded(a),
             AnnotationDeletedNotification a => OnAnnotationDeleted(a),
+            AnnotationReplacedNotification a => OnAnnotationReplaced(a),
+            AnnotationMovedAndReplacedInSameParentNotification a => OnAnnotationMovedAndReplacedInSameParentNotification(a),
             AnnotationMovedFromOtherParentNotification a => OnAnnotationMovedFromOtherParent(a),
             AnnotationMovedInSameParentNotification a => OnAnnotationMovedInSameParent(a),
             ReferenceAddedNotification a => OnReferenceAdded(a),
             ReferenceDeletedNotification a => OnReferenceDeleted(a),
             ReferenceChangedNotification a => OnReferenceChanged(a),
+            EntryMovedInSameReferenceNotification a => OnEntryMovedInSameReference(a),
             _ => throw new ArgumentException($"{notification.GetType().Name} is not implemented")
         };
 
@@ -114,7 +118,6 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     }
 
     #endregion
-
 
     #region Children
 
@@ -254,8 +257,24 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         );
     }
 
-    #endregion
+    private ChildMovedAndReplacedInSameContainmentNotification OnChildMovedAndReplacedInSameContainment(ChildMovedAndReplacedInSameContainmentNotification notification)
+    {
+        var parent = LookUpNode(notification.Parent);
+        var movedChild = LookUpNode(notification.MovedChild);
+        var replacedChild = LookUpNode(notification.ReplacedChild);
+        
+        return new ChildMovedAndReplacedInSameContainmentNotification(
+            notification.NewIndex,
+            movedChild,
+            parent,
+            notification.Containment,
+            replacedChild,
+            notification.OldIndex,
+            notification.NotificationId
+        );
+    }
 
+    #endregion
 
     #region Annotations
 
@@ -285,6 +304,19 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
         );
     }
 
+    private AnnotationReplacedNotification OnAnnotationReplaced(AnnotationReplacedNotification notification)
+    {
+        var newAnnotation = CloneNode(notification.NewAnnotation);
+        var parent = LookUpNode(notification.Parent);
+
+        return new AnnotationReplacedNotification(
+            newAnnotation,
+            notification.ReplacedAnnotation,
+            parent,
+            notification.Index,
+            notification.NotificationId);
+    }
+
     private AnnotationMovedFromOtherParentNotification OnAnnotationMovedFromOtherParent(
         AnnotationMovedFromOtherParentNotification notification)
     {
@@ -312,6 +344,22 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             movedAnnotation,
             parent,
             notification.OldIndex,
+            notification.NotificationId
+        );
+    }
+    
+    private INotification OnAnnotationMovedAndReplacedInSameParentNotification(AnnotationMovedAndReplacedInSameParentNotification notification)
+    {
+        var parent = LookUpNode(notification.Parent);
+        var movedAnnotation = LookUpNode(notification.MovedAnnotation);
+        var replacedAnnotation = LookUpNode(notification.ReplacedAnnotation);
+        
+        return new AnnotationMovedAndReplacedInSameParentNotification(
+            notification.NewIndex,
+            movedAnnotation,
+            parent,
+            notification.OldIndex,
+            replacedAnnotation,
             notification.NotificationId
         );
     }
@@ -363,6 +411,20 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             notification.NotificationId
         );
     }
+    
+    private EntryMovedInSameReferenceNotification OnEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
+    {
+        var parent = LookUpNode(notification.Parent);
+        var target = LookUpNode(notification.Target);
+        
+        return new EntryMovedInSameReferenceNotification(
+            parent, 
+            notification.Reference,
+            notification.OldIndex,
+            notification.NewIndex,
+            target,
+            notification.NotificationId);
+    }
 
     #endregion
 
@@ -374,9 +436,9 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
 
         // TODO change to correct exception (UnknownNodeIdException ?)
         throw new NotImplementedException($"Unknown node with id: {nodeId}");
-    }  
-    
-    private ReferenceTarget LookUpNode(IReferenceTarget target) 
+    }
+
+    private ReferenceTarget LookUpNode(IReferenceTarget target)
     {
         var nodeId = target.Reference.GetId();
         if (sharedNodeMap.TryGetValue(nodeId, out var result))

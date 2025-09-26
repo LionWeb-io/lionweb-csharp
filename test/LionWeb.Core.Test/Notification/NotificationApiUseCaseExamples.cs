@@ -165,7 +165,7 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
         var partition = new Geometry("geo");
 
         var compositor = new NotificationCompositor("compositor");
-        var counter = new Notification.NotificationCounter();
+        var counter = new NotificationCounter();
 
         partition.GetNotificationSender()!.ConnectTo(compositor);
         compositor.ConnectTo(counter);

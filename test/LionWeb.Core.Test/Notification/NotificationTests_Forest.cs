@@ -155,7 +155,7 @@ public class NotificationTests_Forest : NotificationTestsBase
 
         CreateForestReplicator(clonedForest, originalForest);
 
-        var notificationCounter = new NotificationCounter();
+        var notificationCounter = new NotificationObserver();
 
         originalForest.GetNotificationSender()!.ConnectTo(notificationCounter);
 

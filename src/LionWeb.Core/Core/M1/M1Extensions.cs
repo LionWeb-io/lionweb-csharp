@@ -137,10 +137,16 @@ public static class M1Extensions
     /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent.</exception>
     public static T ReplaceWith<T>(this INode self, T replacement) where T : INode
     {
+        if (ReferenceEquals(self, replacement))
+            return replacement;
+        
         INode? parent = self.GetParent();
         if (parent == null)
             throw new TreeShapeException(self, "Cannot replace a node with no parent");
 
+        if (replacement is null)
+            throw new UnsupportedNodeTypeException(replacement, nameof(replacement));
+        
         Containment containment = parent.GetContainmentOf(self);
 
         if (containment == null)
@@ -168,8 +174,21 @@ public static class M1Extensions
                 // should not happen
                 throw new TreeShapeException(self, "Node not contained in its parent");
 
-            nodes.Insert(index, replacement);
-            nodes.Remove(self);
+            var replacementParent = replacement.GetParent();
+            var replacementContainment = replacementParent?.GetContainmentOf(replacement);
+            
+            if (containment.Equals(replacementContainment))
+            {
+                var replacementIndex = nodes.IndexOf(replacement);
+                nodes.Insert(index, replacement);
+                nodes.RemoveAt(index + 1);
+                nodes.RemoveAt(index < replacementIndex ? nodes.LastIndexOf(replacement) : nodes.IndexOf(replacement));
+            } else
+            {
+                nodes.Insert(index, replacement);
+                nodes.Remove(self);
+            }
+            
             parent.Set(containment, nodes);
         } else
         {
