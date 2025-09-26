@@ -34,7 +34,7 @@ public class NotificationCompositor : NotificationPipeBase, INotificationHandler
 
     /// Pushes a new composite, and adds it to the previous one (if any).
     public CompositeNotification Push() =>
-        Push(new CompositeNotification(_idProvider.CreateNotificationId()));
+        Push(new CompositeNotification(_idProvider.Create()));
 
     /// Pushes <paramref name="composite"/>, and adds it to the previous one (if any).
     /// <returns><paramref name="composite"/></returns>

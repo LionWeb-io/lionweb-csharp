@@ -191,7 +191,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         Debug.Assert(partitionInstances.Count == 1);
         var result = partitionInstances.First();
 
-        var notificationId = new NotificationIdProvider(this).CreateNotificationId();
+        var notificationId = new NotificationIdProvider(this).Create();
         _ownNotifications[notificationId] = true;
 
         _forest.AddPartitions([result], notificationId);
@@ -230,7 +230,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
     public override async Task<ReconnectResponse> Reconnect(ParticipationId participationId)
     {
         if(SignedIn)
-            throw new DeltaException(new ErrorResponse("AlreadySignedIn", "Already signed in", null, null));
+            throw new DeltaException(DeltaErrorCode.AlreadySignedOn.AsErrorResponse(null, null));
 
         var response = await Query<ReconnectResponse, ReconnectRequest>(new ReconnectRequest(participationId, EventSequenceNumber, QueryId(), null));
         ParticipationId = participationId;
@@ -266,7 +266,7 @@ public class LionWebClient : LionWebClientBase<IDeltaContent>
         where TResponse : class, IDeltaQueryResponse where TRequest : IDeltaQueryRequest
     {
         if (request.RequiresParticipationId && !SignedIn)
-            throw new DeltaException(new ErrorResponse("NotSignedIn", "Not signed in", request.QueryId, null));
+            throw new DeltaException(DeltaErrorCode.NotSignedOn.AsErrorResponse(request.QueryId, null));
         
         var tcs = new TaskCompletionSource<IDeltaQueryResponse>();
         _queryResponses[request.QueryId] = tcs;

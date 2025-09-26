@@ -29,6 +29,7 @@ public record PartitionAdded(
     CommandSource[]? OriginCommands,
     ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IForestDeltaEvent
 {
+    /// <remarks>Don't delete: We need the <see cref="JsonIgnoreAttribute"/></remarks>
     [JsonIgnore]
     public TargetNode AffectedNode { get; init; } = AffectedNode;
 

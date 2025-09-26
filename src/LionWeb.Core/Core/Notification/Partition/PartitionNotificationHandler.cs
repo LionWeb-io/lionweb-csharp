@@ -34,5 +34,5 @@ public class PartitionNotificationProducer(object? sender)
 
     /// <inheritdoc />
     public INotificationId CreateNotificationId() =>
-        _notificationIdProvider.CreateNotificationId();
+        _notificationIdProvider.Create();
 }

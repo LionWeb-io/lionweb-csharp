@@ -17,6 +17,11 @@
 
 namespace LionWeb.Protocol.Delta.Client;
 
+public interface ICommandIdProvider
+{
+    CommandId Create();
+}
+
 public class CommandIdProvider : ICommandIdProvider
 {
     private int _nextId = 0;

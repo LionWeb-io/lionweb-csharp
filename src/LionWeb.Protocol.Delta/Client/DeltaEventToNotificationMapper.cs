@@ -83,7 +83,10 @@ public class DeltaEventToNotificationMapper
     private PartitionDeletedNotification OnPartitionDeleted(PartitionDeleted partitionDeleted)
     {
         TryToNode(partitionDeleted.DeletedPartition, out var del);
-        return new PartitionDeletedNotification((del as IPartitionInstance)!, ToNotificationId(partitionDeleted));
+        if (del is null or IPartitionInstance)
+            return new PartitionDeletedNotification((IPartitionInstance)del!, ToNotificationId(partitionDeleted));
+
+        throw new DeltaException(DeltaErrorCode.InvalidNodeType.AsError(partitionDeleted.OriginCommands, partitionDeleted.ProtocolMessages, del));
     }
 
     #endregion
@@ -407,8 +410,7 @@ public class DeltaEventToNotificationMapper
         if (TryToNode(nodeId, out var w))
             return w;
 
-        // TODO change to correct exception 
-        throw new NotImplementedException(nodeId);
+        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
     }
 
     private bool TryToNode(TargetNode nodeId, out IWritableNode? node)

@@ -86,10 +86,13 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             {
                 case IDeltaCommand command:
                     Log($"received command: {command.GetType()}({command.CommandId})");
-                    
+
                     if (!messageContext.ClientInfo.SignedOn)
                     {
-                        await Send(messageContext.ClientInfo, new Error("NotSignedOn", "Not signed on", [new CommandSource(messageContext.ClientInfo.ParticipationId, command.CommandId)], null));
+                        await Send(messageContext.ClientInfo,
+                            DeltaErrorCode.NotSignedOn.AsError(
+                                [new CommandSource(messageContext.ClientInfo.ParticipationId, command.CommandId)],
+                                null));
                         return;
                     }
 
@@ -111,7 +114,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 
                 case IDeltaQueryRequest request:
                     Log($"received query: {request.GetType()}({request.QueryId}) for for {messageContext.ClientInfo}");
-                    var response = HandleRequest(request, messageContext.ClientInfo);
+                    var response = HandleQueryRequest(request, messageContext.ClientInfo);
                     await Send(messageContext.ClientInfo, response);
                     break;
 
@@ -127,7 +130,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         }
     }
 
-    private IDeltaQueryResponse HandleRequest(IDeltaQueryRequest request, IClientInfo clientInfo)
+    private IDeltaQueryResponse HandleQueryRequest(IDeltaQueryRequest request, IClientInfo clientInfo)
     {
         switch (request)
         {
@@ -174,7 +177,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     private IDeltaQueryResponse SignOn(IClientInfo clientInfo, SignOnRequest signOnRequest)
     {
         if (clientInfo.SignedOn)
-            return new ErrorResponse("AlreadySignedOn", "Client not signed on", signOnRequest.QueryId, null);
+            return DeltaErrorCode.AlreadySignedOn.AsErrorResponse(signOnRequest.QueryId, null);
 
         clientInfo.SignedOn = true;
         clientInfo.ClientId = signOnRequest.ClientId;
@@ -185,7 +188,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     private IDeltaQueryResponse SignOff(IClientInfo clientInfo, SignOffRequest signOffRequest)
     {
         if (!clientInfo.SignedOn)
-            return new ErrorResponse("NotSignedOn", "Client not signed on", signOffRequest.QueryId, null);
+            return DeltaErrorCode.NotSignedOn.AsErrorResponse(signOffRequest.QueryId, null);
 
         clientInfo.SignedOn = false;
         return new SignOffResponse(signOffRequest.QueryId, null);
@@ -194,12 +197,11 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     private IDeltaQueryResponse Reconnect(IClientInfo clientInfo, ReconnectRequest reconnectRequest)
     {
         if (clientInfo.SignedOn)
-            return new ErrorResponse("AlreadySignedOn", "Already signed on", reconnectRequest.QueryId, null);
+            return DeltaErrorCode.AlreadySignedOn.AsErrorResponse(reconnectRequest.QueryId, null);
 
         if (clientInfo.SequenceNumber != reconnectRequest.LastReceivedSequenceNumber)
-            return new ErrorResponse("NotCurrentSequenceNumber",
-                $"Last sent sequence number is {clientInfo.SequenceNumber} vs. last received {reconnectRequest.LastReceivedSequenceNumber}",
-                reconnectRequest.QueryId, null);
+            return DeltaErrorCode.NotCurrentSequenceNumber.AsErrorResponse(reconnectRequest.QueryId, null,
+                clientInfo.SequenceNumber, reconnectRequest.LastReceivedSequenceNumber);
 
         var response = new ReconnectResponse(clientInfo.SequenceNumber, reconnectRequest.QueryId, null);
         clientInfo.SignedOn = true;
@@ -227,9 +229,8 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 subscribeToPartitionContentsRequest.QueryId, null);
         }
 
-        return new ErrorResponse("UnknownPartition",
-            $"Unknown partition '{subscribeToPartitionContentsRequest.Partition}'",
-            subscribeToPartitionContentsRequest.QueryId, null);
+        return DeltaErrorCode.UnknownPartition.AsErrorResponse(subscribeToPartitionContentsRequest.QueryId, null,
+            subscribeToPartitionContentsRequest.Partition);
     }
 
 
@@ -240,9 +241,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             return new UnsubscribeFromPartitionContentsResponse(unsubscribeFromPartitionContentsRequest.QueryId,
                 null);
 
-        return new ErrorResponse("NotSubscribed",
-            $"NotSubscribed to partition '{unsubscribeFromPartitionContentsRequest.Partition}'",
-            unsubscribeFromPartitionContentsRequest.QueryId, null);
+        return DeltaErrorCode.NotSubscribed.AsErrorResponse(unsubscribeFromPartitionContentsRequest.QueryId, null, unsubscribeFromPartitionContentsRequest.Partition);
     }
 
     #endregion
