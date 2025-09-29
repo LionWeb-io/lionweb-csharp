@@ -22,7 +22,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using NotificationId = string;
 
 [TestClass]
-public class NotificationTests_MultiPartition : NotificationTestsBase
+public class NotificationTests_MultiPartition : ReplicatorTestsBase
 {
     #region Children
 

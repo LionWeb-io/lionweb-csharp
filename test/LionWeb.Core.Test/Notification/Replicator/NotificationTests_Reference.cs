@@ -24,7 +24,7 @@ using Languages.Generated.V2025_1.TestLanguage;
 using M1;
 
 [TestClass]
-public class NotificationTests_Reference : NotificationTestsBase
+public class NotificationTests_Reference : ReplicatorTestsBase
 {
     #region References
 

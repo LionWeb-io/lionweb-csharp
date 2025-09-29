@@ -18,12 +18,9 @@
 namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
-using Core.Notification.Forest;
-using Core.Notification.Partition;
 using Core.Notification.Pipe;
 using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1;
 
 public abstract class NotificationTestsBase
 {
@@ -41,39 +38,6 @@ public abstract class NotificationTestsBase
         List<IDifference> differences = new IdComparer(expected.ToList(), actual.ToList()).Compare().ToList();
         Assert.HasCount(0, differences, differences.DescribeAll(new()));
     }
-    
-    protected static void CreateForestReplicator(IForest clonedForest, IForest originalForest)
-    {
-        var sharedNodeMap = new SharedNodeMap();
-        var notificationMapper = new NotificationMapper(sharedNodeMap);
-        originalForest.GetNotificationSender()!.ConnectTo(notificationMapper);
-        
-        var replicator = ForestReplicator.Create(clonedForest, sharedNodeMap, null);
-        notificationMapper.ConnectTo(replicator);
-    }
-    
-    protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, IPartitionInstance originalPartition)
-    {
-        var sharedNodeMap = new SharedNodeMap();
-        var notificationMapper = new NotificationMapper(sharedNodeMap);
-        originalPartition.GetNotificationSender()!.ConnectTo(notificationMapper);
-
-        var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
-        notificationMapper.ConnectTo(replicator);
-    }
-    
-    protected static void CreatePartitionReplicator(IPartitionInstance clonedPartition, INotification notification, SharedNodeMap? sharedNodeMap = null)
-    {
-        sharedNodeMap ??= new SharedNodeMap();
-        var notificationMapper = new NotificationMapper(sharedNodeMap);
-        var replicator = PartitionReplicator.Create(clonedPartition, sharedNodeMap, null);
-        var notificationForwarder = new NotificationForwarder();
-        
-        notificationForwarder.ConnectTo(notificationMapper);
-        notificationMapper.ConnectTo(replicator);
-        
-        notificationForwarder.ProduceNotification(notification);
-    }
 }
 
 internal class NotificationForwarder() : NotificationPipeBase(null), INotificationProducer
@@ -84,16 +48,6 @@ internal class NotificationForwarder() : NotificationPipeBase(null), INotificati
 public interface IReplicatorCreator
 {
     Geometry CreateReplicator(Geometry node);
-}
-
-internal class NotificationMapper(SharedNodeMap sharedNodeMap) : NotificationPipeBase(null), INotificationHandler
-{
-    private readonly NotificationToNotificationMapper _notificationMapper = new(sharedNodeMap);
-
-    private void ProduceNotification(INotification notification) => Send(notification);
-
-    public void Receive(INotificationSender correspondingSender, INotification notification) =>
-        ProduceNotification(_notificationMapper.Map(notification));
 }
 
 internal class NotificationObserver() : NotificationPipeBase(null), INotificationReceiver

@@ -24,7 +24,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using System.Reflection;
 
 [TestClass]
-public class NotificationTests_Infrastructure: NotificationTestsBase
+public class NotificationTests_Infrastructure: ReplicatorTestsBase
 {
     [TestMethod]
     public void NotificationProducer()

@@ -22,7 +22,7 @@ using Core.Notification.Partition;
 using Languages.Generated.V2025_1.Shapes.M2;
 
 [TestClass]
-public class NotificationTests_Annotation: NotificationTestsBase
+public class NotificationTests_Annotation: ReplicatorTestsBase
 {
     //TODO: misses tests for MoveAndReplaceAnnotationFromOtherParent
     // Requires implementation of emitter logic and support in replicator.
