@@ -20,6 +20,7 @@ namespace LionWeb.Core.Test.Notification;
 using Core.Notification;
 using Core.Notification.Partition;
 using Languages.Generated.V2025_1.Shapes.M2;
+using M1;
 
 [TestClass]
 public class NotificationTests_Annotation: ReplicatorTestsBase
@@ -146,6 +147,61 @@ public class NotificationTests_Annotation: ReplicatorTestsBase
 
     #region AnnotationReplaced
     
+    #region tests uses ReplaceWith method
+
+    [TestMethod]
+    public void AnnotationReplaced_Multiple_Only_uses_ReplaceWith()
+    {
+        var replacement = new BillOfMaterials("replacement");
+        var replaced = new BillOfMaterials("replaced");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([replaced]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        replaced.ReplaceWith(replacement);
+
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    [TestMethod]
+    public void AnnotationReplaced_Multiple_First_uses_ReplaceWith()
+    {
+        var replacement = new BillOfMaterials("replacement");
+        var replaced = new BillOfMaterials("replaced");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([replaced, new BillOfMaterials("bof")]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        replaced.ReplaceWith(replacement);
+
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    [TestMethod]
+    public void AnnotationReplaced_Multiple_Last_uses_ReplaceWith()
+    {
+        var replacement = new BillOfMaterials("replacement");
+        var replaced = new BillOfMaterials("replaced");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([new BillOfMaterials("bof"), replaced]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        replaced.ReplaceWith(replacement);
+
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+
+    #endregion
+    
     [TestMethod]
     public void AnnotationReplaced_Multiple_Only()
     {
@@ -262,6 +318,81 @@ public class NotificationTests_Annotation: ReplicatorTestsBase
     
     #region AnnotationMovedAndReplacedInSameParent
 
+    #region tests uses ReplaceWith method
+
+    [TestMethod]
+    public void AnnotationMovedAndReplacedInSameParent_Forward_uses_ReplaceWith()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([moved, replaced]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        replaced.ReplaceWith(moved);
+        
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    [TestMethod]
+    public void AnnotationMovedAndReplacedInSameParent_Backward_uses_ReplaceWith()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([replaced, moved]);
+
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        replaced.ReplaceWith(moved);
+        
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    
+     [TestMethod]
+    public void AnnotationMovedAndReplacedInSameParent_Backward_MoreThanThreeNodes_uses_ReplaceWith()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([new BillOfMaterials("A"), replaced, new BillOfMaterials("B"), moved, new BillOfMaterials("C")]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        replaced.ReplaceWith(moved);
+        
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+      
+    
+    [TestMethod]
+    public void AnnotationMovedAndReplacedInSameParent_Forward_MoreThanThreeNodes_uses_ReplaceWith()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var moved = new BillOfMaterials("moved");
+        var originalPartition = new Geometry("a");
+        originalPartition.AddAnnotations([new BillOfMaterials("A"), moved, new BillOfMaterials("B"), replaced, new BillOfMaterials("C")]);
+        
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        replaced.ReplaceWith(moved);
+        
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+
+    #endregion
+
     [TestMethod]
     public void AnnotationMovedAndReplacedInSameParent_Forward()
     {
@@ -282,7 +413,6 @@ public class NotificationTests_Annotation: ReplicatorTestsBase
         Assert.AreEqual(1, clonedPartition.GetAnnotations().Count);
         Assert.AreEqual(moved.GetId(), clonedPartition.GetAnnotations()[0].GetId());
     }
-    
     
     [TestMethod]
     public void AnnotationMovedAndReplacedInSameParent_Backward()
