@@ -196,18 +196,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = Lookup(notification.Parent.GetId());
-
-            object? newValue = null;
-            if (notification.Containment.Multiple)
-            {
-                var existingChildren = localParent.Get(notification.Containment);
-                if (existingChildren is IList l)
-                {
-                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.RemoveAt(notification.Index);
-                    newValue = children;
-                }
-            }
+            var newValue = RemoveContainment(localParent, notification.Containment, notification.Index);
 
             localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
@@ -362,6 +351,30 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         }
 
         return nodeToInsert;
+    }
+    
+    private static object? RemoveContainment(INode localParent, Containment containment, Index index)
+    {
+        object? newValue = null;
+
+        if (localParent.CollectAllSetFeatures().Contains(containment))
+        {
+            var existingChildren = localParent.Get(containment);
+            switch (existingChildren)
+            {
+                case IList l:
+                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                    children.RemoveAt(index);
+                    return children;
+                case IWritableNode _:
+                    return newValue;
+                default:
+                    // when containment data is corrupted or assigned to an invalid value after its creation 
+                    throw new InvalidValueException(containment, existingChildren);
+            }
+        }
+
+        return containment.Multiple ? new List<IWritableNode>() : newValue;
     }
 
     #endregion
