@@ -157,22 +157,22 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             Debug.WriteLine(
                 $"Node {notification.Node.PrintIdentity()}: Setting {notification.Property} to {notification.NewValue}");
-            Lookup(notification.Node.GetId()).Set(notification.Property, notification.NewValue,
-                notification.NotificationId);
+            var node = Lookup(notification.Node.GetId());
+            node.Set(notification.Property, notification.NewValue, notification.NotificationId);
         });
 
     private void OnRemotePropertyDeleted(PropertyDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            Lookup(notification.Node.GetId())
-                .Set(notification.Property, null, notification.NotificationId);
+            var node = Lookup(notification.Node.GetId());
+            node.Set(notification.Property, null, notification.NotificationId);
         });
 
     private void OnRemotePropertyChanged(PropertyChangedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            Lookup(notification.Node.GetId()).Set(notification.Property, notification.NewValue,
-                notification.NotificationId);
+            var node = Lookup(notification.Node.GetId());
+            node.Set(notification.Property, notification.NewValue, notification.NotificationId);
         });
 
     #endregion
@@ -187,8 +187,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
             Debug.WriteLine(
                 $"Parent {localParent.PrintIdentity()}: Adding {newChildNode.PrintIdentity()} to {notification.Containment} at {notification.Index}");
-            var newValue = InsertContainment(localParent, notification.Containment, notification.Index,
-                newChildNode);
+            var newValue = InsertContainment(localParent, notification.Containment, notification.Index, newChildNode);
 
             localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
