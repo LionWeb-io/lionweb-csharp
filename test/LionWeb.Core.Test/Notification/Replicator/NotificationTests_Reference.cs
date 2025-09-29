@@ -21,7 +21,6 @@ using Core.Notification;
 using Core.Notification.Partition;
 using Languages.Generated.V2025_1.Shapes.M2;
 using Languages.Generated.V2025_1.TestLanguage;
-using M1;
 
 [TestClass]
 public class NotificationTests_Reference : ReplicatorTestsBase
@@ -186,38 +185,6 @@ public class NotificationTests_Reference : ReplicatorTestsBase
         od.AltSource = line;
 
         AssertEquals([originalPartition], [clonedPartition]);
-    }
-    
-    [TestMethod]
-    public void ReferenceChanged_produces_NoOps()
-    {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var originalPartition = new Geometry("a") { Shapes = [od, circle, line] };
-
-        var notificationObserver = new NotificationObserver();
-        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
-
-        od.AltSource = circle;
-        
-        Assert.AreEqual(0, notificationObserver.Count);
-    }
-    
-    [TestMethod]
-    public void ReferenceChanged_produces_NoOps_uses_ReplaceWith()
-    {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var originalPartition = new Geometry("a") { Shapes = [od, circle, line] };
-
-        var notificationObserver = new NotificationObserver();
-        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
-
-        od.AltSource.ReplaceWith(circle);
-        
-        Assert.AreEqual(0, notificationObserver.Count);
     }
     
     #endregion

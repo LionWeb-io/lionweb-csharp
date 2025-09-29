@@ -58,7 +58,7 @@ public class NotificationTests_Forest : ReplicatorTestsBase
     }
     
     [TestMethod]
-    public void PartitionAddedDeleted_AfterSubscribe()
+    public void PartitionAddedAndDeleted_AfterSubscribe()
     {
         var node = new Geometry("a");
         var originalForest = new Forest();
@@ -101,6 +101,7 @@ public class NotificationTests_Forest : ReplicatorTestsBase
     public void ChildMovedFromOtherContainment_AddAfterSubscribe_Destination_Fails()
     {
         // Original and cloned forests are out of sync: their initial states differ.
+        // One approach to tackle this: cloned forest can check available partitions in original forest, and can clone them.
         var moved = new Circle("moved");
         var origin = new CompositeShape("origin") { Parts = [moved] };
         var originPartition = new Geometry("g") { Shapes = [origin] };
@@ -155,18 +156,18 @@ public class NotificationTests_Forest : ReplicatorTestsBase
 
         CreateForestReplicator(clonedForest, originalForest);
 
-        var notificationCounter = new NotificationObserver();
+        var notificationObserver = new NotificationObserver();
 
-        originalForest.GetNotificationSender()!.ConnectTo(notificationCounter);
+        originalForest.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         originalForest.AddPartitions([node, originPartition]);
 
         node.Documentation = moved;
 
         Assert.AreEqual(
-            notificationCounter.Notifications.DistinctBy(n => n.NotificationId).Count(),
-            notificationCounter.Count,
-            string.Join("\n", notificationCounter.Notifications)
+            notificationObserver.Notifications.DistinctBy(n => n.NotificationId).Count(),
+            notificationObserver.Count,
+            string.Join("\n", notificationObserver.Notifications)
         );
 
         AssertEquals([node, originPartition], clonedForest.Partitions.OrderBy(p => p.GetId()).ToList());
