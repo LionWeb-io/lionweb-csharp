@@ -217,8 +217,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = Lookup(notification.Parent.GetId());
-            var substituteNode = (INode)notification.NewChild;
-            var newValue = ReplaceContainment(localParent, notification.Containment, notification.Index, substituteNode);
+            var replacement = (INode)notification.NewChild;
+            var newValue = ReplaceContainment(localParent, notification.Containment, notification.Index, replacement);
 
             localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
@@ -239,9 +239,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         notification, () =>
         {
             var localNewParent = Lookup(notification.NewParent.GetId());
-            var substituteNode = Lookup(notification.MovedChild.GetId());
+            var replacement = Lookup(notification.MovedChild.GetId());
             var newValue = ReplaceContainment(localNewParent, notification.NewContainment,
-                notification.NewIndex, substituteNode);
+                notification.NewIndex, replacement);
 
             localNewParent.Set(notification.NewContainment, newValue, notification.NotificationId);
         });
@@ -250,9 +250,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification)
     {
         var parent = Lookup(notification.Parent.GetId());
-        var substituteNode = Lookup(notification.MovedChild.GetId());
+        var replacement = Lookup(notification.MovedChild.GetId());
         var newValue = ReplaceContainment(parent, notification.NewContainment,
-            notification.NewIndex, substituteNode);
+            notification.NewIndex, replacement);
 
         parent.Set(notification.NewContainment, newValue);
     }
@@ -290,14 +290,14 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = Lookup(notification.Parent.GetId());
-            var substituteNode = Lookup(notification.MovedChild.GetId());
+            var replacement = Lookup(notification.MovedChild.GetId());
             var newValue = ReplaceContainment(localParent, notification.Containment, notification.NewIndex, 
-                substituteNode, notification.OldIndex);
+                replacement, notification.OldIndex);
             
             localParent.Set(notification.Containment, newValue);
         });
     
-    private static object ReplaceContainment(INode localParent, Containment containment, Index newIndex, INode substituteNode, Index? oldIndex = null)
+    private static object ReplaceContainment(INode localParent, Containment containment, Index newIndex, INode replacement, Index? oldIndex = null)
     {
         if (localParent.TryGet(containment, out var existingChildren))
         {
@@ -307,23 +307,23 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                     {
                         var children = new List<IWritableNode>(l.Cast<IWritableNode>());
                         
-                        var substituteNodeParent = substituteNode.GetParent();
-                        var substituteNodeContainment = substituteNodeParent?.GetContainmentOf(substituteNode);
-                        if (containment.Equals(substituteNodeContainment))
+                        var replacementParent = replacement.GetParent();
+                        var replacementContainment = replacementParent?.GetContainmentOf(replacement);
+                        if (containment.Equals(replacementContainment))
                         {
-                           children.Insert(newIndex, substituteNode);
+                           children.Insert(newIndex, replacement);
                            children.RemoveAt(newIndex + 1);
-                           children.RemoveAt(newIndex < oldIndex ? children.LastIndexOf(substituteNode) : children.IndexOf(substituteNode));
+                           children.RemoveAt(newIndex < oldIndex ? children.LastIndexOf(replacement) : children.IndexOf(replacement));
                         }else
                         {
-                            children.Insert(newIndex, substituteNode);
+                            children.Insert(newIndex, replacement);
                             children.RemoveAt(newIndex + 1);
                         }
 
                         return children;   
                     }
                 case IWritableNode _ when newIndex == 0:
-                    return substituteNode;
+                    return replacement;
                 default:
                     // when containment data is corrupted or assigned to an invalid value after its creation
                     throw new InvalidValueException(containment, existingChildren);
@@ -332,10 +332,10 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
         if (containment.Multiple)
         {
-            return new List<IWritableNode> { substituteNode };
+            return new List<IWritableNode> { replacement };
         }
 
-        return substituteNode;
+        return replacement;
     }
 
     private static object InsertContainment(INode localParent, Containment containment, Index index, INode nodeToInsert)

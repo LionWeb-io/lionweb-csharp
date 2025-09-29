@@ -30,19 +30,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Forward_WithTwoChildren()
     {
-        var substituteNode = new Line("substituteNode");
+        var replacement = new Line("replacement");
         var replaced = NewCircle("replaced");
         
         var actual = new Geometry("a")
         {
-            Shapes = [substituteNode, replaced]
+            Shapes = [replacement, replaced]
         };
         
-        replaced.ReplaceWith(substituteNode);
+        replaced.ReplaceWith(replacement);
         
         var expected = new Geometry("a")
         {
-            Shapes = [new Line("substituteNode")]
+            Shapes = [new Line("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -51,19 +51,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_WithTwoChildren()
     {
-        var substituteNode = new Line("substituteNode");
+        var replacement = new Line("replacement");
         var replaced = NewCircle("replaced");
         
         var actual = new Geometry("a")
         {
-            Shapes = [replaced, substituteNode]
+            Shapes = [replaced, replacement]
         };
         
-        replaced.ReplaceWith(substituteNode);
+        replaced.ReplaceWith(replacement);
         
         var expected = new Geometry("a")
         {
-            Shapes = [new Line("substituteNode")]
+            Shapes = [new Line("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -72,19 +72,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Forward_ReplaceLast()
     {
-        var substituteNode = new Line("substituteNode");
+        var replacement = new Line("replacement");
         var replaced = NewCircle("child");
         
         var actual = new Geometry("a")
         {
-            Shapes = [NewCircle("child"), substituteNode, replaced]
+            Shapes = [NewCircle("child"), replacement, replaced]
         };
         
-        replaced.ReplaceWith(substituteNode);
+        replaced.ReplaceWith(replacement);
         
         var expected = new Geometry("a")
         {
-            Shapes = [NewCircle("child"), new Line("substituteNode")]
+            Shapes = [NewCircle("child"), new Line("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -94,19 +94,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_ReplaceMiddle()
     {
-        var substituteNode = new Line("substituteNode");
+        var replacement = new Line("replacement");
         var replaced = NewCircle("replaced");
         
         var actual = new Geometry("a")
         {
-            Shapes = [NewCircle("child"), replaced, substituteNode]
+            Shapes = [NewCircle("child"), replaced, replacement]
         };
         
-        replaced.ReplaceWith(substituteNode);
+        replaced.ReplaceWith(replacement);
         
         var expected = new Geometry("a")
         {
-            Shapes = [NewCircle("child"), new Line("substituteNode")]
+            Shapes = [NewCircle("child"), new Line("replacement")]
         };
         
         AssertEquals([expected], [actual]);
@@ -115,19 +115,19 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_ReplaceFirst()
     {
-        var substituteNode = new Line("substituteNode");
+        var replacement = new Line("replacement");
         var replaced = NewCircle("replaced");
         
         var actual = new Geometry("a")
         {
-            Shapes = [replaced, NewCircle("child"), substituteNode]
+            Shapes = [replaced, NewCircle("child"), replacement]
         };
         
-        replaced.ReplaceWith(substituteNode);
+        replaced.ReplaceWith(replacement);
         
         var expected = new Geometry("a")
         {
-            Shapes = [new Line("substituteNode"), NewCircle("child")]
+            Shapes = [new Line("replacement"), NewCircle("child")]
         };
         
         AssertEquals([expected], [actual]);
@@ -136,15 +136,15 @@ public class ReplaceTests_Containment
     [TestMethod]
     public void ChildReplaced_Multiple_InSameContainment_Backward_MoreThanThreeChildren()
     {
-        var substituteNode = new Line("E");
+        var replacement = new Line("E");
         var replaced = NewCircle("B");
         
         var actual = new Geometry("container")
         {
-            Shapes = [NewCircle("A"), replaced, NewCircle("C"), NewCircle("D"), substituteNode, NewCircle("F")]
+            Shapes = [NewCircle("A"), replaced, NewCircle("C"), NewCircle("D"), replacement, NewCircle("F")]
         };
         
-        replaced.ReplaceWith(substituteNode);
+        replaced.ReplaceWith(replacement);
         
         var expected = new Geometry("container")
         {
