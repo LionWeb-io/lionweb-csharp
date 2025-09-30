@@ -177,7 +177,7 @@ public class LionWebGenerator
             outputDir.Create();
         }
 
-        generator.Persist(path.FullName);
+        generator.Persist(path.ToString());
         Console.WriteLine($"persisted to: {path}");
     }
 }

@@ -152,8 +152,8 @@ public record Configuration
         {
             PathPattern.VerbatimName => new FileInfo(language.Name + suffix),
             PathPattern.VerbatimKey => new FileInfo(language.Key + suffix),
-            PathPattern.NamespaceAsFilename => new FileInfo(Split(_namespaceSeparator, language) + suffix),
-            PathPattern.NamespaceAsPath => new FileInfo(Split(Path.DirectorySeparatorChar, language) + suffix),
+            PathPattern.NamespaceAsFilename => new FileInfo(Split(_namespaceSeparator, ns) + suffix),
+            PathPattern.NamespaceAsPath => new FileInfo(Split(Path.DirectorySeparatorChar, ns) + suffix),
             _ => throw new ArgumentException(
                 $"Unknown {nameof(PathPattern)} {((int?)PathPattern)?.ToString() ?? "null"}")
         };
@@ -161,8 +161,8 @@ public record Configuration
         return new FileInfo(Path.Combine(OutputDir?.ToString() ?? "", fileInfo.ToString()));
     }
 
-    private static string Split(char separator, Language language) => string.Join(separator,
-        language.Name.Split(_namespaceSeparator).Select(p =>
+    private static string Split(char separator, string languageNamespace) => string.Join(separator,
+        languageNamespace.Split(_namespaceSeparator).Select(p =>
         {
             var stringBuilder = new StringBuilder(p);
             foreach (var invalidChar in Path.GetInvalidFileNameChars())
