@@ -199,7 +199,18 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = Lookup(notification.Parent.GetId());
-            var newValue = RemoveContainment(localParent, notification.Containment, notification.Index);
+            
+            object? newValue = null;
+            if (notification.Containment.Multiple)
+            {
+                var existingChildren = localParent.Get(notification.Containment);
+                if (existingChildren is IList l)
+                {
+                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
+                    children.RemoveAt(notification.Index);
+                    newValue = children;
+                }
+            }
 
             localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
@@ -207,25 +218,24 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteChildReplaced(ChildReplacedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            //TODO: Remove commented out code after fixing failing two way tests
-            /*
             var localParent = Lookup(notification.Parent.GetId());
-            var replacement = (INode)notification.NewChild;
-            var newValue = ReplaceContainment(localParent, notification.Containment, notification.Index, replacement);
+            var newChild = (INode)notification.NewChild;
+            var newValue = ReplaceContainment(localParent, notification.Containment, notification.Index, newChild);
             localParent.Set(notification.Containment, newValue, notification.NotificationId);
-            */
 
-            var replacement = (INode)notification.NewChild;
-            ((INode)notification.ReplacedChild).ReplaceWith(replacement);
+            //TODO: This change results in three failing two-way tests
+            /*var replacement = (INode)notification.NewChild;
+            var replacedChild = Lookup(notification.ReplacedChild.GetId());
+            replacedChild.ReplaceWith(replacement);*/
         });
 
     private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
             var localNewParent = Lookup(notification.NewParent.GetId());
-            var nodeToInsert = LookupOpt(notification.MovedChild.GetId()) ?? (INode)notification.MovedChild;
+            var movedChild = LookupOpt(notification.MovedChild.GetId()) ?? (INode)notification.MovedChild;
             var newValue = InsertContainment(localNewParent, notification.NewContainment, notification.NewIndex,
-                nodeToInsert);
+                movedChild);
 
             localNewParent.Set(notification.NewContainment, newValue, notification.NotificationId);
         });
@@ -234,16 +244,18 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         ChildMovedAndReplacedFromOtherContainmentNotification notification) => SuppressNotificationForwarding(
         notification, () =>
         {
-            var replacement = Lookup(notification.MovedChild.GetId());
-            ((INode)notification.ReplacedChild).ReplaceWith(replacement);
+            var movedChild = Lookup(notification.MovedChild.GetId());
+            var replacedChild = Lookup(notification.ReplacedChild.GetId());
+            replacedChild.ReplaceWith(movedChild);
         });
 
     private void OnRemoteChildMovedAndReplacedFromOtherContainmentInSameParent(
         ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var replacement = Lookup(notification.MovedChild.GetId());
-            ((INode)notification.ReplacedChild).ReplaceWith(replacement);
+            var movedChild = Lookup(notification.MovedChild.GetId());
+            var replacedChild = Lookup(notification.ReplacedChild.GetId());
+            replacedChild.ReplaceWith(movedChild);
         });
 
     private void OnRemoteChildMovedFromOtherContainmentInSameParent(
@@ -278,11 +290,11 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteChildMovedAndReplacedInSameContainment(ChildMovedAndReplacedInSameContainmentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var replacement = Lookup(notification.MovedChild.GetId());
-            ((INode)notification.ReplacedChild).ReplaceWith(replacement);
+            var movedChild = Lookup(notification.MovedChild.GetId());
+            var replacedChild = Lookup(notification.ReplacedChild.GetId());
+            replacedChild.ReplaceWith(movedChild);
         });
 
-    //TODO: Remove unused after fixing failing two way tests
     private static object ReplaceContainment(INode localParent, Containment containment, Index newIndex, INode replacement, Index? oldIndex = null)
     {
         if (localParent.TryGet(containment, out var existingChildren))
@@ -349,30 +361,6 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         }
 
         return nodeToInsert;
-    }
-
-    private static object? RemoveContainment(INode localParent, Containment containment, Index index)
-    {
-        object? newValue = null;
-
-        if (localParent.CollectAllSetFeatures().Contains(containment))
-        {
-            var existingChildren = localParent.Get(containment);
-            switch (existingChildren)
-            {
-                case IList l:
-                    var children = new List<IWritableNode>(l.Cast<IWritableNode>());
-                    children.RemoveAt(index);
-                    return children;
-                case IWritableNode _:
-                    return newValue;
-                default:
-                    // when containment data is corrupted or assigned to an invalid value after its creation 
-                    throw new InvalidValueException(containment, existingChildren);
-            }
-        }
-
-        return containment.Multiple ? new List<IWritableNode>() : newValue;
     }
 
     #endregion

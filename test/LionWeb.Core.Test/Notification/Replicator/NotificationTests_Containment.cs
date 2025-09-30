@@ -360,7 +360,7 @@ public class NotificationTests_Containment: ReplicatorTestsBase
     
     #endregion
 
-    #region ChildMovedAndReplaceInSameContainment
+    #region ChildMovedAndReplacedInSameContainment
     
     [TestMethod]
     [Ignore("Should emit ChildMovedAndReplacedInSameContainmentNotification")]
