@@ -22,7 +22,7 @@ using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
 
 [TestClass]
-public class NotificationTests_Twoway: ReplicatorTestsBase 
+public class ReplicatorTests_Twoway: ReplicatorTestsBase 
 {
     #region Properties
 

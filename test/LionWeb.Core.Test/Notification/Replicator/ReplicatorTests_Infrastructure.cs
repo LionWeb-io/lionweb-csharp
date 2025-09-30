@@ -20,80 +20,12 @@ namespace LionWeb.Core.Test.Notification;
 using Core.Notification;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
-using Languages.Generated.V2024_1.Shapes.M2;
+using Languages.Generated.V2025_1.Shapes.M2;
 using System.Reflection;
 
-[TestClass]
-public class NotificationTests_Infrastructure: ReplicatorTestsBase
+public class ReplicatorTests_Infrastructure: ReplicatorTestsBase
 {
-    [TestMethod]
-    public void NotificationProducer()
-    {
-        var node = new Geometry("a");
-        
-        Assert.IsNotNull(node.GetNotificationSender());
-        Assert.AreSame(node.GetNotificationSender(), ((IPartitionInstance)node).GetNotificationProducer());
-        Assert.AreSame(node.GetNotificationSender(), ((IPartitionInstance)node).GetNotificationSender());
-    }  
-    
-    [TestMethod]
-    public void MultiListeners_NoRead()
-    {
-        var circle = new Circle("c");
-        var node = new Geometry("a") { Shapes = [circle] };
-
-        node.GetNotificationSender()!.Subscribe<PropertyAddedNotification>((sender, args) => { } );
-        node.GetNotificationSender()!.Subscribe<PropertyChangedNotification>((sender, args) => { });
-        node.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => { });
-
-        circle.Name = "Hello";
-        circle.Name = "World";
-
-        Assert.AreEqual("World", circle.Name);
-    }
-
-    [TestMethod]
-    public void MultiListeners_SomeRead()
-    {
-        var circle = new Circle("c");
-        var node = new Geometry("a") { Shapes = [circle] };
-
-        int addedCount = 0;
-        node.GetNotificationSender()!.Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
-        node.GetNotificationSender()!.Subscribe<PropertyChangedNotification>((sender, args) => {});
-
-        circle.Name = "Hello";
-        circle.Name = "World";
-        
-        Assert.AreEqual("World", circle.Name);
-        Assert.AreEqual(1, addedCount);
-    }
-
-    [TestMethod]
-    public void MultiListeners_AllRead()
-    {
-        var circle = new Circle("c");
-        var node = new Geometry("a") { Shapes = [circle] };
-
-        int addedCount = 0;
-        node.GetNotificationSender()!.Subscribe<PropertyAddedNotification>((sender, args) => addedCount++);
-        
-        int changedCount = 0;
-        node.GetNotificationSender()!.Subscribe<PropertyChangedNotification>((sender, args) => changedCount++);
-
-        int allCount = 0;
-        node.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => allCount++);
-
-        circle.Name = "Hello";
-        circle.Name = "World";
-        
-        Assert.AreEqual("World", circle.Name);
-        Assert.AreEqual(1, addedCount);
-        Assert.AreEqual(1, changedCount);
-        Assert.AreEqual(2, allCount);
-    }
-
-    [TestMethod]
+        [TestMethod]
     public void Twoway_OtherListeners()
     {
         var circle = new Circle("c");

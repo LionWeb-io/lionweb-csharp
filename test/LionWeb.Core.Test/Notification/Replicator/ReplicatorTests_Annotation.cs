@@ -23,7 +23,7 @@ using Languages.Generated.V2025_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class NotificationTests_Annotation : ReplicatorTestsBase
+public class ReplicatorTests_Annotation : ReplicatorTestsBase
 {
     #region Annotations
 

@@ -21,7 +21,7 @@ using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class NotificationTests_Forest : ReplicatorTestsBase
+public class ReplicatorTests_Forest : ReplicatorTestsBase
 {
     #region Partition
 

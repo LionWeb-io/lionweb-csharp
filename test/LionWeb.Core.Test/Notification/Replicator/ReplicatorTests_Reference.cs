@@ -23,7 +23,7 @@ using Languages.Generated.V2025_1.Shapes.M2;
 using Languages.Generated.V2025_1.TestLanguage;
 
 [TestClass]
-public class NotificationTests_Reference : ReplicatorTestsBase
+public class ReplicatorTests_Reference : ReplicatorTestsBase
 {
     #region References
 

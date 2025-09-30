@@ -3,7 +3,7 @@
 using Languages.Generated.V2025_1.Shapes.M2;
 
 [TestClass]
-public class NotificationTests_Property : ReplicatorTestsBase
+public class ReplicatorTests_Property : ReplicatorTestsBase
 {
     #region Properties
 
