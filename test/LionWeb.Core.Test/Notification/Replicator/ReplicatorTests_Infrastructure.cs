@@ -23,9 +23,10 @@ using Core.Notification.Pipe;
 using Languages.Generated.V2025_1.Shapes.M2;
 using System.Reflection;
 
+[TestClass]
 public class ReplicatorTests_Infrastructure: ReplicatorTestsBase
 {
-        [TestMethod]
+    [TestMethod]
     public void Twoway_OtherListeners()
     {
         var circle = new Circle("c");
