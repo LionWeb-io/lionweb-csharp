@@ -25,9 +25,6 @@ using M1;
 [TestClass]
 public class NotificationTests_Annotation : ReplicatorTestsBase
 {
-    //TODO: misses tests for MoveAndReplaceAnnotationFromOtherParent
-    // Requires implementation of emitter logic and support in replicator.
-
     #region Annotations
 
     #region AnnotationAdded
@@ -147,7 +144,7 @@ public class NotificationTests_Annotation : ReplicatorTestsBase
 
     #region AnnotationReplaced
 
-    #region tests uses ReplaceWith method
+    #region tests use ReplaceWith method
 
     [TestMethod]
     public void AnnotationReplaced_Multiple_Only_uses_ReplaceWith()
@@ -283,6 +280,115 @@ public class NotificationTests_Annotation : ReplicatorTestsBase
 
         AssertEquals([originalPartition], [clonedPartition]);
     }
+
+    #endregion
+
+    #region AnnotationMovedAndReplacedFromOtherParent
+    
+    [TestMethod]
+    [Ignore("Should emit AnnotationMovedAndReplacedFromOtherParentNotification")]
+    public void AnnotationMovedAndReplacedFromOtherParent_Multiple_Only()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var line = new Line("line");
+        line.AddAnnotations([replaced]);
+        
+        var origin = new CompositeShape("origin");
+        var moved = new BillOfMaterials("moved");
+        origin.AddAnnotations([moved]);
+        var originalPartition = new Geometry("a") { Shapes = [origin, line] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+        
+        replaced.ReplaceWith(moved);
+
+        Assert.AreEqual(1, notificationObserver.Count);
+        Assert.IsInstanceOfType<AnnotationMovedAndReplacedFromOtherParentNotification>(notificationObserver.Notifications[0]);
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+
+    #region tests manually produce notifications
+
+    [TestMethod]
+    public void AnnotationMovedAndReplacedFromOtherParent_Multiple_Only_ProducesNotification()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var line = new Line("line");
+        line.AddAnnotations([replaced]);
+        
+        var origin = new CompositeShape("origin");
+        var moved = new BillOfMaterials("moved");
+        origin.AddAnnotations([moved]);
+        var originalPartition = new Geometry("a") { Shapes = [origin, line] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var newIndex = 0;
+        var oldIndex = 0;
+        var notification = new AnnotationMovedAndReplacedFromOtherParentNotification(line, newIndex, moved, origin, oldIndex, replaced, 
+            new NumericNotificationId("AnnotationMovedAndReplacedFromOtherParent", 0));
+        
+        CreatePartitionReplicator(clonedPartition, notification);
+        
+        Assert.AreEqual(1, clonedPartition.Shapes[1].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[1].GetAnnotations()[0].GetId());
+    }
+
+    [TestMethod]
+    public void AnnotationMovedAndReplacedFromOtherParent_Multiple_First_ProducesNotification()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var line = new Line("line");
+        line.AddAnnotations([replaced, new BillOfMaterials("bof")]);
+        
+        var origin = new CompositeShape("origin");
+        var moved = new BillOfMaterials("moved");
+        origin.AddAnnotations([moved]);
+        var originalPartition = new Geometry("a") { Shapes = [origin, line] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var newIndex = 0;
+        var oldIndex = 0;
+        var notification = new AnnotationMovedAndReplacedFromOtherParentNotification(line, newIndex, moved, origin, oldIndex, replaced, 
+            new NumericNotificationId("AnnotationMovedAndReplacedFromOtherParent", 0));
+        
+        CreatePartitionReplicator(clonedPartition, notification);
+       
+        Assert.AreEqual(2, clonedPartition.Shapes[1].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[1].GetAnnotations()[0].GetId());
+    }
+    
+    [TestMethod]
+    public void AnnotationMovedAndReplacedFromOtherParent_Multiple_Last_ProducesNotification()
+    {
+        var replaced = new BillOfMaterials("replaced");
+        var line = new Line("line");
+        line.AddAnnotations([new BillOfMaterials("bof"), replaced]);
+        
+        var origin = new CompositeShape("origin");
+        var moved = new BillOfMaterials("moved");
+        origin.AddAnnotations([moved]);
+        var originalPartition = new Geometry("a") { Shapes = [origin, line] };
+
+        var clonedPartition = ClonePartition(originalPartition);
+        
+        var newIndex = 1;
+        var oldIndex = 0;
+        var notification = new AnnotationMovedAndReplacedFromOtherParentNotification(line, newIndex, moved, origin, oldIndex, replaced, 
+            new NumericNotificationId("AnnotationMovedAndReplacedFromOtherParent", 0));
+        
+        CreatePartitionReplicator(clonedPartition, notification);
+       
+        Assert.AreEqual(2, clonedPartition.Shapes[1].GetAnnotations().Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Shapes[1].GetAnnotations()[^1].GetId());
+    }
+
+    #endregion 
 
     #endregion
 
