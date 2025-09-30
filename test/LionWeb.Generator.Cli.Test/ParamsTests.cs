@@ -465,7 +465,7 @@ public class ParamsTests
             return _relativeOutputDir;
 
         Directory.Delete(outputDir, true);
-        Assert.IsFalse(Directory.Exists(outputDir));
+        Assert.IsFalse(Directory.Exists(outputDir), outputDir);
         return _relativeOutputDir;
     }
 
@@ -473,19 +473,19 @@ public class ParamsTests
     {
         if (fileInfo.Exists)
             fileInfo.Delete();
-        Assert.IsFalse(fileInfo.Exists);
+        Assert.IsFalse(fileInfo.Exists, fileInfo.ToString());
     }
 
     private static void Delete(DirectoryInfo directoryInfo)
     {
         if (directoryInfo.Exists)
             directoryInfo.Delete(true);
-        Assert.IsFalse(directoryInfo.Exists);
+        Assert.IsFalse(directoryInfo.Exists, directoryInfo.ToString());
     }
 
     private static void AssertExists(FileInfo fileInfo)
     {
         fileInfo.Refresh();
-        Assert.IsTrue(fileInfo.Exists);
+        Assert.IsTrue(fileInfo.Exists, fileInfo.ToString());
     }
 }

@@ -165,7 +165,7 @@ public record Configuration
         language.Name.Split(_namespaceSeparator).Select(p =>
         {
             var stringBuilder = new StringBuilder(p);
-            foreach (var invalidChar in Path.GetInvalidFileNameChars())
+            foreach (var invalidChar in Path.GetInvalidFileNameChars().Append('\\'))
             {
                 stringBuilder.Replace(invalidChar, '_');
             }
