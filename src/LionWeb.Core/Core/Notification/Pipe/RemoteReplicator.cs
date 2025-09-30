@@ -398,12 +398,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            //TODO: replace with replaceWith method
-            var localParent = Lookup(notification.Parent.GetId());
-            var newAnnotation = (INode)notification.NewAnnotation;
-            //var replacedAnnotation = (INode)notification.ReplacedAnnotation;
-            localParent.GetAnnotations()[notification.Index].ReplaceWith(newAnnotation);
-            //replacedAnnotation.ReplaceWith(newAnnotation);
+            var newAnnotation = LookupOpt(notification.NewAnnotation.GetId()) ?? (INode)notification.NewAnnotation;
+            var replacedAnnotation = Lookup(notification.ReplacedAnnotation.GetId());
+            replacedAnnotation.ReplaceWith(newAnnotation);
         });
 
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification notification) =>
@@ -417,7 +414,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteAnnotationMovedAndReplacedFromOtherParent(AnnotationMovedAndReplacedFromOtherParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var movedAnnotation = (INode)notification.MovedAnnotation;
+            var movedAnnotation = LookupOpt(notification.MovedAnnotation.GetId()) ?? (INode)notification.MovedAnnotation;
             var replacedAnnotation = (INode)notification.ReplacedAnnotation;
             replacedAnnotation.ReplaceWith(movedAnnotation);
         });
@@ -426,19 +423,16 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = Lookup(notification.Parent.GetId());
-            INode nodeToInsert = Lookup(notification.MovedAnnotation.GetId());
-            localParent.InsertAnnotations(notification.NewIndex, [nodeToInsert], notification.NotificationId);
+            var movedAnnotation =  LookupOpt(notification.MovedAnnotation.GetId()) ?? Lookup(notification.MovedAnnotation.GetId());
+            localParent.InsertAnnotations(notification.NewIndex, [movedAnnotation], notification.NotificationId);
         });
 
     private void OnRemoteAnnotationMovedAndReplacedInSameParent(AnnotationMovedAndReplacedInSameParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
-            var movedAnnotation = Lookup(notification.MovedAnnotation.GetId());
+            var movedAnnotation =  LookupOpt(notification.MovedAnnotation.GetId()) ?? Lookup(notification.MovedAnnotation.GetId());
             var replacedAnnotation = Lookup(notification.ReplacedAnnotation.GetId());
-            //TODO: replace with replaceWith method
-            localParent.InsertAnnotations(notification.NewIndex, [movedAnnotation], notification.NotificationId);
-            localParent.RemoveAnnotations([replacedAnnotation], notification.NotificationId);
+            replacedAnnotation.ReplaceWith(movedAnnotation);
         });
 
     #endregion
