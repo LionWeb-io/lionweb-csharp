@@ -389,6 +389,55 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
     }
 
     #endregion
+
+    #region MoveEntryFromOtherReferenceInSameParent
+
+    [TestMethod]
+    [Ignore]
+    public void MoveEntryFromOtherReferenceInSameParent()
+    {
+        var ref1 = new LinkTestConcept("ref1");
+        var ref2 = new LinkTestConcept("ref2");
+        var ref3 = new LinkTestConcept("ref3");
+        var ref4 = new LinkTestConcept("ref4");
+        var moved = new LinkTestConcept("moved");
+        
+        var originalPartition = new LinkTestConcept("concept")
+        {
+            Reference_0_n = [ref2, ref3, ref4], 
+            Reference_1_n = [moved, ref1] 
+            
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var oldIndex = 0;
+        var newIndex = 0;
+        var notification =  new EntryMovedFromOtherReferenceInSameParentNotification(originalPartition, 
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, newIndex,  new ReferenceTarget {Reference = moved}, 
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, oldIndex, new NumericNotificationId("EntryMovedFromOtherReferenceInSameParent", 0));
+        
+        var sharedNodeMap = new SharedNodeMap();
+        
+        RegisterNodes(originalPartition.Reference_0_n, sharedNodeMap);
+        RegisterNodes(originalPartition.Reference_1_n, sharedNodeMap);
+        
+        CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+        
+        Assert.AreEqual(4, clonedPartition.Reference_0_n.Count);
+        Assert.AreEqual(1, clonedPartition.Reference_1_n.Count);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[0].GetId());
+    }
+
+    private static void RegisterNodes<T>(IEnumerable<T> references, SharedNodeMap sharedNodeMap) where T: LinkTestConcept
+    {
+        foreach (var reference in references)
+        {
+            sharedNodeMap.RegisterNode(reference);
+        }
+    }
+
+    #endregion
     
     #endregion
 }
