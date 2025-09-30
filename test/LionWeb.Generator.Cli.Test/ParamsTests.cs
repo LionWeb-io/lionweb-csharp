@@ -179,7 +179,7 @@ public class ParamsTests
     {
         Delete(new DirectoryInfo("out"));
         
-        var generatedFile = new FileInfo(@"out/A.B.Cee.Dee.@if.Else.\u1234.\U1234aBcd.TestLanguage.g.cs");
+        var generatedFile = new FileInfo(@"out/a.B.cee.Dee.@if.else.\u1234.\U1234aBcd.TestLanguage.g.cs");
         
         var generator = new LionWebGenerator();
         var result = generator.Exec([
@@ -245,7 +245,7 @@ public class ParamsTests
     {
         Delete(new DirectoryInfo("out"));
         
-        var generatedFile = new FileInfo("out/A/B/Cee/Dee/@if/else/_u1234/_U1234aBcd/TestLanguage.g.cs");
+        var generatedFile = new FileInfo("out/A/B/Cee/Dee/@if/Else/_u1234/_U1234aBcd/TestLanguage.g.cs");
         
         var generator = new LionWebGenerator();
         var result = generator.Exec([
@@ -279,7 +279,7 @@ public class ParamsTests
     {
         Delete(new DirectoryInfo("out"));
         
-        var generatedFile = new FileInfo("out/a.B.Cee.Dee.@if.else._u1234._U1234aBcd.TestLanguage.g.cs");
+        var generatedFile = new FileInfo("out/a.B.Cee.Dee.@if.Else._u1234._U1234aBcd.TestLanguage.g.cs");
         
         var generator = new LionWebGenerator();
         var result = generator.Exec([
