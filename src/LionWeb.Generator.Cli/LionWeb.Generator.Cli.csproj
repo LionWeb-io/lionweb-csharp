@@ -30,6 +30,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\LionWeb.Core\LionWeb.Core.csproj" />
+      <ProjectReference Include="..\LionWeb.Generator.MpsSpecific\LionWeb.Generator.MpsSpecific.csproj" />
       <ProjectReference Include="..\LionWeb.Generator\LionWeb.Generator.csproj" />
     </ItemGroup>
 
