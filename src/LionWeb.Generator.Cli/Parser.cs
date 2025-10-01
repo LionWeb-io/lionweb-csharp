@@ -35,6 +35,7 @@ internal class Parser
     private readonly Option<NamespacePattern?> _namespacePattern;
     private readonly Option<PathPattern?> _pathPattern;
     private readonly Option<string?> _lionWebVersion;
+    private readonly Option<bool?> _dotGSuffix;
     private readonly Option<bool?> _writableIface;
     private ParseResult? _parseResult;
 
@@ -116,6 +117,10 @@ internal class Parser
             }
         });
         _rootCommand.Options.Add(_lionWebVersion);
+
+        _dotGSuffix =
+            new("--dotGSuffix") { Arity = ArgumentArity.ZeroOrOne, DefaultValueFactory = _ => null };
+        _rootCommand.Options.Add(_dotGSuffix);
 
         _writableIface =
             new("--writableInterfaces") { Arity = ArgumentArity.ZeroOrOne, DefaultValueFactory = _ => null };
@@ -217,6 +222,9 @@ internal class Parser
             if (PathPattern.IsSet())
                 configuration.PathPattern = (PathPattern)PathPattern!;
 
+            if (DotGSuffix is not null)
+                configuration.DotGSuffix = (bool)DotGSuffix;
+
             if (GeneratorConfig is not null)
                 configuration.GeneratorConfig = GeneratorConfig;
         }
@@ -261,15 +269,9 @@ internal class Parser
     private NamespacePattern? NamespacePattern => ParseResult.GetValue(_namespacePattern);
     private PathPattern? PathPattern => ParseResult.GetValue(_pathPattern);
 
-    private bool? WritableInterfaces
-    {
-        get
-        {
-            var optionResult = ParseResult.RootCommandResult.GetResult(_writableIface);
-            var r = ParseResult.GetValue(_writableIface);
-            return r;
-        }
-    }
+    private bool? WritableInterfaces => ParseResult.GetValue(_writableIface);
+
+    private bool? DotGSuffix => ParseResult.GetValue(_dotGSuffix);
 
     private GeneratorConfig GeneratorConfig
     {
