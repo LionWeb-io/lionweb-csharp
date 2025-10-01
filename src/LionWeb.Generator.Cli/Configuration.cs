@@ -145,7 +145,7 @@ public record Configuration
     {
         if (OutputFile != null)
             return OutputFile;
-        
+
         var ns = GetNamespace(language);
         var suffix = DotGSuffix ? ".g.cs" : ".cs";
 
@@ -153,11 +153,13 @@ public record Configuration
         {
             PathPattern.VerbatimName => new FileInfo(language.Name + suffix),
             PathPattern.VerbatimKey => new FileInfo(language.Key + suffix),
+            PathPattern.NamespaceInFilename => new FileInfo(Split(_namespaceSeparator, ns) + _namespaceSeparator +
+                                                            language.Name + suffix),
             PathPattern.NamespaceAsFilename => new FileInfo(Split(_namespaceSeparator, ns) + suffix),
             PathPattern.NamespaceAsPath => new FileInfo(Split(Path.DirectorySeparatorChar, ns) + suffix),
             _ => throw new UnknownEnumValueException<PathPattern>(PathPattern)
         };
-        
+
         return new FileInfo(Path.Combine(OutputDir?.ToString() ?? "", fileInfo.ToString()));
     }
 
@@ -263,6 +265,7 @@ public enum PathPattern
 {
     VerbatimName = 1,
     VerbatimKey,
+    NamespaceInFilename,
     NamespaceAsFilename,
     NamespaceAsPath
 }
@@ -271,7 +274,7 @@ public static class PathPatternExtensions
 {
     public static bool IsSet(this PathPattern? candidate) =>
         candidate is not null && candidate is not default(PathPattern);
-    
+
     public static bool IsSet(this PathPattern candidate) =>
         candidate is not default(PathPattern);
 }
