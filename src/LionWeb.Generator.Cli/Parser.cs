@@ -95,10 +95,7 @@ internal class Parser
         };
         _rootCommand.Options.Add(_pathPattern);
 
-        _lionWebVersion = new("--lionWebVersion")
-        {
-            Description = "LionWeb version", DefaultValueFactory = (_ => LionWebVersions.Current.VersionString)
-        };
+        _lionWebVersion = new("--lionWebVersion") { Description = "LionWeb version" };
         _lionWebVersion.Validators.Add(r =>
         {
             switch (r.Tokens.Count)
@@ -110,7 +107,7 @@ internal class Parser
                     return;
                 default:
 
-                    var value = r.Tokens.First().Value;
+                    var value = r.Tokens[0].Value;
                     if (LionWebVersions.AllPureVersions.All(v => v.VersionString != value))
                         r.AddError($"invalid LionWebVersion: {value}");
                     return;
@@ -204,8 +201,8 @@ internal class Parser
     {
         foreach (var configuration in Configurations)
         {
-            if (LionWebVersion is not null)
-                configuration.LionWebVersion = LionWebVersion;
+            if (configuration.LionWebVersion is null || LionWebVersion is not null)
+                configuration.LionWebVersion = LionWebVersionOrDefault;
 
             if (OutputDir is not null && configuration.OutputFile is null)
                 configuration.OutputDir = OutputDir;
@@ -240,7 +237,7 @@ internal class Parser
             var configuration = new Configuration
             {
                 LanguageFile = f,
-                LionWebVersion = LionWebVersion,
+                LionWebVersion = LionWebVersionOrDefault,
                 OutputDir = OutputDir,
                 OutputFile = OutputFile,
                 GeneratorConfig = GeneratorConfig
@@ -263,6 +260,7 @@ internal class Parser
 
     private FileInfo[]? LanguageFiles => ParseResult.GetValue(_languageFile);
     private string? LionWebVersion => ParseResult.GetValue(_lionWebVersion);
+    private string LionWebVersionOrDefault => LionWebVersion ?? LionWebVersions.Current.VersionString;
     private DirectoryInfo? OutputDir => ParseResult.GetValue(_outputDir);
     private FileInfo? OutputFile => ParseResult.GetValue(_outputFile);
     private string? Namespace => ParseResult.GetValue(_ns);
