@@ -45,11 +45,11 @@ public class ParamsTests_Config : ParamsTestsBase
         var generator = new TestLionWebGenerator();
         Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
 
-        var relativeOutputDir = DeleteOutDir(out var outputDir);
+        var outputDir = DeleteOutDir();
 
         var result = generator.Exec([
             "--config", PartialConfig,
-            "--output", relativeOutputDir
+            "--output", RelativeOutputDir
         ]);
 
         Assert.HasCount(2, generator.Configurations);
@@ -66,18 +66,59 @@ public class ParamsTests_Config : ParamsTestsBase
     }
 
     [TestMethod]
+    public void CompleteConfigFile()
+    {
+        var generator = new TestLionWebGenerator();
+        var currDir = Directory.GetCurrentDirectory();
+        Console.WriteLine($"CurrentDir: {currDir}");
+
+        DeleteOutDir();
+
+        var outputDir = Path.Combine(currDir, ResourceDir, "out/2023");
+        
+        var result = generator.Exec([
+            "--config", CompleteConfig
+        ]);
+
+        Assert.HasCount(1, generator.Configurations);
+        Assert.HasCount(1, generator.ValidConfigurations);
+        Assert.AreEqual(0, result);
+
+        Assert.IsEmpty(generator.Errors);
+
+        Assert.AreEqual(
+            new Configuration
+            {
+                LanguageFile = new FileInfo(new FileInfo(Path.Combine(currDir, TestLanguage2023)).FullName),
+                OutputDir = new DirectoryInfo(outputDir),
+                Namespace = "My.Name.Space",
+                PathPattern = PathPattern.NamespaceInFilename,
+                DotGSuffix = false,
+                LionWebVersion = "2023.1",
+                GeneratorConfig = new GeneratorConfig { WritableInterfaces = true }
+            }, generator.Configurations[0]);
+
+        Assert.AreEqual(generator.Configurations[0], generator.ValidConfigurations[0]);
+
+        Assert.IsTrue(Directory.Exists(outputDir));
+        AssertExists(new FileInfo($"{outputDir}/My.Name.Space.TestLanguage.cs"));
+    }
+    
+    [TestMethod]
     public void CompleteConfigFile_Override()
     {
         var generator = new TestLionWebGenerator();
         var currDir = Directory.GetCurrentDirectory();
         Console.WriteLine($"CurrentDir: {currDir}");
 
-        var relativeOutputDir = DeleteOutDir(out var outputDir);
+        var outputDir = DeleteOutDir();
 
         var result = generator.Exec([
             "--config", CompleteConfig,
-            "--output", relativeOutputDir,
+            "--output", RelativeOutputDir,
             "--namespace", "OtherNameSpace",
+            "--pathPattern", nameof(PathPattern.VerbatimName),
+            "--dotGSuffix", "true",
             "--lionWebVersion", "2024.1",
             "--writableInterfaces", "false",
             TestLanguage2024
@@ -96,8 +137,10 @@ public class ParamsTests_Config : ParamsTestsBase
             new Configuration
             {
                 LanguageFile = new FileInfo(new FileInfo(Path.Combine(currDir, TestLanguage2023)).FullName),
-                OutputDir = new DirectoryInfo(relativeOutputDir),
+                OutputDir = new DirectoryInfo(RelativeOutputDir),
                 Namespace = "OtherNameSpace",
+                PathPattern = PathPattern.VerbatimName,
+                DotGSuffix = true,
                 LionWebVersion = "2024.1",
                 GeneratorConfig = new GeneratorConfig { WritableInterfaces = false }
             }, generator.Configurations[0]);
@@ -106,8 +149,10 @@ public class ParamsTests_Config : ParamsTestsBase
             new Configuration
             {
                 LanguageFile = new FileInfo(TestLanguage2024),
-                OutputDir = new DirectoryInfo(relativeOutputDir),
+                OutputDir = new DirectoryInfo(RelativeOutputDir),
                 Namespace = "OtherNameSpace",
+                PathPattern = PathPattern.VerbatimName,
+                DotGSuffix = true,
                 LionWebVersion = "2024.1",
                 GeneratorConfig = new GeneratorConfig { WritableInterfaces = false }
             }, generator.Configurations[1]);

@@ -19,24 +19,23 @@ namespace LionWeb.Generator.Cli.Test;
 
 public class ParamsTestsBase
 {
-    private const string _resourceDir = "../../../resources";
-    private const string _relativeOutputDir = $"{_resourceDir}/out";
+    protected const string ResourceDir = "../../../resources";
+    protected const string TestLanguage2023 = $"{ResourceDir}/testLanguage.2023_1.json";
+    protected const string TestLanguage2024 = $"{ResourceDir}/testLanguage.2024_1.json";
+    protected const string TestLanguageNamespace = $"{ResourceDir}/testLanguage.namespace.2024_1.json";
+    protected const string PartialConfig = $"{ResourceDir}/partial.config.json";
+    protected const string CompleteConfig = $"{ResourceDir}/complete.config.json";
+    protected const string RelativeOutputDir = $"{ResourceDir}/out";
 
-    protected const string TestLanguage2023 = $"{_resourceDir}/testLanguage.2023_1.json";
-    protected const string TestLanguage2024 = $"{_resourceDir}/testLanguage.2024_1.json";
-    protected const string TestLanguageNamespace = $"{_resourceDir}/testLanguage.namespace.2024_1.json";
-    protected const string PartialConfig = $"{_resourceDir}/partial.config.json";
-    protected const string CompleteConfig = $"{_resourceDir}/complete.config.json";
-
-    protected static string DeleteOutDir(out string outputDir)
+    protected static string DeleteOutDir()
     {
-        outputDir = Path.Combine(Directory.GetCurrentDirectory(), _relativeOutputDir);
+        var outputDir = Path.Combine(Directory.GetCurrentDirectory(), RelativeOutputDir);
         if (!Directory.Exists(outputDir))
-            return _relativeOutputDir;
+            return outputDir;
 
         Directory.Delete(outputDir, true);
         Assert.IsFalse(Directory.Exists(outputDir), outputDir);
-        return _relativeOutputDir;
+        return outputDir;
     }
 
     protected static void Delete(FileInfo fileInfo)

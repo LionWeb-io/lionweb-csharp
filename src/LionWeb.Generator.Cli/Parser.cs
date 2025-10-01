@@ -281,6 +281,6 @@ internal class Parser
             return cfg;
         }
     }
-    
+
     private void LogError(string message) => _errorLogger(message);
 }
