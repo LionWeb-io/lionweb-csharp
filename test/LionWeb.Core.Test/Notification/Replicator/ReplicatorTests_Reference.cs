@@ -280,9 +280,7 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
             oldIndex, newIndex, new ReferenceTarget {Reference = moved}, new NumericNotificationId("moveEntryInSameReference", 0));
         
         var sharedNodeMap = new SharedNodeMap();
-        sharedNodeMap.RegisterNode(ref1);
-        sharedNodeMap.RegisterNode(ref2);
-        sharedNodeMap.RegisterNode(moved);
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
         
         CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
         
@@ -310,9 +308,8 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
             oldIndex, newIndex, new ReferenceTarget {Reference = moved}, new NumericNotificationId("moveEntryInSameReference", 0));
         
         var sharedNodeMap = new SharedNodeMap();
-        sharedNodeMap.RegisterNode(ref1);
-        sharedNodeMap.RegisterNode(ref2);
-        sharedNodeMap.RegisterNode(moved);
+        
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
         
         CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
         
@@ -343,10 +340,7 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
         
         var sharedNodeMap = new SharedNodeMap();
         
-        foreach (var reference in originalPartition.Reference_0_n)
-        {
-            sharedNodeMap.RegisterNode(reference);
-        }
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
         
         CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
         
@@ -377,10 +371,7 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
         
         var sharedNodeMap = new SharedNodeMap();
         
-        foreach (var reference in originalPartition.Reference_0_n)
-        {
-            sharedNodeMap.RegisterNode(reference);
-        }
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
         
         CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
         
@@ -393,7 +384,6 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
     #region MoveEntryFromOtherReferenceInSameParent
 
     [TestMethod]
-    [Ignore]
     public void MoveEntryFromOtherReferenceInSameParent()
     {
         var ref1 = new LinkTestConcept("ref1");
@@ -401,35 +391,213 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
         var ref3 = new LinkTestConcept("ref3");
         var ref4 = new LinkTestConcept("ref4");
         var moved = new LinkTestConcept("moved");
-        
+
         var originalPartition = new LinkTestConcept("concept")
         {
             Reference_0_n = [ref2, ref3, ref4], 
-            Reference_1_n = [moved, ref1] 
-            
+            Reference_1_n = [moved, ref1]
         };
-        
+
         var clonedPartition = ClonePartition(originalPartition);
 
         var oldIndex = 0;
         var newIndex = 0;
-        var notification =  new EntryMovedFromOtherReferenceInSameParentNotification(originalPartition, 
-            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, newIndex,  new ReferenceTarget {Reference = moved}, 
-            TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, oldIndex, new NumericNotificationId("EntryMovedFromOtherReferenceInSameParent", 0));
-        
+        var notification = new EntryMovedFromOtherReferenceInSameParentNotification(originalPartition,
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, newIndex, new ReferenceTarget { Reference = moved },
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_1_n, oldIndex,
+            new NumericNotificationId("EntryMovedFromOtherReferenceInSameParent", 0));
+
         var sharedNodeMap = new SharedNodeMap();
-        
-        RegisterNodes(originalPartition.Reference_0_n, sharedNodeMap);
-        RegisterNodes(originalPartition.Reference_1_n, sharedNodeMap);
-        
+
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
+        RegisterReferenceTargets(originalPartition.Reference_1_n, sharedNodeMap);
+
         CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
-        
+
         Assert.AreEqual(4, clonedPartition.Reference_0_n.Count);
         Assert.AreEqual(1, clonedPartition.Reference_1_n.Count);
         Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[0].GetId());
     }
 
-    private static void RegisterNodes<T>(IEnumerable<T> references, SharedNodeMap sharedNodeMap) where T: LinkTestConcept
+    
+    [TestMethod]
+    public void MoveEntryFromOtherReferenceInSameParent_singular_to_multiple_reference_first()
+    {
+        var ref1 = new LinkTestConcept("ref1");
+        var ref2 = new LinkTestConcept("ref2");
+        var ref3 = new LinkTestConcept("ref3");
+        var ref4 = new LinkTestConcept("ref4");
+        var moved = new LinkTestConcept("moved");
+
+        var originalPartition = new LinkTestConcept("concept")
+        {
+            Reference_0_n = [ref1, ref2, ref3, ref4], 
+            Reference_0_1 = moved
+        };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var oldIndex = 0;
+        var newIndex = 0;
+        var notification = new EntryMovedFromOtherReferenceInSameParentNotification(originalPartition,
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, newIndex, new ReferenceTarget { Reference = moved },
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, oldIndex,
+            new NumericNotificationId("EntryMovedFromOtherReferenceInSameParent", 0));
+
+        var sharedNodeMap = new SharedNodeMap();
+
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
+        RegisterReferenceTargets([originalPartition.Reference_0_1], sharedNodeMap);
+
+        CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+
+        Assert.AreEqual(5, clonedPartition.Reference_0_n.Count);
+        Assert.IsNull(clonedPartition.Reference_0_1);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[0].GetId());
+    }
+
+    [TestMethod]
+    public void MoveEntryFromOtherReferenceInSameParent_singular_to_multiple_reference_last()
+    {
+        var ref1 = new LinkTestConcept("ref1");
+        var ref2 = new LinkTestConcept("ref2");
+        var ref3 = new LinkTestConcept("ref3");
+        var ref4 = new LinkTestConcept("ref4");
+        var moved = new LinkTestConcept("moved");
+
+        var originalPartition = new LinkTestConcept("concept")
+        {
+            Reference_0_n = [ref1, ref2, ref3, ref4], 
+            Reference_0_1 = moved
+        };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var oldIndex = 0;
+        var newIndex = 4;
+        var notification = new EntryMovedFromOtherReferenceInSameParentNotification(originalPartition,
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, newIndex, new ReferenceTarget { Reference = moved },
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, oldIndex,
+            new NumericNotificationId("EntryMovedFromOtherReferenceInSameParent", 0));
+
+        var sharedNodeMap = new SharedNodeMap();
+
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
+        RegisterReferenceTargets([originalPartition.Reference_0_1], sharedNodeMap);
+
+        CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+
+        Assert.AreEqual(5, clonedPartition.Reference_0_n.Count);
+        Assert.IsNull(clonedPartition.Reference_0_1);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[^1].GetId());
+    }
+
+    [TestMethod]
+    public void MoveEntryFromOtherReferenceInSameParent_singular_to_multiple_reference_middle()
+    {
+        var ref1 = new LinkTestConcept("ref1");
+        var ref2 = new LinkTestConcept("ref2");
+        var ref3 = new LinkTestConcept("ref3");
+        var ref4 = new LinkTestConcept("ref4");
+        var moved = new LinkTestConcept("moved");
+
+        var originalPartition = new LinkTestConcept("concept")
+        {
+            Reference_0_n = [ref1, ref2, ref3, ref4], 
+            Reference_0_1 = moved
+        };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var oldIndex = 0;
+        var newIndex = 2;
+        var notification = new EntryMovedFromOtherReferenceInSameParentNotification(originalPartition,
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, newIndex, new ReferenceTarget { Reference = moved },
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, oldIndex,
+            new NumericNotificationId("EntryMovedFromOtherReferenceInSameParent", 0));
+
+        var sharedNodeMap = new SharedNodeMap();
+
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
+        RegisterReferenceTargets([originalPartition.Reference_0_1], sharedNodeMap);
+
+        CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+
+        Assert.AreEqual(5, clonedPartition.Reference_0_n.Count);
+        Assert.IsNull(clonedPartition.Reference_0_1);
+        Assert.AreEqual(moved.GetId(), clonedPartition.Reference_0_n[2].GetId());
+    }
+
+    
+    [TestMethod]
+    public void MoveEntryFromOtherReferenceInSameParent_multiple_to_singular_reference_first()
+    {
+        var ref1 = new LinkTestConcept("ref1");
+        var ref2 = new LinkTestConcept("ref2");
+        var ref3 = new LinkTestConcept("ref3");
+        var ref4 = new LinkTestConcept("ref4");
+        var moved = new LinkTestConcept("moved");
+
+        var originalPartition = new LinkTestConcept("concept")
+        {
+            Reference_0_n = [moved, ref1, ref2, ref3, ref4], 
+        };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var oldIndex = 0;
+        var newIndex = 0;
+        var notification = new EntryMovedFromOtherReferenceInSameParentNotification(originalPartition,
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, newIndex, new ReferenceTarget { Reference = moved },
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, oldIndex,
+            new NumericNotificationId("EntryMovedFromOtherReferenceInSameParent", 0));
+
+        var sharedNodeMap = new SharedNodeMap();
+
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
+
+        CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+
+        Assert.AreEqual(4, clonedPartition.Reference_0_n.Count);
+        Assert.AreEqual(moved, clonedPartition.Reference_0_1);
+        Assert.AreEqual(ref1.GetId(), clonedPartition.Reference_0_n[0].GetId());
+    }
+
+    [TestMethod]
+    public void MoveEntryFromOtherReferenceInSameParent_multiple_to_singular_reference_last()
+    {
+        var ref1 = new LinkTestConcept("ref1");
+        var ref2 = new LinkTestConcept("ref2");
+        var ref3 = new LinkTestConcept("ref3");
+        var ref4 = new LinkTestConcept("ref4");
+        var moved = new LinkTestConcept("moved");
+
+        var originalPartition = new LinkTestConcept("concept")
+        {
+            Reference_0_n = [ref1, ref2, ref3, ref4, moved], 
+        };
+
+        var clonedPartition = ClonePartition(originalPartition);
+
+        var oldIndex = 4;
+        var newIndex = 0;
+        var notification = new EntryMovedFromOtherReferenceInSameParentNotification(originalPartition,
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_1, newIndex, new ReferenceTarget { Reference = moved },
+            TestLanguageLanguage.Instance.LinkTestConcept_reference_0_n, oldIndex,
+            new NumericNotificationId("EntryMovedFromOtherReferenceInSameParent", 0));
+
+        var sharedNodeMap = new SharedNodeMap();
+
+        RegisterReferenceTargets(originalPartition.Reference_0_n, sharedNodeMap);
+
+        CreatePartitionReplicator(clonedPartition, notification, sharedNodeMap);
+
+        Assert.AreEqual(4, clonedPartition.Reference_0_n.Count);
+        Assert.AreEqual(moved, clonedPartition.Reference_0_1);
+        Assert.AreEqual(ref1.GetId(), clonedPartition.Reference_0_n[0].GetId());
+    }
+
+    private static void RegisterReferenceTargets<T>(IEnumerable<T> references, SharedNodeMap sharedNodeMap) where T : LinkTestConcept
     {
         foreach (var reference in references)
         {
@@ -438,6 +606,6 @@ public class ReplicatorTests_Reference : ReplicatorTestsBase
     }
 
     #endregion
-    
+
     #endregion
 }

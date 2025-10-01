@@ -129,6 +129,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             case EntryMovedInSameReferenceNotification e:
                 OnRemoteEntryMovedInSameReference(e);
                 break;
+            case EntryMovedFromOtherReferenceInSameParentNotification e:
+                OnRemoteEntryMovedFromOtherReferenceInSameParentNotification(e);
+                break;
             default:
                 throw new ArgumentException($"Can not process notification due to unknown {notification}!");
         }
@@ -435,9 +438,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
     {
         var localParent = Lookup(notification.Parent.GetId());
-        var target = Lookup(notification.Target.Reference.GetId());
+        var movedTarget = Lookup(notification.Target.Reference.GetId());
 
-        object newValue = target;
+        object newValue = movedTarget;
         var reference = notification.Reference;
         if (localParent.TryGet(reference, out object? existingTargets))
         {
@@ -445,17 +448,46 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             {
                 var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
                 targets.RemoveAt(notification.OldIndex);
-                targets.Insert(notification.NewIndex, target);
+                targets.Insert(notification.NewIndex, movedTarget);
                 newValue = targets;
             }
         } else
         {
-            newValue = new List<IReadableNode>() { target };
+            newValue = new List<IReadableNode>() { movedTarget };
         }
 
-        localParent.Set(reference, newValue);
+        localParent.Set(reference, newValue, notification.NotificationId);
     }
 
+    private void OnRemoteEntryMovedFromOtherReferenceInSameParentNotification(EntryMovedFromOtherReferenceInSameParentNotification notification)
+    {
+        var localParent = Lookup(notification.Parent.GetId());
+        var movedTarget = Lookup(notification.MovedTarget.Reference.GetId());
+        
+        var newValue = InsertReference(localParent, notification.NewReference, notification.NewIndex, movedTarget);
+        localParent.Set(notification.NewReference, newValue, notification.NotificationId);
+        
+        newValue = RemoveReference(localParent, notification.OldReference, notification.OldIndex);
+        localParent.Set(notification.OldReference, newValue, notification.NotificationId);
+        
+    }
+
+    private static object? RemoveReference(INode localParent, Reference reference, Index index)
+    {
+        object? newValue = null;
+        if (localParent.TryGet(reference, out object? existingTargets))
+        {
+            if (existingTargets is IList l)
+            {
+                var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
+                targets.RemoveAt(index);
+                newValue = targets;
+            }
+        } 
+        
+        return newValue;
+    }
+    
     private static object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
     {
         object newValue = target;

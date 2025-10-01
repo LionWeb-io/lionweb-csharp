@@ -60,6 +60,7 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             ReferenceDeletedNotification a => OnReferenceDeleted(a),
             ReferenceChangedNotification a => OnReferenceChanged(a),
             EntryMovedInSameReferenceNotification a => OnEntryMovedInSameReference(a),
+            EntryMovedFromOtherReferenceInSameParentNotification a => OnEntryMovedFromOtherReferenceInSameParent(a),
             _ => throw new ArgumentException($"{notification.GetType().Name} is not implemented")
         };
 
@@ -441,6 +442,22 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
             notification.OldIndex,
             notification.NewIndex,
             target,
+            notification.NotificationId);
+    }
+    
+    private EntryMovedFromOtherReferenceInSameParentNotification 
+        OnEntryMovedFromOtherReferenceInSameParent(EntryMovedFromOtherReferenceInSameParentNotification notification)
+    {
+        var parent = LookUpNode(notification.Parent);
+        var target = LookUpNode(notification.MovedTarget);
+        
+        return new EntryMovedFromOtherReferenceInSameParentNotification(
+            parent,
+            notification.NewReference,
+            notification.NewIndex,
+            target,
+            notification.OldReference,
+            notification.OldIndex,
             notification.NotificationId);
     }
 
