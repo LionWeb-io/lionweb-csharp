@@ -23,7 +23,7 @@ using Languages.Generated.V2025_1.Shapes.M2;
 using M1;
 
 [TestClass]
-public class NotificationTests_Containment: NotificationTestsBase
+public class ReplicatorTests_Containment: ReplicatorTestsBase
 {
     #region Children
 
@@ -360,7 +360,7 @@ public class NotificationTests_Containment: NotificationTestsBase
     
     #endregion
 
-    #region ChildMovedAndReplaceInSameContainment
+    #region ChildMovedAndReplacedInSameContainment
     
     [TestMethod]
     [Ignore("Should emit ChildMovedAndReplacedInSameContainmentNotification")]

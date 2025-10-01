@@ -46,6 +46,9 @@ public class PropertyNotificationEmitter : PartitionNotificationEmitterBase<INod
     {
         if (!IsActive())
             return;
+        
+        if(_oldValue is not null && _oldValue.Equals(_newValue))
+            return;
 
         switch (_oldValue, _newValue)
         {
