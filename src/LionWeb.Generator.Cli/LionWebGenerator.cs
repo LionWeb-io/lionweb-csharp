@@ -17,7 +17,7 @@ public class LionWebGenerator
 
     public int Exec(string[] args)
     {
-        var parser = new Parser(args);
+        var parser = new Parser(LogError, args);
         var result = parser.ParseCommandLine();
         Configurations.AddRange(parser.Configurations);
         if (result != 0)
@@ -47,7 +47,10 @@ public class LionWebGenerator
             })!);
 
         if (ValidConfigurations.Count == 0)
+        {
             result = -2;
+            LogError("Nothing to generate");
+        }
 
         return result;
     }
@@ -67,16 +70,16 @@ public class LionWebGenerator
         return configuration;
     }
 
-    private static bool ValidateConfiguration(Configuration configuration)
+    private bool ValidateConfiguration(Configuration configuration)
     {
         if (!configuration.Validate(out var messages))
         {
             foreach (var message in messages)
             {
-                Console.Error.WriteLine(message);
+                LogError(message);
             }
 
-            Console.Error.WriteLine("Skipping invalid configuration");
+            LogError("Skipping invalid configuration");
             Console.WriteLine();
             return false;
         }
@@ -102,7 +105,7 @@ public class LionWebGenerator
 
             if (configuration is { OutputFile: not null, Languages.Count: > 1 })
             {
-                Console.Error.WriteLine(
+                LogError(
                     $"Single output file {configuration.OutputFile} set, but language file {configuration.LanguageFile} contains more than one language");
                 return false;
             }
@@ -112,7 +115,7 @@ public class LionWebGenerator
             return true;
         } catch (Exception e)
         {
-            Console.Error.WriteLine(e);
+            LogError(e);
             return false;
         }
     }
@@ -132,7 +135,7 @@ public class LionWebGenerator
                     Generate(names, configuration, language);
                 } catch (Exception e)
                 {
-                    Console.Error.WriteLine(e);
+                    LogError(e);
                     result = -1;
                 }
             }
@@ -157,7 +160,7 @@ public class LionWebGenerator
         return names;
     }
 
-    private static void Generate(Names names, Configuration configuration, Language language)
+    private void Generate(Names names, Configuration configuration, Language language)
     {
         var generator = new GeneratorFacade
         {
@@ -180,4 +183,10 @@ public class LionWebGenerator
         generator.Persist(path.ToString());
         Console.WriteLine($"persisted to: {path}");
     }
+
+    protected virtual void LogError(Exception ex) =>
+        LogError(ex.ToString());
+
+    protected virtual void LogError(string message) =>
+        Console.Error.WriteLine(message);
 }

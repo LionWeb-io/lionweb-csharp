@@ -15,6 +15,7 @@
 // SPDX-FileCopyrightText: 2024 TRUMPF Laser SE and other contributors
 // SPDX-License-Identifier: Apache-2.0
 
+// ReSharper disable InconsistentNaming
 namespace LionWeb.Generator.Cli;
 
 using System.Diagnostics.CodeAnalysis;

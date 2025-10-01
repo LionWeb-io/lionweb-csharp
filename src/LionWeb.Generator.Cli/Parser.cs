@@ -23,6 +23,7 @@ using System.Text.Json;
 
 internal class Parser
 {
+    private readonly Action<string> _errorLogger;
     private readonly string[] _args;
 
     private readonly Option<FileInfo?> _config;
@@ -41,8 +42,9 @@ internal class Parser
 
     private ParseResult ParseResult => _parseResult ??= _rootCommand.Parse(_args);
 
-    public Parser(string[] args)
+    public Parser(Action<string> errorLogger, string[] args)
     {
+        _errorLogger = errorLogger;
         _args = args;
 
         _rootCommand = new("Generates C# classes from LionWeb languages");
@@ -147,7 +149,7 @@ internal class Parser
         {
             foreach (var error in ParseResult.Errors)
             {
-                Console.Error.WriteLine(error);
+                LogError(error.ToString());
             }
 
             return -2;
@@ -279,4 +281,6 @@ internal class Parser
             return cfg;
         }
     }
+    
+    private void LogError(string message) => _errorLogger(message);
 }
