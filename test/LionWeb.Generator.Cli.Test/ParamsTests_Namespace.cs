@@ -17,6 +17,9 @@
 
 namespace LionWeb.Generator.Cli.Test;
 
+using Core;
+using Core.M3;
+
 [TestClass]
 public class ParamsTests_Namespace : ParamsTestsBase
 {
@@ -285,4 +288,70 @@ public class ParamsTests_Namespace : ParamsTestsBase
         AssertExists(generatedFile);
         Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
     }
+
+    [TestMethod]
+    public void UnknownNamespacePattern_Null()
+    {
+        var ex = Assert.Throws<UnknownEnumValueException<NamespacePattern?>>(() =>
+            new Configuration { NamespacePattern = null }.GetNamespace(Language()));
+        
+        Assert.AreEqual("Unknown NamespacePattern: null", ex.Message);
+    }
+
+    [TestMethod]
+    public void UnknownNamespacePattern_InvalidInt()
+    {
+        var ex = Assert.Throws<UnknownEnumValueException<NamespacePattern>>(() =>
+            new Configuration { NamespacePattern = (NamespacePattern?)int.MaxValue }.GetNamespace(Language()));
+        
+        Assert.AreEqual($"Unknown NamespacePattern: {int.MaxValue}", ex.Message);
+    }
+    
+    [TestMethod]
+    public void NamespacePattern_ValidInt()
+    {
+        Assert.AreEqual("MyLang", new Configuration { NamespacePattern = (NamespacePattern?)1 }.GetNamespace(Language()));
+    }
+
+
+    [TestMethod]
+    public void UnknownPathPattern_Null()
+    {
+        var ex = Assert.Throws<NullReferenceException>(() =>
+        {
+            object pathPattern = null;
+            return new Configuration
+            {
+                Namespace = "ns",
+                PathPattern = (PathPattern)pathPattern
+            }.GetFile(Language());
+        });
+    }
+
+    [TestMethod]
+    public void UnknownPathPattern_InvalidInt()
+    {
+        var ex = Assert.Throws<UnknownEnumValueException<PathPattern>>(() =>
+            new Configuration
+            {
+                Namespace = "ns",
+                PathPattern = (PathPattern)int.MaxValue
+            }.GetFile(Language()));
+        
+        Assert.AreEqual($"Unknown PathPattern: {int.MaxValue}", ex.Message);
+    }
+    
+    [TestMethod]
+    public void PathPattern_ValidInt()
+    {
+        var expected = new FileInfo("MyLang.g.cs");
+        var actual = new Configuration
+        {
+            Namespace = "ns",
+            PathPattern = (PathPattern)1
+        }.GetFile(Language());
+        Assert.AreEqual(expected.FullName, actual.FullName);
+    }
+
+    private static DynamicLanguage Language() => new("d", LionWebVersions.Current) {Name = "MyLang"};
 }

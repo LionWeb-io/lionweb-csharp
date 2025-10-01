@@ -135,8 +135,9 @@ public record Configuration
             { } p when !p.FirstToUpper() =>
                 string.Join(_namespaceSeparator, language.Name.Split(_namespaceSeparator)),
             { } p when p.FirstToUpper() =>
-                string.Join(_namespaceSeparator, language.Name.Split(_namespaceSeparator).Select(s => s.ToFirstUpper())),
-            _ => throw new ArgumentException($"Unknown value for {nameof(NamespacePattern)}: {NamespacePattern}")
+                string.Join(_namespaceSeparator,
+                    language.Name.Split(_namespaceSeparator).Select(s => s.ToFirstUpper())),
+            _ => throw new UnknownEnumValueException<NamespacePattern?>(NamespacePattern)
         };
     }
 
@@ -154,8 +155,7 @@ public record Configuration
             PathPattern.VerbatimKey => new FileInfo(language.Key + suffix),
             PathPattern.NamespaceAsFilename => new FileInfo(Split(_namespaceSeparator, ns) + suffix),
             PathPattern.NamespaceAsPath => new FileInfo(Split(Path.DirectorySeparatorChar, ns) + suffix),
-            _ => throw new ArgumentException(
-                $"Unknown {nameof(PathPattern)} {((int?)PathPattern)?.ToString() ?? "null"}")
+            _ => throw new UnknownEnumValueException<PathPattern>(PathPattern)
         };
         
         return new FileInfo(Path.Combine(OutputDir?.ToString() ?? "", fileInfo.ToString()));
@@ -253,7 +253,8 @@ public static class NamespacePatternExtensions
     public static bool FirstToUpper(this NamespacePattern pattern) => pattern switch
     {
         NamespacePattern.DotSeparated => false,
-        NamespacePattern.DotSeparatedFirstUppercase => true
+        NamespacePattern.DotSeparatedFirstUppercase => true,
+        _ => throw new UnknownEnumValueException<NamespacePattern>(pattern)
     };
 }
 
