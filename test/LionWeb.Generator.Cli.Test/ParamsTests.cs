@@ -147,7 +147,7 @@ public class ParamsTests
     {
         Delete(new DirectoryInfo("out"));
         
-        var generatedFile = new FileInfo(@"out/a.B.cee.Dee.@if.else.\u1234.\U1234aBcd.TestLanguage.g.cs");
+        var generatedFile = new FileInfo(@"out/a.B.cee.Dee.@if.else._0.\u1234.\U1234aBcd.TestLanguage.g.cs");
         
         var generator = new LionWebGenerator();
         var result = generator.Exec([
@@ -171,7 +171,7 @@ public class ParamsTests
 
         Assert.AreEqual(0, result);
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace a.B.cee.Dee.@if.@else.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace a.B.cee.Dee.@if.@else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
     }
 
     [TestMethod]
@@ -179,7 +179,7 @@ public class ParamsTests
     {
         Delete(new DirectoryInfo("out"));
         
-        var generatedFile = new FileInfo(@"out/a.B.cee.Dee.@if.else.\u1234.\U1234aBcd.TestLanguage.g.cs");
+        var generatedFile = new FileInfo(@"out/a.B.cee.Dee.@if.else._0.\u1234.\U1234aBcd.TestLanguage.g.cs");
         
         var generator = new LionWebGenerator();
         var result = generator.Exec([
@@ -203,7 +203,7 @@ public class ParamsTests
 
         Assert.AreEqual(0, result);
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
     }
 
     [TestMethod]
@@ -211,7 +211,7 @@ public class ParamsTests
     {
         Delete(new DirectoryInfo("out"));
         
-        var generatedFile = new FileInfo("out/a/B/cee/Dee/@if/else/_u1234/_U1234aBcd/TestLanguage.g.cs");
+        var generatedFile = new FileInfo("out/a/B/cee/Dee/@if/else/_0/_u1234/_U1234aBcd/TestLanguage.g.cs");
         
         var generator = new LionWebGenerator();
         var result = generator.Exec([
@@ -237,7 +237,7 @@ public class ParamsTests
 
         Assert.AreEqual(0, result);
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace a.B.cee.Dee.@if.@else.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace a.B.cee.Dee.@if.@else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
     }
 
     [TestMethod]
@@ -245,7 +245,7 @@ public class ParamsTests
     {
         Delete(new DirectoryInfo("out"));
         
-        var generatedFile = new FileInfo("out/A/B/Cee/Dee/@if/Else/_u1234/_U1234aBcd/TestLanguage.g.cs");
+        var generatedFile = new FileInfo("out/A/B/Cee/Dee/@if/Else/_0/_u1234/_U1234aBcd/TestLanguage.g.cs");
         
         var generator = new LionWebGenerator();
         var result = generator.Exec([
@@ -271,7 +271,7 @@ public class ParamsTests
 
         Assert.AreEqual(0, result);
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
     }
 
     [TestMethod]
@@ -279,7 +279,7 @@ public class ParamsTests
     {
         Delete(new DirectoryInfo("out"));
         
-        var generatedFile = new FileInfo("out/A.B.Cee.Dee.@if.Else._u1234._U1234aBcd.TestLanguage.g.cs");
+        var generatedFile = new FileInfo("out/A.B.Cee.Dee.@if.Else._0._u1234._U1234aBcd.TestLanguage.g.cs");
         
         var generator = new LionWebGenerator();
         var result = generator.Exec([
@@ -305,7 +305,7 @@ public class ParamsTests
 
         Assert.AreEqual(0, result);
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
     }
 
     [TestMethod]
