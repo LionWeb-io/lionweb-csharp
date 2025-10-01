@@ -387,9 +387,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = Lookup(notification.Parent.GetId());
-            INode target = Lookup(notification.NewTarget.Reference.GetId());
-            var newValue = InsertReference(localParent, notification.Reference, notification.Index,
-                target);
+            var target = Lookup(notification.NewTarget.Reference.GetId());
+            var newValue = InsertReference(localParent, notification.Reference, notification.Index, target);
 
             localParent.Set(notification.Reference, newValue, notification.NotificationId);
         });
@@ -398,19 +397,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         SuppressNotificationForwarding(notification, () =>
         {
             var localParent = Lookup(notification.Parent.GetId());
-
-            object? newValue = null;
-            if (notification.Reference.Multiple)
-            {
-                var existingTargets = localParent.Get(notification.Reference);
-                if (existingTargets is IList l)
-                {
-                    var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                    targets.RemoveAt(notification.Index);
-                    newValue = targets;
-                }
-            }
-
+            var newValue = RemoveReference(localParent, notification.Reference, notification.Index);
+            
             localParent.Set(notification.Reference, newValue, notification.NotificationId);
         });
 
@@ -435,42 +423,43 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             localParent.Set(notification.Reference, newValue, notification.NotificationId);
         });
 
-    private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
-    {
-        var localParent = Lookup(notification.Parent.GetId());
-        var movedTarget = Lookup(notification.Target.Reference.GetId());
-
-        object newValue = movedTarget;
-        var reference = notification.Reference;
-        if (localParent.TryGet(reference, out object? existingTargets))
+    private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            if (existingTargets is IList l)
+            var localParent = Lookup(notification.Parent.GetId());
+            var movedTarget = Lookup(notification.Target.Reference.GetId());
+
+            object newValue = movedTarget;
+            var reference = notification.Reference;
+            if (localParent.TryGet(reference, out object? existingTargets))
             {
-                var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
-                targets.RemoveAt(notification.OldIndex);
-                targets.Insert(notification.NewIndex, movedTarget);
-                newValue = targets;
+                if (existingTargets is IList l)
+                {
+                    var targets = new List<IReadableNode>(l.Cast<IReadableNode>());
+                    targets.RemoveAt(notification.OldIndex);
+                    targets.Insert(notification.NewIndex, movedTarget);
+                    newValue = targets;
+                }
+            } else
+            {
+                newValue = new List<IReadableNode>() { movedTarget };
             }
-        } else
+
+            localParent.Set(reference, newValue, notification.NotificationId);
+        });
+
+    private void OnRemoteEntryMovedFromOtherReferenceInSameParentNotification(EntryMovedFromOtherReferenceInSameParentNotification notification) =>
+        SuppressNotificationForwarding(notification, () =>
         {
-            newValue = new List<IReadableNode>() { movedTarget };
-        }
+            var localParent = Lookup(notification.Parent.GetId());
+            var movedTarget = Lookup(notification.MovedTarget.Reference.GetId());
 
-        localParent.Set(reference, newValue, notification.NotificationId);
-    }
+            var newValue = InsertReference(localParent, notification.NewReference, notification.NewIndex, movedTarget);
+            localParent.Set(notification.NewReference, newValue, notification.NotificationId);
 
-    private void OnRemoteEntryMovedFromOtherReferenceInSameParentNotification(EntryMovedFromOtherReferenceInSameParentNotification notification)
-    {
-        var localParent = Lookup(notification.Parent.GetId());
-        var movedTarget = Lookup(notification.MovedTarget.Reference.GetId());
-        
-        var newValue = InsertReference(localParent, notification.NewReference, notification.NewIndex, movedTarget);
-        localParent.Set(notification.NewReference, newValue, notification.NotificationId);
-        
-        newValue = RemoveReference(localParent, notification.OldReference, notification.OldIndex);
-        localParent.Set(notification.OldReference, newValue, notification.NotificationId);
-        
-    }
+            newValue = RemoveReference(localParent, notification.OldReference, notification.OldIndex);
+            localParent.Set(notification.OldReference, newValue, notification.NotificationId);
+        });
 
     private static object? RemoveReference(INode localParent, Reference reference, Index index)
     {
@@ -483,11 +472,11 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
                 targets.RemoveAt(index);
                 newValue = targets;
             }
-        } 
-        
+        }
+
         return newValue;
     }
-    
+
     private static object InsertReference(INode localParent, Reference reference, Index index, IReadableNode target)
     {
         object newValue = target;
