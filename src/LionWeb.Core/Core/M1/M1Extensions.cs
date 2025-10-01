@@ -19,6 +19,7 @@ namespace LionWeb.Core.M1;
 
 using M2;
 using M3;
+using Notification;
 using System.Collections;
 
 /// <summary>
@@ -127,15 +128,16 @@ public static class M1Extensions
 
     /// <summary>
     /// Replaces <paramref name="self"/> in its parent with <paramref name="replacement"/>.
-    ///
+    /// 
     /// Does <i>not</i> change references to <paramref name="self"/>.
     /// </summary>
     /// <param name="self">Base node, must have a parent.</param>
     /// <param name="replacement">Node that will replace <paramref name="self"/> in <paramref name="self"/>'s parent.</param>
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of <paramref name="replacement"/>.</typeparam>
     /// <returns><paramref name="replacement"/></returns>
     /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent.</exception>
-    public static T ReplaceWith<T>(this INode self, T replacement) where T : INode
+    public static T ReplaceWith<T>(this INode self, T replacement,  INotificationId? notificationId = null) where T : INode
     {
         if (ReferenceEquals(self, replacement))
             return replacement;
@@ -147,7 +149,7 @@ public static class M1Extensions
         if (replacement is null)
             throw new UnsupportedNodeTypeException(replacement, nameof(replacement));
         
-        Containment containment = parent.GetContainmentOf(self);
+        Containment? containment = parent.GetContainmentOf(self);
 
         if (containment == null)
         {
@@ -155,8 +157,8 @@ public static class M1Extensions
             if (index < 0)
                 // should not happen
                 throw new TreeShapeException(self, "Node not contained in its parent");
-            parent.InsertAnnotations(index, [replacement]);
-            parent.RemoveAnnotations([self]);
+            parent.InsertAnnotations(index, [replacement], notificationId);
+            parent.RemoveAnnotations([self], notificationId);
             
             return replacement;
         }
@@ -189,10 +191,10 @@ public static class M1Extensions
                 nodes.Remove(self);
             }
             
-            parent.Set(containment, nodes);
+            parent.Set(containment, nodes, notificationId);
         } else
         {
-            parent.Set(containment, replacement);
+            parent.Set(containment, replacement, notificationId);
         }
 
         return replacement;
