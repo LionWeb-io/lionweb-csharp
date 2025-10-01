@@ -100,7 +100,8 @@ public class ChildReplacer<T>(INode self, T replacement) where T : INode
     protected virtual void SetSingle(INode parent, Containment containment, IWritableNode replacedChild) =>
         parent.Set(containment, replacement);
 
-    protected virtual void SetMany(INode parent, Containment containment, List<INode> nodes) =>
+    protected virtual void SetMany(INode parent, Containment containment, List<INode> nodes,
+        IWritableNode replacedChild, Index index) =>
         parent.Set(containment, nodes);
 
     protected virtual void ReplaceAnnotation(INode parent, int index, IWritableNode replacedAnnotation)
@@ -127,11 +128,18 @@ public class NotificationChildReplacer<T>(
         parent.Set(containment, replacement);
     }
 
-    protected override void SetMany(INode parent, Containment containment, List<INode> nodes)
+    protected override void SetMany(INode parent, Containment containment, IWritableNode replacedChild, Index index)
     {
-        var setId = _notificationIdProvider.CreateNotificationId();
-        producer.Memorize([setId], new ChildReplacedNotification())
-        parent.Set(containment, nodes);
+        var insertId = _notificationIdProvider.CreateNotificationId();
+        var removeId = _notificationIdProvider.CreateNotificationId();
+
+        producer.Memorize(
+            [insertId, removeId],
+            new ChildReplacedNotification(replacement, replacedChild, parent, index, NotificationId)
+        );
+
+        parent.Insert(containment, index, [replacement], insertId);
+        parent.Remove(containment, [self], removeId);
     }
 
     protected override void ReplaceAnnotation(INode parent, int index, IWritableNode replacedAnnotation)
