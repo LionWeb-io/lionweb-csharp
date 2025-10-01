@@ -137,68 +137,8 @@ public static class M1Extensions
     /// <typeparam name="T">Type of <paramref name="replacement"/>.</typeparam>
     /// <returns><paramref name="replacement"/></returns>
     /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent.</exception>
-    public static T ReplaceWith<T>(this INode self, T replacement,  INotificationId? notificationId = null) where T : INode
-    {
-        if (ReferenceEquals(self, replacement))
-            return replacement;
-        
-        INode? parent = self.GetParent();
-        if (parent == null)
-            throw new TreeShapeException(self, "Cannot replace a node with no parent");
-
-        if (replacement is null)
-            throw new UnsupportedNodeTypeException(replacement, nameof(replacement));
-        
-        Containment? containment = parent.GetContainmentOf(self);
-
-        if (containment == null)
-        {
-            var index = parent.GetAnnotations().ToList().IndexOf(self);
-            if (index < 0)
-                // should not happen
-                throw new TreeShapeException(self, "Node not contained in its parent");
-            parent.InsertAnnotations(index, [replacement], notificationId);
-            parent.RemoveAnnotations([self], notificationId);
-            
-            return replacement;
-        }
-
-        if (containment.Multiple)
-        {
-            var value = parent.Get(containment);
-            if (value is not IEnumerable enumerable)
-                // should not happen
-                throw new TreeShapeException(self, "Multiple containment does not yield enumerable");
-
-            var nodes = enumerable.Cast<INode>().ToList();
-            var index = nodes.IndexOf(self);
-            if (index < 0)
-                // should not happen
-                throw new TreeShapeException(self, "Node not contained in its parent");
-
-            var replacementParent = replacement.GetParent();
-            var replacementContainment = replacementParent?.GetContainmentOf(replacement);
-            
-            if (containment.Equals(replacementContainment))
-            {
-                var replacementIndex = nodes.IndexOf(replacement);
-                nodes.Insert(index, replacement);
-                nodes.RemoveAt(index + 1);
-                nodes.RemoveAt(index < replacementIndex ? nodes.LastIndexOf(replacement) : nodes.IndexOf(replacement));
-            } else
-            {
-                nodes.Insert(index, replacement);
-                nodes.Remove(self);
-            }
-            
-            parent.Set(containment, nodes, notificationId);
-        } else
-        {
-            parent.Set(containment, replacement, notificationId);
-        }
-
-        return replacement;
-    }
+    public static T ReplaceWith<T>(this INode self, T replacement,  INotificationId? notificationId = null) where T : INode =>
+        new ChildReplacer<T>(self, replacement).ReplaceWith();
 
     #region Descendants
 
@@ -219,7 +159,7 @@ public static class M1Extensions
     /// <typeparam name="T">Common supertype of all returned nodes.</typeparam>
     public static IEnumerable<T> Descendants<T>(T self, bool includeSelf = false, bool includeAnnotations = false)
         where T : class, IReadableNode =>
-        new ResettingEnumerable<T>(self, includeSelf, includeAnnotations);
+        new M1Extensions.ResettingEnumerable<T>(self, includeSelf, includeAnnotations);
 
     internal static IEnumerable<T> Descendants<T>(T self, HashSet<T> visited, bool includeSelf = false,
         bool includeAnnotations = false) where T : class, IReadableNode
@@ -250,8 +190,7 @@ public static class M1Extensions
         IEnumerator IEnumerable.GetEnumerator() =>
             GetEnumerator();
 
-        public IEnumerator<T> GetEnumerator() =>
-            Descendants<T>(self, [], includeSelf, includeAnnotations).GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => M1Extensions.Descendants<T>(self, [], includeSelf, includeAnnotations).GetEnumerator();
     }
 
     #endregion

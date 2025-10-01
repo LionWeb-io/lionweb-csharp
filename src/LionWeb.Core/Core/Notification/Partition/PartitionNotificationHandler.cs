@@ -23,6 +23,7 @@ using Pipe;
 public interface IPartitionNotificationProducer : INotificationProducer
 {
     INotificationId CreateNotificationId();
+    void Memorize(List<INotificationId> notificationIds, AnnotationReplacedNotification annotationReplacedNotification);
 }
 
 /// Forwards all <see cref="INotificationProducer.ProduceNotification">initiated</see> notifications
@@ -32,7 +33,28 @@ public class PartitionNotificationProducer(object? sender)
 {
     private readonly INotificationIdProvider _notificationIdProvider = new NotificationIdProvider(sender);
 
+    private readonly HashSet<(List<INotificationId> idsToReplace, INotification replacement)> _notificationsToReplace =
+        [];
+
     /// <inheritdoc />
     public INotificationId CreateNotificationId() =>
         _notificationIdProvider.CreateNotificationId();
+
+    /// <inheritdoc />
+    protected override void Send(INotification notification)
+    {
+        var entry = _notificationsToReplace.FirstOrDefault(e => e.idsToReplace.Remove(notification.NotificationId));
+        if (entry == default)
+            base.Send(notification);
+
+        if (entry.idsToReplace.Count == 0)
+            base.Send(entry.replacement);
+
+        _notificationsToReplace.Remove(entry);
+    }
+
+    /// <inheritdoc />
+    public void Memorize(List<INotificationId> notificationIds,
+        AnnotationReplacedNotification annotationReplacedNotification) =>
+        _notificationsToReplace.Add((notificationIds, annotationReplacedNotification));
 }
