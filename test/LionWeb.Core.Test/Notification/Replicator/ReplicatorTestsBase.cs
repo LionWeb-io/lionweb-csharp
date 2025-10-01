@@ -23,7 +23,7 @@ using Core.Notification.Partition;
 using Core.Notification.Pipe;
 using M1;
 
-public class ReplicatorTestsBase: NotificationTestsBase
+public abstract class ReplicatorTestsBase: NotificationTestsBase
 {
     protected static void CreateForestReplicator(IForest clonedForest, IForest originalForest)
     {

@@ -20,7 +20,7 @@ namespace LionWeb.Core.Test.Notification.NoOperationsTests;
 using Languages.Generated.V2025_1.Shapes.M2;
 
 [TestClass]
-public class NoOpsTests_Property: NotificationTestsBase
+public class NoOpsTests_Property : NotificationTestsBase
 {
     [TestMethod]
     public void PropertyAdded_with_null_value()
@@ -32,8 +32,21 @@ public class NoOpsTests_Property: NotificationTestsBase
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         docs.Text = null;
-        
+
         Assert.AreEqual(0, notificationObserver.Count);
     }
 
+    [TestMethod]
+    public void PropertyChanged_to_same_value()
+    {
+        var docs = new Documentation("c") { Text = "originalText" };
+        var originalPartition = new Geometry("a") { Documentation = docs };
+
+        var notificationObserver = new NotificationObserver();
+        originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
+
+        docs.Text = "originalText";
+
+        Assert.AreEqual(0, notificationObserver.Count);
+    }
 }

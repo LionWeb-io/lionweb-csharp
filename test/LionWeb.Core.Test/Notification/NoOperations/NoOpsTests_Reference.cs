@@ -18,10 +18,9 @@
 namespace LionWeb.Core.Test.Notification.NoOperationsTests;
 
 using Languages.Generated.V2025_1.Shapes.M2;
-using M1;
 
 [TestClass]
-public class Reference: NotificationTestsBase
+public class NoOpsTests_Reference : NotificationTestsBase
 {
     [TestMethod]
     public void ReferenceChanged_to_the_same_target()
@@ -35,24 +34,21 @@ public class Reference: NotificationTestsBase
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
         od.AltSource = circle;
-        
+
         Assert.AreEqual(0, notificationObserver.Count);
     }
-    
+
     [TestMethod]
-    public void ReferenceChanged_to_the_same_target_uses_ReplaceWith()
+    public void ReferenceChanged_non_existing_reference_to_null_target()
     {
-        var circle = new Circle("circle");
-        var line = new Line("line");
-        var od = new OffsetDuplicate("od") { AltSource = circle };
-        var originalPartition = new Geometry("a") { Shapes = [od, circle, line] };
+        var od = new OffsetDuplicate("od");
+        var originalPartition = new Geometry("a") { Shapes = [od] };
 
         var notificationObserver = new NotificationObserver();
         originalPartition.GetNotificationSender()!.ConnectTo(notificationObserver);
 
-        od.AltSource.ReplaceWith(circle);
-        
+        od.AltSource = null;
+
         Assert.AreEqual(0, notificationObserver.Count);
     }
-    
 }
