@@ -129,6 +129,18 @@ public static class M1Extensions
 
         Containment? containment = parent.GetContainmentOf(self);
 
+        if (containment == null)
+        {
+            var index = parent.GetAnnotations().ToList().IndexOf(self);
+            if (index < 0)
+                // should not happen
+                throw new TreeShapeException(self, "Node not contained in its parent");
+            parent.InsertAnnotations(index, [replacement]);
+            parent.RemoveAnnotations([self]);
+            
+            return replacement;
+        }
+        
         if (containment.Multiple)
         {
             var value = parent.Get(containment);
