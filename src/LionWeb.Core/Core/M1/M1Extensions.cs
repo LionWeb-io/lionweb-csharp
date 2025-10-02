@@ -135,8 +135,8 @@ public static class M1Extensions
             if (index < 0)
                 // should not happen
                 throw new TreeShapeException(self, "Node not contained in its parent");
-            parent.InsertAnnotations(index, [replacement]);
-            parent.RemoveAnnotations([self]);
+            parent.Insert(containment, index, [replacement]);
+            parent.Remove(containment, [self]);
             
             return replacement;
         }
