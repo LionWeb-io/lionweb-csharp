@@ -232,7 +232,7 @@ public class LenientNode : NodeBase, INode
                 if (feature is Containment cont)
                 {
                     RemoveExistingChildren(cont, oldValue);
-                    var newChildren = M2Extensions.AsNodes<INode>(value).ToList();
+                    var newChildren = M2Extensions.AsNodes<INode>(readableNodes).ToList();
                     foreach (var newChild in newChildren)
                     {
                         AttachChild(newChild);
