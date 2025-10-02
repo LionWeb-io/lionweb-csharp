@@ -79,6 +79,15 @@ public record Configuration
             messages.Add($"{nameof(OutputFile)}'s parent directory doesn't exist: {OutputFile}");
         }
 
+        if (Namespace is { Length: > 0 })
+        {
+            if (!NamespaceUtil.NamespaceRegex().IsMatch(Namespace))
+            {
+                messages.Add($"Not a valid namespace: '{Namespace}'");
+                valid = false;
+            }
+        }
+
         if (!NamespacePattern.IsSet() && Namespace == null)
         {
             messages.Add($"Neither {nameof(NamespacePattern)} nor {nameof(Namespace)} set");
@@ -147,20 +156,21 @@ public record Configuration
             return OutputFile;
 
         var ns = GetNamespace(language);
-        var suffix = DotGSuffix ? ".g.cs" : ".cs";
 
         var fileInfo = PathPattern switch
         {
-            PathPattern.VerbatimName => new FileInfo(language.Name + suffix),
-            PathPattern.VerbatimKey => new FileInfo(language.Key + suffix),
-            PathPattern.NamespaceInFilename => new FileInfo(Split(_namespaceSeparator, ns) + _namespaceSeparator +
-                                                            language.Name + suffix),
-            PathPattern.NamespaceAsFilename => new FileInfo(Split(_namespaceSeparator, ns) + suffix),
-            PathPattern.NamespaceAsPath => new FileInfo(Split(Path.DirectorySeparatorChar, ns) + suffix),
+            PathPattern.VerbatimName => language.Name,
+            PathPattern.VerbatimKey => language.Key,
+            PathPattern.NamespaceInFilename => Split(_namespaceSeparator, ns) + _namespaceSeparator + language.Name,
+            PathPattern.NamespaceAsFilename => Split(_namespaceSeparator, ns),
+            PathPattern.NamespaceInPath => Split(Path.DirectorySeparatorChar, ns) + Path.DirectorySeparatorChar +
+                                           language.Name,
+            PathPattern.NamespaceAsPath => Split(Path.DirectorySeparatorChar, ns),
             _ => throw new UnknownEnumValueException<PathPattern>(PathPattern)
         };
 
-        return new FileInfo(Path.Combine(OutputDir?.ToString() ?? "", fileInfo.ToString()));
+        var suffix = DotGSuffix ? ".g.cs" : ".cs";
+        return new FileInfo(Path.Combine(OutputDir?.ToString() ?? "", fileInfo + suffix));
     }
 
     private static string Split(char separator, string languageNamespace) => string.Join(separator,
@@ -267,6 +277,7 @@ public enum PathPattern
     VerbatimKey,
     NamespaceInFilename,
     NamespaceAsFilename,
+    NamespaceInPath,
     NamespaceAsPath
 }
 

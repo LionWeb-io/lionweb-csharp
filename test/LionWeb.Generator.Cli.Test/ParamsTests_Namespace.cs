@@ -17,9 +17,6 @@
 
 namespace LionWeb.Generator.Cli.Test;
 
-using Core;
-using Core.M3;
-
 [TestClass]
 public class ParamsTests_Namespace : ParamsTestsBase
 {
@@ -28,7 +25,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
     {
         var generatedFile = new FileInfo("out/TestLanguage.g.cs");
         Delete(generatedFile);
-        
+
         var generator = new TestLionWebGenerator();
         var result = generator.Exec([
             "--namespace", "",
@@ -40,7 +37,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
         Assert.HasCount(1, generator.ValidConfigurations);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(TestLanguage2024),
                 OutputDir = new DirectoryInfo("out"),
@@ -50,9 +47,9 @@ public class ParamsTests_Namespace : ParamsTestsBase
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
-        
+
         Assert.IsEmpty(generator.Errors);
-        
+
         AssertExists(generatedFile);
         Assert.Contains("namespace;", File.ReadAllText(generatedFile.FullName));
     }
@@ -62,7 +59,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
     {
         var generatedFile = new FileInfo("out/TestLanguage.g.cs");
         Delete(generatedFile);
-        
+
         var generator = new TestLionWebGenerator();
         var result = generator.Exec([
             "--namespace", "a.b.c",
@@ -74,7 +71,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
         Assert.HasCount(1, generator.ValidConfigurations);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(TestLanguage2024),
                 OutputDir = new DirectoryInfo("out"),
@@ -84,7 +81,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
-        
+
         Assert.IsEmpty(generator.Errors);
 
         AssertExists(generatedFile);
@@ -104,7 +101,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
         Assert.IsEmpty(generator.Configurations);
         Assert.IsEmpty(generator.ValidConfigurations);
         Assert.AreEqual(-2, result);
-        
+
         Assert.Contains("Not a valid namespace: !a", generator.Errors);
     }
 
@@ -112,9 +109,9 @@ public class ParamsTests_Namespace : ParamsTestsBase
     public void NamespacePattern_DotSeparated()
     {
         Delete(new DirectoryInfo("out"));
-        
+
         var generatedFile = new FileInfo(@"out/a.B.cee.Dee.@if.else._0.\u1234.\U1234aBcd.TestLanguage.g.cs");
-        
+
         var generator = new TestLionWebGenerator();
         var result = generator.Exec([
             "--namespacePattern", nameof(NamespacePattern.DotSeparated),
@@ -126,7 +123,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
         Assert.HasCount(1, generator.ValidConfigurations);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(TestLanguageNamespace),
                 OutputDir = new DirectoryInfo("out"),
@@ -136,20 +133,21 @@ public class ParamsTests_Namespace : ParamsTestsBase
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
-        
+
         Assert.IsEmpty(generator.Errors);
 
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace a.B.cee.Dee.@if.@else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace a.B.cee.Dee.@if.@else._0.\u1234.\U1234aBcd.TestLanguage;",
+            File.ReadAllText(generatedFile.FullName));
     }
 
     [TestMethod]
     public void NamespacePattern_DotSeparatedFirstUppercase()
     {
         Delete(new DirectoryInfo("out"));
-        
+
         var generatedFile = new FileInfo(@"out/a.B.cee.Dee.@if.else._0.\u1234.\U1234aBcd.TestLanguage.g.cs");
-        
+
         var generator = new TestLionWebGenerator();
         var result = generator.Exec([
             "--namespacePattern", nameof(NamespacePattern.DotSeparatedFirstUppercase),
@@ -161,7 +159,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
         Assert.HasCount(1, generator.ValidConfigurations);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(TestLanguageNamespace),
                 OutputDir = new DirectoryInfo("out"),
@@ -171,20 +169,21 @@ public class ParamsTests_Namespace : ParamsTestsBase
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
-        
+
         Assert.IsEmpty(generator.Errors);
 
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;",
+            File.ReadAllText(generatedFile.FullName));
     }
 
     [TestMethod]
     public void PathPattern_NamespaceAsPath_DotSeparated()
     {
         Delete(new DirectoryInfo("out"));
-        
+
         var generatedFile = new FileInfo("out/a/B/cee/Dee/@if/else/_0/_u1234/_U1234aBcd/TestLanguage.g.cs");
-        
+
         var generator = new TestLionWebGenerator();
         var result = generator.Exec([
             "--pathPattern", nameof(PathPattern.NamespaceAsPath),
@@ -197,7 +196,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
         Assert.HasCount(1, generator.ValidConfigurations);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(TestLanguageNamespace),
                 OutputDir = new DirectoryInfo("out"),
@@ -208,20 +207,21 @@ public class ParamsTests_Namespace : ParamsTestsBase
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
-        
+
         Assert.IsEmpty(generator.Errors);
 
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace a.B.cee.Dee.@if.@else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace a.B.cee.Dee.@if.@else._0.\u1234.\U1234aBcd.TestLanguage;",
+            File.ReadAllText(generatedFile.FullName));
     }
 
     [TestMethod]
     public void PathPattern_NamespaceAsPath_DotSeparatedFirstUppercase()
     {
         Delete(new DirectoryInfo("out"));
-        
+
         var generatedFile = new FileInfo("out/A/B/Cee/Dee/@if/Else/_0/_u1234/_U1234aBcd/TestLanguage.g.cs");
-        
+
         var generator = new TestLionWebGenerator();
         var result = generator.Exec([
             "--pathPattern", nameof(PathPattern.NamespaceAsPath),
@@ -234,7 +234,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
         Assert.HasCount(1, generator.ValidConfigurations);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(TestLanguageNamespace),
                 OutputDir = new DirectoryInfo("out"),
@@ -245,20 +245,21 @@ public class ParamsTests_Namespace : ParamsTestsBase
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
-        
+
         Assert.IsEmpty(generator.Errors);
 
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;",
+            File.ReadAllText(generatedFile.FullName));
     }
 
     [TestMethod]
     public void PathPattern_NamespaceAsFilename()
     {
         Delete(new DirectoryInfo("out"));
-        
+
         var generatedFile = new FileInfo("out/A.B.Cee.Dee.@if.Else._0._u1234._U1234aBcd.TestLanguage.g.cs");
-        
+
         var generator = new TestLionWebGenerator();
         var result = generator.Exec([
             "--pathPattern", nameof(PathPattern.NamespaceAsFilename),
@@ -271,7 +272,7 @@ public class ParamsTests_Namespace : ParamsTestsBase
         Assert.HasCount(1, generator.ValidConfigurations);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(TestLanguageNamespace),
                 OutputDir = new DirectoryInfo("out"),
@@ -282,76 +283,11 @@ public class ParamsTests_Namespace : ParamsTestsBase
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
-        
+
         Assert.IsEmpty(generator.Errors);
 
         AssertExists(generatedFile);
-        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;", File.ReadAllText(generatedFile.FullName));
+        Assert.Contains(@"namespace A.B.Cee.Dee.@if.Else._0.\u1234.\U1234aBcd.TestLanguage;",
+            File.ReadAllText(generatedFile.FullName));
     }
-
-    [TestMethod]
-    public void UnknownNamespacePattern_Null()
-    {
-        var ex = Assert.Throws<UnknownEnumValueException<NamespacePattern?>>(() =>
-            new Configuration { NamespacePattern = null }.GetNamespace(Language()));
-        
-        Assert.AreEqual("Unknown NamespacePattern: null", ex.Message);
-    }
-
-    [TestMethod]
-    public void UnknownNamespacePattern_InvalidInt()
-    {
-        var ex = Assert.Throws<UnknownEnumValueException<NamespacePattern>>(() =>
-            new Configuration { NamespacePattern = (NamespacePattern?)int.MaxValue }.GetNamespace(Language()));
-        
-        Assert.AreEqual($"Unknown NamespacePattern: {int.MaxValue}", ex.Message);
-    }
-    
-    [TestMethod]
-    public void NamespacePattern_ValidInt()
-    {
-        Assert.AreEqual("MyLang", new Configuration { NamespacePattern = (NamespacePattern?)1 }.GetNamespace(Language()));
-    }
-
-
-    [TestMethod]
-    public void UnknownPathPattern_Null()
-    {
-        var ex = Assert.Throws<NullReferenceException>(() =>
-        {
-            object pathPattern = null;
-            return new Configuration
-            {
-                Namespace = "ns",
-                PathPattern = (PathPattern)pathPattern
-            }.GetFile(Language());
-        });
-    }
-
-    [TestMethod]
-    public void UnknownPathPattern_InvalidInt()
-    {
-        var ex = Assert.Throws<UnknownEnumValueException<PathPattern>>(() =>
-            new Configuration
-            {
-                Namespace = "ns",
-                PathPattern = (PathPattern)int.MaxValue
-            }.GetFile(Language()));
-        
-        Assert.AreEqual($"Unknown PathPattern: {int.MaxValue}", ex.Message);
-    }
-    
-    [TestMethod]
-    public void PathPattern_ValidInt()
-    {
-        var expected = new FileInfo("MyLang.g.cs");
-        var actual = new Configuration
-        {
-            Namespace = "ns",
-            PathPattern = (PathPattern)1
-        }.GetFile(Language());
-        Assert.AreEqual(expected.FullName, actual.FullName);
-    }
-
-    private static DynamicLanguage Language() => new("d", LionWebVersions.Current) {Name = "MyLang"};
 }

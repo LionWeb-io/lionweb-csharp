@@ -87,7 +87,7 @@ public class ParamsTests_Config : ParamsTestsBase
         Assert.IsEmpty(generator.Errors);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(new FileInfo(Path.Combine(currDir, TestLanguage2023)).FullName),
                 OutputDir = new DirectoryInfo(outputDir),
@@ -134,7 +134,7 @@ public class ParamsTests_Config : ParamsTestsBase
             generator.Errors);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(new FileInfo(Path.Combine(currDir, TestLanguage2023)).FullName),
                 OutputDir = new DirectoryInfo(RelativeOutputDir),
@@ -146,7 +146,7 @@ public class ParamsTests_Config : ParamsTestsBase
             }, generator.Configurations[0]);
 
         Assert.AreEqual(
-            new Configuration
+            new Cli.Configuration
             {
                 LanguageFile = new FileInfo(TestLanguage2024),
                 OutputDir = new DirectoryInfo(RelativeOutputDir),
