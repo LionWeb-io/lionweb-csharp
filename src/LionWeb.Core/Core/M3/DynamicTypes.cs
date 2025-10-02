@@ -1277,6 +1277,49 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
         return false;
     }
+    
+    protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (base.AddInternal(link, nodes))
+            return true;
+
+        if (_m3.Language_entities.EqualsIdentity(link))
+        {
+            _entities.AddRange(SetSelfParent(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList(), _m3.Language_entities));
+        }
+
+        return false;
+    }
+    
+    
+    protected override bool InsertInternal(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    {
+        if (base.InsertInternal(link, index, nodes))
+            return true;
+
+        if (_m3.Language_entities.EqualsIdentity(link))
+        {
+            _entities.InsertRange(index, SetSelfParent(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList(), _m3.Language_entities));
+            return true;
+        }
+
+        return false;
+    }
+
+    protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (base.RemoveInternal(link, nodes))
+            return true;
+        
+        if (_m3.Language_entities.EqualsIdentity(link))
+        {
+            RemoveSelfParent(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList(), _entities, _m3.Language_entities);
+            return true;
+        }
+        
+        return false;
+    }
+    
 
     /// <inheritdoc cref="GetFactory"/>
     public INodeFactory? NodeFactory { private get; set; }
