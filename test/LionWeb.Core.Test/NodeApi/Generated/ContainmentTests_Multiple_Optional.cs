@@ -34,7 +34,7 @@ public class ContainmentTests_Multiple_Optional
         Assert.AreSame(parent, line.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(line));
     }
-    
+
     [TestMethod]
     public void Single_Reflective()
     {
