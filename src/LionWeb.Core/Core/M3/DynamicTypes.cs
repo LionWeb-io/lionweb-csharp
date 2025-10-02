@@ -1278,6 +1278,7 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
         return false;
     }
     
+    /// <inheritdoc />
     protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
     {
         if (base.AddInternal(link, nodes))
@@ -1291,17 +1292,14 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
         if (_m3.Language_dependsOn.EqualsIdentity(link))
         {
-            AssureNotNull(nodes, _m3.Language_dependsOn);
-            var safeNodes = _m3.Language_dependsOn.AsNodes<Language>(nodes).ToList();
-            AssureNotNullMembers(safeNodes, _m3.Language_dependsOn);
-            _dependsOn.AddRange(safeNodes);
+            _dependsOn.AddRange(SetSelfParent(_m3.Language_dependsOn.AsNodes<Language>(nodes).ToList(), _m3.Language_dependsOn));
             return true;
         }
 
         return false;
     }
     
-    
+    /// <inheritdoc />
     protected override bool InsertInternal(Link? link, Index index, IEnumerable<IReadableNode> nodes)
     {
         if (base.InsertInternal(link, index, nodes))
@@ -1315,16 +1313,14 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
         
         if (_m3.Language_dependsOn.EqualsIdentity(link))
         {
-            AssureNotNull(nodes, _m3.Language_dependsOn);
-            var safeNodes = _m3.Language_dependsOn.AsNodes<Language>(nodes).ToList();
-            AssureNotNullMembers(safeNodes, _m3.Language_dependsOn);
-            _dependsOn.InsertRange(index, safeNodes);
+            _dependsOn.InsertRange(index, SetSelfParent(_m3.Language_dependsOn.AsNodes<Language>(nodes).ToList(), _m3.Language_dependsOn));
             return true;
         }
 
         return false;
     }
 
+    /// <inheritdoc />
     protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
     {
         if (base.RemoveInternal(link, nodes))
