@@ -1286,6 +1286,7 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
         if (_m3.Language_entities.EqualsIdentity(link))
         {
             _entities.AddRange(SetSelfParent(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList(), _m3.Language_entities));
+            return true;
         }
 
         if (_m3.Language_dependsOn.EqualsIdentity(link))
