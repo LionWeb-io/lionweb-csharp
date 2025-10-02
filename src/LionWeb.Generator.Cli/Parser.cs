@@ -167,14 +167,24 @@ internal class Parser
         var configurationFile = ParseResult.GetValue(_config);
         if (configurationFile is not null)
         {
-            var utf8JsonStream = configurationFile.OpenRead();
-            var deserialized = JsonSerializer.Deserialize<Configuration[]>(utf8JsonStream);
+                Configuration[]? deserialized;
+            try
+            {
+                var utf8JsonStream = configurationFile.OpenRead();
+                deserialized = JsonSerializer.Deserialize<Configuration[]>(utf8JsonStream);
+            } catch (JsonException e)
+            {
+                LogError(e);
+                return result;
+            }
             if (deserialized is not null)
             {
                 var baseDir = configurationFile.Directory?.ToString() ?? "";
                 foreach (var conf in deserialized)
                 {
-                    var languageFile = new FileInfo(Path.Combine(baseDir, conf.LanguageFile.ToString()));
+                    var languageFile = conf is { LanguageFile: null }
+                        ? null
+                        : new FileInfo(Path.Combine(baseDir, conf.LanguageFile.ToString()));
 
                     var outputDir = conf is { OutputDir: null }
                         ? null
@@ -266,9 +276,7 @@ internal class Parser
     private string? Namespace => ParseResult.GetValue(_ns);
     private NamespacePattern? NamespacePattern => ParseResult.GetValue(_namespacePattern);
     private PathPattern? PathPattern => ParseResult.GetValue(_pathPattern);
-
     private bool? WritableInterfaces => ParseResult.GetValue(_writableIface);
-
     private bool? DotGSuffix => ParseResult.GetValue(_dotGSuffix);
 
     private GeneratorConfig GeneratorConfig
@@ -282,5 +290,6 @@ internal class Parser
         }
     }
 
+    private void LogError(Exception e) => LogError(e.ToString());
     private void LogError(string message) => _errorLogger(message);
 }

@@ -46,7 +46,7 @@ public class ParamsTests : ParamsTestsBase
         Assert.AreEqual(-2, result);
 
         Assert.Contains("Neither OutputDir nor OutputFile set", generator.Errors);
-        Assert.Contains("Neither NamespacePattern nor Namespace set", generator.Errors);
+        Assert.Contains("Neither Namespace nor NamespacePattern set", generator.Errors);
         Assert.Contains("Skipping invalid configuration", generator.Errors);
     }
 

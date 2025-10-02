@@ -29,7 +29,7 @@ public record Configuration
     private const char _namespaceSeparator = '.';
 
     [JsonConverter(typeof(FileInfoConverter))]
-    public FileInfo LanguageFile { get; init; }
+    public FileInfo? LanguageFile { get; init; }
 
     [JsonConverter(typeof(DirectoryInfoConverter))]
     public DirectoryInfo? OutputDir { get; set; }
@@ -55,30 +55,60 @@ public record Configuration
         var valid = true;
         messages = [];
 
-        if (LanguageFile == null || !LanguageFile.Exists)
+        valid &= ValidateLanguageFile(messages);
+        valid &= ValidateOutput(messages);
+        valid &= ValidateNamespace(messages);
+        valid &= ValidatePathPattern(messages);
+        valid &= ValidateLionWebVersion(messages);
+        valid &= ValidateGeneratorConfig(messages);
+
+        return valid;
+    }
+
+    private bool ValidateLanguageFile(List<string> messages)
+    {
+        if (LanguageFile is not { Exists: true })
         {
-            messages.Add($"{nameof(LanguageFile)} doesn't exist: {LanguageFile}");
-            valid = false;
+            messages.Add($"{nameof(LanguageFile)} doesn't exist: {LanguageFile?.ToString() ?? "null"}");
+            return false;
         }
 
+        return true;
+    }
+
+    private bool ValidateOutput(List<string> messages)
+    {
         if (OutputDir == null && OutputFile == null)
         {
             messages.Add($"Neither {nameof(OutputDir)} nor {nameof(OutputFile)} set");
-            valid = false;
-        } else if (OutputDir != null && OutputFile != null)
+            return false;
+        }
+
+        if (OutputDir != null && OutputFile != null)
         {
             messages.Add(
                 $"Both {nameof(OutputDir)} ({OutputDir}) and {nameof(OutputFile)} ({OutputFile}) set");
 
-            valid = false;
-        } else if (OutputDir is { Exists: false })
+            return false;
+        }
+
+        if (OutputDir is { Exists: false })
         {
             messages.Add($"{nameof(OutputDir)} doesn't exist: {OutputDir}");
-        } else if (OutputFile is { Directory.Exists: false })
+        }
+        
+        if (OutputFile is { Directory.Exists: false })
         {
             messages.Add($"{nameof(OutputFile)}'s parent directory doesn't exist: {OutputFile}");
         }
 
+        return true;
+    }
+
+    private bool ValidateNamespace(List<string> messages)
+    {
+        bool valid = true;
+        
         if (Namespace is { Length: > 0 })
         {
             if (!NamespaceUtil.NamespaceRegex().IsMatch(Namespace))
@@ -90,12 +120,12 @@ public record Configuration
 
         if (!NamespacePattern.IsSet() && Namespace == null)
         {
-            messages.Add($"Neither {nameof(NamespacePattern)} nor {nameof(Namespace)} set");
+            messages.Add($"Neither {nameof(Namespace)} nor {nameof(NamespacePattern)} set");
             valid = false;
         } else if (NamespacePattern.IsSet() && Namespace != null)
         {
             messages.Add(
-                $"Both {nameof(NamespacePattern)} ({NamespacePattern}) and {nameof(Namespace)} ({Namespace}) set");
+                $"Both {nameof(Namespace)} ({Namespace}) and {nameof(NamespacePattern)} ({NamespacePattern}) set");
             valid = false;
         }
 
@@ -105,33 +135,49 @@ public record Configuration
             valid = false;
         }
 
+        return valid;
+    }
+
+    private bool ValidatePathPattern(List<string> messages)
+    {
         if (!PathPattern.IsSet())
         {
             messages.Add($"{nameof(NamespacePattern)} not set");
-            valid = false;
-        } else if (Enum.GetName((PathPattern)PathPattern) == null)
-        {
-            messages.Add($"Unknown value for {nameof(PathPattern)}: {PathPattern}");
-            valid = false;
+            return false;
         }
 
+        if (Enum.GetName((PathPattern)PathPattern) == null)
+        {
+            messages.Add($"Unknown value for {nameof(PathPattern)}: {PathPattern}");
+            return false;
+        }
 
+        return true;
+    }
+
+    private bool ValidateLionWebVersion(List<string> messages)
+    {
         try
         {
             var _ = LionWebVersionParsed;
         } catch (UnsupportedVersionException e)
         {
             messages.Add($"Unsupported {nameof(LionWebVersion)}");
-            valid = false;
+            return false;
         }
 
+        return true;
+    }
+
+    private bool ValidateGeneratorConfig(List<string> messages)
+    {
         if (GeneratorConfig == null)
         {
             messages.Add($"{nameof(GeneratorConfig)} not set");
-            valid = false;
+            return false;
         }
 
-        return valid;
+        return true;
     }
 
     public string GetNamespace(Language language)
@@ -292,8 +338,13 @@ public static class PathPatternExtensions
 
 internal class FileInfoConverter : JsonConverter<FileInfo>
 {
-    public override FileInfo? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
-        new(reader.GetString()!);
+    public override FileInfo? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var s = reader.GetString();
+        if (s is not null && s.Length > 0)
+            return new(s);
+        return null;
+    }
 
     public override void Write(Utf8JsonWriter writer, FileInfo value, JsonSerializerOptions options) =>
         writer.WriteStringValue(value.ToString());
@@ -302,8 +353,13 @@ internal class FileInfoConverter : JsonConverter<FileInfo>
 internal class DirectoryInfoConverter : JsonConverter<DirectoryInfo>
 {
     public override DirectoryInfo? Read(ref Utf8JsonReader reader, Type typeToConvert,
-        JsonSerializerOptions options) =>
-        new(reader.GetString()!);
+        JsonSerializerOptions options)
+    {
+        var s = reader.GetString();
+        if (s is not null && s.Length > 0)
+            return new(s);
+        return null;
+    }
 
     public override void Write(Utf8JsonWriter writer, DirectoryInfo value, JsonSerializerOptions options) =>
         writer.WriteStringValue(value.ToString());

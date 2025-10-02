@@ -162,4 +162,106 @@ public class ParamsTests_Config : ParamsTestsBase
         Assert.IsTrue(Directory.Exists(outputDir));
         AssertExists(new FileInfo($"{outputDir}/TestLanguage.g.cs"));
     }
+    
+    [TestMethod]
+    public void Invalid_LanguageFile()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+        var result = generator.Exec(["--config", $"{ResourceDir}/invalid-LanguageFile.config.json"]);
+
+        Assert.HasCount(2, generator.Configurations);
+        Assert.IsEmpty(generator.ValidConfigurations);
+        Assert.AreEqual(-2, result);
+
+        Assert.Contains(s => s.Contains("LanguageFile doesn't exist:") && s.Contains("missingLanguage.json"),
+            generator.Errors);
+        Assert.Contains("LanguageFile doesn't exist: null", generator.Errors);
+    }
+    
+    [TestMethod]
+    public void Invalid_Output_NoDir()
+    {
+        DeleteOutDir();
+        
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+        var result = generator.Exec(["--config", $"{ResourceDir}/invalid-Output.config.json"]);
+
+        Assert.HasCount(6, generator.Configurations);
+        Assert.IsEmpty(generator.ValidConfigurations);
+        Assert.AreEqual(-2, result);
+
+        Assert.Contains("Neither OutputDir nor OutputFile set", generator.Errors);
+        Assert.Contains(s => s.Contains("Both OutputDir ") && s.Contains(" and OutputFile "),
+            generator.Errors);
+        Assert.Contains(s => s.Contains("OutputDir doesn't exist: ") && s.Contains("out/"),
+            generator.Errors);
+        Assert.Contains(s => s.Contains("OutputFile's parent directory doesn't exist: ") && s.Contains("out/file"),
+            generator.Errors);
+    }
+    
+    [TestMethod]
+    public void Invalid_Output_DirExists()
+    {
+        if (!Directory.Exists(RelativeOutputDir))
+            Directory.CreateDirectory(RelativeOutputDir);
+        
+        Assert.IsTrue(Directory.Exists(RelativeOutputDir));
+        
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+        var result = generator.Exec(["--config", $"{ResourceDir}/invalid-Output.config.json"]);
+
+        Assert.DoesNotContain(s => s.Contains("OutputDir doesn't exist: ") && s.Contains("out/"),
+            generator.Errors);
+        Assert.DoesNotContain(s => s.Contains("OutputFile's parent directory doesn't exist: ") && s.Contains("out/file"),
+            generator.Errors);
+    }
+    
+    [TestMethod]
+    public void Invalid_Namespace()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+        var result = generator.Exec(["--config", $"{ResourceDir}/invalid-Namespace.config.json"]);
+
+        Assert.HasCount(8, generator.Configurations);
+        Assert.HasCount(1, generator.ValidConfigurations);
+        Assert.AreEqual(-1, result);
+
+        Assert.Contains("Not a valid namespace: '!invalid'", generator.Errors);
+        Assert.Contains("Neither Namespace nor NamespacePattern set", generator.Errors);
+        Assert.Contains("Both Namespace (myNs) and NamespacePattern (DotSeparated) set", generator.Errors);
+    }
+    
+    [TestMethod]
+    public void Invalid_NamespacePattern_empty()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+        var result = generator.Exec(["--config", $"{ResourceDir}/invalid-NamespacePattern-empty.config.json"]);
+
+        Assert.IsEmpty(generator.Configurations);
+        Assert.IsEmpty(generator.ValidConfigurations);
+        Assert.AreEqual(-2, result);
+
+        Assert.Contains(s => s.Contains("The JSON value could not be converted to System.Nullable`1[LionWeb.Generator.Cli.NamespacePattern]"),
+            generator.Errors);
+    }
+    
+    [TestMethod]
+    public void Invalid_NamespacePattern_unknown()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+        var result = generator.Exec(["--config", $"{ResourceDir}/invalid-NamespacePattern-unknown.config.json"]);
+
+        Assert.IsEmpty(generator.Configurations);
+        Assert.IsEmpty(generator.ValidConfigurations);
+        Assert.AreEqual(-2, result);
+
+        Assert.Contains(s => s.Contains("The JSON value could not be converted to System.Nullable`1[LionWeb.Generator.Cli.NamespacePattern]"),
+            generator.Errors);
+    }
 }

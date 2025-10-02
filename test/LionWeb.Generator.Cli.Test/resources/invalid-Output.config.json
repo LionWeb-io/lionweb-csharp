@@ -1,0 +1,28 @@
+﻿[
+  {
+    "LanguageFile": "testLanguage.2023_1.json"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "OutputFile": null,
+    "OutputDir": null
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "OutputFile": "",
+    "OutputDir": ""
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "OutputFile": "outputFile",
+    "OutputDir": "outputDir"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "OutputFile": "out/file"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "OutputDir": "out/"
+  }
+]
