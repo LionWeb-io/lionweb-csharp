@@ -37,7 +37,7 @@ public class GenericApiTests : DynamicNodeTestsBase
 
         List<LanguageEntity> entities = [new DynamicConcept("myDynConcept1", lionWebVersion, lang)];
 
-        lang.Add(lionWebVersion.LionCore.Language_entities, entities);
+        lang.Add(entities, lionWebVersion.LionCore.Language_entities);
 
         Assert.AreEqual(1, lang.Entities.Count);
     }
@@ -55,7 +55,7 @@ public class GenericApiTests : DynamicNodeTestsBase
             new DynamicConcept("myDynConcept2", lionWebVersion, lang),
         ];
 
-        lang.Insert(lionWebVersion.LionCore.Language_entities, 0, entities);
+        lang.Insert(entities, 0, lionWebVersion.LionCore.Language_entities);
 
         Assert.AreEqual(2, lang.Entities.Count);
     }
@@ -72,8 +72,8 @@ public class GenericApiTests : DynamicNodeTestsBase
             new DynamicConcept("myDynConcept2", lionWebVersion, lang),
         ];
 
-        lang.Insert(lionWebVersion.LionCore.Language_entities, 0, entities);
-        lang.Remove(lionWebVersion.LionCore.Language_entities, entities);
+        lang.Insert(entities, 0, lionWebVersion.LionCore.Language_entities);
+        lang.Remove(entities, lionWebVersion.LionCore.Language_entities);
 
         Assert.AreEqual(0, lang.Entities.Count);
     }
@@ -89,7 +89,7 @@ public class GenericApiTests : DynamicNodeTestsBase
         var lang = new DynamicLanguage("myDynLang", lionWebVersion);
         List<Language> languages = [ShapesLanguage.Instance, MultiLanguage.Instance];
 
-        lang.Add(lionWebVersion.LionCore.Language_dependsOn, languages);
+        lang.Add(languages, lionWebVersion.LionCore.Language_dependsOn);
 
         Assert.AreEqual(2, lang.DependsOn.Count);
     }
@@ -101,8 +101,8 @@ public class GenericApiTests : DynamicNodeTestsBase
         var lang = new DynamicLanguage("myDynLang", lionWebVersion);
         List<Language> languages = [ShapesLanguage.Instance, MultiLanguage.Instance];
 
-        lang.Insert(lionWebVersion.LionCore.Language_dependsOn, 0, languages);
-        lang.Insert(lionWebVersion.LionCore.Language_dependsOn, 2, [ALangLanguage.Instance]);
+        lang.Insert(languages, 0, lionWebVersion.LionCore.Language_dependsOn);
+        lang.Insert([ALangLanguage.Instance], 2, lionWebVersion.LionCore.Language_dependsOn);
 
         Assert.AreEqual(3, lang.DependsOn.Count);
     }
@@ -115,8 +115,8 @@ public class GenericApiTests : DynamicNodeTestsBase
         var lang = new DynamicLanguage("myDynLang", lionWebVersion);
         List<Language> languages = [ShapesLanguage.Instance, MultiLanguage.Instance];
 
-        lang.Insert(lionWebVersion.LionCore.Language_dependsOn, 0, languages);
-        lang.Remove(lionWebVersion.LionCore.Language_dependsOn, languages);
+        lang.Insert(languages, 0, lionWebVersion.LionCore.Language_dependsOn);
+        lang.Remove(languages, lionWebVersion.LionCore.Language_dependsOn);
 
         Assert.AreEqual(0, lang.DependsOn.Count);
     }
@@ -135,7 +135,7 @@ public class GenericApiTests : DynamicNodeTestsBase
         var parent = new Geometry("g");
         var line = new Line("line");
 
-        parent.Add(ShapesLanguage.Instance.Geometry_shapes, [line]);
+        parent.Add([line], ShapesLanguage.Instance.Geometry_shapes);
 
         Assert.AreSame(parent, line.GetParent());
         Assert.IsTrue(parent.Shapes.Contains(line));
@@ -148,7 +148,7 @@ public class GenericApiTests : DynamicNodeTestsBase
         var line1 = new Line("line1");
         var line2 = new Line("line2");
 
-        parent.Add(ShapesLanguage.Instance.Geometry_shapes, [line1, line2]);
+        parent.Add([line1, line2], ShapesLanguage.Instance.Geometry_shapes);
 
         Assert.AreEqual(2, parent.Shapes.Count);
         Assert.AreSame(parent, line1.GetParent());
@@ -168,7 +168,7 @@ public class GenericApiTests : DynamicNodeTestsBase
         var line1 = new Line("line1");
         var line2 = new Line("line2");
 
-        parent.Insert(ShapesLanguage.Instance.Geometry_shapes, 0, [line1, line2]);
+        parent.Insert([line1, line2], 0, ShapesLanguage.Instance.Geometry_shapes);
 
         Assert.AreEqual(2, parent.Shapes.Count);
         Assert.AreSame(parent, line1.GetParent());
@@ -187,8 +187,8 @@ public class GenericApiTests : DynamicNodeTestsBase
         var parent = new Geometry("g");
         var line = new Line("myId");
 
-        parent.Insert(ShapesLanguage.Instance.Geometry_shapes, 0, [line]);
-        parent.Remove(ShapesLanguage.Instance.Geometry_shapes, [line]);
+        parent.Insert([line], 0, ShapesLanguage.Instance.Geometry_shapes);
+        parent.Remove([line], ShapesLanguage.Instance.Geometry_shapes);
 
         Assert.IsNull(line.GetParent());
         Assert.IsFalse(parent.Shapes.Contains(line));
@@ -201,9 +201,9 @@ public class GenericApiTests : DynamicNodeTestsBase
         var line1 = new Line("line1");
         var line2 = new Line("line2");
 
-        parent.Insert(ShapesLanguage.Instance.Geometry_shapes, 0, [line1]);
-        parent.Insert(ShapesLanguage.Instance.Geometry_shapes, 0, [line2]);
-        parent.Remove(ShapesLanguage.Instance.Geometry_shapes, [line1, line2]);
+        parent.Insert([line1], 0, ShapesLanguage.Instance.Geometry_shapes);
+        parent.Insert([line2], 0, ShapesLanguage.Instance.Geometry_shapes);
+        parent.Remove([line1, line2], ShapesLanguage.Instance.Geometry_shapes);
 
         Assert.IsEmpty(parent.Shapes);
         Assert.IsNull(line1.GetParent());
@@ -225,7 +225,7 @@ public class GenericApiTests : DynamicNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        parent.Add(null, [bom]);
+        parent.Add([bom]);
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
     }
@@ -237,7 +237,7 @@ public class GenericApiTests : DynamicNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 0, [bom]);
+        parent.Insert([bom], 0);
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
     }
@@ -247,7 +247,7 @@ public class GenericApiTests : DynamicNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(null, -1, [bom]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert([bom], -1));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }
@@ -257,7 +257,7 @@ public class GenericApiTests : DynamicNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(null,1, [bom]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert([bom], 1));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }
@@ -267,9 +267,9 @@ public class GenericApiTests : DynamicNodeTestsBase
     {
         var doc = newDocumentation("cId");
         var parent = newLine("g");
-        parent.Add(null, [doc]);
+        parent.Add([doc]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 0, [bom]);
+        parent.Insert([bom], 0);
         Assert.AreSame(parent, doc.GetParent());
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
@@ -281,9 +281,9 @@ public class GenericApiTests : DynamicNodeTestsBase
     {
         var doc = newDocumentation("cId");
         var parent = newLine("g");
-        parent.Add(null, [doc]);
+        parent.Add([doc]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 1, [bom]);
+        parent.Insert([bom], 1);
         Assert.AreSame(parent, doc.GetParent());
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
@@ -296,9 +296,9 @@ public class GenericApiTests : DynamicNodeTestsBase
         var docA = newDocumentation("cIdA");
         var docB = newDocumentation("cIdB");
         var parent = newLine("g");
-        parent.Add(null, [docA, docB]);
+        parent.Add([docA, docB]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 0, [bom]);
+        parent.Insert([bom], 0);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.AreSame(parent, bom.GetParent());
@@ -312,9 +312,9 @@ public class GenericApiTests : DynamicNodeTestsBase
         var docA = newDocumentation("cIdA");
         var docB = newDocumentation("cIdB");
         var parent = newLine("g");
-        parent.Add(null, [docA, docB]);
+        parent.Add([docA, docB]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 1, [bom]);
+        parent.Insert([bom], 1);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.AreSame(parent, bom.GetParent());
@@ -328,9 +328,9 @@ public class GenericApiTests : DynamicNodeTestsBase
         var docA = newDocumentation("cIdA");
         var docB = newDocumentation("cIdB");
         var parent = newLine("g");
-        parent.Add(null, [docA, docB]);
+        parent.Add([docA, docB]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 2, [bom]);
+        parent.Insert([bom], 2);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.AreSame(parent, bom.GetParent());
@@ -347,7 +347,7 @@ public class GenericApiTests : DynamicNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        parent.Remove(null, [bom]);
+        parent.Remove([bom]);
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }
@@ -357,9 +357,9 @@ public class GenericApiTests : DynamicNodeTestsBase
     {
         var doc = newDocumentation("myC");
         var parent = newLine("cs");
-        parent.Add(null, [doc]);
+        parent.Add([doc]);
         var bom = newBillOfMaterials("myId");
-        parent.Remove(null, [bom]);
+        parent.Remove([bom]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(bom.GetParent());
         CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
@@ -370,8 +370,8 @@ public class GenericApiTests : DynamicNodeTestsBase
     {
         var bom = newBillOfMaterials("myId");
         var parent = newLine("g");
-        parent.Add(null, [bom]);
-        parent.Remove(null, [bom]);
+        parent.Add([bom]);
+        parent.Remove([bom]);
         Assert.IsNull(bom.GetParent());
         CollectionAssert.AreEqual(new List<INode> { }, parent.GetAnnotations().ToList());
     }
@@ -382,8 +382,8 @@ public class GenericApiTests : DynamicNodeTestsBase
         var doc = newDocumentation("cId");
         var bom = newBillOfMaterials("myId");
         var parent = newLine("g");
-        parent.Add(null, [bom, doc]);
-        parent.Remove(null, [bom]);
+        parent.Add([bom, doc]);
+        parent.Remove([bom]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(bom.GetParent());
         CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
@@ -395,8 +395,8 @@ public class GenericApiTests : DynamicNodeTestsBase
         var doc = newDocumentation("cId");
         var bom = newBillOfMaterials("myId");
         var parent = newLine("g");
-        parent.Add(null, [doc, bom]);
-        parent.Remove(null, [bom]);
+        parent.Add([doc, bom]);
+        parent.Remove([bom]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(bom.GetParent());
         CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
@@ -409,8 +409,8 @@ public class GenericApiTests : DynamicNodeTestsBase
         var docB = newDocumentation("cIdB");
         var bom = newBillOfMaterials("myId");
         var parent = newLine("g");
-        parent.Add(null, [docA, bom, docB]);
-        parent.Remove(null, [bom]);
+        parent.Add([docA, bom, docB]);
+        parent.Remove([bom]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.IsNull(bom.GetParent());

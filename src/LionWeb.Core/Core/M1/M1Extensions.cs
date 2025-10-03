@@ -53,7 +53,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node with no parent");
 
-        parent.Insert(containment, index, [newPredecessor]);
+        parent.Insert([newPredecessor], index, containment);
     }
 
     /// <summary>
@@ -83,7 +83,7 @@ public static class M1Extensions
             // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node with no parent");
 
-        parent.Insert(containment, index + 1, [newSuccessor]);
+        parent.Insert([newSuccessor], index + 1, containment);
     }
 
     /// <summary>
@@ -153,8 +153,8 @@ public static class M1Extensions
             if (index < 0)
                 // should not happen
                 throw new TreeShapeException(self, "Node not contained in its parent");
-            parent.Insert(containment, index, [replacement]);
-            parent.Remove(containment, [self]);
+            parent.Insert([replacement], index, containment);
+            parent.Remove([self], containment);
             
             return replacement;
         }
@@ -187,8 +187,8 @@ public static class M1Extensions
                 nodes.Remove(self);
             }
             
-            parent.Insert(containment, index, [replacement]);
-            parent.Remove(containment, [self]);
+            parent.Insert([replacement], index, containment);
+            parent.Remove([self], containment);
         } else
         {
             parent.Set(containment, replacement);
