@@ -19,10 +19,13 @@ namespace LionWeb.Generator.Cli;
 
 using Core;
 using System.CommandLine;
+using System.CommandLine.Help;
 using System.Text.Json;
 
 internal class CmdlineParser
 {
+    private const PathPattern _defaultPathPattern = Cli.PathPattern.VerbatimName;
+    private const bool _defaultDotGSuffix = true;
     private readonly Action<string> _errorLogger;
     private readonly string[] _args;
 
@@ -85,17 +88,21 @@ internal class CmdlineParser
 
         _namespacePattern = new("--namespacePattern")
         {
-            Description = "Pattern for namespace to generate languages into", Arity = ArgumentArity.ZeroOrOne
+            Description = $"Pattern for namespace to generate languages into", Arity = ArgumentArity.ZeroOrOne
         };
         _rootCommand.Options.Add(_namespacePattern);
 
         _pathPattern = new("--pathPattern")
         {
-            Description = "Pattern for file to generate languages into", Arity = ArgumentArity.ZeroOrOne
+            Description = $"Pattern for file to generate languages into, defaults to {_defaultPathPattern}",
+            Arity = ArgumentArity.ZeroOrOne
         };
         _rootCommand.Options.Add(_pathPattern);
 
-        _lionWebVersion = new("--lionWebVersion") { Description = "LionWeb version" };
+        _lionWebVersion = new("--lionWebVersion")
+        {
+            Description = $"LionWeb version to use, defaults to {LionWebVersions.Current.VersionString}"
+        };
         _lionWebVersion.Validators.Add(r =>
         {
             switch (r.Tokens.Count)
@@ -116,11 +123,22 @@ internal class CmdlineParser
         _rootCommand.Options.Add(_lionWebVersion);
 
         _dotGSuffix =
-            new("--dotGSuffix") { Arity = ArgumentArity.ZeroOrOne, DefaultValueFactory = _ => null };
+            new("--dotGSuffix")
+            {
+                Description =
+                    $"Whether output file should have .g suffix before .cs, defaults to {_defaultDotGSuffix}",
+                Arity = ArgumentArity.ZeroOrOne,
+                DefaultValueFactory = _ => null
+            };
         _rootCommand.Options.Add(_dotGSuffix);
 
         _writableIface =
-            new("--writableInterfaces") { Arity = ArgumentArity.ZeroOrOne, DefaultValueFactory = _ => null };
+            new("--writableInterfaces")
+            {
+                Description = "Whether generated interfaces should implement IWritableNode",
+                Arity = ArgumentArity.ZeroOrOne,
+                DefaultValueFactory = _ => null
+            };
         _rootCommand.Options.Add(_writableIface);
 
         _languageFile = new("languageFile")
@@ -153,6 +171,9 @@ internal class CmdlineParser
 
     private int CheckParseErrors()
     {
+        if (ParseResult.Action is not null)
+            ParseResult.Invoke();
+
         if (ParseResult.Errors.Count != 0)
         {
             foreach (var error in ParseResult.Errors)
@@ -173,7 +194,7 @@ internal class CmdlineParser
         var configurationFile = ParseResult.GetValue(_config);
         if (configurationFile is not null)
         {
-                Configuration[]? deserialized;
+            Configuration[]? deserialized;
             try
             {
                 var utf8JsonStream = configurationFile.OpenRead();
@@ -183,6 +204,7 @@ internal class CmdlineParser
                 LogError(e);
                 return result;
             }
+
             if (deserialized is not null)
             {
                 var baseDir = configurationFile.Directory?.ToString() ?? "";
@@ -250,7 +272,8 @@ internal class CmdlineParser
 
         if (LanguageFiles.Length > 1 && OutputFile is not null)
         {
-            LogError($"Single output file {OutputFile} set, but multiple language files provided: {string.Join(", ", (object[])LanguageFiles)}");
+            LogError(
+                $"Single output file {OutputFile} set, but multiple language files provided: {string.Join(", ", (object[])LanguageFiles)}");
             return false;
         }
 
@@ -287,10 +310,10 @@ internal class CmdlineParser
     private string? Namespace => ParseResult.GetValue(_ns);
     private NamespacePattern? NamespacePattern => ParseResult.GetValue(_namespacePattern);
     private PathPattern? PathPattern => ParseResult.GetValue(_pathPattern);
-    private PathPattern? PathPatternOrDefault => PathPattern ?? Cli.PathPattern.VerbatimName;
+    private PathPattern? PathPatternOrDefault => PathPattern ?? _defaultPathPattern;
     private bool? WritableInterfaces => ParseResult.GetValue(_writableIface);
     private bool? DotGSuffix => ParseResult.GetValue(_dotGSuffix);
-    private bool? DotGSuffixOrDefault => DotGSuffix ?? true;
+    private bool? DotGSuffixOrDefault => DotGSuffix ?? _defaultDotGSuffix;
 
     private GeneratorConfig GeneratorConfig
     {

@@ -3,9 +3,6 @@
     "LanguageFile": "../testLanguage.2023_1.json",
     "OutputFile": "out/2023.ceeees",
     "Namespace": "My.Name.Space",
-    "LionWebVersion": "2023.1",
-    "GeneratorConfig": {
-      "WritableInterfaces": true
-    }
+    "LionWebVersion": "2023.1"
   }
 ]
