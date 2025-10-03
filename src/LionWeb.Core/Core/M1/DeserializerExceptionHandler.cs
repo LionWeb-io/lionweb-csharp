@@ -131,7 +131,7 @@ public class DeserializerExceptionHandler : IDeserializerHandler
     /// <inheritdoc />
     public virtual bool SkipDeserializingDependentNode(ICompressedId id) =>
         throw new DeserializerException(
-            $"Skip deserializing {id} because dependentLanguages contains node with same id");
+            $"Skip deserializing node with id '{id}' because dependentLanguages contains node with same id");
 }
 
 /// Something went wrong during serialization.

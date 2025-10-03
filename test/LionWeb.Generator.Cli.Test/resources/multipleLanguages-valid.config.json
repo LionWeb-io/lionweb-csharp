@@ -1,0 +1,13 @@
+﻿[
+  {
+    "LanguageFile": "relative/multipleLanguages.2024_1.json",
+    "OutputDir": "out/2023",
+    "Namespace": "My.Name.Space",
+    "PathPattern": "NamespaceInFilename",
+    "DotGSuffix": false,
+    "LionWebVersion": "2024.1",
+    "GeneratorConfig": {
+      "WritableInterfaces": true
+    }
+  }
+]

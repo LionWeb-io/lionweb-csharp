@@ -35,6 +35,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 /// </summary>
 public partial class Names : INames
 {
+    private const char _namespaceSeparator = '.';
+    
     private readonly HashSet<Type> _usedTypes = [];
 
     /// <inheritdoc />
@@ -56,7 +58,7 @@ public partial class Names : INames
     public Names(Language language, string namespaceName)
     {
         _language = language;
-        _namespaceName = namespaceName.PrefixKeyword();
+        _namespaceName = string.Join(_namespaceSeparator, namespaceName.Split(_namespaceSeparator).Select(p => p.PrefixKeyword()));
 
         _m3 = language.LionWebVersion.LionCore;
         _builtIns = language.LionWebVersion.BuiltIns;
@@ -82,7 +84,7 @@ public partial class Names : INames
     /// <inheritdoc />
     public string LanguageName(Language lang) => LanguageBaseName(lang) + "Language";
 
-    private string LanguageBaseName(Language lang) => lang.Name.Split('.').Last().ToFirstUpper().PrefixKeyword();
+    private string LanguageBaseName(Language lang) => lang.Name.Split(_namespaceSeparator).Last().ToFirstUpper().PrefixKeyword();
 
     /// <inheritdoc />
     public NameSyntax LanguageType => AsType(_language);

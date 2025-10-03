@@ -1,0 +1,11 @@
+﻿[
+  {
+    "LanguageFile": "relative/multipleLanguages.2024_1.json",
+    "OutputFile": "out/multi.cs",
+    "Namespace": "My.Name.Space",
+    "LionWebVersion": "2024.1",
+    "GeneratorConfig": {
+      "WritableInterfaces": true
+    }
+  }
+]
