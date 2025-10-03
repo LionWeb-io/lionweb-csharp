@@ -17,9 +17,29 @@
 
 namespace LionWeb.Core.Test.NodeApi.Lenient;
 
+using Languages.Generated.V2024_1.Shapes.M2;
+
 [TestClass]
 public class GenericApiTests: LenientNodeTestsBase
 {
+    #region containment generic add/insert/remove api
+    
+    #region Single
+
+    [TestMethod]
+    public void Single_Reflective()
+    {
+        var parent = newGeometry("g");
+        var line = newLine("myId");
+        parent.Add(ShapesLanguage.Instance.Geometry_shapes, [line]);
+        Assert.AreSame(parent, line.GetParent());
+        Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Contains(line));
+    }
+    
+    #endregion
+    
+    #endregion
+    
     #region annotation generic add/insert/remove api
 
     #region Single
