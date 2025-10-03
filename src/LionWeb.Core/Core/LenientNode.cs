@@ -255,6 +255,45 @@ public class LenientNode : NodeBase, INode
         }
     }
 
+    /// <inheritdoc />
+    protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            var enumerable = M2Extensions.AsNodes<INode>(nodes).ToList();
+            AddAnnotations(enumerable);
+            return true;
+        }
+        
+        return true;
+    }
+    
+    /// <inheritdoc />
+    protected override bool InsertInternal(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            var enumerable = M2Extensions.AsNodes<INode>(nodes).ToList();
+            InsertAnnotations(index, enumerable);
+            return true;
+        }
+
+        return true;
+    }
+
+    /// <inheritdoc />
+    protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link is null)
+        {
+            var enumerable= M2Extensions.AsNodes<INode>(nodes).ToList();
+            RemoveAnnotations(enumerable);
+            return true;
+        }
+
+        return true;
+    }
+
     private void RemoveExistingChildren(Containment c, object? oldValue)
     {
         switch (oldValue)
