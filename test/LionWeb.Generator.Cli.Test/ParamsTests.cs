@@ -144,4 +144,47 @@ public class ParamsTests : ParamsTestsBase
         AssertExists(generatedFile);
         Assert.Contains("namespace", File.ReadAllText(generatedFile.FullName));
     }
+
+    [TestMethod]
+    public void MultipleLanguages_OutputDir()
+    {
+        var outputDir = DeleteOutDir();
+
+        var generator = new TestLionWebGenerator();
+        var result = generator.Exec([
+            "--outputDir", outputDir,
+            "--namespacePattern", "DotSeparatedFirstUppercase",
+            TestLanguage2024,
+            TestLanguageNamespace
+        ]);
+
+        Assert.HasCount(2, generator.Configurations);
+        Assert.HasCount(2, generator.ValidConfigurations);
+        Assert.AreEqual(0, result);
+
+        Assert.IsEmpty(generator.Errors);
+
+        AssertExists(new FileInfo(Path.Combine(outputDir, "TestLanguage.g.cs")));
+        AssertExists(new FileInfo(Path.Combine(outputDir,
+            @"a.B.cee.Dee.@if.else._0.\u1234.\U1234aBcd.TestLanguage.g.cs")));
+    }
+
+    [TestMethod]
+    public void MultipleLanguages_OutputFile()
+    {
+        var generator = new TestLionWebGenerator();
+        var result = generator.Exec([
+            "--outputFile", "something",
+            "--namespacePattern", "DotSeparatedFirstUppercase",
+            TestLanguage2024,
+            TestLanguageNamespace
+        ]);
+
+        Assert.IsEmpty(generator.Configurations);
+        Assert.IsEmpty(generator.ValidConfigurations);
+        Assert.AreEqual(-2, result);
+
+        Assert.Contains(s => s.Contains("Single output file something set, but multiple language files provided: "),
+            generator.Errors);
+    }
 }

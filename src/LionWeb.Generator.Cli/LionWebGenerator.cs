@@ -17,7 +17,7 @@ public class LionWebGenerator
 
     public int Exec(string[] args)
     {
-        var parser = new Parser(LogError, args);
+        var parser = new CmdlineParser(LogError, args);
         var result = parser.ParseCommandLine();
         Configurations.AddRange(parser.Configurations);
         if (result != 0)

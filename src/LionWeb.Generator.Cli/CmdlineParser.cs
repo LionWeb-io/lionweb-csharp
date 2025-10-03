@@ -21,7 +21,7 @@ using Core;
 using System.CommandLine;
 using System.Text.Json;
 
-internal class Parser
+internal class CmdlineParser
 {
     private readonly Action<string> _errorLogger;
     private readonly string[] _args;
@@ -43,7 +43,7 @@ internal class Parser
 
     private ParseResult ParseResult => _parseResult ??= _rootCommand.Parse(_args);
 
-    public Parser(Action<string> errorLogger, string[] args)
+    public CmdlineParser(Action<string> errorLogger, string[] args)
     {
         _errorLogger = errorLogger;
         _args = args;
@@ -55,7 +55,7 @@ internal class Parser
         _config.AcceptExistingOnly();
         _rootCommand.Options.Add(_config);
 
-        _outputDir = new("--output")
+        _outputDir = new("--outputDir", "--output")
         {
             Description = "Directory to write generated files to", Arity = ArgumentArity.ZeroOrOne
         };
@@ -142,7 +142,13 @@ internal class Parser
         result = ReadConfigFile();
         OverrideConfigs();
 
-        return CreateCommandLineConfigs() ? 0 : result;
+        if (CreateCommandLineConfigs())
+            return 0;
+
+        if (Configurations.Count == 0)
+            return -2;
+
+        return result;
     }
 
     private int CheckParseErrors()
@@ -241,6 +247,12 @@ internal class Parser
     {
         if (LanguageFiles is null)
             return false;
+
+        if (LanguageFiles.Length > 1 && OutputFile is not null)
+        {
+            LogError($"Single output file {OutputFile} set, but multiple language files provided: {string.Join(", ", (object[])LanguageFiles)}");
+            return false;
+        }
 
         Configurations.AddRange(LanguageFiles.Select(f =>
         {
