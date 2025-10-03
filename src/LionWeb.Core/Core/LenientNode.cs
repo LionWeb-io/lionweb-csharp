@@ -255,6 +255,78 @@ public class LenientNode : NodeBase, INode
         }
     }
 
+    /// <inheritdoc />
+    protected override bool AddInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            var enumerable = M2Extensions.AsNodes<INode>(nodes).ToList();
+            AddAnnotations(enumerable);
+            return true;
+        }
+        
+        //TODO: the code block below is this method is not tested properly 
+        
+        var oldValue = TryGetFeature(link, out var old) ? old : null;
+        
+        var readableNodes = M2Extensions.AsNodes<IReadableNode>(nodes).ToList();
+        if (readableNodes.Count == 0)
+        {
+            if (RemoveFeature(link))
+                return true;
+            if (_classifier != null && _classifier.AllFeatures().Contains(link))
+                return true;
+            return false;
+        }
+
+        if (link is Containment cont)
+        {
+            RemoveExistingChildren(cont, oldValue);
+            var newChildren = M2Extensions.AsNodes<INode>(readableNodes).ToList();
+            foreach (var newChild in newChildren)
+            {
+                AttachChild(newChild);
+            }
+
+            SetFeature(link, newChildren.ToList());
+        } else
+        {
+            SetFeature(link, readableNodes);
+        }
+        
+        return true;
+    }
+    
+    /// <inheritdoc />
+    protected override bool InsertInternal(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    {
+        if (link == null)
+        {
+            var enumerable = M2Extensions.AsNodes<INode>(nodes).ToList();
+            InsertAnnotations(index, enumerable);
+            return true;
+        }
+
+        //TODO: not complete
+        
+        return true;
+    }
+
+    /// <inheritdoc />
+    protected override bool RemoveInternal(Link? link, IEnumerable<IReadableNode> nodes)
+    {
+        if (link is null)
+        {
+            var enumerable= M2Extensions.AsNodes<INode>(nodes).ToList();
+            RemoveAnnotations(enumerable);
+            return true;
+        }
+
+        //TODO: not complete
+        
+        return true;
+    }
+
     private void RemoveExistingChildren(Containment c, object? oldValue)
     {
         switch (oldValue)

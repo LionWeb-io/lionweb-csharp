@@ -127,17 +127,35 @@ public static class M1Extensions
         if (parent == null)
             throw new TreeShapeException(self, "Cannot replace a node with no parent");
 
-        Containment containment = parent.GetContainmentOf(self);
+        Containment? containment = parent.GetContainmentOf(self);
 
-        var value = parent.Get(containment);
-        if (value is not IEnumerable enumerable)
-            throw new TreeShapeException(self, "Multiple containment does not yield enumerable");
+        if (containment == null)
+        {
+            var index = parent.GetAnnotations().ToList().IndexOf(self);
+            if (index < 0)
+                // should not happen
+                throw new TreeShapeException(self, "Node not contained in its parent");
+            parent.Insert(containment, index, [replacement]);
+            parent.Remove(containment, [self]);
+            
+            return replacement;
+        }
+        
+        if (containment.Multiple)
+        {
+            var value = parent.Get(containment);
+            if (value is not IEnumerable enumerable)
+                throw new TreeShapeException(self, "Multiple containment does not yield enumerable");
 
-        var nodes = enumerable.Cast<IReadableNode>().ToList();
-        var index = nodes.IndexOf(self);
-        parent.Insert(containment, index, [replacement]);
-        parent.Remove(containment, [self]);
-
+            var nodes = enumerable.Cast<IReadableNode>().ToList();
+            var index = nodes.IndexOf(self);
+            parent.Insert(containment, index, [replacement]);
+            parent.Remove(containment, [self]);
+        } else
+        {
+            parent.Set(containment, replacement);
+        }
+        
         return replacement;
     }
 

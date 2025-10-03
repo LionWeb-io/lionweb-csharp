@@ -1494,7 +1494,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
         if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(link))
         {
-            AddShapes(nodes.Cast<IShape>());
+            AddShapes(ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
             return true;
         }
 
@@ -1509,7 +1509,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(link))
         {
-            InsertShapes(index, nodes.Cast<IShape>());
+            InsertShapes(index, ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
 			return true;
 		}
 
@@ -1524,7 +1524,7 @@ public partial class Geometry : ConceptInstanceBase, IPartitionInstance<INode>
 
 		if (ShapesLanguage.Instance.Geometry_shapes.EqualsIdentity(link))
         {
-            RemoveShapes(nodes.Cast<IShape>());
+            RemoveShapes(ShapesLanguage.Instance.Geometry_shapes.AsNodes<LionWeb.Core.Test.Languages.Generated.V2024_1.Shapes.M2.IShape>(nodes));
 			return true;
 		}
 
