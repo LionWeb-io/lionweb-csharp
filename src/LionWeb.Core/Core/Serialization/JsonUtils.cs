@@ -27,19 +27,13 @@ using System.Text.Json.Stream;
 /// </summary>
 public static class JsonUtils
 {
-    private static readonly JsonSerializerOptions _readOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
+    private static readonly JsonSerializerOptions _readOptions = LionWebJsonSerializerContext.Default.Options;
 
     /// Parses <paramref name="json"/> as JSON.
     public static T ReadJsonFromString<T>(string json) =>
         JsonSerializer.Deserialize<T>(json, _readOptions)!;
 
-    private static readonly JsonSerializerOptions _writeOptions = new()
-    {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-    };
+    private static readonly JsonSerializerOptions _writeOptions = _readOptions;
 
     /// Returns <paramref name="data"/> rendered as JSON.
     public static string WriteJsonToString(object data) =>
@@ -56,7 +50,9 @@ public static class JsonUtils
     /// <i>Only</i> includes these nodes, no descendants etc.</param>
     /// <param name="serializer">Serializer to use.</param>
     /// <param name="nodes">Nodes to serialize.</param>
-    public static void WriteNodesToStream(Stream utf8JsonStream, ISerializer serializer, IEnumerable<IReadableNode> nodes)
+    /// <seealso cref="WriteNodesToStreamAsync"/>
+    public static void WriteNodesToStream(Stream utf8JsonStream, ISerializer serializer,
+        IEnumerable<IReadableNode> nodes)
     {
         object data = new LazySerializationChunk
         {
@@ -74,7 +70,9 @@ public static class JsonUtils
     /// <i>Only</i> includes these nodes, no descendants etc.</param>
     /// <param name="serializer">Serializer to use.</param>
     /// <param name="nodes">Nodes to serialize.</param>
-    public static async Task WriteNodesToStreamAsync(Stream utf8JsonStream, ISerializer serializer, IEnumerable<IReadableNode> nodes)
+    /// <seealso cref="WriteNodesToStream"/>
+    public static async Task WriteNodesToStreamAsync(Stream utf8JsonStream, ISerializer serializer,
+        IEnumerable<IReadableNode> nodes)
     {
         object data = new LazySerializationChunk
         {
@@ -94,58 +92,55 @@ public static class JsonUtils
     /// should throw <see cref="VersionMismatchException"/> if the check fails.
     /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
     /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
-    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(Stream utf8JsonStream, IDeserializer deserializer,
-        Action<string>? lionWebVersionChecker = null)
-    {
-        var streamReader = new Utf8JsonAsyncStreamReader(utf8JsonStream, leaveOpen: true);
+    /// <seealso cref="ReadNodesFromStream"/>
+    public static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(
+        Stream utf8JsonStream,
+        IDeserializer deserializer,
+        Action<string>? lionWebVersionChecker = null
+    ) => await ReadNodesFromStreamAsync(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
 
-        bool insideNodes = false;
-        while (await Advance())
+    internal static async Task<List<IReadableNode>> ReadNodesFromStreamAsync(
+        Stream utf8JsonStream,
+        IDeserializer deserializer,
+        Action<string>? lionWebVersionChecker,
+        JsonSerializerOptions jsonSerializerOptions
+    ) =>
+        await new StreamReaderAsync(utf8JsonStream, deserializer)
         {
-            switch (streamReader.TokenType)
-            {
-                case JsonTokenType.PropertyName when streamReader.GetString() == "serializationFormatVersion":
-                    await Advance();
-                    string? version = streamReader.GetString();
-                    if (version != null)
-                    {
-                        if (lionWebVersionChecker == null)
-                        {
-                            deserializer.LionWebVersion.AssureCompatible(version);
-                        } else
-                        {
-                            lionWebVersionChecker(version);
-                        }
-                    }
+            JsonSerializerOptions = jsonSerializerOptions, LionWebVersionChecker = lionWebVersionChecker
+        }.ReadNodes();
 
-                    break;
+    /// <summary>
+    /// Uses <paramref name="deserializer"/> to read nodes from <paramref name="utf8JsonStream"/>.  
+    /// </summary>
+    /// <param name="utf8JsonStream">Stream to read from.</param>
+    /// <param name="deserializer">Deserializer to use.</param>
+    /// <param name="lionWebVersionChecker">Optional action to access or check the <see cref="SerializationChunk.SerializationFormatVersion"/>;
+    /// should throw <see cref="VersionMismatchException"/> if the check fails.
+    /// If <c>null</c>, we use <see cref="LionWebVersionsExtensions.AssureCompatible(LionWeb.Core.LionWebVersions,string,string?)"/>.</param>
+    /// <returns>Nodes as returned from <see cref="IDeserializer.Finish"/>.</returns>
+    /// <seealso cref="ReadNodesFromStreamAsync"/>
+    public static List<IReadableNode> ReadNodesFromStream(
+        Stream utf8JsonStream,
+        IDeserializer deserializer,
+        Action<string>? lionWebVersionChecker = null
+    ) => ReadNodesFromStream(utf8JsonStream, deserializer, lionWebVersionChecker, _readOptions);
 
-                case JsonTokenType.PropertyName when streamReader.GetString() == "nodes":
-                    insideNodes = true;
-                    break;
-
-                case JsonTokenType.PropertyName when streamReader.GetString() != "nodes":
-                    insideNodes = false;
-                    break;
-
-                case JsonTokenType.StartObject when insideNodes:
-                    var serializedNode = await streamReader.DeserializeAsync<SerializedNode>(_readOptions);
-                    if (serializedNode != null)
-                        deserializer.Process(serializedNode);
-
-                    break;
-            }
-        }
-
-        return deserializer.Finish().ToList();
-
-        async Task<bool> Advance() => await streamReader.ReadAsync();
-    }
+    internal static List<IReadableNode> ReadNodesFromStream(
+        Stream utf8JsonStream,
+        IDeserializer deserializer,
+        Action<string>? lionWebVersionChecker,
+        JsonSerializerOptions jsonSerializerOptions
+    ) =>
+        new StreamReaderSync(utf8JsonStream, deserializer)
+        {
+            JsonSerializerOptions = jsonSerializerOptions, LionWebVersionChecker = lionWebVersionChecker
+        }.ReadNodes();
 }
 
 /// Variant of <see cref="SerializationChunk"/> that moves <see cref="Languages"/> as last entry,
 /// so we can fill it _after_ we've processed all <see cref="Nodes"/>.
-internal class LazySerializationChunk
+public class LazySerializationChunk
 {
     /// <inheritdoc cref="SerializationChunk.SerializationFormatVersion"/>
     [JsonPropertyOrder(0)]

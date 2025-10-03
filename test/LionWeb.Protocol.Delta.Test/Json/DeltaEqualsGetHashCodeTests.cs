@@ -29,26 +29,6 @@ public class DeltaEqualsGetHashCodeTests : JsonTestsBase
     #region Command
 
     [TestMethod]
-    public void CommandResponse_Different()
-    {
-        var a = new CommandResponse("a", CreateProtocolMessages("msgA"));
-        var b = new CommandResponse("a", CreateProtocolMessages("msgB"));
-
-        Assert.IsFalse(a.Equals(b));
-        Assert.AreNotEqual(a.GetHashCode(), b.GetHashCode());
-    }
-
-    [TestMethod]
-    public void CommandResponse_Same()
-    {
-        var a = new CommandResponse("a", CreateProtocolMessages("msgA"));
-        var b = new CommandResponse("a", CreateProtocolMessages("msgA"));
-
-        Assert.IsTrue(a.Equals(b));
-        Assert.AreEqual(a.GetHashCode(), b.GetHashCode());
-    }
-
-    [TestMethod]
     public void AddProperty_Different_Self()
     {
         var a = new AddProperty("a", new MetaPointer("myLang", "v0", "key"), "x", "aa",

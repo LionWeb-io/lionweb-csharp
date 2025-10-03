@@ -32,7 +32,7 @@ public static class Textualizer
         => strings.Select((str) => _oneIndentation + str);
 
     private static string Join(IEnumerable<string> strings, string separator)
-        => string.Join(separator, strings.ToArray()) ?? "";
+        => string.Join(separator, strings.ToArray()) ?? string.Empty;
 
 
     /// <returns>a textualization of the given {@link INode node}.</returns>
@@ -74,7 +74,7 @@ public static class Textualizer
             {
                 INamed named when named.GetNodeName() is  { } s => $" ({s})",
                 INamed => $" {noNameSetOutput}",
-                _ => ""
+                _ => string.Empty
             };
 
         string ReferenceTargetAsString(INode target)
@@ -92,7 +92,7 @@ public static class Textualizer
             var children = containment.AsNodes<INode>(node.Get(containment));
             return
             [
-                $"{Name(containment)}:{(children.Any() ? "" : " <none>")}",
+                $"{Name(containment)}:{(children.Any() ? string.Empty : " <none>")}",
                 ..Indent(children.SelectMany(child => child.AsStrings()))
             ];
         }

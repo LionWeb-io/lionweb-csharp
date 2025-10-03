@@ -19,8 +19,10 @@ namespace LionWeb.Protocol.Delta.Test;
 
 using Client;
 using Core;
-using Core.M1.Event;
+using Core.M1;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Pipe;
 using Core.Serialization;
 using Core.Test.Languages.Generated.V2023_1.Shapes.M2;
 using Core.Utilities;
@@ -31,11 +33,15 @@ using Repository;
 [TestClass]
 public class ClientTests
 {
+    private const RepositoryId _repositoryId = "myRepo";
+    
     private readonly DeltaRepositoryConnector _repositoryConnector;
+    private readonly IForest _repositoryForest;
     private readonly Geometry _repositoryPartition;
     private readonly LionWebTestRepository _repository;
 
     private readonly DeltaClientConnector _clientConnector;
+    private readonly IForest _clientForest;
     private readonly Geometry _clientPartition;
     private readonly LionWebTestClient _client;
     private readonly IClientInfo _clientInfo;
@@ -48,51 +54,95 @@ public class ClientTests
         _repositoryConnector = new DeltaRepositoryConnector(lionWebVersion);
         _clientInfo = new ClientInfo { ParticipationId = "clientParticipation" };
         _clientConnector = new(lionWebVersion,
-            content => _repositoryConnector.ReceiveFromClient(new DeltaMessageContext(_clientInfo, content)));
-        _repositoryConnector.Sender = content => _clientConnector.ReceiveFromRepository(content);
+            content => _repositoryConnector.ReceiveMessageFromClient(new DeltaMessageContext(_clientInfo, content)));
+        _repositoryConnector.Sender = content => _clientConnector.ReceiveMessageFromRepository(content);
 
-        _repositoryPartition = new Geometry("partition");
-        _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryPartition,
+        _repositoryForest = new Forest();
+        _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryForest,
             _repositoryConnector);
 
-        _clientPartition = Clone(_repositoryPartition);
-        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientPartition, _clientConnector);
+        _clientForest = new Forest();
+        _clientPartition = new Geometry("partition");
+        _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector);
         _client.ParticipationId = _clientInfo.ParticipationId;
+        
+        _clientForest.AddPartitions([_clientPartition]);
+        _repository.WaitForReceived(1);
+        _repositoryPartition = (Geometry)_repositoryForest.Partitions.First();
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public void ConnectionWorks()
     {
         _clientPartition.Documentation = new Documentation("doc");
+
+         _repository.WaitForReceived(1);
 
         AssertEquals(_clientPartition, _repositoryPartition);
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public async Task SignOn()
     {
-        var signOnResponse = await _client.SignOn();
-        
+        var signOnResponse = await _client.SignOn(_repositoryId);
+
         Assert.AreEqual("clientParticipation", signOnResponse.ParticipationId);
     }
 
     [TestMethod]
+    [Timeout(6000)]
+    public async Task GetAvailableIds()
+    {
+        var availableIdsResponse = await _client.GetAvailableIds(11);
+
+        Assert.AreEqual(11, availableIdsResponse.Ids.Length);
+        foreach (var freeId in availableIdsResponse.Ids)
+        {
+            Assert.IsTrue(IdUtils.IsValid(freeId));
+        }
+    }
+
+    [TestMethod]
+    [Timeout(6000)]
+    public async Task GetAvailableIds_SomeAlreadyUsed()
+    {
+        await _client.SignOn(_repositoryId);
+
+        var usedNodeId = "repoProvidedId-6";
+        _clientPartition.Documentation = new Documentation(usedNodeId);
+
+        var availableIdsResponse = await _client.GetAvailableIds(11);
+
+        Assert.AreEqual(11, availableIdsResponse.Ids.Length);
+        foreach (var freeId in availableIdsResponse.Ids)
+        {
+            Assert.IsTrue(IdUtils.IsValid(freeId));
+        }
+
+        Assert.IsFalse(availableIdsResponse.Ids.Contains(usedNodeId));
+    }
+
+    [TestMethod]
+    [Timeout(6000)]
     public void InOrderEvents()
     {
-        _repositoryConnector.SendAll(ChildAdded(0));
-        _repositoryConnector.SendAll(PropertyAdded(1));
-        _repositoryConnector.SendAll(PropertyChanged(2));
+        _repositoryConnector.SendToAllClients(ChildAdded(0));
+        _repositoryConnector.SendToAllClients(PropertyAdded(1));
+        _repositoryConnector.SendToAllClients(PropertyChanged(2));
 
         AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
             _clientPartition);
     }
 
     [TestMethod]
+    [Timeout(6000)]
     public void OutOfOrderEvents()
     {
-        _repositoryConnector.SendAll(PropertyAdded(1));
-        _repositoryConnector.SendAll(PropertyChanged(2));
-        _repositoryConnector.SendAll(ChildAdded(0));
+        _repositoryConnector.SendToAllClients(PropertyAdded(1));
+        _repositoryConnector.SendToAllClients(PropertyChanged(2));
+        _repositoryConnector.SendToAllClients(ChildAdded(0));
 
         AssertEquals(new Geometry("partition") { Documentation = new Documentation("doc") { Text = "changed text" } },
             _clientPartition);
@@ -131,7 +181,7 @@ public class ClientTests
             ShapesLanguage.Instance.Documentation_text.ToMetaPointer(),
             "changed text",
             "text",
-            [new CommandSource(_clientInfo.ParticipationId, "cmdY")],
+            [new CommandSource(_clientInfo.ParticipationId, "cmdZ")],
             null
         ) { SequenceNumber = sequenceNumber };
 
@@ -151,53 +201,51 @@ public class ClientTests
 
 internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
 {
-    private readonly EventToDeltaCommandMapper _mapper;
+    private readonly NotificationToDeltaCommandMapper _mapper;
 
     public DeltaRepositoryConnector(LionWebVersions lionWebVersion)
     {
-        _mapper = new EventToDeltaCommandMapper(
-            new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion));
+        _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
     }
 
     public Action<IDeltaContent> Sender { get; set; }
 
-    public Task Send(IClientInfo clientInfo, IDeltaContent content)
+    public Task SendToClient(IClientInfo clientInfo, IDeltaContent content)
     {
         Sender?.Invoke(content);
         return Task.CompletedTask;
     }
 
-    public Task SendAll(IDeltaContent content)
+    public Task SendToAllClients(IDeltaContent content)
     {
         Sender?.Invoke(content);
         return Task.CompletedTask;
     }
 
-    public event EventHandler<IMessageContext<IDeltaContent>>? Receive;
-    public void ReceiveFromClient(IDeltaMessageContext context) => Receive?.Invoke(null, context);
-    public IDeltaContent Convert(IEvent internalEvent) => _mapper.Map(internalEvent);
+    public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
+    public void ReceiveMessageFromClient(IDeltaMessageContext context) => ReceiveFromClient?.Invoke(null, context);
+    public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
 }
 
 internal class DeltaClientConnector : IDeltaClientConnector
 {
     private readonly Action<IDeltaContent> _sender;
-    private readonly EventToDeltaCommandMapper _mapper;
+    private readonly NotificationToDeltaCommandMapper _mapper;
 
     public DeltaClientConnector(LionWebVersions lionWebVersion, Action<IDeltaContent> sender)
     {
         _sender = sender;
-        _mapper = new EventToDeltaCommandMapper(
-            new PartitionEventToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion));
+        _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
     }
 
-    public Task Send(IDeltaContent content)
+    public Task SendToRepository(IDeltaContent content)
     {
         _sender(content);
         return Task.CompletedTask;
     }
 
-    public event EventHandler<IDeltaContent>? Receive;
+    public event EventHandler<IDeltaContent>? ReceiveFromRepository;
 
-    public void ReceiveFromRepository(IDeltaContent context) => Receive?.Invoke(null, context);
-    public IDeltaContent Convert(IEvent internalEvent) => _mapper.Map(internalEvent);
+    public void ReceiveMessageFromRepository(IDeltaContent context) => ReceiveFromRepository?.Invoke(null, context);
+    public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
 }

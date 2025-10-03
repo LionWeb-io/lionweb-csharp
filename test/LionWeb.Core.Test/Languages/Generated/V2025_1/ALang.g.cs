@@ -6,9 +6,10 @@
 #nullable enable
 namespace LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.A;
 using LionWeb.Core;
-using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Partition.Emitter;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2025_1;
 using System;
@@ -135,12 +136,12 @@ public partial class AConcept : ConceptInstanceBase
     	/// <seealso cref = "AEnum.left"/>
     	/// <seealso cref = "AConcept.BRef"/>
     	/// <remarks>Optional Single Reference</remarks>
-        public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept? value)
+        public AConcept SetBRef(LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept? value, INotificationId? notificationId = null)
 	{
-		ReferenceSingleEventEmitter evt = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef);
-		evt.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(ALangLanguage.Instance.AConcept_BRef, this, value, _bRef, notificationId);
+		emitter.CollectOldData();
 		_bRef = value;
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
@@ -151,7 +152,7 @@ public partial class AConcept : ConceptInstanceBase
 	/// <inheritdoc/>
         public override Concept GetConcept() => ALangLanguage.Instance.AConcept;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -165,15 +166,15 @@ public partial class AConcept : ConceptInstanceBase
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (ALangLanguage.Instance.AConcept_BRef.EqualsIdentity(feature))
 		{
 			if (value is null or LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept)
 			{
-				BRef = (LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept?)value;
+				SetBRef((LionWeb.Core.Test.Languages.Generated.V2025_1.Circular.B.BConcept?)value, notificationId);
 				return true;
 			}
 

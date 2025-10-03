@@ -9,6 +9,11 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - tbd
 
 ### Added
+* Added `JsonUtils.ReadNodesFromStream()` to load nodes from strings synchronously.
+* Added benchmarking project.
+* Introduced `INotifiableNode`. Represents nodes that support notifications.
+* Introduced `INotification` to make a clear distinction between delta protocol-specific events and LionWeb internal event system.
+* Introduced `INotificationId`. Represents globally unique id of a notification.
 * Added `LionWebVersions` _2025.1_ and _2025.1-compatible_. No content differences to _2024.1_ so far.
 * Added `EnumerationLiteralIdentityComparer` and `KeyedIdentityComparer`.
 * Added `bool IReadableNode.TryGet(Feature, out object? value)`.
@@ -42,6 +47,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added external languages to `DynamicLanguageCloner`.
 * Added convenience method `DynamicLanguageClonerExtensions.Clone(Language)`.
 ### Fixed
+* Bug fix: `M1Extensions.ReplaceWith` method now handles node move and replacement operation in the same containment correctly.
+* Bug fix: prevents emitting `ReferenceChangedNotification` when old and new targets of a reference are the same nodes.
+* Bug fix: generator now generates correct type for features of builtin Node type
 * `LenientNode` now works properly if keys of features change.
 * Deserializer can now create instances of languages not registered beforehand.
 * Use `[NotNullWhen]` instead of `[MaybeNullWhen]` attributes for _TryGet_-like out parameters.
@@ -57,7 +65,9 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * `Comparer` didn't recognize internal references to nodes that are children in single containments.
 * `Hasher` would not recognize internal references if it encounters the reference before the target node.
 * Deserializing languages with annotations that contain references works now.
+* Fixed generating &lt;seealso&gt; tags pointing to case-mangled names.
 ### Changed
+* Pipe members following forests get all notifications of all partitions inside the forest.
 * Made `DynamicStructuredDataTypeInstance.GetHashCode()` more stable.
 * `DynamicLanguageCloner` doesn't change a language's factory anymore.
 * `ILanguageRegistry` works on both registered and current round's languages.

@@ -17,12 +17,153 @@
 
 namespace LionWeb.Core.Test.NodeApi;
 
+using Core.Utilities;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M1;
 
 [TestClass]
 public class ReplaceTests_Containment
 {
+
+    #region Child replaced in same containment
+
+    [TestMethod]
+    public void ChildReplaced_Multiple_InSameContainment_Forward_WithTwoChildren()
+    {
+        var replacement = new Line("replacement");
+        var replaced = NewCircle("replaced");
+        
+        var actual = new Geometry("a")
+        {
+            Shapes = [replacement, replaced]
+        };
+        
+        replaced.ReplaceWith(replacement);
+        
+        var expected = new Geometry("a")
+        {
+            Shapes = [new Line("replacement")]
+        };
+        
+        AssertEquals([expected], [actual]);
+    }
+    
+    [TestMethod]
+    public void ChildReplaced_Multiple_InSameContainment_Backward_WithTwoChildren()
+    {
+        var replacement = new Line("replacement");
+        var replaced = NewCircle("replaced");
+        
+        var actual = new Geometry("a")
+        {
+            Shapes = [replaced, replacement]
+        };
+        
+        replaced.ReplaceWith(replacement);
+        
+        var expected = new Geometry("a")
+        {
+            Shapes = [new Line("replacement")]
+        };
+        
+        AssertEquals([expected], [actual]);
+    } 
+    
+    [TestMethod]
+    public void ChildReplaced_Multiple_InSameContainment_Forward_ReplaceLast()
+    {
+        var replacement = new Line("replacement");
+        var replaced = NewCircle("child");
+        
+        var actual = new Geometry("a")
+        {
+            Shapes = [NewCircle("child"), replacement, replaced]
+        };
+        
+        replaced.ReplaceWith(replacement);
+        
+        var expected = new Geometry("a")
+        {
+            Shapes = [NewCircle("child"), new Line("replacement")]
+        };
+        
+        AssertEquals([expected], [actual]);
+    } 
+    
+    
+    [TestMethod]
+    public void ChildReplaced_Multiple_InSameContainment_Backward_ReplaceMiddle()
+    {
+        var replacement = new Line("replacement");
+        var replaced = NewCircle("replaced");
+        
+        var actual = new Geometry("a")
+        {
+            Shapes = [NewCircle("child"), replaced, replacement]
+        };
+        
+        replaced.ReplaceWith(replacement);
+        
+        var expected = new Geometry("a")
+        {
+            Shapes = [NewCircle("child"), new Line("replacement")]
+        };
+        
+        AssertEquals([expected], [actual]);
+    } 
+    
+    [TestMethod]
+    public void ChildReplaced_Multiple_InSameContainment_Backward_ReplaceFirst()
+    {
+        var replacement = new Line("replacement");
+        var replaced = NewCircle("replaced");
+        
+        var actual = new Geometry("a")
+        {
+            Shapes = [replaced, NewCircle("child"), replacement]
+        };
+        
+        replaced.ReplaceWith(replacement);
+        
+        var expected = new Geometry("a")
+        {
+            Shapes = [new Line("replacement"), NewCircle("child")]
+        };
+        
+        AssertEquals([expected], [actual]);
+    }
+    
+    [TestMethod]
+    public void ChildReplaced_Multiple_InSameContainment_Backward_MoreThanThreeChildren()
+    {
+        var replacement = new Line("E");
+        var replaced = NewCircle("B");
+        
+        var actual = new Geometry("container")
+        {
+            Shapes = [NewCircle("A"), replaced, NewCircle("C"), NewCircle("D"), replacement, NewCircle("F")]
+        };
+        
+        replaced.ReplaceWith(replacement);
+        
+        var expected = new Geometry("container")
+        {
+            Shapes = [NewCircle("A"), new Line("E"), NewCircle("C"), NewCircle("D"), NewCircle("F")]
+        };
+        
+        AssertEquals([expected], [actual]);
+    }
+
+    private Circle NewCircle(string id) => new(id) { Name = id };
+
+    private static void AssertEquals(IEnumerable<INode?> expected, IEnumerable<INode?> actual)
+    {
+        List<IDifference> differences = new Comparer(expected.ToList(), actual.ToList()).Compare().ToList();
+        Assert.IsFalse(differences.Count != 0, differences.DescribeAll(new()));
+    }
+    
+    #endregion
+
     [TestMethod]
     public void Beginning()
     {
@@ -77,7 +218,7 @@ public class ReplaceTests_Containment
         var circle = new Circle("circ0");
         var line = new Line("line");
 
-        Assert.ThrowsException<TreeShapeException>(() => circle.ReplaceWith(line));
+        Assert.ThrowsExactly<TreeShapeException>(() => circle.ReplaceWith(line));
     }
 
     [TestMethod]
@@ -107,7 +248,7 @@ public class ReplaceTests_Containment
             ]
         };
         var coord = new Coord("coord");
-        Assert.ThrowsException<InvalidValueException>(() => circle.ReplaceWith(coord));
+        Assert.ThrowsExactly<InvalidValueException>(() => circle.ReplaceWith(coord));
     }
 
     [TestMethod]
@@ -122,7 +263,7 @@ public class ReplaceTests_Containment
                 circle
             ]
         };
-        Assert.ThrowsException<InvalidValueException>(() => circle.ReplaceWith((INode)null));
+        Assert.ThrowsExactly<UnsupportedNodeTypeException>(() => circle.ReplaceWith((INode)null));
     }
 }
 
@@ -170,7 +311,7 @@ public class ReplaceTests_Annotation
         var doc = new Documentation("circ0");
         var bom = new BillOfMaterials("line");
 
-        Assert.ThrowsException<TreeShapeException>(() => doc.ReplaceWith(bom));
+        Assert.ThrowsExactly<TreeShapeException>(() => doc.ReplaceWith(bom));
     }
 
     [TestMethod]
@@ -181,7 +322,7 @@ public class ReplaceTests_Annotation
         var shape = new Line("geom");
         shape.AddAnnotations([doc]);
         var coord = new Coord("coord");
-        Assert.ThrowsException<InvalidValueException>(() => doc.ReplaceWith(coord));
+        Assert.ThrowsExactly<InvalidValueException>(() => doc.ReplaceWith(coord));
     }
 
     [TestMethod]
@@ -191,6 +332,6 @@ public class ReplaceTests_Annotation
 
         var shape = new Line("geom");
         shape.AddAnnotations([doc]);
-        Assert.ThrowsException<InvalidValueException>(() => doc.ReplaceWith((INode)null));
+        Assert.ThrowsExactly<UnsupportedNodeTypeException>(() => doc.ReplaceWith((INode)null));
     }
 }

@@ -24,25 +24,7 @@ using Message.Query;
 [TestClass]
 public class DeltaToStringTests : JsonTestsBase
 {
-    [TestMethod]
-    public void NoMessages()
-    {
-        var input = new CommandResponse(CommandId(), null);
-        Assert.AreEqual(
-            "CommandResponse { ProtocolMessages = null, CommandId = 1 }",
-            input.ToString());
-    }
-
     #region Command
-
-    [TestMethod]
-    public void CommandResponse()
-    {
-        var input = new CommandResponse(CommandId(), ProtocolMessages());
-        Assert.AreEqual(
-            "CommandResponse { ProtocolMessages = [ProtocolMessage { Kind = MyKind, Message = MyMessage, Data = [ProtocolMessageData { Key = key0, Value = value0 }, ProtocolMessageData { Key = key1, Value = value1 }] }], CommandId = 1 }",
-            input.ToString());
-    }
 
     [TestMethod]
     public void AddProperty()

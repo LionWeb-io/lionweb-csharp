@@ -152,7 +152,7 @@ internal abstract class NodeCreatorBase
     private bool LookupBool(Property property)
     {
         if (_serializedPropertiesByKey.TryGetValue(property.Key, out var value))
-            return value == "true";
+            return value == SerializationConstants.True;
 
         var result =
             _versionSpecifics._handler.InvalidPropertyValue<bool>(null, property,

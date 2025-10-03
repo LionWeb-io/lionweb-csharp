@@ -122,7 +122,7 @@ public readonly record struct DirectSdt : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (MixedDirectSdtLangLanguage.Instance.DirectSdt_directSdtEnum.EqualsIdentity(field))
 			return DirectSdtEnum;

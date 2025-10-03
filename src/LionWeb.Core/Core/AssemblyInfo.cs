@@ -18,3 +18,4 @@
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("LionWeb.Core.Test")]
+[assembly: InternalsVisibleTo("LionWeb.Core.Benchmark")]

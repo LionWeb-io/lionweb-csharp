@@ -91,7 +91,7 @@ public class StreamingTests
 
 
     [TestMethod]
-    public void MassDeserialization()
+    public async Task MassDeserialization_Async()
     {
         using Stream stream =
             File.OpenRead("output.json");
@@ -104,7 +104,26 @@ public class StreamingTests
         deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);
         deserializer.RegisterInstantiatedLanguage(_language);
 
-        List<IReadableNode> nodes = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).GetAwaiter().GetResult();
+        List<IReadableNode> nodes = await JsonUtils.ReadNodesFromStreamAsync(stream, deserializer);
+
+        Assert.AreEqual(_maxSize, nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count());
+    }
+
+    [TestMethod]
+    public void MassDeserialization_Sync()
+    {
+        using Stream stream =
+            File.OpenRead("output.json");
+
+        var deserializer = new DeserializerBuilder()
+            .WithLionWebVersion(LionWebVersions.v2024_1)
+            .WithCompressedIds(new(KeepOriginal: true))
+            .Build();
+
+        deserializer.RegisterInstantiatedLanguage(LionWebVersions.v2024_1.BuiltIns);
+        deserializer.RegisterInstantiatedLanguage(_language);
+
+        List<IReadableNode> nodes = JsonUtils.ReadNodesFromStream(stream, deserializer);
 
         Assert.AreEqual(_maxSize, nodes.Cast<INode>().SelectMany(n => n.Descendants(true, true)).Count());
     }
@@ -116,7 +135,7 @@ public class StreamingTests
     public TestContext TestContext { get; set; }
 }
 
-internal static class StringRandomizer
+public static class StringRandomizer
 {
     // Constant seed for reproducible tests
     private static readonly Random _defaultRandom = new Random(0x1EE7);
@@ -125,7 +144,9 @@ internal static class StringRandomizer
     public static string RandomLength() =>
         Random(_defaultRandom.Next(500));
 
-    public static string Random(int length) =>
-        new string(Enumerable.Repeat(_chars, length)
+    public static string Random(int length, string? chars = _chars) =>
+        new string(Enumerable.Repeat(chars, length)
             .Select(s => s[_defaultRandom.Next(s.Length)]).ToArray());
+    
+    public static char RandomChar(string? chars = _chars) => chars[_defaultRandom.Next(chars.Length)];
 }
