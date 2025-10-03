@@ -272,7 +272,7 @@ public class GetFileTests : ConfigurationTestsBase
     public void UnknownPathPattern_InvalidInt()
     {
         var configuration = new Configuration { Namespace = "ns", PathPattern = (PathPattern)int.MaxValue };
-        var ex = Assert.Throws<UnknownEnumValueException<PathPattern>>(() => configuration.GetFile(LanguageNoDots()));
+        var ex = Assert.Throws<UnknownEnumValueException<PathPattern?>>(() => configuration.GetFile(LanguageNoDots()));
 
         Assert.AreEqual($"Unknown PathPattern: {int.MaxValue}", ex.Message);
     }

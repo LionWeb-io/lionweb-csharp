@@ -166,16 +166,17 @@ public class ParamsTests_Config : ParamsTestsBase
     }
     
     [TestMethod]
-    public void RelativeLanguageFile_upwards()
+    public void RelativeLanguageFile()
     {
         var generator = new TestLionWebGenerator();
         Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
 
-        var outputDir = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), ResourceDir, "/relative/out"));
+        var outputDir = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), ResourceDir, "relative/out"));
         Delete(outputDir);
 
+        var languageFile = Path.Combine(Directory.GetCurrentDirectory(), ResourceDir, "relative/relative.config.json");
         var result = generator.Exec([
-            "--config", Path.Combine(Directory.GetCurrentDirectory(), ResourceDir, "/relative/relative.config.json")
+            "--config", languageFile
         ]);
 
         Assert.HasCount(1, generator.Configurations);
@@ -183,6 +184,49 @@ public class ParamsTests_Config : ParamsTestsBase
         Assert.AreEqual(0, result);
 
         AssertExists(new FileInfo($"{outputDir}/2023.ceeees"));
+    }
+
+    [TestMethod]
+    public void MultipleLanguages_valid()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+
+        var outputDir = DeleteOutDir();
+        
+        var languageFile = Path.Combine(Directory.GetCurrentDirectory(), ResourceDir, "multipleLanguages-valid.config.json");
+        var result = generator.Exec([
+            "--config", languageFile
+        ]);
+
+        Assert.HasCount(1, generator.Configurations);
+        Assert.HasCount(1, generator.ValidConfigurations);
+        Assert.AreEqual(0, result);
+
+        AssertExists(new FileInfo($@"{outputDir}/2023/My.Name.Space.a.B.cee.Dee.@if.else._0.aBcd.TestLanguage.cs"));
+        AssertExists(new FileInfo($@"{outputDir}/2023/My.Name.Space.SecondTestLanguage.cs"));
+    }
+
+    [TestMethod]
+    public void MultipleLanguages_invalid()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+
+        var outputDir = DeleteOutDir();
+        
+        var languageFile = Path.Combine(Directory.GetCurrentDirectory(), ResourceDir, "multipleLanguages-invalid.config.json");
+        var result = generator.Exec([
+            "--config", languageFile
+        ]);
+
+        Assert.HasCount(1, generator.Configurations);
+        Assert.IsEmpty(generator.ValidConfigurations);
+        Assert.AreEqual(-2, result);
+        
+        Assert.Contains(s => s.Contains("Single output file ") && s.Contains("out/multi.cs set, but language file ") && s.Contains("relative/multipleLanguages.2024_1.json contains more than one language"), generator.Errors);
+
+        Assert.IsFalse(Directory.Exists(outputDir));
     }
 
     [TestMethod]
