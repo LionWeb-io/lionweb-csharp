@@ -31,7 +31,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newGeometry("g");
         var line = newLine("myId");
-        parent.Add(ShapesLanguage.Instance.Geometry_shapes, [line]);
+        parent.Add([line], ShapesLanguage.Instance.Geometry_shapes);
         Assert.AreSame(parent, line.GetParent());
         Assert.IsTrue((parent.Get(Geometry_shapes) as IEnumerable<IReadableNode>).Contains(line));
     }
@@ -49,7 +49,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        parent.Add(null, [bom]);
+        parent.Add([bom]);
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
     }
@@ -59,7 +59,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newCoord("g");
         var value = newDocumentation("myId");
-        parent.Add(null, [value]);
+        parent.Add([value]);
         Assert.AreSame(parent, value.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(value));
     }
@@ -69,7 +69,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newCoord("g");
         var value = newLine("myId");
-        parent.Add(null, [value]);
+        parent.Add([value]);
         Assert.AreSame(parent, value.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(value));
     }
@@ -81,7 +81,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 0, [bom]);
+        parent.Insert([bom], 0);
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
     }
@@ -91,7 +91,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newCoord("g");
         var value = newDocumentation("myId");
-        parent.Insert(null, 0, [value]);
+        parent.Insert([value], 0);
         Assert.AreSame(parent, value.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(value));
     }
@@ -111,7 +111,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(null, -1, [bom]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert([bom], -1));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }
@@ -121,7 +121,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert(null, 1, [bom]));
+        Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => parent.Insert([bom], 1));
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }
@@ -131,9 +131,9 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var doc = newDocumentation("cId");
         var parent = newLine("g");
-        parent.Add(null, [doc]);
+        parent.Add([doc]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 0, [bom]);
+        parent.Insert([bom], 0);
         Assert.AreSame(parent, doc.GetParent());
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
@@ -145,9 +145,9 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var doc = newDocumentation("cId");
         var parent = newLine("g");
-        parent.Add(null, [doc]);
+        parent.Add([doc]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 1, [bom]);
+        parent.Insert([bom], 1);
         Assert.AreSame(parent, doc.GetParent());
         Assert.AreSame(parent, bom.GetParent());
         Assert.IsTrue(parent.GetAnnotations().Contains(bom));
@@ -160,9 +160,9 @@ public class GenericApiTests: LenientNodeTestsBase
         var docA = newDocumentation("cIdA");
         var docB = newDocumentation("cIdB");
         var parent = newLine("g");
-        parent.Add(null, [docA, docB]);
+        parent.Add([docA, docB]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 0, [bom]);
+        parent.Insert([bom], 0);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.AreSame(parent, bom.GetParent());
@@ -176,9 +176,9 @@ public class GenericApiTests: LenientNodeTestsBase
         var docA = newDocumentation("cIdA");
         var docB = newDocumentation("cIdB");
         var parent = newLine("g");
-        parent.Add(null, [docA, docB]);
+        parent.Add([docA, docB]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null,1, [bom]);
+        parent.Insert([bom], 1);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.AreSame(parent, bom.GetParent());
@@ -192,9 +192,9 @@ public class GenericApiTests: LenientNodeTestsBase
         var docA = newDocumentation("cIdA");
         var docB = newDocumentation("cIdB");
         var parent = newLine("g");
-        parent.Add(null, [docA, docB]);
+        parent.Add([docA, docB]);
         var bom = newBillOfMaterials("myId");
-        parent.Insert(null, 2, [bom]);
+        parent.Insert([bom], 2);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.AreSame(parent, bom.GetParent());
@@ -211,7 +211,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newLine("g");
         var bom = newBillOfMaterials("myId");
-        parent.Remove(null, [bom]);
+        parent.Remove([bom]);
         Assert.IsNull(bom.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(bom));
     }
@@ -221,7 +221,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newCoord("g");
         var value = newDocumentation("myId");
-        parent.Remove(null, [value]);
+        parent.Remove([value]);
         Assert.IsNull(value.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(value));
     }
@@ -231,7 +231,7 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var parent = newCoord("g");
         var value = newLine("myId");
-        parent.Remove(null, [value]);
+        parent.Remove([value]);
         Assert.IsNull(value.GetParent());
         Assert.IsFalse(parent.GetAnnotations().Contains(value));
     }
@@ -241,9 +241,9 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var doc = newDocumentation("myC");
         var parent = newLine("cs");
-        parent.Add(null, [doc]);
+        parent.Add([doc]);
         var bom = newBillOfMaterials("myId");
-        parent.Remove(null, [bom]);
+        parent.Remove([bom]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(bom.GetParent());
         CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
@@ -254,8 +254,8 @@ public class GenericApiTests: LenientNodeTestsBase
     {
         var bom = newBillOfMaterials("myId");
         var parent = newLine("g");
-        parent.Add(null, [bom]);
-        parent.Remove(null, [bom]);
+        parent.Add([bom]);
+        parent.Remove([bom]);
         Assert.IsNull(bom.GetParent());
         CollectionAssert.AreEqual(new List<INode> { }, parent.GetAnnotations().ToList());
     }
@@ -266,8 +266,8 @@ public class GenericApiTests: LenientNodeTestsBase
         var doc = newDocumentation("cId");
         var value = newDocumentation("myId");
         var parent = newCoord("g");
-        parent.Add(null, [value, doc]);
-        parent.Remove(null, [value]);
+        parent.Add([value, doc]);
+        parent.Remove([value]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(value.GetParent());
         CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
@@ -279,8 +279,8 @@ public class GenericApiTests: LenientNodeTestsBase
         var doc = newDocumentation("cId");
         var value = newLine("myId");
         var parent = newCoord("g");
-        parent.Add(null, [value, doc]);
-        parent.Remove(null, [value]);
+        parent.Add([value, doc]);
+        parent.Remove([value]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(value.GetParent());
         CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
@@ -292,8 +292,8 @@ public class GenericApiTests: LenientNodeTestsBase
         var doc = newDocumentation("cId");
         var bom = newBillOfMaterials("myId");
         var parent = newCoord("g");
-        parent.Add(null, [bom, doc]);
-        parent.Remove(null, [bom]);
+        parent.Add([bom, doc]);
+        parent.Remove([bom]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(bom.GetParent());
         CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
@@ -305,8 +305,8 @@ public class GenericApiTests: LenientNodeTestsBase
         var doc = newDocumentation("cId");
         var bom = newBillOfMaterials("myId");
         var parent = newLine("g");
-        parent.Add(null, [doc, bom]);
-        parent.Remove(null, [bom]);
+        parent.Add([doc, bom]);
+        parent.Remove([bom]);
         Assert.AreSame(parent, doc.GetParent());
         Assert.IsNull(bom.GetParent());
         CollectionAssert.AreEqual(new List<INode> { doc }, parent.GetAnnotations().ToList());
@@ -319,8 +319,8 @@ public class GenericApiTests: LenientNodeTestsBase
         var docB = newDocumentation("cIdB");
         var bom = newBillOfMaterials("myId");
         var parent = newLine("g");
-        parent.Add(null, [docA, bom, docB]);
-        parent.Remove(null, [bom]);
+        parent.Add([docA, bom, docB]);
+        parent.Remove([bom]);
         Assert.AreSame(parent, docA.GetParent());
         Assert.AreSame(parent, docB.GetParent());
         Assert.IsNull(bom.GetParent());

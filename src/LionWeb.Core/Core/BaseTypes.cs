@@ -215,9 +215,9 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="IReadableNode.Get"/>
     public void Set(Feature feature, object? value);
 
-    public void Add(Link? link, IEnumerable<IReadableNode> nodes);
-    public void Insert(Link? link, Index index, IEnumerable<IReadableNode> nodes);
-    public void Remove(Link? link, IEnumerable<IReadableNode> nodes);
+    public void Add(IEnumerable<IReadableNode> nodes, Link? link = null);
+    public void Insert(IEnumerable<IReadableNode> nodes, Index index, Link? link = null);
+    public void Remove(IEnumerable<IReadableNode> nodes, Link? link = null);
 }
 
 /// The type-parametrized twin of the non-generic <see cref="IWritableNode"/> interface.
@@ -496,7 +496,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public void Add(Link? link, IEnumerable<IReadableNode> nodes)
+    public void Add(IEnumerable<IReadableNode> nodes, Link? link = null)
     {
         if (AddInternal(link, nodes))
             return;
@@ -517,7 +517,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public void Insert(Link? link, Index index, IEnumerable<IReadableNode> nodes)
+    public void Insert(IEnumerable<IReadableNode> nodes, Index index, Link? link = null)
     {
         if (InsertInternal(link, index, nodes))
             return;
@@ -538,7 +538,7 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public void Remove(Link? link, IEnumerable<IReadableNode> nodes)
+    public void Remove(IEnumerable<IReadableNode> nodes, Link? link = null)
     {
         if (RemoveInternal(link, nodes))
             return;
