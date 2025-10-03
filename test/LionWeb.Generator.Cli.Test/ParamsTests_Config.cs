@@ -254,11 +254,13 @@ public class ParamsTests_Config : ParamsTestsBase
         Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
         var result = generator.Exec(["--config", $"{ResourceDir}/invalid-Output.config.json"]);
 
-        Assert.HasCount(6, generator.Configurations);
+        Assert.HasCount(8, generator.Configurations);
         Assert.IsEmpty(generator.ValidConfigurations);
         Assert.AreEqual(-2, result);
 
         Assert.Contains("Neither OutputDir nor OutputFile set", generator.Errors);
+        Assert.Contains("PathPattern ignored because OutputFile is set", generator.Errors);
+        Assert.Contains("DotGSuffix ignored because OutputFile is set", generator.Errors);
         Assert.Contains(s => s.Contains("Both OutputDir ") && s.Contains(" and OutputFile "),
             generator.Errors);
         Assert.Contains(s => s.Contains("OutputDir doesn't exist: ") && s.Contains("out/"),

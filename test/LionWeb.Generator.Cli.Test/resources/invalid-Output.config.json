@@ -24,5 +24,15 @@
   {
     "LanguageFile": "testLanguage.2023_1.json",
     "OutputDir": "out/"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "OutputFile": "out/file",
+    "PathPattern": "VerbatimKey"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "OutputFile": "out/file",
+    "DotGSuffix": false
   }
 ]
