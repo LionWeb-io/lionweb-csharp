@@ -40,8 +40,8 @@ public record Configuration
     public NamespacePattern? NamespacePattern { get; set; }
     public string? Namespace { get; set; }
 
-    public PathPattern PathPattern { get; set; } = PathPattern.VerbatimName;
-    public bool DotGSuffix { get; set; } = true;
+    public PathPattern? PathPattern { get; set; }
+    public bool? DotGSuffix { get; set; }
 
     public string? LionWebVersion { get; set; }
     public GeneratorConfig? GeneratorConfig { get; set; }
@@ -102,6 +102,15 @@ public record Configuration
             messages.Add($"{nameof(OutputFile)}'s parent directory doesn't exist: {OutputFile}");
         }
 
+        if (OutputFile is not null)
+        {
+            if (DotGSuffix is not null)
+                messages.Add($"{nameof(DotGSuffix)} ignored because {nameof(OutputFile)} is set");
+
+            if (PathPattern is not null)
+                messages.Add($"{nameof(PathPattern)} ignored because {nameof(OutputFile)} is set");
+        }
+
         return true;
     }
 
@@ -142,7 +151,7 @@ public record Configuration
     {
         if (!PathPattern.IsSet())
         {
-            messages.Add($"{nameof(NamespacePattern)} not set");
+            messages.Add($"{nameof(PathPattern)} not set");
             return false;
         }
 
@@ -157,12 +166,18 @@ public record Configuration
 
     private bool ValidateLionWebVersion(List<string> messages)
     {
+        if (string.IsNullOrEmpty(LionWebVersion))
+        {
+            messages.Add($"{LionWebVersion} not set");
+            return false;
+        }
+        
         try
         {
             var _ = LionWebVersionParsed;
         } catch (UnsupportedVersionException e)
         {
-            messages.Add($"Unsupported {nameof(LionWebVersion)}");
+            messages.Add($"Unsupported {nameof(LionWebVersion)}: {LionWebVersion}");
             return false;
         }
 
@@ -205,17 +220,17 @@ public record Configuration
 
         var fileInfo = PathPattern switch
         {
-            PathPattern.VerbatimName => language.Name,
-            PathPattern.VerbatimKey => language.Key,
-            PathPattern.NamespaceInFilename => Split(_namespaceSeparator, ns) + _namespaceSeparator + language.Name,
-            PathPattern.NamespaceAsFilename => Split(_namespaceSeparator, ns),
-            PathPattern.NamespaceInPath => Split(Path.DirectorySeparatorChar, ns) + Path.DirectorySeparatorChar +
+            Cli.PathPattern.VerbatimName => language.Name,
+            Cli.PathPattern.VerbatimKey => language.Key,
+            Cli.PathPattern.NamespaceInFilename => Split(_namespaceSeparator, ns) + _namespaceSeparator + language.Name,
+            Cli.PathPattern.NamespaceAsFilename => Split(_namespaceSeparator, ns),
+            Cli.PathPattern.NamespaceInPath => Split(Path.DirectorySeparatorChar, ns) + Path.DirectorySeparatorChar +
                                            language.Name,
-            PathPattern.NamespaceAsPath => Split(Path.DirectorySeparatorChar, ns),
-            _ => throw new UnknownEnumValueException<PathPattern>(PathPattern)
+            Cli.PathPattern.NamespaceAsPath => Split(Path.DirectorySeparatorChar, ns),
+            _ => throw new UnknownEnumValueException<PathPattern?>(PathPattern)
         };
 
-        var suffix = DotGSuffix ? ".g.cs" : ".cs";
+        var suffix = DotGSuffix ?? true ? ".g.cs" : ".cs";
         return new FileInfo(Path.Combine(OutputDir?.ToString() ?? "", fileInfo + suffix));
     }
 
@@ -294,46 +309,6 @@ public record Configuration
         hashCode.Add(GeneratorConfig);
         return hashCode.ToHashCode();
     }
-}
-
-[JsonConverter(typeof(JsonStringEnumConverter<NamespacePattern>))]
-public enum NamespacePattern
-{
-    DotSeparated = 1,
-    DotSeparatedFirstUppercase
-}
-
-public static class NamespacePatternExtensions
-{
-    public static bool IsSet(this NamespacePattern? candidate) =>
-        candidate is not null && candidate is not default(NamespacePattern);
-
-    public static bool FirstToUpper(this NamespacePattern pattern) => pattern switch
-    {
-        NamespacePattern.DotSeparated => false,
-        NamespacePattern.DotSeparatedFirstUppercase => true,
-        _ => throw new UnknownEnumValueException<NamespacePattern>(pattern)
-    };
-}
-
-[JsonConverter(typeof(JsonStringEnumConverter<PathPattern>))]
-public enum PathPattern
-{
-    VerbatimName = 1,
-    VerbatimKey,
-    NamespaceInFilename,
-    NamespaceAsFilename,
-    NamespaceInPath,
-    NamespaceAsPath
-}
-
-public static class PathPatternExtensions
-{
-    public static bool IsSet(this PathPattern? candidate) =>
-        candidate is not null && candidate is not default(PathPattern);
-
-    public static bool IsSet(this PathPattern candidate) =>
-        candidate is not default(PathPattern);
 }
 
 internal class FileInfoConverter : JsonConverter<FileInfo>

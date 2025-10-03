@@ -226,11 +226,11 @@ internal class Parser
             if (NamespacePattern.IsSet() && configuration.Namespace is null)
                 configuration.NamespacePattern = NamespacePattern;
 
-            if (PathPattern.IsSet())
-                configuration.PathPattern = (PathPattern)PathPattern!;
+            if (!configuration.PathPattern.IsSet() || PathPattern.IsSet())
+                configuration.PathPattern = PathPatternOrDefault;
 
-            if (DotGSuffix is not null)
-                configuration.DotGSuffix = (bool)DotGSuffix;
+            if (configuration.DotGSuffix is null || DotGSuffix is not null)
+                configuration.DotGSuffix = DotGSuffixOrDefault;
 
             if (GeneratorConfig is not null)
                 configuration.GeneratorConfig = GeneratorConfig;
@@ -250,6 +250,8 @@ internal class Parser
                 LionWebVersion = LionWebVersionOrDefault,
                 OutputDir = OutputDir,
                 OutputFile = OutputFile,
+                PathPattern = PathPatternOrDefault,
+                DotGSuffix = DotGSuffixOrDefault,
                 GeneratorConfig = GeneratorConfig
             };
 
@@ -258,9 +260,6 @@ internal class Parser
 
             if (NamespacePattern.IsSet())
                 configuration.NamespacePattern = NamespacePattern;
-
-            if (PathPattern.IsSet())
-                configuration.PathPattern = (PathPattern)PathPattern!;
 
             return configuration;
         }));
@@ -276,8 +275,10 @@ internal class Parser
     private string? Namespace => ParseResult.GetValue(_ns);
     private NamespacePattern? NamespacePattern => ParseResult.GetValue(_namespacePattern);
     private PathPattern? PathPattern => ParseResult.GetValue(_pathPattern);
+    private PathPattern? PathPatternOrDefault => PathPattern ?? Cli.PathPattern.VerbatimName;
     private bool? WritableInterfaces => ParseResult.GetValue(_writableIface);
     private bool? DotGSuffix => ParseResult.GetValue(_dotGSuffix);
+    private bool? DotGSuffixOrDefault => DotGSuffix ?? true;
 
     private GeneratorConfig GeneratorConfig
     {
