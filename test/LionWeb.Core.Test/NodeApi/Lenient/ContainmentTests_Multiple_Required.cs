@@ -527,7 +527,6 @@ public class ContainmentTests_Multiple_Required : LenientNodeTestsBase
     }
 
     [TestMethod]
-    [Ignore("fails after adding generic api")]
     public void IReadableNode_Reflective()
     {
         var parent = newCompositeShape("g");

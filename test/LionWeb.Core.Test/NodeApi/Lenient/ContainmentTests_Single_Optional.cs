@@ -420,7 +420,6 @@ public class ContainmentTests_Single_Optional : LenientNodeTestsBase
     }
 
     [TestMethod]
-    [Ignore("fails after adding generic api")]
     public void IReadableNode_Reflective()
     {
         var parent = newGeometry("g");

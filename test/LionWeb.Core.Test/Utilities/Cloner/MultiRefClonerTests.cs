@@ -155,7 +155,6 @@ public class MultiRefClonerTests : ClonerTestsBase
     }
 
     [TestMethod]
-    [Ignore("fails after adding generic api")]
     public void IncludedMixedNoExternal()
     {
         Line lineA = ShapesLanguage.Instance.GetFactory().CreateLine();
