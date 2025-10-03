@@ -1,0 +1,29 @@
+﻿[
+  {
+    "LanguageFile": "testLanguage.2023_1.json"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "LionWebVersion": null
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "LionWebVersion": ""
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "LionWebVersion": "unknown"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "LionWebVersion": "2023.1"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "LionWebVersion": "2024.1"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "LionWebVersion": "2025.1"
+  }
+]

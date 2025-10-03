@@ -42,8 +42,10 @@ public class ParamsTests_Namespace : ParamsTestsBase
                 LanguageFile = new FileInfo(TestLanguage2024),
                 OutputDir = new DirectoryInfo("out"),
                 Namespace = "",
+                GeneratorConfig = new GeneratorConfig(),
                 LionWebVersion = "2024.1",
-                GeneratorConfig = new GeneratorConfig()
+                PathPattern = PathPattern.VerbatimName,
+                DotGSuffix = true
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
@@ -76,8 +78,10 @@ public class ParamsTests_Namespace : ParamsTestsBase
                 LanguageFile = new FileInfo(TestLanguage2024),
                 OutputDir = new DirectoryInfo("out"),
                 Namespace = "a.b.c",
+                GeneratorConfig = new GeneratorConfig(),
                 LionWebVersion = "2024.1",
-                GeneratorConfig = new GeneratorConfig()
+                PathPattern = PathPattern.VerbatimName,
+                DotGSuffix = true
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
@@ -128,8 +132,10 @@ public class ParamsTests_Namespace : ParamsTestsBase
                 LanguageFile = new FileInfo(TestLanguageNamespace),
                 OutputDir = new DirectoryInfo("out"),
                 NamespacePattern = NamespacePattern.DotSeparated,
+                GeneratorConfig = new GeneratorConfig(),
                 LionWebVersion = "2024.1",
-                GeneratorConfig = new GeneratorConfig()
+                PathPattern = PathPattern.VerbatimName,
+                DotGSuffix = true
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);
@@ -164,8 +170,10 @@ public class ParamsTests_Namespace : ParamsTestsBase
                 LanguageFile = new FileInfo(TestLanguageNamespace),
                 OutputDir = new DirectoryInfo("out"),
                 NamespacePattern = NamespacePattern.DotSeparatedFirstUppercase,
+                GeneratorConfig = new GeneratorConfig(),
                 LionWebVersion = "2024.1",
-                GeneratorConfig = new GeneratorConfig()
+                PathPattern = PathPattern.VerbatimName,
+                DotGSuffix = true
             }, generator.ValidConfigurations[0]);
 
         Assert.AreEqual(0, result);

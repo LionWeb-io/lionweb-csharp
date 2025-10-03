@@ -17,6 +17,8 @@
 
 namespace LionWeb.Generator.Cli.Test;
 
+using Core;
+
 [TestClass]
 public class ParamsTests_Config : ParamsTestsBase
 {
@@ -164,6 +166,26 @@ public class ParamsTests_Config : ParamsTestsBase
     }
     
     [TestMethod]
+    public void RelativeLanguageFile_upwards()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+
+        var outputDir = new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), ResourceDir, "/relative/out"));
+        Delete(outputDir);
+
+        var result = generator.Exec([
+            "--config", Path.Combine(Directory.GetCurrentDirectory(), ResourceDir, "/relative/relative.config.json")
+        ]);
+
+        Assert.HasCount(1, generator.Configurations);
+        Assert.HasCount(1, generator.ValidConfigurations);
+        Assert.AreEqual(0, result);
+
+        AssertExists(new FileInfo($"{outputDir}/2023.ceeees"));
+    }
+
+    [TestMethod]
     public void Invalid_LanguageFile()
     {
         var generator = new TestLionWebGenerator();
@@ -220,6 +242,36 @@ public class ParamsTests_Config : ParamsTestsBase
     }
     
     [TestMethod]
+    public void Invalid_PathPattern_empty()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+        var result = generator.Exec(["--config", $"{ResourceDir}/invalid-PathPattern-empty.config.json"]);
+
+        Assert.IsEmpty(generator.Configurations);
+        Assert.IsEmpty(generator.ValidConfigurations);
+        Assert.AreEqual(-2, result);
+
+        Assert.Contains(s => s.Contains("The JSON value could not be converted to System.Nullable`1[LionWeb.Generator.Cli.PathPattern]"),
+            generator.Errors);
+    }
+    
+    [TestMethod]
+    public void Invalid_PathPattern_unknown()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+        var result = generator.Exec(["--config", $"{ResourceDir}/invalid-PathPattern-unknown.config.json"]);
+
+        Assert.IsEmpty(generator.Configurations);
+        Assert.IsEmpty(generator.ValidConfigurations);
+        Assert.AreEqual(-2, result);
+
+        Assert.Contains(s => s.Contains("The JSON value could not be converted to System.Nullable`1[LionWeb.Generator.Cli.PathPattern]"),
+            generator.Errors);
+    }
+
+    [TestMethod]
     public void Invalid_Namespace()
     {
         var generator = new TestLionWebGenerator();
@@ -263,5 +315,23 @@ public class ParamsTests_Config : ParamsTestsBase
 
         Assert.Contains(s => s.Contains("The JSON value could not be converted to System.Nullable`1[LionWeb.Generator.Cli.NamespacePattern]"),
             generator.Errors);
+    }
+    
+    [TestMethod]
+    public void Invalid_LionWebVersion()
+    {
+        var generator = new TestLionWebGenerator();
+        Console.WriteLine($"CurrentDir: {Directory.GetCurrentDirectory()}");
+        var result = generator.Exec(["--config", $"{ResourceDir}/invalid-LionWebVersion.config.json"]);
+
+        Assert.HasCount(7, generator.Configurations);
+        Assert.IsEmpty(generator.ValidConfigurations);
+        Assert.AreEqual(-2, result);
+
+        Assert.Contains("Unsupported LionWebVersion: unknown", generator.Errors);
+        
+        Assert.Contains(c => c.LionWebVersion == LionWebVersions.v2023_1.VersionString, generator.Configurations);
+        Assert.Contains(c => c.LionWebVersion == LionWebVersions.v2024_1.VersionString, generator.Configurations);
+        Assert.Contains(c => c.LionWebVersion == LionWebVersions.v2025_1.VersionString, generator.Configurations);
     }
 }
