@@ -1145,7 +1145,15 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
     /// <inheritdoc cref="Entities"/>
     public void AddEntities(IEnumerable<LanguageEntity> entities) =>
         _entities.AddRange(SetSelfParent(entities?.ToList(), _m3.Language_entities));
-
+  
+    /// <inheritdoc cref="Entities"/>
+    public void InsertEntities(Index index, IEnumerable<LanguageEntity> entities) =>
+        _entities.InsertRange(index, SetSelfParent(entities?.ToList(), _m3.Language_entities));
+    
+    /// <inheritdoc cref="Entities"/>
+    public void RemoveEntities(IEnumerable<LanguageEntity> entities) =>
+        RemoveSelfParent(entities?.ToList(), _entities, _m3.Language_entities);
+    
     private readonly List<Language> _dependsOn = [];
 
     /// <inheritdoc />
@@ -1154,10 +1162,29 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
     /// <inheritdoc cref="DependsOn"/>
     public void AddDependsOn(IEnumerable<Language> languages)
     {
-        AssureNotNull(languages, _m3.Language_dependsOn);
         var safeNodes = languages.ToList();
+        AssureNotNull(languages, _m3.Language_dependsOn);
         AssureNotNullMembers(safeNodes, _m3.Language_dependsOn);
         _dependsOn.AddRange(safeNodes);
+    }
+
+    /// <inheritdoc cref="DependsOn"/>
+    public void InsertDependsOn(Index index, IEnumerable<Language> languages)
+    {
+        var safeNodes = languages.ToList();
+        AssureNotNull(languages, _m3.Language_dependsOn);
+        AssureNotNullMembers(safeNodes, _m3.Language_dependsOn);
+        _dependsOn.InsertRange(index, safeNodes);
+    }
+    
+    
+    /// <inheritdoc cref="DependsOn"/>
+    public void RemoveDependsOn(IEnumerable<Language> languages)
+    {
+        var safeNodes = languages.ToList();
+        AssureNotNull(languages, _m3.Language_dependsOn);
+        AssureNotNullMembers(safeNodes, _m3.Language_dependsOn);
+        RemoveAll(safeNodes, _dependsOn, null);
     }
 
     /// <inheritdoc cref="IConceptInstance.GetClassifier()" />
@@ -1286,13 +1313,13 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
         if (_m3.Language_entities.EqualsIdentity(link))
         {
-            _entities.AddRange(SetSelfParent(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList(), _m3.Language_entities));
+            AddEntities(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList());
             return true;
         }
 
         if (_m3.Language_dependsOn.EqualsIdentity(link))
         {
-            _dependsOn.AddRange(SetSelfParent(_m3.Language_dependsOn.AsNodes<Language>(nodes).ToList(), _m3.Language_dependsOn));
+            AddDependsOn(_m3.Language_dependsOn.AsNodes<Language>(nodes).ToList());
             return true;
         }
 
@@ -1307,13 +1334,13 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
 
         if (_m3.Language_entities.EqualsIdentity(link))
         {
-            _entities.InsertRange(index, SetSelfParent(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList(), _m3.Language_entities));
+            InsertEntities(index, _m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList());
             return true;
         }
         
         if (_m3.Language_dependsOn.EqualsIdentity(link))
         {
-            _dependsOn.InsertRange(index, SetSelfParent(_m3.Language_dependsOn.AsNodes<Language>(nodes).ToList(), _m3.Language_dependsOn));
+            InsertDependsOn(index, _m3.Language_dependsOn.AsNodes<Language>(nodes).ToList());
             return true;
         }
 
@@ -1328,13 +1355,13 @@ public class DynamicLanguage(NodeId id, LionWebVersions lionWebVersion) : Dynami
         
         if (_m3.Language_entities.EqualsIdentity(link))
         {
-            RemoveSelfParent(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList(), _entities, _m3.Language_entities);
+            RemoveEntities(_m3.Language_entities.AsNodes<LanguageEntity>(nodes).ToList());
             return true;
         }
         
         if (_m3.Language_dependsOn.EqualsIdentity(link))
         {
-            RemoveSelfParent(_m3.Language_dependsOn.AsNodes<Language>(nodes).ToList(), _dependsOn, _m3.Language_dependsOn);
+            RemoveDependsOn(_m3.Language_dependsOn.AsNodes<Language>(nodes).ToList());
             return true;
         }
         
