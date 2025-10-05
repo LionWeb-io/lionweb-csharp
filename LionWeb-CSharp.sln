@@ -57,6 +57,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Generator.Cli", "sr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Generator.Cli.Test", "test\LionWeb.Generator.Cli.Test\LionWeb.Generator.Cli.Test.csproj", "{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.WebSocket", "src\LionWeb.WebSocket\LionWeb.WebSocket.csproj", "{DEB08206-216F-43C2-9355-1ADA2D7FE651}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -103,6 +105,10 @@ Global
 		{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEB08206-216F-43C2-9355-1ADA2D7FE651}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEB08206-216F-43C2-9355-1ADA2D7FE651}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEB08206-216F-43C2-9355-1ADA2D7FE651}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEB08206-216F-43C2-9355-1ADA2D7FE651}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -119,6 +125,7 @@ Global
 		{B3B0A6DE-F454-4BD4-B55A-53E327808BC6} = {09525310-7481-4D53-BC3F-6DB6BE11CEE6}
 		{79149002-9723-4F81-BA7B-924863397F2D} = {E957460B-DC76-488F-9F56-484512041B57}
 		{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8} = {09525310-7481-4D53-BC3F-6DB6BE11CEE6}
+		{DEB08206-216F-43C2-9355-1ADA2D7FE651} = {E957460B-DC76-488F-9F56-484512041B57}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B87942B3-33E0-4127-96DA-337DDC0E2BF6}
