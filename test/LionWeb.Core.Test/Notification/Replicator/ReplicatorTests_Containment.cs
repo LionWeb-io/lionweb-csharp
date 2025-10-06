@@ -716,6 +716,29 @@ public class ReplicatorTests_Containment: ReplicatorTestsBase
         AssertEquals([originalPartition], [clonedPartition]);
     }
 
+    
+    [TestMethod]
+    public void ChildMovedFromOtherContainmentInSameParent_Reverse()
+    {
+        var moved1 = new LinkTestConcept("moved1");
+        var moved2 = new LinkTestConcept("moved2");
+        var originalPartition = new LinkTestConcept("a")
+        {
+            Containment_0_1 = moved1,
+            Containment_1 = moved2,
+        };
+        
+        var clonedPartition = ClonePartition(originalPartition);
+
+        CreatePartitionReplicator(clonedPartition, originalPartition);
+
+        originalPartition.Containment_0_1 = moved2;
+        originalPartition.Containment_1 = moved1;
+        
+        AssertEquals([originalPartition], [clonedPartition]);
+    }
+    
+    
     #endregion
 
     #region ChildMovedInSameContainment
