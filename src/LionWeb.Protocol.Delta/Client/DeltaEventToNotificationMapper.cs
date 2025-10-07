@@ -27,6 +27,7 @@ using Core.Notification.Partition;
 using Core.Serialization;
 using Message;
 using Message.Event;
+using System.Diagnostics.CodeAnalysis;
 
 public class DeltaEventToNotificationMapper
 {
@@ -82,11 +83,11 @@ public class DeltaEventToNotificationMapper
 
     private PartitionDeletedNotification OnPartitionDeleted(PartitionDeleted partitionDeleted)
     {
-        TryToNode(partitionDeleted.DeletedPartition, out var del);
-        if (del is null or IPartitionInstance)
-            return new PartitionDeletedNotification((IPartitionInstance)del!, ToNotificationId(partitionDeleted));
+        TryToNode(partitionDeleted.DeletedPartition, out var deletedNode);
+        if (deletedNode is null or IPartitionInstance)
+            return new PartitionDeletedNotification((IPartitionInstance)deletedNode!, ToNotificationId(partitionDeleted));
 
-        throw new DeltaException(DeltaErrorCode.InvalidNodeType.AsError(partitionDeleted.OriginCommands, partitionDeleted.ProtocolMessages, del));
+        throw new DeltaException(DeltaErrorCode.InvalidNodeType.AsError(partitionDeleted.OriginCommands, partitionDeleted.ProtocolMessages, deletedNode));
     }
 
     #endregion
@@ -413,7 +414,7 @@ public class DeltaEventToNotificationMapper
         throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
     }
 
-    private bool TryToNode(TargetNode nodeId, out IWritableNode? node)
+    private bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
     {
         if (_sharedNodeMap.TryGetValue(nodeId, out var n) && n is IWritableNode w)
         {
