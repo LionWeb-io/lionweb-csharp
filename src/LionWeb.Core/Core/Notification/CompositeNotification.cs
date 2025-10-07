@@ -50,6 +50,9 @@ public record CompositeNotification : IForestNotification, IPartitionNotificatio
     public INotificationId NotificationId { get; set; }
 
     /// <inheritdoc />
+    public HashSet<IReadableNode> AffectedNodes => Parts.SelectMany(p => p.AffectedNodes).ToHashSet();
+
+    /// <inheritdoc />
     public IPartitionInstance Partition => throw new NotImplementedException();
 
     /// <inheritdoc />
@@ -108,6 +111,7 @@ public record CompositeNotification : IForestNotification, IPartitionNotificatio
 
             builder.Append(part);
         }
+
         builder.Append(']');
 
         return true;

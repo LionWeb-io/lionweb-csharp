@@ -26,8 +26,13 @@ public interface IForestNotification : INotification
 
 public abstract record AForestNotification(INotificationId NotificationId) : IForestNotification
 {
+    private HashSet<IReadableNode> _affectedNodes;
+
     /// <inheritdoc />
     public INotificationId NotificationId { get; set; } = NotificationId;
+
+    /// <inheritdoc />
+    public HashSet<IReadableNode> AffectedNodes => [Partition];
 
     /// <inheritdoc />
     public abstract IPartitionInstance Partition { get; }

@@ -22,6 +22,8 @@ public interface INotification
 {
     /// Globally unique id of this notification.
     INotificationId NotificationId { get; set; }
+    
+    HashSet<IReadableNode> AffectedNodes { get; }
 }
 
 /// ID of a notification in the LionWeb notification system.
