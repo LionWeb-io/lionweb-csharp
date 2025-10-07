@@ -1,0 +1,36 @@
+﻿[
+  {
+    "LanguageFile": "testLanguage.2023_1.json"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "Namespace": null,
+    "NamespacePattern": null
+  },
+  {
+    "LanguageFile": "testLanguage.2024_1.json",
+    "Namespace": "",
+    "OutputDir": "out"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "Namespace": "myNs",
+    "NamespacePattern": "DotSeparated"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "Namespace": "!invalid"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "NamespacePattern": null
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "NamespacePattern": "DotSeparated"
+  },
+  {
+    "LanguageFile": "testLanguage.2023_1.json",
+    "NamespacePattern": "DotSeparatedFirstUppercase"
+  }
+]

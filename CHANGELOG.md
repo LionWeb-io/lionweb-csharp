@@ -9,6 +9,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 ## [0.3.0] - tbd
 
 ### Added
+* Added command line interface (CLI) for the LionWeb C# generator.
 * Added `JsonUtils.ReadNodesFromStream()` to load nodes from strings synchronously.
 * Added benchmarking project.
 * Introduced `INotifiableNode`. Represents nodes that support notifications.
@@ -47,6 +48,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Added external languages to `DynamicLanguageCloner`.
 * Added convenience method `DynamicLanguageClonerExtensions.Clone(Language)`.
 ### Fixed
+* Bug fix: local replicator now unregisters replaced node from shared node map when ChildMovedAndReplacedFromOtherContainmentInSameParent notification is received.
 * Bug fix: `M1Extensions.ReplaceWith` method now handles node move and replacement operation in the same containment correctly.
 * Bug fix: prevents emitting `ReferenceChangedNotification` when old and new targets of a reference are the same nodes.
 * Bug fix: generator now generates correct type for features of builtin Node type

@@ -53,6 +53,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Protocol.Delta.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Core.Benchmark", "test\LionWeb.Core.Benchmark\LionWeb.Core.Benchmark.csproj", "{B3B0A6DE-F454-4BD4-B55A-53E327808BC6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Generator.Cli", "src\LionWeb.Generator.Cli\LionWeb.Generator.Cli.csproj", "{79149002-9723-4F81-BA7B-924863397F2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LionWeb.Generator.Cli.Test", "test\LionWeb.Generator.Cli.Test\LionWeb.Generator.Cli.Test.csproj", "{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +95,14 @@ Global
 		{B3B0A6DE-F454-4BD4-B55A-53E327808BC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3B0A6DE-F454-4BD4-B55A-53E327808BC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3B0A6DE-F454-4BD4-B55A-53E327808BC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{79149002-9723-4F81-BA7B-924863397F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{79149002-9723-4F81-BA7B-924863397F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{79149002-9723-4F81-BA7B-924863397F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{79149002-9723-4F81-BA7B-924863397F2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -105,6 +117,8 @@ Global
 		{EC0443AB-DE70-4880-9CB4-DD21BF5FE12C} = {E957460B-DC76-488F-9F56-484512041B57}
 		{9ECE3D56-838A-41E6-B1EC-E4304D76CBF3} = {09525310-7481-4D53-BC3F-6DB6BE11CEE6}
 		{B3B0A6DE-F454-4BD4-B55A-53E327808BC6} = {09525310-7481-4D53-BC3F-6DB6BE11CEE6}
+		{79149002-9723-4F81-BA7B-924863397F2D} = {E957460B-DC76-488F-9F56-484512041B57}
+		{D0F284AA-34F1-4DDA-BB4E-1BA15665D7D8} = {09525310-7481-4D53-BC3F-6DB6BE11CEE6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B87942B3-33E0-4127-96DA-337DDC0E2BF6}
