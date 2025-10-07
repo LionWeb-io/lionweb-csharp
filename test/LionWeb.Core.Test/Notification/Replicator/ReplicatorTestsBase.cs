@@ -20,8 +20,8 @@ namespace LionWeb.Core.Test.Notification;
 using Core.Notification;
 using Core.Notification.Forest;
 using Core.Notification.Partition;
-using Core.Notification.Pipe;
 using M1;
+using Replicator;
 
 public abstract class ReplicatorTestsBase: NotificationTestsBase
 {
@@ -57,14 +57,4 @@ public abstract class ReplicatorTestsBase: NotificationTestsBase
         
         notificationForwarder.ProduceNotification(notification);
     }
-}
-
-internal class NotificationMapper(SharedNodeMap sharedNodeMap) : NotificationPipeBase(null), INotificationHandler
-{
-    private readonly NotificationToNotificationMapper _notificationMapper = new(sharedNodeMap);
-
-    private void ProduceNotification(INotification notification) => Send(notification);
-
-    public void Receive(INotificationSender correspondingSender, INotification notification) =>
-        ProduceNotification(_notificationMapper.Map(notification));
 }
