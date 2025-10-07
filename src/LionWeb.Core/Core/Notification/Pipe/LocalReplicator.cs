@@ -70,7 +70,7 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
                 OnLocalAnnotationDeleted(e);
                 break;
             case ChildMovedAndReplacedFromOtherContainmentInSameParentNotification e:
-                OnChildMovedAndReplacedFromOtherContainmentInSameParentNotification(e);
+                OnLocalChildMovedAndReplacedFromOtherContainmentInSameParentNotification(e);
                 break;
         }
 
@@ -107,7 +107,8 @@ public class LocalReplicator : NotificationPipeBase, INotificationHandler
     private void OnLocalAnnotationDeleted(AnnotationDeletedNotification annotationDeleted) =>
         _sharedNodeMap.UnregisterNode(annotationDeleted.DeletedAnnotation);
 
-    private void OnChildMovedAndReplacedFromOtherContainmentInSameParentNotification(ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification) =>
+    private void OnLocalChildMovedAndReplacedFromOtherContainmentInSameParentNotification(
+        ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification) =>
         _sharedNodeMap.UnregisterNode(notification.ReplacedChild);
     
     #endregion
