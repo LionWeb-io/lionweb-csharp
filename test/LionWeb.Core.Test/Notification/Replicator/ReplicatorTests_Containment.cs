@@ -19,9 +19,10 @@ namespace LionWeb.Core.Test.Notification;
 
 using Core.Notification;
 using Core.Notification.Partition;
-using Languages.Generated.V2025_1.Shapes.M2;
+using Languages.Generated.V2024_1.Shapes.M2;
 using Languages.Generated.V2025_1.TestLanguage;
 using M1;
+// TODO: switch back to use version 2025 after adding generic api
 
 [TestClass]
 public class ReplicatorTests_Containment: ReplicatorTestsBase
