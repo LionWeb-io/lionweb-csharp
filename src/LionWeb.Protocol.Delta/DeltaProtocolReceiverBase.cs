@@ -21,7 +21,7 @@ using Core.Notification;
 using Core.Notification.Pipe;
 using Message;
 
-public abstract class DeltaProtocolReceiverBase<TContent>() : NotificationPipeBase(null), INotificationProducer
+public abstract class DeltaProtocolReceiverBase<TContent>(object? sender) : NotificationPipeBase(sender), INotificationProducer
     where TContent : IDeltaContent
 {
     /// <inheritdoc />

@@ -25,10 +25,9 @@ public class DeltaProtocolCommandReceiver : DeltaProtocolReceiverBase<IDeltaComm
 {
     private readonly DeltaCommandToNotificationMapper _mapper;
 
-    public DeltaProtocolCommandReceiver(
-        PartitionSharedNodeMap sharedNodeMap,
+    public DeltaProtocolCommandReceiver(PartitionSharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
-        DeserializerBuilder deserializerBuilder)
+        DeserializerBuilder deserializerBuilder, object? sender) : base(sender)
     {
         _mapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }

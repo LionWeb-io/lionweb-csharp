@@ -51,8 +51,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         _commandReceiver = new DeltaProtocolCommandReceiver(
             SharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder
-        );
+            deserializerBuilder, name);
 
         _commandReceiver.ConnectTo(_replicator);
 

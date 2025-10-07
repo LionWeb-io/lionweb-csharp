@@ -54,8 +54,7 @@ public class NotificationsTestSerialized : NotificationTestsBase, IReplicatorCre
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder
-        );
+            deserializerBuilder, "clone");
 
         eventReceiver.ConnectTo(replicator);
 

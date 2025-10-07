@@ -25,10 +25,9 @@ public class DeltaProtocolEventReceiver : DeltaProtocolReceiverBase<IDeltaEvent>
 {
     private readonly DeltaEventToNotificationMapper _mapper;
 
-    public DeltaProtocolEventReceiver(
-        PartitionSharedNodeMap sharedNodeMap,
+    public DeltaProtocolEventReceiver(PartitionSharedNodeMap sharedNodeMap,
         SharedKeyedMap sharedKeyedMap,
-        DeserializerBuilder deserializerBuilder)
+        DeserializerBuilder deserializerBuilder, object? sender) : base(sender)
     {
         _mapper = new(sharedNodeMap, sharedKeyedMap, deserializerBuilder);
     }
