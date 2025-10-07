@@ -17,9 +17,12 @@
 
 namespace LionWeb.Core.Test.Notification;
 
+using Core.Notification;
 using Core.Notification.Partition;
 using Core.Notification.Pipe;
 using Languages.Generated.V2024_1.Shapes.M2;
+using Replicator;
+using System.Reflection;
 
 [TestClass]
 public class ReplicatorTests_Twoway: ReplicatorTestsBase 
@@ -831,25 +834,87 @@ public class ReplicatorTests_Twoway: ReplicatorTestsBase
 
     #endregion
 
+    #region Infrastructure
 
+    [TestMethod]
+    public void OtherListeners()
+    {
+        var circle = new Circle("c");
+        var node = new Geometry("a") { Shapes = [circle] };
+
+        var cloneCircle = new Circle("c");
+        var clone = new Geometry("a") { Shapes = [cloneCircle] };
+
+        var (replicator, cloneReplicator) = CreateReplicators(node, clone);
+
+        int nodeCount = 0;
+        node.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => nodeCount++);
+        
+        int cloneCount = 0;
+        clone.GetNotificationSender()!.Subscribe<IPartitionNotification>((sender, args) => cloneCount++);
+        
+        circle.Name = "Hello";
+        cloneCircle.Name = "World";
+
+        AssertEquals([node], [clone]);
+        Assert.AreEqual(2, nodeCount);
+        Assert.AreEqual(2, cloneCount);
+    }
+    
+    [TestMethod]
+    public void NoLingeringNotificiationIds()
+    {
+        var circle = new Circle("c");
+        var node = new Geometry("a") { Shapes = [circle] };
+
+        var cloneCircle = new Circle("c");
+        var clone = new Geometry("a") { Shapes = [cloneCircle] };
+
+        var (replicator, cloneReplicator) = CreateReplicators(node, clone);
+        
+        circle.Name = "Hello";
+        cloneCircle.Name = "World";
+
+        AssertEquals([node], [clone]);
+        
+        Assert.AreEqual(0, ReplicatorNotificationIds(replicator).Count);
+        Assert.AreEqual(0, ReplicatorNotificationIds(cloneReplicator).Count);
+    }
+    
+    private static HashSet<INotificationId> ReplicatorNotificationIds(INotificationPipe replicator)
+    {
+        var fieldInfoFilter = typeof(MultipartNotificationHandler).GetRuntimeFields().First(f => f.Name == "_lastHandler");
+        var filter = (IdFilteringNotificationFilter) fieldInfoFilter.GetValue(replicator);
+     
+        var fieldInfoNotificationIds = typeof(IdFilteringNotificationFilter).GetRuntimeFields().First(f => f.Name == "_notificationIds");
+        var notificationIds = fieldInfoNotificationIds.GetValue(filter);
+        
+        return (HashSet<INotificationId>)notificationIds!;
+    }
+
+    #endregion
+    
+    
     private Tuple<INotificationHandler, INotificationHandler>
         CreateReplicators(IPartitionInstance node, IPartitionInstance clone)
     {
-        var replicator = CreateReplicator(node, "nodeReplicator");
-        var cloneReplicator = CreateReplicator(clone, "cloneReplicator");
+        var replicatorMap = new SharedNodeMap();
+        var cloneMap = new SharedNodeMap();
+        var replicator = CreateReplicator(node, replicatorMap, "nodeReplicator");
+        var cloneReplicator = CreateReplicator(clone, cloneMap, "cloneReplicator");
 
-        var cloneHandlerA = new NodeCloneNotificationHandler(node.GetId());
-        replicator.ConnectTo(cloneHandlerA);
-        cloneHandlerA.ConnectTo(cloneReplicator);
+        var cloneMapper = new NotificationMapper(cloneMap);
+        replicator.ConnectTo(cloneMapper);
+        cloneMapper.ConnectTo(cloneReplicator);
 
-        var cloneHandlerB = new NodeCloneNotificationHandler(clone.GetId());
-        cloneReplicator.ConnectTo(cloneHandlerB);
-        cloneHandlerB.ConnectTo(replicator);
+        var mapper = new NotificationMapper(replicatorMap);
+        cloneReplicator.ConnectTo(mapper);
+        mapper.ConnectTo(replicator);
 
         return Tuple.Create(replicator, cloneReplicator);
     }
 
-    private static INotificationHandler CreateReplicator(IPartitionInstance clone, object? sender) =>
-        PartitionReplicator.Create(clone, new(), sender);
+    private static INotificationHandler CreateReplicator(IPartitionInstance clone, SharedNodeMap sharedNodeMap, object? sender) =>
+        PartitionReplicator.Create(clone, sharedNodeMap, sender);
 
 }
