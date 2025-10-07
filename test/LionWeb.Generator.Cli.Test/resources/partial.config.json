@@ -1,0 +1,11 @@
+﻿[
+  {
+    "LanguageFile": "testLanguage.2024_1.json",
+    "Namespace": "My.Name.Space"
+  },
+  {
+    "LanguageFile": "missingLanguage.json",
+    "OutputDir": "out/missing",
+    "NamespacePattern": "DotSeparatedFirstUppercase"
+  }
+]
