@@ -18,16 +18,19 @@
 namespace LionWeb.Protocol.Delta.Client;
 
 using Core;
-using Core.M1.Event.Partition;
+using Core.M1;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Forest;
+using Core.Notification.Pipe;
 
-public abstract class LionWebClientBase<T>
+public abstract class LionWebClientBase<T> : ILionWebClient, IDisposable
 {
+    private readonly string _name;
     protected readonly LionWebVersions _lionWebVersion;
-    protected readonly string _name;
     protected readonly IClientConnector<T> _connector;
-    protected readonly Dictionary<string, IReadableNode> SharedNodeMap;
-    protected readonly PartitionEventHandler PartitionEventHandler;
+    protected readonly PartitionSharedNodeMap SharedNodeMap;
+    protected readonly INotificationHandler _replicator;
 
     private ParticipationId? _participationId;
     private readonly ClientId? _clientId;
@@ -44,40 +47,94 @@ public abstract class LionWebClientBase<T>
         init => _clientId = value;
     }
 
-    public LionWebClientBase(LionWebVersions lionWebVersion, List<Language> languages, string name,
-        IPartitionInstance partition, IClientConnector<T> connector)
+    public LionWebClientBase(
+        LionWebVersions lionWebVersion,
+        List<Language> languages,
+        string name,
+        IForest forest,
+        IClientConnector<T> connector
+    )
     {
         _lionWebVersion = lionWebVersion;
         _name = name;
         _connector = connector;
 
-        SharedNodeMap = [];
-        PartitionEventHandler = new PartitionEventHandler(name);
-        var replicator = new PartitionEventReplicator(partition, SharedNodeMap);
-        replicator.ReplicateFrom(PartitionEventHandler);
+        SharedNodeMap = new();
+        _replicator = ForestReplicator.Create(forest, SharedNodeMap, _name);
 
-        replicator.Subscribe<IPartitionEvent>(SendPartitionEventToRepository);
+        _replicator.ConnectTo( new LocalNotificationReceiver(name, this));
 
-        connector.Receive += (_, content) => Receive(content);
+        _connector.ReceiveFromRepository += OnReceiveFromRepository;
     }
+
+    /// <inheritdoc />
+    public virtual void Dispose()
+    {
+        GC.SuppressFinalize(this);
+        _connector.ReceiveFromRepository -= OnReceiveFromRepository;
+        _replicator.Dispose();
+        SharedNodeMap.Dispose();
+    }
+
+    public event EventHandler<Exception>? CommunicationError;
+
+    protected void OnCommunicationError(Exception ex) =>
+        CommunicationError?.Invoke(this, ex);
+
+    #region Local
+
+    private class LocalNotificationReceiver(object? sender, LionWebClientBase<T> client)
+        : INotificationReceiver
+    {
+        public void Receive(INotificationSender correspondingSender, INotification notification) =>
+            client.SendNotificationToRepository(sender, notification);
+    }
+
+    #endregion
+
+    #region Remote
+
+    protected abstract void Receive(T deltaContent);
+
+    private void OnReceiveFromRepository(object? _, T content) =>
+        Receive(content);
+
+    #endregion
+
+    #region Send
 
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOnRequest"/>
-    public abstract Task SignOn();
-    
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOnResponse"/></returns>
+    public abstract Task SignOn(RepositoryId repositoryId);
+
     /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.SignOffRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.SignOffResponse"/></returns>
     public abstract Task SignOff();
 
-    private void SendPartitionEventToRepository(object? sender, IPartitionEvent? partitionEvent)
-    {
-        if (partitionEvent == null)
-            return;
-
-        var converted = _connector.Convert(partitionEvent);
-
-        Send(converted);
-    }
+    /// <inheritdoc cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsRequest"/>
+    /// <returns><see cref="LionWeb.Protocol.Delta.Message.Query.GetAvailableIdsResponse"/></returns>
+    public abstract Task GetAvailableIds(int count);
 
     protected abstract Task Send(T deltaContent);
 
-    protected abstract void Receive(T deltaContent);
+    private void SendNotificationToRepository(object? sender, INotification? notification)
+    {
+        if (notification == null)
+            return;
+
+        var converted = _connector.Convert(notification);
+
+        Send(converted);
+        Log("Sent to repository");
+    }
+
+    #endregion
+
+    protected virtual void Log(string message, bool header = false)
+    {
+        var prependedMessage = $"{_name}: {message}";
+        Console.WriteLine(header
+            ? $"{ILionWebClient.HeaderColor_Start}{prependedMessage}{ILionWebClient.HeaderColor_End}"
+            : prependedMessage);
+    }
 }

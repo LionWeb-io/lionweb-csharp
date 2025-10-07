@@ -68,12 +68,12 @@ public abstract class ClassifierGeneratorBase(INames names, LionWebVersions lion
             MetaProperty(link)
         ));
 
-    protected ExpressionStatementSyntax EventCollectOldDataCall() =>
+    protected ExpressionStatementSyntax EmitterCollectOldDataCall() =>
         ExpressionStatement(
-            InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("CollectOldData"))));
+            InvocationExpression(MemberAccess(IdentifierName("emitter"), IdentifierName("CollectOldData"))));
 
-    protected ExpressionStatementSyntax EventRaiseEventCall() =>
-        ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("evt"), IdentifierName("RaiseEvent"))));
+    protected ExpressionStatementSyntax EmitterNotifyCall() =>
+        ExpressionStatement(InvocationExpression(MemberAccess(IdentifierName("emitter"), IdentifierName("Notify"))));
 
     protected ExpressionStatementSyntax OptionalAddRangeCall(Containment containment) =>
         ExpressionStatement(InvocationExpression(

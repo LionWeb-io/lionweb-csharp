@@ -18,13 +18,15 @@
 namespace LionWeb.Core;
 
 using M1;
-using M1.Event.Partition;
-using M1.Event.Partition.Emitter;
 using M2;
 using M3;
+using Notification;
+using Notification.Partition;
+using Notification.Partition.Emitter;
+using Notification.Pipe;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
+using Utilities;
 
 /// An interface that LionWeb AST nodes implement to provide <em>read</em> access.
 public interface IReadableNode
@@ -49,7 +51,7 @@ public interface IReadableNode
     /// <seealso cref="IWritableNode.InsertAnnotations"/>
     /// <seealso cref="IWritableNode.RemoveAnnotations"/>
     public IReadOnlyList<IReadableNode> GetAnnotations();
-    
+
     /// The <see cref="Classifier"/> that <c>this</c> node is an instance of.
     public Classifier GetClassifier();
 
@@ -63,7 +65,7 @@ public interface IReadableNode
     /// <seealso cref="IWritableNode.Set"/>
     /// <see cref="CollectAllSetFeatures"/>
     public object? Get(Feature feature);
-    
+
     /// <summary>
     /// Tries to get the value of the given <paramref name="feature"/> on <c>this</c> node.
     /// </summary>
@@ -122,18 +124,17 @@ public interface IConceptInstance<out T> : IReadableNode<T>, IConceptInstance wh
 {
 }
 
-
 /// Instance of an <see cref="Concept.Partition"/>.
 /// <inheritdoc />
 public interface IPartitionInstance : IConceptInstance
 {
-    /// Optional hook to listen to partition events.
+    /// Optional hook to listen to partition notifications.
     /// Not supported by every implementation. 
-    IPartitionPublisher? GetPublisher() => null;
+    INotificationSender? GetNotificationSender() => GetNotificationProducer();
 
-    /// Optional hook to raise partition events.
-    /// Not supported by every implementation. 
-    IPartitionCommander? GetCommander() => null;
+    /// Optional hook to raise partition notifications.
+    /// Not supported by every implementation.
+    protected internal IPartitionNotificationProducer? GetNotificationProducer();
 }
 
 /// <inheritdoc cref="IPartitionInstance" />
@@ -206,7 +207,6 @@ public interface IWritableNode : IReadableNode
     /// <seealso cref="AddAnnotations"/>
     /// <seealso cref="InsertAnnotations"/>
     public bool RemoveAnnotations(IEnumerable<IWritableNode> annotations);
-
 
     /// <summary>
     /// Sets the given <paramref name="feature"/> on <c>this</c> node to the given <paramref name="value"/>.
@@ -310,19 +310,18 @@ public interface IStructuredDataTypeInstance
 }
 
 /// Every model node is an instance of <see cref="INode"/>.
-public interface INode : IWritableNode<INode>;
+public interface INode : INotifiableNode<INode>;
 
 /// Base implementation of <see cref="IReadableNode{T}"/>.
-public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
+public abstract class ReadableNodeBase<T> : IReadableNode<T> where T : IReadableNode
 {
-    [GeneratedRegex("^[a-zA-Z0-9_-]+$")]
-    private static partial Regex IdRegex();
-
     /// The <see cref="IBuiltInsLanguage"/> variant used for this node.
-    protected virtual IBuiltInsLanguage _builtIns => new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
+    protected virtual IBuiltInsLanguage _builtIns =>
+        new Lazy<IBuiltInsLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.BuiltIns).Value;
 
     /// The <see cref="ILionCoreLanguage"/> variant used for this node.
-    protected virtual ILionCoreLanguage _m3 => new Lazy<ILionCoreLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.LionCore).Value;
+    protected virtual ILionCoreLanguage _m3 =>
+        new Lazy<ILionCoreLanguage>(() => GetClassifier().GetLanguage().LionWebVersion.LionCore).Value;
 
 
     /// <summary>
@@ -333,7 +332,7 @@ public abstract partial class ReadableNodeBase<T> : IReadableNode<T> where T : I
     /// <exception cref="InvalidIdException">If <paramref name="id"/> is not a <see cref="IReadableNode.GetId">valid identifier</see>.</exception>
     protected ReadableNodeBase(NodeId id, T? parent)
     {
-        if (id == null || !IdRegex().IsMatch(id))
+        if (!IdUtils.IsValid(id))
             throw new InvalidIdException(id);
 
         _id = id;
@@ -406,31 +405,34 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <inheritdoc />
-    public virtual void AddAnnotations(IEnumerable<INode> annotations)
+    public virtual void AddAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null)
     {
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleEventEmitter evt = new(this, safeAnnotations, _annotations, null);
-        evt.CollectOldData();
+        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
+            startIndex: null, notificationId: notificationId);
+        notification.CollectOldData();
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
-        evt.RaiseEvent();
+        notification.Notify();
     }
 
     /// <inheritdoc />
-    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations)
+    public virtual void InsertAnnotations(Index index, IEnumerable<INode> annotations,
+        INotificationId? notificationId = null)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
         AssureAnnotations(safeAnnotations);
-        AnnotationAddMultipleEventEmitter evt = new(this, safeAnnotations, _annotations, index);
-        evt.CollectOldData();
+        AnnotationAddMultipleNotificationEmitter notification = new(this, safeAnnotations, _annotations,
+            startIndex: index, notificationId: notificationId);
+        notification.CollectOldData();
         _annotations.InsertRange(index, SetSelfParent(safeAnnotations, null));
-        evt.RaiseEvent();
+        notification.Notify();
     }
 
     /// <inheritdoc />
-    public virtual bool RemoveAnnotations(IEnumerable<INode> annotations) =>
-        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover);
+    public virtual bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) =>
+        RemoveSelfParent(annotations?.ToList(), _annotations, null, AnnotationRemover, notificationId);
 
     /// <inheritdoc />
     public override IEnumerable<Feature> CollectAllSetFeatures() => [];
@@ -465,16 +467,16 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
         GetInternal(feature, out value);
 
     /// <inheritdoc />
-    public void Set(Feature feature, object? value)
+    public void Set(Feature feature, object? value, INotificationId? notificationId = null)
     {
-        if (SetInternal(feature, value))
+        if (SetInternal(feature, value, notificationId))
             return;
 
         throw new UnknownFeatureException(GetClassifier(), feature);
     }
 
     /// <inheritdoc cref="IWritableNode.Set"/>
-    protected virtual bool SetInternal(Feature? feature, object? value)
+    protected virtual bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
     {
         if (feature == null)
         {
@@ -482,11 +484,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 throw new InvalidValueException(feature, value);
             var safeNodes = M2Extensions.AsNodes<INode>(value).ToList();
             AssureAnnotations(safeNodes);
-            AnnotationSetEventEmitter evt = new(this, safeNodes, _annotations);
-            evt.CollectOldData();
+            AnnotationSetNotificationEmitter notification = new(this, safeNodes, _annotations, notificationId);
+            notification.CollectOldData();
             RemoveSelfParent(_annotations.ToList(), _annotations, null);
             _annotations.AddRange(SetSelfParent(safeNodes, null));
-            evt.RaiseEvent();
+            notification.Notify();
             return true;
         }
 
@@ -557,11 +559,11 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     }
 
     /// <summary>
-    /// Tries to retrieve the <see cref="IPartitionInstance.GetCommander"/> from this node's <see cref="Concept.Partition"/>.
+    /// Tries to retrieve the <see cref="IPartitionInstance.GetNotificationProducer"/> from this node's <see cref="Concept.Partition"/>.
     /// </summary>
-    /// <returns>This node's <see cref="IPartitionCommander"/>, if available.</returns>
-    protected virtual IPartitionCommander? GetPartitionCommander() =>
-        this.GetPartition()?.GetCommander();
+    /// <returns>This node's <see cref="IPartitionNotificationProducer"/>, if available.</returns>
+    protected virtual IPartitionNotificationProducer? GetPartitionNotificationProducer() =>
+        this.GetPartition()?.GetNotificationProducer();
 
     #region Helpers
 
@@ -813,12 +815,13 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="node">Node to remove from <paramref name="storage"/>.</param>
     /// <param name="storage">Storage potentially containing <paramref name="node"/>.</param>
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if <paramref name="node"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="node"/> is <c>null</c> or not an instance of <typeparamref name="T"/>.</exception>
-    protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link)
+    protected bool RemoveSelfParent<T>(INode node, List<T> storage, Link? link, INotificationId? notificationId = null)
         where T : class, INode =>
-        RemoveSelfParent(AsList<T>(node, link), storage, link);
+        RemoveSelfParent(AsList<T>(node, link), storage, link, notificationId: notificationId);
 
     /// <summary>
     /// Removes all members of <paramref name="list"/> from <paramref name="storage"/>, and sets their parent to <c>null</c>.
@@ -828,19 +831,22 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="storage">Storage potentially containing members of <paramref name="list"/>.</param>
     /// <param name="link">Origin of <paramref name="storage"/>.</param>
     /// <param name="remover">
-    /// Optional Action to call for each removed element of <paramref name="list"/>.
-    /// Only called if <see cref="GetPartitionCommander"/> is available.
+    ///     Optional Action to call for each removed element of <paramref name="list"/>.
+    ///     Only called if <see cref="GetPartitionNotificationProducer"/> is available.
     /// </param>
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="list"/> and <paramref name="storage"/>.</typeparam>
     /// <returns><c>true</c> if at least one member of <paramref name="list"/> has been removed from <paramref name="storage"/>; <c>false</c> otherwise.</returns>
     /// <exception cref="InvalidValueException">If <paramref name="list"/> is <c>null</c> or contains any <c>null</c> members.</exception>
-    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link, Action<IPartitionCommander, Index, T>? remover = null)
+    protected bool RemoveSelfParent<T>([NotNull] List<T>? list, List<T> storage, Link? link,
+        Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover = null,
+        INotificationId? notificationId = null)
         where T : IReadableNode
     {
         AssureNotNull(list, link);
         AssureNotNullMembers(list, link);
 
-        var partitionCommander = GetPartitionCommander();
+        var partitionProducer = GetPartitionNotificationProducer();
 
         bool result = false;
         foreach (T node in list)
@@ -851,10 +857,10 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
 
             storage.RemoveAt(index);
             result = true;
-            if(node is  INode iNode)
+            if (node is INode iNode)
                 SetParentInternal(iNode, null);
-            if (partitionCommander != null && remover != null)
-                remover(partitionCommander, index, node);
+            if (partitionProducer != null && remover != null)
+                remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
         }
 
         return result;
@@ -867,14 +873,17 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
     /// <param name="safeNodes">Nodes to remove.</param>
     /// <param name="storage">Storage of nodes.</param>
     /// <param name="remover">
-    /// Optional Action to call for each removed element of <paramref name="safeNodes"/>.
-    /// Only called if <see cref="GetPartitionCommander"/> is available.
+    ///     Optional Action to call for each removed element of <paramref name="safeNodes"/>.
+    ///     Only called if <see cref="GetPartitionNotificationProducer"/> is available.
     /// </param>
+    /// <param name="notificationId">The notification ID of the notification that triggers this action.</param>
     /// <typeparam name="T">Type of members of <paramref name="safeNodes"/> and <paramref name="storage"/>.</typeparam>
-    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage, Action<IPartitionCommander, Index, T>? remover)
+    protected void RemoveAll<T>(List<T> safeNodes, List<T> storage,
+        Action<IPartitionNotificationProducer, Index, T, INotificationId?>? remover,
+        INotificationId? notificationId = null)
         where T : IReadableNode
     {
-        var partitionCommander = GetPartitionCommander();
+        var partitionProducer = GetPartitionNotificationProducer();
 
         foreach (var node in safeNodes)
         {
@@ -883,27 +892,33 @@ public abstract class NodeBase : ReadableNodeBase<INode>, INode
                 continue;
 
             storage.RemoveAt(index);
-            if (partitionCommander != null && remover != null)
-                remover(partitionCommander, index, node);
+            if (partitionProducer != null && remover != null)
+                remover(partitionProducer, index, node, notificationId ?? partitionProducer.CreateNotificationId());
         }
     }
 
-    /// Raises <see cref="ReferenceDeletedEvent"/> for <paramref name="reference"/>.
-    protected Action<IPartitionCommander, Index, T> ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
-        (commander, index, node) =>
+    /// Raises <see cref="ReferenceDeletedNotification"/> for <paramref name="reference"/>.
+    protected Action<IPartitionNotificationProducer, Index, T, INotificationId?>
+        ReferenceRemover<T>(Reference reference) where T : IReadableNode =>
+        (producer, index, node, notificationId) =>
         {
             IReferenceTarget deletedTarget = new ReferenceTarget(null, node);
-            commander.Raise(new ReferenceDeletedEvent(this, reference, index, deletedTarget, commander.CreateEventId()));
+            producer.ProduceNotification(new ReferenceDeletedNotification(this, reference, index, deletedTarget,
+                notificationId ?? producer.CreateNotificationId()));
         };
 
-    /// Raises <see cref="ChildDeletedEvent"/> for <paramref name="containment"/>.
-    protected Action<IPartitionCommander, Index, T> ContainmentRemover<T>(Containment containment) where T : INode =>
-        (commander, index, node) =>
-            commander.Raise(new ChildDeletedEvent(node, this, containment, index, commander.CreateEventId()));
+    /// Raises <see cref="ChildDeletedNotification"/> for <paramref name="containment"/>.
+    protected Action<IPartitionNotificationProducer, Index, T, INotificationId?>
+        ContainmentRemover<T>(Containment containment) where T : INode =>
+        (producer, index, node, notificationId) =>
+            producer.ProduceNotification(new ChildDeletedNotification(node, this, containment, index,
+                notificationId ?? producer.CreateNotificationId()));
 
-    /// Raises <see cref="AnnotationDeletedEvent"/>.
-    private void AnnotationRemover(IPartitionCommander commander, Index index, INode node) =>
-        commander.Raise(new AnnotationDeletedEvent(node, this, index, commander.CreateEventId()));
+    /// Raises <see cref="AnnotationDeletedNotification"/>.
+    private void AnnotationRemover(IPartitionNotificationProducer producer, Index index, INode node,
+        INotificationId? notificationId = null) =>
+        producer.ProduceNotification(new AnnotationDeletedNotification(node, this, index,
+            notificationId ?? producer.CreateNotificationId()));
 
     #endregion
 }
@@ -939,4 +954,13 @@ public abstract class PartitionInstanceBase : ConceptInstanceBase, IPartitionIns
 {
     /// <inheritdoc />
     protected PartitionInstanceBase(NodeId id) : base(id) { }
+
+    /// <inheritdoc />
+    public INotificationSender? GetNotificationSender() => GetNotificationProducer();
+
+    /// <inheritdoc />
+    IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => GetNotificationProducer();
+
+    /// <inheritdoc cref="IPartitionInstance.GetNotificationProducer"/>
+    protected internal abstract IPartitionNotificationProducer? GetNotificationProducer();
 }

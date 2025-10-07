@@ -18,9 +18,10 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
-using Core.M1.Event.Partition.Emitter;
 using Core.M2;
 using Core.M3;
+using Core.Notification;
+using Core.Notification.Partition.Emitter;
 using Core.Utilities;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
@@ -67,39 +68,46 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     public IEnumerable<MemberDeclarationSyntax> AbstractMembers() =>
         feature switch
         {
-            Link { Multiple: true } l =>
-            [
-                AbstractMultipleLinkProperty(l),
-                AbstractLinkAdder(l)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                AbstractLinkInserter(l)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
-                AbstractLinkRemover(l)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-            ],
-            { Optional: false } =>
-            [
-                AbstractSingleRequiredFeatureProperty(),
-                AbstractRequiredFeatureSetter(feature is Containment)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-            ],
-            { Optional: true } =>
-            [
-                AbstractSingleOptionalFeatureProperty(),
-                AbstractOptionalFeatureSetter(feature is Containment)
-                    .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
-            ],
+            Containment { Multiple: true } c => AbstractLinkMembers(c, writeable: true),
+            Reference { Multiple: true } r => AbstractLinkMembers(r, writeable: false),
+            Containment { Optional: false } => AbstractSingleRequiredMembers(true),
+            Reference { Optional: false } or Property { Optional: false } => AbstractSingleRequiredMembers(false),
+            Containment { Optional: true } => AbstractSingleOptionalMembers(writeable: true),
+            Reference { Optional: true } or Property { Optional: true } => AbstractSingleOptionalMembers(false),
             _ => throw new ArgumentException($"unsupported feature: {feature}", nameof(feature))
         };
+
+    private IEnumerable<MemberDeclarationSyntax> AbstractLinkMembers(Link link, bool writeable) =>
+    [
+        AbstractMultipleLinkProperty(link),
+        AbstractLinkAdder(link, writeable: writeable)
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+        AbstractLinkInserter(link, writeable: writeable)
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken)),
+        AbstractLinkRemover(link, writeable: writeable)
+            .WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+    ];
+
+    private IEnumerable<MemberDeclarationSyntax> AbstractSingleRequiredMembers(bool writeable) =>
+    [
+        AbstractSingleRequiredFeatureProperty(writeable: writeable),
+        AbstractRequiredFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+    ];
+
+    private IEnumerable<MemberDeclarationSyntax> AbstractSingleOptionalMembers(bool writeable) =>
+    [
+        AbstractSingleOptionalFeatureProperty(),
+        AbstractOptionalFeatureSetter(writeable: writeable).WithSemicolonToken(Token(SyntaxKind.SemicolonToken))
+    ];
 
     private IEnumerable<MemberDeclarationSyntax> RequiredProperty(Property property)
     {
         List<StatementSyntax> setterBody =
         [
-            PropertyEventVariable(),
-            EventCollectOldDataCall(),
+            PropertyEmitterVariable(),
+            EmitterCollectOldDataCall(),
             AssignFeatureField(),
-            EventRaiseEventCall(),
+            EmitterNotifyCall(),
             ReturnStatement(This())
         ];
         if (IsReferenceType(property))
@@ -115,13 +123,13 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         return new List<MemberDeclarationSyntax> { SingleFeatureField() }.Concat(members);
     }
 
-    private LocalDeclarationStatementSyntax PropertyEventVariable() =>
+    private LocalDeclarationStatementSyntax PropertyEmitterVariable() =>
         Variable(
-            "evt",
-            AsType(typeof(PropertyEventEmitter)),
-            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
+            "emitter",
+            AsType(typeof(PropertyNotificationEmitter)),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
-    
+
     private MethodDeclarationSyntax TryGet(bool writeable = false) =>
         Method(FeatureTryGet(feature), AsType(typeof(bool)),
                 [
@@ -171,15 +179,15 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     )
             ]));
 
-    
+
     private IEnumerable<MemberDeclarationSyntax> OptionalProperty(Property property) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }
             .Concat(
                 OptionalFeatureSetter([
-                    PropertyEventVariable(),
-                    EventCollectOldDataCall(),
+                    PropertyEmitterVariable(),
+                    EmitterCollectOldDataCall(),
                     AssignFeatureField(),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
             );
@@ -193,12 +201,12 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             TryGet(true)
         }.Concat(RequiredFeatureSetter([
                 AsureNotNullCall(),
-                SingleContainmentEventVariable(),
-                EventCollectOldDataCall(),
+                SingleContainmentEmitterVariable(),
+                EmitterCollectOldDataCall(),
                 SetParentNullCall(containment),
                 AttachChildCall(),
                 AssignFeatureField(),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ], true)
             .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
@@ -213,21 +221,21 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SingleFeatureField(true), SingleOptionalFeatureProperty(true), TryGet(true)
             }
             .Concat(
-            OptionalFeatureSetter([
-                SingleContainmentEventVariable(),
-                EventCollectOldDataCall(),
-                SetParentNullCall(containment),
-                AttachChildCall(),
-                AssignFeatureField(),
-                EventRaiseEventCall(),
-                ReturnStatement(This())
-            ], true));
+                OptionalFeatureSetter([
+                    SingleContainmentEmitterVariable(),
+                    EmitterCollectOldDataCall(),
+                    SetParentNullCall(containment),
+                    AttachChildCall(),
+                    AssignFeatureField(),
+                    EmitterNotifyCall(),
+                    ReturnStatement(This())
+                ], true));
 
-    private LocalDeclarationStatementSyntax SingleContainmentEventVariable() =>
+    private LocalDeclarationStatementSyntax SingleContainmentEmitterVariable() =>
         Variable(
-            "evt",
-            AsType(typeof(ContainmentSingleEventEmitter<>), AsType(feature.GetFeatureType(), writeable:true)),
-            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
+            "emitter",
+            AsType(typeof(ContainmentSingleNotificationEmitter<>), AsType(feature.GetFeatureType(), writeable: true)),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
 
     private IEnumerable<MemberDeclarationSyntax> RequiredSingleReference(Reference reference) =>
@@ -240,49 +248,49 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             }
             .Concat(RequiredFeatureSetter([
                     AsureNotNullCall(),
-                    ReferenceEventVariable(),
-                    EventCollectOldDataCall(),
+                    ReferenceEmitterVariable(),
+                    EmitterCollectOldDataCall(),
                     AssignFeatureField(),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
                 .Select(s => s.Xdoc(XdocThrowsIfSetToNull()))
             );
 
-    private LocalDeclarationStatementSyntax ReferenceEventVariable() =>
+    private LocalDeclarationStatementSyntax ReferenceEmitterVariable() =>
         Variable(
-            "evt",
-            AsType(typeof(ReferenceSingleEventEmitter)),
-            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature)])
+            "emitter",
+            AsType(typeof(ReferenceSingleNotificationEmitter)),
+            NewCall([MetaProperty(feature), This(), IdentifierName("value"), FeatureField(feature), IdentifierName("notificationId")])
         );
 
     private IEnumerable<MemberDeclarationSyntax> OptionalSingleReference(Reference reference) =>
         new List<MemberDeclarationSyntax> { SingleFeatureField(), SingleOptionalFeatureProperty(), TryGet() }
             .Concat(OptionalFeatureSetter([
-                ReferenceEventVariable(),
-                EventCollectOldDataCall(),
+                ReferenceEmitterVariable(),
+                EmitterCollectOldDataCall(),
                 AssignFeatureField(),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ]));
 
     private IEnumerable<MemberDeclarationSyntax> RequiredMultiContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleLinkField(containment),
-            MultipleLinkProperty(containment, AsNonEmptyReadOnlyCall(containment))
+            MultipleLinkField(containment, writeable: true),
+            MultipleLinkProperty(containment, AsNonEmptyReadOnlyCall(containment), writeable: true)
                 .Xdoc(XdocRequiredMultipleLink(containment)),
             TryGetMultiple()
         }.Concat(
             LinkAdder(containment, [
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
-                    AddMultipleContainmentEventVariable(Null()),
-                    EventCollectOldDataCall(),
+                    AddMultipleContainmentEmitterVariable(Null()),
+                    EmitterCollectOldDataCall(),
                     RequiredAddRangeCall(containment),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
-                ])
+                ], writeable: true)
                 .Select(a => XdocRequiredAdder(a, containment))
         ).Concat(
             LinkInserter(containment, [
@@ -290,12 +298,12 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNonEmptyCall(containment),
                     AssureNoSelfMoveCall(containment),
-                    AddMultipleContainmentEventVariable(IdentifierName("index")),
-                    EventCollectOldDataCall(),
+                    AddMultipleContainmentEmitterVariable(IdentifierName("index")),
+                    EmitterCollectOldDataCall(),
                     InsertRangeCall(containment),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
-                ])
+                ], writeable: true)
                 .Select(i => XdocRequiredInserter(i, containment))
         ).Concat(
             LinkRemover(containment, [
@@ -304,7 +312,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     AssureNotClearingCall(containment),
                     RequiredRemoveSelfParentCall(containment),
                     ReturnStatement(This())
-                ])
+                ], writeable: true)
                 .Select(r => XdocRequiredRemover(r, containment))
         );
 
@@ -333,20 +341,20 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
     private IEnumerable<MemberDeclarationSyntax> OptionalMultiContainment(Containment containment) =>
         new List<MemberDeclarationSyntax>
         {
-            MultipleLinkField(containment),
-            MultipleLinkProperty(containment, AsReadOnlyCall(containment)),
+            MultipleLinkField(containment, writeable: true),
+            MultipleLinkProperty(containment, AsReadOnlyCall(containment), writeable: true),
             TryGetMultiple()
         }.Concat(
             LinkAdder(containment, [
                 SafeNodesVariable(),
                 AssureNotNullCall(containment),
                 AssureNotNullMembersCall(containment),
-                AddMultipleContainmentEventVariable(Null()),
-                EventCollectOldDataCall(),
+                AddMultipleContainmentEmitterVariable(Null()),
+                EmitterCollectOldDataCall(),
                 OptionalAddRangeCall(containment),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
-            ])
+            ], writeable: true)
         ).Concat(
             LinkInserter(containment, [
                 AssureInRangeCall(containment),
@@ -354,25 +362,25 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 AssureNotNullCall(containment),
                 AssureNoSelfMoveCall(containment),
                 AssureNotNullMembersCall(containment),
-                AddMultipleContainmentEventVariable(IdentifierName("index")),
-                EventCollectOldDataCall(),
+                AddMultipleContainmentEmitterVariable(IdentifierName("index")),
+                EmitterCollectOldDataCall(),
                 InsertRangeCall(containment),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
-            ])
+            ], writeable: true)
         ).Concat(
             LinkRemover(containment, [
                 OptionalRemoveSelfParentCall(containment),
                 ReturnStatement(This())
-            ])
+            ], writeable: true)
         );
 
-    private LocalDeclarationStatementSyntax AddMultipleContainmentEventVariable(ExpressionSyntax index) =>
+    private LocalDeclarationStatementSyntax AddMultipleContainmentEmitterVariable(ExpressionSyntax index) =>
         Variable(
-            "evt",
-            AsType(typeof(ContainmentAddMultipleEventEmitter<>), AsType(feature.GetFeatureType())),
+            "emitter",
+            AsType(typeof(ContainmentAddMultipleNotificationEmitter<>), AsType(feature.GetFeatureType(), writeable: true)),
             NewCall([
-                MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index
+                MetaProperty(feature), This(), IdentifierName("safeNodes"), FeatureField(feature), index, IdentifierName("notificationId")
             ])
         );
 
@@ -388,10 +396,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
-                    AddMultipleReferenceEventVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
-                    EventCollectOldDataCall(),
+                    AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
+                    EmitterCollectOldDataCall(),
                     SimpleAddRangeCall(reference),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
                 .Select(a => XdocRequiredAdder(a, reference))
@@ -401,10 +409,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                     SafeNodesVariable(),
                     AssureNotNullCall(reference),
                     AssureNonEmptyCall(reference),
-                    AddMultipleReferenceEventVariable(IdentifierName("index")),
-                    EventCollectOldDataCall(),
+                    AddMultipleReferenceEmitterVariable(IdentifierName("index")),
+                    EmitterCollectOldDataCall(),
                     SimpleInsertRangeCall(reference),
-                    EventRaiseEventCall(),
+                    EmitterNotifyCall(),
                     ReturnStatement(This())
                 ])
                 .Select(i => XdocRequiredInserter(i, reference))
@@ -420,12 +428,12 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 .Select(r => XdocRequiredRemover(r, reference))
         );
 
-    private LocalDeclarationStatementSyntax AddMultipleReferenceEventVariable(ExpressionSyntax index) =>
+    private LocalDeclarationStatementSyntax AddMultipleReferenceEmitterVariable(ExpressionSyntax index) =>
         Variable(
-            "evt",
-            AsType(typeof(ReferenceAddMultipleEventEmitter<>), AsType(feature.GetFeatureType())),
+            "emitter",
+            AsType(typeof(ReferenceAddMultipleNotificationEmitter<>), AsType(feature.GetFeatureType())),
             NewCall([
-                MetaProperty(feature), This(), IdentifierName("safeNodes"), index
+                MetaProperty(feature), This(), IdentifierName("safeNodes"), index, IdentifierName("notificationId")
             ])
         );
 
@@ -433,17 +441,17 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         new List<MemberDeclarationSyntax>
         {
             MultipleLinkField(reference),
-            MultipleLinkProperty(reference, AsReadOnlyCall(reference)),
+            MultipleLinkProperty(reference, AsReadOnlyCall(reference)), 
             TryGetMultiple()
         }.Concat(
             LinkAdder(reference, [
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
-                AddMultipleReferenceEventVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
-                EventCollectOldDataCall(),
+                AddMultipleReferenceEmitterVariable(MemberAccess(FeatureField(reference), IdentifierName("Count"))),
+                EmitterCollectOldDataCall(),
                 SimpleAddRangeCall(reference),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -452,10 +460,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 SafeNodesVariable(),
                 AssureNotNullCall(reference),
                 AssureNotNullMembersCall(reference),
-                AddMultipleReferenceEventVariable(IdentifierName("index")),
-                EventCollectOldDataCall(),
+                AddMultipleReferenceEmitterVariable(IdentifierName("index")),
+                EmitterCollectOldDataCall(),
                 SimpleInsertRangeCall(reference),
-                EventRaiseEventCall(),
+                EmitterNotifyCall(),
                 ReturnStatement(This())
             ])
         ).Concat(
@@ -537,7 +545,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             IdentifierName("safeNodes"),
             FeatureField(containment),
             MetaProperty(containment),
-            CallGeneric("ContainmentRemover", AsType(containment.Type), MetaProperty(containment))
+            CallGeneric("ContainmentRemover", AsType(containment.Type, writeable: true), MetaProperty(containment))
         ));
 
     private ExpressionStatementSyntax OptionalRemoveSelfParentCall(Containment containment) =>
@@ -545,7 +553,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             OptionalNodesToList(),
             FeatureField(containment),
             MetaProperty(containment),
-            CallGeneric("ContainmentRemover", AsType(containment.Type), MetaProperty(containment))
+            CallGeneric("ContainmentRemover", AsType(containment.Type, writeable: true), MetaProperty(containment))
         ));
 
     private ExpressionStatementSyntax SimpleAddRangeCall(Reference reference) =>
@@ -587,10 +595,9 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
                 Null())
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword));
 
-    private FieldDeclarationSyntax MultipleLinkField(Link link) =>
-        Field(FeatureField(link).ToString(), AsType(typeof(List<>), AsType(link.Type)),
-                Collection([])
-            )
+    private FieldDeclarationSyntax MultipleLinkField(Link link, bool writeable = false) =>
+        Field(FeatureField(link).ToString(), AsType(typeof(List<>), AsType(link.Type, writeable: writeable)),
+                Collection([]))
             .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword));
 
     private PropertyDeclarationSyntax SingleRequiredFeatureProperty(bool writeable = false) =>
@@ -632,10 +639,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ("Multiple", (feature is Link { Multiple: true }).AsLiteral())
         ]);
 
-    private PropertyDeclarationSyntax AbstractSingleRequiredFeatureProperty()
-    {
-        var writable = feature is Containment;
-        return PropertyDeclaration(AsType(feature.GetFeatureType(), writeable: writable),
+    private PropertyDeclarationSyntax AbstractSingleRequiredFeatureProperty(bool writeable = false) =>
+        PropertyDeclaration(AsType(feature.GetFeatureType(), writeable: writeable),
                 Identifier(FeatureProperty(feature).ToString()))
             .WithAccessorList(AccessorList(List([
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
@@ -650,7 +655,6 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             ]))
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(feature));
-    }
 
     private PropertyDeclarationSyntax SingleOptionalFeatureProperty(bool writeable = false) =>
         Property(FeatureProperty(feature).ToString(),
@@ -683,8 +687,8 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .Xdoc(XdocDefault(feature));
 
-    private PropertyDeclarationSyntax MultipleLinkProperty(Link link, InvocationExpressionSyntax getter) =>
-        PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(link.Type)),
+    private PropertyDeclarationSyntax MultipleLinkProperty(Link link, InvocationExpressionSyntax getter, bool writeable = false) =>
+        PropertyDeclaration(AsType(typeof(IReadOnlyList<>), AsType(link.Type, writeable: writeable)),
                 Identifier(FeatureProperty(link).ToString()))
             .WithAccessorList(AccessorList(List([
                 AccessorDeclaration(SyntaxKind.GetAccessorDeclaration)
@@ -744,7 +748,10 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private MethodDeclarationSyntax AbstractRequiredFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier),
-                [Param("value", AsType(feature.GetFeatureType(), writeable: writeable))]
+                [
+                    Param("value", AsType(feature.GetFeatureType(), writeable: writeable)),
+                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
@@ -766,7 +773,7 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
         return result;
     }
-    
+
     private IEnumerable<XmlNodeSyntax> XdocDefault(Feature ffeature) =>
         XdocKeyed(ffeature)
             .Concat(XdocRemarks(ffeature));
@@ -819,23 +826,24 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
 
     private MethodDeclarationSyntax AbstractOptionalFeatureSetter(bool writeable = false) =>
         Method(FeatureSet().ToString(), AsType(classifier), [
-                Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable)))
+                Param("value", NullableType(AsType(feature.GetFeatureType(), writeable: writeable))),
+                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(feature));
 
-    private IEnumerable<MethodDeclarationSyntax> LinkRemover(Link link, List<StatementSyntax> body)
+    private IEnumerable<MethodDeclarationSyntax> LinkRemover(Link link, List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractLinkRemover(link)
+            AbstractLinkRemover(link, writeable: writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkRemover(link),
+                InterfaceDelegator(AbstractLinkRemover(link, writeable: writeable),
                     Call(LinkRemove(link).ToString(), IdentifierName("nodes"))
                 )
             );
@@ -843,25 +851,28 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         return result;
     }
 
-    private MethodDeclarationSyntax AbstractLinkRemover(Link link) =>
+    private MethodDeclarationSyntax AbstractLinkRemover(Link link, bool writeable = false) =>
         Method(LinkRemove(link).ToString(), AsType(classifier),
-                [Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type)))]
+                [
+                    Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
+                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(link));
 
-    private IEnumerable<MethodDeclarationSyntax> LinkInserter(Link link, List<StatementSyntax> body)
+    private IEnumerable<MethodDeclarationSyntax> LinkInserter(Link link, List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractLinkInserter(link)
+            AbstractLinkInserter(link, writeable: writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkInserter(link),
+                InterfaceDelegator(AbstractLinkInserter(link, writeable: writeable),
                     Call(LinkInsert(link).ToString(), IdentifierName("index"), IdentifierName("nodes"))
                 )
             );
@@ -869,35 +880,39 @@ public class FeatureGenerator(Classifier classifier, Feature feature, INames nam
         return result;
     }
 
-    private MethodDeclarationSyntax AbstractLinkInserter(Link link) =>
+    private MethodDeclarationSyntax AbstractLinkInserter(Link link, bool writeable = false) =>
         Method(LinkInsert(link).ToString(), AsType(classifier), [
                 Param("index", AsType(typeof(int))),
-                Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type)))
+                Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
+                ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
             ])
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))
             .Xdoc(XdocDefault(link));
 
-    private IEnumerable<MethodDeclarationSyntax> LinkAdder(Link link, List<StatementSyntax> body)
+    private IEnumerable<MethodDeclarationSyntax> LinkAdder(Link link, List<StatementSyntax> body, bool writeable = false)
     {
         List<MethodDeclarationSyntax> result =
         [
-            AbstractLinkAdder(link)
+            AbstractLinkAdder(link, writeable: writeable)
                 .WithBody(AsStatements(body))
         ];
 
         if (InheritedFromInterface())
             result.Insert(0,
-                InterfaceDelegator(AbstractLinkAdder(link),
+                InterfaceDelegator(AbstractLinkAdder(link, writeable: writeable),
                     Call(LinkAdd(link).ToString(), IdentifierName("nodes")))
             );
 
         return result;
     }
 
-    private MethodDeclarationSyntax AbstractLinkAdder(Link link) =>
+    private MethodDeclarationSyntax AbstractLinkAdder(Link link, bool writeable = false) =>
         Method(LinkAdd(link).ToString(), AsType(classifier),
-                [Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type)))]
+                [
+                    Param("nodes", AsType(typeof(IEnumerable<>), AsType(link.Type, writeable: writeable))),
+                    ParamWithDefaultNullValue("notificationId", AsType(typeof(INotificationId)))
+                ]
             )
             .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
             .WithAttributeLists(AsAttributes([ObsoleteAttribute(feature)]))

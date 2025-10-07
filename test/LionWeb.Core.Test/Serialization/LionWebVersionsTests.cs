@@ -335,13 +335,7 @@ public class LionWebVersionsTests
 
         stream.Seek(0, SeekOrigin.Begin);
 
-        try
-        {
-            var x = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).Result;
-        } catch (AggregateException e)
-        {
-            Assert.IsInstanceOfType<VersionMismatchException>(e.InnerExceptions.First());
-        }
+        Assert.ThrowsExactly<VersionMismatchException>(() => JsonUtils.ReadNodesFromStream(stream, deserializer));
     }
 
     [TestMethod]
@@ -399,13 +393,7 @@ public class LionWebVersionsTests
 
         stream.Seek(0, SeekOrigin.Begin);
 
-        try
-        {
-            var x = JsonUtils.ReadNodesFromStreamAsync(stream, deserializer).Result;
-        } catch (AggregateException e)
-        {
-            Assert.IsInstanceOfType<VersionMismatchException>(e.InnerExceptions.First());
-        }
+        Assert.ThrowsExactly<VersionMismatchException>(() => JsonUtils.ReadNodesFromStream(stream, deserializer));
     }
 
     #endregion

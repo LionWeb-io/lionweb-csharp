@@ -17,9 +17,11 @@
 
 namespace LionWeb.Core;
 
-using M1.Event.Partition;
 using M2;
 using M3;
+using Notification;
+using Notification.Pipe;
+using Notification.Partition;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using Utilities;
@@ -183,7 +185,7 @@ public class LenientNode : NodeBase, INode
     /// For containments, sets the target node as parent of the value, even if the value doesn't fit the containment's type.
     /// For containments, the target node MUST implement <see cref="INode"/>; for references, the target node MUST implement <see cref="IReadableNode"/>. 
     /// </summary>
-    protected override bool SetInternal(Feature? feature, object? value)
+    protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
     {
         if (feature == null)
         {
@@ -378,14 +380,14 @@ public class LenientNode : NodeBase, INode
                 .Contains(child));
 
     /// <inheritdoc />
-    public override void AddAnnotations(IEnumerable<INode> annotations)
+    public override void AddAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null)
     {
         var safeAnnotations = annotations?.ToList();
         _annotations.AddRange(SetSelfParent(safeAnnotations, null));
     }
 
     /// <inheritdoc />
-    public override void InsertAnnotations(Index index, IEnumerable<INode> annotations)
+    public override void InsertAnnotations(Index index, IEnumerable<INode> annotations, INotificationId? notificationId = null)
     {
         AssureInRange(index, _annotations);
         var safeAnnotations = annotations?.ToList();
@@ -393,7 +395,7 @@ public class LenientNode : NodeBase, INode
     }
 
     /// <inheritdoc />
-    public override bool RemoveAnnotations(IEnumerable<INode> annotations) =>
+    public override bool RemoveAnnotations(IEnumerable<INode> annotations, INotificationId? notificationId = null) =>
         RemoveSelfParent(annotations?.ToList(), _annotations, null, null);
 
     private IEnumerable<Feature> FeatureKeys => _featureValues.Select(f => f.feature);
@@ -439,17 +441,18 @@ public class LenientNode : NodeBase, INode
 
 public class LenientPartition : LenientNode, IPartitionInstance
 {
-    private readonly PartitionEventHandler _eventHandler;
+    private readonly IPartitionNotificationProducer _notificationProducer;
+
     public LenientPartition(NodeId id, Classifier? classifier) : base(id, classifier)
     {
-        _eventHandler = new PartitionEventHandler(this);
+        _notificationProducer = new PartitionNotificationProducer(this);
     }
 
     /// <inheritdoc />
-    public IPartitionPublisher GetPublisher() => _eventHandler;
+    public INotificationSender? GetNotificationSender() => _notificationProducer;
 
     /// <inheritdoc />
-    public IPartitionCommander GetCommander() => _eventHandler;
+    IPartitionNotificationProducer? IPartitionInstance.GetNotificationProducer() => _notificationProducer;
 
     /// <inheritdoc />
     public Concept GetConcept() => (Concept)GetClassifier();

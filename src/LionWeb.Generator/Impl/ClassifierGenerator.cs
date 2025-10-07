@@ -18,9 +18,10 @@
 namespace LionWeb.Generator.Impl;
 
 using Core;
-using Core.M1.Event.Partition;
 using Core.M2;
 using Core.M3;
+using Core.Notification.Partition;
+using Core.Notification.Pipe;
 using Core.Utilities;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -92,17 +93,18 @@ public class ClassifierGenerator(
         if (concept.Partition)
         {
             bases.Add(AsType(typeof(IPartitionInstance<INode>)));
-
+            
             additionalMembers.AddRange([
-                Field("_eventHandler", AsType(typeof(PartitionEventHandler)))
+                Field("_notificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))))
                     .WithModifiers(AsModifiers(SyntaxKind.PrivateKeyword, SyntaxKind.ReadOnlyKeyword)),
-                Method("GetPublisher", NullableType(AsType(typeof(IPartitionPublisher))), exprBody: IdentifierName("_eventHandler"))
-                    .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword)),
-                Method("GetCommander", NullableType(AsType(typeof(IPartitionCommander))), exprBody: IdentifierName("_eventHandler"))
+                Method("GetNotificationProducer", NullableType(AsType(typeof(IPartitionNotificationProducer))), exprBody: IdentifierName("_notificationProducer"))
+                    .WithExplicitInterfaceSpecifier(ExplicitInterfaceSpecifier(IdentifierName(AsType(typeof(IPartitionInstance)).ToString()))),
+                Method("GetNotificationSender", NullableType(AsType(typeof(INotificationSender))), exprBody: IdentifierName("_notificationProducer"))
                     .WithModifiers(AsModifiers(SyntaxKind.PublicKeyword))
+                    .Xdoc(XdocInheritDoc())
             ]);
             
-            additionalConstructorStatements.Add(Assignment("_eventHandler", NewCall([This()])));
+            additionalConstructorStatements.Add(Assignment("_notificationProducer", NewCall([This()], AsType(typeof(PartitionNotificationProducer)))));
         }
 
         return ClassifierClass(bases, additionalMembers, additionalConstructorStatements);

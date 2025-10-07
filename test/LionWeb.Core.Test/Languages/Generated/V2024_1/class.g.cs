@@ -6,9 +6,10 @@
 #nullable enable
 namespace @namespace.@int.@public.V2024_1;
 using LionWeb.Core;
-using LionWeb.Core.M1.Event.Partition.Emitter;
 using LionWeb.Core.M2;
 using LionWeb.Core.M3;
+using LionWeb.Core.Notification;
+using LionWeb.Core.Notification.Partition.Emitter;
 using LionWeb.Core.Utilities;
 using LionWeb.Core.VersionSpecific.V2024_1;
 using System;
@@ -172,7 +173,7 @@ public partial interface @interface : INode
 	public @enum String { get; set; }
 
 	/// <remarks>Required Property</remarks>
-        public @interface SetString(@enum value);
+        public @interface SetString(@enum value, INotificationId? notificationId = null);
 }
 
 [LionCoreMetaPointer(Language = typeof(ClassLanguage), Key = "key-keyword-concept2")]
@@ -196,13 +197,13 @@ public partial class @out : @struct
 
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @out SetDefault(@if value)
+        public @out SetDefault(@if value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.out_default);
-		PropertyEventEmitter evt = new(ClassLanguage.Instance.out_default, this, value, _default);
-		evt.CollectOldData();
+		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.out_default, this, value, _default, notificationId);
+		emitter.CollectOldData();
 		_default = value;
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
@@ -213,7 +214,7 @@ public partial class @out : @struct
 	/// <inheritdoc/>
         public override Concept GetConcept() => ClassLanguage.Instance.@out;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -227,15 +228,15 @@ public partial class @out : @struct
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (ClassLanguage.Instance.out_default.EqualsIdentity(feature))
 		{
 			if (value is @namespace.@int.@public.V2024_1.@if v)
 			{
-				Default = v;
+				SetDefault(v, notificationId);
 				return true;
 			}
 
@@ -280,16 +281,16 @@ public partial class @record : AnnotationInstanceBase, @interface
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- @interface @interface.SetString(@enum value) => SetString(value);
+ @interface @interface.SetString(@enum value, INotificationId? notificationId = null) => SetString(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @record SetString(@enum value)
+        public @record SetString(@enum value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
-		PropertyEventEmitter evt = new(ClassLanguage.Instance.interface_string, this, value, _string);
-		evt.CollectOldData();
+		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.interface_string, this, value, _string, notificationId);
+		emitter.CollectOldData();
 		_string = value;
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
@@ -310,15 +311,15 @@ public partial class @record : AnnotationInstanceBase, @interface
 
 	/// <remarks>Required Single Containment</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @record SetDouble(@interface value)
+        public @record SetDouble(@interface value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.record_double);
-		ContainmentSingleEventEmitter<@interface> evt = new(ClassLanguage.Instance.record_double, this, value, _double);
-		evt.CollectOldData();
+		ContainmentSingleNotificationEmitter<@interface> emitter = new(ClassLanguage.Instance.record_double, this, value, _double, notificationId);
+		emitter.CollectOldData();
 		SetParentNull(_double);
 		AttachChild(value);
 		_double = value;
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
@@ -329,7 +330,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 	/// <inheritdoc/>
         public override Annotation GetAnnotation() => ClassLanguage.Instance.@record;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -349,15 +350,15 @@ public partial class @record : AnnotationInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
 		{
 			if (value is @namespace.@int.@public.V2024_1.@enum v)
 			{
-				String = v;
+				SetString(v, notificationId);
 				return true;
 			}
 
@@ -368,7 +369,7 @@ public partial class @record : AnnotationInstanceBase, @interface
 		{
 			if (value is @namespace.@int.@public.V2024_1.@interface v)
 			{
-				Double = v;
+				SetDouble(v, notificationId);
 				return true;
 			}
 
@@ -436,16 +437,16 @@ public partial class @struct : ConceptInstanceBase, @interface
 	}
 /// <remarks>Required Property</remarks>
 /// <exception cref="InvalidValueException">If set to null</exception>
- @interface @interface.SetString(@enum value) => SetString(value);
+ @interface @interface.SetString(@enum value, INotificationId? notificationId = null) => SetString(value);
 	/// <remarks>Required Property</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @struct SetString(@enum value)
+        public @struct SetString(@enum value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.interface_string);
-		PropertyEventEmitter evt = new(ClassLanguage.Instance.interface_string, this, value, _string);
-		evt.CollectOldData();
+		PropertyNotificationEmitter emitter = new(ClassLanguage.Instance.interface_string, this, value, _string, notificationId);
+		emitter.CollectOldData();
 		_string = value;
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
@@ -466,13 +467,13 @@ public partial class @struct : ConceptInstanceBase, @interface
 
 	/// <remarks>Required Single Reference</remarks>
     	/// <exception cref = "InvalidValueException">If set to null</exception>
-        public @struct SetRef(@record value)
+        public @struct SetRef(@record value, INotificationId? notificationId = null)
 	{
 		AssureNotNull(value, ClassLanguage.Instance.struct_ref);
-		ReferenceSingleEventEmitter evt = new(ClassLanguage.Instance.struct_ref, this, value, _ref);
-		evt.CollectOldData();
+		ReferenceSingleNotificationEmitter emitter = new(ClassLanguage.Instance.struct_ref, this, value, _ref, notificationId);
+		emitter.CollectOldData();
 		_ref = value;
-		evt.RaiseEvent();
+		emitter.Notify();
 		return this;
 	}
 
@@ -483,7 +484,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 	/// <inheritdoc/>
         public override Concept GetConcept() => ClassLanguage.Instance.@struct;
 	/// <inheritdoc/>
-        protected override bool GetInternal(Feature? feature, out Object? result)
+        protected override bool GetInternal(Feature? feature, out object? result)
 	{
 		if (base.GetInternal(feature, out result))
 			return true;
@@ -503,15 +504,15 @@ public partial class @struct : ConceptInstanceBase, @interface
 	}
 
 	/// <inheritdoc/>
-        protected override bool SetInternal(Feature? feature, Object? value)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
 	{
-		if (base.SetInternal(feature, value))
+		if (base.SetInternal(feature, value, notificationId))
 			return true;
 		if (ClassLanguage.Instance.interface_string.EqualsIdentity(feature))
 		{
 			if (value is @namespace.@int.@public.V2024_1.@enum v)
 			{
-				String = v;
+				SetString(v, notificationId);
 				return true;
 			}
 
@@ -522,7 +523,7 @@ public partial class @struct : ConceptInstanceBase, @interface
 		{
 			if (value is @namespace.@int.@public.V2024_1.@record v)
 			{
-				Ref = v;
+				SetRef(v, notificationId);
 				return true;
 			}
 
@@ -591,7 +592,7 @@ public readonly record struct @if : IStructuredDataTypeInstance
 	}
 
 	/// <inheritdoc/>
-        public Object? Get(Field field)
+        public object? Get(Field field)
 	{
 		if (ClassLanguage.Instance.if_namespace.EqualsIdentity(field))
 			return Namespace;

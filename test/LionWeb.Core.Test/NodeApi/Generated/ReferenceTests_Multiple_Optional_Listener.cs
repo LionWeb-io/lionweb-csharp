@@ -17,8 +17,9 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
+using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1.Event.Partition;
+using Notification;
 
 [TestClass]
 public class ReferenceTests_Multiple_Optional_Listener
@@ -31,10 +32,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g");
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -43,7 +44,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.AddShapes([line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -52,10 +53,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g");
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -64,7 +65,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #region Insert
@@ -76,10 +77,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circle] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -88,7 +89,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.InsertShapes(0, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -98,10 +99,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circle] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -110,7 +111,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line, circle });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -120,10 +121,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circle] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -132,7 +133,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.InsertShapes(1, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -142,10 +143,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circle] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -154,7 +155,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle, line });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -165,19 +166,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         parent.InsertShapes(0, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -188,19 +189,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { line, circleA, circleB });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -211,19 +212,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         parent.InsertShapes(1, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -234,19 +235,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, line, circleB });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -257,19 +258,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         parent.InsertShapes(2, [line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -280,19 +281,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, circleB] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(2, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, line), args.NewTarget);
-            events++;
+            notifications++;
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, circleB, line });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #endregion
@@ -305,12 +306,12 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g");
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -319,12 +320,12 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g");
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -334,12 +335,12 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("cs") { Shapes = [circle] };
         var line = new Line("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -348,10 +349,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [line] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -360,7 +361,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -369,10 +370,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [line] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -381,7 +382,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> {  });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -391,10 +392,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [line, circle] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -403,7 +404,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -413,10 +414,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [line, circle] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
@@ -425,7 +426,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -435,10 +436,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [circle, line] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -447,7 +448,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -457,10 +458,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [circle, line] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -469,7 +470,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circle });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -480,10 +481,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, line, circleB] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -492,7 +493,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.RemoveShapes([line]);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -503,10 +504,10 @@ public class ReferenceTests_Multiple_Optional_Listener
         var line = new Line("myId");
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, line, circleB] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
@@ -515,7 +516,7 @@ public class ReferenceTests_Multiple_Optional_Listener
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, new List<INode> { circleA, circleB });
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #endregion
@@ -530,12 +531,12 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g");
         var values = new IShape[0];
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
         parent.AddShapes(values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -544,13 +545,13 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g");
         var values = new IShape[0];
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -559,12 +560,12 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g");
         var values = new IShape[0];
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, _) => notifications++);
 
         parent.InsertShapes(0, values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -573,12 +574,12 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g");
         var values = new IShape[0];
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -589,19 +590,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         parent.AddShapes([circle]);
         var values = new List<IShape>();
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, circle), args.DeletedTarget);
-            events++;
+            notifications++;
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #endregion
@@ -616,19 +617,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.NewTarget);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            notifications++;
         });
 
         parent.AddShapes(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -639,19 +640,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.NewTarget);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            notifications++;
         });
 
         parent.Set(ShapesLanguage.Instance.ReferenceGeometry_shapes, values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     #region Insert
@@ -664,19 +665,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var valueB = new Line("sB");
         var values = new List<IShape> { valueA, valueB };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(events, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.NewTarget);
-            events++;
+            Assert.AreEqual(notifications, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            notifications++;
         });
 
         parent.InsertShapes(0, values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -689,19 +690,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceAddedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(1 + events, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.NewTarget);
-            events++;
+            Assert.AreEqual(1 + notifications, args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.NewTarget);
+            notifications++;
         });
 
         parent.InsertShapes(1, values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     #endregion
@@ -717,19 +718,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var values = new List<IShape> { valueA, valueB };
         parent.AddShapes(values);
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.DeletedTarget);
-            events++;
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            notifications++;
         });
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -742,12 +743,12 @@ public class ReferenceTests_Multiple_Optional_Listener
         var valueB = new Line("sB");
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, _) => notifications++);
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -759,19 +760,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var valueA = new Line("sA");
         var values = new IShape[] { valueA, circleA };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
             Assert.AreEqual(new ReferenceTarget(null, circleA), args.DeletedTarget);
-            events++;
+            notifications++;
         });
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -782,19 +783,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [valueA, valueB] };
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(0, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.DeletedTarget);
-            events++;
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            notifications++;
         });
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -806,19 +807,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circle, valueA, valueB] };
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.DeletedTarget);
-            events++;
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            notifications++;
         });
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -831,19 +832,19 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [circleA, valueA, valueB, circleB] };
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
             Assert.AreEqual(1, args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.DeletedTarget);
-            events++;
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            notifications++;
         });
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     [TestMethod]
@@ -856,20 +857,20 @@ public class ReferenceTests_Multiple_Optional_Listener
         var parent = new ReferenceGeometry("g") { Shapes = [valueA, circleA, valueB, circleB] };
         var values = new IShape[] { valueA, valueB };
 
-        int events = 0;
+        int notifications = 0;
         int[] indexes = { 0, 1 };
-        parent.GetPublisher().Subscribe<ReferenceDeletedEvent>((_, args) =>
+        parent.GetNotificationSender().Subscribe<ReferenceDeletedNotification>((_, args) =>
         {
             Assert.AreSame(parent, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.ReferenceGeometry_shapes, args.Reference);
-            Assert.AreEqual(indexes[events], args.Index);
-            Assert.AreEqual(new ReferenceTarget(null, values[events]), args.DeletedTarget);
-            events++;
+            Assert.AreEqual(indexes[notifications], args.Index);
+            Assert.AreEqual(new ReferenceTarget(null, values[notifications]), args.DeletedTarget);
+            notifications++;
         });
 
         parent.RemoveShapes(values);
 
-        Assert.AreEqual(2, events);
+        Assert.AreEqual(2, notifications);
     }
 
     #endregion

@@ -17,8 +17,9 @@
 
 namespace LionWeb.Core.Test.NodeApi.Generated;
 
+using Core.Notification.Partition;
 using Languages.Generated.V2024_1.Shapes.M2;
-using M1.Event.Partition;
+using Notification;
 
 [TestClass]
 public class ContainmentTests_Single_Required_Listener
@@ -32,10 +33,10 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
         var coord = new Coord("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
             Assert.AreEqual(0, args.Index);
@@ -44,7 +45,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Offset = coord;
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -54,10 +55,10 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
         var coord = new Coord("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
             Assert.AreEqual(0, args.Index);
@@ -66,7 +67,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.SetOffset(coord);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -76,10 +77,10 @@ public class ContainmentTests_Single_Required_Listener
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
         var coord = new Coord("myId");
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildAddedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
             Assert.AreEqual(0, args.Index);
@@ -88,7 +89,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -99,10 +100,10 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(oldParent, args.OldParent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
@@ -114,7 +115,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Offset = coord;
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -125,10 +126,10 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(oldParent, args.OldParent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
@@ -140,7 +141,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -152,10 +153,10 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildMovedAndReplacedFromOtherContainmentEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildMovedAndReplacedFromOtherContainmentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(oldParent, args.OldParent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
@@ -168,7 +169,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Offset = coord;
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -180,10 +181,10 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var oldParent = new OffsetDuplicate("oldParent") { Offset = coord };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildMovedAndReplacedFromOtherContainmentEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildMovedAndReplacedFromOtherContainmentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(oldParent, args.OldParent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
@@ -196,7 +197,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -206,10 +207,10 @@ public class ContainmentTests_Single_Required_Listener
         var offsetDuplicate = new OffsetDuplicate("od") { Fixpoints = [coord] };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -220,7 +221,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Offset = coord;
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -230,10 +231,10 @@ public class ContainmentTests_Single_Required_Listener
         var offsetDuplicate = new OffsetDuplicate("od") { Fixpoints = [coord] };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -244,7 +245,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -255,10 +256,10 @@ public class ContainmentTests_Single_Required_Listener
         var offsetDuplicate = new OffsetDuplicate("od") { Fixpoints = [coord], Offset = replacedCoord };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -270,7 +271,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Offset = coord;
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -281,10 +282,10 @@ public class ContainmentTests_Single_Required_Listener
         var offsetDuplicate = new OffsetDuplicate("od") { Fixpoints = [coord], Offset = replacedCoord };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildMovedAndReplacedFromOtherContainmentInSameParentNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(ShapesLanguage.Instance.IShape_fixpoints, args.OldContainment);
             Assert.AreEqual(0, args.OldIndex);
             Assert.AreSame(offsetDuplicate, args.Parent);
@@ -296,7 +297,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     #region existing
@@ -309,10 +310,10 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildReplacedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
             Assert.AreEqual(0, args.Index);
@@ -322,7 +323,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Offset = coord;
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -333,10 +334,10 @@ public class ContainmentTests_Single_Required_Listener
         var coord = new Coord("myId");
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildReplacedEvent>((_, args) =>
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, args) =>
         {
-            events++;
+            notifications++;
             Assert.AreSame(offsetDuplicate, args.Parent);
             Assert.AreSame(ShapesLanguage.Instance.OffsetDuplicate_offset, args.Containment);
             Assert.AreEqual(0, args.Index);
@@ -346,7 +347,7 @@ public class ContainmentTests_Single_Required_Listener
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, coord);
 
-        Assert.AreEqual(1, events);
+        Assert.AreEqual(1, notifications);
     }
 
     [TestMethod]
@@ -356,17 +357,17 @@ public class ContainmentTests_Single_Required_Listener
         var offsetDuplicate = new OffsetDuplicate("g") { Offset = oldCoord };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildReplacedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildAddedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildDeletedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedInSameContainmentEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
         offsetDuplicate.Offset = oldCoord;
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -376,17 +377,17 @@ public class ContainmentTests_Single_Required_Listener
         var offsetDuplicate = new OffsetDuplicate("g") { Offset = oldCoord };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildReplacedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildAddedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildDeletedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedInSameContainmentEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
         offsetDuplicate.Set(ShapesLanguage.Instance.OffsetDuplicate_offset, oldCoord);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     #endregion
@@ -401,17 +402,17 @@ public class ContainmentTests_Single_Required_Listener
         var offsetDuplicate = new OffsetDuplicate("od");
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildReplacedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildAddedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildDeletedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedInSameContainmentEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => offsetDuplicate.Offset = null);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     [TestMethod]
@@ -420,17 +421,17 @@ public class ContainmentTests_Single_Required_Listener
         var offsetDuplicate = new OffsetDuplicate("od") { Offset = new Coord("myId") };
         var parent = new Geometry("g") { Shapes = [offsetDuplicate] };
 
-        int events = 0;
-        parent.GetPublisher().Subscribe<ChildReplacedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildAddedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildDeletedEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedInSameContainmentEvent>((_, _) => events++);
-        parent.GetPublisher().Subscribe<ChildMovedFromOtherContainmentInSameParentEvent>((_, _) => events++);
+        int notifications = 0;
+        parent.GetNotificationSender().Subscribe<ChildReplacedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildAddedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildDeletedNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedInSameContainmentNotification>((_, _) => notifications++);
+        parent.GetNotificationSender().Subscribe<ChildMovedFromOtherContainmentInSameParentNotification>((_, _) => notifications++);
 
         Assert.ThrowsException<InvalidValueException>(() => offsetDuplicate.Offset = null);
 
-        Assert.AreEqual(0, events);
+        Assert.AreEqual(0, notifications);
     }
 
     #endregion

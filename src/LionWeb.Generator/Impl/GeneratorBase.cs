@@ -118,7 +118,7 @@ public abstract class GeneratorBase
     protected List<XmlNodeSyntax> XdocKeyed(IKeyed keyed)
     {
         List<XmlNodeSyntax> result = [];
-        
+
         var keyedDocumentation = VersionSpecifics.GetKeyedDocumentation(keyed);
         if (keyedDocumentation != null)
             result.AddRange(XdocLine(keyedDocumentation));
@@ -169,8 +169,12 @@ public abstract class GeneratorBase
                 AttributeArgument(s.AsLiteral())
             )));
     }
-    
+
     /// <returns><c>TryGetMyFeature</c></returns>
     protected string FeatureTryGet(Feature feature) =>
         $"TryGet{feature.Name.ToFirstUpper()}";
+
+    /// <returns><c>SetMyFeature</c></returns>
+    protected string FeatureSet(Feature feature) =>
+        $"Set{feature.Name.ToFirstUpper()}";
 }

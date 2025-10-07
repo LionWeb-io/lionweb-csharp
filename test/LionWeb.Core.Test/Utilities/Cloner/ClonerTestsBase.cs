@@ -17,6 +17,7 @@
 
 namespace LionWeb.Core.Test.Utilities.Cloner;
 
+using Core.Notification;
 using Languages.Generated.V2024_1.Shapes.M2;
 using M3;
 
@@ -35,7 +36,7 @@ public abstract class ClonerTestsBase
         protected override bool GetInternal(Feature feature, out object? result) =>
             _settings.TryGetValue(feature, out result);
 
-        protected override bool SetInternal(Feature feature, object? value)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
         {
             _settings[feature] = value;
             return true;
@@ -55,7 +56,7 @@ public abstract class ClonerTestsBase
         protected override bool GetInternal(Feature feature, out object? result) =>
             _settings.TryGetValue(feature, out result);
 
-        protected override bool SetInternal(Feature feature, object? value)
+        protected override bool SetInternal(Feature? feature, object? value, INotificationId? notificationId = null)
         {
             _settings[feature] = value;
             return true;

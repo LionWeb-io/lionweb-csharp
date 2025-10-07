@@ -8,18 +8,24 @@ SPDX-License-Identifier: Apache-2.0
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <PackageVersion Include="JsonSchema.Net" Version="7.3.4" />
-    <PackageVersion Include="MinVer" Version="4.3.0" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.2" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.dotMemory" Version="0.15.2" />
+    <PackageVersion Include="BenchmarkDotNet.Diagnostics.Windows" Version="0.15.2" />
+    <PackageVersion Include="BenchmarkDotNet.TestAdapter" Version="0.15.2" />
+    <PackageVersion Include="JsonSchema.Net" Version="7.4.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <PackageVersion Include="MinVer" Version="6.0.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="MSTest.TestAdapter" Version="3.10.2" />
     <PackageVersion Include="MSTest.TestFramework" Version="3.10.2" />
-    <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="1.5.0" />
-    <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.8.0" />
-    <PackageVersion Include="coverlet.collector" Version="6.0.0">
+    <PackageVersion Include="Microsoft.Testing.Extensions.TrxReport" Version="1.8.2" />
+    <PackageVersion Include="Microsoft.CodeAnalysis" Version="4.14.0" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageVersion>
+    <PackageVersion Include="System.CommandLine" Version="2.0.0-rc.1.25451.107" />
     <PackageVersion Include="Utf8JsonAsyncStreamReader" Version="1.1.0" />
-    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.0" PrivateAssets="All"/>
+    <PackageVersion Include="Microsoft.SourceLink.GitHub" Version="1.1.0" PrivateAssets="All" />
   </ItemGroup>
 </Project>

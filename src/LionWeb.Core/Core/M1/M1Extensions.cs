@@ -19,6 +19,7 @@ namespace LionWeb.Core.M1;
 
 using M2;
 using M3;
+using Notification;
 using System.Collections;
 
 /// <summary>
@@ -39,13 +40,19 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot insert before a node with no parent");
 
         Containment containment = parent.GetContainmentOf(self)!;
+        if (!containment.Multiple)
+            throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
         var value = parent.Get(containment);
         if (value is not IEnumerable enumerable)
+            // should not happen
             throw new TreeShapeException(self, "Cannot insert before a node in a single containment");
 
-        var list = enumerable.AsNodes<IReadableNode>().ToList();
+        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
         var index = list.IndexOf(self);
+        if (index < 0)
+            // should not happen
+            throw new TreeShapeException(self, "Cannot insert before a node with no parent");
 
         parent.Insert(containment, index, [newPredecessor]);
     }
@@ -63,13 +70,19 @@ public static class M1Extensions
             throw new TreeShapeException(self, "Cannot insert after a node with no parent");
 
         Containment containment = parent.GetContainmentOf(self)!;
+        if (!containment.Multiple)
+            throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
         var value = parent.Get(containment);
         if (value is not IEnumerable enumerable)
+            // should not happen
             throw new TreeShapeException(self, "Cannot insert after a node in a single containment");
 
-        var list = enumerable.AsNodes<IReadableNode>().ToList();
+        var list = new List<INode>(containment.AsNodes<INode>(enumerable));
         var index = list.IndexOf(self);
+        if (index < 0)
+            // should not happen
+            throw new TreeShapeException(self, "Cannot insert after a node with no parent");
 
         parent.Insert(containment, index + 1, [newSuccessor]);
     }
@@ -123,10 +136,16 @@ public static class M1Extensions
     /// <exception cref="TreeShapeException">If <paramref name="self"/> has no parent.</exception>
     public static T ReplaceWith<T>(this INode self, T replacement) where T : INode
     {
+        if (ReferenceEquals(self, replacement))
+            return replacement;
+        
         INode? parent = self.GetParent();
         if (parent == null)
             throw new TreeShapeException(self, "Cannot replace a node with no parent");
 
+        if (replacement is null)
+            throw new UnsupportedNodeTypeException(replacement, nameof(replacement));
+        
         Containment? containment = parent.GetContainmentOf(self);
 
         if (containment == null)
@@ -140,22 +159,42 @@ public static class M1Extensions
             
             return replacement;
         }
-        
+
         if (containment.Multiple)
         {
             var value = parent.Get(containment);
             if (value is not IEnumerable enumerable)
+                // should not happen
                 throw new TreeShapeException(self, "Multiple containment does not yield enumerable");
 
-            var nodes = enumerable.Cast<IReadableNode>().ToList();
+            var nodes = enumerable.Cast<INode>().ToList();
             var index = nodes.IndexOf(self);
+            if (index < 0)
+                // should not happen
+                throw new TreeShapeException(self, "Node not contained in its parent");
+
+            var replacementParent = replacement.GetParent();
+            var replacementContainment = replacementParent?.GetContainmentOf(replacement);
+            
+            if (containment.Equals(replacementContainment))
+            {
+                var replacementIndex = nodes.IndexOf(replacement);
+                nodes.Insert(index, replacement);
+                nodes.RemoveAt(index + 1);
+                nodes.RemoveAt(index < replacementIndex ? nodes.LastIndexOf(replacement) : nodes.IndexOf(replacement));
+            } else
+            {
+                nodes.Insert(index, replacement);
+                nodes.Remove(self);
+            }
+            
             parent.Insert(containment, index, [replacement]);
             parent.Remove(containment, [self]);
         } else
         {
             parent.Set(containment, replacement);
         }
-        
+
         return replacement;
     }
 

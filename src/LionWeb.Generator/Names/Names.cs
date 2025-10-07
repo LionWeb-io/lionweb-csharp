@@ -35,6 +35,8 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 /// </summary>
 public partial class Names : INames
 {
+    private const char _namespaceSeparator = '.';
+    
     private readonly HashSet<Type> _usedTypes = [];
 
     /// <inheritdoc />
@@ -56,7 +58,7 @@ public partial class Names : INames
     public Names(Language language, string namespaceName)
     {
         _language = language;
-        _namespaceName = namespaceName.PrefixKeyword();
+        _namespaceName = string.Join(_namespaceSeparator, namespaceName.Split(_namespaceSeparator).Select(p => p.PrefixKeyword()));
 
         _m3 = language.LionWebVersion.LionCore;
         _builtIns = language.LionWebVersion.BuiltIns;
@@ -82,7 +84,7 @@ public partial class Names : INames
     /// <inheritdoc />
     public string LanguageName(Language lang) => LanguageBaseName(lang) + "Language";
 
-    private string LanguageBaseName(Language lang) => lang.Name.Split('.').Last().ToFirstUpper().PrefixKeyword();
+    private string LanguageBaseName(Language lang) => lang.Name.Split(_namespaceSeparator).Last().ToFirstUpper().PrefixKeyword();
 
     /// <inheritdoc />
     public NameSyntax LanguageType => AsType(_language);
@@ -116,6 +118,8 @@ public partial class Names : INames
             result = PredefinedType(Token(SyntaxKind.IntKeyword));
         else if (type == typeof(bool))
             result = PredefinedType(Token(SyntaxKind.BoolKeyword));
+        else if (type == typeof(object))
+            result = PredefinedType(Token(SyntaxKind.ObjectKeyword));
 
         else if (generics == null || generics.Length == 0)
         {
@@ -180,10 +184,8 @@ public partial class Names : INames
         Language l => AsType(l),
         Classifier c => ToName(AsType(c, disambiguate)),
         Datatype d => ToName(AsType(d, disambiguate)),
-        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)),
-            IdentifierName(f.Name.PrefixKeyword())),
-        Field f => QualifiedName(ToName(AsType(f.GetStructuredDataType(), disambiguate)),
-            IdentifierName(f.Name.PrefixKeyword())),
+        Feature f => QualifiedName(ToName(AsType(f.GetFeatureClassifier(), disambiguate)), FeatureProperty(f)),
+        Field f => QualifiedName(ToName(AsType(f.GetStructuredDataType(), disambiguate)), FieldProperty(f)),
         EnumerationLiteral f => QualifiedName(ToName(AsType(f.GetEnumeration(), disambiguate)),
             IdentifierName(f.Name.PrefixKeyword()))
     };
@@ -220,7 +222,7 @@ public partial class Names : INames
     public string Use(Type type)
     {
         _usedTypes.Add(type);
-        return AfterIncludingBacktick().Replace(type.Name, "").PrefixKeyword();
+        return AfterIncludingBacktick().Replace(type.Name, string.Empty).PrefixKeyword();
     }
 
     /// <inheritdoc />

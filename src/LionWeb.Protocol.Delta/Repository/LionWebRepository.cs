@@ -24,17 +24,18 @@ using Message;
 using Message.Command;
 using Message.Event;
 using Message.Query;
-using System.Diagnostics;
 
 public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
-    private readonly DeltaProtocolPartitionCommandReceiver _commandReceiver;
+    private readonly DeltaProtocolCommandReceiver _commandReceiver;
 
-    public LionWebRepository(LionWebVersions lionWebVersion,
+    public LionWebRepository(
+        LionWebVersions lionWebVersion,
         List<Language> languages,
         string name,
-        IPartitionInstance partition,
-        IRepositoryConnector<IDeltaContent> connector) : base(lionWebVersion, languages, name, partition, connector)
+        IForest forest,
+        IRepositoryConnector<IDeltaContent> connector
+    ) : base(lionWebVersion, languages, name, forest, connector)
     {
         DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithLionWebVersion(lionWebVersion)
@@ -42,43 +43,26 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                 .WithHandler(new ReceiverDeserializerHandler())
             ;
 
-        Dictionary<CompressedMetaPointer, IKeyed> sharedKeyedMap = DeltaUtils.BuildSharedKeyMap(languages);
+        SharedKeyedMap sharedKeyedMap = SharedKeyedMapBuilder.BuildSharedKeyMap(languages);
 
-        _commandReceiver = new DeltaProtocolPartitionCommandReceiver(
-            PartitionEventHandler,
+        _commandReceiver = new DeltaProtocolCommandReceiver(
             SharedNodeMap,
             sharedKeyedMap,
             deserializerBuilder
         );
+
+        _commandReceiver.ConnectTo(_replicator);
     }
 
     /// <inheritdoc />
-    protected override async Task SendAll(IDeltaContent deltaContent)
+    public override void Dispose()
     {
-        switch (deltaContent)
-        {
-            case IDeltaEvent deltaEvent:
-                var commandSource = deltaEvent is { OriginCommands: { } cmds }
-                    ? cmds.First()
-                    : null;
-                Debug.WriteLine(
-                    $"{_name}: sending event: {deltaEvent.GetType()}({commandSource},{deltaEvent.SequenceNumber})");
-                break;
-
-            default:
-                Debug.WriteLine($"{_name}: sending: {deltaContent.GetType()}");
-                break;
-        }
-
-        await _connector.SendAll(deltaContent);
+        GC.SuppressFinalize(this);
+        _commandReceiver.Dispose();
+        base.Dispose();
     }
 
-    /// <inheritdoc />
-    protected override async Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
-    {
-        Debug.WriteLine($"{_name}: sending to {clientInfo}: {deltaContent.GetType()}");
-        await _connector.Send(clientInfo, deltaContent);
-    }
+    #region Remote
 
     /// <inheritdoc />
     protected override async Task Receive(IMessageContext<IDeltaContent> messageContext)
@@ -87,63 +71,98 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         {
             var content = messageContext.Content;
             content.InternalParticipationId = messageContext.ClientInfo.ParticipationId;
-            Debug.WriteLine(
-                $"{_name}: received {content.GetType().Name} for {messageContext.ClientInfo.ParticipationId}: {content})");
-            Interlocked.Increment(ref _messageCount);
+            Log(
+                $"received {content.GetType().Name} for {messageContext.ClientInfo.ParticipationId}", true);
 
             switch (content)
             {
                 case IDeltaCommand command:
-                    Debug.WriteLine($"{_name}: received command: {command.GetType()}({command.CommandId})");
+                    Log($"received command: {command.GetType()}({command.CommandId})");
                     _commandReceiver.Receive(command);
                     break;
 
+                case GetAvailableIdsRequest idsRequest:
+                    Log(
+                        $"received {nameof(GetAvailableIdsRequest)} for {messageContext.ClientInfo}: {idsRequest})");
+                    await Send(messageContext.ClientInfo,
+                        new GetAvailableIdsResponse(GetFreeNodeIds(idsRequest.count).ToArray(), idsRequest.QueryId,
+                            null));
+                    break;
+
                 case SignOnRequest signOnRequest:
-                    Debug.WriteLine(
-                        $"{_name}: received {nameof(SignOnRequest)} for {messageContext.ClientInfo}: {signOnRequest})");
+                    Log(
+                        $"received {nameof(SignOnRequest)} for {messageContext.ClientInfo}: {signOnRequest})");
                     await Send(messageContext.ClientInfo,
                         new SignOnResponse(messageContext.ClientInfo.ParticipationId, signOnRequest.QueryId, null));
                     break;
 
                 default:
-                    Debug.WriteLine(
-                        $"{_name}: ignoring received: {content.GetType()}({content.InternalParticipationId})");
+                    Log(
+                        $"ignoring received: {content.GetType()}({content.InternalParticipationId})");
                     break;
             }
         } catch (Exception e)
         {
-            Debug.WriteLine(e);
+            Log(e.ToString());
+            OnCommunicationError(e);
         }
     }
-}
 
-public class LionWebTestRepository(
-    LionWebVersions lionWebVersion,
-    List<Language> languages,
-    string name,
-    IPartitionInstance partition,
-    IRepositoryConnector<IDeltaContent> connector)
-    : LionWebRepository(lionWebVersion, languages, name, partition, connector)
-{
-    public int WaitCount { get; private set; }
+    #endregion
 
-    private const int SleepInterval = 100;
+    #region Send
 
-    private void WaitForCount(int count)
+    /// <inheritdoc />
+    protected override async Task Send(IClientInfo clientInfo, IDeltaContent deltaContent)
     {
-        while (MessageCount < count)
+        try
         {
-            Debug.WriteLine($"{_name}: {nameof(MessageCount)}: {MessageCount} vs. {nameof(count)}: {count}");
-            Thread.Sleep(SleepInterval);
+            Log($"sending to {clientInfo}: {deltaContent.GetType().Name}", true);
+            await _connector.SendToClient(clientInfo, deltaContent);
+        } catch (Exception e)
+        {
+            OnCommunicationError(e);
         }
     }
 
-    public void WaitForReceived(int delta) =>
-        WaitForCount(WaitCount += delta);
+    /// <inheritdoc />
+    protected override async Task SendAll(IDeltaContent deltaContent)
+    {
+        try
+        {
+            switch (deltaContent)
+            {
+                case IDeltaEvent deltaEvent:
+                    var commandSource = deltaEvent is { OriginCommands: { } cmds }
+                        ? cmds.First()
+                        : null;
+                    Log(
+                        $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})",
+                        true);
+                    break;
+
+                default:
+                    Log($"sending: {deltaContent.GetType().Name}", true);
+                    break;
+            }
+
+            await _connector.SendToAllClients(deltaContent);
+        } catch (Exception e)
+        {
+            Log(e.ToString());
+            OnCommunicationError(e);
+        }
+    }
+
+    #endregion
 }
 
 public class ExceptionParticipationIdProvider : IParticipationIdProvider
 {
+    private int _nextParticipationId = 1000;
+
     /// <inheritdoc />
-    public string ParticipationId => throw new NotImplementedException();
+    public string ParticipationId =>
+        // $"participationId{++_nextParticipationId}";
+        throw new NotImplementedException();
 }
