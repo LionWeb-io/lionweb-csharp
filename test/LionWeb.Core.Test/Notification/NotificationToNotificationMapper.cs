@@ -308,11 +308,12 @@ public class NotificationToNotificationMapper(SharedNodeMap sharedNodeMap)
     private AnnotationReplacedNotification OnAnnotationReplaced(AnnotationReplacedNotification notification)
     {
         var newAnnotation = CloneNode(notification.NewAnnotation);
+        var replacedAnnotation = LookUpNode(notification.ReplacedAnnotation);
         var parent = LookUpNode(notification.Parent);
 
         return new AnnotationReplacedNotification(
             newAnnotation,
-            notification.ReplacedAnnotation,
+            replacedAnnotation,
             parent,
             notification.Index,
             notification.NotificationId);

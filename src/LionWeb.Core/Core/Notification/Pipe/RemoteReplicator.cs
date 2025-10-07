@@ -34,17 +34,14 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 {
     private readonly IForest? _localForest;
 
-    private readonly SharedNodeMap _sharedNodeMap;
     protected readonly IdFilteringNotificationFilter Filter;
 
     public RemoteReplicator(
         IForest? localForest,
-        SharedNodeMap sharedNodeMap,
         IdFilteringNotificationFilter filter,
         object? sender) : base(sender)
     {
         _localForest = localForest;
-        _sharedNodeMap = sharedNodeMap;
         Filter = filter;
     }
 
@@ -146,9 +143,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemotePartitionDeleted(PartitionDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localPartition = (IPartitionInstance?)LookupOpt(notification.DeletedPartition.GetId());
-            if (localPartition != null)
-                _localForest?.RemovePartitions([localPartition], notification.NotificationId);
+            var localPartition = notification.DeletedPartition;
+            _localForest?.RemovePartitions([localPartition], notification.NotificationId);
         });
 
     #endregion
@@ -160,21 +156,21 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         {
             Debug.WriteLine(
                 $"Node {notification.Node.PrintIdentity()}: Setting {notification.Property} to {notification.NewValue}");
-            var node = Lookup(notification.Node.GetId());
+            var node = (INotifiableNode)notification.Node;
             node.Set(notification.Property, notification.NewValue, notification.NotificationId);
         });
 
     private void OnRemotePropertyDeleted(PropertyDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var node = Lookup(notification.Node.GetId());
+            var node = (INotifiableNode)notification.Node;
             node.Set(notification.Property, null, notification.NotificationId);
         });
 
     private void OnRemotePropertyChanged(PropertyChangedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var node = Lookup(notification.Node.GetId());
+            var node = (INotifiableNode)notification.Node;
             node.Set(notification.Property, notification.NewValue, notification.NotificationId);
         });
 
@@ -185,7 +181,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteChildAdded(ChildAddedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
+            var localParent = (INode)notification.Parent;
             var newChildNode = (INode)notification.NewChild;
 
             Debug.WriteLine(
@@ -198,8 +194,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteChildDeleted(ChildDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
-            
+            var localParent = (INotifiableNode)notification.Parent;
+
             object? newValue = null;
             if (notification.Containment.Multiple)
             {
@@ -218,16 +214,16 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteChildReplaced(ChildReplacedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var newChild = LookupOpt(notification.NewChild.GetId()) ?? (INode)notification.NewChild;
-            var replacedChild = Lookup(notification.ReplacedChild.GetId());
+            var newChild = (INode)notification.NewChild;
+            var replacedChild = (INode)notification.ReplacedChild;
             replacedChild.ReplaceWith(newChild, notification.NotificationId);
         });
 
     private void OnRemoteChildMovedFromOtherContainment(ChildMovedFromOtherContainmentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localNewParent = Lookup(notification.NewParent.GetId());
-            var movedChild = LookupOpt(notification.MovedChild.GetId()) ?? (INode)notification.MovedChild;
+            var localNewParent = (INode)notification.NewParent;
+            var movedChild = (INode)notification.MovedChild;
             var newValue = InsertContainment(localNewParent, notification.NewContainment, notification.NewIndex,
                 movedChild);
 
@@ -238,8 +234,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         ChildMovedAndReplacedFromOtherContainmentNotification notification) => SuppressNotificationForwarding(
         notification, () =>
         {
-            var movedChild = Lookup(notification.MovedChild.GetId());
-            var replacedChild = Lookup(notification.ReplacedChild.GetId());
+            var movedChild = (INode)notification.MovedChild;
+            var replacedChild = (INode)notification.ReplacedChild;
             replacedChild.ReplaceWith(movedChild, notification.NotificationId);
         });
 
@@ -247,8 +243,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         ChildMovedAndReplacedFromOtherContainmentInSameParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var movedChild = Lookup(notification.MovedChild.GetId());
-            var replacedChild = Lookup(notification.ReplacedChild.GetId());
+            var movedChild = (INode)notification.MovedChild;
+            var replacedChild = (INode)notification.ReplacedChild;
             replacedChild.ReplaceWith(movedChild, notification.NotificationId);
         });
 
@@ -256,9 +252,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
         ChildMovedFromOtherContainmentInSameParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
+            var localParent = (INode)notification.Parent;
             var newValue = InsertContainment(localParent, notification.NewContainment, notification.NewIndex,
-                Lookup(notification.MovedChild.GetId()));
+                (INode)notification.MovedChild);
 
             localParent.Set(notification.NewContainment, newValue, notification.NotificationId);
         });
@@ -266,8 +262,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteChildMovedInSameContainment(ChildMovedInSameContainmentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
-            INode nodeToInsert = Lookup(notification.MovedChild.GetId());
+            var localParent = (INotifiableNode)notification.Parent;
+            var nodeToInsert = (INode)notification.MovedChild;
             object newValue = nodeToInsert;
             var existingChildren = localParent.Get(notification.Containment);
             if (existingChildren is IList l)
@@ -281,11 +277,12 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
             localParent.Set(notification.Containment, newValue, notification.NotificationId);
         });
 
-    private void OnRemoteChildMovedAndReplacedInSameContainment(ChildMovedAndReplacedInSameContainmentNotification notification) =>
+    private void OnRemoteChildMovedAndReplacedInSameContainment(
+        ChildMovedAndReplacedInSameContainmentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var movedChild = Lookup(notification.MovedChild.GetId());
-            var replacedChild = Lookup(notification.ReplacedChild.GetId());
+            var movedChild = (INode)notification.MovedChild;
+            var replacedChild = (INode)notification.ReplacedChild;
             replacedChild.ReplaceWith(movedChild, notification.NotificationId);
         });
 
@@ -323,7 +320,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteAnnotationAdded(AnnotationAddedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
+            var localParent = (INotifiableNode)notification.Parent;
             var newAnnotation = (INode)notification.NewAnnotation;
             localParent.InsertAnnotations(notification.Index, [newAnnotation], notification.NotificationId);
         });
@@ -331,48 +328,50 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteAnnotationDeleted(AnnotationDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
-            var localDeleted = Lookup(notification.DeletedAnnotation.GetId());
+            var localParent = (INotifiableNode)notification.Parent;
+            var localDeleted = (INotifiableNode)notification.DeletedAnnotation;
             localParent.RemoveAnnotations([localDeleted], notification.NotificationId);
         });
 
     private void OnRemoteAnnotationReplaced(AnnotationReplacedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var newAnnotation = LookupOpt(notification.NewAnnotation.GetId()) ?? (INode)notification.NewAnnotation;
-            var replacedAnnotation = Lookup(notification.ReplacedAnnotation.GetId());
+            var newAnnotation = (INode)notification.NewAnnotation;
+            var replacedAnnotation = (INode)notification.ReplacedAnnotation;
             replacedAnnotation.ReplaceWith(newAnnotation, notification.NotificationId);
         });
 
     private void OnRemoteAnnotationMovedFromOtherParent(AnnotationMovedFromOtherParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localNewParent = Lookup(notification.NewParent.GetId());
-            var movedAnnotation = LookupOpt(notification.MovedAnnotation.GetId()) ?? (INode)notification.MovedAnnotation;
+            var localNewParent = (INotifiableNode)notification.NewParent;
+            var movedAnnotation = (INotifiableNode)notification.MovedAnnotation;
             localNewParent.InsertAnnotations(notification.NewIndex, [movedAnnotation], notification.NotificationId);
         });
 
-    private void OnRemoteAnnotationMovedAndReplacedFromOtherParent(AnnotationMovedAndReplacedFromOtherParentNotification notification) =>
+    private void OnRemoteAnnotationMovedAndReplacedFromOtherParent(
+        AnnotationMovedAndReplacedFromOtherParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var movedAnnotation = LookupOpt(notification.MovedAnnotation.GetId()) ?? (INode)notification.MovedAnnotation;
-            var replacedAnnotation = Lookup(notification.ReplacedAnnotation.GetId());
+            var movedAnnotation = (INode)notification.MovedAnnotation;
+            var replacedAnnotation = (INode)notification.ReplacedAnnotation;
             replacedAnnotation.ReplaceWith(movedAnnotation, notification.NotificationId);
         });
-    
+
     private void OnRemoteAnnotationMovedInSameParent(AnnotationMovedInSameParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
-            var movedAnnotation =  LookupOpt(notification.MovedAnnotation.GetId()) ?? Lookup(notification.MovedAnnotation.GetId());
+            var localParent = (INotifiableNode)notification.Parent;
+            var movedAnnotation = (INotifiableNode)notification.MovedAnnotation;
             localParent.InsertAnnotations(notification.NewIndex, [movedAnnotation], notification.NotificationId);
         });
 
-    private void OnRemoteAnnotationMovedAndReplacedInSameParent(AnnotationMovedAndReplacedInSameParentNotification notification) =>
+    private void OnRemoteAnnotationMovedAndReplacedInSameParent(
+        AnnotationMovedAndReplacedInSameParentNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var movedAnnotation =  LookupOpt(notification.MovedAnnotation.GetId()) ?? Lookup(notification.MovedAnnotation.GetId());
-            var replacedAnnotation = Lookup(notification.ReplacedAnnotation.GetId());
+            var movedAnnotation = (INode)notification.MovedAnnotation;
+            var replacedAnnotation = (INode)notification.ReplacedAnnotation;
             replacedAnnotation.ReplaceWith(movedAnnotation, notification.NotificationId);
         });
 
@@ -383,8 +382,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteReferenceAdded(ReferenceAddedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
-            INode target = Lookup(notification.NewTarget.Reference.GetId());
+            var localParent = (INode)notification.Parent;
+            var target = notification.NewTarget.Reference;
             var newValue = InsertReference(localParent, notification.Reference, notification.Index,
                 target);
 
@@ -394,7 +393,7 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteReferenceDeleted(ReferenceDeletedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
+            var localParent = (INotifiableNode)notification.Parent;
 
             object? newValue = null;
             if (notification.Reference.Multiple)
@@ -414,9 +413,9 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     private void OnRemoteReferenceChanged(ReferenceChangedNotification notification) =>
         SuppressNotificationForwarding(notification, () =>
         {
-            var localParent = Lookup(notification.Parent.GetId());
+            var localParent = (INotifiableNode)notification.Parent;
 
-            object newValue = Lookup(notification.NewTarget.Reference.GetId());
+            object newValue = notification.NewTarget.Reference;
             if (notification.Reference.Multiple)
             {
                 var existingTargets = localParent.Get(notification.Reference);
@@ -434,8 +433,8 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
 
     private void OnRemoteEntryMovedInSameReference(EntryMovedInSameReferenceNotification notification)
     {
-        var localParent = Lookup(notification.Parent.GetId());
-        var target = Lookup(notification.Target.Reference.GetId());
+        var localParent = (INotifiableNode)notification.Parent;
+        var target = notification.Target.Reference;
 
         object newValue = target;
         var reference = notification.Reference;
@@ -480,12 +479,6 @@ public class RemoteReplicator : NotificationPipeBase, INotificationHandler
     }
 
     #endregion
-
-    private INode Lookup(NodeId nodeId) =>
-        (INode)_sharedNodeMap[nodeId];
-
-    private INode? LookupOpt(NodeId nodeId) =>
-        _sharedNodeMap.TryGetValue(nodeId, out var result) ? (INode?)result : null;
 
     /// Uses <see cref="IdFilteringNotificationFilter"/> to suppress forwarding notifications raised during executing <paramref name="action"/>. 
     protected virtual void SuppressNotificationForwarding(INotification notification, Action action)

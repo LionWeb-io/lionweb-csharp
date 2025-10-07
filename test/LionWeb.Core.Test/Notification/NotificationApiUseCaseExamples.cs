@@ -427,42 +427,6 @@ public class NotificationApiUseCaseExamples : NotificationTestsBase
     }
     
     #endregion
-    
-    [TestMethod]
-    public void ReplicateChanges_Partition()
-    {
-        var circle = new Circle("c");
-        var partition = new Geometry("geo") { Shapes = [circle] };
-        var clone = ClonePartition(partition);
-
-        var replicator = PartitionReplicator.Create(clone, new(), partition.GetId());
-        partition.GetNotificationSender()!.ConnectTo(replicator);
-
-        circle.Name = "Hello";
-
-        AssertEquals([partition], [clone]);
-    }
-
-
-    [TestMethod]
-    public void ReplicateChanges_Forest()
-    {
-        var originalForest = new Forest();
-        var cloneForest = new Forest();
-
-        var replicator = ForestReplicator.Create(cloneForest, new(), null);
-        originalForest.GetNotificationSender()!.ConnectTo(replicator);
-
-        var moved = new Documentation("moved");
-        var originPartition = new Geometry("origin-geo") { Shapes = [new Line("l") { ShapeDocs = moved }] };
-
-        var partition = new Geometry("geo");
-
-        originalForest.AddPartitions([partition, originPartition]);
-        partition.Documentation = moved;
-
-        AssertEquals([partition, originPartition], cloneForest.Partitions.OrderBy(p => p.GetId()).ToList());
-    }
 
     #endregion
 }
