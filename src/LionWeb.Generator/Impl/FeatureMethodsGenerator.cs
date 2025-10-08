@@ -60,7 +60,11 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
         }
 
         var addInternal =  GenAddInternal();
-        featureMethods = featureMethods.Append(addInternal);
+        var insertInternal = GenInsertInternal();
+        
+        featureMethods = featureMethods
+            .Append(addInternal)
+            .Append(insertInternal);
 
         return featureMethods;
     }
@@ -91,61 +95,6 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
             ])
         );
 
-    #endregion
-
-    #region AddInternal
-
-    private MethodDeclarationSyntax GenAddInternal() =>
-        Method("AddInternal", AsType(typeof(bool)), [
-                Param("link", NullableType(AsType(typeof(Link)))),
-                Param("nodes", AsType(typeof(IEnumerable<IReadableNode>)))
-            ])
-            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
-            .Xdoc(XdocInheritDoc())
-            .WithBody(AsStatements(new List<StatementSyntax>
-                {
-                    IfStatement(ParseExpression("base.AddInternal(link, nodes)"),
-                        ReturnTrue())
-                }
-                .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenAddInternal))
-                .Append(ReturnStatement(false.AsLiteral()))
-            ));
-
-    private StatementSyntax GenAddInternal(Link link)
-    {
-        List<StatementSyntax> body = link switch
-        {
-            Containment containment => GenAddInternalMultipleContainment(containment, writeable: true),
-            Reference reference => GenAddInternalMultipleReference(reference),
-            _ => throw new ArgumentException($"unsupported link: {link}", nameof(link))
-        };
-
-        return IfStatement(
-            GenEqualsIdentityLink(link),
-            AsStatements(body)
-        );
-    }
-    
-    private List<StatementSyntax> GenAddInternalMultipleReference(Reference reference) =>
-    [
-        AsStatements([
-            ExpressionStatement(
-                InvocationExpression(
-                    IdentifierName(AddLink(reference)), AsArguments([AsNodesCall(reference, argument: "nodes")]))),
-            ReturnTrue()
-        ])
-    ];
-
-    private List<StatementSyntax> GenAddInternalMultipleContainment(Containment containment, bool writeable) =>
-    [
-        AsStatements([
-            ExpressionStatement(
-                InvocationExpression(
-                    IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, argument: "nodes", writeable)]))),
-            ReturnTrue()
-        ])
-    ];
-    
     #endregion
     
     #region SetInternal
@@ -390,6 +339,111 @@ public class FeatureMethodsGenerator(Classifier classifier, INames names, LionWe
 
     #endregion
 
+    #region AddInternal
+
+    private MethodDeclarationSyntax GenAddInternal() =>
+        Method("AddInternal", AsType(typeof(bool)), [
+                Param("link", NullableType(AsType(typeof(Link)))),
+                Param("nodes", AsType(typeof(IEnumerable<IReadableNode>)))
+            ])
+            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+            .Xdoc(XdocInheritDoc())
+            .WithBody(AsStatements(new List<StatementSyntax>
+                {
+                    IfStatement(ParseExpression("base.AddInternal(link, nodes)"),
+                        ReturnTrue())
+                }
+                .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenAddInternal))
+                .Append(ReturnStatement(false.AsLiteral()))
+            ));
+
+    private StatementSyntax GenAddInternal(Link link)
+    {
+        List<StatementSyntax> body = link switch
+        {
+            Containment containment => GenAddInternalMultipleContainment(containment, writeable: true),
+            Reference reference => GenAddInternalMultipleReference(reference),
+            _ => throw new ArgumentException($"unsupported link: {link}", nameof(link))
+        };
+
+        return IfStatement(
+            GenEqualsIdentityLink(link),
+            AsStatements(body)
+        );
+    }
+
+    private List<StatementSyntax> GenAddInternalMultipleReference(Reference reference) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(AddLink(reference)), AsArguments([AsNodesCall(reference, argument: "nodes")]))),
+        ReturnTrue()
+    ];
+
+    private List<StatementSyntax> GenAddInternalMultipleContainment(Containment containment, bool writeable) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(AddLink(containment)), AsArguments([AsNodesCall(containment, argument: "nodes", writeable)]))),
+        ReturnTrue()
+    ];
+    
+    #endregion
+
+    #region InsertInternal
+
+    private MethodDeclarationSyntax GenInsertInternal() =>
+        Method("InsertInternal", AsType(typeof(bool)), [
+                Param("link", NullableType(AsType(typeof(Link)))),
+                Param("index", AsType(typeof(int))),
+                Param("nodes", AsType(typeof(IEnumerable<IReadableNode>)))
+            ])
+            .WithModifiers(AsModifiers(SyntaxKind.ProtectedKeyword, SyntaxKind.OverrideKeyword))
+            .Xdoc(XdocInheritDoc())
+            .WithBody(AsStatements(new List<StatementSyntax>
+                {
+                    IfStatement(ParseExpression("base.InsertInternal(link, index, nodes)"),
+                        ReturnTrue())
+                }
+                .Concat(FeaturesToImplement(classifier).OfType<Link>().Where(l => l.Multiple).Select(GenInsertInternal))
+                .Append(ReturnStatement(false.AsLiteral()))
+            ));
+
+    
+    private StatementSyntax GenInsertInternal(Link link)
+    {
+        List<StatementSyntax> body = link switch
+        {
+            Containment containment => GenInsertInternalMultipleContainment(containment, writeable: true),
+            Reference reference => GenInsertInternalMultipleReference(reference),
+            _ => throw new ArgumentException($"unsupported link: {link}", nameof(link))
+        };
+
+        return IfStatement(
+            GenEqualsIdentityLink(link),
+            AsStatements(body)
+        );
+    }
+
+    private List<StatementSyntax> GenInsertInternalMultipleReference(Reference reference) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(InsertLink(reference)), AsArguments([IdentifierName("index"), AsNodesCall(reference, argument: "nodes")]))),
+        ReturnTrue()
+    ];
+
+    private List<StatementSyntax> GenInsertInternalMultipleContainment(Containment containment, bool writeable) =>
+    [
+        ExpressionStatement(
+            InvocationExpression(
+                IdentifierName(InsertLink(containment)),
+                AsArguments([IdentifierName("index"), AsNodesCall(containment, argument: "nodes", writeable)]))),
+        ReturnTrue()
+    ];
+    
+    #endregion
+    
     #region CollectAllSetFeatures
 
     private MethodDeclarationSyntax GenCollectAllSetFeatures() =>

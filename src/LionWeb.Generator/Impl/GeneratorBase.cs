@@ -181,4 +181,8 @@ public abstract class GeneratorBase
     /// <returns><c>AddLink</c></returns>
     protected string AddLink(Link link) =>
         $"Add{link.Name.ToFirstUpper()}";
+    
+    /// <returns><c>InsertLink</c></returns>
+    protected string InsertLink(Link link) =>
+        $"Insert{link.Name.ToFirstUpper()}";
 }
