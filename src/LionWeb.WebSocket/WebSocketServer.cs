@@ -18,6 +18,7 @@ public class WebSocketServer
 
     public LionWebVersions LionWebVersion;
     public required List<Language> Languages { get; init; }
+    public IDeltaRepositoryConnector Connector => _repositoryConnector;
 
     private readonly DeltaSerializer _deltaSerializer;
     private readonly IDeltaRepositoryConnector _repositoryConnector;
