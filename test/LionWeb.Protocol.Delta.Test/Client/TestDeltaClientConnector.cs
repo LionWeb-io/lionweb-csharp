@@ -22,54 +22,40 @@ using Core.Notification;
 using Delta.Client;
 using Delta.Repository;
 using Message;
-using Repository;
-using System.Text;
 
-class ClientConnector : IDeltaClientConnector
+class TestDeltaClientConnector : IDeltaClientConnector, IDeltaRepositoryClient
 {
-    private readonly DeltaSerializer _deltaSerializer = new();
     private readonly NotificationToDeltaCommandMapper _mapper;
-    private RepositoryConnector _repositoryConnector;
+
     private ClientInfo _clientInfo;
+    private IDeltaRepositoryConnector _deltaRepositoryConnector;
 
-
-    public ClientConnector(LionWebVersions lionWebVersion)
+    public TestDeltaClientConnector(LionWebVersions lionWebVersion)
     {
         _mapper = new(new CommandIdProvider(), lionWebVersion);
     }
 
-    public void Connect(ClientId clientId, RepositoryConnector repositoryConnector)
+    public void Connect(ClientId clientId, IDeltaRepositoryConnector deltaRepositoryConnector)
     {
-        _clientInfo = new ClientInfo
-        {
-            ClientId = clientId
-        };
-        repositoryConnector.AddClient(_clientInfo, this);
-        _repositoryConnector = repositoryConnector;
+        _clientInfo = new ClientInfo { ClientId = clientId };
+        deltaRepositoryConnector.AddClient(_clientInfo, this);
+        _deltaRepositoryConnector = deltaRepositoryConnector;
     }
+
+    public event EventHandler<IDeltaContent>? ReceivedFromRepository;
 
     public Task SendToRepository(IDeltaContent content)
     {
-        var encoded = Encode(content);
-        _repositoryConnector.MessageFromClient(_clientInfo, encoded);
-
+        _deltaRepositoryConnector.ReceiveFromClient(new DeltaMessageContext(_clientInfo, content));
         return Task.CompletedTask;
     }
-
-    private byte[] Encode(IDeltaContent content) =>
-        Encode(_deltaSerializer.Serialize(content));
-
-    private static byte[] Encode(string msg) =>
-        Encoding.UTF8.GetBytes(msg);
-
-    public event EventHandler<IDeltaContent>? ReceiveFromRepository;
 
     public IDeltaContent Convert(INotification notification) =>
         _mapper.Map(notification);
 
-    public void MessageFromRepository(byte[] encoded)
+    public Task SendToClient(IDeltaContent content)
     {
-        var deltaContent = _deltaSerializer.Deserialize<IDeltaContent>(Encoding.UTF8.GetString(encoded));
-        ReceiveFromRepository?.Invoke(this, deltaContent);
+        ReceivedFromRepository?.Invoke(this, content);
+        return Task.CompletedTask;
     }
 }

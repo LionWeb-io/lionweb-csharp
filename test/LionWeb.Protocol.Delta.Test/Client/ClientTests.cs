@@ -33,13 +33,14 @@ using Message.Event;
 public class ClientTests
 {
     private const RepositoryId _repositoryId = "myRepo";
-    
-    private readonly DeltaRepositoryConnector _repositoryConnector;
+
+    private readonly TestDeltaRepositoryConnector _repositoryConnector;
     private readonly IForest _repositoryForest;
     private readonly Geometry _repositoryPartition;
     private readonly LionWebTestRepository _repository;
 
-    private readonly DeltaClientConnector _clientConnector;
+    private readonly TestDeltaClientConnector _clientConnector;
+
     private readonly IForest _clientForest;
     private readonly Geometry _clientPartition;
     private readonly LionWebTestClient _client;
@@ -50,11 +51,11 @@ public class ClientTests
         var lionWebVersion = LionWebVersions.v2023_1;
         List<Language> languages = [ShapesLanguage.Instance];
 
-        _repositoryConnector = new DeltaRepositoryConnector(lionWebVersion);
+        _repositoryConnector = new TestDeltaRepositoryConnector(lionWebVersion);
         _clientInfo = new ClientInfo { ParticipationId = "clientParticipation" };
-        _clientConnector = new(lionWebVersion,
-            content => _repositoryConnector.ReceiveMessageFromClient(new DeltaMessageContext(_clientInfo, content)));
-        _repositoryConnector.Sender = content => _clientConnector.ReceiveMessageFromRepository(content);
+        _clientConnector = new TestDeltaClientConnector(lionWebVersion);
+        _clientConnector.Connect("clientId", _repositoryConnector);
+        _repositoryConnector.Sender = content => _clientConnector.SendToClient(content);
 
         _repositoryForest = new Forest();
         _repository = new LionWebTestRepository(lionWebVersion, languages, "server", _repositoryForest,
@@ -65,7 +66,7 @@ public class ClientTests
         _client = new LionWebTestClient(lionWebVersion, languages, "client", _clientForest, _clientConnector);
         _client.SignOn(_repositoryId);
         _client.ParticipationId = _clientInfo.ParticipationId;
-        
+
         _clientForest.AddPartitions([_clientPartition]);
         _repository.WaitForReceived(1);
         _repositoryPartition = (Geometry)_repositoryForest.Partitions.First();
@@ -77,7 +78,7 @@ public class ClientTests
     {
         _clientPartition.Documentation = new Documentation("doc");
 
-         _repository.WaitForReceived(1);
+        _repository.WaitForReceived(1);
 
         AssertEquals(_clientPartition, _repositoryPartition);
     }

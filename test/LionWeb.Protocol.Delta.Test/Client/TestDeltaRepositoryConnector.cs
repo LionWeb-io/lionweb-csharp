@@ -23,11 +23,11 @@ using Delta.Client;
 using Delta.Repository;
 using Message;
 
-internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
+internal class TestDeltaRepositoryConnector : IDeltaRepositoryConnector
 {
     private readonly NotificationToDeltaCommandMapper _mapper;
 
-    public DeltaRepositoryConnector(LionWebVersions lionWebVersion)
+    public TestDeltaRepositoryConnector(LionWebVersions lionWebVersion)
     {
         _mapper = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion);
     }
@@ -46,7 +46,15 @@ internal class DeltaRepositoryConnector : IDeltaRepositoryConnector
         return Task.CompletedTask;
     }
 
-    public event EventHandler<IMessageContext<IDeltaContent>>? ReceiveFromClient;
-    public void ReceiveMessageFromClient(IDeltaMessageContext context) => ReceiveFromClient?.Invoke(null, context);
+    public void AddClient(IClientInfo clientInfo, IDeltaRepositoryClient clientConnector)
+    {
+    }
+
+    public void RemoveClient(ClientInfo clientInfo)
+    {
+    }
+
+    public event EventHandler<IMessageContext<IDeltaContent>>? ReceivedFromClient;
+    public void ReceiveFromClient(IMessageContext<IDeltaContent> message) => ReceivedFromClient?.Invoke(null, message);
     public IDeltaContent Convert(INotification notification) => _mapper.Map(notification);
 }
