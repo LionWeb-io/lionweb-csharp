@@ -44,6 +44,8 @@ public class WebSocketClient
             async content => await Send(_deltaSerializer.Serialize(content)));
     }
 
+    public IDeltaClientConnector Connector => _clientConnector;
+
     public async Task ConnectToServer(string ipAddress, int port) =>
         await ConnectToServer($"ws://{ipAddress}:{port}");
 
