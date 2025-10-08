@@ -11,8 +11,14 @@ This repository contains an implementation of (select parts of) the [LionWeb](ht
 
 * [`src/LionWeb.Core`]: implementation of LionWeb for/in C#
 * [`src/LionWeb.Generator`]: implementation of a C# code generator for LionWeb
+* [`src/LionWeb.Generator.Cli`]: command-line interface for `LionWeb.Generator`
+* [`src/LionWeb.Generator.MpsSpecfic`]: M2 extensions used by `LionWeb.Generator`
+* [`src/LionWeb.Protocol.Delta`]: implementation of LionWeb delta protocol
 * [`build/LionWeb-CSharp-Build`]: a .NET console application that generates various source files in the `-Test` project
+* [`test/LionWeb.Core.Benchmark`]: Benchmarks for different aspects of LionWeb C#
 * [`test/LionWeb.Core.Test`]: unit tests for `LionWeb.Core`
+* [`test/LionWeb.Generator.Cli.Test`]: unit tests for `LionWeb.Generator.Cli`
+* [`test/LionWeb.Protocol.Delta.Test`]: unit tests for `LionWeb.Protocol.Delta`
 
 See these projects' respective `README`s for more information.
 

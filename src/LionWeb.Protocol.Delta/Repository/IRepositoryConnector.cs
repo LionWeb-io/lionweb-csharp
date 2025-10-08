@@ -22,7 +22,7 @@ using Core.Notification;
 public interface IRepositoryConnector<T>
 {
     Task SendToClient(IClientInfo clientInfo, T content);
-    Task SendToAllClients(T content);
+    Task SendToAllClients(T content, HashSet<NodeId> affectedPartitions);
     event EventHandler<IMessageContext<T>> ReceiveFromClient;
     T Convert(INotification notification);
 }
@@ -31,11 +31,4 @@ public interface IMessageContext<T>
 {
     IClientInfo ClientInfo { get; }
     T Content { get; }
-}
-
-public interface IClientInfo
-{
-    ParticipationId ParticipationId { get; }
-    
-    EventSequenceNumber IncrementAndGetSequenceNumber();
 }

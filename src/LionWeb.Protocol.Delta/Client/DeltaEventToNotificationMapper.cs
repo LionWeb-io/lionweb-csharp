@@ -27,6 +27,7 @@ using Core.Notification.Partition;
 using Core.Serialization;
 using Message;
 using Message.Event;
+using System.Diagnostics.CodeAnalysis;
 
 public class DeltaEventToNotificationMapper
 {
@@ -80,11 +81,14 @@ public class DeltaEventToNotificationMapper
             ToNotificationId(partitionAdded)
         );
 
-    private PartitionDeletedNotification OnPartitionDeleted(PartitionDeleted partitionDeleted) =>
-        new(
-            (IPartitionInstance)ToNode(partitionDeleted.DeletedPartition),
-            ToNotificationId(partitionDeleted)
-        );
+    private PartitionDeletedNotification OnPartitionDeleted(PartitionDeleted partitionDeleted)
+    {
+        TryToNode(partitionDeleted.DeletedPartition, out var deletedNode);
+        if (deletedNode is null or IPartitionInstance)
+            return new PartitionDeletedNotification((IPartitionInstance)deletedNode!, ToNotificationId(partitionDeleted));
+
+        throw new DeltaException(DeltaErrorCode.InvalidNodeType.AsError(partitionDeleted.OriginCommands, partitionDeleted.ProtocolMessages, deletedNode));
+    }
 
     #endregion
 
@@ -404,11 +408,22 @@ public class DeltaEventToNotificationMapper
 
     private IWritableNode ToNode(TargetNode nodeId)
     {
-        if (_sharedNodeMap.TryGetValue(nodeId, out var node) && node is IWritableNode w)
+        if (TryToNode(nodeId, out var w))
             return w;
 
-        // TODO change to correct exception 
-        throw new NotImplementedException(nodeId);
+        throw new DeltaException(DeltaErrorCode.UnknownNodeId.AsError(null, null, nodeId));
+    }
+
+    private bool TryToNode(TargetNode nodeId, [NotNullWhen(true)] out IWritableNode? node)
+    {
+        if (_sharedNodeMap.TryGetValue(nodeId, out var n) && n is IWritableNode w)
+        {
+            node = w;
+            return true;
+        }
+
+        node = null;
+        return false;
     }
 
     private T ToFeature<T>(MetaPointer deltaReference, IReadableNode node) where T : Feature

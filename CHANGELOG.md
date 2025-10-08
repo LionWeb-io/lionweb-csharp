@@ -10,6 +10,13 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 
 ### Added
 * Added generic add/insert/remove node api for multiple `link` (references and containments) features.
+* Implemented delta protocol queries for both `LionWebClient` and `LionWebRepository`:
+  * `SubscribeToChangingPartitions`
+  * `SubscribeToPartitionContents`
+  * `UnsubscribeFromPartitionContents`
+  * `SignOff`
+  * `Reconnect`
+  * `ListPartitions`
 * Added command line interface (CLI) for the LionWeb C# generator.
 * Added `JsonUtils.ReadNodesFromStream()` to load nodes from strings synchronously.
 * Added benchmarking project.
@@ -70,6 +77,7 @@ and this project adheres _loosely_ to [Semantic Versioning](https://semver.org/s
 * Deserializing languages with annotations that contain references works now.
 * Fixed generating &lt;seealso&gt; tags pointing to case-mangled names.
 ### Changed
+* `LionWebRepository` now adheres to delta spec regarding client's sign-on state. This means any interaction first needs a sign-on. 
 * Pipe members following forests get all notifications of all partitions inside the forest.
 * Made `DynamicStructuredDataTypeInstance.GetHashCode()` more stable.
 * `DynamicLanguageCloner` doesn't change a language's factory anymore.

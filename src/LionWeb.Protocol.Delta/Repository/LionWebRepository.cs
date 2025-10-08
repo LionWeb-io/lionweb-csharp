@@ -20,6 +20,7 @@ namespace LionWeb.Protocol.Delta.Repository;
 using Core;
 using Core.M1;
 using Core.M3;
+using Core.Notification.Forest;
 using Message;
 using Message.Command;
 using Message.Event;
@@ -28,6 +29,8 @@ using Message.Query;
 public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
 {
     private readonly DeltaProtocolCommandReceiver _commandReceiver;
+    private readonly SerializerBuilder _serializerBuilder;
+    private readonly IParticipationIdProvider _participationIdProvider;
 
     public LionWebRepository(
         LionWebVersions lionWebVersion,
@@ -48,10 +51,14 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
         _commandReceiver = new DeltaProtocolCommandReceiver(
             SharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder
-        );
+            deserializerBuilder, name);
 
         _commandReceiver.ConnectTo(_replicator);
+
+        _serializerBuilder = new SerializerBuilder()
+            .WithLionWebVersion(_lionWebVersion);
+
+        _participationIdProvider = new ParticipationIdProvider();
     }
 
     /// <inheritdoc />
@@ -78,22 +85,36 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             {
                 case IDeltaCommand command:
                     Log($"received command: {command.GetType()}({command.CommandId})");
-                    _commandReceiver.Receive(command);
+
+                    if (!messageContext.ClientInfo.SignedOn)
+                    {
+                        await Send(messageContext.ClientInfo,
+                            DeltaErrorCode.NotSignedOn.AsError(
+                                [new CommandSource(messageContext.ClientInfo.ParticipationId, command.CommandId)],
+                                null));
+                        return;
+                    }
+
+                    var notification = _commandReceiver.Map(command);
+                    if (notification is PartitionAddedNotification partitionAdded)
+                    {
+                        messageContext.ClientInfo.SubscribedPartitions.Add(partitionAdded.NewPartition.GetId());
+                    }
+
+                    _commandReceiver.ProduceNotification(notification);
+
+                    if (notification is PartitionDeletedNotification partitionDeleted)
+                    {
+                        messageContext.ClientInfo.SubscribedPartitions.Remove(partitionDeleted.DeletedPartition
+                            .GetId());
+                    }
+
                     break;
 
-                case GetAvailableIdsRequest idsRequest:
-                    Log(
-                        $"received {nameof(GetAvailableIdsRequest)} for {messageContext.ClientInfo}: {idsRequest})");
-                    await Send(messageContext.ClientInfo,
-                        new GetAvailableIdsResponse(GetFreeNodeIds(idsRequest.count).ToArray(), idsRequest.QueryId,
-                            null));
-                    break;
-
-                case SignOnRequest signOnRequest:
-                    Log(
-                        $"received {nameof(SignOnRequest)} for {messageContext.ClientInfo}: {signOnRequest})");
-                    await Send(messageContext.ClientInfo,
-                        new SignOnResponse(messageContext.ClientInfo.ParticipationId, signOnRequest.QueryId, null));
+                case IDeltaQueryRequest request:
+                    Log($"received query: {request.GetType()}({request.QueryId}) for for {messageContext.ClientInfo}");
+                    var response = HandleQueryRequest(request, messageContext.ClientInfo);
+                    await Send(messageContext.ClientInfo, response);
                     break;
 
                 default:
@@ -106,6 +127,120 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
             Log(e.ToString());
             OnCommunicationError(e);
         }
+    }
+
+    private IDeltaQueryResponse HandleQueryRequest(IDeltaQueryRequest request, IClientInfo clientInfo)
+    {
+        switch (request)
+        {
+            case GetAvailableIdsRequest idsRequest:
+                return GetAvailableIds(idsRequest);
+
+            case ListPartitionsRequest listPartitionsRequest:
+                return ListPartitions(listPartitionsRequest);
+
+            case SignOnRequest signOnRequest:
+                return SignOn(clientInfo, signOnRequest);
+
+            case SignOffRequest signOffRequest:
+                return SignOff(clientInfo, signOffRequest);
+
+            case ReconnectRequest reconnectRequest:
+                return Reconnect(clientInfo, reconnectRequest);
+
+            case SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest:
+                return SubscribeToChangingPartitions(subscribeToChangingPartitionsRequest, clientInfo);
+
+            case SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest:
+                return SubscribeToPartitionContents(subscribeToPartitionContentsRequest, clientInfo);
+
+            case UnsubscribeFromPartitionContentsRequest unsubscribeFromPartitionContentsRequest:
+                return UnsubscribeFromPartitionContents(unsubscribeFromPartitionContentsRequest, clientInfo);
+
+            default:
+                Log(
+                    $"ignoring received query: {request.GetType()}({request.InternalParticipationId})");
+                return null;
+        }
+    }
+
+    private IDeltaQueryResponse GetAvailableIds(GetAvailableIdsRequest idsRequest) =>
+        new GetAvailableIdsResponse(GetFreeNodeIds(idsRequest.count).ToArray(), idsRequest.QueryId, null);
+
+    private IDeltaQueryResponse ListPartitions(ListPartitionsRequest listPartitionsRequest)
+    {
+        DeltaSerializationChunk chunk = Serialize(_forest.Partitions);
+        return new ListPartitionsResponse(chunk, listPartitionsRequest.QueryId, null);
+    }
+
+    private IDeltaQueryResponse SignOn(IClientInfo clientInfo, SignOnRequest signOnRequest)
+    {
+        if (clientInfo.SignedOn)
+            return DeltaErrorCode.AlreadySignedOn.AsErrorResponse(signOnRequest.QueryId, null);
+
+        clientInfo.SignedOn = true;
+        clientInfo.ClientId = signOnRequest.ClientId;
+        clientInfo.ParticipationId = _participationIdProvider.Create();
+        return new SignOnResponse(clientInfo.ParticipationId, signOnRequest.QueryId, null);
+    }
+
+    private IDeltaQueryResponse SignOff(IClientInfo clientInfo, SignOffRequest signOffRequest)
+    {
+        if (!clientInfo.SignedOn)
+            return DeltaErrorCode.NotSignedOn.AsErrorResponse(signOffRequest.QueryId, null);
+
+        clientInfo.SignedOn = false;
+        return new SignOffResponse(signOffRequest.QueryId, null);
+    }
+
+    private IDeltaQueryResponse Reconnect(IClientInfo clientInfo, ReconnectRequest reconnectRequest)
+    {
+        if (clientInfo.SignedOn)
+            return DeltaErrorCode.AlreadySignedOn.AsErrorResponse(reconnectRequest.QueryId, null);
+
+        if (clientInfo.SequenceNumber != reconnectRequest.LastReceivedSequenceNumber)
+            return DeltaErrorCode.NotCurrentSequenceNumber.AsErrorResponse(reconnectRequest.QueryId, null,
+                clientInfo.SequenceNumber, reconnectRequest.LastReceivedSequenceNumber);
+
+        var response = new ReconnectResponse(clientInfo.SequenceNumber, reconnectRequest.QueryId, null);
+        clientInfo.SignedOn = true;
+        return response;
+    }
+
+    private IDeltaQueryResponse SubscribeToChangingPartitions(
+        SubscribeToChangingPartitionsRequest subscribeToChangingPartitionsRequest, IClientInfo clientInfo)
+    {
+        clientInfo.NotifyAboutParitionCreation = subscribeToChangingPartitionsRequest.Creation;
+        clientInfo.NotifyAboutParitionDeletion = subscribeToChangingPartitionsRequest.Deletion;
+        clientInfo.SubscribeCreatedParitions = subscribeToChangingPartitionsRequest.Partitions;
+
+        return new SubscribeToChangingPartitionsResponse(subscribeToChangingPartitionsRequest.QueryId, null);
+    }
+
+    private IDeltaQueryResponse SubscribeToPartitionContents(
+        SubscribeToPartitionContentsRequest subscribeToPartitionContentsRequest, IClientInfo clientInfo)
+    {
+        if (clientInfo.SubscribedPartitions.Add(subscribeToPartitionContentsRequest.Partition) &&
+            SharedNodeMap.TryGetPartition(subscribeToPartitionContentsRequest.Partition, out var partition))
+        {
+            return new SubscribeToPartitionContentsResponse(
+                Serialize(M1Extensions.Descendants<IReadableNode>(partition, true, true)),
+                subscribeToPartitionContentsRequest.QueryId, null);
+        }
+
+        return DeltaErrorCode.UnknownPartition.AsErrorResponse(subscribeToPartitionContentsRequest.QueryId, null,
+            subscribeToPartitionContentsRequest.Partition);
+    }
+
+
+    private IDeltaQueryResponse UnsubscribeFromPartitionContents(
+        UnsubscribeFromPartitionContentsRequest unsubscribeFromPartitionContentsRequest, IClientInfo clientInfo)
+    {
+        if (clientInfo.SubscribedPartitions.Remove(unsubscribeFromPartitionContentsRequest.Partition))
+            return new UnsubscribeFromPartitionContentsResponse(unsubscribeFromPartitionContentsRequest.QueryId,
+                null);
+
+        return DeltaErrorCode.NotSubscribed.AsErrorResponse(unsubscribeFromPartitionContentsRequest.QueryId, null, unsubscribeFromPartitionContentsRequest.Partition);
     }
 
     #endregion
@@ -130,12 +265,24 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     {
         try
         {
+            HashSet<NodeId> affectedPartitions = [];
+
             switch (deltaContent)
             {
                 case IDeltaEvent deltaEvent:
                     var commandSource = deltaEvent is { OriginCommands: { } cmds }
                         ? cmds.First()
                         : null;
+
+                    foreach (var affectedNode in deltaEvent.AffectedNodes)
+                    {
+                        if (SharedNodeMap.TryGetPartition(affectedNode, out var partition))
+                            affectedPartitions.Add(partition.GetId());
+                    }
+
+                    if (deltaEvent is PartitionDeleted d)
+                        affectedPartitions.Add(d.DeletedPartition);
+
                     Log(
                         $"sending event: {deltaEvent.GetType().Name}({commandSource},{deltaEvent.SequenceNumber})",
                         true);
@@ -146,7 +293,7 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
                     break;
             }
 
-            await _connector.SendToAllClients(deltaContent);
+            await _connector.SendToAllClients(deltaContent, affectedPartitions);
         } catch (Exception e)
         {
             Log(e.ToString());
@@ -155,14 +302,11 @@ public class LionWebRepository : LionWebRepositoryBase<IDeltaContent>
     }
 
     #endregion
-}
 
-public class ExceptionParticipationIdProvider : IParticipationIdProvider
-{
-    private int _nextParticipationId = 1000;
-
-    /// <inheritdoc />
-    public string ParticipationId =>
-        // $"participationId{++_nextParticipationId}";
-        throw new NotImplementedException();
+    private DeltaSerializationChunk Serialize(IEnumerable<IReadableNode> nodes)
+    {
+        var serializer = _serializerBuilder.Build();
+        var chunk = new DeltaSerializationChunk(serializer.Serialize(nodes).ToArray());
+        return chunk;
+    }
 }

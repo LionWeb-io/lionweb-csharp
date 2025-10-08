@@ -78,7 +78,7 @@ public class Forest : IForest
 
     private void ProducePartitionAddedNotification(INotificationId? notificationId, IPartitionInstance partition) =>
         GetNotificationProducer()?.ProduceNotification(new PartitionAddedNotification(partition,
-            notificationId ?? _notificationIdProvider.CreateNotificationId()));
+            notificationId ?? _notificationIdProvider.Create()));
 
     private void ConnectToPartition(IPartitionInstance partition)
     {
@@ -103,7 +103,7 @@ public class Forest : IForest
 
     private void ProducePartitionDeletedNotification(INotificationId? notificationId, IPartitionInstance partition) =>
         GetNotificationProducer()?.ProduceNotification(new PartitionDeletedNotification(partition,
-            notificationId ?? _notificationIdProvider.CreateNotificationId()));
+            notificationId ?? _notificationIdProvider.Create()));
 
     private void UnsubscribeFromPartition(IPartitionInstance partition)
     {
@@ -162,4 +162,12 @@ public class Forest : IForest
             target.ProduceNotification(correspondingSender, notification);
         }
     }
+}
+
+public static class ForestExtensions
+{
+    public static IEnumerable<IReadableNode> Descendants(this IForest forest, bool includeAnnotations = true) =>
+        forest
+            .Partitions
+            .SelectMany(p => M1Extensions.Descendants(p, true, includeAnnotations));
 }

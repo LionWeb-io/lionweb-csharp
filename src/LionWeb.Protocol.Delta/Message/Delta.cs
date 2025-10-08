@@ -154,6 +154,12 @@ public record ProtocolMessageData(MessageDataKey Key, string Value)
     }
 }
 
+public interface IDeltaError
+{
+    ErrorCode ErrorCode { get; }
+    string Message { get; }
+}
+
 public interface IDeltaContent
 {
     ProtocolMessage[]? ProtocolMessages { get; }

@@ -32,6 +32,9 @@ public interface IDeltaEvent : IDeltaContent
     EventSequenceNumber SequenceNumber { get; set; }
 
     CommandSource[]? OriginCommands { get; }
+    
+    [JsonIgnore]
+    HashSet<TargetNode> AffectedNodes { get; }
 }
 
 public abstract record DeltaEventBase(
@@ -47,6 +50,10 @@ public abstract record DeltaEventBase(
 
     /// <inheritdoc />
     public virtual CommandSource[]? OriginCommands { get; init; } = OriginCommands;
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public abstract HashSet<TargetNode> AffectedNodes { get; }
 
     /// <inheritdoc />
     public virtual bool Equals(DeltaEventBase? other)
@@ -107,6 +114,10 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
     /// <inheritdoc />
     [JsonIgnore]
     public override string Id => string.Join("--", Parts.Select(e => e.Id));
+
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<TargetNode> AffectedNodes => [];
 
     public IDeltaEvent[] Parts { get; init; }
 
@@ -174,12 +185,22 @@ public record CompositeEvent : DeltaEventBase, IDeltaEvent
 
 public record NoOpEvent(
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<TargetNode> AffectedNodes => [];
+}
 
 public record Error(
     ErrorCode ErrorCode,
     string Message,
     CommandSource[]? OriginCommands,
-    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent;
+    ProtocolMessage[]? ProtocolMessages) : DeltaEventBase(OriginCommands, ProtocolMessages), IDeltaEvent, IDeltaError
+{
+    /// <inheritdoc />
+    [JsonIgnore]
+    public override HashSet<TargetNode> AffectedNodes => [];
+}
 
 #endregion

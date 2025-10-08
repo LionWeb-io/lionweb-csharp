@@ -17,7 +17,6 @@
 
 namespace LionWeb.Protocol.Delta.Test.Pipe;
 
-using Client;
 using Core;
 using Core.M1;
 using Core.M3;
@@ -26,6 +25,7 @@ using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Notification;
+using Delta.Client;
 
 [TestClass]
 public class NotificationsTestSerialized : NotificationTestsBase, IReplicatorCreator
@@ -48,21 +48,22 @@ public class NotificationsTestSerialized : NotificationTestsBase, IReplicatorCre
 
         var cloneForest = new Forest();
         cloneForest.AddPartitions([clone]);
-        
+
         var replicator = ForestReplicator.Create(cloneForest, sharedNodeMap, "cloneReplicator");
 
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder
-        );
-        
+            deserializerBuilder, "clone");
+
         eventReceiver.ConnectTo(replicator);
 
         var commandToEventMapper = new DeltaCommandToDeltaEventMapper("myParticipation", sharedNodeMap);
         node.GetNotificationSender()?.Subscribe<IPartitionNotification>((sender, partitionNotification) =>
         {
-            var deltaCommand = new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion).Map(partitionNotification);
+            var deltaCommand =
+                new NotificationToDeltaCommandMapper(new CommandIdProvider(), lionWebVersion)
+                    .Map(partitionNotification);
             eventReceiver.Receive(commandToEventMapper.Map(deltaCommand));
         });
 

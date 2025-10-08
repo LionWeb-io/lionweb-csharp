@@ -307,8 +307,3 @@ public class NotificationToDeltaCommandMapper
             _ => _commandIdProvider.Create()
         };
 }
-
-public interface ICommandIdProvider
-{
-    CommandId Create();
-}

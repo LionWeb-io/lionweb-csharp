@@ -17,7 +17,6 @@
 
 namespace LionWeb.Protocol.Delta.Test.Pipe;
 
-using Client;
 using Core;
 using Core.M1;
 using Core.M3;
@@ -26,6 +25,7 @@ using Core.Notification.Forest;
 using Core.Notification.Partition;
 using Core.Test.Languages.Generated.V2024_1.Shapes.M2;
 using Core.Test.Notification;
+using Delta.Client;
 using Message.Command;
 
 [TestClass]
@@ -55,8 +55,7 @@ public class NotificationsTestJson : NotificationTestsBase, IReplicatorCreator
         var eventReceiver = new DeltaProtocolEventReceiver(
             sharedNodeMap,
             sharedKeyedMap,
-            deserializerBuilder
-        );
+            deserializerBuilder, "clone");
         
         eventReceiver.ConnectTo(replicator);
 
